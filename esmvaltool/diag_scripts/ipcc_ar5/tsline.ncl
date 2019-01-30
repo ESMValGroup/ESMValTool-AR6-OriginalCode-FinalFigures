@@ -18,6 +18,7 @@
 ;                average
 ;    ref_start: start year of reference period for anomalies
 ;    ref_end: end year of reference period for anomalies
+;    ref_value: if true, right panel with mean values is attached
 ;    plot_units: variable unit for plotting
 ;
 ; Caveats
@@ -98,6 +99,7 @@ begin
   ; Set default values for non-required diag_script_info attributes
   set_default_att(diag_script_info, "time_avg", "monthly")
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
+  set_default_att(diag_script_info, "ref_value", False)
 
   ; Determine time range
   start_year = min(metadata_att_as_array(info_items, "start_year"))
@@ -120,19 +122,13 @@ begin
   end if
   end if
 
+  ; get multi-model mean index
+  mm_ind = ind(datasetnames .eq. "MultiModelMean")
+
   ; Set index of the reference (and alternative) dataset
   if (isatt(variable_info[0], "reference_dataset")) then
     ref_ind = ind(datasetnames.eq.variable_info[0]@reference_dataset)
     A_ref = read_data(info_items[ref_ind])
-  end if
-
-  ; individual case for HadCRUT4 observations
-  ; FIX-ME: mean value comes from climatology file (absolute.nc).
-  ; There are no missing values as in the anomaly data.
-  clim_ind = -1
-  if (any(datasetnames.eq."HadCRUT4-clim")) then
-    clim_ind = ind(datasetnames.eq."HadCRUT4-clim")
-    ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
   end if
 
   ; Anomaly
@@ -157,9 +153,24 @@ begin
       anom_ref = new((/dim_MOD/), double)
       anom_ref!0 = "model"
       anom_ref&model = datasetnames
+      anom_ref = 0.
     end if
   else
     anom = "noanom"
+  end if
+
+  ; if true, right panel with mean values is attached
+  if (isatt(diag_script_info, "ref_value")) then
+    ref_value = diag_script_info@ref_value
+  end if
+
+  ; individual case for HadCRUT4 observations
+  ; FIX-ME: mean value comes from climatology file (absolute.nc).
+  ; There are no missing values as in the anomaly data.
+  clim_ind = -1
+  if (ref_value .and. any(datasetnames.eq."HadCRUT4-clim")) then
+    clim_ind = ind(datasetnames.eq."HadCRUT4-clim")
+    ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
   end if
 
   ; TODO
@@ -172,7 +183,7 @@ begin
   model_arr&model = datasetnames
   model_arr&time = time
   delete(time)
-  delete(ntime)
+;  delete(ntime)
 
   ; Loop over models
   do imod = 0, dim_MOD - 1
@@ -224,8 +235,10 @@ begin
             end do
           end if
 
-          anom_ref(imod) = area_operations(A0_timavg_ref, -90., 90., \
+          if (ref_value.eq.True)
+            anom_ref(imod) = area_operations(A0_timavg_ref, -90., 90., \
                                            0., 360., "average", True)
+          end if
           delete(A0_timavg_ref)
 
         end if
@@ -305,10 +318,28 @@ begin
 
   end do
 
+  ; calculate 5 and 95% quantile
+  if (clim_ind .ne. -1) then
+    ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset .and. \
+                  datasetnames.ne."HadCRUT4-clim")
+  else
+    ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset)
+  end if
+
+print(datasetnames)
+print(ind_mod)
+  quant_5  = new((/ntime/), double)
+  quant_95 = new((/ntime/), double)
+  do i = 0, ntime-1
+    statb = stat_dispersion(model_arr(ind_mod,i), False)
+    quant_5(i)  = statb(24)
+    quant_95(i) = statb(25)
+  end do
+
   ; individual case for HadCRUT4 observations
   ; FIX-ME: mean value comes from climatology file (absolute.nc).
   ; There are no missing values as in the anomaly data.
-  if (any(datasetnames.eq."HadCRUT4-clim")) then
+  if (ref_value .and. any(datasetnames.eq."HadCRUT4-clim")) then
     ; Read data
     A0 = read_data(info_items[clim_ind])
     dnames = getVarDimNames(A0)
@@ -318,20 +349,22 @@ begin
       A0 = convert_units(A0, diag_script_info@plot_units)
     end if
 
-    A0_timavg_clim = time_operations(A0, 1990, 1990, "average", \
-                                     "annualclim", True)
-    clim_ref = area_operations(A0_timavg_clim, -90., 90., 0., 360., \
-                               "average", True)
-    anom_ref(ref_ind) = clim_ref
+    if (ref_value.eq.True)
+      A0_timavg_clim = time_operations(A0, 1990, 1990, "average", \
+                                       "annualclim", True)
+      clim_ref = area_operations(A0_timavg_clim, -90., 90., 0., 360., \
+                                 "average", True)
+      anom_ref(ref_ind) = clim_ref
 
-    tmp = model_arr(ind_wo_clim, :)
-    delete(model_arr)
-    model_arr = tmp
-    delete(tmp)
-    tmp = anom_ref(ind_wo_clim)
-    delete(anom_ref)
-    anom_ref = tmp
-    delete(tmp)
+      tmp = model_arr(ind_wo_clim, :)
+      delete(model_arr)
+      model_arr = tmp
+      delete(tmp)
+      tmp = anom_ref(ind_wo_clim)
+      delete(anom_ref)
+      anom_ref = tmp
+      delete(tmp)
+    end if
   end if
 
   ; Convert time coordinate to years (required by the plot routine)

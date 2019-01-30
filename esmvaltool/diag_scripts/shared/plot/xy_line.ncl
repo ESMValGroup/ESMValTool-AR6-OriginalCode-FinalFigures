@@ -1884,21 +1884,8 @@ begin
 
   copy_VarMeta(res_in, res)  ; copy passed resources
 
-  ; ***************************************
-  ; panel first two plots
-  ; ***************************************
-
   plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
 
-  ; Add right panel with mean values in anomaly plot
-
-  var = fspan(0., 2., 3)
-  mean = new((/dimsizes(source_mean), 3/), double)
-  mean(:, 0) = source_mean(:)
-  mean(:, 1) = source_mean(:)
-  mean(:, 2) = source_mean(:)
-
-  plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
 
   ; ---------------------------------------------------------------------
   ; Procedure to attach a box to the given plot, given the lower left
@@ -1921,7 +1908,25 @@ begin
   xx = (/res@trXMinF, res@trXMaxF/)
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
-  newplot = gsn_attach_plots(plot(0), plot2, res, res0)
+
+  ; -------------------------------------------------
+  ; Add right panel with mean values in anomaly plot
+  ; -------------------------------------------------
+
+  if (any(source_mean.ne.0.)) then
+
+    var = fspan(0., 2., 3)
+    mean = new((/dimsizes(source_mean), 3/), double)
+    mean(:, 0) = source_mean(:)
+    mean(:, 1) = source_mean(:)
+    mean(:, 2) = source_mean(:)
+
+    plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
+
+    newplot = gsn_attach_plots(plot(0), plot2, res, res0)
+
+  end if
+
 
   ; ***********************************************
   ; legend resources
