@@ -9,9 +9,9 @@ documentation:
   authors:
     - bock_ls
 
-  maintainer:
+#  maintainer:
     
-  references:
+#  references:
 
   projects:
     - ipcc_ar6
@@ -235,6 +235,7 @@ diagnostics:
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading: &grading_settings
+        script: perfmetrics/main.ncl
         # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon')
         plot_type: cycle_latlon
         # Time average ('opt' argument of time_operations.ncl)
@@ -243,10 +244,6 @@ diagnostics:
         region: Global
         # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
         plot_stddev: ref_model
-        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
-        plot_stddev: ref_model
-        # Plot legend in a separate file
-        legend_outside: true
         # Draw plots
         draw_plots: false
         # Calculate grading
@@ -1610,10 +1607,10 @@ diagnostics:
 
   fig_3_3_1_a:
     description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
-    references:
-      - flato13ipcco
-    authors:
-      - righ_ma
+    #references:
+    #  - flato13ipcco
+    #authors:
+    #  - righ_ma
     variables:
       tas:
         preprocessor: clim
@@ -1689,8 +1686,8 @@ diagnostics:
 
   fig_3_3_1_b:
     description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
-    references:
-      - flato13ipcc
+    #references:
+    #  - flato13ipcc
     variables:
       tas:
         preprocessor: clim_ref   
