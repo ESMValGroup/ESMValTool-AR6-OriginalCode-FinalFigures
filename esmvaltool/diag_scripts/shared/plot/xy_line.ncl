@@ -1472,7 +1472,7 @@ undef("xy_line")
 procedure xy_line(wks[1],
                   source,
                   source_x,
-                  source_stddev,
+                  source_stat,
                   res_in:logical,
                   items:list)
 ;
@@ -1480,7 +1480,7 @@ procedure xy_line(wks[1],
 ;    wks: workstation, must be passed - no default used yet!
 ;    source: data to be plotted (no netCDF input possible yet)
 ;    source_x: x-axis of array to be plotted (e.g. source&time, ... )
-;    source_stddev: standard deviation of input, needed for multi_model_mean
+;    source_stat: statistics of multi_model_mean, e.g. 5 and 95% quantile or stddev
 ;    res_in: diag_script-specific resources passed from diag_script
 ;    items: list of input_file_info metadata
 ;
@@ -1498,8 +1498,8 @@ procedure xy_line(wks[1],
 ;    20150511_A_senf_da: modified legend
 ;    20140109-A_senf_da: written.
 ;
-local funcname, scriptname, res, res_in, res_stddev, source, source_x, \
-  source_stddev, wks, wks_in, colors, colors_mm, dashes, dashes_mm, thicks, \
+local funcname, scriptname, res, res_in, res_stat, source, source_x, \
+  source_stat, wks, wks_in, colors, colors_mm, dashes, dashes_mm, thicks, \
   thicks_mm, annots, annots_mm, avgstd, avgstd_mm, temp, plot, \
   shading_plot, mm, lgres, nitems, lbid, amres, annoid, labels, lg_outfile, \
   psres, vpx, vph, vpy, vpw, bpres, tmborder
@@ -1566,6 +1566,19 @@ begin
 
   ; Plot
   plot = gsn_csm_xy(wks, source_x, source, res)
+
+  ; Add multi model statistics (5% and 95% quantile)
+  ;if () then
+    res_stat = True
+    copy_VarMeta(res, res_stat)
+    res_stat@gsnXYFillColors = "LightGrey"
+    delete(res_stat@xyLineColors)
+    ; We don't want the line, so make it transparent.
+    res_stat@xyLineColor = -1
+    shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, :), \
+                              res_stat)
+    overlay(plot, shading_plot)
+  ;end if
 
   ; ; Add multi model mean and stddev
   ; if (diag_script_info@multi_model_mean .eq. "y") then
@@ -1729,7 +1742,7 @@ procedure xy_line_anom(wks[1],
                        source_mean,
                        source,
                        source_x,
-                       source_stddev,
+                       source_stat,
                        ref_start,
                        ref_end,
                        res_in: logical,
@@ -1741,7 +1754,7 @@ procedure xy_line_anom(wks[1],
 ;    source_mean:   source_mean
 ;    source:        data to be plotted (no netCDF input possible yet)
 ;    source_x:      x-axis of array to be plotted (e.g. source&time, ... )
-;    source_stddev: standard deviation of input, needed multi_model_mean
+;    source_stat: statistics of multi_model_mean, e.g. 5 and 95% quantile or stddev
 ;    ref_start:     start year of the reference dataset
 ;    ref_end:       end year of the reference dataset
 ;    res_in:        diag_script-specific resources passed from diag_script
@@ -1762,8 +1775,8 @@ procedure xy_line_anom(wks[1],
 ;    20160822_A_bock_li: written
 ;
 
-local funcname, scriptname, verbosity, res, res_in, res_stddev, source, \
-    source_x, source_stddev, wks, wks_in, colors, colors_mm, dashes, \
+local funcname, scriptname, verbosity, res, res_in, res_stat, source, \
+    source_x, source_stat, wks, wks_in, colors, colors_mm, dashes, \
     dashes_mm, thicks, thicks_mm, annots, annots_mm, avgstd, avgstd_mm, temp, \
     plot, shading_plot, mm, lgres, nitems, lbid, amres, annoid, labels, \
     psres, vpx, vph, vpy, vpw, bpres, tmborder
@@ -1908,6 +1921,21 @@ begin
   xx = (/res@trXMinF, res@trXMaxF/)
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
+
+  ; Add multi model statistics (5% and 95% quantile)
+  if (isatt(diag_script_info, "stat_shading")) then
+    if (diag_script_info@stat_shading .ne. False) then
+      res_stat = True
+      copy_VarMeta(res, res_stat)
+      res_stat@gsnXYFillColors = "LightGrey"
+      delete(res_stat@xyLineColors)
+      ; We don't want the line, so make it transparent.
+      res_stat@xyLineColor = -1
+      shading_plot = gsn_csm_xy(wks, source_x, source_stat(1:2, :), \
+                                res_stat)
+      overlay(plot(0), shading_plot)
+    end if
+  end if
 
   ; -------------------------------------------------
   ; Add right panel with mean values in anomaly plot

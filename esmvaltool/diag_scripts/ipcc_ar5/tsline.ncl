@@ -123,7 +123,7 @@ begin
   end if
 
   ; get multi-model mean index
-  mm_ind = ind(datasetnames .eq. "MultiModelMean")
+  mmm_ind = ind(datasetnames .eq. "MultiModelMean")
 
   ; Set index of the reference (and alternative) dataset
   if (isatt(variable_info[0], "reference_dataset")) then
@@ -173,17 +173,19 @@ begin
     ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
   end if
 
-  ; TODO
-  model_arr_stddev = 0
-
   ; Create model array
   model_arr = new((/dim_MOD, ntime/), double)
   model_arr!0 = "model"
   model_arr!1 = "time"
   model_arr&model = datasetnames
   model_arr&time = time
+
+  model_arr_stat = new((/3, ntime/), double)
+  model_arr_stat!0 = "stat"
+  model_arr_stat!1 = "time"
+  model_arr_stat&time = time
   delete(time)
-;  delete(ntime)
+  model_arr_stat = 0.
 
   ; Loop over models
   do imod = 0, dim_MOD - 1
@@ -318,7 +320,7 @@ begin
 
   end do
 
-  ; calculate 5 and 95% quantile
+  ; calculate multi model statistics
   if (clim_ind .ne. -1) then
     ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset .and. \
                   datasetnames.ne."HadCRUT4-clim")
@@ -326,14 +328,21 @@ begin
     ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset)
   end if
 
-print(datasetnames)
-print(ind_mod)
-  quant_5  = new((/ntime/), double)
-  quant_95 = new((/ntime/), double)
+  model_arr_stat&stat = (/"mean","min","max"/)
+
+printVarSummary(model_arr)
+printVarSummary(model_arr_stat)
+  model_arr_stat(0,:) = (/model_arr(mmm_ind,:)/)
   do i = 0, ntime-1
     statb = stat_dispersion(model_arr(ind_mod,i), False)
-    quant_5(i)  = statb(24)
-    quant_95(i) = statb(25)
+    ; 5% quantile
+    ; model_arr_stat(0,i) = statb(24)
+    ; min
+    model_arr_stat(1,i) = (/statb(2)/)
+    ; 95% quantile
+    ; model_arr_stat(0,i) = statb(25)
+    ; max
+    model_arr_stat(2,i) = (/statb(14)/)
   end do
 
   ; individual case for HadCRUT4 observations
@@ -393,12 +402,19 @@ print(ind_mod)
   if (config_user_info@write_netcdf.eq."True") then
     out_path = config_user_info@work_dir
     system("mkdir -p " + out_path)
-    out_path = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + "_" \
+    out_path1 = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + "_" \
       + start_year + "-" + end_year + ".nc"
     model_arr@ncdf = out_path
     model_arr@diag_script = DIAG_SCRIPT
     model_arr@var = var0
-    ncdf_outfile = ncdf_write(model_arr, out_path)
+    ncdf_outfile = ncdf_write(model_arr, out_path1)
+    ; statistics
+    out_path2 = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + "_" \
+      + "mm_stat_" + start_year + "-" + end_year + ".nc"
+    model_arr_stat@ncdf = out_path
+    model_arr_stat@diag_script = DIAG_SCRIPT
+    model_arr_stat@var = var0
+    ncdf_outfile = ncdf_write(model_arr_stat, out_path2)
   end if
 
   ; Define workstation
@@ -442,9 +458,9 @@ print(ind_mod)
 
   if(anom .eq. "anom") then
     xy_line_anom(wks, anom_ref, model_arr, model_arr&time, \
-                 model_arr_stddev, ref_start, ref_end, res, res0, info_items)
+                 model_arr_stat, ref_start, ref_end, res, res0, info_items)
   else
-    xy_line(wks, model_arr, model_arr&time, model_arr_stddev, res, info_items)
+    xy_line(wks, model_arr, model_arr&time, model_arr_stat, res, info_items)
   end if
 
   log_info(" wrote " + outfile + "." + file_type)
