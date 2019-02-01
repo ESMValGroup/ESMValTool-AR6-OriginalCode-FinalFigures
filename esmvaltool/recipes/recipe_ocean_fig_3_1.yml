@@ -39,12 +39,28 @@ preprocessors:
   # --------------------------------------------------
   # Transects preprocessors
   # --------------------------------------------------
-  prep_transect: # For extracting a transect
+  prep_transect_AMT: # For extracting a transect
     time_average:
     extract_transect: # Atlantic Meridional Transect
       latitude: [-50.,50.]
       longitude: 332.
 
+  prep_transect: # For extracting a transect
+    custom_order: true
+    time_average:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    zonal_means:
+      coordinate: longitude
+      mean_type: mean
+    extract_levels:
+      #levels: [-1, -40, -80, -120, -160, -200, -240, -280, -320, -360, -400, -440, -480, -520, -560, -600, -640, -680, -720, -760, -800, -840, -880, -920, -960, -1000, -1200, -1400, -1600, -1800, -2000, -2200, -2400, -2600, -2800, -3000, -3200, -3400, -3600, -3800, -4000, -4200, -4400, -4600, -4800, -5000, -5200, -5400, -5600, -5800]
+      levels: [0.1, 0.5, 1, 10, 20, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680, 720, 760, 800, 840, 880, 920, 960, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600, 3800, 4000, 4200, 4400, 4600, 4800, 5000, 5200, 5400, 5600, 5800]
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean ]
 
 
 diagnostics:
@@ -66,3 +82,4 @@ diagnostics:
     scripts:
       Regional_Ocean_DepthLayers_regrid_transect:
         script: ocean/diagnostic_fig_3_1.py
+        observational_dataset: {dataset: WOA, project: obs4mips,}

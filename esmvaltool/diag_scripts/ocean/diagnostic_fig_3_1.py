@@ -130,6 +130,7 @@ def make_depth_safe(cube):
 
     depth_points = []
     bad_points = depth.points <= 0.
+    print('depth points:', depth.points)
     for itr, point in enumerate(depth.points):
         if bad_points[itr]:
             depth_points.append(depth.bounds[itr, :].mean())
@@ -196,6 +197,7 @@ def make_transects_plots(
         cfg,
         metadata,
         filename,
+        obs_filename,
 ):
     """
     Make a simple plot of the transect for an indivudual model.
@@ -212,6 +214,8 @@ def make_transects_plots(
         The metadata dictionairy for a specific model.
     filename: str
         The preprocessed model file.
+    obs_filename: str
+        Observartional filename
 
     """
     # Load cube and set up units
@@ -221,52 +225,63 @@ def make_transects_plots(
     cube = make_depth_safe(cube)
     cubes = make_cube_region_dict(cube)
 
-    obs_key = 'observational_dataset'
-    obs_filename = ''
-    obs_metadata = {}
-    if obs_key in cfg:
-        obs_filename = diagtools.match_model_to_key(obs_key,
-                                                    cfg[obs_key],
-                                                    metadatas)
-        obs_metadata = metadatas[obs_filename]
-        obs_filename = obs_metadata['dataset']
+    print(obs_filename)
+    obs_cube = iris.load_cube(obs_filename)
+    obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
 
-        obs_cube = iris.load_cube(obs_filename)
-        obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
-        obs_cube = obs_cube.collapsed('time', iris.analysis.MEAN)
-
+    if metadata['long_name'] == 'Sea Water Potential Temperature':
+        contours = [0,5,  10, 15, 20, 25,30,35]
+        diff_contours = [-3., -2, -1, 1, 2, 3]
+    if metadata['long_name'] == 'Sea Water Salinity':
+        contours = [30, 31, 32, 33, 34, 35, 36 ]
+        diff_contours = [ -1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1 ]
     for region, cube in cubes.items():
-
-
-        if region:
-            region_title = region
-        else:
-            region_title = determine_transect_str(cube, region)
-
         # Add title to plot
         title = ' '.join(
-            [metadata['dataset'], metadata['long_name'], region_title])
+            [metadata['dataset'], metadata['long_name']])
 
         title = titlify(title)
+
+        cube = cube - obs_cube
+
+        cmap = 'seismic'
+        colour_range = diagtools.get_cube_range_diff([cube,])
 
         #f, (ax1, ax2,) = plt.subplots(2, sharex=True, sharey=False)
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
-        iris.plot.contourf(cube, 15, )#linewidth=0, rasterized=True)
+        iris.plot.contourf(cube, 15, cmap=cmap, )#vmin=colour_range[0], vmax=colour_range[1] )
         plt.ylim(1000, 0)
+        plt.clim(colour_range)
         plt.title(title)
         plt.setp(ax1.get_xticklabels(), visible=False)
         plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
 
+        CS = iris.plot.contour(obs_cube, contours, colors='k' )
+        ax1.clabel(CS, CS.levels, inline=True, fontsize=10)
+
+        CS_diff = iris.plot.contour(cube, diff_contours, colors='white' )
+        ax1.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10)
 
         ax2 = fig.add_subplot(212)
-        iris.plot.contourf(cube, 15, )# linewidth=0, rasterized=True)
-        plt.ylim(6000, 1000)
+        iris.plot.contourf(cube, 14, cmap=cmap, )#vmin=colour_range[0], vmax=colour_range[1] )
+        plt.ylim(5000, 1000)
+        plt.clim(colour_range)
+
         locs, labels = plt.yticks()
-        ax2.set_yticks([2000, 3000, 4000, 5000, 6000])
+        ax2.set_yticks([2000, 3000, 4000, 5000,])
+        plt.colorbar(orientation='horizontal')
+        plt.clim(colour_range)
+
+        CS = iris.plot.contour(obs_cube, contours, colors='k' )
+        ax2.clabel(CS, CS.levels, inline=True, fontsize=10)
+
+        CS_diff = iris.plot.contour(cube, diff_contours, colors='white' )
+        ax2.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10)
 
         fig.subplots_adjust(hspace=0.01)
-        plt.colorbar(orientation='horizontal')
+
+
         #plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
 
 
@@ -327,6 +342,12 @@ def main(cfg):
         )
 
         metadatas = diagtools.get_input_files(cfg, index=index)
+        obs_key = 'observational_dataset'
+        obs_filename = ''
+        obs_metadata = {}
+        obs_filename = diagtools.match_model_to_key(obs_key,
+                                          cfg[obs_key],
+                                        metadatas)
 
         for filename in sorted(metadatas):
 
@@ -338,7 +359,7 @@ def main(cfg):
 
             ######
             # Time series of individual model
-            make_transects_plots(cfg, metadatas[filename], filename)
+            make_transects_plots(cfg, metadatas[filename], filename, obs_filename)
 
 
     logger.info('Success')
