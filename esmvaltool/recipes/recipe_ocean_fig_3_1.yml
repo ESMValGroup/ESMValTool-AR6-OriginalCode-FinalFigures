@@ -1,0 +1,68 @@
+# ESMValTool
+# recipe_OceanPhysics.yml
+---
+documentation:
+  description: |
+    Recipe to demonstrate several simple plots based on the monthly ocean
+    temperature. Please use this file as a template for adding additional
+    fields into the ocean. This work based on the BGC-val toolkit GMD-2018-103.
+
+  authors:
+    - demo_le
+
+  maintainer:
+    - schl_ma
+
+  references:
+    - demora2018gmd
+
+  projects:
+    - ukesm
+
+
+datasets:
+  # working datasets
+  # - {dataset: CanESM2, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: GISS-E2-H, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: HadGEM2-AO, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: HadCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: CanCM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: CSIRO-Mk3-6-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+
+  # Problem with latitude > 90.
+  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+
+
+
+preprocessors:
+  # --------------------------------------------------
+  # Transects preprocessors
+  # --------------------------------------------------
+  prep_transect: # For extracting a transect
+    time_average:
+    extract_transect: # Atlantic Meridional Transect
+      latitude: [-50.,50.]
+      longitude: 332.
+
+
+
+diagnostics:
+   # --------------------------------------------------
+  # Transects diagnostics
+  # --------------------------------------------------
+  diag_transect:
+    description: Extracting along a trajectory
+    variables:
+      thetao: # Temperature ocean 3D
+        preprocessor: prep_transect
+        field: TO3M
+      so: # Salinity ocean 3D
+        preprocessor: prep_transect
+        field: TO3M
+    additional_datasets:
+      # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
+        - {dataset: WOA,  project: obs4mips,  level: L3,  version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+    scripts:
+      Regional_Ocean_DepthLayers_regrid_transect:
+        script: ocean/diagnostic_fig_3_1.py
