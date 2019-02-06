@@ -101,8 +101,8 @@ begin
   ;data_all&experiments = diag_script_info@experiments
   dim_ref = (/dimsizes(diag_script_info@ref), ntime/)
   data_ref = new(dim_ref, double)
-  data_ref!0 = "models"
-  data_ref&models = diag_script_info@ref
+  ;data_ref!0 = "models"
+  ;data_ref&models = diag_script_info@ref
 
   ; Anomaly
   if (isatt(diag_script_info, "ts_anomaly")) then
@@ -149,21 +149,6 @@ begin
 
     data_temp = ncdf_read(input_files(ii), "tas")
 
-    ;; Create array for collecting all datasets
-    ;if (.not.isdefined("data_all")) then
-    ;  ;dim_temp = dimsizes(data_temp&time)
-    ;  ;dim_data = (/dimsizes(input_files), 3, dim_temp/)
-    ;  ;data_all = new(dim_data, double)
-    ;  data_all(0, :, :) = data_temp
-    ;  ;data_all!0 = "experiments"
-    ;  ;data_all&experiments = diag_script_info@experiments
-    ;end if
-
-    ;; Append data
-    ;data_all(ii, :, :) = (/data_temp/)
-
-printVarSummary(data_all)
-printVarSummary(data_temp)
     if (ii.eq.0) then
       data_all(0:2, :) = data_temp
     else
@@ -183,36 +168,73 @@ printVarSummary(data_temp)
                     "tsline_" + anom + "_" + detr + ".nc"
   input_files_ref := tostring(input_files_ref)
 
-print("input_files_ref = " + input_files_ref)
-print("ind(isfilepresent(input_files_ref)) = " + ind(isfilepresent(input_files_ref)))
-
   ; Filter out non-existing files
   input_files_ref := input_files_ref(ind(isfilepresent(input_files_ref)))
 
-  ; ; Loop over files in the list, read and append data
-  ; do ii = 0, dimsizes(input_files_ref) - 1
-
   data_temp = ncdf_read(input_files_ref(0), "tas")
-
-printVarSummary(data_ref)
-printVarSummary(data_temp)
-print("data_temp&model = " + data_temp&model)
 
   do i = 0, dimsizes(data_ref&models)-1
 
-print("data_ref&models(i) = " + data_ref&models(i))
-    ind_ref = ind(data_temp&model .eq. data_ref&models(i))
+    ind_ref = ind(data_temp&model .eq. diag_script_info@ref(i))
     if (all(ismissing(ind_ref))) then
       error_msg("f", DIAG_SCRIPT, "", "observational data set not available")
     else
-      data_ref(i,  :) = (/data_temp(ind_ref, :)/)
+      data_ref(i,  :) = data_temp(ind_ref, :)
     end if
-
-  end do
 
 printVarSummary(data_ref)
 
+  end do
+
   delete(data_temp)
+
+
+  ; -------------------------------------------
+  ; Plotting
+  ; -------------------------------------------
+
+  ; Set resources
+  res = True
+  res@trXMinF = start_year
+  res@trXMaxF = end_year
+  res@tmXBMode = "Explicit"
+  if (xmax - xmin.gt.20) then
+    res@tmXBValues = ispan(xmin, xmax, 10)
+    res@tmXBLabels = ispan(xmin, xmax, 10)
+    res@tmXBMinorValues =  ispan(xmin, xmax, 5)
+  else
+    res@tmXBValues = ispan(xmin, xmax, 5)
+    res@tmXBLabels = ispan(xmin, xmax, 5)
+    res@tmXBMinorValues =  ispan(xmin, xmax, 1)
+  end if
+  res@tmXBLabelAngleF = 45
+  res@tmXBLabelJust     = "CenterRight"
+
+  if isatt(data_ref, "long_name")
+    res@tiMainString = data_ref@long_name
+  end if
+
+  if (isatt(diag_script_info, "ts_anomaly")) then
+    res@tiYAxisString = var0 + " Anomaly" + " [" + data_ref@units + "]"
+  else
+    res@tiYAxisString = var0 + " [" + data_ref@units + "]"
+  end if
+
+  res0 = True
+  ref_start = diag_script_info@ref_start
+  ref_end = diag_script_info@ref_end
+  res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
+    + " " + var0 + " Mean" + " [" + data_ref@units + "]"
+
+  if(anom .eq. "anom") then
+    xy_line_anom(wks, anom_ref, data_ref, data_ref&time, \
+                 0, ref_start, ref_end, res, res0, info_items)
+  else
+    xy_line(wks, model_arr, model_arr&time, model_arr_stat, res, info_items)
+  end if
+
+  log_info(" wrote " + outfile + "." + file_type)
+
 
 ;  ; Attach plotting options
 ;  copy_VarAtts(diag_script_info, data_all)
