@@ -1937,6 +1937,37 @@ begin
     end if
   end if
 
+  ; Add pre-calculated multi model statistics
+  if (DIAG_SCRIPT .eq. "tsline_collect.ncl") then
+    print("DIAG_SCRIPT = "+DIAG_SCRIPT)
+    ; Add multi model mean and stddev
+    ; Stat
+    res_stddev = True
+    copy_VarMeta(res, res_stddev)
+    res_stddev@gsnXYFillColors = "(/91,174,178/)"
+    delete(res_stddev@xyLineColors)
+
+    ; We don't want the line, so make it transparent.
+    res_stddev@xyLineColor = -1
+    shading_plot = gsn_csm_xy(wks, source_x, source_stddev(1:2, :), \
+                              res_stddev)
+    overlay(plot, shading_plot)
+    res_stddev@gsnXYFillColors = "(/204,174,113/)"
+    shading_plot = gsn_csm_xy(wks, source_x, source_stddev(4:5, :), \
+                              res_stddev)
+    overlay(plot, shading_plot)
+    ; MMM
+    delete([/res@xyLineThicknesses, res@xyLineColors, res@xyDashPatterns/])
+    res@xyLineThicknesses = thicks_mmm
+    res@xyLineColors = "(/112,160,205/)"
+    res@xyDashPatterns = dashes_mmm
+    mmm = gsn_csm_xy(wks, source_x, source_stddev(0, :), res)
+    overlay(plot, mmm)
+    res@xyLineColors = "(/196,121,0/)"
+    mmm = gsn_csm_xy(wks, source_x, source_stddev(3, :), res)
+    overlay(plot, mmm)
+  end if
+
   ; -------------------------------------------------
   ; Add right panel with mean values in anomaly plot
   ; -------------------------------------------------

@@ -14,8 +14,7 @@
 ; Optional diag_script_info attributes (diagnostic specific)
 ;    time_avg: type of time average (currently only "yearly" and "monthly" are
 ;              available).
-;    ts_anomaly: calculates anomalies with respect to the first 10-year
-;                average
+;    ts_anomaly: calculates anomalies with respect to the defined period
 ;    ref_start: start year of reference period for anomalies
 ;    ref_end: end year of reference period for anomalies
 ;    ref_value: if true, right panel with mean values is attached
@@ -70,7 +69,7 @@ begin
   plot_fields = (/"T2Ms"/)
   ind_f = any(field_type0 .eq. plot_fields)
   if (all(ismissing(ind_f))) then
-      error_msg("f", DIAG_SCRIPT, "", "can't use field " + field_type0)
+    error_msg("f", DIAG_SCRIPT, "", "can't use field " + field_type0)
   end if
   delete(plot_fields)
   delete(ind_f)
@@ -330,8 +329,6 @@ begin
 
   model_arr_stat&stat = (/"mean","min","max"/)
 
-printVarSummary(model_arr)
-printVarSummary(model_arr_stat)
   model_arr_stat(0,:) = (/model_arr(mmm_ind,:)/)
   do i = 0, ntime-1
     statb = stat_dispersion(model_arr(ind_mod,i), False)
@@ -402,15 +399,14 @@ printVarSummary(model_arr_stat)
   if (config_user_info@write_netcdf.eq."True") then
     out_path = config_user_info@work_dir
     system("mkdir -p " + out_path)
-    out_path1 = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + "_" \
-      + start_year + "-" + end_year + ".nc"
+    out_path1 = out_path + "tsline_" + anom + "_" + detr + ".nc"
+      ; + start_year + "-" + end_year + ".nc"
     model_arr@ncdf = out_path
     model_arr@diag_script = DIAG_SCRIPT
     model_arr@var = var0
     ncdf_outfile = ncdf_write(model_arr, out_path1)
     ; statistics
-    out_path2 = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + "_" \
-      + "mm_stat_" + start_year + "-" + end_year + ".nc"
+    out_path2 = out_path + "tsline_mm_stat.nc"
     model_arr_stat@ncdf = out_path
     model_arr_stat@diag_script = DIAG_SCRIPT
     model_arr_stat@var = var0

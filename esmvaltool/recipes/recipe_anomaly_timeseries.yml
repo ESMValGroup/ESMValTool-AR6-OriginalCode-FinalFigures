@@ -42,7 +42,7 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
-      exclude: [reference_dataset, alternative_dataset]
+      exclude: [reference_dataset]
 
 diagnostics:
 
@@ -50,9 +50,8 @@ diagnostics:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       tas:
-        preprocessor: clim_ref   
+        preprocessor: clim_ref_europe   
         reference_dataset: HadCRUT4   
-        alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP5
@@ -88,9 +87,8 @@ diagnostics:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       tas:
-        preprocessor: clim_ref   
+        preprocessor: clim_ref_europe   
         reference_dataset: HadCRUT4   
-        alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP5
@@ -113,6 +111,42 @@ diagnostics:
         ref_end: 1995         #end year of reference period for anomalies
         ref_value: False      #attach absolute values on the right
         stat_shading: True    #shading of multi model statistics
+        #range_option: 0
+        plot_units: "degC"
+        # Plot style
+        styleset: CMIP5
+
+  ta_europe_collect:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    #variables:
+    #  tas:
+    #    preprocessor: clim_ref_europe   
+    #    mip: Amon
+    #    field: T2Ms
+    #    reference_dataset: HadCRUT4   
+    # #   project: CMIP5
+    # #   exp: historicalNat
+    # #   ensemble: r1i1p1
+    # #   start_year: 1990
+    # #   end_year: 2004
+    #additional_datasets:
+    ##  - {dataset: bcc-csm1-1}
+    #  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+    #     start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: ['*/tsline*']
+        experiments: ["historical", "historicalNat"]
+        time_avg: "yearly"
+        start_year: 1990
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
+        ref_start: 1990       #start year of reference period for anomalies
+        ref_end: 1995         #end year of reference period for anomalies
+        ref_value: False      #attach absolute values on the right
+        #stat_shading: False   #shading of multi model statistics
         #range_option: 0
         plot_units: "degC"
         # Plot style
