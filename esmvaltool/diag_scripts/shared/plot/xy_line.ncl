@@ -1937,8 +1937,9 @@ begin
     end if
   end if
 
+print("DIAG_SCRIPT = "+DIAG_SCRIPT)
   ; Add pre-calculated multi model statistics
-  if (DIAG_SCRIPT .eq. "tsline_collect.ncl") then
+  if (DIAG_SCRIPT .eq. "collect") then
     print("DIAG_SCRIPT = "+DIAG_SCRIPT)
     ; Add multi model mean and stddev
     ; Stat

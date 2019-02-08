@@ -116,27 +116,27 @@ diagnostics:
         # Plot style
         styleset: CMIP5
 
-  ta_europe_collect:
+  tas_europe_collect:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
-    #variables:
-    #  tas:
-    #    preprocessor: clim_ref_europe   
-    #    mip: Amon
-    #    field: T2Ms
-    #    reference_dataset: HadCRUT4   
+    variables:
+      tas:
+        preprocessor: clim_ref_europe   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
     # #   project: CMIP5
     # #   exp: historicalNat
     # #   ensemble: r1i1p1
     # #   start_year: 1990
     # #   end_year: 2004
-    #additional_datasets:
+    additional_datasets:
     ##  - {dataset: bcc-csm1-1}
-    #  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-    #     start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 2017, tier: 2}
     scripts:
       collect: 
         script: ipcc_ar6/tsline_collect.ncl
-        ancestors: ['*/tsline*']
+        ancestors: [tas, '*/tsline*']
         experiments: ["historical", "historicalNat"]
         time_avg: "yearly"
         start_year: 1990

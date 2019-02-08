@@ -41,12 +41,16 @@ begin
   enter_msg(DIAG_SCRIPT, "")
   diag_script_base = basename(DIAG_SCRIPT)
 
-;  var0 = variable_info[0]@short_name
+  var0 = variable_info[0]@short_name
 ;  field_type0 = variable_info[0]@field
-;  info_items = select_metadata_by_name(input_file_info, var0)
+  info_items = select_metadata_by_name(input_file_info, var0)
 ;  datasetnames = metadata_att_as_array(info_items, "dataset")
 ;  dim_MOD = ListCount(info_items)
 ;  dim_VAR = ListCount(variable_info)
+
+  ; Create output plot directory
+  plot_dir = config_user_info@plot_dir
+  system("mkdir -p " + plot_dir)
 
   ; Check file type
   file_type = config_user_info@output_file_type
@@ -122,6 +126,8 @@ begin
                   "period for reference years is not defined " + \
                   "(needed for anomaly)")
       end if
+      anom_ref = 0.
+
     end if
   else
     anom = "noanom"
@@ -173,7 +179,7 @@ begin
 
   data_temp = ncdf_read(input_files_ref(0), "tas")
 
-  do i = 0, dimsizes(data_ref&models)-1
+  do i = 0, dimsizes(diag_script_info@ref)-1
 
     ind_ref = ind(data_temp&model .eq. diag_script_info@ref(i))
     if (all(ismissing(ind_ref))) then
@@ -193,10 +199,18 @@ printVarSummary(data_ref)
   ; Plotting
   ; -------------------------------------------
 
+  ; Define workstation
+  outfile = config_user_info@plot_dir + data_ref@var + "_" + anom + "_" + \
+  detr + "_" + start_year + "-" + end_year
+  wks = gsn_open_wks(file_type, outfile)
+
+
   ; Set resources
   res = True
-  res@trXMinF = start_year
-  res@trXMaxF = end_year
+  xmin = start_year
+  xmax = end_year
+  res@trXMinF = xmin
+  res@trXMaxF = xmax
   res@tmXBMode = "Explicit"
   if (xmax - xmin.gt.20) then
     res@tmXBValues = ispan(xmin, xmax, 10)
@@ -214,17 +228,20 @@ printVarSummary(data_ref)
     res@tiMainString = data_ref@long_name
   end if
 
+printVarSummary(data_ref)
+  ;info_items = select_metadata_by_name(input_file_info, data_ref@var)
+
   if (isatt(diag_script_info, "ts_anomaly")) then
-    res@tiYAxisString = var0 + " Anomaly" + " [" + data_ref@units + "]"
+    res@tiYAxisString = data_ref@var + " Anomaly" + " [" + data_ref@units + "]"
   else
-    res@tiYAxisString = var0 + " [" + data_ref@units + "]"
+    res@tiYAxisString = data_ref@var + " [" + data_ref@units + "]"
   end if
 
   res0 = True
   ref_start = diag_script_info@ref_start
   ref_end = diag_script_info@ref_end
   res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
-    + " " + var0 + " Mean" + " [" + data_ref@units + "]"
+    + " " + data_ref@var + " Mean" + " [" + data_ref@units + "]"
 
   if(anom .eq. "anom") then
     xy_line_anom(wks, anom_ref, data_ref, data_ref&time, \
