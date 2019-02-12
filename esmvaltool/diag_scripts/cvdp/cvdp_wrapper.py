@@ -18,14 +18,17 @@ def setup_driver(cfg):
     if not os.path.isdir(cvdp_root):
         raise DiagnosticError("CVDP is not available.")
 
+    def _ismodular(cfg):
+        return 'modular_list' in cfg.keys() and len(cfg['modular_list']) > 0
+
     settings = {
         'outdir': "{0}/".format(cfg['work_dir']),
         'obs': 'False',
         'zp': os.path.join(cvdp_root, "ncl_scripts/"),
         'run_style': 'serial',
         'webpage_title': 'CVDP run via ESMValTool',
-        'modular': 'True',
-        'modular_list': 'sst.trends_timeseries'
+        'modular': _ismodular(cfg),
+        'modular_list': ",".join(cfg['modular_list'])
     }
     settings['output_data'] = "True" if _nco_available() else "False"
 
