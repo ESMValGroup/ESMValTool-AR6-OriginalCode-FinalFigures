@@ -1153,33 +1153,33 @@ diagnostics:
 #        normalization: [centered_median]
 
 
-  ### od550aer: AEROSOL OPTICAL DEPTH AT 550 nm ###############################
-  od550aer:
-    description: Aerosol optical depth at 550 nm
-    variables:
-      od550aer:
-        preprocessor: ppNOLEV2thr10
-        reference_dataset: ESACCI-AEROSOL
-        alternative_dataset: MODIS
-        mip: AERmon
-        field: T2Ms
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2003
-        end_year: 2004
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1}
-      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
-      - {dataset: MODIS, project: OBS, type: sat, version: L3-C6, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### od550aer: AEROSOL OPTICAL DEPTH AT 550 nm ###############################
+#  od550aer:
+#    description: Aerosol optical depth at 550 nm
+#    variables:
+#      od550aer:
+#        preprocessor: ppNOLEV2thr10
+#        reference_dataset: ESACCI-AEROSOL
+#        alternative_dataset: MODIS
+#        mip: AERmon
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2003
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1}
+#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
+#      - {dataset: MODIS, project: OBS, type: sat, version: L3-C6, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
 #  ### od870aer: AEROSOL OPTICAL DEPTH AT 870 nm ###############################
@@ -1207,31 +1207,31 @@ diagnostics:
 #        normalization: [centered_median]
 
 
-  ### abs550aer: ABSORPTION OPTICAL DEPTH AT 550 nm ###########################
-  abs550aer:
-    description: Absorption optical depth at 550 nm
-    variables:
-      abs550aer:
-        preprocessor: ppNOLEV1thr10
-        reference_dataset: ESACCI-AEROSOL
-        mip: aero
-        field: T2Ms
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2002
-        end_year: 2004
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1}
-      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### abs550aer: ABSORPTION OPTICAL DEPTH AT 550 nm ###########################
+#  abs550aer:
+#    description: Absorption optical depth at 550 nm
+#    variables:
+#      abs550aer:
+#        preprocessor: ppNOLEV1thr10
+#        reference_dataset: ESACCI-AEROSOL
+#        mip: aero
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2002
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1}
+#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
 #  ### od550lt1aer: FINE MODE AEROSOL OPTICAL DEPTH AT 550 nm ##################
