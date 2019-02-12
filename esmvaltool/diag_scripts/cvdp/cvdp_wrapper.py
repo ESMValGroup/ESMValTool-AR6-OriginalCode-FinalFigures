@@ -23,14 +23,16 @@ def setup_driver(cfg):
         'obs': 'False',
         'zp': os.path.join(cvdp_root, "ncl_scripts/"),
         'run_style': 'serial',
-        'webpage_title': 'CVDP run via ESMValTool'
+        'webpage_title': 'CVDP run via ESMValTool',
+        'modular': 'True',
+        'modular_list': 'sst.trends_timeseries'
     }
     settings['output_data'] = "True" if _nco_available() else "False"
 
     def _update_settings(line):
 
         for key, value in settings.items():
-            pattern = r'\s*{0}\s*=.*\n'.format(key)
+            pattern = r'^\s*{0}\s*=\s*".*".*\n'.format(key)
             search_results = re.findall(pattern, line)
             if search_results == []:
                 continue
