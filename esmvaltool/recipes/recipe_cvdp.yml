@@ -35,6 +35,8 @@ diagnostics:
         #reference_dataset: MPI-ESM-LR
       psl:
         field: T2Ms
+      ts:
+        field: T2Ms
     scripts:
       cvdp:
         script: cvdp/cvdp_wrapper.py
