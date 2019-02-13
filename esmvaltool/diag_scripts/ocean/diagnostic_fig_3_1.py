@@ -43,6 +43,12 @@ logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 
+# TODO: Fix colour scale. Why can't it do the total range?
+# TODO: Add further models and colour ranges
+# TODO: Write figure description
+# TODO: Add x and y axis labels.
+# TODO: Add documentation and PEP8 compliance.
+
 def titlify(title):
     """
     Check whether a title is too long then add it to current figure.
