@@ -142,6 +142,10 @@ authors:
     name: Kindermann, Stephan
     institute: DKRZ, Germany
     email: kindermann 'at' dkrz.de
+  kosa_yu:
+    name: Kosaka, Yu
+    institute: RCAST, University of Tokyo, Japan
+    email: ykosaka 'at' atmos.rcast.u-tokyo.ac.jp
   kras_jo:
     name: Krasting, John
     institute: NOAA, USA
@@ -419,7 +423,6 @@ authors:
     name: Tilmes, Simone
     institute: NCAR, US
     email: tilmes 'at' ucar.edu
-
 
 references:
   acknow_author: "Please acknowledge the author(s)."
