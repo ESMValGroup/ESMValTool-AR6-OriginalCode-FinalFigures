@@ -176,58 +176,25 @@ diagnostics:
         reference_dataset: ERA-Interim
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 1986
         end_year: 2005
     additional_datasets:
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1,
          start_year: 1986, end_year: 2005, tier: 3}
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      # - {dataset: CESM1-CAM5-1-FV}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      # - {dataset: CMCC-CM}
-      # - {dataset: CMCC-CMS}
-      # - {dataset: CNRM-CM5-2}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      # - {dataset: FGOALS-g2}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H-CC}
-      # - {dataset: GISS-E2-H}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: GISS-E2-R}
-      # - {dataset: HadGEM2-CC}
-      # - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
     scripts:
-      fig_3_3_1_a: 
+      fig_3_2: &fig-9-2_and_9-4_settings
         script: clouds/clouds_bias.ncl
         projection: Robinson
         timemean: annualclim
@@ -245,101 +212,29 @@ diagnostics:
   # mean relative error (geographical ditributions)
   # **********************************************************************
 
-  fig_3_2:
+  fig_3_4:
     description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
     variables:
       pr:
         preprocessor: clim
         reference_dataset: GPCP-SG
+        project: CMIP6
         mip: Amon
         field: T2Ms
+        grid: gr
+        exp: historical
     additional_datasets:
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
          start_year: 1986, end_year: 2005, tier: 1}
-      - {dataset: ACCESS1-0, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: ACCESS1-3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: bcc-csm1-1, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: bcc-csm1-1-m, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: BNU-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CanESM2, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CCSM4, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-BGC, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: CESM1-CAM5-1-FV, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-CAM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-FASTCHEM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-WACCM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CMCC-CESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: CMCC-CM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-      #    start_year: 1986, end_year: 2005}
-      # - {dataset: CMCC-CMS, project: CMIP5, exp: historical, ensemble: r1i1p1,
-      #    start_year: 1986, end_year: 2005}
-      # - {dataset: CNRM-CM5-2, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CNRM-CM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: FGOALS-g2, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-CM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-ESM2G, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-ESM2M, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-H-CC, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: GISS-E2-H, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-R-CC, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-R, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: HadGEM2-CC, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: HadGEM2-ES, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: inmcm4, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: MIROC4h, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC-ESM-CHEM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-LR, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-MR, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-P, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MRI-CGCM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: NorESM1-M, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: NorESM1-ME, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
     scripts:
       fig09-4:
         <<: *fig-9-2_and_9-4_settings
@@ -366,62 +261,22 @@ diagnostics:
         alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
         ensemble: r1i1p1
+        grid: gr
         start_year: 1870
         end_year: 2004
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      #- {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      #- {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      #- {dataset: EC-EARTH, ensemble: r6i1p1}
-      #- {dataset: FGOALS-g2}
-      #- {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      #- {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
+      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
          start_year: 1870, end_year: 2017, tier: 2}
       - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
@@ -821,62 +676,15 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
         ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -913,62 +721,15 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
         ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -993,61 +754,13 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1072,61 +785,14 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
         ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1154,58 +820,12 @@ diagnostics:
         field: T3M
         project: CMIP5
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1230,60 +850,14 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1309,59 +883,14 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r17i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1387,52 +916,14 @@ diagnostics:
         alternative_dataset: ERA-Interim
         mip: Amon
         field: T3M
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2003
         end_year: 2004
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r14i1p1f1}
       - {dataset: AIRS, project: obs4mips, level: L3, version: RetStd-v5, tier: 1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
     scripts:
@@ -1458,62 +949,15 @@ diagnostics:
         alternative_dataset: NCEP
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1546,48 +990,8 @@ diagnostics:
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: ESACCI-SST, project: OBS, type: sat, version: L4-GHRSST-SSTdepth-OSTIA-GLOB, tier: 2}
       - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
@@ -1612,61 +1016,14 @@ diagnostics:
         reference_dataset: GPCP-SG
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
     scripts:
       grading:
@@ -1691,53 +1048,14 @@ diagnostics:
         alternative_dataset: PATMOS
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2000
         end_year: 2002
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1}
       - {dataset: ESACCI-CLOUD, project: OBS, type: sat, version: AVHRR-fv2.0, tier: 2}
       - {dataset: PATMOS, project: OBS, type: sat, version: 1, tier: 2}
     scripts:
@@ -1762,54 +1080,15 @@ diagnostics:
         reference_dataset: CERES-EBAF
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2001
         end_year: 2003
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
     scripts:
       grading:
@@ -1833,51 +1112,14 @@ diagnostics:
         reference_dataset: CERES-EBAF
         mip: Amon
         field: T2Ms
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2001
         end_year: 2003
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
     scripts:
       grading:
@@ -1903,51 +1145,14 @@ diagnostics:
         field: T2Ms
         derive: true
         force_derivation: false
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2001
         end_year: 2003
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
     scripts:
       grading:
@@ -1969,49 +1174,13 @@ diagnostics:
         field: T2Ms
         derive: true
         force_derivation: false
-        project: CMIP5
+        project: CMIP6
         exp: historical
-        ensemble: r1i1p1
+        grid: gr
         start_year: 2001
         end_year: 2003
     additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CMCC-CM}
-      - {dataset: CNRM-CM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
     scripts:
       grading:
@@ -2022,204 +1191,143 @@ diagnostics:
         normalization: [centered_median]
 
 
-  ### od550aer: AEROSOL OPTICAL DEPTH AT 550 nm ###############################
-  od550aer:
-    description: Aerosol optical depth at 550 nm
-    variables:
-      od550aer:
-        preprocessor: ppNOLEV2thr10
-        reference_dataset: ESACCI-AEROSOL
-        alternative_dataset: MODIS
-        mip: aero
-        field: T2Ms
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 2003
-        end_year: 2004
-    additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: BNU-ESM}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MRI-CGCM3}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
-      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
-      - {dataset: MODIS, project: OBS, type: sat, version: L3-C6, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### od870aer: AEROSOL OPTICAL DEPTH AT 870 nm ###############################
-  od870aer:
-    description: Aerosol optical depth at 870 nm
-    variables:
-      od870aer:
-        preprocessor: ppNOLEV1thr10
-        reference_dataset: ESACCI-AEROSOL
-        mip: aero
-        field: T2Ms
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 2002
-        end_year: 2004
-    additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MRI-CGCM3}
-      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### abs550aer: ABSORPTION OPTICAL DEPTH AT 550 nm ###########################
-  abs550aer:
-    description: Absorption optical depth at 550 nm
-    variables:
-      abs550aer:
-        preprocessor: ppNOLEV1thr10
-        reference_dataset: ESACCI-AEROSOL
-        mip: aero
-        field: T2Ms
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 2002
-        end_year: 2004
-    additional_datasets:
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
-      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### od550lt1aer: FINE MODE AEROSOL OPTICAL DEPTH AT 550 nm ##################
-  od550lt1aer:
-    description: Fine mode optical depth at 550 nm
-    variables:
-      od550lt1aer:
-        preprocessor: ppNOLEV1thr10
-        reference_dataset: ESACCI-AEROSOL
-        mip: aero
-        field: T2Ms
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 2002
-        end_year: 2004
-    additional_datasets:
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MRI-CGCM3}
-      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### toz: TOTAL COLUMN OZONE #################################################
-  toz:
-    description: Total column ozone
-    variables:
-      toz:
-        preprocessor: ppNOLEV2thr10
-        reference_dataset: ESACCI-OZONE
-        alternative_dataset: NIWA
-        mip: Amon
-        field: T2Ms
-        derive: true
-        force_derivation: false
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 2002
-        end_year: 2004
-    additional_datasets:
-      - {dataset: CESM1-WACCM, ensemble: r2i1p1}
-      - {dataset: CNRM-CM5}
-      - {dataset: GFDL-CM3}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: ESACCI-OZONE, project: OBS, type: sat, version: L3, tier: 2}
-      - {dataset: NIWA, project: OBS, type: reanaly, version: 1, tier: 3}
-    scripts:
-      grading_global:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-      grading_antarctic:
-        <<: *grading_settings
-        # Region
-        region: Antarctic
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### od550aer: AEROSOL OPTICAL DEPTH AT 550 nm ###############################
+#  od550aer:
+#    description: Aerosol optical depth at 550 nm
+#    variables:
+#      od550aer:
+#        preprocessor: ppNOLEV2thr10
+#        reference_dataset: ESACCI-AEROSOL
+#        alternative_dataset: MODIS
+#        mip: aero
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2003
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
+#      - {dataset: MODIS, project: OBS, type: sat, version: L3-C6, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  ### od870aer: AEROSOL OPTICAL DEPTH AT 870 nm ###############################
+#  od870aer:
+#    description: Aerosol optical depth at 870 nm
+#    variables:
+#      od870aer:
+#        preprocessor: ppNOLEV1thr10
+#        reference_dataset: ESACCI-AEROSOL
+#        mip: aero
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2002
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  ### abs550aer: ABSORPTION OPTICAL DEPTH AT 550 nm ###########################
+#  abs550aer:
+#    description: Absorption optical depth at 550 nm
+#    variables:
+#      abs550aer:
+#        preprocessor: ppNOLEV1thr10
+#        reference_dataset: ESACCI-AEROSOL
+#        mip: aero
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2002
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  ### od550lt1aer: FINE MODE AEROSOL OPTICAL DEPTH AT 550 nm ##################
+#  od550lt1aer:
+#    description: Fine mode optical depth at 550 nm
+#    variables:
+#      od550lt1aer:
+#        preprocessor: ppNOLEV1thr10
+#        reference_dataset: ESACCI-AEROSOL
+#        mip: aero
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2002
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  ### toz: TOTAL COLUMN OZONE #################################################
+#  toz:
+#    description: Total column ozone
+#    variables:
+#      toz:
+#        preprocessor: ppNOLEV2thr10
+#        reference_dataset: ESACCI-OZONE
+#        alternative_dataset: NIWA
+#        mip: Amon
+#        field: T2Ms
+#        derive: true
+#        force_derivation: false
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2002
+#        end_year: 2004
+#    additional_datasets:
+#      - {dataset: ESACCI-OZONE, project: OBS, type: sat, version: L3, tier: 2}
+#      - {dataset: NIWA, project: OBS, type: reanaly, version: 1, tier: 3}
+#    scripts:
+#      grading_global:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#      grading_antarctic:
+#        <<: *grading_settings
+#        # Region
+#        region: Antarctic
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
   ### COLLECT METRICS #########################################################
