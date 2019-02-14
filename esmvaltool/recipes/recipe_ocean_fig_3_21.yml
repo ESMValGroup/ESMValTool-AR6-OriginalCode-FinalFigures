@@ -1,0 +1,69 @@
+# ESMValTool
+# recipe_OceanPhysics.yml
+---
+documentation:
+  description: |
+    Recipe to produce figure 3.5 for IPCC WG1
+
+  authors:
+    - demo_le
+
+  references:
+    - demora2018gmd
+
+  projects:
+    - ukesm
+
+
+# TODO: Add additional models.
+# TODO: Add multi_model_statistics
+# TODO: Increase range.
+# TODO: Figure out the observational data. CORA is not gridded.
+
+preprocessors:
+  prep_3_21:
+    custom_order: true
+    extract_levels:
+      levels:  [0., ]
+      scheme: linear_horizontal_extrapolate_vertical
+    time_average:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    extract_region:
+      start_longitude: 0.
+      end_longitude: 360.
+      start_latitude: -70.
+      end_latitude: 70.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean ]
+
+diagnostics:
+  diag_3_21:
+    variables:
+      so: # Salinity ocean 3D
+        preprocessor: prep_3_21
+        field: TO3M
+        additional_datasets:
+        # - {dataset: WOA,  project: obs4mips,  level: L3, version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+        # - {dataset: CORA,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1955}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1950}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2000, end_year: 2000}
+
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2050, end_year: 2050}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2090, end_year: 2090}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2085, end_year: 2089}
+
+        # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1955}
+        # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1950}
+        # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2000, end_year: 2000}
+        #
+        # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2050, end_year: 2050}
+        # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2090, end_year: 2090}
+        # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2085, end_year: 2089}
+
+    scripts:
+      diagnostic_3_21:
+        script: ocean/diagnostic_fig_3_21.py
