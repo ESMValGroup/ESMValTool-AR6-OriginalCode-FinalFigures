@@ -224,19 +224,70 @@ def plot_zonal_cube(cube, plot_details):
     return key_word, xlabel
 
 
-def make_mean_cubes(args):
-    """
-    Takes the mean of several cubes.
-    """
+def fill_between_two_cubes(cube1, cube2, color):
+    # Zonal_mean_error
+    if cube1.data.shape == cube1.coord('latitude').points.shape:
+        plt.fill_between(cube1.coord('latitude').points,
+                        cube1.data,
+                        cube2.data,
+                        color=color,
+                        alpha = 0.4
+             )
 
-    return sum(args) / float(len(args))
-    #n = float(len(cubes))
-    #return reduce(iris.analysis.maths.add, cubes) / n
+    if cube1.data.shape == cube1.coord('longitude').points.shape:
+        plt.fill_between(cube1.coord('longitude').points,
+                        cube1.data,
+                        cube2.data,
+                        color=color,
+                        alpha = 0.4
+             )
+
+
+def make_mean_of_cube_list(cube_list):
+    """
+    Takes the mean of a list of cubes (not an iris.cube.CubeList).
+
+    Assumes all the cubes are the same shape.
+    """
+    cube_mean = cube_list[0]
+    for cube in cube_list[1:]:
+        cube_mean+=cube
+    cube_mean = cube_mean/ float(len(cube_list))
+    cube_mean.units = 'celsius'
+    return cube_mean
+
+
+def make_std_of_cube_list(cube_list):
+    """
+    Makes the standard deviation of a list of cubes (not an iris.cube.CubeList).
+
+    assumes all the cubes are the same shape and 1D
+    """
+    cube_std = cube_list[0].copy()
+    out_data = np.zeros_like(cube_std.data)
+    out_mask = np.zeros_like(cube_std.data)
+    out_dict = {}
+
+    for cube in cube_list:
+        for (d,),  dat in np.ndenumerate(cube.data):
+            if dat == 1e+20:
+                out_mask[d] += 1
+            try:        out_dict[d].append(dat)
+            except:     out_dict[d] = [dat, ]
+
+    for d, dat in out_dict.items():
+        out_data[d] = np.std(dat)
+
+    #out_data = np.ma.masked_where(out_mask, out_data)
+    out_data = np.ma.masked_where(cube_std.data.mask, out_data)
+    cube_std.data = out_data
+    return cube_std
 
 
 def make_multimodle_zonal_mean_plots(
         cfg,
         pane = 'a',
+        save = True,
 ):
     """
     Make a zonal mean error plot for an individual model.
@@ -321,24 +372,14 @@ def make_multimodle_zonal_mean_plots(
         else:
             value = float(model_numbers[dataset] ) / (number_models - 1.)
             color = cmap(value)
-            print('colors:', i, model_numbers[dataset], number_models, '\tvalue:', value )
-
-        print('dataset:', dataset, '\tcolor:', color)
-
-        plot_details[dataset] = {'c': color, 'ls': '-', 'lw': 1,
-                                 'label': dataset}
 
         # Is this data is a multi-model dataset?
-        multi_model = dataset.find('MultiModel') > -1
-
-        if multi_model:
-            continue
-            #Doing this by hand!
-            plot_details[dataset] = {'c': 'red', 'ls': '-', 'lw': 2,
-                                                 'label': dataset}
+        if dataset.find('MultiModel') > -1: continue
 
         new_cube = cube - obs_cube
         if pane in ['a', 'b']:
+            plot_details[dataset] = {'c': color, 'ls': '-', 'lw': 1,
+                                     'label': dataset}
             key_word, xlabel = plot_zonal_cube(new_cube, plot_details[dataset])
 
         ####
@@ -352,12 +393,8 @@ def make_multimodle_zonal_mean_plots(
         ####
         # Calculate error
         errorcubeslist = [cube - obs_cube for cube in project_cubes[project].values()]
-        project_mean_error = errorcubeslist[0]
-        for cube in errorcubeslist[1:]: project_mean_error+=cube
-        project_mean_error = project_mean_error/ float(len(errorcubeslist))
+        project_mean_error = make_mean_of_cube_list(errorcubeslist)
 
-
-        #project_cubes[project] / float(project_counts[project])
         if project == 'CMIP5':
                 mip_color  = 'red'
         if project == 'CMIP3':
@@ -369,13 +406,23 @@ def make_multimodle_zonal_mean_plots(
                                              'label': label}
         if pane in 'abc':
                 key_word, xlabel = plot_zonal_cube(project_mean_error, plot_details[dataset])
+
+        if pane in 'c':
+                cube_std = make_std_of_cube_list(errorcubeslist)
+                fill_between_two_cubes(project_mean_error - cube_std, project_mean_error + cube_std, mip_color)
+
         if pane in 'd':
                 cubeslist = [cube  for cube in project_cubes[project].values()]
-                project_mean = cubeslist[0]
-                for cube in cubeslist[1:]:
-                    project_mean+=cube
-                project_mean = project_mean/ float(len(cubeslist))
+                project_mean = make_mean_of_cube_list(cubeslist)
                 key_word, xlabel = plot_zonal_cube(project_mean, plot_details[dataset])
+
+                cube_std = make_std_of_cube_list(cubeslist)
+                fill_between_two_cubes(project_mean - cube_std, project_mean + cube_std, mip_color)
+
+                plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
+                                         'label': obs_key}
+                key_word, xlabel = plot_zonal_cube(obs_cube, plot_details[obs_key])
+
 
     #####
     # title and axis lables
@@ -383,10 +430,13 @@ def make_multimodle_zonal_mean_plots(
         plt.axhline(0., linestyle=':', linewidth=0.2, color='k')
     plt.xlabel(xlabel)
     plt.ylabel('SST error ('+r'$^\circ$'+'C)')
-    title = ' '.join(['(', pane, ')', key_word, metadata['dataset'], ])
+    title = ' '.join(['(', pane, ')', key_word ])
     plt.title(title)
 
-   # Add Legend outside right.
+    if not save:
+        return plt.gca(), plot_details
+
+    # Add Legend outside right.
     diagtools.add_legend_outside_right(plot_details, plt.gca())
 
     # Load image format extention
@@ -407,6 +457,7 @@ def make_multimodle_zonal_mean_plots(
 
     plt.close()
 
+
 def main(cfg):
     """
     Load the config file and some metadata, then pass them the plot making
@@ -418,48 +469,34 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
-    for pane in ['a', 'b', 'c', 'd']:
-            make_multimodle_zonal_mean_plots(cfg, pane=pane)
     #####
-    for index, metadata_filename in enumerate(cfg['input_files']):
-        continue
-        metadatas = diagtools.get_input_files(cfg, index=index)
+    # individual panes
+    for pane in [ 'c', 'd', 'a', 'b',]:
+        make_multimodle_zonal_mean_plots(cfg, pane=pane, save = True)
 
-        logger.info(
-            'metadata filename:\t%s',
-            metadata_filename,
-        )
-        obs_key = 'observational_dataset'
-        obs_filename = ''
-        obs_metadata = {}
-        if obs_key in cfg:
-            obs_filename = diagtools.match_model_to_key(obs_key,
-                                                        cfg[obs_key],
-                                                        metadatas)
-            obs_metadata = metadatas[obs_filename]
+    #####
+    # Altogether
+    fig = plt.figure()
+    fig.set_size_inches(9., 9.)
+    plot_details = {}
+    axes = []
+    for pane,sbpt in zip([ 'a', 'b', 'c', 'd', ], [221,222,223,224]):
+        axes.append(plt.subplot(sbpt))
+        ax, pt_dets = make_multimodle_zonal_mean_plots(cfg, pane=pane, save = False)
+        plot_details.update(pt_dets)
 
-        for filename in sorted(metadatas):
+    diagtools.add_legend_outside_right(plot_details, plt.gca())
 
-            logger.info('-----------------')
-            logger.info(
-                'model filenames:\t%s',
-                filename,
-            )
-            ######
-            # Transects of individual model
-            # make_transects_plots(cfg, metadatas[filename], filename)
+    # Load image format extention and path
+    image_extention = diagtools.get_image_format(cfg)
+    path = cfg['plot_dir'] + 'fig_3.21'+image_extention
 
-            ######
-            # fig 3.19 for of individual model
-            if obs_filename and filename != obs_filename:
-                make_single_zonal_mean_plots(cfg,
-                                  metadatas[filename],
-                                  filename,
-                                  obs_metadata=obs_metadata,
-                                  obs_filename=obs_filename)
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path)
 
-
-
+    plt.close()
 
     logger.info('Success')
 
