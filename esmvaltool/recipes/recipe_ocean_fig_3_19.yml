@@ -1,0 +1,112 @@
+# ESMValTool
+# recipe_OceanPhysics.yml
+---
+documentation:
+  description: |
+    Recipe to produce figure 3.19 for IPCC WG1
+
+  authors:
+    - demo_le
+
+  references:
+    - demora2018gmd
+
+  projects:
+    - ukesm
+
+
+# TODO: Add additional models.
+# TODO: Add multi_model_statistics
+# TODO: Increase range.
+# TODO: Figure out the observational data. CORA is not gridded.
+
+preprocessors:
+  prep_3_19a:
+    custom_order: true
+    time_average:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    zonal_means:
+      coordinate: longitude
+      mean_type: mean
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean ]
+
+  prep_3_19a_theteo:
+    custom_order: true
+    time_average:
+    extract_levels:
+      levels:  [0., ]
+      scheme: linear_horizontal_extrapolate_vertical
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    zonal_means:
+      coordinate: longitude
+      mean_type: mean
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean ]
+
+  prep_3_19b_theteo:
+    custom_order: true
+    time_average:
+    extract_levels:
+      levels:  [0., ]
+      scheme: linear_horizontal_extrapolate_vertical
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    extract_region:
+      start_longitude: 0.
+      end_longitude: 360.
+      start_latitude: -10.
+      end_latitude: 10.
+    zonal_means:
+      coordinate: latitude
+      mean_type: mean
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean ]
+
+diagnostics:
+  diag_3_19:
+    variables:
+    #   tos: # ocean surface temperature
+    #     preprocessor: prep_3_19a
+    #     field: TO2M
+    #     additional_datasets:
+    #     # - {dataset: WOA,  project: obs4mips,  level: L3, version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+    #     # - {dataset: CORA,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+    #     # - {dataset: HadISST,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+    #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1979, end_year: 1980}
+
+      thetao_zonal:
+        short_name: thetao # ocean surface temperature
+        preprocessor: prep_3_19a_theteo
+        field: TO3M
+        additional_datasets:
+        - {dataset: WOA,  project: obs4mips,  level: L3, version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+        # - {dataset: CORA,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+        # - {dataset: HadISST,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1979, end_year: 1980}
+        - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1979, end_year: 1980}
+        - {dataset: CanESM2,    project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1999, end_year: 2000}
+      thetao_equator:
+        short_name: thetao # ocean surface temperature
+        preprocessor: prep_3_19b_theteo
+        field: TO3M
+        additional_datasets:
+        - {dataset: WOA,  project: obs4mips,  level: L3, version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+        # - {dataset: CORA,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+        # - {dataset: HadISST,  project: OBS,  version: 51,  tier: 3, start_year: 1950,  end_year: 2008}
+        - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1979, end_year: 1980}
+        - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1979, end_year: 1980}
+        - {dataset: CanESM2,    project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1999, end_year: 2000}
+
+    scripts:
+      diagnostic_3_19:
+        script: ocean/diagnostic_fig_3_19.py
+        observational_dataset: {dataset: WOA, project: obs4mips,}
