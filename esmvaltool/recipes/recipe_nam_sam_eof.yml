@@ -11,6 +11,28 @@ documentation:
   maintainer:
     - kosa_yu
 
+  references:
+    - acknow_project
+
+  projects:
+    - ipcc_ar6
+
+  realms:
+    - atmos
+
+  themes:
+    - varmodes
+
+  domains:
+    - polar
+
+  plot_types:
+    - polar
+    - times
+
+  statistics:
+    - eof
+
 datasets:
   - {dataset: ACCESS1-0, project: CMIP5, exp: historical, ensemble: r1i1p1,
      start_year: 1920, end_year: 2005}
