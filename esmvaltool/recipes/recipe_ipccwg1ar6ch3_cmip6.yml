@@ -261,7 +261,7 @@ diagnostics:
         end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, end_year: 2000}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
