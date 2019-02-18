@@ -97,6 +97,7 @@ def make_single_zonal_mean_plots(
   # Load cube and set up units
     cube = iris.load_cube(filename)
     cube = diagtools.bgc_units(cube, metadata['short_name'])
+    short_name = metadata['short_name']
 
     # Is this data is a multi-model dataset?
     multi_model = metadata['dataset'].find('MultiModel') > -1
@@ -147,7 +148,7 @@ def make_single_zonal_mean_plots(
         path = diagtools.get_image_path(
             cfg,
             metadata,
-            suffix= key_word.replace(' ','') + image_extention,
+            suffix= key_word.replace(' ','')+short_name + image_extention,
         )
 
     # Saving files:
@@ -381,7 +382,11 @@ def make_multimodle_zonal_mean_plots(
         # Is this data is a multi-model dataset?
         if dataset.find('MultiModel') > -1: continue
 
+        print('dataset:', dataset, cube.shape)
         new_cube = cube - obs_cube
+        if new_cube.data.mean() < -200. :
+                print ("Warning: this model is borken:", dataset, 'mean:', new_cube.data.mean())
+                continue
         if pane in ['a', 'b']:
             plot_details[dataset] = {'c': color, 'ls': '-', 'lw': 1,
                                      'label': dataset}
@@ -390,7 +395,12 @@ def make_multimodle_zonal_mean_plots(
         ####
         # Calculate the project lines
         project_cubes[project][dataset] = cube
-
+    # Plot the project means.
+    for project in projects:
+        #if project in ['OBS', 'obs4mip']: continue
+        for ds, cube in project_cubes[project].items():
+                print(ds, '\t', cube.data.mean() )
+    #assert 0
     # Plot the project means.
     for project in projects:
         if project in ['OBS', 'obs4mip']: continue
@@ -411,7 +421,7 @@ def make_multimodle_zonal_mean_plots(
                                              'label': project}
         if pane in 'abc':
                 key_word, xlabel = plot_zonal_cube(project_mean_error, plot_details[project])
-
+                ylabel = 'SST error ('+r'$^\circ$'+'C)'
         if pane in 'c':
                 cube_std = make_std_of_cube_list(errorcubeslist)
                 fill_between_two_cubes(project_mean_error - cube_std, project_mean_error + cube_std, mip_color)
@@ -427,6 +437,7 @@ def make_multimodle_zonal_mean_plots(
                 plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
                                          'label': obs_key}
                 key_word, xlabel = plot_zonal_cube(obs_cube, plot_details[obs_key])
+                ylabel = 'SST ('+r'$^\circ$'+'C)'
 
 
     #####
@@ -434,7 +445,7 @@ def make_multimodle_zonal_mean_plots(
     if pane in 'abc':
         plt.axhline(0., linestyle=':', linewidth=0.2, color='k')
     plt.xlabel(xlabel)
-    plt.ylabel('SST error ('+r'$^\circ$'+'C)')
+    plt.ylabel(ylabel)
     title = ' '.join(['(', pane, ')', key_word ])
     plt.title(title)
 
@@ -451,7 +462,7 @@ def make_multimodle_zonal_mean_plots(
     path = diagtools.get_image_path(
         cfg,
         metadata,
-        suffix= key_word.replace(' ','') + pane + image_extention,
+        suffix= key_word.replace(' ','') + pane + short_name+ image_extention,
         )
 
     # Saving files:
