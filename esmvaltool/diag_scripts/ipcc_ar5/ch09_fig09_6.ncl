@@ -29,9 +29,9 @@
 ;
 ; #############################################################################
 
-load "interface_scripts/interface.ncl"
-load "./diag_scripts/shared/latlon.ncl"
-load "./diag_scripts/shared/statistics.ncl"
+load "$diag_scripts/../interface_scripts/interface.ncl"
+load "$diag_scripts/shared/latlon.ncl"
+load "$diag_scripts/shared/statistics.ncl"
 
 begin
   enter_msg(DIAG_SCRIPT, "")

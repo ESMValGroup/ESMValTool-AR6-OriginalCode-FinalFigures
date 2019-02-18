@@ -31,8 +31,8 @@
 ;    20181101-A_gier_be: moved collect from main script
 ;
 ; #############################################################################
-load "interface_scripts/interface.ncl"
-load "./diag_scripts/shared/plot/style.ncl"
+load "$diag_scripts/../interface_scripts/interface.ncl"
+load "$diag_scripts/shared/plot/style.ncl"
 
 begin
   enter_msg(DIAG_SCRIPT, "")
