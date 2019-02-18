@@ -42,6 +42,7 @@ from esmvaltool.diag_scripts.shared import run_diagnostic
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+dpi = 100
 
 def titlify(title):
     """
@@ -161,7 +162,7 @@ def match_model_to_key(
         model_type,
         cfg_dict,
         input_files_dict,
-        variable_group
+        variable_groups
 ):
     """
     Match up model or observations dataset dictionairies from config file.
@@ -187,7 +188,7 @@ def match_model_to_key(
         A dictionairy of the input files and their linked details.
     """
     for input_file, intput_dict in input_files_dict.items():
-        if intput_dict['variable_group'] != variable_group: continue
+        if intput_dict['variable_group'] not in variable_groups: continue
         intersect_keys = intput_dict.keys() & cfg_dict.keys()
         match = True
         for key in intersect_keys:
@@ -243,6 +244,7 @@ def fill_between_two_cubes(cube1, cube2, color):
              )
 
 
+
 def make_mean_of_cube_list(cube_list):
     """
     Takes the mean of a list of cubes (not an iris.cube.CubeList).
@@ -284,10 +286,32 @@ def make_std_of_cube_list(cube_list):
     return cube_std
 
 
+def load_obs(cfg, groups):
+    """
+    Load the observations.
+    """
+    obs_key = 'observational_dataset'
+    obs_filename = ''
+    obs_metadata = {}
+    metadatas = diagtools.get_input_files(cfg)
+    if obs_key in cfg:
+        obs_filename = match_model_to_key(obs_key, #using local copy
+                                                    cfg[obs_key],
+                                                    metadatas,
+                                                    groups)
+        obs_metadata = metadatas[obs_filename]
+        obs_cube = iris.load_cube(obs_filename)
+        obs_cube = diagtools.bgc_units(obs_cube, obs_metadata['short_name'])
+        obs_key = obs_metadata['dataset']
+    return obs_cube, obs_key, obs_filename
+
+
+
 def make_multimodle_zonal_mean_plots(
         cfg,
         pane = 'a',
         save = True,
+        shortname = 'thetao',
 ):
     """
     Make a zonal mean error plot for an individual model.
@@ -298,38 +322,19 @@ def make_multimodle_zonal_mean_plots(
     ----------
     cfg: dict
         the opened global config dictionairy, passed by ESMValTool.
-    metadata: dict
-        The metadata dictionairy for a specific model.
-    filename: str
-        The preprocessed model file.
-    obs_metadata: dict
-        The metadata dictionairy for the observational dataset.
-    obs_filename: str
-        The preprocessed observational dataset file.
 
     """
     metadatas = diagtools.get_input_files(cfg)
     plot_details = {}
     cmap = plt.cm.get_cmap('jet')
     if pane in ['a', 'c']:
-        group = 'thetao_zonal'
+        groups = ['thetao_zonal', 'tos_zonal', ]
     if pane in ['b', 'd']:
-        group = 'thetao_equator'
+        groups = ['thetao_equator', 'tos_equator', ]
 
     #####
     # Load obs data and details
-    obs_key = 'observational_dataset'
-    obs_filename = ''
-    obs_metadata = {}
-    if obs_key in cfg:
-        obs_filename = match_model_to_key(obs_key, #using local copy
-                                                    cfg[obs_key],
-                                                    metadatas,
-                                                    group)
-        obs_metadata = metadatas[obs_filename]
-        obs_cube = iris.load_cube(obs_filename)
-        obs_cube = diagtools.bgc_units(obs_cube, obs_metadata['short_name'])
-        obs_key = obs_metadata['dataset']
+    obs_cube, obs_key, obs_filename = load_obs(cfg, groups)
 
     plot_details = {}
     cmap = plt.cm.get_cmap('jet')
@@ -341,7 +346,7 @@ def make_multimodle_zonal_mean_plots(
     for i, filename in enumerate(sorted(metadatas)):
         metadata = metadatas[filename]
         if filename == obs_filename: continue
-        if group != metadata['variable_group']: continue
+        if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
         projects[metadata['project']] = True
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
@@ -361,7 +366,7 @@ def make_multimodle_zonal_mean_plots(
         dataset = metadata['dataset']
         project = metadata['project']
 
-        if group != metadata['variable_group']:
+        if metadata['variable_group'] not in groups:
             continue
 
         cube = iris.load_cube(filename)
@@ -397,15 +402,15 @@ def make_multimodle_zonal_mean_plots(
 
         if project == 'CMIP5':
                 mip_color  = 'red'
-        if project == 'CMIP3':
+        elif project == 'CMIP3':
                 mip_color  = 'dodgerblue'
-        if project == 'CMIP6':
+        elif project == 'CMIP6':
                 mip_color  = 'green'
-        label = project + ' mean'
-        plot_details[dataset] = {'c': mip_color, 'ls': '-', 'lw': 2,
-                                             'label': label}
+        else:  assert 0
+        plot_details[project] = {'c': mip_color, 'ls': '-', 'lw': 2,
+                                             'label': project}
         if pane in 'abc':
-                key_word, xlabel = plot_zonal_cube(project_mean_error, plot_details[dataset])
+                key_word, xlabel = plot_zonal_cube(project_mean_error, plot_details[project])
 
         if pane in 'c':
                 cube_std = make_std_of_cube_list(errorcubeslist)
@@ -414,7 +419,7 @@ def make_multimodle_zonal_mean_plots(
         if pane in 'd':
                 cubeslist = [cube  for cube in project_cubes[project].values()]
                 project_mean = make_mean_of_cube_list(cubeslist)
-                key_word, xlabel = plot_zonal_cube(project_mean, plot_details[dataset])
+                key_word, xlabel = plot_zonal_cube(project_mean, plot_details[project])
 
                 cube_std = make_std_of_cube_list(cubeslist)
                 fill_between_two_cubes(project_mean - cube_std, project_mean + cube_std, mip_color)
@@ -443,7 +448,6 @@ def make_multimodle_zonal_mean_plots(
     image_extention = diagtools.get_image_format(cfg)
 
     # Determine image filename:
-
     path = diagtools.get_image_path(
         cfg,
         metadata,
@@ -453,9 +457,11 @@ def make_multimodle_zonal_mean_plots(
     # Saving files:
     if cfg['write_plots']:
         logger.info('Saving plots to %s', path)
-        plt.savefig(path)
+        plt.savefig(path, dpi=dpi)
 
     plt.close()
+
+
 
 
 def main(cfg):
@@ -469,6 +475,8 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
+    dpi = 100
+
     #####
     # individual panes
     for pane in [ 'c', 'd', 'a', 'b',]:
@@ -477,7 +485,7 @@ def main(cfg):
     #####
     # Altogether
     fig = plt.figure()
-    fig.set_size_inches(9., 9.)
+    fig.set_size_inches(10., 9.)
     plot_details = {}
     axes = []
     for pane,sbpt in zip([ 'a', 'b', 'c', 'd', ], [221,222,223,224]):
@@ -485,11 +493,53 @@ def main(cfg):
         ax, pt_dets = make_multimodle_zonal_mean_plots(cfg, pane=pane, save = False)
         plot_details.update(pt_dets)
 
-    diagtools.add_legend_outside_right(plot_details, plt.gca())
+    plt.subplots_adjust(right=0.80, hspace=0.3, wspace=0.3)
+    cax = plt.axes([0.8, 0.1, 0.075, 0.8])
+    plt.axis('off')
+
+    # ####
+    # Make legend order
+    legend_order = []
+    obs = ['HadISST', 'WOA', 'CORA']
+    projects = ['CMIP6', 'CMIP5', 'CMIP3',] #'WOA', 'OBS']
+    for ob in obs:
+        if ob in plot_details.keys(): legend_order.append(ob)
+    for proj in projects:
+        if proj in plot_details.keys(): legend_order.append(proj)
+    for linename in sorted(plot_details.keys()):
+        if linename in legend_order: continue
+        legend_order.append(linename)
+
+    # ####
+    # Make dummy axes
+    for index in legend_order:
+        colour = plot_details[index]['c']
+        linewidth = plot_details[index].get('lw', 1)
+        linestyle = plot_details[index].get('ls', '-')
+        label = plot_details[index].get('label', str(index))
+        plt.plot([], [], c=colour, lw=linewidth, ls=linestyle, label=label)
+
+
+
+    # handles, labels = plt.gca().get_legend_handles_labels()
+    # print (handles, labels, legend_order)
+    # assert 0
+    # plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
+
+    # Make legend
+    legd = cax.legend(
+        # handles,
+        # labels,
+        loc='center left',
+        ncol=1,
+        prop={'size': 10},)
+        #bbox_to_anchor=(1., 0.5))
+    #legd.draw_frame(False)
+    #legd.get_frame().set_alpha(0.)
 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
-    path = cfg['plot_dir'] + 'fig_3.21'+image_extention
+    path = cfg['plot_dir'] + 'fig_3.19'+image_extention
 
     # Saving files:
     if cfg['write_plots']:
