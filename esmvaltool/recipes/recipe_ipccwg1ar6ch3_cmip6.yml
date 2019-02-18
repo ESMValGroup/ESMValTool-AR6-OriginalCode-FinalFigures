@@ -152,6 +152,11 @@ preprocessors:
       statistics: [mean, median]
       exclude: [reference_dataset, alternative_dataset]
 
+  pp_psl:
+    regrid:
+      target_grid: 2.5x2.5
+      scheme: linear
+
 
 diagnostics:
 
@@ -546,10 +551,40 @@ diagnostics:
   # Fig. 3.27 (ZOD fig. 3.41)
   # Yu
   # **********************************************************************
-  # Northern and southern annular modes
+  # Calculate NAM and SAM as EOF1s of sea level pressure.
   # **********************************************************************
   # status: 
   # **********************************************************************
+
+  fig_3_27:
+    description: apply EOF to monthly psl over NH and SH
+    themes:
+      - varmodes
+    realms:
+      - atmos
+    variables:
+      psl:
+        preprocessor: pp_psl
+        reference_dataset: JRA-55
+        mip: Amon
+        field: T2Ms
+    additional_datasets:
+      #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      #- {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: GISS-E2-1-G, ensemble: r5i1p1f1, grid: gn}
+      #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+      #- {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+      - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
+         start_year: 1958, end_year: 2006, tier: 3}
+    scripts:
+      pattern_index:
+        script: annular_modes/annular_modes_eof.ncl
+        season_nam: monthly
+        season_sam: monthly
+        syear_eof: 1979
+        eyear_eof: 2004
+        movingave_index: 12
 
 
   # **********************************************************************
