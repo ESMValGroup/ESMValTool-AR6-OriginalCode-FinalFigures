@@ -185,14 +185,9 @@ diagnostics:
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1,
          start_year: 1986, end_year: 2005, tier: 3}
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
     scripts:
       fig_3_2: &fig-9-2_and_9-4_settings
         script: clouds/clouds_bias.ncl
@@ -228,15 +223,10 @@ diagnostics:
     additional_datasets:
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
          start_year: 1986, end_year: 2005, tier: 1}
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
       - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
     scripts:
       fig09-4:
         <<: *fig-9-2_and_9-4_settings
@@ -268,9 +258,10 @@ diagnostics:
         ensemble: r1i1p1
         grid: gr
         start_year: 1870
-        end_year: 2004
+        end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, end_year: 2000}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
