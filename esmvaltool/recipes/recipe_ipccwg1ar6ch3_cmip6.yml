@@ -569,6 +569,12 @@ diagnostics:
         mip: Amon
         field: T2Ms
     additional_datasets:
+      #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      #- {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: GISS-E2-1-G, ensemble: r5i1p1f1, grid: gn}
+      #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+      #- {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
       - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
          start_year: 1958, end_year: 2006, tier: 3}
     scripts:
