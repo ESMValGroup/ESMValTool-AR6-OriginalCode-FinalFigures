@@ -25,7 +25,7 @@
 ;                          the input data
 ;    movingave_index:      Integer, size of the moving average window to be
 ;                          applied to the PC1s (mainly for visualizing)
-; 
+;
 ; ############################################################################
 
 load "$diag_scripts/../interface_scripts/interface.ncl"
