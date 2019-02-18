@@ -85,6 +85,7 @@ diagnostics:
         end_year: 1999
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: ACCESS1-0, project: CMIP5}
@@ -153,6 +154,7 @@ diagnostics:
         end_year: 1999
     additional_datasets:
       #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: ACCESS1-0}
@@ -222,6 +224,7 @@ diagnostics:
         end_year: 1999
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: ACCESS1-0}
@@ -241,9 +244,9 @@ diagnostics:
       - {dataset: CMCC-CMS}
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
-     # - {dataset: EC-EARTH} cannot concatenate cubes
+      #- {dataset: EC-EARTH} cannot concatenate cubes
       - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
+      #- {dataset: GFDL-CM2p1}
       - {dataset: GFDL-CM3}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
@@ -293,6 +296,10 @@ diagnostics:
         derive: true
         force_derivation: false
     additional_datasets:
+      #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      #- {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      ##- {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1, grid: gr, project: CMIP6}
+      #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
       - {dataset: bcc-csm1-1}
