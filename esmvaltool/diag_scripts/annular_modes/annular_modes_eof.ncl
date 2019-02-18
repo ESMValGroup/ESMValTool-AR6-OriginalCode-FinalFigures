@@ -767,9 +767,9 @@ begin
     pres@amJust                           = "TopLeft"
     pres@amOrthogonalPosF                 = -0.65
     pres@gsnPanelFigureStrings = (/ "(a) NAM ("+refname+")", \
-                                    "(b) NAM (CMIP5 MME mean)", \
+                                    "(b) NAM (MME mean)", \
                                     "(d) SAM ("+refname+")", \
-                                    "(e) SAM (CMIP5 MME mean)" /)
+                                    "(e) SAM (MME mean)" /)
     gsn_panel(wks, ndtooned(plots(0:1, 0:1)), (/2, 2/), pres)
 
     log_info(DIAG_SCRIPT + " plotting NAM and SAM indices")
