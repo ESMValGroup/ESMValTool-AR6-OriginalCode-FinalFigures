@@ -706,6 +706,7 @@ diagnostics:
         end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -751,6 +752,7 @@ diagnostics:
         end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -912,6 +914,7 @@ diagnostics:
         end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r17i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -945,6 +948,7 @@ diagnostics:
         end_year: 2010
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r14i1p1f1}
       - {dataset: AIRS, project: obs4mips, level: L3, version: RetStd-v5, tier: 1} 
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
@@ -978,6 +982,7 @@ diagnostics:
         end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
@@ -1011,6 +1016,7 @@ diagnostics:
         end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
@@ -1044,6 +1050,7 @@ diagnostics:
         end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1}
       - {dataset: ESACCI-CLOUD, project: OBS, type: sat, version: AVHRR-fv2.0, tier: 2}
       - {dataset: PATMOS, project: OBS, type: sat, version: 1, tier: 2}
