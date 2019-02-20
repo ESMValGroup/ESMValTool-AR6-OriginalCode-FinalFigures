@@ -1,6 +1,6 @@
 """
-Transects diagnostics figure 3.1
-================================
+Transects diagnostics figure 3.17
+=================================
 
 Diagnostic to produce images of a transect. These plost show either latitude or
 longitude against depth, and the cube value is used as the colour scale.

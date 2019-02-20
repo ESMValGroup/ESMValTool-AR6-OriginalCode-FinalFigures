@@ -33,6 +33,11 @@ datasets:
   - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
   - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
 
+  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: HadGEM2-AO, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+
 
 
 preprocessors:
@@ -81,5 +86,5 @@ diagnostics:
         - {dataset: WOA,  project: obs4mips,  level: L3,  version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
     scripts:
       Regional_Ocean_DepthLayers_regrid_transect:
-        script: ocean/diagnostic_fig_3_1.py
+        script: ocean/diagnostic_fig_3_17.py
         observational_dataset: {dataset: WOA, project: obs4mips,}
