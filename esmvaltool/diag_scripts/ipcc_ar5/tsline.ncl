@@ -39,15 +39,15 @@
 ;
 ; #############################################################################
 
-load "interface_scripts/interface.ncl"
+load "$diag_scripts/../interface_scripts/interface.ncl"
 
-load "./diag_scripts/shared/latlon.ncl"
-load "./diag_scripts/shared/statistics.ncl"
-load "./diag_scripts/shared/scaling.ncl"
-load "./diag_scripts/shared/ensemble.ncl"
+load "$diag_scripts/shared/latlon.ncl"
+load "$diag_scripts/shared/statistics.ncl"
+load "$diag_scripts/shared/scaling.ncl"
+load "$diag_scripts/shared/ensemble.ncl"
 
-load "./diag_scripts/shared/plot/style.ncl"
-load "./diag_scripts/shared/plot/xy_line.ncl"
+load "$diag_scripts/shared/plot/style.ncl"
+load "$diag_scripts/shared/plot/xy_line.ncl"
 
 
 begin
@@ -233,6 +233,7 @@ begin
         if(imod .ne. ref_ind) then
           procmod = area_operations(A0_mask, -90., 90., 0., \
                                     360., "average", True)
+          delete(A0_mask)
         else
           procmod = area_operations(A0, -90., 90., 0., 360., \
                                     "average", True)

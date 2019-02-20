@@ -152,6 +152,16 @@ preprocessors:
       statistics: [mean, median]
       exclude: [reference_dataset, alternative_dataset]
 
+  pp_psl:
+    regrid:
+      target_grid: 2.5x2.5
+      scheme: linear
+
+  regrid_4_5:
+    regrid:
+      target_grid: 4x5
+      scheme: linear
+
 
 diagnostics:
 
@@ -185,14 +195,9 @@ diagnostics:
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1,
          start_year: 1986, end_year: 2005, tier: 3}
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
     scripts:
       fig_3_2: &fig-9-2_and_9-4_settings
         script: clouds/clouds_bias.ncl
@@ -212,7 +217,7 @@ diagnostics:
   # mean relative error (geographical ditributions)
   # **********************************************************************
 
-  fig_3_4:
+  fig_3_3:
     description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
     variables:
       pr:
@@ -223,18 +228,15 @@ diagnostics:
         field: T2Ms
         grid: gr
         exp: historical
+        start_year: 1986
+        end_year: 2005
     additional_datasets:
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
          start_year: 1986, end_year: 2005, tier: 1}
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
       - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+      - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
+      - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
     scripts:
       fig09-4:
         <<: *fig-9-2_and_9-4_settings
@@ -266,17 +268,12 @@ diagnostics:
         ensemble: r1i1p1
         grid: gr
         start_year: 1870
-        end_year: 2004
+        end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
-      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
          start_year: 1870, end_year: 2017, tier: 2}
       - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
@@ -291,7 +288,7 @@ diagnostics:
         range_option: 0
         plot_units: "degC"
         # Plot style
-        styleset: CMIP5
+        styleset: CMIP6
 
 
   # **********************************************************************
@@ -358,7 +355,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3
-  # Fig. 11 (ZOD fig. 3.19)
+  # Fig. 3.11 (ZOD fig. 3.19)
   # Axel, Lisa
   # **********************************************************************
   # Summer-winter range of precipitation and sea-level pressure
@@ -382,7 +379,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig. 3.15 (ZOD fig. 3.23)
+  # Fig. 3.13 (ZOD fig. 3.23)
   # Lisa, Manuel
   # **********************************************************************
   # Blocking frequency
@@ -394,7 +391,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.4 
-  # Fig. 3.17 (ZOD fig. 3.34)
+  # Fig. 3.14 (ZOD fig. 3.34)
   # Daniel
   # **********************************************************************
   # Trends in september sea ice extent
@@ -406,7 +403,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.4 
-  # Fig. 3.18 (ZOD fig. 3.36)
+  # Fig. 3.15 (ZOD fig. 3.36)
   # similar to fig. IPCC AR5, chap. 10, 10.16
   # Daniel
   # **********************************************************************
@@ -419,7 +416,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.4.2 
-  # 3.19 (ZOD fig. 3.36)
+  # Fig. 3.16 (ZOD fig. 3.36)
   # Daniel
   # **********************************************************************
   # Snow cover extent
@@ -432,7 +429,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.20 (ZOD fig. 3.25)
+  # Fig. 3.17 (ZOD fig. 3.25)
   # similar to fig. IPCC AR5, chap. 9, 9.13
   # Lee
   # **********************************************************************
@@ -445,7 +442,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.21 (ZOD fig. 3.26)
+  # Fig. 3.18 (ZOD fig. 3.26)
   # similar to fig. IPCC AR5, chap. 9, 9.17
   # Lee
   # **********************************************************************
@@ -458,7 +455,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.22 (ZOD fig. 3.27)
+  # Fig. 3.19 (ZOD fig. 3.27)
   # similar to fig. IPCC AR5, chap. 9, 9.14
   # Lee
   # **********************************************************************
@@ -471,7 +468,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.23 (ZOD fig. 3.28)
+  # Fig. 3.20 (ZOD fig. 3.28)
   # similar to fig. IPCC AR5, chap. 9, 9.13
   # Lee
   # **********************************************************************
@@ -484,7 +481,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.24 (ZOD fig. 3.30)
+  # Fig. 3.21 (ZOD fig. 3.30)
   # Lee
   # **********************************************************************
   # Salinity trends for the near-surface ocean
@@ -496,7 +493,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.25 (ZOD fig. 3.31)
+  # Fig. 3.22 (ZOD fig. 3.31)
   # Lee
   # **********************************************************************
   # Long-term trends in halosteric sea leve anomaly
@@ -508,7 +505,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.26 (ZOD fig. 3.32)
+  # Fig. 3.23 (ZOD fig. 3.32)
   # Lee
   # **********************************************************************
   # Components of global mean sea level change
@@ -520,7 +517,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.27 (ZOD fig. 3.33)
+  # Fig. 3.24 (ZOD fig. 3.33)
   # Lee
   # **********************************************************************
   # AMOC streamfunction profiles
@@ -532,7 +529,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.6 
-  # Fig. 3.28 (ZOD fig. 3.39)
+  # Fig. 3.25 (ZOD fig. 3.39)
   # Tina
   # **********************************************************************
   # Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
@@ -544,7 +541,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.6 
-  # Fig. 3.29 (ZOD fig. 3.40)
+  # Fig. 3.26 (ZOD fig. 3.40)
   # Tina
   # **********************************************************************
   # Changes to the ampitude of the seasonal cycle fo atmospheric CO2
@@ -556,19 +553,49 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.30 (ZOD fig. 3.41)
-  # Adam
+  # Fig. 3.27 (ZOD fig. 3.41)
+  # Yu
   # **********************************************************************
-  # Northern and southern annular modes
+  # Calculate NAM and SAM as EOF1s of sea level pressure.
   # **********************************************************************
   # status: 
   # **********************************************************************
+
+  fig_3_27:
+    description: apply EOF to monthly psl over NH and SH
+    themes:
+      - varmodes
+    realms:
+      - atmos
+    variables:
+      psl:
+        preprocessor: pp_psl
+        reference_dataset: JRA-55
+        mip: Amon
+        field: T2Ms
+    additional_datasets:
+      #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      #- {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: GISS-E2-1-G, ensemble: r5i1p1f1, grid: gn}
+      #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+      #- {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+      - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
+         start_year: 1958, end_year: 2006, tier: 3}
+    scripts:
+      pattern_index:
+        script: annular_modes/annular_modes_eof.ncl
+        season_nam: monthly
+        season_sam: monthly
+        syear_eof: 1979
+        eyear_eof: 2004
+        movingave_index: 12
 
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.31 (ZOD fig. 3.42)
+  # Fig. 3.28 (ZOD fig. 3.42)
   # Adam
   # **********************************************************************
   # SAM index in the last millenium
@@ -580,7 +607,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.32 (ZOD fig. 3.44)
+  # Fig. 3.29 (ZOD fig. 3.44)
   # Adam
   # **********************************************************************
   # Maximum entropy power spectra of surface air temperature
@@ -592,7 +619,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7.3 
-  # Fig. 3.33 (ZOD fig. 3.45)
+  # Fig. 3.30 (ZOD fig. 3.45)
   # Adam
   # **********************************************************************
   # ENSO seasonality
@@ -604,7 +631,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.34 (ZOD fig. 3.46)
+  # Fig. 3.31 (ZOD fig. 3.46)
   # Adam
   # **********************************************************************
   # El Nino and La Nina composites for temperature and precipitation
@@ -616,7 +643,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.35 (ZOD fig. 3.47)
+  # Fig. 3.32 (ZOD fig. 3.47)
   # Adam
   # **********************************************************************
   # PDV patterns
@@ -629,7 +656,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.36 (ZOD fig. 3.49)
+  # Fig. 3.33 (ZOD fig. 3.49)
   # Adam 
   # **********************************************************************
   # Comparison of AMV index
@@ -640,7 +667,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.37 (ZOD fig. 3.13)
+  # Fig. 3.34 (ZOD fig. 3.13)
   # similar to fig. IPCC AR5, chap. 10, 10.21
   # Lisa  
   # **********************************************************************
@@ -654,7 +681,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig 3.38 (ZOD fig. 3.1)
+  # Fig 3.35 (ZOD fig. 3.1)
   # similar to fig. IPCC AR5, chap. 9, 9.7
   # **********************************************************************
   # Portrait plot global seasonal cycle climatology (RMSD) 
@@ -680,10 +707,11 @@ diagnostics:
         exp: historical
         ensemble: r1i1p1
         grid: gr
-        start_year: 2000
-        end_year: 2002
+        start_year: 1980
+        end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -725,10 +753,11 @@ diagnostics:
         exp: historical
         ensemble: r1i1p1
         grid: gr
-        start_year: 2000
-        end_year: 2002
+        start_year: 1980
+        end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -740,133 +769,133 @@ diagnostics:
         # Normalization ('mean', 'median', 'centered_median', 'none')
         normalization: [centered_median]
 
-  ### ua: EASTWARD WIND #######################################################
-  ua850:
-    description: Eastward wind at 850 hPa global.
-    themes:
-      - atmDyn
-    realms:
-      - atmos
-    variables:
-      ua:
-        preprocessor: pp850
-        reference_dataset: ERA-Interim
-        alternative_dataset: NCEP
-        mip: Amon
-        field: T3M
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2000
-        end_year: 2002
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### ua: EASTWARD WIND #######################################################
+#  ua850:
+#    description: Eastward wind at 850 hPa global.
+#    themes:
+#      - atmDyn
+#    realms:
+#      - atmos
+#    variables:
+#      ua:
+#        preprocessor: pp850
+#        reference_dataset: ERA-Interim
+#        alternative_dataset: NCEP
+#        mip: Amon
+#        field: T3M
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2000
+#        end_year: 2002
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+#      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  ua200:
+#    description: Eastward wind at 200 hPa global.
+#    themes:
+#      - atmDyn
+#    realms:
+#      - atmos
+#    variables:
+#      ua:
+#        preprocessor: pp200
+#        reference_dataset: ERA-Interim
+#        alternative_dataset: NCEP
+#        mip: Amon
+#        field: T3M
+#        project: CMIP6
+#        exp: historical
+#        ensemble: r1i1p1
+#        grid: gr
+#        start_year: 2000
+#        end_year: 2002
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+#      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
-  ua200:
-    description: Eastward wind at 200 hPa global.
-    themes:
-      - atmDyn
-    realms:
-      - atmos
-    variables:
-      ua:
-        preprocessor: pp200
-        reference_dataset: ERA-Interim
-        alternative_dataset: NCEP
-        mip: Amon
-        field: T3M
-        project: CMIP6
-        exp: historical
-        ensemble: r1i1p1
-        grid: gr
-        start_year: 2000
-        end_year: 2002
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### va: NORTHWARD WIND ######################################################
-  va850:
-    description: Northward wind at 850 hPa global.
-    themes:
-      - atmDyn
-    realms:
-      - atmos
-    variables:
-      va:
-        preprocessor: pp850
-        reference_dataset: ERA-Interim
-        alternative_dataset: NCEP
-        mip: Amon
-        field: T3M
-        project: CMIP5
-        exp: historical
-        grid: gr
-        start_year: 2000
-        end_year: 2002
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
-      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  va200:
-    description: Northward wind at 200 hPa global.
-    themes:
-      - atmDyn
-    realms:
-      - atmos
-    variables:
-      va:
-        preprocessor: pp200
-        reference_dataset: ERA-Interim
-        alternative_dataset: NCEP
-        mip: Amon
-        field: T3M
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2000
-        end_year: 2002
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
-      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### va: NORTHWARD WIND ######################################################
+#  va850:
+#    description: Northward wind at 850 hPa global.
+#    themes:
+#      - atmDyn
+#    realms:
+#      - atmos
+#    variables:
+#      va:
+#        preprocessor: pp850
+#        reference_dataset: ERA-Interim
+#        alternative_dataset: NCEP
+#        mip: Amon
+#        field: T3M
+#        project: CMIP5
+#        exp: historical
+#        grid: gr
+#        start_year: 2000
+#        end_year: 2002
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1}
+#      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+#      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  va200:
+#    description: Northward wind at 200 hPa global.
+#    themes:
+#      - atmDyn
+#    realms:
+#      - atmos
+#    variables:
+#      va:
+#        preprocessor: pp200
+#        reference_dataset: ERA-Interim
+#        alternative_dataset: NCEP
+#        mip: Amon
+#        field: T3M
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2000
+#        end_year: 2002
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1}
+#      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+#      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
   ### zg: GEOPOTENTIAL HEIGHT #################################################
@@ -886,10 +915,11 @@ diagnostics:
         project: CMIP6
         exp: historical
         grid: gr
-        start_year: 2000
-        end_year: 2002
+        start_year: 1980
+        end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r17i1p1f1}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -920,11 +950,12 @@ diagnostics:
         exp: historical
         grid: gr
         start_year: 2003
-        end_year: 2004
+        end_year: 2010
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r14i1p1f1}
-      - {dataset: AIRS, project: obs4mips, level: L3, version: RetStd-v5, tier: 1}
+      - {dataset: AIRS, project: obs4mips, level: L3, version: RetStd-v5, tier: 1} 
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
     scripts:
       grading:
@@ -952,48 +983,15 @@ diagnostics:
         project: CMIP6
         exp: historical
         grid: gr
-        start_year: 2000
-        end_year: 2002
+        start_year: 1980
+        end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### ts: SEA-SURFACE (SKIN) TEMPERATURE ######################################
-  ts:
-    description: Sea-surface (skin) temperature
-    themes:
-      - phys
-    realms:
-      - atmos
-      - ocean
-    variables:
-      ts:
-        preprocessor: ppNOLEV1x1
-        reference_dataset: ESACCI-SST
-        alternative_dataset: HadISST
-        mip: Amon
-        field: T2Ms
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 2000
-        end_year: 2002
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: ESACCI-SST, project: OBS, type: sat, version: L4-GHRSST-SSTdepth-OSTIA-GLOB, tier: 2}
-      - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
         <<: *grading_settings
@@ -1019,10 +1017,12 @@ diagnostics:
         project: CMIP6
         exp: historical
         grid: gr
-        start_year: 2000
-        end_year: 2002
+        start_year: 1980
+        end_year: 2005
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
     scripts:
@@ -1051,10 +1051,11 @@ diagnostics:
         project: CMIP6
         exp: historical
         grid: gr
-        start_year: 2000
-        end_year: 2002
+        start_year: 1982
+        end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1}
       - {dataset: ESACCI-CLOUD, project: OBS, type: sat, version: AVHRR-fv2.0, tier: 2}
       - {dataset: PATMOS, project: OBS, type: sat, version: 1, tier: 2}
@@ -1067,128 +1068,127 @@ diagnostics:
         normalization: [centered_median]
 
 
-  ### rlut: ALL-SKY LONGWAVE RADIATION ########################################
-  rlut:
-    description: All-sky longwave radiation
-    themes:
-      - phys
-    realms:
-      - atmos
-    variables:
-      rlut:
-        preprocessor: ppNOLEV1
-        reference_dataset: CERES-EBAF
-        mip: Amon
-        field: T2Ms
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2001
-        end_year: 2003
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
-      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### rlut: ALL-SKY LONGWAVE RADIATION ########################################
+#  rlut:
+#    description: All-sky longwave radiation
+#    themes:
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      rlut:
+#        preprocessor: ppNOLEV1
+#        reference_dataset: CERES-EBAF
+#        mip: Amon
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2001
+#        end_year: 2003
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1}
+#      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+#      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+#
+#
+#  ### rsut: ALL-SKY SHORTWAVE RADIATION #######################################
+#  rsut:
+#    description: All-sky shortwave radiation
+#    themes:
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      rsut:
+#        preprocessor: ppNOLEV1
+#        reference_dataset: CERES-EBAF
+#        mip: Amon
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2001
+#        end_year: 2003
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
+#      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
-  ### rsut: ALL-SKY SHORTWAVE RADIATION #######################################
-  rsut:
-    description: All-sky shortwave radiation
-    themes:
-      - phys
-    realms:
-      - atmos
-    variables:
-      rsut:
-        preprocessor: ppNOLEV1
-        reference_dataset: CERES-EBAF
-        mip: Amon
-        field: T2Ms
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2001
-        end_year: 2003
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-
-  ### lwcre: LONGWAVE CLOUD FORCING ###########################################
-  lwcre:
-    description: Longwave cloud radiative effect
-    themes:
-      - clouds
-    realms:
-      - atmos
-    variables:
-      lwcre:
-        preprocessor: ppNOLEV1
-        reference_dataset: CERES-EBAF
-        mip: Amon
-        field: T2Ms
-        derive: true
-        force_derivation: false
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2001
-        end_year: 2003
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
-    scripts:
-      grading:
-        <<: *grading_settings
-
-
-  ### swcre: SHORTWAVE CLOUD FORCING ##########################################
-  swcre:
-    description: Shortwave cloud radiative effect
-    themes:
-      - clouds
-    realms:
-      - atmos
-    variables:
-      swcre:
-        preprocessor: ppNOLEV1
-        reference_dataset: CERES-EBAF
-        mip: Amon
-        field: T2Ms
-        derive: true
-        force_derivation: false
-        project: CMIP6
-        exp: historical
-        grid: gr
-        start_year: 2001
-        end_year: 2003
-    additional_datasets:
-      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
-    scripts:
-      grading:
-        <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+#  ### lwcre: LONGWAVE CLOUD FORCING ###########################################
+#  lwcre:
+#    description: Longwave cloud radiative effect
+#    themes:
+#      - clouds
+#    realms:
+#      - atmos
+#    variables:
+#      lwcre:
+#        preprocessor: ppNOLEV1
+#        reference_dataset: CERES-EBAF
+#        mip: Amon
+#        field: T2Ms
+#        derive: true
+#        force_derivation: false
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2001
+#        end_year: 2003
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#
+#
+#  ### swcre: SHORTWAVE CLOUD FORCING ##########################################
+#  swcre:
+#    description: Shortwave cloud radiative effect
+#    themes:
+#      - clouds
+#    realms:
+#      - atmos
+#    variables:
+#      swcre:
+#        preprocessor: ppNOLEV1
+#        reference_dataset: CERES-EBAF
+#        mip: Amon
+#        field: T2Ms
+#        derive: true
+#        force_derivation: false
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 2001
+#        end_year: 2003
+#    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1}
+#    scripts:
+#      grading:
+#        <<: *grading_settings
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
 
 
 #  ### od550aer: AEROSOL OPTICAL DEPTH AT 550 nm ###############################
@@ -1199,7 +1199,7 @@ diagnostics:
 #        preprocessor: ppNOLEV2thr10
 #        reference_dataset: ESACCI-AEROSOL
 #        alternative_dataset: MODIS
-#        mip: aero
+#        mip: AERmon
 #        field: T2Ms
 #        project: CMIP6
 #        exp: historical
@@ -1207,6 +1207,8 @@ diagnostics:
 #        start_year: 2003
 #        end_year: 2004
 #    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1}
 #      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
 #      - {dataset: MODIS, project: OBS, type: sat, version: L3-C6, tier: 2}
 #    scripts:
@@ -1216,8 +1218,8 @@ diagnostics:
 #        metric: [RMSD]
 #        # Normalization ('mean', 'median', 'centered_median', 'none')
 #        normalization: [centered_median]
-#
-#
+
+
 #  ### od870aer: AEROSOL OPTICAL DEPTH AT 870 nm ###############################
 #  od870aer:
 #    description: Aerosol optical depth at 870 nm
@@ -1241,8 +1243,8 @@ diagnostics:
 #        metric: [RMSD]
 #        # Normalization ('mean', 'median', 'centered_median', 'none')
 #        normalization: [centered_median]
-#
-#
+
+
 #  ### abs550aer: ABSORPTION OPTICAL DEPTH AT 550 nm ###########################
 #  abs550aer:
 #    description: Absorption optical depth at 550 nm
@@ -1258,6 +1260,8 @@ diagnostics:
 #        start_year: 2002
 #        end_year: 2004
 #    additional_datasets:
+#      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#      - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1}
 #      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat, version: SU-v4.21, tier: 2}
 #    scripts:
 #      grading:
@@ -1266,8 +1270,8 @@ diagnostics:
 #        metric: [RMSD]
 #        # Normalization ('mean', 'median', 'centered_median', 'none')
 #        normalization: [centered_median]
-#
-#
+
+
 #  ### od550lt1aer: FINE MODE AEROSOL OPTICAL DEPTH AT 550 nm ##################
 #  od550lt1aer:
 #    description: Fine mode optical depth at 550 nm
@@ -1352,19 +1356,310 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.41 (ZOD fig. 3.5)
+  # Fig. 3.38 (ZOD fig. 3.5)
   # similar to fig. IPCC AR5, chap. 9, 9.6
-  # Lisa
+  # Lisa/Tina
   # **********************************************************************
-  # Centered pattern correlations
+  # Centred pattern correlations between models and observations for
+  # the annual mean climatology over the period 1980-1999.
   # **********************************************************************
-  # status: porting from v1 to v2
+  # status: 
   # **********************************************************************
+
+  fig_3_38_tas:
+    description: Calculate pattern correlation for tas
+    variables:
+      tas:
+        preprocessor: regrid_4_5
+        reference_dataset: ERA-Interim
+        alternative_dataset: NCEP
+        #project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1, grid: gr, project: CMIP6}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: ACCESS1-0, project: CMIP5}
+      - {dataset: ACCESS1-3, project: CMIP5}
+      - {dataset: bcc-csm1-1, project: CMIP5}
+      - {dataset: bcc-csm1-1-m, project: CMIP5}
+      - {dataset: BNU-ESM, project: CMIP5}
+      - {dataset: CanCM4, project: CMIP5}
+      - {dataset: CanESM2, project: CMIP5}
+      - {dataset: CCSM4, project: CMIP5}
+      - {dataset: CESM1-BGC, project: CMIP5}
+      - {dataset: CESM1-CAM5, project: CMIP5}
+      - {dataset: CESM1-FASTCHEM, project: CMIP5}
+      - {dataset: CESM1-WACCM, project: CMIP5}
+      - {dataset: CMCC-CESM, project: CMIP5}
+      - {dataset: CMCC-CM, project: CMIP5}
+      - {dataset: CMCC-CMS, project: CMIP5}
+      - {dataset: CNRM-CM5, project: CMIP5}
+      - {dataset: CNRM-CM5-2, project: CMIP5}
+      - {dataset: FIO-ESM, project: CMIP5}
+      - {dataset: GFDL-CM2p1, project: CMIP5}
+      - {dataset: GFDL-CM3, project: CMIP5}
+      - {dataset: GFDL-ESM2G, project: CMIP5}
+      - {dataset: GFDL-ESM2M, project: CMIP5}
+      - {dataset: GISS-E2-H, project: CMIP5}
+      - {dataset: GISS-E2-H-CC, project: CMIP5}
+      - {dataset: GISS-E2-R, project: CMIP5}
+      - {dataset: GISS-E2-R-CC, project: CMIP5}
+      - {dataset: HadCM3, project: CMIP5}
+      - {dataset: HadGEM2-AO, project: CMIP5}
+      - {dataset: HadGEM2-CC, project: CMIP5}
+      - {dataset: HadGEM2-ES, project: CMIP5}
+      - {dataset: inmcm4, project: CMIP5}
+      - {dataset: IPSL-CM5A-LR, project: CMIP5}
+      - {dataset: IPSL-CM5A-MR, project: CMIP5}
+      - {dataset: IPSL-CM5B-LR, project: CMIP5}
+      - {dataset: MIROC-ESM, project: CMIP5}
+      - {dataset: MIROC-ESM-CHEM, project: CMIP5}
+      - {dataset: MIROC4h, project: CMIP5}
+      - {dataset: MIROC5, project: CMIP5}
+      - {dataset: MPI-ESM-LR, project: CMIP5}
+      - {dataset: MPI-ESM-MR, project: CMIP5}
+      - {dataset: MPI-ESM-P, project: CMIP5}
+      - {dataset: MRI-CGCM3, project: CMIP5}
+      - {dataset: MRI-ESM1, project: CMIP5}
+      - {dataset: NorESM1-M, project: CMIP5}
+      - {dataset: NorESM1-ME, project: CMIP5}
+      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}      
+    scripts:
+      fig_3_38_pattern_cor: &fig09_6_pattern_cor
+        script: ipcc_ar5/ch09_fig09_6.ncl
+
+  fig_3_38_rlut:
+    description: Calculate pattern correlation for all-sky longwave radiation
+    variables:
+      rlut:
+        preprocessor: regrid_4_5
+        reference_dataset: CERES-EBAF
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1, grid: gr, project: CMIP6}
+      #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+    scripts:
+      fig_3_38_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  fig_3_38_pr:
+    description: Calculate pattern correlation for precipitation
+    variables:
+      pr:
+        preprocessor: regrid_4_5
+        reference_dataset: GPCP-SG
+        alternative_dataset: CMAP
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1, grid: gr, project: CMIP6}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      #- {dataset: EC-EARTH} cannot concatenate cubes
+      - {dataset: FIO-ESM}
+      #- {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
+      - {dataset: CMAP, project: OBS, type: mergedanaly, version: 1, tier: 2}
+    scripts:
+      fig_3_38_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  fig_3_38_swcre:
+    description: Calculate pattern correlation for shortwave cloud radiative effect
+    variables:
+      swcre:
+        preprocessor: regrid_4_5
+        reference_dataset: CERES-EBAF
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+        derive: true
+        force_derivation: false
+    additional_datasets:
+      #- {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      #- {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      ##- {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1, grid: gr, project: CMIP6}
+      #- {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: FGOALS-g2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+    scripts:
+      fig_3_38_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  ### COLLECT CORRELATIONS AND PLOT ###########################################
+  fig_3_38_cor_collect:
+    description: Wrapper to collect and plot previously calculated correlations
+    scripts:
+      fig_3_38_cor_collect:
+        script: ipcc_ar5/ch09_fig09_6_collect.ncl
+        ancestors: ['*/fig_3_38_pattern_cor']
+
+
   
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.42 (ZOD fig. 3.6)
+  # Fig. 3.39 (ZOD fig. 3.6)
   # Lisa
   # **********************************************************************
   # model improvements - mind map
@@ -1375,7 +1670,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.43 (ZOD fig. 3.7)
+  # Fig. 3.40 (ZOD fig. 3.7)
   # Lisa
   # **********************************************************************
   # model improvements - important features

@@ -5,16 +5,17 @@ documentation:
 
   description: |
     Reproducing selected figures from IPCC AR5, chap. 9 (Flato et al., 2013)
-    9.2, 9.4, 9.5, 9.8, 9.42a.
+    9.2, 9.4, 9.5, 9.6, 9.8, 9.42a.
 
   authors:
     - bock_ls
+    - gier_be
     - laue_ax
     - schl_ma
 
   maintainer:
     - righ_ma
-    
+
   references:
     - flato13ipcc
 
@@ -50,6 +51,11 @@ preprocessors:
       span: overlap
       statistics: [mean]
       exclude: [reference_dataset, alternative_dataset]
+
+  regrid_4_5:
+    regrid:
+      target_grid: 4x5
+      scheme: linear
 
 diagnostics:
 
@@ -585,10 +591,291 @@ diagnostics:
       fig09-5c:
         <<: *fig-9-5_settings
 
+  # ***************************************************************************
+  # Flato et al. (2013) - IPCC AR5, chap. 9                               
+  # similar to fig. 9.6                                                   
+  # ***************************************************************************
+  # Centred pattern correlations between models and observations for
+  # the annual mean climatology over the period 1980-1999.
+  # Contribution by Bettina Gier
+  # ***************************************************************************     
+
+  fig09-6_tas:
+    description: Calculate pattern correlation for tas
+    variables:
+      tas:
+        preprocessor: regrid_4_5
+        reference_dataset: ERA-Interim
+        alternative_dataset: NCEP
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      # - {dataset: EC-EARTH} height2m: does not exist
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}      
+    scripts:
+      fig09-6_pattern_cor: &fig09_6_pattern_cor
+        script: ipcc_ar5/ch09_fig09_6.ncl
+
+  fig09-6_rlut:
+    description: Calculate pattern correlation for all-sky longwave radiation
+    variables:
+      rlut:
+        preprocessor: regrid_4_5
+        reference_dataset: CERES-EBAF
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+    scripts:
+      fig09-6_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  fig09-6_pr:
+    description: Calculate pattern correlation for precipitation
+    variables:
+      pr:
+        preprocessor: regrid_4_5
+        reference_dataset: GPCP-SG
+        alternative_dataset: CMAP
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+     # - {dataset: EC-EARTH} cannot concatenate cubes
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
+      - {dataset: CMAP, project: OBS, type: mergedanaly, version: 1, tier: 2}
+    scripts:
+      fig09-6_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  fig09-6_swcre:
+    description: Calculate pattern correlation for shortwave cloud radiative effect
+    variables:
+      swcre:
+        preprocessor: regrid_4_5
+        reference_dataset: CERES-EBAF
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+        derive: true
+        force_derivation: false
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: FGOALS-g2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+    scripts:
+      fig09-6_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  ### COLLECT CORRELATIONS AND PLOT ###########################################
+  fig09-6_cor_collect:
+    description: Wrapper to collect and plot previously calculated correlations
+    scripts:
+      fig09-6_cor_collect:
+        script: ipcc_ar5/ch09_fig09_6_collect.ncl
+        ancestors: ['*/fig09-6_pattern_cor']
 
   # **********************************************************************
   # Flato et al. (2013) - IPCC AR5, chap. 9
-  # similar to fig. 9.8       
+  # similar to fig. 9.8
   # **********************************************************************
   # Time series of anomalies of annual and global surface temperature
   # **********************************************************************
@@ -597,8 +884,8 @@ diagnostics:
     description: IPCC AR5 Ch. 9, Fig. 9.8 (near-surface temperature)
     variables:
       tas:
-        preprocessor: clim_ref   
-        reference_dataset: HadCRUT4   
+        preprocessor: clim_ref
+        reference_dataset: HadCRUT4
         alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
@@ -663,7 +950,7 @@ diagnostics:
       - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
          start_year: 1990, end_year: 1990, tier: 2}
     scripts:
-      fig09-8: 
+      fig09-8:
         script: ipcc_ar5/tsline.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
@@ -677,28 +964,29 @@ diagnostics:
 
   # **********************************************************************
   # Flato et al. (2013) - IPCC AR5, chap. 9
-  # similar to fig. 9.42a       
+  # similar to fig. 9.42a
   # **********************************************************************
-  # 
+  # Equilibrium climate sensitivity (ECS) vs. global mean surface
+  # temperature (GMSAT)
+  # Contribution by Manuel Schlund
   # **********************************************************************
 
-  ecs:
-    description: Calculate ECS.
+  ecs_cmip5:
+    description: Calculate ECS for CMIP5 models.
     variables:
-      tas: &spatial_mean_cmip5_r1i1p1_amon_t2ms
+      tas: &ecs_settings
         preprocessor: spatial_mean
         project: CMIP5
         ensemble: r1i1p1
         mip: Amon
         field: T2Ms
       rtmt:
-        <<: *spatial_mean_cmip5_r1i1p1_amon_t2ms
+        <<: *ecs_settings
     additional_datasets:
       - {dataset: bcc-csm1-1, exp: piControl, start_year: 160, end_year: 309}
       - {dataset: bcc-csm1-1, exp: abrupt4xCO2, start_year: 160, end_year: 309}
       - {dataset: bcc-csm1-1-m, exp: piControl, start_year: 240, end_year: 389}
-      - {dataset: bcc-csm1-1-m, exp: abrupt4xCO2, start_year: 240,
-         end_year: 389}
+      - {dataset: bcc-csm1-1-m, exp: abrupt4xCO2, start_year: 240, end_year: 389}
       - {dataset: CanESM2, exp: piControl, start_year: 2015, end_year: 2164}
       - {dataset: CanESM2, exp: abrupt4xCO2, start_year: 1850, end_year: 1999}
       - {dataset: CCSM4, exp: piControl, start_year: 800, end_year: 949}
@@ -715,41 +1003,34 @@ diagnostics:
       - {dataset: GISS-E2-R, exp: abrupt4xCO2, start_year: 1850, end_year: 1999}
       - {dataset: inmcm4, exp: piControl, start_year: 2090, end_year: 2239}
       - {dataset: inmcm4, exp: abrupt4xCO2, start_year: 2090, end_year: 2239}
-      - {dataset: IPSL-CM5A-LR, exp: piControl, start_year: 1850,
-         end_year: 1999}
-      - {dataset: IPSL-CM5A-LR, exp: abrupt4xCO2, start_year: 1850,
-         end_year: 1999}
-      - {dataset: IPSL-CM5B-LR, exp: piControl, start_year: 1850,
-         end_year: 1999}
-      - {dataset: IPSL-CM5B-LR, exp: abrupt4xCO2, start_year: 1850,
-         end_year: 1999}
+      - {dataset: IPSL-CM5A-LR, exp: piControl, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM5A-LR, exp: abrupt4xCO2, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM5B-LR, exp: piControl, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM5B-LR, exp: abrupt4xCO2, start_year: 1850, end_year: 1999}
       - {dataset: MIROC5, exp: piControl, start_year: 2100, end_year: 2249}
       - {dataset: MIROC5, exp: abrupt4xCO2, start_year: 2100, end_year: 2249}
       - {dataset: MIROC-ESM, exp: piControl, start_year: 1800, end_year: 1949}
       - {dataset: MIROC-ESM, exp: abrupt4xCO2, start_year: 1, end_year: 150}
       - {dataset: MPI-ESM-LR, exp: piControl, start_year: 2015, end_year: 2164}
-      - {dataset: MPI-ESM-LR, exp: abrupt4xCO2, start_year: 1850,
-         end_year: 1999}
+      - {dataset: MPI-ESM-LR, exp: abrupt4xCO2, start_year: 1850, end_year: 1999}
       # Day is out of range for month (wait for iris > 2.0)
       # - {dataset: ACCESS1-0, exp: piControl, start_year: 300, end_year: 449}
       # - {dataset: ACCESS1-0, exp: abrupt4xCO2, start_year: 300, end_year: 449}
     scripts:
-      ecs:
+      ecs: &ecs_script
         script: climate_metrics/ecs.py
-        plot_ecs_regression: 'True'
-        output_name: 'ecs'
+        plot_ecs_regression: true
 
-  fig09-42a:
-    description: Plot ECS vs. GMSAT.
+  fig09-42a_cmip5:
+    description: Plot ECS vs. GMSAT for CMIP5 models.
     variables:
       tas:
-        <<: *spatial_mean_cmip5_r1i1p1_amon_t2ms
+        <<: *ecs_settings
     additional_datasets:
       - {dataset: bcc-csm1-1, exp: piControl, start_year: 160, end_year: 309}
       - {dataset: bcc-csm1-1, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: bcc-csm1-1-m, exp: piControl, start_year: 240, end_year: 389}
-      - {dataset: bcc-csm1-1-m, exp: historical, start_year: 1961,
-         end_year: 1990}
+      - {dataset: bcc-csm1-1-m, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: CanESM2, exp: piControl, start_year: 2015, end_year: 2164}
       - {dataset: CanESM2, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: CCSM4, exp: piControl, start_year: 800, end_year: 949}
@@ -757,8 +1038,7 @@ diagnostics:
       - {dataset: CNRM-CM5, exp: piControl, start_year: 1850, end_year: 1999}
       - {dataset: CNRM-CM5, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: CSIRO-Mk3-6-0, exp: piControl, start_year: 1, end_year: 150}
-      - {dataset: CSIRO-Mk3-6-0, exp: historical, start_year: 1961,
-         end_year: 1990}
+      - {dataset: CSIRO-Mk3-6-0, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: GFDL-CM3, exp: piControl, start_year: 1, end_year: 150}
       - {dataset: GFDL-CM3, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: GISS-E2-H, exp: piControl, start_year: 1200, end_year: 1349}
@@ -767,14 +1047,10 @@ diagnostics:
       - {dataset: GISS-E2-R, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: inmcm4, exp: piControl, start_year: 2090, end_year: 2239}
       - {dataset: inmcm4, exp: historical, start_year: 1961, end_year: 1990}
-      - {dataset: IPSL-CM5A-LR, exp: piControl, start_year: 1850,
-         end_year: 1999}
-      - {dataset: IPSL-CM5A-LR, exp: historical, start_year: 1961,
-         end_year: 1990}
-      - {dataset: IPSL-CM5B-LR, exp: piControl, start_year: 1850,
-         end_year: 1999}
-      - {dataset: IPSL-CM5B-LR, exp: historical, start_year: 1961,
-         end_year: 1990}
+      - {dataset: IPSL-CM5A-LR, exp: piControl, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM5A-LR, exp: historical, start_year: 1961, end_year: 1990}
+      - {dataset: IPSL-CM5B-LR, exp: piControl, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM5B-LR, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: MIROC5, exp: piControl, start_year: 2100, end_year: 2249}
       - {dataset: MIROC5, exp: historical, start_year: 1961, end_year: 1990}
       - {dataset: MIROC-ESM, exp: piControl, start_year: 1800, end_year: 1949}
@@ -786,16 +1062,14 @@ diagnostics:
       # - {dataset: ACCESS1-0, exp: historical, start_year: 1961,
       #    end_year: 1990}
     scripts:
-      fig09-42a:
+      fig09-42a: &fig09_42a_script
         script: ipcc_ar5/ch09_fig09_42a.py
-        ancestors: ['tas', 'ecs/ecs']
-        ecs_filename: 'ecs'
-        output_name: 'ch09_fig09-42a'
+        ancestors: ['tas', 'ecs_cmip5/ecs']
         tas_units: celsius
         save:
           bbox_inches: tight
           orientation: landscape
-        axes_functions:
+        axes_functions: &axes_functions
           set_title: GMSAT vs. ECS for CMIP5 models
           set_xlabel: ECS / °C
           set_ylabel: GMSAT / °C
@@ -806,3 +1080,46 @@ diagnostics:
               bbox_to_anchor: [1.05, 0.5]
               borderaxespad: 0.0
               ncol: 2
+
+  ecs_cmip6:
+    description: Calculate ECS for CMIP6 models.
+    variables:
+      tas:
+        <<: *ecs_settings
+        project: CMIP6
+      rtmt:
+        <<: *ecs_settings
+        project: CMIP6
+    additional_datasets:
+      # - {dataset: GISS-E2-1-G,  exp: piControl,    ensemble: r1i1p1f1, grid: gn, start_year: 4550, end_year: 4699}
+      # - {dataset: GISS-E2-1-G,  exp: abrupt-4xCO2, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM6A-LR, exp: piControl,    ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 1999}
+      - {dataset: IPSL-CM6A-LR, exp: abrupt-4xCO2, ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 1999}
+      - {dataset: MIROC6,       exp: piControl,    ensemble: r1i1p1f1, grid: gn, start_year: 3200, end_year: 3349}
+      - {dataset: MIROC6,       exp: abrupt-4xCO2, ensemble: r1i1p1f1, grid: gn, start_year: 3200, end_year: 3349}
+    scripts:
+      ecs:
+        <<: *ecs_script
+
+  fig09-42a_cmip6:
+    description: Plot ECS vs. GMSAT for CMIP6 models.
+    variables:
+      tas:
+        <<: *ecs_settings
+        project: CMIP6
+    additional_datasets:
+      # - {dataset: GISS-E2-1-G,  exp: piControl,    ensemble: r1i1p1f1, grid: gn, start_year: 4550, end_year: 4699}
+      # - {dataset: GISS-E2-1-G,  exp: historical,   ensemble: r1i1p1f1, grid: gn, start_year: 1961, end_year: 1990}
+      - {dataset: IPSL-CM6A-LR, exp: piControl,    ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 1999}
+        # TODO
+      - {dataset: IPSL-CM6A-LR, exp: historical,   ensemble: r29i1p1f1, grid: gr, start_year: 1961, end_year: 1990}
+      - {dataset: MIROC6,       exp: piControl,    ensemble: r1i1p1f1, grid: gn, start_year: 3200, end_year: 3349}
+      - {dataset: MIROC6,       exp: historical,   ensemble: r1i1p1f1, grid: gn, start_year: 1961, end_year: 1990}
+    scripts:
+      fig09-42a:
+        <<: *fig09_42a_script
+        ancestors: ['tas', 'ecs_cmip6/ecs']
+        axes_functions:
+          <<: *axes_functions
+          set_title: GMSAT vs. ECS for CMIP6 models
+        dataset_style: cmip6
