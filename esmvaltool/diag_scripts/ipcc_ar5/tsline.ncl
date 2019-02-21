@@ -56,6 +56,7 @@ begin
 
   var0 = variable_info[0]@short_name
   field_type0 = variable_info[0]@field
+  exp0 = variable_info[0]@exp
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
@@ -98,7 +99,7 @@ begin
   ; Set default values for non-required diag_script_info attributes
   set_default_att(diag_script_info, "time_avg", "monthly")
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
-  set_default_att(diag_script_info, "ref_value", False)
+  set_default_att(diag_script_info, "ref_value", True)
 
   ; Determine time range
   start_year = min(metadata_att_as_array(info_items, "start_year"))
@@ -130,6 +131,15 @@ begin
     A_ref = read_data(info_items[ref_ind])
   end if
 
+  ; individual case for HadCRUT4 observations
+  ; FIX-ME: mean value comes from climatology file (absolute.nc).
+  ; There are no missing values as in the anomaly data.
+  clim_ind = -1
+  if (any(datasetnames.eq."HadCRUT4-clim")) then
+    clim_ind = ind(datasetnames.eq."HadCRUT4-clim")
+    ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
+  end if
+
   ; Anomaly
   if (isatt(diag_script_info, "ts_anomaly")) then
     anom = diag_script_info@ts_anomaly
@@ -152,7 +162,7 @@ begin
       anom_ref = new((/dim_MOD/), double)
       anom_ref!0 = "model"
       anom_ref&model = datasetnames
-      anom_ref = 0.
+      ;anom_ref = 0.
     end if
   else
     anom = "noanom"
@@ -163,14 +173,8 @@ begin
     ref_value = diag_script_info@ref_value
   end if
 
-  ; individual case for HadCRUT4 observations
-  ; FIX-ME: mean value comes from climatology file (absolute.nc).
-  ; There are no missing values as in the anomaly data.
-  clim_ind = -1
-  if (ref_value .and. any(datasetnames.eq."HadCRUT4-clim")) then
-    clim_ind = ind(datasetnames.eq."HadCRUT4-clim")
-    ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
-  end if
+  ; TODO
+  model_arr_stddev = 0
 
   ; Create model array
   model_arr = new((/dim_MOD, ntime/), double)
@@ -178,13 +182,8 @@ begin
   model_arr!1 = "time"
   model_arr&model = datasetnames
   model_arr&time = time
-
-  model_arr_stat = new((/3, ntime/), double)
-  model_arr_stat!0 = "stat"
-  model_arr_stat!1 = "time"
-  model_arr_stat&time = time
-  delete(time)
-  model_arr_stat = 0.
+  model_arr@_FillValue = A_ref@_FillValue
+  model_arr = A_ref@_FillValue
 
   ; Loop over models
   do imod = 0, dim_MOD - 1
@@ -227,8 +226,10 @@ begin
           A0_timavg_ref = time_operations(A0, ref_start, ref_end, \
                                           "average", "annualclim", True)
           if(imod .ne. ref_ind) then
+            A0_timavg_ref_mask = time_operations(A0_mask, ref_start, ref_end, \
+                                                 "average", "annualclim", True)
             do i = 0, dimsizes(A0&time) - 1
-              A0_mask(i, :, :) = A0_mask(i, :, :) - A0_timavg_ref(:, :)
+              A0_mask(i, :, :) = A0_mask(i, :, :) - A0_timavg_ref_mask(:, :)
             end do
           else
             do i = 0, dimsizes(A0&time) - 1
@@ -328,6 +329,10 @@ begin
     ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset)
   end if
 
+  model_arr_stat = new((/3, ntime/), double)
+  model_arr_stat!0 = "stat"
+  model_arr_stat!1 = "time"
+  model_arr_stat&time = time
   model_arr_stat&stat = (/"mean","min","max"/)
 
   model_arr_stat(0,:) = (/model_arr(mmm_ind,:)/)
@@ -400,22 +405,24 @@ begin
   if (config_user_info@write_netcdf.eq."True") then
     out_path = config_user_info@work_dir
     system("mkdir -p " + out_path)
-    out_path1 = out_path + "tsline_" + anom + "_" + detr + ".nc"
+    out_path1 = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + ".nc"
       ; + start_year + "-" + end_year + ".nc"
     model_arr@ncdf = out_path
+    model_arr@experiment = exp0
     model_arr@diag_script = DIAG_SCRIPT
     model_arr@var = var0
     ncdf_outfile = ncdf_write(model_arr, out_path1)
     ; statistics
-    out_path2 = out_path + "tsline_mm_stat.nc"
+    out_path2 = out_path + "tsline_mm_" + var0 + "_stat.nc"
     model_arr_stat@ncdf = out_path
+    model_arr_stat@experiment = exp0
     model_arr_stat@diag_script = DIAG_SCRIPT
     model_arr_stat@var = var0
     ncdf_outfile = ncdf_write(model_arr_stat, out_path2)
   end if
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + var0 + "_" + anom + "_" + \
+  outfile = config_user_info@plot_dir + var0 + "_" + exp0 + "_" + anom + "_" + \
     detr + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
@@ -455,9 +462,9 @@ begin
 
   if(anom .eq. "anom") then
     xy_line_anom(wks, anom_ref, model_arr, model_arr&time, \
-                 model_arr_stat, ref_start, ref_end, res, res0, info_items)
+                 model_arr_stddev, ref_start, ref_end, res, res0, info_items)
   else
-    xy_line(wks, model_arr, model_arr&time, model_arr_stat, res, info_items)
+    xy_line(wks, model_arr, model_arr&time, model_arr_stddev, res, info_items)
   end if
 
   log_info(" wrote " + outfile + "." + file_type)

@@ -26,15 +26,15 @@
 ;
 ; #############################################################################
 
-load "./interface_scripts/interface.ncl"
+load "$diag_scripts/../interface_scripts/interface.ncl"
 
-load "./diag_scripts/shared/latlon.ncl"
-load "./diag_scripts/shared/statistics.ncl"
-load "./diag_scripts/shared/scaling.ncl"
-load "./diag_scripts/shared/ensemble.ncl"
+load "$diag_scripts/shared/latlon.ncl"
+load "$diag_scripts/shared/statistics.ncl"
+load "$diag_scripts/shared/scaling.ncl"
+load "$diag_scripts/shared/ensemble.ncl"
 
-load "./diag_scripts/shared/plot/style.ncl"
-load "./diag_scripts/shared/plot/xy_line.ncl"
+load "$diag_scripts/shared/plot/style.ncl"
+load "$diag_scripts/shared/plot/xy_line.ncl"
 
 begin
 
@@ -103,6 +103,7 @@ begin
   data_all = new(dim_data, double)
   ;data_all!0 = "experiments"
   ;data_all&experiments = diag_script_info@experiments
+
   dim_ref = (/dimsizes(diag_script_info@ref), ntime/)
   data_ref = new(dim_ref, double)
   ;data_ref!0 = "models"
@@ -144,23 +145,35 @@ begin
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-     "tsline_mm_stat.nc"
+     "tsline_mm_" + var0 + "_stat.nc"
   input_files := tostring(input_files)
 
   ; Filter out non-existing files
   input_files := input_files(ind(isfilepresent(input_files)))
 
+  nfiles = dimsizes(input_files)
+
+  dim_data   = (/2, ntime/)
+  data_mean  = new(dim_data, double)
+  data_mean!0 = "experiment"
+  data_mean&experiment = (/"exp","exp"/)
+  data_stat = new((/2,2,ntime/), double)
+
   ; Loop over files in the list, read and append data
-  do ii = 0, dimsizes(input_files) - 1
+  do ii = 0, nfiles - 1
 
     data_temp = ncdf_read(input_files(ii), "tas")
 
-    if (ii.eq.0) then
-      data_all(0:2, :) = data_temp
-    else
-      ; Append data
-      data_all(3:5, :) = (/data_temp/)
-    end if
+    ;if (ii.eq.0) then
+    ;  data_all(0:2, :) = data_temp
+    ;else
+    ;  ; Append data
+    ;  data_all(3:5, :) = (/data_temp/)
+    ;end if
+    data_mean(ii,:)  = (/data_temp(0,:)/)
+    data_mean&experiment(ii) = data_temp@experiment
+    data_stat(0,ii,:) = data_temp(1,:)
+    data_stat(1,ii,:) = data_temp(2,:)
 
     delete(data_temp)
 
@@ -171,7 +184,7 @@ begin
   ; -------------------------------------------
 
   input_files_ref = diag_script_info@input_files + "/" + \
-                    "tsline_" + anom + "_" + detr + ".nc"
+                    "tsline_" + var0 + "_" + anom + "_" + detr + ".nc"
   input_files_ref := tostring(input_files_ref)
 
   ; Filter out non-existing files
@@ -188,8 +201,6 @@ begin
       data_ref(i,  :) = data_temp(ind_ref, :)
     end if
 
-printVarSummary(data_ref)
-
   end do
 
   delete(data_temp)
@@ -200,7 +211,7 @@ printVarSummary(data_ref)
   ; -------------------------------------------
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + data_ref@var + "_" + anom + "_" + \
+  outfile = config_user_info@plot_dir + data_ref@var + "_mulitmodel_" + anom + "_" + \
   detr + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
@@ -228,9 +239,6 @@ printVarSummary(data_ref)
     res@tiMainString = data_ref@long_name
   end if
 
-printVarSummary(data_ref)
-  ;info_items = select_metadata_by_name(input_file_info, data_ref@var)
-
   if (isatt(diag_script_info, "ts_anomaly")) then
     res@tiYAxisString = data_ref@var + " Anomaly" + " [" + data_ref@units + "]"
   else
@@ -243,12 +251,12 @@ printVarSummary(data_ref)
   res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
     + " " + data_ref@var + " Mean" + " [" + data_ref@units + "]"
 
-  if(anom .eq. "anom") then
-    xy_line_anom(wks, anom_ref, data_ref, data_ref&time, \
-                 0, ref_start, ref_end, res, res0, info_items)
-  else
-    xy_line(wks, model_arr, model_arr&time, model_arr_stat, res, info_items)
-  end if
+printVarSummary(data_mean)
+printVarSummary(data_ref)
+printVarSummary(data_stat)
+
+  xy_line_collect(wks, data_mean, data_ref, data_ref&time, \
+                  data_stat, ref_start, ref_end, res, res0, info_items)
 
   log_info(" wrote " + outfile + "." + file_type)
 

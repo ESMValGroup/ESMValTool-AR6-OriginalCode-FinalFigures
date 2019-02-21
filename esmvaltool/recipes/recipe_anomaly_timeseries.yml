@@ -9,8 +9,7 @@ documentation:
   authors:
     - bock_ls
 
-  maintainer:
-    - righ_ma
+#  maintainer:
     
   references:
     - bindoff13ipcc
@@ -30,6 +29,15 @@ preprocessors:
       statistics: [mean]
       exclude: [reference_dataset, alternative_dataset]
 
+  clim_ref2:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
   clim_ref_europe:
     extract_region:
       start_longitude: -40.
@@ -42,22 +50,23 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
-      exclude: [reference_dataset]
+      exclude: [reference_dataset, alternative_dataset]
 
 diagnostics:
 
-  tas_europe_hist:
+  tas_hist:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       tas:
-        preprocessor: clim_ref_europe   
+        preprocessor: clim_ref  
         reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
+        start_year: 1850 #1990
         end_year: 2004
     additional_datasets:
       - {dataset: ACCESS1-0}
@@ -68,85 +77,87 @@ diagnostics:
       - {dataset: CanESM2}
       - {dataset: CCSM4}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-         start_year: 1990, end_year: 2017, tier: 2}
+         start_year: 1850, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
     scripts:
       tsline: 
         script: ipcc_ar5/tsline.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1990       #start year of reference period for anomalies
-        ref_end: 1995         #end year of reference period for anomalies
-        ref_value: False      #attach absolute values on the right
+        ref_start: 1880       #start year of reference period for anomalies
+        ref_end: 1919         #end year of reference period for anomalies
+        ref_value: True       #attach absolute values on the right
         stat_shading: True    #shading of multi model statistics
         #range_option: 0
         plot_units: "degC"
         # Plot style
         styleset: CMIP5
 
-  tas_europe_hist_nat:
+  tas_hist_nat:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       tas:
-        preprocessor: clim_ref_europe   
+        preprocessor: clim_ref   
         reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP5
         exp: historicalNat
         ensemble: r1i1p1
-        start_year: 1990
+        start_year: 1850
         end_year: 2004
     additional_datasets:
       - {dataset: bcc-csm1-1}
       - {dataset: CSIRO-Mk3-6-0}
       - {dataset: FGOALS-g2}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-         start_year: 1990, end_year: 2017, tier: 2}
+         start_year: 1850, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
     scripts:
       tsline: 
         script: ipcc_ar5/tsline.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1990       #start year of reference period for anomalies
-        ref_end: 1995         #end year of reference period for anomalies
-        ref_value: False      #attach absolute values on the right
+        ref_start: 1880       #start year of reference period for anomalies
+        ref_end: 1919         #end year of reference period for anomalies
+        ref_value: True       #attach absolute values on the right
         stat_shading: True    #shading of multi model statistics
         #range_option: 0
         plot_units: "degC"
         # Plot style
         styleset: CMIP5
 
-  tas_europe_collect:
+  tas_collect:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       tas:
-        preprocessor: clim_ref_europe   
+        preprocessor: clim_ref2   
         mip: Amon
         field: T2Ms
         reference_dataset: HadCRUT4   
-    # #   project: CMIP5
-    # #   exp: historicalNat
-    # #   ensemble: r1i1p1
-    # #   start_year: 1990
-    # #   end_year: 2004
     additional_datasets:
-    ##  - {dataset: bcc-csm1-1}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-         start_year: 1990, end_year: 2017, tier: 2}
+         start_year: 1850, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
     scripts:
       collect: 
         script: ipcc_ar6/tsline_collect.ncl
         ancestors: [tas, '*/tsline*']
         experiments: ["historical", "historicalNat"]
         time_avg: "yearly"
-        start_year: 1990
+        start_year: 1850
         end_year: 2017
         ref: ["HadCRUT4"]
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1990       #start year of reference period for anomalies
-        ref_end: 1995         #end year of reference period for anomalies
+        ref_start: 1880       #start year of reference period for anomalies
+        ref_end: 1919         #end year of reference period for anomalies
         ref_value: False      #attach absolute values on the right
-        #stat_shading: False   #shading of multi model statistics
+        stat_shading: True    #shading of multi model statistics
         #range_option: 0
         plot_units: "degC"
         # Plot style
