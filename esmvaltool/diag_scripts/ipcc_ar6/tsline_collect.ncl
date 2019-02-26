@@ -4,7 +4,7 @@
 ; IPCC AR6
 ; #############################################################################
 ; Description
-;    Collects timeseries and their statistics previously calculated by 
+;    Collects timeseries and their statistics previously calculated by
 ;    tsline.ncl and passes them to a new tsline plot
 ;
 ; Required diag_script_info attributes
@@ -105,8 +105,6 @@ begin
 
   dim_ref = (/dimsizes(diag_script_info@ref), ntime/)
   data_ref = new(dim_ref, double)
-  ;data_ref!0 = "models"
-  ;data_ref&models = diag_script_info@ref
 
   ; Anomaly
   if (isatt(diag_script_info, "ts_anomaly")) then
@@ -144,7 +142,7 @@ begin
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-     "tsline_mm_" + var0 + "_stat.nc"
+    "tsline_mm_" + var0 + "_stat.nc"
   input_files := tostring(input_files)
 
   ; Filter out non-existing files
@@ -155,18 +153,18 @@ begin
   dim_data   = (/nfiles, ntime/)
   data_mean  = new(dim_data, double)
   data_mean!0 = "experiment"
-  data_mean&experiment = (/"exp","exp"/)
-  data_stat = new((/2,nfiles,ntime/), double)
+  data_mean&experiment = (/"exp", "exp"/)
+  data_stat = new((/2, nfiles, ntime/), double)
 
   ; Loop over files in the list, read and append data
   do ii = 0, nfiles - 1
 
     data_temp = ncdf_read(input_files(ii), "tas")
 
-    data_mean(ii,:)  = (/data_temp(0,:)/)
+    data_mean(ii, :)  = (/data_temp(0, :)/)
     data_mean&experiment(ii) = data_temp@experiment
-    data_stat(0,ii,:) = data_temp(1,:)
-    data_stat(1,ii,:) = data_temp(2,:)
+    data_stat(0, ii, :) = data_temp(1, :)
+    data_stat(1, ii, :) = data_temp(2, :)
 
     delete(data_temp)
 
@@ -177,7 +175,7 @@ begin
   ; -------------------------------------------
 
   input_files_ref = diag_script_info@input_files + "/" + \
-                    "tsline_" + var0 + "_" + anom + "_" + detr + ".nc"
+    "tsline_" + var0 + "_" + anom + "_" + detr + ".nc"
   input_files_ref := tostring(input_files_ref)
 
   ; Filter out non-existing files
@@ -198,16 +196,15 @@ begin
 
   delete(data_temp)
 
-
   ; -------------------------------------------
   ; Plotting
   ; -------------------------------------------
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + data_ref@var + "_" + diag_script_info@region + \
-            "_mulitmodel_" + anom + "_" + detr + "_" + start_year + "-" + end_year
+  outfile = config_user_info@plot_dir + data_ref@var + "_" + \
+    diag_script_info@region + "_mulitmodel_" + anom + \
+    "_" + detr + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
-
 
   ; Set resources
   res = True

@@ -165,7 +165,6 @@ begin
       anom_ref = new((/dim_MOD/), double)
       anom_ref!0 = "model"
       anom_ref&model = datasetnames
-      ;anom_ref = 0.
     end if
   else
     anom = "noanom"
@@ -214,7 +213,7 @@ begin
             A_ref_mask = time_operations(A_ref, start_year, \
                                          end_year, "extract", "", 0)
             A0 = where(A_ref_mask.eq.A_ref_mask@_FillValue, \
-                            A_ref_mask@_FillValue, A0)
+                       A_ref_mask@_FillValue, A0)
             delete(A_ref_mask)
           end if
 
@@ -224,34 +223,20 @@ begin
         if(anom .eq. "anom") then
           A0_timavg_ref = time_operations(A0, ref_start, ref_end, \
                                           "average", "annualclim", True)
-          ;if(imod .ne. ref_ind) then
-          ;  A0_timavg_ref_mask = time_operations(A0_mask, ref_start, ref_end, \
-          ;                                       "average", "annualclim", True)
-          ;  do i = 0, dimsizes(A0&time) - 1
-          ;    A0_mask(i, :, :) = A0_mask(i, :, :) - A0_timavg_ref_mask(:, :)
-          ;  end do
-          ;else
-            do i = 0, dimsizes(A0&time) - 1
-              A0(i, :, :) = A0(i, :, :) - A0_timavg_ref(:, :)
-            end do
-          ;end if
+          do i = 0, dimsizes(A0&time) - 1
+            A0(i, :, :) = A0(i, :, :) - A0_timavg_ref(:, :)
+          end do
 
           if (ref_value.eq.True)
             anom_ref(imod) = area_operations(A0_timavg_ref, -90., 90., \
-                                           0., 360., "average", True)
+                                             0., 360., "average", True)
           end if
           delete(A0_timavg_ref)
 
         end if
 
-        ;if(imod .ne. ref_ind) then
-        ;  procmod = area_operations(A0_mask, -90., 90., 0., \
-        ;                            360., "average", True)
-        ;  delete(A0_mask)
-        ;else
-          procmod = area_operations(A0, -90., 90., 0., 360., \
-                                    "average", True)
-        ;end if
+        procmod = area_operations(A0, -90., 90., 0., 360., \
+                                  "average", True)
 
       end if
 
@@ -322,10 +307,12 @@ begin
 
   ; calculate multi model statistics
   if (clim_ind .ne. -1) then
-    ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset .and. \
+    ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
+                  datasetnames.ne.variable_info[0]@reference_dataset .and. \
                   datasetnames.ne."HadCRUT4-clim")
   else
-    ind_mod = ind(datasetnames.ne."MultiModelMean" .and. datasetnames.ne.variable_info[0]@reference_dataset)
+    ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
+                  datasetnames.ne.variable_info[0]@reference_dataset)
   end if
 
 ;  ;multi model mean
@@ -338,23 +325,23 @@ begin
   model_arr_stat!0 = "stat"
   model_arr_stat!1 = "time"
   model_arr_stat&time = time
-  model_arr_stat&stat = (/"mean","min","max"/)
+  model_arr_stat&stat = (/"mean", "min", "max"/)
 
-  model_arr_stat(0,:) = (/model_arr(mmm_ind,:)/)
+  model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
   do i = 0, ntime-1
-    statb = stat_dispersion(model_arr(ind_mod,i), False)
+    statb = stat_dispersion(model_arr(ind_mod, i), False)
     ; 5% quantile
-    ; model_arr_stat(0,i) = statb(24)
+    ; model_arr_stat(0, i) = statb(24)
     ; 10% quantile
-    model_arr_stat(1,i) = (/statb(3)/)
+    model_arr_stat(1, i) = (/statb(3)/)
     ; min
-    ;model_arr_stat(1,i) = (/statb(2)/)
+    ; model_arr_stat(1,i) = (/statb(2)/)
     ; 95% quantile
     ; model_arr_stat(0,i) = statb(25)
     ; 90% quantile
-    model_arr_stat(2,i) = (/statb(13)/)
+    model_arr_stat(2, i) = (/statb(13)/)
     ; max
-    model_arr_stat(2,i) = (/statb(14)/)
+    model_arr_stat(2, i) = (/statb(14)/)
   end do
 
   ; individual case for HadCRUT4 observations
@@ -431,8 +418,8 @@ begin
   end if
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + var0 + "_" + diag_script_info@region + "_" + \
-            exp0 + "_" + anom + "_" + detr + "_" + start_year + "-" + end_year
+  outfile = config_user_info@plot_dir + var0 + "_" + diag_script_info@region \
+    + "_" + exp0 + "_" + anom + "_" + detr + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
   ; Set resources
@@ -453,9 +440,6 @@ begin
   res@tmXBLabelAngleF = 45
   res@tmXBLabelJust     = "CenterRight"
 
-  ;if isatt(model_arr, "long_name")
-  ;  res@tiMainString = model_arr@long_name
-  ;end if
   res@tiMainString = diag_script_info@region
 
   if (isatt(diag_script_info, "ts_anomaly")) then

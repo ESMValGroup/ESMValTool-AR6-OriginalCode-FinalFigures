@@ -1473,7 +1473,7 @@ undef("xy_line")
 procedure xy_line(wks[1],
                   source,
                   source_x,
-                  source_stat,
+                  source_stddev,
                   res_in:logical,
                   items:list)
 ;
@@ -1481,7 +1481,7 @@ procedure xy_line(wks[1],
 ;    wks: workstation, must be passed - no default used yet!
 ;    source: data to be plotted (no netCDF input possible yet)
 ;    source_x: x-axis of array to be plotted (e.g. source&time, ... )
-;    source_stat: statistics of multi_model_mean, e.g. 5 and 95% quantile or stddev
+;    source_stddev: standard deviation of input, needed for multi_model_mean
 ;    res_in: diag_script-specific resources passed from diag_script
 ;    items: list of input_file_info metadata
 ;
@@ -1499,8 +1499,8 @@ procedure xy_line(wks[1],
 ;    20150511_A_senf_da: modified legend
 ;    20140109-A_senf_da: written.
 ;
-local funcname, scriptname, res, res_in, res_stat, source, source_x, \
-  source_stat, wks, wks_in, colors, colors_mm, dashes, dashes_mm, thicks, \
+local funcname, scriptname, res, res_in, res_stddev, source, source_x, \
+  source_stddev, wks, wks_in, colors, colors_mm, dashes, dashes_mm, thicks, \
   thicks_mm, annots, annots_mm, avgstd, avgstd_mm, temp, plot, \
   shading_plot, mm, lgres, nitems, lbid, amres, annoid, labels, lg_outfile, \
   psres, vpx, vph, vpy, vpw, bpres, tmborder
@@ -1567,19 +1567,6 @@ begin
 
   ; Plot
   plot = gsn_csm_xy(wks, source_x, source, res)
-
-  ; Add multi model statistics (5% and 95% quantile)
-  ;if () then
-    res_stat = True
-    copy_VarMeta(res, res_stat)
-    res_stat@gsnXYFillColors = "LightGrey"
-    delete(res_stat@xyLineColors)
-    ; We don't want the line, so make it transparent.
-    res_stat@xyLineColor = -1
-    shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, :), \
-                              res_stat)
-    overlay(plot, shading_plot)
-  ;end if
 
   ; ; Add multi model mean and stddev
   ; if (diag_script_info@multi_model_mean .eq. "y") then
@@ -1989,27 +1976,28 @@ end
 ; #############################################################################
 undef("xy_line_collect")
 procedure xy_line_collect(wks[1],
-                       source_mean,
-                       source,
-                       source_x,
-                       source_stat,
-                       ref_start,
-                       ref_end,
-                       res_in: logical,
-                       res0_in: logical,
-                       items: list)
+                          source_mean,
+                          source,
+                          source_x,
+                          source_stat,
+                          ref_start,
+                          ref_end,
+                          res_in: logical,
+                          res0_in: logical,
+                          items: list)
 ;
 ; Arguments:
 ;    wks:  workstation, must be passed - no default used yet!
 ;    source_mean:   source_mean
 ;    source:        data to be plotted (no netCDF input possible yet)
 ;    source_x:      x-axis of array to be plotted (e.g. source&time, ... )
-;    source_stat: statistics of multi_model_mean, e.g. 5 and 95% quantile or stddev
+;    source_stat:   statistics of multi_model_mean, e.g. 5 and 95% quantile
+;                   or stddev
 ;    ref_start:     start year of the reference dataset
 ;    ref_end:       end year of the reference dataset
 ;    res_in:        diag_script-specific resources passed from diag_script
 ;    res0_in:       res0_in
-;    items: list of input_file_info metadata
+;    items:         list of input_file_info metadata
 ;
 ; Source prototype
 ;
@@ -2051,44 +2039,6 @@ begin
 
   plot = new(1, graphic)
 
-;  res0 = True
-;  res0@gsnDraw   = False
-;  res0@gsnFrame  = False
-;  res0@vpHeightF = 0.5
-;  res0@vpWidthF  = 0.05
-;  res0@trYMinF = \
-;    min(source_mean) - 0.05 * (max(source_mean) - min(source_mean))
-;  res0@trYMaxF = \
-;    max(source_mean) + 0.05 * (max(source_mean) - min(source_mean))
-;  res0@trXMinF = 0.
-;  res0@trXMaxF = 2.
-;  res0@tmXTOn = False
-;  res0@tmXBOn = False
-;  res0@tmYLLabelsOn = False
-;  res0@tmYRLabelsOn = True
-;  res0@tmYRLabelFontHeightF = 0.016
-;  res0@tmYLLabelFontHeightF = 0.016
-;  res0@tiXAxisFontHeightF = 0.016
-;  res0@tiYAxisFontHeightF = 0.016
-;  res0@tiYAxisSide   = "Right"
-;  res0@tiYAxisAngleF = 90.
-;  res0@tiYAxisOn = True
-;  res0@pmLegendDisplayMode = "Never"
-;  res0@tmXBMajorOutwardLengthF = 0.006
-;  res0@tmYLMajorOutwardLengthF = 0.006
-;  res0@tmXBMinorOutwardLengthF = 0.003
-;  res0@tmYLMinorOutwardLengthF = 0.003
-;  res0@tmXBMajorLengthF = 0.006
-;  res0@tmYLMajorLengthF = 0.006
-;  res0@tmXBMinorLengthF = 0.003
-;  res0@tmYLMinorLengthF = 0.003
-;
-;  res0@xyDashPatterns    = dashes
-;  res0@xyLineThicknesses = thicks
-;  res0@xyLineColors      = colors
-;
-;  copy_VarMeta(res0_in, res0)  ; copy passed resources
-
   res           = True
   res@gsnDraw   = False
   res@gsnFrame  = False
@@ -2111,8 +2061,8 @@ begin
   res@tmXBMinorLengthF = 0.003
   res@tmYLMinorLengthF = 0.003
 
-  min_tmp = (/min(source_mean),min(source),min(source_stat)/)
-  max_tmp = (/max(source_mean),max(source),max(source_stat)/)
+  min_tmp = (/min(source_mean), min(source), min(source_stat)/)
+  max_tmp = (/max(source_mean), max(source), max(source_stat)/)
   res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
   res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
   res@tiYAxisOn = True
@@ -2153,13 +2103,13 @@ begin
     res@xyDashPatterns    = (/0/)
     res@xyLineThicknesses = (/3/)
     res@xyLineColors = (/"red"/)
-  elseif (nexp .eq. 2) then
-    res@xyDashPatterns    = (/0,0/)
-    res@xyLineThicknesses = (/3,3/)
+  elseif(nexp .eq. 2) then
+    res@xyDashPatterns    = (/0, 0/)
+    res@xyLineThicknesses = (/3, 3/)
     res@xyLineColors = (/"red", "blue"/)
   else
     error_msg("w", scriptname, funcname, "Color palette not defined for " \
-                  + nexp + " experiments")
+              + nexp + " experiments")
   end if
 
   res@pmLegendDisplayMode = "Always"
@@ -2180,21 +2130,19 @@ begin
         delete(res_stat@xyLineColors)
         ; We don't want the line, so make it transparent.
         res_stat@xyLineColor = -1
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,0, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
-      elseif (nexp .eq. 2) then
+      elseif(nexp .eq. 2) then
         res_stat@gsnXYFillColors = "lightsalmon"
-        ;res_stat@gsnXYFillColors = "(/91/250,174/250,178/250/)"
         delete(res_stat@xyLineColors)
         ; We don't want the line, so make it transparent.
         res_stat@xyLineColor = -1
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,0, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
         res_stat@gsnXYFillColors = "LightBlue"
-        ;res_stat@gsnXYFillColors = "(/204/250,174/250,113/250/)"
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,1, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       else
@@ -2203,7 +2151,6 @@ begin
       end if
     end if
   end if
-
 
   ; Draw some lines to create a legend
   res_lines                   = True      ; polyline mods desired
@@ -2215,44 +2162,6 @@ begin
   xx = (/res@trXMinF, res@trXMaxF/)
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
-
-
-;  ; ***********************************************
-;  ; legend resources
-;  ; ***********************************************
-;
-;  lgres                    = True
-;  lgres@lgItemType         = "Lines"   ; show lines only (default)
-;  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
-;  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
-;  lgres@vpHeightF          = 0.5       ; height of legend (NDC)
-;  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
-;  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
-;
-;  if (.not.isatt(diag_script_info, "EMs_in_lg")) then
-;    diag_script_info@EMs_in_lg = True  ; Set default
-;  end if
-;  if (.not.diag_script_info@EMs_in_lg) then
-;    idcs_modelnames = annots
-;    colors := colors(idcs_modelnames)
-;    dashes := dashes(idcs_modelnames)
-;    thicks := thicks(idcs_modelnames)
-;    annots := models@name(idcs_modelnames)
-;  end if
-;  lgres@lgLineColors      = colors
-;  lgres@lgDashIndexes     = dashes
-;  lgres@lgLineThicknesses = thicks + 0.5
-;  labels = annots
-;  nitems = dimsizes(labels)
-;  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
-;
-;  ; Create legend
-;  lbid = gsn_create_legend(wks, nitems, labels, lgres)
-;
-;  amres = True
-;  amres@amParallelPosF   = 0.81
-;  amres@amOrthogonalPosF = 0.0
-;  annoid1 = gsn_add_annotation(plot(0), lbid, amres)
 
   resP = True
   resP@gsnMaximize = True
