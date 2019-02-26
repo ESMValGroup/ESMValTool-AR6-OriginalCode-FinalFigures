@@ -2051,43 +2051,43 @@ begin
 
   plot = new(1, graphic)
 
-  res0 = True
-  res0@gsnDraw   = False
-  res0@gsnFrame  = False
-  res0@vpHeightF = 0.5
-  res0@vpWidthF  = 0.05
-  res0@trYMinF = \
-    min(source_mean) - 0.05 * (max(source_mean) - min(source_mean))
-  res0@trYMaxF = \
-    max(source_mean) + 0.05 * (max(source_mean) - min(source_mean))
-  res0@trXMinF = 0.
-  res0@trXMaxF = 2.
-  res0@tmXTOn = False
-  res0@tmXBOn = False
-  res0@tmYLLabelsOn = False
-  res0@tmYRLabelsOn = True
-  res0@tmYRLabelFontHeightF = 0.016
-  res0@tmYLLabelFontHeightF = 0.016
-  res0@tiXAxisFontHeightF = 0.016
-  res0@tiYAxisFontHeightF = 0.016
-  res0@tiYAxisSide   = "Right"
-  res0@tiYAxisAngleF = 90.
-  res0@tiYAxisOn = True
-  res0@pmLegendDisplayMode = "Never"
-  res0@tmXBMajorOutwardLengthF = 0.006
-  res0@tmYLMajorOutwardLengthF = 0.006
-  res0@tmXBMinorOutwardLengthF = 0.003
-  res0@tmYLMinorOutwardLengthF = 0.003
-  res0@tmXBMajorLengthF = 0.006
-  res0@tmYLMajorLengthF = 0.006
-  res0@tmXBMinorLengthF = 0.003
-  res0@tmYLMinorLengthF = 0.003
-
-  res0@xyDashPatterns    = dashes
-  res0@xyLineThicknesses = thicks
-  res0@xyLineColors      = colors
-
-  copy_VarMeta(res0_in, res0)  ; copy passed resources
+;  res0 = True
+;  res0@gsnDraw   = False
+;  res0@gsnFrame  = False
+;  res0@vpHeightF = 0.5
+;  res0@vpWidthF  = 0.05
+;  res0@trYMinF = \
+;    min(source_mean) - 0.05 * (max(source_mean) - min(source_mean))
+;  res0@trYMaxF = \
+;    max(source_mean) + 0.05 * (max(source_mean) - min(source_mean))
+;  res0@trXMinF = 0.
+;  res0@trXMaxF = 2.
+;  res0@tmXTOn = False
+;  res0@tmXBOn = False
+;  res0@tmYLLabelsOn = False
+;  res0@tmYRLabelsOn = True
+;  res0@tmYRLabelFontHeightF = 0.016
+;  res0@tmYLLabelFontHeightF = 0.016
+;  res0@tiXAxisFontHeightF = 0.016
+;  res0@tiYAxisFontHeightF = 0.016
+;  res0@tiYAxisSide   = "Right"
+;  res0@tiYAxisAngleF = 90.
+;  res0@tiYAxisOn = True
+;  res0@pmLegendDisplayMode = "Never"
+;  res0@tmXBMajorOutwardLengthF = 0.006
+;  res0@tmYLMajorOutwardLengthF = 0.006
+;  res0@tmXBMinorOutwardLengthF = 0.003
+;  res0@tmYLMinorOutwardLengthF = 0.003
+;  res0@tmXBMajorLengthF = 0.006
+;  res0@tmYLMajorLengthF = 0.006
+;  res0@tmXBMinorLengthF = 0.003
+;  res0@tmYLMinorLengthF = 0.003
+;
+;  res0@xyDashPatterns    = dashes
+;  res0@xyLineThicknesses = thicks
+;  res0@xyLineColors      = colors
+;
+;  copy_VarMeta(res0_in, res0)  ; copy passed resources
 
   res           = True
   res@gsnDraw   = False
@@ -2111,8 +2111,10 @@ begin
   res@tmXBMinorLengthF = 0.003
   res@tmYLMinorLengthF = 0.003
 
-  res@trYMinF  = min(source) - 0.05 * (max(source) - min(source))
-  res@trYMaxF  = max(source) + 0.05 * (max(source) - min(source))
+  min_tmp = (/min(source_mean),min(source),min(source_stat)/)
+  max_tmp = (/max(source_mean),max(source),max(source_stat)/)
+  res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
+  res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
   res@tiYAxisOn = True
   res@tiXAxisString = "Year"
   res@gsnStringFontHeightF = 0.016
@@ -2125,13 +2127,40 @@ begin
 
   plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
 
+  ; ---------------------------------------------------------------------
+  ; Procedure to attach a box to the given plot, given the lower left
+  ; corner, width, color, and opacity.
+  ; ---------------------------------------------------------------------
+  gsres                = True
+  gsres@gsFillColor    = "yellow"
+  gsres@gsFillOpacityF = 0.2
+  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+
+  ; ---------------------------------------------------------------------
+  ; add multi model mean of different experiments
+  ; ---------------------------------------------------------------------
+  ; number of different experiments
+  tmp = dimsizes(source_mean)
+  nexp     = tmp(0)
+  delete(tmp)
+
   delete(res@xyDashPatterns)
   delete(res@xyLineThicknesses)
   delete(res@xyLineColors)
-  res@xyDashPatterns    = (/0,0/)
-  res@xyLineThicknesses = (/3,3/)
-  res@xyLineColors = (/"blue", "red"/)
-  ;res@xyLineColors = (/"(/112/250,116/250,205/250/)", "(/196/250,121/250,0/)"/)
+  if (nexp .eq. 1) then
+    res@xyDashPatterns    = (/0/)
+    res@xyLineThicknesses = (/3/)
+    res@xyLineColors = (/"red"/)
+  elseif (nexp .eq. 2) then
+    res@xyDashPatterns    = (/0,0/)
+    res@xyLineThicknesses = (/3,3/)
+    res@xyLineColors = (/"red", "blue"/)
+  else
+    error_msg("w", scriptname, funcname, "Color palette not defined for " \
+                  + nexp + " experiments")
+  end if
 
   res@pmLegendDisplayMode = "Always"
   res@xyExplicitLegendLabels = source_mean&experiment
@@ -2140,15 +2169,41 @@ begin
   overlay(plot(0), mmm)
 
   ; ---------------------------------------------------------------------
-  ; Procedure to attach a box to the given plot, given the lower left
-  ; corner, width, color, and opacity.
+  ; Add multi model statistics (5% and 95% quantile)
   ; ---------------------------------------------------------------------
-  gsres                = True
-  gsres@gsFillColor    = "yellow"
-  gsres@gsFillOpacityF = 0.3
-  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
-  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
-  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+  if (isatt(diag_script_info, "stat_shading")) then
+    if (diag_script_info@stat_shading .ne. False) then
+      res_stat = True
+      copy_VarMeta(res, res_stat)
+      if (nexp .eq. 1) then
+        res_stat@gsnXYFillColors = "lightsalmon"
+        delete(res_stat@xyLineColors)
+        ; We don't want the line, so make it transparent.
+        res_stat@xyLineColor = -1
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,0, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      elseif (nexp .eq. 2) then
+        res_stat@gsnXYFillColors = "lightsalmon"
+        ;res_stat@gsnXYFillColors = "(/91/250,174/250,178/250/)"
+        delete(res_stat@xyLineColors)
+        ; We don't want the line, so make it transparent.
+        res_stat@xyLineColor = -1
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,0, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+        res_stat@gsnXYFillColors = "LightBlue"
+        ;res_stat@gsnXYFillColors = "(/204/250,174/250,113/250/)"
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,1, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      else
+        error_msg("w", scriptname, funcname, "Color palette not defined for " \
+                  + nexp + " experiments")
+      end if
+    end if
+  end if
+
 
   ; Draw some lines to create a legend
   res_lines                   = True      ; polyline mods desired
@@ -2161,58 +2216,7 @@ begin
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
 
-  ; Add multi model statistics (5% and 95% quantile)
-  if (isatt(diag_script_info, "stat_shading")) then
-    if (diag_script_info@stat_shading .ne. False) then
-      res_stat = True
-      copy_VarMeta(res, res_stat)
-      res_stat@gsnXYFillColors = "LightBlue"
-      ;res_stat@gsnXYFillColors = "(/91/250,174/250,178/250/)"
-      delete(res_stat@xyLineColors)
-      ; We don't want the line, so make it transparent.
-      res_stat@xyLineColor = -1
-      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,0, :), \
-                                res_stat)
-      overlay(plot(0), shading_plot)
-      res_stat@gsnXYFillColors = "lightsalmon"
-      ;res_stat@gsnXYFillColors = "(/204/250,174/250,113/250/)"
-      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1,1, :), \
-                                res_stat)
-      overlay(plot(0), shading_plot)
-    end if
-  end if
 
-;  ; Add pre-calculated multi model statistics
-;  if (DIAG_SCRIPT .eq. "collect") then
-;    print("DIAG_SCRIPT = "+DIAG_SCRIPT)
-;    ; Add multi model mean and stddev
-;    ; Stat
-;    res_stddev = True
-;    copy_VarMeta(res, res_stddev)
-;    res_stddev@gsnXYFillColors = "(/91,174,178/)"
-;    delete(res_stddev@xyLineColors)
-;
-;    ; We don't want the line, so make it transparent.
-;    res_stddev@xyLineColor = -1
-;    shading_plot = gsn_csm_xy(wks, source_x, source_stddev(1:2, :), \
-;                              res_stddev)
-;    overlay(plot, shading_plot)
-;    res_stddev@gsnXYFillColors = "(/204,174,113/)"
-;    shading_plot = gsn_csm_xy(wks, source_x, source_stddev(4:5, :), \
-;                              res_stddev)
-;    overlay(plot, shading_plot)
-;    ; MMM
-;    delete([/res@xyLineThicknesses, res@xyLineColors, res@xyDashPatterns/])
-;    res@xyLineThicknesses = thicks_mmm
-;    res@xyLineColors = "(/112,160,205/)"
-;    res@xyDashPatterns = dashes_mmm
-;    mmm = gsn_csm_xy(wks, source_x, source_stddev(0, :), res)
-;    overlay(plot, mmm)
-;    res@xyLineColors = "(/196,121,0/)"
-;    mmm = gsn_csm_xy(wks, source_x, source_stddev(3, :), res)
-;    overlay(plot, mmm)
-;  end if
-;
 ;  ; ***********************************************
 ;  ; legend resources
 ;  ; ***********************************************

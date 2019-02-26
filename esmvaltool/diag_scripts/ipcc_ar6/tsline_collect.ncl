@@ -74,6 +74,7 @@ begin
   set_default_att(diag_script_info, "time_avg", "monthly")
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
   set_default_att(diag_script_info, "ref_value", False)
+  set_default_att(diag_script_info, "region", "global")
 
   ; Determine time range
 ;  start_year = min(metadata_att_as_array(info_items, "start_year"))
@@ -101,8 +102,6 @@ begin
   ; Create array for collecting two additional datasets
   dim_data = (/2*3, ntime/)
   data_all = new(dim_data, double)
-  ;data_all!0 = "experiments"
-  ;data_all&experiments = diag_script_info@experiments
 
   dim_ref = (/dimsizes(diag_script_info@ref), ntime/)
   data_ref = new(dim_ref, double)
@@ -153,23 +152,17 @@ begin
 
   nfiles = dimsizes(input_files)
 
-  dim_data   = (/2, ntime/)
+  dim_data   = (/nfiles, ntime/)
   data_mean  = new(dim_data, double)
   data_mean!0 = "experiment"
   data_mean&experiment = (/"exp","exp"/)
-  data_stat = new((/2,2,ntime/), double)
+  data_stat = new((/2,nfiles,ntime/), double)
 
   ; Loop over files in the list, read and append data
   do ii = 0, nfiles - 1
 
     data_temp = ncdf_read(input_files(ii), "tas")
 
-    ;if (ii.eq.0) then
-    ;  data_all(0:2, :) = data_temp
-    ;else
-    ;  ; Append data
-    ;  data_all(3:5, :) = (/data_temp/)
-    ;end if
     data_mean(ii,:)  = (/data_temp(0,:)/)
     data_mean&experiment(ii) = data_temp@experiment
     data_stat(0,ii,:) = data_temp(1,:)
@@ -211,8 +204,8 @@ begin
   ; -------------------------------------------
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + data_ref@var + "_mulitmodel_" + anom + "_" + \
-  detr + "_" + start_year + "-" + end_year
+  outfile = config_user_info@plot_dir + data_ref@var + "_" + diag_script_info@region + \
+            "_mulitmodel_" + anom + "_" + detr + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
 
@@ -235,9 +228,7 @@ begin
   res@tmXBLabelAngleF = 45
   res@tmXBLabelJust     = "CenterRight"
 
-  if isatt(data_ref, "long_name")
-    res@tiMainString = data_ref@long_name
-  end if
+  res@tiMainString = diag_script_info@region
 
   if (isatt(diag_script_info, "ts_anomaly")) then
     res@tiYAxisString = data_ref@var + " Anomaly" + " [" + data_ref@units + "]"
@@ -251,55 +242,10 @@ begin
   res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
     + " " + data_ref@var + " Mean" + " [" + data_ref@units + "]"
 
-printVarSummary(data_mean)
-printVarSummary(data_ref)
-printVarSummary(data_stat)
-
   xy_line_collect(wks, data_mean, data_ref, data_ref&time, \
                   data_stat, ref_start, ref_end, res, res0, info_items)
 
   log_info(" wrote " + outfile + "." + file_type)
-
-
-;  ; Attach plotting options
-;  copy_VarAtts(diag_script_info, data_all)
-;  if (isatt(diag_script_info, "title")) then
-;    data_all@res_tiMainString = diag_script_info@title
-;  end if
-;  if (diag_script_info@metric.eq."taylor") then
-;    data_all@res_varLabels = data_all&models
-;    data_all@res_caseLabels = data_all&diagnostics
-;  end if
-;
-;  ; Create outfile directory
-;  system("mkdir -p " + config_user_info@plot_dir)
-;  if (dimsizes(data_all&diagnostics).gt.1) then
-;    diags = data_all&diagnostics(0) + "_to_" + \
-;      data_all&diagnostics(dimsizes(data_all&diagnostics) - 1)
-;  else
-;    diags = str_concat(data_all&diagnostics)
-;  end if
-;
-;  ; Define outfile name
-;  outfile_plot = config_user_info@plot_dir + diags
-;  if (isatt(data_all, "metric")) then
-;    outfile_plot = outfile_plot + "_" + data_all@metric
-;  end if
-;
-;  ; Create workspace
-;  wks = gsn_open_wks(file_type, outfile_plot)
-;  if (diag_script_info@metric.eq."taylor") then
-;    wks@legendfile = outfile_plot + "_legend"
-;  end if
-;
-;  ; Call plotting function
-;  if (diag_script_info@metric.eq."taylor") then
-;    plot = taylor_plot(wks, data_all, "grade")
-;  else
-;    plot = portrait_plot(wks, data_all, "grade")
-;  end if
-
-;  log_info(" gv " + outfile_plot + "." + file_type)
 
   leave_msg(DIAG_SCRIPT, "")
 
