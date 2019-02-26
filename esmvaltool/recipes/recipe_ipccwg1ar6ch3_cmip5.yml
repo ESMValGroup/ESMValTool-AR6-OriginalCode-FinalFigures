@@ -41,6 +41,58 @@ preprocessors:
       statistics: [mean]
       exclude: [reference_dataset, alternative_dataset]
 
+  clim_ref2:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_land:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset, alternative_dataset]
+
+  clim_ref2_land:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+
+  clim_ref_ocean:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: land #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset, alternative_dataset]
+
+  clim_ref2_ocean:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: land #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
   pp850:
     extract_levels:
       levels: 85000
@@ -472,6 +524,455 @@ diagnostics:
   # **********************************************************************
   # status: developing from AR5 9_8 
   # **********************************************************************
+
+  ########################################################################
+  # Global
+  ########################################################################
+
+  tas_hist_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref  
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1870 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      #- {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      #- {dataset: CESM1-CAM5-1-FV2}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: CSIRO-Mk3-6-0}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: FGOALS-g2}
+      #- {dataset: FGOALS-s2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H, ensemble: r1i1p2}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R, ensemble: r1i1p2}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      #- {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: &tsline_settings
+        script: ipcc_ar5/tsline.ncl
+        time_avg: "yearly"
+        ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
+        region: "global"
+        ref_start: 1880       #start year of reference period for anomalies
+        ref_end: 1919         #end year of reference period for anomalies
+        ref_value: True       #attach absolute values on the right
+        ref_mask: False       #True: maksing of models by observations
+        stat_shading: True    #shading of multi model statistics
+        #range_option: 0
+        plot_units: "degC"
+        # Plot style
+        styleset: CMIP5
+
+  tas_hist_nat_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref   
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1870
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R}
+      - {dataset: HadGEM2-ES}
+      #- {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+
+  fig_3_7_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref2   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, '*global/tsline*']
+        start_year: 1870
+        end_year: 2017
+        ref: ["HadCRUT4"]
+
+  ########################################################################
+  # Land
+  ########################################################################
+
+  tas_hist_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land  
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1870 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      #- {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      #- {dataset: CESM1-CAM5-1-FV2}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: CSIRO-Mk3-6-0}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: FGOALS-g2}
+      #- {dataset: FGOALS-s2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H, ensemble: r1i1p2}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R, ensemble: r1i1p2}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      #- {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "land"
+
+  tas_hist_nat_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land   
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1870
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R}
+      - {dataset: HadGEM2-ES}
+      #- {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "land"
+
+  fig_3_7_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref2_land   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, '*land/tsline*']
+        region: "land"
+        start_year: 1870
+        end_year: 2017
+        ref: ["HadCRUT4"]
+
+  ########################################################################
+  # Ocean
+  ########################################################################
+
+  tas_hist_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1870 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      #- {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      #- {dataset: CESM1-CAM5-1-FV2}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: CSIRO-Mk3-6-0}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: FGOALS-g2}
+      #- {dataset: FGOALS-s2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H, ensemble: r1i1p2}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R, ensemble: r1i1p2}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      #- {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "ocean"
+
+  tas_hist_nat_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean   
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1870
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R}
+      - {dataset: HadGEM2-ES}
+      #- {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "ocean"
+
+  fig_3_7_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref2_ocean   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, '*ocean/tsline*']
+        region: "ocean"
+        start_year: 1870
+        end_year: 2017
+        ref: ["HadCRUT4"]
+
+
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
