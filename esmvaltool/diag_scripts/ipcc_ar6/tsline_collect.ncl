@@ -237,6 +237,13 @@ begin
   end if
   res@tmXBLabelAngleF = 45
   res@tmXBLabelJust     = "CenterRight"
+  if (isatt(diag_script_info, "y_min")) then
+    res@trYMinF = diag_script_info@y_min
+  end if
+  if (isatt(diag_script_info, "y_max")) then
+    res@trYMaxF = diag_script_info@y_max
+  end if
+
 
   res@tiMainString = diag_script_info@region
 
