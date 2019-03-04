@@ -610,6 +610,8 @@ diagnostics:
         ref_value: True       #attach absolute values on the right
         ref_mask: False       #True: maksing of models by observations
         stat_shading: True    #shading of multi model statistics
+        write_stat: True      #write multi model statistics in nc-file
+        stat: "10-90"         #statistics for multi model nc-file (MinMax,5-95,10-90)
         #range_option: 0
         plot_units: "degC"
         # Plot style

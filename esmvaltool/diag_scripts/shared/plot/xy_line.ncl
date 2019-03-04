@@ -1892,16 +1892,6 @@ begin
 
   plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
 
-  ; Add right panel with mean values in anomaly plot
-
-  var = fspan(0., 2., 3)
-  mean = new((/dimsizes(source_mean), 3/), double)
-  mean(:, 0) = source_mean(:)
-  mean(:, 1) = source_mean(:)
-  mean(:, 2) = source_mean(:)
-
-  plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
-
   ; ---------------------------------------------------------------------
   ; Procedure to attach a box to the given plot, given the lower left
   ; corner, width, color, and opacity.
@@ -1923,7 +1913,18 @@ begin
   xx = (/res@trXMinF, res@trXMaxF/)
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
-  newplot = gsn_attach_plots(plot(0), plot2, res, res0)
+
+  ; Add right panel with mean values in anomaly plot
+  if (diag_script_info@ref_value) then
+    var = fspan(0., 2., 3)
+    mean = new((/dimsizes(source_mean), 3/), double)
+    mean(:, 0) = source_mean(:)
+    mean(:, 1) = source_mean(:)
+    mean(:, 2) = source_mean(:)
+
+    plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
+    newplot = gsn_attach_plots(plot(0), plot2, res, res0)
+  end if
 
   ; ***********************************************
   ; legend resources
@@ -2061,21 +2062,104 @@ begin
   res@tmXBMinorLengthF = 0.003
   res@tmYLMinorLengthF = 0.003
 
-  min_tmp = (/min(source_mean), min(source), min(source_stat)/)
-  max_tmp = (/max(source_mean), max(source), max(source_stat)/)
+  if (isatt(diag_script_info, "ref")) then
+    min_tmp = (/min(source_mean), min(source), min(source_stat)/)
+    max_tmp = (/max(source_mean), max(source), max(source_stat)/)
+  else
+    min_tmp = (/min(source_mean), min(source_stat)/)
+    max_tmp = (/max(source_mean), max(source_stat)/)
+  end if
   res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
   res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
   res@tiYAxisOn = True
   res@tiXAxisString = "Year"
   res@gsnStringFontHeightF = 0.016
 
-  res@xyDashPatterns    = dashes
-  res@xyLineThicknesses = thicks  ; make 2nd lines thicker
-  res@xyLineColors      = colors  ; change line color
-
   copy_VarMeta(res_in, res)  ; copy passed resources
 
-  plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
+  ; ---------------------------------------------------------------------
+  ; add multi model mean of different experiments
+  ; ---------------------------------------------------------------------
+  ; number of different experiments
+  tmp = dimsizes(source_mean)
+  nexp     = tmp(0)
+  delete(tmp)
+
+  if (nexp .eq. 1) then
+    res@xyDashPatterns    = (/0/)
+    res@xyLineThicknesses = (/3/)
+    res@xyLineColors = (/"red"/)
+  elseif(nexp .eq. 2) then
+    res@xyDashPatterns    = (/0, 0/)
+    res@xyLineThicknesses = (/3, 3/)
+    res@xyLineColors = (/"red", "blue"/)
+  elseif(nexp .eq. 3) then
+    res@xyDashPatterns    = (/0, 0, 0/)
+    res@xyLineThicknesses = (/3, 3, 3/)
+    res@xyLineColors = (/"red", "blue", "orange"/)
+  else
+    error_msg("w", scriptname, funcname, "Color palette not defined for " \
+              + nexp + " experiments")
+  end if
+
+  res@pmLegendDisplayMode = "Always"
+  res@xyExplicitLegendLabels = source_mean&experiment
+
+  plot(0) = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
+
+  res@pmLegendDisplayMode = "Never"
+
+  ; ---------------------------------------------------------------------
+  ; Add multi model statistics (5% and 95% quantile)
+  ; ---------------------------------------------------------------------
+  if (isatt(diag_script_info, "stat_shading")) then
+    if (diag_script_info@stat_shading .ne. False) then
+      res_stat = True
+      copy_VarMeta(res, res_stat)
+      ;if (nexp .eq. 1) then
+      res_stat@gsnXYFillColors = "lightsalmon"
+      delete(res_stat@xyLineColors)
+      ; We don't want the line, so make it transparent.
+      res_stat@xyLineColor = -1
+      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
+                                res_stat)
+      overlay(plot(0), shading_plot)
+      ;elseif(nexp .eq. 2) then
+      if(nexp .ge. 2) then
+        res_stat@gsnXYFillColors = "LightBlue"
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      ;elseif(nexp .eq. 3) then
+      if(nexp .ge. 3) then
+        res_stat@gsnXYFillColors = "lightgoldenrod"
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      ;else
+      end if
+      if(nexp .gt. 3) then
+        error_msg("w", scriptname, funcname, "Color palette not defined for " \
+                  + nexp + " experiments")
+      end if
+    end if
+  end if
+
+  ; ---------------------------------------------------------------------
+  ; add reference datasets
+  ; ---------------------------------------------------------------------
+  if (isatt(diag_script_info, "ref")) then
+    delete(res@xyDashPatterns)
+    delete(res@xyLineThicknesses)
+    delete(res@xyLineColors)
+    res@xyDashPatterns    = dashes
+    res@xyLineThicknesses = thicks  ; make 2nd lines thicker
+    res@xyLineColors      = colors  ; change line color
+
+    ref_p = gsn_csm_xy(wks, source_x, source, res)  ; create plot
+    overlay(plot(0), ref_p)
+  end if
 
   ; ---------------------------------------------------------------------
   ; Procedure to attach a box to the given plot, given the lower left
@@ -2089,70 +2173,8 @@ begin
   newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
 
   ; ---------------------------------------------------------------------
-  ; add multi model mean of different experiments
-  ; ---------------------------------------------------------------------
-  ; number of different experiments
-  tmp = dimsizes(source_mean)
-  nexp     = tmp(0)
-  delete(tmp)
-
-  delete(res@xyDashPatterns)
-  delete(res@xyLineThicknesses)
-  delete(res@xyLineColors)
-  if (nexp .eq. 1) then
-    res@xyDashPatterns    = (/0/)
-    res@xyLineThicknesses = (/3/)
-    res@xyLineColors = (/"red"/)
-  elseif(nexp .eq. 2) then
-    res@xyDashPatterns    = (/0, 0/)
-    res@xyLineThicknesses = (/3, 3/)
-    res@xyLineColors = (/"red", "blue"/)
-  else
-    error_msg("w", scriptname, funcname, "Color palette not defined for " \
-              + nexp + " experiments")
-  end if
-
-  res@pmLegendDisplayMode = "Always"
-  res@xyExplicitLegendLabels = source_mean&experiment
-
-  mmm = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
-  overlay(plot(0), mmm)
-
-  ; ---------------------------------------------------------------------
-  ; Add multi model statistics (5% and 95% quantile)
-  ; ---------------------------------------------------------------------
-  if (isatt(diag_script_info, "stat_shading")) then
-    if (diag_script_info@stat_shading .ne. False) then
-      res_stat = True
-      copy_VarMeta(res, res_stat)
-      if (nexp .eq. 1) then
-        res_stat@gsnXYFillColors = "lightsalmon"
-        delete(res_stat@xyLineColors)
-        ; We don't want the line, so make it transparent.
-        res_stat@xyLineColor = -1
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
-                                  res_stat)
-        overlay(plot(0), shading_plot)
-      elseif(nexp .eq. 2) then
-        res_stat@gsnXYFillColors = "lightsalmon"
-        delete(res_stat@xyLineColors)
-        ; We don't want the line, so make it transparent.
-        res_stat@xyLineColor = -1
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
-                                  res_stat)
-        overlay(plot(0), shading_plot)
-        res_stat@gsnXYFillColors = "LightBlue"
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
-                                  res_stat)
-        overlay(plot(0), shading_plot)
-      else
-        error_msg("w", scriptname, funcname, "Color palette not defined for " \
-                  + nexp + " experiments")
-      end if
-    end if
-  end if
-
   ; Draw some lines to create a legend
+  ; ---------------------------------------------------------------------
   res_lines                   = True      ; polyline mods desired
   res_lines@tfPolyDrawOrder   = "Predraw"
   res_lines@gsLineColor       = "grey"    ; line color
