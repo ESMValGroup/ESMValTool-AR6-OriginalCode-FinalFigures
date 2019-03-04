@@ -148,8 +148,8 @@ CMIP5:
     DKRZ: '[institute]/[dataset]/[exp]/[frequency]/[modeling_realm]/[mip]/[ensemble]/[latestversion]/[short_name]'
     ETHZ: '[exp]/[mip]/[short_name]/[dataset]/[ensemble]/'
     SMHI: '[dataset]/[ensemble]/[exp]/[frequency]'
-    BSC: '[project]/[exp]/[dataset.lower]'
     RCAST: '[exp]/[mip]/[short_name]/[dataset]/[ensemble]/'
+    BSC: '[type]/[project]/[exp]/[dataset.lower]'
   input_file: '[short_name]_[mip]_[dataset]_[exp]_[ensemble]_*.nc'
   input_fx_dir:
     default: '/'
@@ -235,6 +235,7 @@ CMIP5:
     'NorESM1-ME': ['NCC']
 
 OBS:
+  cmor_strict: false
   input_dir:
     default: 'Tier[tier]/[dataset]'
     BSC: '[type]/[institute.lower]/[dataset.lower]/[freq_folder]/[short_name][freq_base]'
@@ -251,6 +252,7 @@ OBS:
   cmor_type: 'CMIP5'
 
 obs4mips:
+  cmor_strict: false
   input_dir:
     default: 'Tier[tier]/[dataset]'
     RCAST: '/'
@@ -262,9 +264,9 @@ obs4mips:
   output_file: '[project]_[dataset]_[level]_[version]_[field]_[short_name]_[start_year]-[end_year]'
   cmor_type: 'CMIP6'
   cmor_path: 'obs4mips'
-  cmor_strict: False
 
 ana4mips:
+  cmor_strict: false
   input_dir:
     default: 'Tier[tier]/[dataset]'
     RCAST: '/'
