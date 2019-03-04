@@ -2085,21 +2085,14 @@ begin
   nexp     = tmp(0)
   delete(tmp)
 
-  if (nexp .eq. 1) then
-    res@xyDashPatterns    = (/0/)
-    res@xyLineThicknesses = (/3/)
-    res@xyLineColors = (/"red"/)
-  elseif(nexp .eq. 2) then
-    res@xyDashPatterns    = (/0, 0/)
-    res@xyLineThicknesses = (/3, 3/)
-    res@xyLineColors = (/"red", "blue"/)
-  elseif(nexp .eq. 3) then
-    res@xyDashPatterns    = (/0, 0, 0/)
-    res@xyLineThicknesses = (/3, 3, 3/)
-    res@xyLineColors = (/"red", "blue", "orange"/)
-  else
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
+  res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
+  res@xyLineThicknesses = (/3, 3, 3, 3, 3, 3/)
+  res@xyLineColors = cmap(1:5,:)
+
+  if (nexp .gt. 6) then
     error_msg("w", scriptname, funcname, "Color palette not defined for " \
-              + nexp + " experiments")
+              + "more than " + nexp + " experiments")
   end if
 
   res@pmLegendDisplayMode = "Always"
@@ -2115,29 +2108,26 @@ begin
   if (isatt(diag_script_info, "stat_shading")) then
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
       copy_VarMeta(res, res_stat)
-      ;if (nexp .eq. 1) then
-      res_stat@gsnXYFillColors = "lightsalmon"
+      res_stat@gsnXYFillColors = cmap(1,:)
       delete(res_stat@xyLineColors)
       ; We don't want the line, so make it transparent.
       res_stat@xyLineColor = -1
       shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                 res_stat)
       overlay(plot(0), shading_plot)
-      ;elseif(nexp .eq. 2) then
       if(nexp .ge. 2) then
-        res_stat@gsnXYFillColors = "LightBlue"
+        res_stat@gsnXYFillColors = cmap(2,:)
         shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
-      ;elseif(nexp .eq. 3) then
       if(nexp .ge. 3) then
-        res_stat@gsnXYFillColors = "lightgoldenrod"
+        res_stat@gsnXYFillColors = cmap(3,:)
         shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
-      ;else
       end if
       if(nexp .gt. 3) then
         error_msg("w", scriptname, funcname, "Color palette not defined for " \
