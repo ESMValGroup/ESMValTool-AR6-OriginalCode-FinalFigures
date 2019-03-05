@@ -6,7 +6,12 @@ Modes of variability
 Overview
 --------
 
-The goal of this recipe is to compute modes of variability from a reference/observational dataset and a set of climate projections and calculate the root-mean-square error between the mean anomalies obtained for the clusters from the reference and projection data sets. This is done through K-means clustering applied either directly to the spatial data or after computing the EOFs. The user can specify the number of clusters to be computed. The recipe output consist of netcdf files of the time series of the cluster occurrences, the mean anomaly corresponding to each cluster at each location and the corresponding p-value, for both the observed and projected weather regimes and the RMSE between them.
+The goal of this recipe is to compute modes of variability from a reference/observational dataset and a set of climate projections and calculate the root-mean-square error between the mean anomalies obtained for the clusters from the reference and projection data sets. 
+This is done through K-means clustering applied either directly to the spatial data or after computing the EOFs. 
+
+The user can specify the number of clusters to be computed. 
+
+The recipe's output consist of netcdf files of the time series of the cluster occurrences, the mean anomaly corresponding to each cluster at each location and the corresponding p-value, for both the observed and projected weather regimes and the RMSE between them.
 
 
 Available recipes and diagnostics
@@ -63,7 +68,7 @@ References
 
 * Ferranti, L., S. Corti, and M. Janousek, 2015: Flow-dependent verification of the ECMWF ensemble over the Euro-Atlantic sector. Quarterly Journal of the Royal Meteorological Society, 141 (688), 916-924, doi: 10.1002/qj.2411.
 
-* Grams, C. M., Beerli, R., Pfenninger, S., Staffell, I., & Wernli, H. (2017). Balancing Europe's wind-power output through spatial deployment informed by weather regimes. Nature climate change, 7(8), 557.
+* Grams, C. M., Beerli, R., Pfenninger, S., Staffell, I., & Wernli, H. (2017). Balancing Europe's wind-power output through spatial deployment informed by weather regimes. Nature climate change, 7(8), 557, doi: 10.1038/nclimate3338.
 
 * Hannachi, A., D. M. Straus, C. L. E. Franzke, S. Corti, and T. Woollings, 2017: Low Frequency Nonlinearity and Regime Behavior in the Northern Hemisphere Extra-Tropical Atmosphere. Reviews of Geophysics, doi: 10.1002/2015RG000509.
 
