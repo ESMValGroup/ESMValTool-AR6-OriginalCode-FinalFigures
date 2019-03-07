@@ -24,6 +24,9 @@
 ;    stat: statistics for multi model nc-file (MinMax,5-95,10-90)
 ;    y-min: set min of y-axis
 ;    y-max: set max of y-axis
+;    mean_nh_sh: if true, calculate first NH and SH mean
+;    run_ave: if not equal 0 than calculate running mean over this number 
+;             of years
 ;
 ; Caveats
 ;
@@ -215,6 +218,11 @@ begin
 
         if (isatt(variable_info[0], "reference_dataset")) then
 
+          ; save field with no masking for mean reference value
+          if (anom .eq. "anom" .and. ref_value .eq. True)
+            A0_nomask = A0
+          end if
+
           if(diag_script_info@ref_mask .and. imod .ne. ref_ind) then
             ; Determine start/end year
             start_year = info_items[imod]@start_year
@@ -237,8 +245,13 @@ begin
           end do
 
           if (ref_value.eq.True)
-            anom_ref(imod) = area_operations(A0_timavg_ref, -90., 90., \
+            A0_timavg_ref_nomask = time_operations(A0_nomask, ref_start, \
+                                                   ref_end, "average",   \
+                                                   "annualclim", True)
+            anom_ref(imod) = area_operations(A0_timavg_ref_nomask, -90., 90., \
                                              0., 360., "average", True)
+            delete(A0_timavg_ref_nomask)
+            delete(A0_nomask)
           end if
           delete(A0_timavg_ref)
 

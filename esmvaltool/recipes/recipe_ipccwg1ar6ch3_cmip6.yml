@@ -271,13 +271,12 @@ diagnostics:
         end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
       - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
          start_year: 1870, end_year: 2017, tier: 2}
-      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
-         start_year: 1990, end_year: 1990, tier: 2}
     scripts:
       fig09-8: 
         script: ipcc_ar5/tsline.ncl
@@ -285,7 +284,9 @@ diagnostics:
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
         ref_start: 1961       #start year of reference period for anomalies
         ref_end: 1990         #end year of reference period for anomalies
-        range_option: 0
+        ref_value: True
+        ref_mask: False
+        mean_nh_sh: True
         plot_units: "degC"
         # Plot style
         styleset: CMIP6

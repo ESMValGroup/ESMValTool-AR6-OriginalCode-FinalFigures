@@ -86,6 +86,7 @@ begin
     end if
 
     procmod = dim_avg_Wrap(A0)
+    delete(A0)
 
     A0_timavg = time_operations(procmod, -1, -1, "average", "yearly", True)
     delete(procmod)

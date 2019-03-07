@@ -527,7 +527,7 @@ diagnostics:
         <<: *tsline_settings
         region: "30N-60N"
 
-  pr_cmip5_hist_nat_30-60N:
+  pr_cmip5_hist_nat_30N-60N:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       pr:
@@ -685,7 +685,7 @@ diagnostics:
         <<: *tsline_settings
         region: "30S-30N"
 
-  pr_cmip5_hist_nat_30-30N:
+  pr_cmip5_hist_nat_30N-30N:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       pr:
@@ -843,7 +843,7 @@ diagnostics:
         <<: *tsline_settings
         region: "30S-60S"
 
-  pr_cmip5_hist_nat_30-60S:
+  pr_cmip5_hist_nat_30N-60S:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       pr:
@@ -1001,7 +1001,7 @@ diagnostics:
         <<: *tsline_settings
         region: "60S-90S"
 
-  pr_cmip5_hist_nat_30-90S:
+  pr_cmip5_hist_nat_30N-90S:
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       pr:

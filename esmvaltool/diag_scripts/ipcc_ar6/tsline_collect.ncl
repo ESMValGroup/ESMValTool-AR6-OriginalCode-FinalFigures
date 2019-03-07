@@ -18,6 +18,7 @@
 ;    ref_end: end year of reference period for anomalies
 ;    ref_value: if true, right panel with mean values is attached
 ;    plot_units: variable unit for plotting
+;    order: order in which experiments should be plotted
 ;
 ; Caveats
 ;
@@ -169,13 +170,20 @@ begin
 
     data_temp = ncdf_read(input_files(ii), var0)
 
-    data_mean(ii, :)  = (/data_temp(0, :)/)
-    data_mean&experiment(ii) = data_temp@experiment
-    ;data_mean&experiment(ii) = stringtochar(data_temp@experiment)
+    if(isatt(diag_script_info, "order")) then
+print("data_temp@experiment = " + data_temp@experiment)
+print("diag_script_info@order = " + diag_script_info@order)
+print("old ii = " + ii)
+      ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
+print("new ii = " + ii_n)
+    end if
+
+    data_mean(ii_n, :)  = (/data_temp(0, :)/)
+    data_mean&experiment(ii_n) = data_temp@experiment
     data_mean&time = data_temp&time
 
-    data_stat(0, ii, :) = data_temp(1, :)
-    data_stat(1, ii, :) = data_temp(2, :)
+    data_stat(0, ii_n, :) = data_temp(1, :)
+    data_stat(1, ii_n, :) = data_temp(2, :)
 
     delete(data_temp)
 
@@ -258,8 +266,6 @@ begin
   ref_end = diag_script_info@ref_end
   res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
     + " " + data_mean@var + " Mean" + " [" + data_mean@units + "]"
-
-printVarSummary(data_mean)
 
   if (isatt(diag_script_info, "ref")) then
     xy_line_collect(wks, data_mean, data_ref, data_ref&time, \

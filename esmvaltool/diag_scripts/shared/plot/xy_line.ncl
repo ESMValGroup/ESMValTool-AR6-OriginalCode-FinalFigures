@@ -2126,6 +2126,7 @@ begin
 
   res@pmLegendDisplayMode = "Always"
   res@xyExplicitLegendLabels = source_mean&experiment
+  res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
 
   plot(0) = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
 
