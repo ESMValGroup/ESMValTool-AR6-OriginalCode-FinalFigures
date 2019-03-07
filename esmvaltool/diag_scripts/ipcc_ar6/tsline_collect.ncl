@@ -171,11 +171,12 @@ begin
     data_temp = ncdf_read(input_files(ii), var0)
 
     if(isatt(diag_script_info, "order")) then
-print("data_temp@experiment = " + data_temp@experiment)
-print("diag_script_info@order = " + diag_script_info@order)
-print("old ii = " + ii)
       ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
-print("new ii = " + ii_n)
+      if (all(ismissing(ii_n))) then
+        error_msg("f", DIAG_SCRIPT, "", "Collected experiment " + \
+                  data_temp@experiment + " does not appear in " + \
+                  "diag_script_info@order")
+      end if
     end if
 
     data_mean(ii_n, :)  = (/data_temp(0, :)/)
