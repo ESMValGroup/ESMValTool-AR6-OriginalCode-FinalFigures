@@ -53,6 +53,8 @@ import numpy as np
 import iris
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
 from scipy.stats import linregress
 
 
@@ -210,6 +212,8 @@ def count_models(metadatas, obs_filename):
 
 def make_pane_a(
         cfg,
+        fig=None,
+        ax=None
 ):
     """
     Make a profile plot for an individual model.
@@ -220,8 +224,26 @@ def make_pane_a(
     ----------
     cfg: dict
         the opened global config dictionairy, passed by ESMValTool.
+    pane: string
+        Which pane to produce. Either b or c.
+    fig: Pyplot.figure()
+        The pyplot figure
+    ax: pyplot.axes
+        The pyplot axes.
+
+    Returns
+    ----------
+    fig: Pyplot.figure() - optional
+        The pyplot figure (only returned if also provided)
+    ax: pyplot.axes - optional
+        The pyplot axes.  (only returned if also provided)
     """
-    fig = plt.figure()
+    savefig = False
+    if fig in [None,] and ax in [None,]:
+        fig = plt.figure()
+        fig.set_size_inches(10., 9.)
+        ax = plt.subplot(111)
+        savefig = True
 
     metadatas = diagtools.get_input_files(cfg)
 
@@ -254,11 +276,10 @@ def make_pane_a(
 
         label = ' '.join([metadatas[filename]['dataset'],
                           ':',
-                          str(round(cubes[dataset].data[max_index] , 1)),
-                          str(cubes[dataset].units),
-                          str(round(cubes[dataset].coord('depth').points[max_index], 0)),
-                          str(cubes[dataset].coord('depth').units),
-                          'm',
+                          '('+str(round(cubes[dataset].data[max_index] , 1)),
+                          str(cubes[dataset].units)+',',
+                          str(int(cubes[dataset].coord('depth').points[max_index])),
+                          str(cubes[dataset].coord('depth').units)+')'
                           ])
         if filename == obs_filename:
             plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
@@ -300,14 +321,16 @@ def make_pane_a(
     #     metadata['long_name'],
     # ])
     # plt.title(title)
+    plt.title('(a) AMOC streamfunction profiles at 26.5N')
 
     # Add Legend outside right.
     # diagtools.add_legend_outside_right(plot_details, plt.gca())
-    fig.set_size_inches(10., 9.)
-    leg = plt.legend(loc='lower right', prop={'size':10})
+    leg = plt.legend(loc='lower right', prop={'size':6})
     leg.draw_frame(False)
     leg.get_frame().set_alpha(0.)
 
+    if not savefig:
+        return fig, ax
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
     path = cfg['plot_dir'] + 'fig_3.24a'+image_extention
@@ -323,16 +346,39 @@ def make_pane_a(
 def make_pane_bc(
         cfg,
         pane = 'b',
+        fig=None,
+        ax=None
 ):
     """
     Make a box and whiskers plot for panes b and c.
+
+    If a figure and axes are not provided, if will save the pane as it's own
+    image, otherwise it returns the fig and ax.
 
     Parameters
     ----------
     cfg: dict
         the opened global config dictionairy, passed by ESMValTool.
+    pane: string
+        Which pane to produce. Either b or c.
+    fig: Pyplot.figure()
+        The pyplot figure
+    ax: pyplot.axes
+        The pyplot axes.
+
+    Returns
+    ----------
+    fig: Pyplot.figure() - optional
+        The pyplot figure (only returned if also provided)
+    ax: pyplot.axes - optional
+        The pyplot axes.  (only returned if also provided)
     """
-    fig = plt.figure()
+    savefig = False
+    if fig in [None,] and ax in [None,]:
+        fig = plt.figure()
+        fig.set_size_inches(10., 9.)
+        ax = plt.subplot(1, 1, 1)
+        savefig = True
 
     metadatas = diagtools.get_input_files(cfg)
 
@@ -364,17 +410,17 @@ def make_pane_bc(
     model_numbers, number_models, projects= count_models(metadatas, obs_filename)
 
     box_data = [trends[dataset] for dataset in sorted(trends)]
-    box = plt.boxplot(box_data,
+    box = ax.boxplot(box_data,
                      0,
                      sym = 'k.',
                      whis = [1, 99],
+                     showmeans= False,
                      meanline = False,
                      showfliers = True,
                      labels = sorted(trends.keys()))
     plt.xticks(rotation=45)
     plt.setp(box['fliers'], markersize=1.0)
 
-    plt.subplots_adjust(bottom=0.25)
 
     # Add observational data.
 
@@ -388,15 +434,19 @@ def make_pane_bc(
     #
     #     plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 1,
     #                              'label': obs_key}
+    if savefig:
+        plt.subplots_adjust(bottom=0.25)
 
     # pane specific stuff
     if pane == 'b':
         plt.title('(b) Distribution of 8 year AMOC trends in CMIP5')
-        plt.axhline(-0.55, c='k', lw=5, alpha=0.1, zorder = 0) # Wrong numbers!
+        plt.axhline(-0.55, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
+        if not savefig:
+            plt.setp( ax.get_xticklabels(), visible=False)
 
     if pane == 'c':
-        plt.title('(c) Distribution o interannual AMOC changes in CMIP5')
-        plt.axhline(-4.4, c='k', lw=5, alpha=0.1, zorder = 0) # wrong numbers!
+        plt.title('(c) Distribution of interannual AMOC changes in CMIP5')
+        plt.axhline(-4.4, c='k', lw=8, alpha=0.1, zorder = 0) # wrong numbers!
 
 
     # title = ' '.join([
@@ -412,6 +462,9 @@ def make_pane_bc(
     # leg.draw_frame(False)
     # leg.get_frame().set_alpha(0.)
 
+    if not savefig:
+        return fig, ax
+
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
     path = cfg['plot_dir'] + 'fig_3.24'+pane+image_extention
@@ -422,6 +475,51 @@ def make_pane_bc(
         plt.savefig(path)
 
     plt.close()
+
+
+def  make_figure(cfg):
+    """
+    Make the entire figure.
+
+    Parameters
+    ----------
+    cfg: dict
+        the opened global config dictionairy, passed by ESMValTool.
+
+    """
+    fig = plt.figure()
+    fig.set_size_inches(w=11,h=7)
+    gs1 = gridspec.GridSpec(2,5)
+
+    # fig.subplots_adjust(wspace=0.25, hspace=0.1)
+
+    axa = plt.subplot2grid((2,5), (0,0), colspan=2, rowspan=2)
+    fig, axa = make_pane_a(cfg, fig=fig, ax=axa)
+
+    axb = plt.subplot2grid((2,5), (0,2), colspan=3, rowspan=1)
+    fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb)
+
+    axc = plt.subplot2grid((2,5), (1,2), colspan=3, rowspan=1)
+    fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc)
+
+    plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
+
+    # Load image format extention and path
+    image_extention = diagtools.get_image_format(cfg)
+    path = cfg['plot_dir'] + 'fig_3.24'+image_extention
+
+    # Watermakr
+    fig.text(0.95, 0.05, 'Draft',
+             fontsize=50, color='gray',
+             ha='right', va='bottom', alpha=0.5)
+
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path)
+
+    plt.close()
+
 
 
 def main(cfg):
@@ -437,11 +535,15 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
+    make_figure(cfg)
+    return
+
+    # individual plots:
     make_pane_bc(cfg, pane='c')
     make_pane_bc(cfg, pane='b')
-
-
     make_pane_a(cfg)
+
+
 
     # for index, metadata_filename in enumerate(cfg['input_files']):
         # make_pane_a(cfg)
