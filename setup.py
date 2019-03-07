@@ -31,26 +31,28 @@ REQUIREMENTS = {
         'cdo',
         'cf_units',
         'cython',
+        'eofs',
+        'fiona',
         'jinja2',
-        'scitools-iris',
         'matplotlib<3',
         'nc-time-axis',  # needed by iris.plot
         'netCDF4',
         'numba',
         'numpy',
+        'pandas',
         'pillow',
         'prov[dot]',
         'psutil',
         'pyyaml',
+        'scitools-iris',
         'shapely',
         'six',
+        'sklearn',
         'stratify',
         'vmprof',
         'xarray',
+        'xlsxwriter',
         'yamale',
-        'sklearn',
-        'pandas',
-        'eofs',
     ],
     # Test dependencies
     # Execute 'python setup.py test' to run tests
@@ -80,12 +82,6 @@ REQUIREMENTS = {
         'yapf',
     ],
 }
-
-if sys.version_info.major == 2:
-    REQUIREMENTS['test'].append('more-itertools<6')
-    for i, req in enumerate(REQUIREMENTS['install']):
-        if req.startswith('cdo'):
-            REQUIREMENTS['install'][i] = 'cdo!=1.5.*'
 
 
 def discover_python_files(paths, ignore):
@@ -220,8 +216,8 @@ with open('README.md') as readme:
             'Environment :: Console',
             'License :: OSI Approved :: Apache Software License',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
         ],
         packages=PACKAGES,
         # Include all version controlled files
