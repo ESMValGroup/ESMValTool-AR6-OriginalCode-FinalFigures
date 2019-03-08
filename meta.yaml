@@ -65,6 +65,8 @@ requirements:
     - vmprof
     - xarray
     - yamale  # in birdhouse channel
+    - fiona
+    - xlsxwriter
     # Multi language support:
     - ncl
     - jasper!=1.900.31  # pinned NCL dependency
