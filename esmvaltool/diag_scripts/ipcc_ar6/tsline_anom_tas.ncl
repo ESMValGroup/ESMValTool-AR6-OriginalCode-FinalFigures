@@ -163,6 +163,9 @@ begin
           isatt(diag_script_info, "ref_end")) then
         ref_start = diag_script_info@ref_start
         ref_end   = diag_script_info@ref_end
+        if (ref_start.lt.start_year) then
+          ref_start = start_year
+        end if
         if ((ref_start.lt.start_year) .or. (ref_end.gt.end_year) .or. \
             (ref_end.lt.ref_start)) then
           error_msg("f", DIAG_SCRIPT, "", \
@@ -239,14 +242,15 @@ begin
         ; Anomaly
         if(anom .eq. "anom") then
           ; calculate mean of ref period if 0.5 data points are available
-          tmp = time_operations(A0, ref_start, ref_end, "extract", \
-                                "annualclim", True)
+          tmp = time_operations(A0, 1961, 1990, "extract", "", 0)
           date := cd_calendar(tmp&time, 0)
           year := date(:, 0)
           month := date(:, 1)
           weights = days_in_month(toint(year), toint(month))
-          limit  = toint(0.5 * dimsizes(temp&time))
+          limit  = toint(0.5 * dimsizes(tmp&time))
           A0_timavg_ref = dim_avg_wgt_n_Wrap(tmp, weights, limit, 0)
+          delete(tmp)
+          delete(date)
 
           do i = 0, dimsizes(A0&time) - 1
             A0(i, :, :) = A0(i, :, :) - A0_timavg_ref(:, :)
@@ -260,6 +264,20 @@ begin
                                              0., 360., "average", True)
             delete(A0_timavg_ref_nomask)
             delete(A0_nomask)
+          end if
+
+          anom_ref_tmp = area_operations(A0_timavg_ref, -90., 90., \
+                                         0., 360., "average", True)
+          if (diag_script_info@mean_nh_sh) then
+            ; calculate global mean first for each hemisphere
+
+            tmp1 = area_operations(A0_timavg_ref, -90., 0., 0., 360., \
+                                   "average", True)
+            tmp2 = area_operations(A0_timavg_ref, 0., 90., 0., 360., \
+                                   "average", True)
+            anom_ref_tmp = (tmp1 + tmp2) /2.
+            delete(tmp1)
+            delete(tmp2)
           end if
           delete(A0_timavg_ref)
 
@@ -278,6 +296,17 @@ begin
           procmod = (tmp1 + tmp2) /2.
           delete(tmp1)
           delete(tmp2)
+        end if
+
+printVarSummary(procmod)
+printVarSummary(anom_ref_tmp)
+        if(anom .eq. "anom") then
+          procmod = procmod + anom_ref_tmp
+          anom_ref_new = time_operations(procmod, ref_start, ref_end, "average", \
+                                         "annualclim", True)
+          procmod = procmod - anom_ref_new
+          delete(anom_ref_new)
+          delete(anom_ref_tmp)
         end if
 
       end if
