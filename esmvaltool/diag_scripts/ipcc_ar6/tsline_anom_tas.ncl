@@ -426,7 +426,11 @@ printVarSummary(anom_ref_tmp)
   ; FIX-ME: mean value comes from climatology file (absolute.nc).
   ; There are no missing values as in the anomaly data.
   if (isatt(variable_info[0], "reference_dataset") .and. variable_info[0]@reference_dataset .eq. "HadCRUT4") then
-    anom_ref(ref_ind) = 14.0
+    if(ref_start .eq. 1961 .and. ref_end .eq. 1990) then
+      anom_ref(ref_ind) = 14.0
+    else
+      anom_ref(ref_ind) = anom_ref@_FillValue
+    end if
   end if
 ;  if (ref_value .and. any(datasetnames.eq."HadCRUT4-clim")) then
 ;    ; Read data
