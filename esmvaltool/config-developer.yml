@@ -231,22 +231,24 @@ CMIP5:
     'NorESM1-ME': ['NCC']
 
 OBS:
+  cmor_strict: false
   input_dir:
     default: 'Tier[tier]/[dataset]'
     BSC: '[type]/[institute.lower]/[dataset.lower]/[freq_folder]/[short_name][freq_base]'
     RCAST: '[dataset]'
   input_file:
-    default: '[project]_[dataset]_[type]_[version]_[field]_[short_name]_*.nc'
+    default: '[project]_[dataset]_[type]_[version]_[mip]_[short_name]_*.nc'
     BSC: '[short_name]_*.nc'
     RCAST: '[short_name]_[mip]_[type]_[dataset]_*.nc'
   input_fx_dir:
     default: 'Tier[tier]/[dataset]'
   input_fx_file:
-    default: '[project]_[dataset]_[type]_fx_[fx_var].nc'
-  output_file: '[project]_[dataset]_[type]_[version]_[field]_[short_name]_[start_year]-[end_year]'
+    default: '[project]_[dataset]_[type]_[version]_fx_[fx_var].nc'
+  output_file: '[project]_[dataset]_[type]_[version]_[mip]_[short_name]_[start_year]-[end_year]'
   cmor_type: 'CMIP5'
 
 obs4mips:
+  cmor_strict: false
   input_dir:
     default: 'Tier[tier]/[dataset]'
     RCAST: '/'
@@ -258,9 +260,9 @@ obs4mips:
   output_file: '[project]_[dataset]_[level]_[version]_[field]_[short_name]_[start_year]-[end_year]'
   cmor_type: 'CMIP6'
   cmor_path: 'obs4mips'
-  cmor_strict: False
 
 ana4mips:
+  cmor_strict: false
   input_dir:
     default: 'Tier[tier]/[dataset]'
     RCAST: '/'
