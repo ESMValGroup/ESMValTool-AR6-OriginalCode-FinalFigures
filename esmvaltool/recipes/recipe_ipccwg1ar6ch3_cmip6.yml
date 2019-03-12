@@ -195,15 +195,17 @@ diagnostics:
       - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1,
          start_year: 1986, end_year: 2005, tier: 3}
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
       - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
     scripts:
-      fig_3_2: &fig-9-2_and_9-4_settings
-        script: clouds/clouds_bias.ncl
+      fig_3_2: &fig-3-2_and_3-3_settings
+        script: ipcc_ar6/clouds_bias.ncl
         projection: Robinson
         timemean: annualclim
-        plot_abs_diff: true
+        plot_rms_diff: True
+        plot_abs_diff: false
         plot_rel_diff: false
 
   # **********************************************************************
@@ -234,14 +236,16 @@ diagnostics:
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
          start_year: 1986, end_year: 2005, tier: 1}
       - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
       - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
       - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
     scripts:
-      fig09-4:
-        <<: *fig-9-2_and_9-4_settings
-        plot_abs_diff: true
-        plot_rel_diff: true
+      fig_3_3:
+        <<: *fig-3-2_and_3-3_settings
+        plot_rms_diff: True
+        plot_abs_diff: False
+        plot_rel_diff: True
 
 
   # **********************************************************************
@@ -260,14 +264,12 @@ diagnostics:
       tas:
         preprocessor: clim_ref   
         reference_dataset: HadCRUT4   
-        alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP6
         exp: historical
-        ensemble: r1i1p1
         grid: gr
-        start_year: 1870
+        start_year: 1850
         end_year: 2014
     additional_datasets:
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
@@ -276,21 +278,19 @@ diagnostics:
       - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-         start_year: 1870, end_year: 2017, tier: 2}
+         start_year: 1850, end_year: 2017, tier: 2}
     scripts:
       fig09-8: 
-        script: ipcc_ar5/tsline.ncl
+        script: ipcc_ar6/tsline_anom_tas.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1961       #start year of reference period for anomalies
-        ref_end: 1990         #end year of reference period for anomalies
-        ref_value: True
-        ref_mask: False
+        ref_start: 1850       #start year of reference period for anomalies
+        ref_end: 1900         #end year of reference period for anomalies
+        ref_mask: True
         mean_nh_sh: True
         plot_units: "degC"
         # Plot style
         styleset: CMIP6
-
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3

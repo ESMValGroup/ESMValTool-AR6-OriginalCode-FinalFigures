@@ -39,6 +39,15 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_alt:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
       exclude: [reference_dataset, alternative_dataset]
 
   clim_ref2:
@@ -217,8 +226,7 @@ preprocessors:
 
 diagnostics:
 
-  
-
+ 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Fig. 3.2 (ZOD fig. 3.9)
@@ -289,11 +297,12 @@ diagnostics:
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
     scripts:
-      fig_3_3_1_a: 
-        script: clouds/clouds_bias.ncl
+      fig_3_2: &fig-3-2_and_3-3_settings
+        script: ipcc_ar6/clouds_bias.ncl
         projection: Robinson
         timemean: annualclim
-        plot_abs_diff: true
+        plot_rms_diff: True
+        plot_abs_diff: false
         plot_rel_diff: false
 
   # **********************************************************************
@@ -307,106 +316,70 @@ diagnostics:
   # mean relative error (geographical ditributions)
   # **********************************************************************
 
-  fig_3_2:
+  fig_3_3:
     description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
     variables:
       pr:
         preprocessor: clim
         reference_dataset: GPCP-SG
+        project: CMIP5
         mip: Amon
         field: T2Ms
+        ensemble: r1i1p1
+        exp: historical
+        start_year: 1986
+        end_year: 2005
     additional_datasets:
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
          start_year: 1986, end_year: 2005, tier: 1}
-      - {dataset: ACCESS1-0, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: ACCESS1-3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: bcc-csm1-1, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: bcc-csm1-1-m, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: BNU-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CanESM2, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CCSM4, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-BGC, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: CESM1-CAM5-1-FV, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-CAM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-FASTCHEM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-WACCM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CMCC-CESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: CMCC-CM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-      #    start_year: 1986, end_year: 2005}
-      # - {dataset: CMCC-CMS, project: CMIP5, exp: historical, ensemble: r1i1p1,
-      #    start_year: 1986, end_year: 2005}
-      # - {dataset: CNRM-CM5-2, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CNRM-CM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: FGOALS-g2, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-CM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-ESM2G, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-ESM2M, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-H-CC, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: GISS-E2-H, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-R-CC, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-R, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: HadGEM2-CC, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: HadGEM2-ES, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: inmcm4, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: MIROC4h, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC-ESM-CHEM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-LR, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-MR, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-P, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MRI-CGCM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: NorESM1-M, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: NorESM1-ME, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      # - {dataset: CESM1-CAM5-1-FV}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      # - {dataset: CMCC-CM}
+      # - {dataset: CMCC-CMS}
+      # - {dataset: CNRM-CM5-2}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      # - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H-CC}
+      # - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: GISS-E2-R}
+      # - {dataset: HadGEM2-CC}
+      # - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
     scripts:
-      fig09-4:
-        <<: *fig-9-2_and_9-4_settings
-        plot_abs_diff: true
-        plot_rel_diff: true
+      fig_3_3:
+        <<: *fig-3-2_and_3-3_settings
+        plot_rms_diff: True
+        plot_abs_diff: False
+        plot_rel_diff: True
 
 
   # **********************************************************************
@@ -425,13 +398,12 @@ diagnostics:
       tas:
         preprocessor: clim_ref   
         reference_dataset: HadCRUT4   
-        alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1870
+        start_year: 1850
         end_year: 2004
     additional_datasets:
       - {dataset: ACCESS1-0}
@@ -457,18 +429,18 @@ diagnostics:
       #- {dataset: FGOALS-g2}
       #- {dataset: FGOALS-s2}
       - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
+      #- {dataset: GFDL-CM2p1, start_year: 1861}
+      #- {dataset: GFDL-CM3, start_year: 1861}
+      #- {dataset: GFDL-ESM2G, start_year: 1861}
+      #- {dataset: GFDL-ESM2M, start_year: 1861}
       - {dataset: GISS-E2-H, ensemble: r1i1p2}
       - {dataset: GISS-E2-H-CC}
       - {dataset: GISS-E2-R, ensemble: r1i1p2}
       - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadCM3, start_year: 1860}
+      #- {dataset: HadGEM2-AO, start_year: 1860}
+      #- {dataset: HadGEM2-CC, start_year: 1860}
+      #- {dataset: HadGEM2-ES, start_year: 1860}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -481,24 +453,23 @@ diagnostics:
       - {dataset: MPI-ESM-MR}
       - {dataset: MPI-ESM-P}
       - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
+      #- {dataset: MRI-ESM1, start_year: 1851}
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-         start_year: 1870, end_year: 2017, tier: 2}
+         start_year: 1850, end_year: 2017, tier: 2}
     scripts:
       fig09-8: 
-        script: ipcc_ar5/tsline.ncl
+        script: ipcc_ar6/tsline_anom_tas.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1961       #start year of reference period for anomalies
-        ref_end: 1990         #end year of reference period for anomalies
-        ref_mask: False
+        ref_start: 1850       #start year of reference period for anomalies
+        ref_end: 1900         #end year of reference period for anomalies
+        ref_mask: True
         mean_nh_sh: True
         plot_units: "degC"
         # Plot style
         styleset: CMIP5
-
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
