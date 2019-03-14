@@ -325,9 +325,8 @@ begin
       ; Match time coordinate
       if (time_avg.eq."monthly") then
         date = cd_calendar(procmod&time, -1)
-      else if (time_avg.eq."yearly") then
+      elseif (time_avg.eq."yearly") then
         date = procmod&year
-      end if
       end if
       idx1 = ind(date(0).eq.model_arr&time)
       idx2 = ind(date(dimsizes(date) - 1).eq.model_arr&time)

@@ -76,7 +76,7 @@ begin
   set_default_att(diag_script_info, "time_avg", "monthly")
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
   set_default_att(diag_script_info, "ref_value", False)
-  set_default_att(diag_script_info, "region", "global")
+  set_default_att(diag_script_info, "region", "Global")
 
   ; Determine time range
 ;  start_year = min(metadata_att_as_array(info_items, "start_year"))
@@ -108,6 +108,10 @@ begin
   if (isatt(diag_script_info, "ref")) then
     dim_ref = (/dimsizes(diag_script_info@ref), ntime/)
     data_ref = new(dim_ref, double)
+    data_ref!0 = "dataset"
+    data_ref&dataset= new(dimsizes(diag_script_info@ref), string, "")
+    data_ref!1 = "time"
+    data_ref&time = time
   end if
 
   ; Anomaly
@@ -149,16 +153,21 @@ begin
     "tsline_mm_" + var0 + "_stat.nc"
   input_files := tostring(input_files)
 
+print("input_files: " + input_files)
+
   ; Filter out non-existing files
   input_files := input_files(ind(isfilepresent(input_files)))
+
+print("input_files: " + input_files)
 
   nfiles = dimsizes(input_files)
 
   dim_data   = (/nfiles, ntime/)
   data_mean  = new(dim_data, double)
   data_mean!0 = "experiment"
-  data_mean&experiment = new(nfiles, string, "exp")
   data_mean!1 = "time"
+  data_mean&experiment = new(nfiles, string, "exp")
+  data_mean&time = time
   data_mean@var = var0
   data_mean@units = diag_script_info@plot_units
   data_stat = new((/2, nfiles, ntime/), double)
@@ -172,19 +181,33 @@ begin
 
     if(isatt(diag_script_info, "order")) then
       ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
-      if (all(ismissing(ii_n))) then
+      if (ii_n .gt. dimsizes(data_mean&experiment)-1) then
+        error_msg("f", DIAG_SCRIPT, "", "diag_script_info@order not " \
+                  + "well defined (less experiments available)")
+      elseif (all(ismissing(ii_n))) then
         error_msg("f", DIAG_SCRIPT, "", "Collected experiment " + \
                   data_temp@experiment + " does not appear in " + \
                   "diag_script_info@order")
       end if
+    else
+      ii_n = ii
     end if
 
-    data_mean(ii_n, :)  = (/data_temp(0, :)/)
-    data_mean&experiment(ii_n) = data_temp@experiment
-    data_mean&time = data_temp&time
+    ; Match time coordinate
+    if (time_avg.eq."monthly") then
+      date = cd_calendar(data_temp&time, -1)
+    elseif (time_avg.eq."yearly") then
+      date = data_temp&time
+    end if
+    idx1 = ind(date(0).eq.data_mean&time)
+    idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
+    delete(date)
 
-    data_stat(0, ii_n, :) = data_temp(1, :)
-    data_stat(1, ii_n, :) = data_temp(2, :)
+    data_mean(ii_n, idx1:idx2)  = (/data_temp(0, :)/)
+    data_mean&experiment(ii_n) = data_temp@experiment
+
+    data_stat(0, ii_n, idx1:idx2) = data_temp(1, :)
+    data_stat(1, ii_n, idx1:idx2) = data_temp(2, :)
 
     delete(data_temp)
 
@@ -204,13 +227,25 @@ begin
 
     data_temp = ncdf_read(input_files_ref(0), var0)
 
+    log_info("Read in " + input_files_ref(0))
+
     do i = 0, dimsizes(diag_script_info@ref)-1
 
       ind_ref = ind(data_temp&model .eq. diag_script_info@ref(i))
       if (all(ismissing(ind_ref))) then
         error_msg("f", DIAG_SCRIPT, "", "observational data set not available")
       else
-        data_ref(i,  :) = data_temp(ind_ref, :)
+        ; Match time coordinate
+        if (time_avg.eq."monthly") then
+          date = cd_calendar(data_temp&time, -1)
+        elseif (time_avg.eq."yearly") then
+          date = data_temp&time
+        end if
+        idx1 = ind(date(0).eq.data_ref&time)
+        idx2 = ind(date(dimsizes(date) - 1).eq.data_ref&time)
+        delete(date)
+
+        data_ref(i, idx1:idx2) = (/data_temp(ind_ref, :)/)
       end if
 
     end do
@@ -219,13 +254,33 @@ begin
   end if
 
   ; -------------------------------------------
+  ; NetCDF Output
+  ; -------------------------------------------
+
+  out_path = config_user_info@work_dir
+  system("mkdir -p " + out_path)
+  out_path1 = out_path + "tsline_collect_" + var0 + ".nc"
+  data_mean@ncdf = out_path
+  data_mean@diag_script = DIAG_SCRIPT
+  data_mean@var = var0
+  ncdf_outfile = ncdf_write(data_mean, out_path1)
+
+  if (isatt(diag_script_info, "ref")) then
+    out_path1 = out_path + "tsline_collect_" + var0 + "_ref.nc"
+    data_ref@ncdf = out_path
+    data_ref@diag_script = DIAG_SCRIPT
+    data_ref@var = var0
+    ncdf_outfile = ncdf_write(data_ref, out_path1)
+  end if
+
+  ; -------------------------------------------
   ; Plotting
   ; -------------------------------------------
 
   ; Define workstation
   outfile = config_user_info@plot_dir + data_mean@var + "_" + \
-    diag_script_info@region + "_multimodel_" + anom + \
-    "_" + detr + "_" + start_year + "-" + end_year
+    str_sub_str(diag_script_info@region, " ", "_") + \
+    "_multimodel_" + anom + "_" + detr + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
   ; Set resources

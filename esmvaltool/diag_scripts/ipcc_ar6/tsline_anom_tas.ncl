@@ -110,7 +110,7 @@ begin
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
   set_default_att(diag_script_info, "ref_value", True)
   set_default_att(diag_script_info, "ref_mask", False)
-  set_default_att(diag_script_info, "region", "global")
+  set_default_att(diag_script_info, "region", "Global")
   set_default_att(diag_script_info, "write_stat", False)
   set_default_att(diag_script_info, "stat", "MinMax")
   set_default_att(diag_script_info, "mean_nh_sh", False)
@@ -247,7 +247,8 @@ begin
           year := date(:, 0)
           month := date(:, 1)
           weights = days_in_month(toint(year), toint(month))
-          limit  = toint(0.5 * dimsizes(tmp&time))
+          ;limit  = toint(0.5 * dimsizes(tmp&time))
+          limit  = 1
           A0_timavg_ref = dim_avg_wgt_n_Wrap(tmp, weights, limit, 0)
           delete(tmp)
           delete(date)
@@ -298,33 +299,16 @@ begin
           delete(tmp2)
         end if
 
-printVarSummary(procmod)
-printVarSummary(anom_ref_tmp)
         if(anom .eq. "anom") then
           procmod = procmod + anom_ref_tmp
+
           anom_ref_new = time_operations(procmod, ref_start, ref_end, "average", \
                                          "annualclim", True)
           procmod = procmod - anom_ref_new
+
           delete(anom_ref_new)
           delete(anom_ref_tmp)
         end if
-
-      end if
-
-      ; time
-      if (field_type0.eq."T0M") then
-
-        ; Anomaly
-        if(anom .eq. "anom") then
-          A0_timavg_ref = time_operations(A0, ref_start, ref_end, \
-                                          "average", "annualclim", \
-                                          True)
-          do i = 0, dimsizes(A0&time) - 1
-            A0(i) = A0(i) - A0_timavg_ref
-          end do
-        end if
-
-        procmod = A0
 
       end if
 
@@ -505,7 +489,8 @@ printVarSummary(anom_ref_tmp)
   end if
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + var0 + "_" + diag_script_info@region \
+  outfile = config_user_info@plot_dir + var0 + "_" \
+    + str_sub_str(diag_script_info@region, " ", "_") \
     + "_" + project0 + "_" + exp0 + "_" + anom + "_" + detr + "_" \
     + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
