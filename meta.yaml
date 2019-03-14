@@ -74,7 +74,7 @@ requirements:
     - cdo=1.9.5
     - hdf5=1.10.3
     # TODO: add julia
-
+    - jinja2
 test:
   # TODO: add unit tests? This seems to require installing the tests
   imports:

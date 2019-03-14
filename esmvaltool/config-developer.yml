@@ -23,6 +23,10 @@ CMIP6:
     default: '/'
     DKRZ: '[institute]/[dataset]/[exp]/[ensemble]/[mip]/[short_name]/[grid]/[latestversion]'
   input_file: '[short_name]_[mip]_[dataset]_[exp]_[ensemble]_[grid]_*.nc'
+  input_fx_dir:
+    default: '/'
+    DKRZ: '[institute]/[dataset]/[exp]/[ensemble]/fx/[fx_var]/[grid]/[latestversion]'
+  input_fx_file: '[fx_var]_fx_[dataset]_[exp]_[ensemble]_[grid].nc'
   output_file: '[project]_[dataset]_[mip]_[exp]_[ensemble]_[field]_[short_name]_[start_year]-[end_year]'
   cmor_type: 'CMIP6'
   institutes:
@@ -144,8 +148,8 @@ CMIP5:
     DKRZ: '[institute]/[dataset]/[exp]/[frequency]/[modeling_realm]/[mip]/[ensemble]/[latestversion]/[short_name]'
     ETHZ: '[exp]/[mip]/[short_name]/[dataset]/[ensemble]/'
     SMHI: '[dataset]/[ensemble]/[exp]/[frequency]'
-    BSC: '[project]/[exp]/[dataset.lower]'
     RCAST: '[exp]/[mip]/[short_name]/[dataset]/[ensemble]/'
+    BSC: '[type]/[project]/[exp]/[dataset.lower]'
   input_file: '[short_name]_[mip]_[dataset]_[exp]_[ensemble]_*.nc'
   input_fx_dir:
     default: '/'

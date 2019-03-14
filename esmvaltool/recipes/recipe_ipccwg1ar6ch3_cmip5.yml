@@ -39,7 +39,68 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_alt:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
       exclude: [reference_dataset, alternative_dataset]
+
+  clim_ref2:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_land:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset, alternative_dataset]
+
+  clim_ref2_land:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+
+  clim_ref_ocean:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: land #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset, alternative_dataset]
+
+  clim_ref2_ocean:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: land #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
 
   pp850:
     extract_levels:
@@ -165,8 +226,7 @@ preprocessors:
 
 diagnostics:
 
-  
-
+ 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Fig. 3.2 (ZOD fig. 3.9)
@@ -237,11 +297,12 @@ diagnostics:
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
     scripts:
-      fig_3_3_1_a: 
-        script: clouds/clouds_bias.ncl
+      fig_3_2: &fig-3-2_and_3-3_settings
+        script: ipcc_ar6/clouds_bias.ncl
         projection: Robinson
         timemean: annualclim
-        plot_abs_diff: true
+        plot_rms_diff: True
+        plot_abs_diff: false
         plot_rel_diff: false
 
   # **********************************************************************
@@ -255,106 +316,70 @@ diagnostics:
   # mean relative error (geographical ditributions)
   # **********************************************************************
 
-  fig_3_2:
+  fig_3_3:
     description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
     variables:
       pr:
         preprocessor: clim
         reference_dataset: GPCP-SG
+        project: CMIP5
         mip: Amon
         field: T2Ms
+        ensemble: r1i1p1
+        exp: historical
+        start_year: 1986
+        end_year: 2005
     additional_datasets:
       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
          start_year: 1986, end_year: 2005, tier: 1}
-      - {dataset: ACCESS1-0, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: ACCESS1-3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: bcc-csm1-1, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: bcc-csm1-1-m, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: BNU-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CanESM2, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CCSM4, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-BGC, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: CESM1-CAM5-1-FV, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-CAM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-FASTCHEM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CESM1-WACCM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CMCC-CESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: CMCC-CM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-      #    start_year: 1986, end_year: 2005}
-      # - {dataset: CMCC-CMS, project: CMIP5, exp: historical, ensemble: r1i1p1,
-      #    start_year: 1986, end_year: 2005}
-      # - {dataset: CNRM-CM5-2, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: CNRM-CM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: FGOALS-g2, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-CM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-ESM2G, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GFDL-ESM2M, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-H-CC, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: GISS-E2-H, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-R-CC, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: GISS-E2-R, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      # - {dataset: HadGEM2-CC, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      # - {dataset: HadGEM2-ES, project: CMIP5, exp: historical,
-      #    ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: inmcm4, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: MIROC4h, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC5, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MIROC-ESM-CHEM, project: CMIP5, exp: historical,
-         ensemble: r1i1p1, start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-LR, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-MR, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MPI-ESM-P, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: MRI-CGCM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: NorESM1-M, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
-      - {dataset: NorESM1-ME, project: CMIP5, exp: historical, ensemble: r1i1p1,
-         start_year: 1986, end_year: 2005}
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      # - {dataset: CESM1-CAM5-1-FV}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      # - {dataset: CMCC-CM}
+      # - {dataset: CMCC-CMS}
+      # - {dataset: CNRM-CM5-2}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      # - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H-CC}
+      # - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: GISS-E2-R}
+      # - {dataset: HadGEM2-CC}
+      # - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
     scripts:
-      fig09-4:
-        <<: *fig-9-2_and_9-4_settings
-        plot_abs_diff: true
-        plot_rel_diff: true
+      fig_3_3:
+        <<: *fig-3-2_and_3-3_settings
+        plot_rms_diff: True
+        plot_abs_diff: False
+        plot_rel_diff: True
 
 
   # **********************************************************************
@@ -373,13 +398,120 @@ diagnostics:
       tas:
         preprocessor: clim_ref   
         reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      #- {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      #- {dataset: CESM1-CAM5-1-FV2}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: CSIRO-Mk3-6-0}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: FGOALS-g2}
+      #- {dataset: FGOALS-s2}
+      - {dataset: FIO-ESM}
+      #- {dataset: GFDL-CM2p1, start_year: 1861}
+      #- {dataset: GFDL-CM3, start_year: 1861}
+      #- {dataset: GFDL-ESM2G, start_year: 1861}
+      #- {dataset: GFDL-ESM2M, start_year: 1861}
+      - {dataset: GISS-E2-H, ensemble: r1i1p2}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R, ensemble: r1i1p2}
+      - {dataset: GISS-E2-R-CC}
+      #- {dataset: HadCM3, start_year: 1860}
+      #- {dataset: HadGEM2-AO, start_year: 1860}
+      #- {dataset: HadGEM2-CC, start_year: 1860}
+      #- {dataset: HadGEM2-ES, start_year: 1860}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      #- {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      #- {dataset: MRI-ESM1, start_year: 1851}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      fig09-8: 
+        script: ipcc_ar6/tsline_anom_tas.ncl
+        time_avg: "yearly"
+        ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
+        ref_start: 1850       #start year of reference period for anomalies
+        ref_end: 1900         #end year of reference period for anomalies
+        ref_mask: True
+        mean_nh_sh: True
+        plot_units: "degC"
+        # Plot style
+        styleset: CMIP5
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig 3.5 (ZOD fig. 3.11)
+  # similar to fig. IPCC AR5, chap. 9, 9.33
+  # Lisa
+  # **********************************************************************
+  # Global climate variability - surface temperature
+  # **********************************************************************
+  # status: porting from v1 to v2
+  # **********************************************************************
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig. 3.7 (ZOD fig. 3.13)
+  # Lisa  
+  # **********************************************************************
+  # Temperature anomaly - global, land, ocaean and continental
+  # **********************************************************************
+  # status: developing from AR5 9_8 
+  # **********************************************************************
+
+  ########################################################################
+  # Global
+  ########################################################################
+
+  tas_hist_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref  
+        reference_dataset: HadCRUT4   
         alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1870
+        start_year: 1870 #1990
         end_year: 2004
     additional_datasets:
       - {dataset: ACCESS1-0}
@@ -434,49 +566,402 @@ diagnostics:
       - {dataset: NorESM1-ME}
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
          start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
       - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
          start_year: 1990, end_year: 1990, tier: 2}
     scripts:
-      fig09-8: 
+      tsline: &tsline_settings
         script: ipcc_ar5/tsline.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1961       #start year of reference period for anomalies
-        ref_end: 1990         #end year of reference period for anomalies
-        range_option: 0
+        region: "global"
+        ref_start: 1880       #start year of reference period for anomalies
+        ref_end: 1919         #end year of reference period for anomalies
+        ref_value: True       #attach absolute values on the right
+        ref_mask: False       #True: maksing of models by observations
+        stat_shading: True    #shading of multi model statistics
+        write_stat: True      #write multi model statistics in nc-file
+        stat: "10-90"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        #range_option: 0
         plot_units: "degC"
         # Plot style
         styleset: CMIP5
 
+  tas_hist_nat_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref   
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1870
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R}
+      - {dataset: HadGEM2-ES}
+      #- {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+
+  fig_3_7_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref2   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, '*global/tsline*']
+        start_year: 1870
+        end_year: 2017
+        ref: ["HadCRUT4"]
+
+  ########################################################################
+  # Land
+  ########################################################################
+
+  tas_hist_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land  
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1870 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      #- {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      #- {dataset: CESM1-CAM5-1-FV2}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: CSIRO-Mk3-6-0}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: FGOALS-g2}
+      #- {dataset: FGOALS-s2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H, ensemble: r1i1p2}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R, ensemble: r1i1p2}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      #- {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "land"
+
+  tas_hist_nat_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land   
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1870
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R}
+      - {dataset: HadGEM2-ES}
+      #- {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "land"
+
+  fig_3_7_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref2_land   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, '*land/tsline*']
+        region: "land"
+        start_year: 1870
+        end_year: 2017
+        ref: ["HadCRUT4"]
+
+  ########################################################################
+  # Ocean
+  ########################################################################
+
+  tas_hist_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1870 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      #- {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      #- {dataset: CESM1-CAM5-1-FV2}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: CSIRO-Mk3-6-0}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: FGOALS-g2}
+      #- {dataset: FGOALS-s2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H, ensemble: r1i1p2}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R, ensemble: r1i1p2}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      #- {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "ocean"
+
+  tas_hist_nat_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean   
+        reference_dataset: HadCRUT4   
+        alternative_dataset: HadCRUT4-clim
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1870
+        end_year: 2004
+    additional_datasets:
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CNRM-CM5}
+      - {dataset: CSIRO-Mk3-6-0}
+      - {dataset: FGOALS-g2}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-R}
+      - {dataset: HadGEM2-ES}
+      #- {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MRI-CGCM3}
+      - {dataset: NorESM1-M}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4-clim, project: OBS, type: ground, version: 1,
+         start_year: 1990, end_year: 1990, tier: 2}
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "ocean"
+
+  fig_3_7_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref2_ocean   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1870, end_year: 2017, tier: 2}
+         #start_year: 1990, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, '*ocean/tsline*']
+        region: "ocean"
+        start_year: 1870
+        end_year: 2017
+        ref: ["HadCRUT4"]
+
+
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
-  # Sect. 3.3 
-  # Fig 3.5 (ZOD fig. 3.11)
-  # similar to fig. IPCC AR5, chap. 9, 9.33
+  # Sect. 3.3
+  # Fig. 3.8
   # Lisa
   # **********************************************************************
-  # Global climate variability - surface temperature
-  # **********************************************************************
-  # status: porting from v1 to v2
-  # **********************************************************************
-
-
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Sect. 3.3 
-  # Fig. 3.7 (ZOD fig. 3.13)
-  # Lisa  
-  # **********************************************************************
   # Temperature anomaly - global, land, ocaean and continental
+  # with sinngle forcings
   # **********************************************************************
-  # status: developing from AR5 9_8 
+  # status: developing from AR5 9_8
   # **********************************************************************
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig. 3.8 (ZOD fig. 3.15)
+  # Fig. 3.9 (ZOD fig. 3.15)
   # Nathan
   # **********************************************************************
   # Vertical profiles of decadal tropical tempreture trends
@@ -488,10 +973,21 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3.2 
-  # Fig 3.9 (ZOD fig. 3.16)
+  # Fig 3.10 (ZOD fig. 3.16)
   # Lisa
   # **********************************************************************
   # Precipitation anomalies timeseries
+  # **********************************************************************
+  # status: developing from AR5 9_8 
+  # **********************************************************************
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3.2 
+  # Fig 3.11 (ZOD fig. 3.16)
+  # Lisa
+  # **********************************************************************
+  # Global and zonal average changes in annual mean precipitation
   # **********************************************************************
   # status: developing from AR5 9_8 
   # **********************************************************************
@@ -500,7 +996,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig. 3.10 (ZOD fig. 3.18)
+  # Fig. 3.12 (ZOD fig. 3.18)
   # Olaf, Lisa
   # **********************************************************************
   # Latitude-calendar month plots of mass-weighted meridional stream 
@@ -513,7 +1009,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3
-  # Fig. 11 (ZOD fig. 3.19)
+  # Fig. 3.13 (ZOD fig. 3.19)
   # Axel, Lisa
   # **********************************************************************
   # Summer-winter range of precipitation and sea-level pressure
@@ -525,7 +1021,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig. 3.12 (ZOD fig. 3.20)
+  # Fig. 3.14 (ZOD fig. 3.20)
   # Birgit
   # **********************************************************************
   # Trends in zonal wind
@@ -537,7 +1033,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig. 3.13 (ZOD fig. 3.23)
+  # Fig. 3.15 (ZOD fig. 3.23)
   # Lisa, Manuel
   # **********************************************************************
   # Blocking frequency
@@ -549,7 +1045,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.4 
-  # Fig. 3.14 (ZOD fig. 3.34)
+  # Fig. 3.16 (ZOD fig. 3.34)
   # Daniel
   # **********************************************************************
   # Trends in september sea ice extent
@@ -561,7 +1057,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.4 
-  # Fig. 3.15 (ZOD fig. 3.36)
+  # Fig. 3.17 (ZOD fig. 3.36)
   # similar to fig. IPCC AR5, chap. 10, 10.16
   # Daniel
   # **********************************************************************
@@ -574,7 +1070,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.4.2 
-  # Fig. 3.16 (ZOD fig. 3.36)
+  # Fig. 3.18 (ZOD fig. 3.36)
   # Daniel
   # **********************************************************************
   # Snow cover extent
@@ -587,7 +1083,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.17 (ZOD fig. 3.25)
+  # Fig. 3.19 (ZOD fig. 3.25)
   # similar to fig. IPCC AR5, chap. 9, 9.13
   # Lee
   # **********************************************************************
@@ -600,7 +1096,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.18 (ZOD fig. 3.26)
+  # Fig. 3.20 (ZOD fig. 3.26)
   # similar to fig. IPCC AR5, chap. 9, 9.17
   # Lee
   # **********************************************************************
@@ -613,7 +1109,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.19 (ZOD fig. 3.27)
+  # Fig. 3.21 (ZOD fig. 3.27)
   # similar to fig. IPCC AR5, chap. 9, 9.14
   # Lee
   # **********************************************************************
@@ -626,7 +1122,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.20 (ZOD fig. 3.28)
+  # Fig. 3.22 (ZOD fig. 3.28)
   # similar to fig. IPCC AR5, chap. 9, 9.13
   # Lee
   # **********************************************************************
@@ -639,7 +1135,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.21 (ZOD fig. 3.30)
+  # Fig. 3.23 (ZOD fig. 3.30)
   # Lee
   # **********************************************************************
   # Salinity trends for the near-surface ocean
@@ -651,7 +1147,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.22 (ZOD fig. 3.31)
+  # Fig. 3.24 (ZOD fig. 3.31)
   # Lee
   # **********************************************************************
   # Long-term trends in halosteric sea leve anomaly
@@ -663,7 +1159,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.23 (ZOD fig. 3.32)
+  # Fig. 3.25 (ZOD fig. 3.32)
   # Lee
   # **********************************************************************
   # Components of global mean sea level change
@@ -675,7 +1171,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.5 
-  # Fig. 3.24 (ZOD fig. 3.33)
+  # Fig. 3.26 (ZOD fig. 3.33)
   # Lee
   # **********************************************************************
   # AMOC streamfunction profiles
@@ -687,7 +1183,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.6 
-  # Fig. 3.25 (ZOD fig. 3.39)
+  # Fig. 3.27 (ZOD fig. 3.39)
   # Tina
   # **********************************************************************
   # Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
@@ -699,7 +1195,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.6 
-  # Fig. 3.26 (ZOD fig. 3.40)
+  # Fig. 3.28 (ZOD fig. 3.40)
   # Tina
   # **********************************************************************
   # Changes to the ampitude of the seasonal cycle fo atmospheric CO2
@@ -711,7 +1207,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.27 (ZOD fig. 3.41)
+  # Fig. 3.29 (ZOD fig. 3.41)
   # Yu
   # **********************************************************************
   # Calculate NAM and SAM as EOF1s of sea level pressure.
@@ -832,7 +1328,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.28 (ZOD fig. 3.42)
+  # Fig. 3.30 (ZOD fig. 3.42)
   # Adam
   # **********************************************************************
   # SAM index in the last millenium
@@ -844,7 +1340,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.29 (ZOD fig. 3.44)
+  # Fig. 3.31 (ZOD fig. 3.44)
   # Adam
   # **********************************************************************
   # Maximum entropy power spectra of surface air temperature
@@ -856,7 +1352,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7.3 
-  # Fig. 3.30 (ZOD fig. 3.45)
+  # Fig. 3.32 (ZOD fig. 3.45)
   # Adam
   # **********************************************************************
   # ENSO seasonality
@@ -868,7 +1364,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.31 (ZOD fig. 3.46)
+  # Fig. 3.33 (ZOD fig. 3.46)
   # Adam
   # **********************************************************************
   # El Nino and La Nina composites for temperature and precipitation
@@ -880,7 +1376,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.32 (ZOD fig. 3.47)
+  # Fig. 3.34 (ZOD fig. 3.47)
   # Adam
   # **********************************************************************
   # PDV patterns
@@ -893,7 +1389,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.7 
-  # Fig. 3.33 (ZOD fig. 3.49)
+  # Fig. 3.35 (ZOD fig. 3.49)
   # Adam 
   # **********************************************************************
   # Comparison of AMV index
@@ -904,7 +1400,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.34 (ZOD fig. 3.13)
+  # Fig. 3.36 (ZOD fig. 3.13)
   # similar to fig. IPCC AR5, chap. 10, 10.21
   # Lisa  
   # **********************************************************************
@@ -918,7 +1414,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig 3.35 (ZOD fig. 3.1)
+  # Fig 3.37 (ZOD fig. 3.1)
   # similar to fig. IPCC AR5, chap. 9, 9.7
   # **********************************************************************
   # Portrait plot global seasonal cycle climatology (RMSD) 
@@ -2363,7 +2859,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.38 (ZOD fig. 3.5)
+  # Fig. 3.40 (ZOD fig. 3.5)
   # similar to fig. IPCC AR5, chap. 9, 9.6
   # Lisa
   # **********************************************************************
@@ -2649,7 +3145,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.39 (ZOD fig. 3.6)
+  # Fig. 3.41 (ZOD fig. 3.6)
   # Lisa
   # **********************************************************************
   # model improvements - mind map
@@ -2660,7 +3156,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.8 
-  # Fig. 3.40 (ZOD fig. 3.7)
+  # Fig. 3.42 (ZOD fig. 3.7)
   # Lisa
   # **********************************************************************
   # model improvements - important features

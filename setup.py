@@ -33,6 +33,7 @@ REQUIREMENTS = {
         'cython',
         'eofs',
         'fiona',
+        'jinja2',
         'matplotlib<3',
         'nc-time-axis',  # needed by iris.plot
         'netCDF4',
@@ -235,7 +236,9 @@ with open('README.md') as readme:
                 'nclcodestyle = esmvaltool.'
                 'utils.nclcodestyle.nclcodestyle:_main',
                 'mip_convert_setup = esmvaltool.'
-                'utils.cmorizers.mip_convert.esmvt_mipconv_setup:main'
+                'utils.cmorizers.mip_convert.esmvt_mipconv_setup:main',
+                'showcolortables=esmvaltool.utils.color_tables' +
+                '.show_color_tables:run'
             ],
         },
         cmdclass={
