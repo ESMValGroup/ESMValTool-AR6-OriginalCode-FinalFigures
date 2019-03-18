@@ -314,6 +314,45 @@ def make_pane_a(
     #
     #     plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 1,
     #                              'label': obs_key}
+    add_obs = True
+    if add_obs:
+        # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
+        # Downloaded 15/3/2019
+        # The full doi for this data set is: 10.5285/5acfd143-1104-7b58-e053-6c86abc0d94b
+        # moc_vertical.nc: MOC vertical profiles in NetCDF format
+        obs_filename = "/users/modellers/ledm/workspace/ESMValTool_AR6/run/LocalData/moc_vertical.nc"
+        obs_dataset = "RAPID"
+        obs_cube = iris.load_cube(obs_filename)
+        obs_cube = obs_cube.collapsed('time', iris.analysis.MEAN)
+        max_index = np.argmax(obs_cube.data)
+        print(obs_cube, max_index)
+        label = ' '.join([obs_dataset,
+                          ':',
+                          '('+str(round(obs_cube.data[max_index] , 1)),
+                          str(obs_cube.units)+',',
+                          str(int(obs_cube.coord('depth').points[max_index])),
+                          str(obs_cube.coord('depth').units)+')'
+                          ])
+
+        plot_details[obs_dataset] = {'c': 'black',
+                                 'ls': '-',
+                                 'lw': 1,
+                                 'label': label}
+
+        qplt.plot(obs_cube, obs_cube.coord('depth'),
+            color = plot_details[obs_dataset]['c'],
+            linewidth = plot_details[obs_dataset]['lw'],
+            linestyle = plot_details[obs_dataset]['ls'],
+            label = label
+            )
+
+        # Add a marker at the maximum
+        plt.plot(obs_cube.data[max_index],
+                 obs_cube.coord('depth').points[max_index],
+                 c =  plot_details[obs_dataset]['c'],
+                 marker = 'd',
+                 markersize = '10',
+                 )
 
     # Add title to plot
     # title = ' '.join([
