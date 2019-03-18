@@ -14,11 +14,19 @@
 ; Optional diag_script_info attributes (diagnostic specific)
 ;    time_avg: type of time average (currently only "yearly" and "monthly" are
 ;              available).
-;    ts_anomaly: calculates anomalies with respect to the first 10-year
-;                average
+;    ts_anomaly: calculates anomalies with respect to the defined period
 ;    ref_start: start year of reference period for anomalies
 ;    ref_end: end year of reference period for anomalies
+;    ref_value: if true, right panel with mean values is attached
+;    ref_mask: if true, model fields will be masked by reference fields
 ;    plot_units: variable unit for plotting
+;    write_stat: if true, write multi model statistics in nc-file
+;    stat: statistics for multi model nc-file (MinMax,5-95,10-90)
+;    y-min: set min of y-axis
+;    y-max: set max of y-axis
+;    mean_nh_sh: if true, calculate first NH and SH mean
+;    run_ave: if not equal 0 than calculate running mean over this number 
+;             of years
 ;
 ; Caveats
 ;
@@ -39,15 +47,15 @@
 ;
 ; #############################################################################
 
-load "interface_scripts/interface.ncl"
+load "$diag_scripts/../interface_scripts/interface.ncl"
 
-load "./diag_scripts/shared/latlon.ncl"
-load "./diag_scripts/shared/statistics.ncl"
-load "./diag_scripts/shared/scaling.ncl"
-load "./diag_scripts/shared/ensemble.ncl"
+load "$diag_scripts/shared/latlon.ncl"
+load "$diag_scripts/shared/statistics.ncl"
+load "$diag_scripts/shared/scaling.ncl"
+load "$diag_scripts/shared/ensemble.ncl"
 
-load "./diag_scripts/shared/plot/style.ncl"
-load "./diag_scripts/shared/plot/xy_line.ncl"
+load "$diag_scripts/shared/plot/style.ncl"
+load "$diag_scripts/shared/plot/xy_line.ncl"
 
 
 begin
@@ -56,6 +64,8 @@ begin
 
   var0 = variable_info[0]@short_name
   field_type0 = variable_info[0]@field
+  exp0 = variable_info[0]@exp
+  project0 = input_file_info[0]@project
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
@@ -69,7 +79,7 @@ begin
   plot_fields = (/"T2Ms"/)
   ind_f = any(field_type0 .eq. plot_fields)
   if (all(ismissing(ind_f))) then
-      error_msg("f", DIAG_SCRIPT, "", "can't use field " + field_type0)
+    error_msg("f", DIAG_SCRIPT, "", "can't use field " + field_type0)
   end if
   delete(plot_fields)
   delete(ind_f)
@@ -98,6 +108,13 @@ begin
   ; Set default values for non-required diag_script_info attributes
   set_default_att(diag_script_info, "time_avg", "monthly")
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
+  set_default_att(diag_script_info, "ref_value", True)
+  set_default_att(diag_script_info, "ref_mask", False)
+  set_default_att(diag_script_info, "region", "global")
+  set_default_att(diag_script_info, "write_stat", False)
+  set_default_att(diag_script_info, "stat", "MinMax")
+  set_default_att(diag_script_info, "mean_nh_sh", False)
+  set_default_att(diag_script_info, "run_ave", 0)
 
   ; Determine time range
   start_year = min(metadata_att_as_array(info_items, "start_year"))
@@ -120,20 +137,23 @@ begin
   end if
   end if
 
+  ; get multi-model mean index
+  mmm_ind = ind(datasetnames .eq. "MultiModelMean")
+
   ; Set index of the reference (and alternative) dataset
   if (isatt(variable_info[0], "reference_dataset")) then
     ref_ind = ind(datasetnames.eq.variable_info[0]@reference_dataset)
     A_ref = read_data(info_items[ref_ind])
   end if
 
-  ; individual case for HadCRUT4 observations
-  ; FIX-ME: mean value comes from climatology file (absolute.nc).
-  ; There are no missing values as in the anomaly data.
-  clim_ind = -1
-  if (any(datasetnames.eq."HadCRUT4-clim")) then
-    clim_ind = ind(datasetnames.eq."HadCRUT4-clim")
-    ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
-  end if
+;  ; individual case for HadCRUT4 observations
+;  ; FIX-ME: mean value comes from climatology file (absolute.nc).
+;  ; There are no missing values as in the anomaly data.
+;  clim_ind = -1
+;  if (any(datasetnames.eq."HadCRUT4-clim")) then
+;    clim_ind = ind(datasetnames.eq."HadCRUT4-clim")
+;    ind_wo_clim = ind(datasetnames.ne."HadCRUT4-clim")
+;  end if
 
   ; Anomaly
   if (isatt(diag_script_info, "ts_anomaly")) then
@@ -162,6 +182,11 @@ begin
     anom = "noanom"
   end if
 
+  ; if true, right panel with mean values is attached
+  if (isatt(diag_script_info, "ref_value")) then
+    ref_value = diag_script_info@ref_value
+  end if
+
   ; TODO
   model_arr_stddev = 0
 
@@ -171,13 +196,13 @@ begin
   model_arr!1 = "time"
   model_arr&model = datasetnames
   model_arr&time = time
-  delete(time)
-  delete(ntime)
+  model_arr@_FillValue = 1e+20
+  model_arr = model_arr@_FillValue
 
   ; Loop over models
   do imod = 0, dim_MOD - 1
 
-    if(imod.ne.clim_ind) then
+    ;if(imod.ne.clim_ind) then
 
       ; Read data
       A0 = read_data(info_items[imod])
@@ -193,18 +218,19 @@ begin
 
         if (isatt(variable_info[0], "reference_dataset")) then
 
-          if(imod .ne. ref_ind) then
+          ; save field with no masking for mean reference value
+          if (anom .eq. "anom" .and. ref_value .eq. True)
+            A0_nomask = A0
+          end if
 
+          if(diag_script_info@ref_mask .and. imod .ne. ref_ind) then
             ; Determine start/end year
             start_year = info_items[imod]@start_year
             end_year = info_items[imod]@end_year
             A_ref_mask = time_operations(A_ref, start_year, \
                                          end_year, "extract", "", 0)
-
-            A0_mask = A0
-            A0_mask = where(A_ref_mask.eq.A_ref_mask@_FillValue, \
-                            A_ref_mask@_FillValue, A0)
-
+            A0 = where(A_ref_mask.eq.A_ref_mask@_FillValue, \
+                       A_ref_mask@_FillValue, A0)
             delete(A_ref_mask)
           end if
 
@@ -214,28 +240,36 @@ begin
         if(anom .eq. "anom") then
           A0_timavg_ref = time_operations(A0, ref_start, ref_end, \
                                           "average", "annualclim", True)
-          if(imod .ne. ref_ind) then
-            do i = 0, dimsizes(A0&time) - 1
-              A0_mask(i, :, :) = A0_mask(i, :, :) - A0_timavg_ref(:, :)
-            end do
-          else
-            do i = 0, dimsizes(A0&time) - 1
-              A0(i, :, :) = A0(i, :, :) - A0_timavg_ref(:, :)
-            end do
-          end if
+          do i = 0, dimsizes(A0&time) - 1
+            A0(i, :, :) = A0(i, :, :) - A0_timavg_ref(:, :)
+          end do
 
-          anom_ref(imod) = area_operations(A0_timavg_ref, -90., 90., \
-                                           0., 360., "average", True)
+          if (ref_value.eq.True)
+            A0_timavg_ref_nomask = time_operations(A0_nomask, ref_start, \
+                                                   ref_end, "average",   \
+                                                   "annualclim", True)
+            anom_ref(imod) = area_operations(A0_timavg_ref_nomask, -90., 90., \
+                                             0., 360., "average", True)
+            delete(A0_timavg_ref_nomask)
+            delete(A0_nomask)
+          end if
           delete(A0_timavg_ref)
 
         end if
 
-        if(imod .ne. ref_ind) then
-          procmod = area_operations(A0_mask, -90., 90., 0., \
-                                    360., "average", True)
-        else
-          procmod = area_operations(A0, -90., 90., 0., 360., \
-                                    "average", True)
+        procmod = area_operations(A0, -90., 90., 0., 360., \
+                                  "average", True)
+
+        if (diag_script_info@mean_nh_sh) then
+          ; calculate global mean first for each hemisphere
+
+          tmp1 = area_operations(A0, -90., 0., 0., 360., \
+                                 "average", True)
+          tmp2 = area_operations(A0, 0., 90., 0., 360., \
+                                 "average", True)
+          procmod = (tmp1 + tmp2) /2.
+          delete(tmp1)
+          delete(tmp2)
         end if
 
       end if
@@ -278,6 +312,9 @@ begin
       if (time_avg.ne."monthly") then
         A0_timavg = time_operations(procmod, -1, -1, "average", \
                                     time_avg, True)
+        if(diag_script_info@run_ave .gt. 0) then
+          A0_timavg = runave_Wrap(A0_timavg, diag_script_info@run_ave, 1)
+        end if
       else
         A0_timavg = procmod
       end if
@@ -288,9 +325,8 @@ begin
       ; Match time coordinate
       if (time_avg.eq."monthly") then
         date = cd_calendar(procmod&time, -1)
-      else if (time_avg.eq."yearly") then
+      elseif (time_avg.eq."yearly") then
         date = procmod&year
-      end if
       end if
       idx1 = ind(date(0).eq.model_arr&time)
       idx2 = ind(date(dimsizes(date) - 1).eq.model_arr&time)
@@ -301,38 +337,86 @@ begin
       delete(procmod)
       delete(date)
 
-    end if
+    ;end if
 
   end do
+
+  ; calculate multi model statistics
+  if (diag_script_info@write_stat) then
+    if (isatt(variable_info[0], "reference_dataset")) then
+      ;if (clim_ind .ne. -1) then
+      ;  ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
+      ;                datasetnames.ne.variable_info[0]@reference_dataset .and. \
+      ;                datasetnames.ne."HadCRUT4-clim")
+      ;else
+        ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
+                      datasetnames.ne.variable_info[0]@reference_dataset)
+      ;end if
+    else
+      ind_mod = ind(datasetnames.ne."MultiModelMean")
+    end if
+
+    model_arr_stat = new((/3, ntime/), double)
+    model_arr_stat!0 = "stat"
+    model_arr_stat!1 = "time"
+    model_arr_stat&time = time
+    model_arr_stat&stat = (/"mean", "min", "max"/)
+
+    model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
+    do i = 0, ntime-1
+      statb = stat_dispersion(model_arr(ind_mod, i), False)
+      if (diag_script_info@stat .eq. "MinMax") then
+        ; min
+        model_arr_stat(1,i) = (/statb(2)/)
+        ; max
+        model_arr_stat(2, i) = (/statb(14)/)
+      elseif (diag_script_info@stat .eq. "5-95") then
+        ; 5% quantile
+        model_arr_stat(0, i) = statb(24)
+        ; 95% quantile
+        model_arr_stat(0,i) = statb(25)
+      elseif (diag_script_info@stat .eq. "10-90") then
+        ; 10% quantile
+        model_arr_stat(1, i) = (/statb(3)/)
+        ; 90% quantile
+        model_arr_stat(2, i) = (/statb(13)/)
+      end if
+    end do
+  end if
 
   ; individual case for HadCRUT4 observations
   ; FIX-ME: mean value comes from climatology file (absolute.nc).
   ; There are no missing values as in the anomaly data.
-  if (any(datasetnames.eq."HadCRUT4-clim")) then
-    ; Read data
-    A0 = read_data(info_items[clim_ind])
-    dnames = getVarDimNames(A0)
-
-    ; Convert units for plotting (if required)
-    if (isatt(diag_script_info, "plot_units")) then
-      A0 = convert_units(A0, diag_script_info@plot_units)
-    end if
-
-    A0_timavg_clim = time_operations(A0, 1990, 1990, "average", \
-                                     "annualclim", True)
-    clim_ref = area_operations(A0_timavg_clim, -90., 90., 0., 360., \
-                               "average", True)
-    anom_ref(ref_ind) = clim_ref
-
-    tmp = model_arr(ind_wo_clim, :)
-    delete(model_arr)
-    model_arr = tmp
-    delete(tmp)
-    tmp = anom_ref(ind_wo_clim)
-    delete(anom_ref)
-    anom_ref = tmp
-    delete(tmp)
+  if (isatt(variable_info[0], "reference_dataset") .and. variable_info[0]@reference_dataset .eq. "HadCRUT4") then
+    anom_ref(ref_ind) = 14.0
   end if
+;  if (ref_value .and. any(datasetnames.eq."HadCRUT4-clim")) then
+;    ; Read data
+;    A0 = read_data(info_items[clim_ind])
+;    dnames = getVarDimNames(A0)
+;
+;    ; Convert units for plotting (if required)
+;    if (isatt(diag_script_info, "plot_units")) then
+;      A0 = convert_units(A0, diag_script_info@plot_units)
+;    end if
+;
+;    if (ref_value.eq.True)
+;      A0_timavg_clim = time_operations(A0, 1990, 1990, "average", \
+;                                       "annualclim", True)
+;      clim_ref = area_operations(A0_timavg_clim, -90., 90., 0., 360., \
+;                                 "average", True)
+;      anom_ref(ref_ind) = clim_ref
+;
+;      tmp = model_arr(ind_wo_clim, :)
+;      delete(model_arr)
+;      model_arr = tmp
+;      delete(tmp)
+;      tmp = anom_ref(ind_wo_clim)
+;      delete(anom_ref)
+;      anom_ref = tmp
+;      delete(tmp)
+;    end if
+;  end if
 
   ; Convert time coordinate to years (required by the plot routine)
   if (time_avg.eq."monthly") then
@@ -360,17 +444,28 @@ begin
   if (config_user_info@write_netcdf.eq."True") then
     out_path = config_user_info@work_dir
     system("mkdir -p " + out_path)
-    out_path = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + "_" \
-      + start_year + "-" + end_year + ".nc"
+    out_path1 = out_path + "tsline_" + var0 + "_" + anom + "_" + detr + ".nc"
+      ; + start_year + "-" + end_year + ".nc"
     model_arr@ncdf = out_path
+    model_arr@experiment = project0 + "_" + exp0
     model_arr@diag_script = DIAG_SCRIPT
     model_arr@var = var0
-    ncdf_outfile = ncdf_write(model_arr, out_path)
+    ncdf_outfile = ncdf_write(model_arr, out_path1)
+    ; statistics
+    if (diag_script_info@write_stat) then
+      out_path2 = out_path + "tsline_mm_" + var0 + "_stat.nc"
+      model_arr_stat@ncdf = out_path
+      model_arr_stat@experiment = project0 + "_" + exp0
+      model_arr_stat@diag_script = DIAG_SCRIPT
+      model_arr_stat@var = var0
+      ncdf_outfile = ncdf_write(model_arr_stat, out_path2)
+    end if
   end if
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + var0 + "_" + anom + "_" + \
-    detr + "_" + start_year + "-" + end_year
+  outfile = config_user_info@plot_dir + var0 + "_" + diag_script_info@region \
+    + "_" + project0 + "_" + exp0 + "_" + anom + "_" + detr + "_" \
+    + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
   ; Set resources
@@ -390,10 +485,14 @@ begin
   end if
   res@tmXBLabelAngleF = 45
   res@tmXBLabelJust     = "CenterRight"
-
-  if isatt(model_arr, "long_name")
-    res@tiMainString = model_arr@long_name
+  if (isatt(diag_script_info, "y_min")) then
+    res@trYMinF = diag_script_info@y_min
   end if
+  if (isatt(diag_script_info, "y_max")) then
+    res@trYMaxF = diag_script_info@y_max
+  end if
+
+  res@tiMainString = diag_script_info@region
 
   if (isatt(diag_script_info, "ts_anomaly")) then
     res@tiYAxisString = var0 + " Anomaly" + " [" + model_arr@units + "]"

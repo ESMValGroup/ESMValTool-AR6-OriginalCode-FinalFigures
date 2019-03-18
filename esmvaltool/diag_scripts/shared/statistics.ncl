@@ -21,11 +21,11 @@
 ;
 ; #############################################################################
 
-load "./interface_scripts/auxiliary.ncl"
-load "./interface_scripts/logging.ncl"
+load "$diag_scripts/../interface_scripts/auxiliary.ncl"
+load "$diag_scripts/../interface_scripts/logging.ncl"
 
-load "./diag_scripts/shared/latlon.ncl"
-load "./diag_scripts/shared/regridding.ncl"
+load "$diag_scripts/shared/latlon.ncl"
+load "$diag_scripts/shared/regridding.ncl"
 
 ; #############################################################################
 undef("dim_stddev_wgt_Wrap")
@@ -1402,6 +1402,7 @@ function calculate_metric(var:numeric,
 ;    dimensionality.
 ;
 ; Modification history
+;    20190312-A_bock_ls: added calculation of RMSDxy
 ;    20140313-A_righ_ma: implemented weights calculation within the function,
 ;                     depending on dimensionality.
 ;    20140120-A_fran_fr: written.
@@ -1470,15 +1471,25 @@ begin
       time_weights = sdays
     end if
 
-    if (dim_names(1).eq."lat" .and. dim_names(2).eq."lon") then
-      area_weights = map_area(var&lat, var&lon)
-    end if
+    if (metric .eq. "RMSDxy") then
+      ;if (isdefined("time_weights")) then
+      ;  weights = new(dimsizes(var), float)
+      ;  do ii = 0, dimsizes(time_weights) - 1
+      ;    weights(ii, :, :) = time_weights(ii)
+      ;  end do
+      ;end if
+       weights = time_weights
+    else
+      if (dim_names(1).eq."lat" .and. dim_names(2).eq."lon") then
+        area_weights = map_area(var&lat, var&lon)
+      end if
 
-    if (isdefined("time_weights").and.isdefined("area_weights")) then
-      weights = new(dimsizes(var), float)
-      do ii = 0, dimsizes(time_weights) - 1
-        weights(ii, :, :) = time_weights(ii) * area_weights
-      end do
+      if (isdefined("time_weights").and.isdefined("area_weights")) then
+        weights = new(dimsizes(var), float)
+        do ii = 0, dimsizes(time_weights) - 1
+          weights(ii, :, :) = time_weights(ii) * area_weights
+        end do
+      end if
     end if
   end if
 
@@ -1498,13 +1509,24 @@ begin
     wgt1d = 1.0
   end if
 
-  ; Calculate weighted averages
-  avg_var = dim_avg_wgt_Wrap(var1d, wgt1d, 1)
-  avg_ref = dim_avg_wgt_Wrap(ref1d, wgt1d, 1)
+  if (isStrSubset(metric, "stddev_ratio") .or. \
+      isStrSubset(metric, "correlation")) then
+    ; Calculate weighted averages
+    avg_var = dim_avg_wgt_Wrap(var1d, wgt1d, 1)
+    avg_ref = dim_avg_wgt_Wrap(ref1d, wgt1d, 1)
+  end if
 
   ; RMSD
   if (metric.eq."RMSD") then
     out = sqrt(dim_avg_wgt_Wrap((var1d - ref1d) ^ 2, wgt1d, 1))
+    leave_msg(scriptname, funcname)
+    return(out)
+  end if
+
+  ; RMSD
+  if (metric.eq."RMSDxy") then
+    out = sqrt(dim_avg_wgt_n_Wrap((var - ref) ^ 2, weights, 1, 0))
+    ;out = onedtond(tmp, (/dimsizes(var&lat),dimsizes(var&lon)/))
     leave_msg(scriptname, funcname)
     return(out)
   end if
