@@ -28,12 +28,20 @@ diagnostics:
     description: Run the NCAR CVDPackage.
     variables:
       tas:
-        #reference_dataset: bcc-csm1-1
       pr:
-        #reference_dataset: MPI-ESM-LR
       psl:
+        field: T2Ms
+      pr:
+        field: T2Ms
+      psl:
+        field: T2Ms
+      ts:
+        field: T2Ms
     scripts:
       cvdp:
         script: cvdp/cvdp_wrapper.py
+        modular_list:
+          - sst.trends_timeseries
+          - pr.trends_timeseries
         quickplot:
           plot_type: pcolormesh
