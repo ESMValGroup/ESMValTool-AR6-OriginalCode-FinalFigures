@@ -131,6 +131,9 @@ def bgc_units(cube, name):
     if name in ['chl', ]:
         new_units = 'mg m-3'
 
+    if name in ['zostoga', ]:
+        new_units = 'mm'
+
     if name in ['mfo', 'amoc', 'msftmyz']:
         # sverdrup are 1000000 m3.s-1, but mfo is kg s-1.
         new_units = 'Tg s-1'
@@ -227,6 +230,37 @@ def cube_time_to_float(cube):
         floattimes.append(floattime)
     return floattimes
 
+def load_calendar_datetime(calendar):
+    """
+    Load a cftime.datetime calendar..
+
+    Parameters
+    ----------
+    calendar: str
+        the caendar name.
+
+    Returns
+    -------
+    cftime.datetime
+        A datetime creator function from cftime, based on the requeted calendar.
+    """
+    calendar = calendar.lower()
+
+    if calendar in ['360_day', ]:
+        datetime = cftime.Datetime360Day
+    elif calendar in ['365_day', 'noleap']:
+        datetime = cftime.DatetimeNoLeap
+    elif calendar in ['julian', ]:
+        datetime = cftime.DatetimeJulian
+    elif calendar in ['gregorian', ]:
+        datetime = cftime.DatetimeGregorian
+    elif calendar in ['proleptic_gregorian', ]:
+        datetime = cftime.DatetimeProlepticGregorian
+    else:
+        logger.warning('Calendar set to Gregorian, instead of %s',
+                       calendar)
+        datetime = cftime.DatetimeGregorian
+    return datetime
 
 def guess_calendar_datetime(cube):
     """
