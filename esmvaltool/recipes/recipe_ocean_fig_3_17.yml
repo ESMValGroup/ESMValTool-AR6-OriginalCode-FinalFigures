@@ -1,0 +1,90 @@
+# ESMValTool
+# recipe_OceanPhysics.yml
+---
+documentation:
+  description: |
+    Recipe to demonstrate several simple plots based on the monthly ocean
+    temperature. Please use this file as a template for adding additional
+    fields into the ocean. This work based on the BGC-val toolkit GMD-2018-103.
+
+  authors:
+    - demo_le
+
+  maintainer:
+    - schl_ma
+
+  references:
+    - demora2018gmd
+
+  projects:
+    - ukesm
+
+
+datasets:
+  # working datasets
+  # - {dataset: CanESM2, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: GISS-E2-H, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: HadGEM2-AO, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: HadCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: CanCM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  # - {dataset: CSIRO-Mk3-6-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+
+  # Problem with latitude > 90.
+  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+
+  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: HadGEM2-AO, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+  - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
+
+
+
+preprocessors:
+  # --------------------------------------------------
+  # Transects preprocessors
+  # --------------------------------------------------
+  prep_transect_AMT: # For extracting a transect
+    time_average:
+    extract_transect: # Atlantic Meridional Transect
+      latitude: [-50.,50.]
+      longitude: 332.
+
+  prep_transect: # For extracting a transect
+    custom_order: true
+    time_average:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    zonal_means:
+      coordinate: longitude
+      mean_type: mean
+    extract_levels:
+      #levels: [-1, -40, -80, -120, -160, -200, -240, -280, -320, -360, -400, -440, -480, -520, -560, -600, -640, -680, -720, -760, -800, -840, -880, -920, -960, -1000, -1200, -1400, -1600, -1800, -2000, -2200, -2400, -2600, -2800, -3000, -3200, -3400, -3600, -3800, -4000, -4200, -4400, -4600, -4800, -5000, -5200, -5400, -5600, -5800]
+      levels: [0.1, 0.5, 1, 10, 20, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680, 720, 760, 800, 840, 880, 920, 960, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600, 3800, 4000, 4200, 4400, 4600, 4800, 5000, 5200, 5400, 5600, 5800]
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean ]
+
+
+diagnostics:
+   # --------------------------------------------------
+  # Transects diagnostics
+  # --------------------------------------------------
+  diag_transect:
+    description: Extracting along a trajectory
+    variables:
+      thetao: # Temperature ocean 3D
+        preprocessor: prep_transect
+        field: TO3M
+      so: # Salinity ocean 3D
+        preprocessor: prep_transect
+        field: TO3M
+    additional_datasets:
+      # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
+        - {dataset: WOA,  project: obs4mips,  level: L3,  version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+    scripts:
+      Regional_Ocean_DepthLayers_regrid_transect:
+        script: ocean/diagnostic_fig_3_17.py
+        observational_dataset: {dataset: WOA, project: obs4mips,}
