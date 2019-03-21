@@ -74,6 +74,7 @@ requirements:
     - cdo
     # TODO: add julia
     - jinja2
+
 test:
   # TODO: add unit tests? This seems to require installing the tests
   imports:
