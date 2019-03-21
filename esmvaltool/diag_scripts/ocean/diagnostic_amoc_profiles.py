@@ -66,9 +66,9 @@ logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 
-def calculate_trend(cube, window = '8 years'):
+def calculate_trend(cube, window = '8 years', tails=False):
     """
-    Calculate a moving average.
+    Calculate a trend inside a window.
 
     The window is a string which is a number and a measuremet of time.
     For instance, the following are acceptable window strings:
@@ -83,10 +83,11 @@ def calculate_trend(cube, window = '8 years'):
     average returned would be the average of all values within 5 years
     of the central value.
 
-    In the case of edge conditions, at the start an end of the data, they
+    When tails is True, the start and end of the data, they
     only include the average of the data available. Ie the first value
     in the moving average of a ``10 year`` window will only include the average
     of the five subsequent years.
+    When tails is False, these tails are ignored.
 
     Parameters
     ----------
@@ -94,6 +95,8 @@ def calculate_trend(cube, window = '8 years'):
         Input cube
     window: str
         A description of the window to use for the
+    tails: bool
+        Boolean flag to switch off tails.
 
     Returns
     ----------
@@ -149,8 +152,9 @@ def calculate_trend(cube, window = '8 years'):
         print (time_itr, len(arr))
 
         # No Tails
-        print(time_itr, [tmin, tmax], 'Length:', len(arr.compressed()), len(times), window_len*2 + 1)
-        if len(arr.compressed()) != window_len*2 + 1:
+        if not tails:
+            print(time_itr, [tmin, tmax], 'Length:', len(arr.compressed()), len(times), window_len*2 + 1)
+            if len(arr.compressed()) != window_len*2 + 1:
                 print("Wrong size")
                 continue
 
@@ -178,18 +182,18 @@ def calculate_interannual(cube):
 
 def get_26North(cube):
     """
-    Extract 26.5 North.
+    Extract 26.5 North. (RAPID array)
     """
     latitude = cube.coord('latitude').points
     closest_lat = np.min(np.abs(latitude - 26.5))
     cube = cube.extract(iris.Constraint(latitude=closest_lat))
     print('get_26North:',cube.data.shape)
-
     return cube
+
 
 def get_max_amoc(cube):
     """
-    Extract maximum.
+    Extract maximum AMOC in the profile.
     """
     cube = cube.collapsed('depth', iris.analysis.MAX)
     print('get_max_amoc:',cube.data.shape)
@@ -198,13 +202,17 @@ def get_max_amoc(cube):
 
 
 def load_cube(filename, metadata):
-    """Load cube and set up units"""
+    """
+    Load cube and set up correct units, and find 26.5 N
+
+    """
     cube = iris.load_cube(filename)
     print('load_cube',cube.data.shape, cube.coords)
     cube = diagtools.bgc_units(cube, metadata['short_name'])
     print('load_cube', cube.data.shape)
     cube = get_26North(cube)
     return cube
+
 
 def count_models(metadatas, obs_filename):
     """calculate the number of models."""
@@ -314,17 +322,6 @@ def make_pane_a(
                  markersize = '10',
                  )
 
-    # Add observational data.
-    # if obs_filename:
-    #     obs_cube = iris.load_cube(obs_filename)
-    #     obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
-    #     # obs_cube = obs_cube.collapsed('time', iris.analysis.MEAN)
-    #
-    #     obs_key = obs_metadata['dataset']
-    #     qplt.plot(obs_cube, obs_cube.coord('depth'), c='black')
-    #
-    #     plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 1,
-    #                              'label': obs_key}
     add_obs = True
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
@@ -434,6 +431,8 @@ def make_pane_bc(
 
     metadatas = diagtools.get_input_files(cfg)
 
+    #####
+    # Load the CMIP data and calculate the trend or interannual variability
     trends = {}
     for filename in sorted(metadatas.keys()):
         dataset = metadatas[filename]['dataset']
@@ -475,7 +474,9 @@ def make_pane_bc(
     # calculate the number of models
     model_numbers, number_models, projects= count_models(metadatas, obs_filename)
 
+
     if timeseries:
+        # Draw the trend/variability as a time series
         cmap = plt.cm.get_cmap('jet')
         for dataset in sorted(trends):
             print(dataset, trends[dataset])
@@ -488,6 +489,7 @@ def make_pane_bc(
                 lw = 2.5
             plt.plot(trends[dataset], c = color, lw=lw, label = dataset)
     else:
+        # Draw the trend/variability as a box and whisker diagram.
         box_data = [trends[dataset] for dataset in sorted(trends)]
         box = ax.boxplot(box_data,
                          0,
@@ -516,21 +518,20 @@ def make_pane_bc(
         plt.axhline(-4.4, c='k', lw=8, alpha=0.1, zorder = 0) # wrong numbers!
         plt.ylabel('Sv')
 
-
+    # If putting all the panes in one figure, return them now.
     if not savefig:
         return fig, ax
+   # Save the pane as its own image.
 
     if timeseries:
         plt.legend()
 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
-
     if timeseries:
         path = cfg['plot_dir'] + '/fig_3.24_'+pane+'_timeseries'+image_extention
     else:
         path = cfg['plot_dir'] + '/fig_3.24_'+pane+image_extention
-
 
     # Saving files:
     if cfg['write_plots']:
