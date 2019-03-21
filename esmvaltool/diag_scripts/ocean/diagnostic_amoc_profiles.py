@@ -146,10 +146,21 @@ def calculate_trend(cube, window = '8 years'):
                             time_itr.minute)
 
         arr = np.ma.masked_where((times < tmin) + (times > tmax), cube.data)
+        print (time_itr, len(arr))
+
+        # No Tails
+        print(time_itr, [tmin, tmax], 'Length:', len(arr.compressed()), len(times), window_len*2 + 1)
+        if len(arr.compressed()) != window_len*2 + 1:
+                print("Wrong size")
+                continue
+
+#        print(time_itr, len(arr), len(times), window_len*2 + 1)
         time_arr = np.ma.masked_where(arr.mask, float_times)
+        #if debug:
+        #    print(time_itr, times, time_arr.compressed(),  arr.compressed())
 
         # print(time_itr, linregress(time_arr.compressed(), arr.compressed()))
-        output.append(linregress(time_arr, arr)[0])
+        output.append(linregress(time_arr.compressed(), arr.compressed())[0])
     return np.array(output)
 
 
@@ -157,7 +168,7 @@ def calculate_interannual(cube):
     """
     Calculate the interannnual variability.
     """
-    cube.aggregated_by('year', iris.analysis.MEAN)
+    cube = cube.aggregated_by('year', iris.analysis.MEAN)
     data = cube.data
     arr = []
     for d,dat  in enumerate(data[:-1]):
@@ -370,9 +381,10 @@ def make_pane_a(
 
     if not savefig:
         return fig, ax
+
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
-    path = cfg['plot_dir'] + 'fig_3.24a'+image_extention
+    path = cfg['plot_dir'] + '/fig_3.24a'+image_extention
 
     # Saving files:
     if cfg['write_plots']:
@@ -386,7 +398,8 @@ def make_pane_bc(
         cfg,
         pane = 'b',
         fig=None,
-        ax=None
+        ax=None,
+        timeseries = False,
 ):
     """
     Make a box and whiskers plot for panes b and c.
@@ -421,58 +434,72 @@ def make_pane_bc(
 
     metadatas = diagtools.get_input_files(cfg)
 
-    obs_key = 'observational_dataset'
-    obs_filename = ''
-    obs_metadata = {}
-    if obs_key in cfg:
-        obs_filename = diagtools.match_model_to_key(obs_key,
-                                                    cfg[obs_key],
-                                                    metadatas)
-        obs_metadata = metadatas[obs_filename]
-
     trends = {}
     for filename in sorted(metadatas.keys()):
         dataset = metadatas[filename]['dataset']
         cube = load_cube(filename, metadatas[filename])
         print (cube.data.shape)
         if pane == 'b':
-            cube.aggregated_by('year', iris.analysis.MEAN)
             cube = get_max_amoc(cube)
+            cube = cube.aggregated_by('year', iris.analysis.MEAN)
             trends[dataset] = calculate_trend(cube)
         if pane == 'c':
-            cube.aggregated_by('year', iris.analysis.MEAN)
             cube = get_max_amoc(cube)
+            cube = cube.aggregated_by('year', iris.analysis.MEAN)
             trends[dataset] = calculate_interannual(cube)
+
+    #####
+    # Add observational data.
+    add_obs = True
+    if add_obs:
+        # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
+        # Downloaded 15/3/2019
+        # The full doi for this data set is: 10.5285/5acfd143-1104-7b58-e053-6c86abc0d94b
+        # moc_vertical.nc: MOC vertical profiles in NetCDF format
+        obs_filename = "/users/modellers/ledm/workspace/ESMValTool_AR6/run/LocalData/moc_vertical.nc"
+        obs_dataset = "RAPID"
+        obs_cube = iris.load_cube(obs_filename)
+        iris.coord_categorisation.add_month(obs_cube, 'time', name='month')
+        iris.coord_categorisation.add_year(obs_cube, 'time', name='year')
+        obs_cube = obs_cube.aggregated_by(['month','year'], iris.analysis.MEAN)
+        if pane == 'b':
+            obs_cube = get_max_amoc(obs_cube)
+            obs_cube = obs_cube.aggregated_by('year', iris.analysis.MEAN)
+            trends[obs_dataset] = calculate_trend(obs_cube,)
+        if pane == 'c':
+            obs_cube = get_max_amoc(obs_cube)
+            obs_cube = obs_cube.aggregated_by('year', iris.analysis.MEAN)
+            trends[obs_dataset] = calculate_interannual(obs_cube)
 
     #####
     # calculate the number of models
     model_numbers, number_models, projects= count_models(metadatas, obs_filename)
 
-    box_data = [trends[dataset] for dataset in sorted(trends)]
-    box = ax.boxplot(box_data,
-                     0,
-                     sym = 'k.',
-                     whis = [1, 99],
-                     showmeans= False,
-                     meanline = False,
-                     showfliers = True,
-                     labels = sorted(trends.keys()))
-    plt.xticks(rotation=45)
-    plt.setp(box['fliers'], markersize=1.0)
+    if timeseries:
+        cmap = plt.cm.get_cmap('jet')
+        for dataset in sorted(trends):
+            print(dataset, trends[dataset])
+            try:
+                value = float(model_numbers[dataset] ) / (number_models - 1.)
+                color = cmap(value)
+                lw = 1.
+            except:
+                color = 'black'
+                lw = 2.5
+            plt.plot(trends[dataset], c = color, lw=lw, label = dataset)
+    else:
+        box_data = [trends[dataset] for dataset in sorted(trends)]
+        box = ax.boxplot(box_data,
+                         0,
+                         sym = 'k.',
+                         whis = [1, 99],
+                         showmeans= False,
+                         meanline = False,
+                         showfliers = True,
+                         labels = sorted(trends.keys()))
+        plt.xticks(rotation=45)
+        plt.setp(box['fliers'], markersize=1.0)
 
-
-    # Add observational data.
-
-    # if obs_filename:
-    #     obs_cube = iris.load_cube(obs_filename)
-    #     obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
-    #     # obs_cube = obs_cube.collapsed('time', iris.analysis.MEAN)
-    #
-    #     obs_key = obs_metadata['dataset']
-    #     qplt.plot(obs_cube, obs_cube.coord('depth'), c='black')
-    #
-    #     plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 1,
-    #                              'label': obs_key}
     if savefig:
         plt.subplots_adjust(bottom=0.25)
 
@@ -480,33 +507,30 @@ def make_pane_bc(
     if pane == 'b':
         plt.title('(b) Distribution of 8 year AMOC trends in CMIP5')
         plt.axhline(-0.55, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
+        plt.ylabel('Sv yr'+r'$^{-1}$')
         if not savefig:
             plt.setp( ax.get_xticklabels(), visible=False)
 
     if pane == 'c':
         plt.title('(c) Distribution of interannual AMOC changes in CMIP5')
         plt.axhline(-4.4, c='k', lw=8, alpha=0.1, zorder = 0) # wrong numbers!
+        plt.ylabel('Sv')
 
-
-    # title = ' '.join([
-    #     metadata['dataset'],
-    #     metadata['long_name'],
-    # ])
-    # plt.title(title)
-
-    # Add Legend outside right.
-    # diagtools.add_legend_outside_right(plot_details, plt.gca())
-    # fig.set_size_inches(10., 9.)
-    # leg = plt.legend(loc='lower right', prop={'size':10})
-    # leg.draw_frame(False)
-    # leg.get_frame().set_alpha(0.)
 
     if not savefig:
         return fig, ax
 
+    if timeseries:
+        plt.legend()
+
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
-    path = cfg['plot_dir'] + 'fig_3.24'+pane+image_extention
+
+    if timeseries:
+        path = cfg['plot_dir'] + '/fig_3.24_'+pane+'_timeseries'+image_extention
+    else:
+        path = cfg['plot_dir'] + '/fig_3.24_'+pane+image_extention
+
 
     # Saving files:
     if cfg['write_plots']:
@@ -516,7 +540,7 @@ def make_pane_bc(
     plt.close()
 
 
-def  make_figure(cfg):
+def  make_figure(cfg, debug=False, timeseries=False):
     """
     Make the entire figure.
 
@@ -536,18 +560,21 @@ def  make_figure(cfg):
     fig, axa = make_pane_a(cfg, fig=fig, ax=axa)
 
     axb = plt.subplot2grid((2,5), (0,2), colspan=3, rowspan=1)
-    fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb)
+    fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb, timeseries=timeseries)
 
     axc = plt.subplot2grid((2,5), (1,2), colspan=3, rowspan=1)
-    fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc)
+    fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
 
     plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
-    path = cfg['plot_dir'] + 'fig_3.24'+image_extention
+    if timeseries:
+        path = cfg['plot_dir'] + '/fig_3.24_timeseries'+image_extention
+    else:
+        path = cfg['plot_dir'] + '/fig_3.24'+image_extention
 
-    # Watermakr
+    # Watermark
     fig.text(0.95, 0.05, 'Draft',
              fontsize=50, color='gray',
              ha='right', va='bottom', alpha=0.5)
@@ -574,49 +601,18 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
-    make_figure(cfg)
-    return
-
     # individual plots:
-    make_pane_bc(cfg, pane='c')
-    make_pane_bc(cfg, pane='b')
+    # make_timeseriespane_bc(cfg, pane='b')
+    # make_timeseriespane_bc(cfg, pane='c')
+    make_pane_bc(cfg, pane='c', timeseries=False)
+    make_pane_bc(cfg, pane='b', timeseries=False)
+    make_pane_bc(cfg, pane='c', timeseries=True)
+    make_pane_bc(cfg, pane='b', timeseries=True)
     make_pane_a(cfg)
 
-
-
-    # for index, metadata_filename in enumerate(cfg['input_files']):
-        # make_pane_a(cfg)
-        # continue
-        #
-        # logger.info('metadata filename:\t%s', metadata_filename)
-        #
-        # metadatas = diagtools.get_input_files(cfg, index=index)
-        #
-        # obs_key = 'observational_dataset'
-        # obs_filename = ''
-        # obs_metadata = {}
-        # if obs_key in cfg:
-        #     obs_filename = diagtools.match_model_to_key(obs_key,
-        #                                                 cfg[obs_key],
-        #                                                 metadatas)
-        #     obs_metadata = metadatas[obs_filename]
-        #
-        # for filename in sorted(metadatas.keys()):
-        #
-        #     if filename == obs_filename:
-        #         continue
-        #
-        #     logger.info('-----------------')
-        #     logger.info(
-        #         'model filenames:\t%s',
-        #         filename,
-        #     )
-        #
-        #     ######
-        #     # Time series of individual model
-        #     make_single_profiles_plots(cfg, metadatas[filename], filename,
-        #                         obs_metadata=obs_metadata,
-        #                         obs_filename=obs_filename)
+    # overall plots:
+    make_figure(cfg, timeseries= True)
+    make_figure(cfg, timeseries= False)
 
     logger.info('Success')
 
