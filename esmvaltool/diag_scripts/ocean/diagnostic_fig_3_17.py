@@ -199,6 +199,171 @@ def make_cube_region_dict(cube):
     return cubes
 
 
+def make_mean_of_cube_list(cube_list, long_name):
+    """
+    Takes the mean of a list of cubes (not an iris.cube.CubeList).
+
+    Assumes all the cubes are the same shape.
+    """
+    cube_mean = cube_list[0]
+    if long_name == 'Sea Water Potential Temperature':
+            units_str = 'kelvin'
+    if long_name == 'Sea Water Salinity':
+            units_str = '1.'
+
+    print ('make_mean_of_cube_list: cube -1', cube_mean.data.mean())
+
+    for i, cube in enumerate(cube_list[1:]):
+        print ('make_mean_of_cube_list: cube', i, cube.data.mean())
+        cube.units = units_str
+        print ('make_mean_of_cube_list: cube', i, cube.data.mean())
+
+        print ('make_mean_of_cube_list: cube_mean, ', i, cube_mean.data.mean())
+        cube_mean.units = units_str
+        print ('make_mean_of_cube_list: cube_mean, ', i, cube_mean.data.mean())
+        cube_mean+=cube
+        print ('make_mean_of_cube_list: cube_mean, ', i, cube_mean.data.mean())
+
+    cube_mean = cube_mean/ float(len(cube_list))
+    cube_mean.units = units_str
+    print ('make_mean_of_cube_list: cube_mean', cube_mean.data.mean())
+    # assert 0
+    return cube_mean
+
+
+def make_multimodelmean_transects(
+        cfg,
+        # short_name = 'thetao'
+):
+    """
+    Make a simple plot of the transect for an indivudual model.
+
+    This tool loads the cube from the file, checks that the units are
+    sensible BGC units, checks for layers, adjusts the titles accordingly,
+    determines the ultimate file name and format, then saves the image.
+
+    Parameters
+    ----------
+    cfg: dict
+        the opened global config dictionairy, passed by ESMValTool.
+
+    """
+    metadatas = diagtools.get_input_files(cfg,)
+    obs_key = 'observational_dataset'
+    obs_filename = ''
+    obs_metadata = {}
+    obs_filename = diagtools.match_model_to_key(obs_key,
+                                      cfg[obs_key],
+                                      metadatas,)
+    print('obs_filename', obs_filename)
+
+    # Load cube and set up units
+    cubes = []
+    for filename in sorted(metadatas):
+        if filename == obs_filename:
+            continue
+        metadata = metadatas[filename]
+        # if metadata['short_name'] != short_name: continue
+        if metadata['dataset'] == 'MRI-ESM1': continue
+        cube = iris.load_cube(filename)
+        cubes.append(cube)
+        print('loading:', metadata['dataset'], cube.data.mean(), cube.units )
+
+    short_name = metadatas[filename]['short_name']
+    # Take the multimodel mean.
+    cube = make_mean_of_cube_list(cubes, metadata['long_name'])
+    cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
+
+    cube = make_depth_safe(cube)
+    #cubes = make_cube_region_dict(cube)
+
+    obs_cube = iris.load_cube(obs_filename)
+    obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
+
+    if metadata['long_name'] == 'Sea Water Potential Temperature':
+        contours = [0, 5, 10, 15, 20, 25, 30, 35]
+        diff_contours = [-3., -2, -1, 1, 2, 3]
+        fmt = '%1.0f'
+        diff_fmt = '%1.0f'
+        cube.units = 'celsius'
+        obs_cube.units = 'celsius'
+
+    if metadata['long_name'] == 'Sea Water Salinity':
+        contours = [32, 32.5, 33, 33.5, 34, 34.5, 35, 35.5, 36 ]
+        diff_contours = [ -1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1 ]
+        fmt = '%1.1f'
+        diff_fmt = '%1.2f'
+        cube.units = '1.'
+        obs_cube.units = '1.'
+
+    # Add title to plot
+    title = ' '.join(
+        [metadata['long_name'], ])
+
+    title = titlify(title)
+
+    cube = cube - obs_cube
+    cmap = 'seismic'
+    colour_range = diagtools.get_cube_range_diff([cube,])
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(211)
+    iris.plot.contourf(cube, 15, cmap=cmap, )#vmin=colour_range[0], vmax=colour_range[1] )
+    plt.ylim(1000, 0)
+    plt.clim(colour_range)
+    plt.title(title)
+    plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
+
+    CS = iris.plot.contour(obs_cube, contours, colors='k' )
+    ax1.clabel(CS, CS.levels, inline=True, fontsize=10, fmt = fmt)
+
+    CS_diff = iris.plot.contour(cube, diff_contours, colors='white' )
+    ax1.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
+
+    ax2 = fig.add_subplot(212)
+    iris.plot.contourf(cube, 14, cmap=cmap, )
+    plt.ylim(5000, 1000)
+    plt.clim(colour_range)
+
+    locs, labels = plt.yticks()
+    ax2.set_yticks([2000, 3000, 4000, 5000,])
+    plt.colorbar(orientation='horizontal')
+    plt.clim(colour_range)
+
+    CS = iris.plot.contour(obs_cube, contours, colors='black')
+    ax2.clabel(CS, CS.levels, inline=True, fontsize=10, fmt = fmt)
+
+    CS_diff = iris.plot.contour(cube, diff_contours, colors='white')
+    ax2.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
+
+    fig.subplots_adjust(hspace=0.01)
+
+    # Load image format extention
+    image_extention = diagtools.get_image_format(cfg)
+
+    # Determine image filename:
+    path = diagtools.folder(cfg['plot_dir'])+'fig_3_17_'+short_name +image_extention
+
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path)
+
+    plt.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
 def make_transects_plots(
         cfg,
         metadata,
@@ -287,10 +452,7 @@ def make_transects_plots(
 
         fig.subplots_adjust(hspace=0.01)
 
-
         #plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
-
-
 
         # Load image format extention
         image_extention = diagtools.get_image_format(cfg)
@@ -341,34 +503,35 @@ def main(cfg):
 
     """
     #####
-    for index, metadata_filename in enumerate(cfg['input_files']):
-        logger.info(
-            'metadata filename:\t%s',
-            metadata_filename,
-        )
+    make_multimodelmean_transects(cfg, ) #short_name = 'thetao')
+    make_multimodelmean_transects(cfg, ) #short_name = 'so')
 
-        metadatas = diagtools.get_input_files(cfg, index=index)
-        obs_key = 'observational_dataset'
-        obs_filename = ''
-        obs_metadata = {}
-        obs_filename = diagtools.match_model_to_key(obs_key,
-                                          cfg[obs_key],
-                                        metadatas)
-
-        for filename in sorted(metadatas):
-
-            logger.info('-----------------')
-            logger.info(
-                'model filenames:\t%s',
-                filename,
-            )
-
-            ######
-            # Time series of individual model
-            make_transects_plots(cfg, metadatas[filename], filename, obs_filename)
-
-
-    logger.info('Success')
+    # for index, metadata_filename in enumerate(cfg['input_files']):
+    #     logger.info(
+    #         'metadata filename:\t%s',
+    #         metadata_filename,
+    #     )
+    #     metadatas = diagtools.get_input_files(cfg, index=index)
+    #     obs_key = 'observational_dataset'
+    #     obs_filename = ''
+    #     obs_metadata = {}
+    #     obs_filename = diagtools.match_model_to_key(obs_key,
+    #                                       cfg[obs_key],
+    #                                     metadatas)
+    #
+    #     for filename in sorted(metadatas):
+    #         logger.info('-----------------')
+    #         logger.info(
+    #             'model filenames:\t%s',
+    #             filename,
+    #         )
+    #
+    #         ######
+    #         # Time series of individual model
+    #         make_transects_plots(cfg, metadatas[filename], filename, obs_filename)
+    #
+    #
+    # logger.info('Success')
 
 
 if __name__ == '__main__':
