@@ -221,10 +221,10 @@ begin
 
         if (isatt(variable_info[0], "reference_dataset")) then
 
-          ; save field with no masking for mean reference value
-          if (anom .eq. "anom" .and. ref_value .eq. True)
-            A0_nomask = A0
-          end if
+          ;; save field with no masking for mean reference value
+          ;if (anom .eq. "anom" .and. ref_value .eq. True)
+          ;  A0_nomask = A0
+          ;end if
 
           if(diag_script_info@ref_mask .and. imod .ne. ref_ind) then
             ; Determine start/end year
@@ -257,15 +257,15 @@ begin
             A0(i, :, :) = A0(i, :, :) - A0_timavg_ref(:, :)
           end do
 
-          if (ref_value.eq.True)
-            A0_timavg_ref_nomask = time_operations(A0_nomask, ref_start, \
-                                                   ref_end, "average",   \
-                                                   "annualclim", True)
-            anom_ref(imod) = area_operations(A0_timavg_ref_nomask, -90., 90., \
-                                             0., 360., "average", True)
-            delete(A0_timavg_ref_nomask)
-            delete(A0_nomask)
-          end if
+          ;if (ref_value.eq.True)
+          ;  A0_timavg_ref_nomask = time_operations(A0_nomask, ref_start, \
+          ;                                         ref_end, "average",   \
+          ;                                         "annualclim", True)
+          ;  anom_ref(imod) = area_operations(A0_timavg_ref_nomask, -90., 90., \
+          ;                                   0., 360., "average", True)
+          ;  delete(A0_timavg_ref_nomask)
+          ;  delete(A0_nomask)
+          ;end if
 
           anom_ref_tmp = area_operations(A0_timavg_ref, -90., 90., \
                                          0., 360., "average", True)
@@ -305,6 +305,10 @@ begin
           anom_ref_new = time_operations(procmod, ref_start, ref_end, "average", \
                                          "annualclim", True)
           procmod = procmod - anom_ref_new
+
+          if (ref_value.eq.True)
+            anom_ref(imod) = anom_ref_new
+          end if
 
           delete(anom_ref_new)
           delete(anom_ref_tmp)
@@ -409,13 +413,13 @@ begin
   ; individual case for HadCRUT4 observations
   ; FIX-ME: mean value comes from climatology file (absolute.nc).
   ; There are no missing values as in the anomaly data.
-  if (isatt(variable_info[0], "reference_dataset") .and. variable_info[0]@reference_dataset .eq. "HadCRUT4") then
-    if(ref_start .eq. 1961 .and. ref_end .eq. 1990) then
-      anom_ref(ref_ind) = 14.0
-    else
-      anom_ref(ref_ind) = anom_ref@_FillValue
-    end if
-  end if
+  ;if (isatt(variable_info[0], "reference_dataset") .and. variable_info[0]@reference_dataset .eq. "HadCRUT4") then
+  ;  if(ref_start .eq. 1961 .and. ref_end .eq. 1990) then
+  ;    anom_ref(ref_ind) = 14.0
+  ;  else
+  ;    anom_ref(ref_ind) = anom_ref@_FillValue
+  ;  end if
+  ;end if
 ;  if (ref_value .and. any(datasetnames.eq."HadCRUT4-clim")) then
 ;    ; Read data
 ;    A0 = read_data(info_items[clim_ind])
