@@ -1,0 +1,89 @@
+# ESMValTool
+# recipe_ipcc6_co2.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+  authors:
+    - gier_be
+
+#  maintainer:
+    
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+  nbp_mean:
+    average_region:
+      coord1: latitude
+      coord2: longitude
+
+  co2_surface:
+    extract_levels:
+      levels: 100000
+      scheme: linear
+    average_region:
+      coord1: latitude
+      coord2: longitude
+
+diagnostics:
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.6.1 (ZOD fig. 3.40)
+  # **********************************************************************
+  # Changes to the ampitude of the seasonal cycle fo atmospheric CO2
+  # **********************************************************************
+  # status: 
+  # **********************************************************************
+
+  fig_3_38_co2:
+    description: Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+    variables:
+      nbp:
+        preprocessor: nbp_mean
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        exp: historical
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        additional_datasets:
+          - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 3, start_year: 1986, end_year: 2008}
+          - {dataset: CanESM5, grid: gn, ensemble: r2i1p1f1}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2}
+          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r6i1p1f1}
+          - {dataset: GISS-E2-1-G, grid: gn}
+          - {dataset: CESM2, grid: gn}
+     # co2:
+     #   preprocessor: co2_surface
+     #   #derive: True
+     #   project: CMIP5
+     #   ensemble: r1i1p1
+     #   field: T0M
+     #   exp: esmHistorical
+     #   mip: Amon
+     #   start_year: 1970
+     #   end_year: 2010 #2010
+     #   additional_datasets:
+     #     - {dataset: ESRL, project: OBS, type: ground, version: MLO, tier: 2, start_year: 1973, end_year: 2010}
+     #     - {dataset: ESRL, project: OBS, type: ground, version: GLOB, tier: 2, start_year: 1980, end_year: 2010}
+     #     - {dataset: BNU-ESM}
+     #     - {dataset: CanESM2}
+     #     - {dataset: CESM1-BGC}
+      #    - {dataset: FIO-ESM}
+      #    - {dataset: GFDL-ESM2G, start_year: 1861} # 10^35 co2 - missing values badly?
+      #    - {dataset: GFDL-ESM2M, start_year: 1861} # 10^35 co2 - missing values badly?
+      #    - {dataset: MIROC-ESM}
+      #    - {dataset: MPI-ESM-LR}
+      #    - {dataset: MRI-ESM1}
+    scripts:
+      fig_3_38_co2:
+        script: ipcc_ar6/CO2_SCA_trend.py
+        co2data: {CO2-MLO: [/work/bd0854/b309137/data_ext/Tier2/ESRL/OBS_ESRL_ground_MLO_T0M_co2_195801-201912.nc, 1961, 2014], CO2-GLOB: [/work/bd0854/b309137/data_ext/Tier2/ESRL/OBS_ESRL_ground_GLOB_T0M_co2_198001-201812.nc, 1980, 2014]}
+        ref_model: CO2-MLO
