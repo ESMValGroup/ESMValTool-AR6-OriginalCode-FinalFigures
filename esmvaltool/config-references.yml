@@ -218,6 +218,10 @@ authors:
     name: Lorenz, Ruth
     institute: ETH Zurich, Switzerland
     email: ruth.lorenz 'at' env.ethz.ch
+  lova_to:
+    name: Lovato, Tomas
+    institute: CMCC, IT
+    email: tomas.lovato 'at' cmcc.it
   maek_ja:
     name: Makela, Jarmo
   malo_er:
@@ -507,6 +511,8 @@ authors:
     name: Tilmes, Simone
     institute: NCAR, US
     email: tilmes 'at' ucar.edu
+
+
 
 references:
   acknow_author: "Please acknowledge the author(s)."
