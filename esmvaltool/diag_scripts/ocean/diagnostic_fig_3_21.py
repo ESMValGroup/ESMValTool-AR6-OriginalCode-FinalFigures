@@ -191,10 +191,13 @@ def main(cfg):
     # zrange12 = diagtools.get_cube_range([cube221, cube222])
     # cube224.data = np.ma.clip(cube224.data, 0.1, 10.)
 
-    n_points = 16
+    n_points = 9
     # linspace12 = np.linspace(
     #     zrange12[0], zrange12[1], n_points, endpoint=True)
-    linspace_all = np.linspace(-0.201, 0.201, n_points, endpoint=True)
+    lims = [-0.2, 0.2]
+    linspace_all = np.linspace(lims[0], lims[1], n_points, endpoint=True)
+    print(linspace_all)
+    #assert 0
 
     # Add the sub plots to the figure.
     # add_map_subplot(221, cube221, linspace12, cmap='viridis', title=model)
@@ -216,24 +219,26 @@ def main(cfg):
         cube223,
         linspace_all,
         linewidth=0,
-        cmap=plt.cm.get_cmap('bone'),
+        cmap=plt.cm.get_cmap('RdYlBu'),
         zmin=linspace_all.min(),
         zmax=linspace_all.max(),
         rasterized=True)
     plt.gca().add_feature(cartopy.feature.LAND, facecolor=[0.8, 0.8, 0.8])
     plt.gca().coastlines()
+    cbar = pyplot.colorbar(orientation='horizontal')
 
     sp222 = plt.subplot(222)
     qplot = iris.plot.contourf(
         cube223,
         linspace_all,
         linewidth=0,
-        cmap=plt.cm.get_cmap('bone'),
+        cmap=plt.cm.get_cmap('RdYlBu'),
         zmin=linspace_all.min(),
         zmax=linspace_all.max(),
         rasterized=True)
     plt.gca().add_feature(cartopy.feature.LAND, facecolor=[0.8, 0.8, 0.8])
     plt.gca().coastlines()
+    cbar = pyplot.colorbar(orientation='horizontal')
 
     print(linspace_all)
     sp223 = plt.subplot(223)
@@ -241,7 +246,7 @@ def main(cfg):
         cube223,
         linspace_all,
         linewidth=0,
-        cmap=plt.cm.get_cmap('bwr'),
+        cmap=plt.cm.get_cmap('RdYlBu'),
         zmin=linspace_all.min(),
         zmax=linspace_all.max(),
         rasterized=True,
@@ -251,8 +256,8 @@ def main(cfg):
     print('cube224:',cube224.data.min(), cube224.data.max())
 
     # TODO: problem here is that the contourf plot just ignores the linspace and zmin/zmax ranges.
-    
-    pyplot.colorbar()
+
+    cbar = pyplot.colorbar(orientation='horizontal')
 
     iris.plot.contour(cube223_contours,
                  thresholds,
@@ -270,12 +275,12 @@ def main(cfg):
         cube224,
         linspace_all,
         linewidth=0,
-        cmap=plt.cm.get_cmap('bwr'),
+        cmap=plt.cm.get_cmap('RdYlBu'),
         zmin=linspace_all.min(),
         zmax=linspace_all.max(),
         extend='both',
         rasterized=True)
-    pyplot.colorbar()
+    cbar = pyplot.colorbar(orientation='horizontal')
 
     mesh42 = iris.plot.contour(cube224_contours,
                  thresholds,
@@ -297,7 +302,6 @@ def main(cfg):
     # cb_ax = fig.add_axes([0.93, 0.02, 0.02, 0.9])
     # cbar = fig.colorbar(mesh41, cax=cb_ax)
     # plt.colorbar() #img, cax=cbar_ax)
-
 
     # Determine image filename:
     path = diagtools.folder(cfg['plot_dir']) + 'fig_3_21' + image_extention
