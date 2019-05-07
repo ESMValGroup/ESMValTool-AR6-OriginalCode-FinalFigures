@@ -456,20 +456,34 @@ cmip5_histNat_models: &cmip5_histNat_models
      start_year: 1850, end_year: 2017, tier: 2}
 
 cmip6_hist_models: &cmip6_hist_models_tas
+  - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
   - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
-  - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1}
   - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
      start_year: 1850, end_year: 2017, tier: 2}
 
+
 cmip6_hist_models: &cmip6_hist_models_tas_era
+  - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
   - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
   - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
   - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
   - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
 
 Datasets_CMIP5_historical: &cmip5_historical_models
@@ -559,11 +573,16 @@ Datasets_CMIP6_historical: &cmip6_hist_models_pr
      end_year: 2014}
 
 Datasets_CMIP6_historical: &cmip6_hist_models_pr_gpcp
+  - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
   - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
   - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
   - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
   - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3,
      tier: 1}
 
@@ -577,7 +596,8 @@ diagnostics:
   # similar to fig. IPCC AR5, chap. 9, 9.2 a/b/c
   # Lisa
   # **********************************************************************
-  # Multi model mean, multi model mean bias, and mean absolute error
+  # Multi model mean, multi model mean bias, root mean square error and 
+  # mean relative error
   # (geographical distributions)
   # **********************************************************************
 
@@ -596,13 +616,13 @@ diagnostics:
         end_year: 2014
     additional_datasets: *cmip6_hist_models_tas_era
     scripts:
-      fig_3_2: &fig-3-2_and_3-3_settings
+      fig_3_2: &fig-3-2_and_3-9_settings
         script: ipcc_ar6/clouds_bias.ncl
         projection: Robinson
         timemean: annualclim
         plot_rms_diff: True
         plot_abs_diff: false
-        plot_rel_diff: false
+        plot_rel_diff: True
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
@@ -629,7 +649,7 @@ diagnostics:
         end_year: 2014
     additional_datasets: *cmip6_hist_models_tas
     scripts:
-      fig09-8: 
+      tsline_anom:
         script: ipcc_ar6/tsline_anom_tas.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
@@ -650,16 +670,12 @@ diagnostics:
   # **********************************************************************
   # Global climate variability - surface temperature
   # **********************************************************************
-  # status: porting from v1 to v2
-  # **********************************************************************
 
   fig_3_4:
     description: IPCC AR5 Ch. 9, Fig. 9.33 (near-surface temperature)
     variables:
       tas:
         preprocessor: clim_5x5
-        #reference_dataset: HadCRUT4
-        #alternative_dataset: HadCRUT4-clim
         mip: Amon
         field: T2Ms
         project: CMIP6
@@ -670,12 +686,14 @@ diagnostics:
     additional_datasets:
       - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2449}
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2300}
+      - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, start_year: 1, end_year: 1200}
+      - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn, start_year: 1, end_year: 499}
       - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, start_year: 1850, end_year: 2349}
       - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, start_year: 1850, end_year: 2349}
       - {dataset: E3SM-1-0, ensemble: r1i1p1f1, start_year: 1, end_year: 500}
+      - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, start_year: 151, end_year: 650}
       - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, start_year: 4150, end_year: 5000}
       #- {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, start_year: 1850, end_year: 3049}
-      - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, start_year: 151, end_year: 650}
       - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, start_year: 3200, end_year: 3999}
       #- {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
       #   start_year: 1870, end_year: 2017, tier: 2}
@@ -696,8 +714,6 @@ diagnostics:
   # Lisa  
   # **********************************************************************
   # Temperature anomaly - global, land, ocean and continental
-  # **********************************************************************
-  # status: developing from AR5 9_8 
   # **********************************************************************
 
   ########################################################################
@@ -1586,28 +1602,6 @@ diagnostics:
 #        ref: ["HadCRUT4"]
 #        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
 
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Sect. 3.3 
-  # Fig. 3.7 
-  # Lisa  
-  # **********************************************************************
-  # Temperature anomaly - global, land, ocean and continental
-  # with single forcings
-  # **********************************************************************
-  # status: Placeholder for SOD
-  # **********************************************************************
-
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Sect. 3.3 
-  # Fig. 3.8 (ZOD fig. 3.15)
-  # Nathan
-  # **********************************************************************
-  # Vertical profiles of decadal tropical tempreture trends
-  # **********************************************************************
-  # status: 
-  # **********************************************************************
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
@@ -1636,10 +1630,7 @@ diagnostics:
     additional_datasets: *cmip6_hist_models_pr_gpcp
     scripts:
       fig_3_9:
-        <<: *fig-3-2_and_3-3_settings
-        plot_rms_diff: True
-        plot_abs_diff: False
-        plot_rel_diff: True
+        <<: *fig-3-2_and_3-9_settings
 
 
   # **********************************************************************
