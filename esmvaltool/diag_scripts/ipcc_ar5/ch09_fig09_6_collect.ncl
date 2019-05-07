@@ -54,16 +54,48 @@ begin
   ; Filter non-existing files (mp files only useful if cor file exists)
   file_list := file_list(ind(isfilepresent(file_list)))
   mp_file_list := mp_file_list(ind(isfilepresent(file_list)))
+  mp_file_list_new = mp_file_list
 
   ; Set up auxiliary variables
   var_collect = new(dimsizes(file_list), string)
   alt_obs = new(dimsizes(file_list), string)
 
+print("file_list = " + file_list)
+
+;  ind_tas   = ind(isStrSubset(file_list,fig_3_38_tas))
+;  ind_pr    = ind(isStrSubset(file_list,fig_3_38_pr))
+;  ind_rlut  = ind(isStrSubset(file_list,fig_3_38_rlut))
+;  ind_swcre = ind(isStrSubset(file_list,fig_3_38_swcre))
+;  ind_tas   = str_index_of_substr(file_list,fig_3_38_tas,-1)
+;  ind_pr    = str_index_of_substr(file_list,fig_3_38_tas,-1)
+;  ind_rlut  = str_index_of_substr(file_list,fig_3_38_tas,-1)
+;  ind_swcre = str_index_of_substr(file_list,fig_3_38_tas,-1)
+;
+;print("ind_tas = " + ind_tas)
+;
+;  file_list_new = file_list(ind_tas,ind_pr,ind_rlut,ind_swcre)
+;  delete(file_list)
+;  file_list = file_list_new
+;  delete(file_list_new)
+;
+;print("file_list = " + file_list)
+
+  ;To FIX
+  var_order = (/"tas","pr","rlut","swcre"/)
+
   ; Loop over files in list, read and append data
   do ii = 0, dimsizes(file_list) - 1
+;  do ii = 0, dimsizes(var_order) - 1
+
     data_temp = ncdf_read(file_list(ii), "cor")
-    var_collect(ii) = data_temp@corvar
-    alt_obs(ii) = data_temp@alt_obs
+    ii_new = ind(data_temp@corvar .eq. var_order)
+print("var = " + data_temp@corvar)
+print("ii = " + ii)
+print("ii_new = " + ii_new)
+    var_collect(ii_new) = data_temp@corvar
+    alt_obs(ii_new) = data_temp@alt_obs
+
+    mp_file_list_new(ii_new) = mp_file_list(ii)
 
     ; Make 2D array to store all data
     if (.not.isdefined("data_all")) then
@@ -75,7 +107,7 @@ begin
       ; If model coordinates are identical
       if (dimsizes(data_temp&models).eq.dimsizes(data_all&models)) \
         .and. all(data_temp&models.eq.data_all&models) then
-        data_all(:, ii) = (/data_temp/)
+        data_all(:, ii_new) = (/data_temp/)
       else
         ; Loop over models in new data entry
         do imod_temp = 0, dimsizes(data_temp&models) - 1
@@ -84,7 +116,7 @@ begin
             ; Append record for model(imod)
             data_new = extend_var_at(data_all, 0, \
                                      dimsizes(data_all&models))
-            data_new(dimsizes(data_all&models), ii) = (/data_temp(imod_temp)/)
+            data_new(dimsizes(data_all&models), ii_new) = (/data_temp(imod_temp)/)
             data_new&models(dimsizes(data_all&models)) = \
               (/data_temp&models(imod_temp)/)
             delete(data_all)
@@ -96,7 +128,7 @@ begin
               ; if neq data model is similar to current
               ; entry, write data entry
               if (data_all&models(imod).eq. data_temp&models(imod_temp)) then
-                data_all(imod, ii) = (/data_temp(imod_temp)/)
+                data_all(imod, ii_new) = (/data_temp(imod_temp)/)
               end if
             end do
           end if
@@ -113,8 +145,8 @@ begin
   projects = new(dimsizes(data_all&models), string)
 
   ; Loop over model-project files to complete project list
-  do ii = 0, dimsizes(mp_file_list) - 1
-    modproj = asciiread(mp_file_list(ii), -1, "string")
+  do ii = 0, dimsizes(mp_file_list_new) - 1
+    modproj = asciiread(mp_file_list_new(ii), -1, "string")
     mods = modproj(:dimsizes(modproj)/2-1)
     projs = modproj(dimsizes(modproj)/2:)
 
@@ -353,7 +385,7 @@ begin
   end do
 
   y_min_label = res@trYMinF + 0.2*yspan
-  lb_stride = yspan/res@vpHeightF * font_height * 1.2   ; font_height*3
+  lb_stride = yspan/res@vpHeightF * font_height * 1.5   ; font_height*3
   plabel = projects
   ; Draw Legend
   do iproj = 0, dimsizes(projects)-1
@@ -363,12 +395,12 @@ begin
       plabel(iproj) = "CMIP5"
     end if
     plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, plabel(iproj),\
-                                                 x_val(0), y_min_label + \
+                                                 x_val(0)-0.5, y_min_label + \
                                                  lb_stride*(iproj+1), res_text)
   end do
   res_text@txFontColor = "green"
-  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "OBS", \
-                                               x_val(0), y_min_label, res_text)
+  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "alt. Obs.", \
+                                               x_val(0)-0.5, y_min_label, res_text)
 
   draw(plot)
   frame(wks)

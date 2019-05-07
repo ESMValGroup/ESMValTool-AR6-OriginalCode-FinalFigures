@@ -255,12 +255,18 @@ begin
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_temperature_10.rgb")
-    mmdata@res_cnFillColors = pal
+printVarSummary(pal)
+print("pal: " + pal)
+    mmdata@res_cnFillColors = pal(::-1,:)
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_temperature_10.rgb")
-    diff@res_cnFillColors = pal2
+    diff@res_cnFillColors = pal2(::-1,:)
     if (plot_rms_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+    if (plot_rel_diff) then
+      pal4 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_temperature_10.rgb")
     end if
   elseif (var0.eq."pr") then
@@ -336,6 +342,9 @@ begin
     if (isvar("pal4")) then
       delete(reldiff@res_cnFillColors)
       reldiff@res_cnFillColors = pal4
+      if(var0.eq."tas") then
+        reldiff@res_cnFillColors = pal4(::-1,:)
+      end if
     end if
 
     iadd = 3
