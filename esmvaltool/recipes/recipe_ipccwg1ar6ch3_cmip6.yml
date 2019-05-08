@@ -2232,5 +2232,319 @@ diagnostics:
   # Centered pattern correlation 
   # **********************************************************************
 
+  fig_faq_2_tas:
+    description: Calculate pattern correlation for tas
+    variables:
+      tas:
+        preprocessor: regrid_4_5
+        reference_dataset: ERA-Interim
+        alternative_dataset: NCEP
+        #project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: ACCESS1-0, project: CMIP5}
+      - {dataset: ACCESS1-3, project: CMIP5}
+      - {dataset: bcc-csm1-1, project: CMIP5}
+      - {dataset: bcc-csm1-1-m, project: CMIP5}
+      - {dataset: BNU-ESM, project: CMIP5}
+      - {dataset: CanCM4, project: CMIP5}
+      - {dataset: CanESM2, project: CMIP5}
+      - {dataset: CCSM4, project: CMIP5}
+      - {dataset: CESM1-BGC, project: CMIP5}
+      - {dataset: CESM1-CAM5, project: CMIP5}
+      - {dataset: CESM1-FASTCHEM, project: CMIP5}
+      - {dataset: CESM1-WACCM, project: CMIP5}
+      - {dataset: CMCC-CESM, project: CMIP5}
+      - {dataset: CMCC-CM, project: CMIP5}
+      - {dataset: CMCC-CMS, project: CMIP5}
+      - {dataset: CNRM-CM5, project: CMIP5}
+      - {dataset: CNRM-CM5-2, project: CMIP5}
+      - {dataset: FIO-ESM, project: CMIP5}
+      - {dataset: GFDL-CM2p1, project: CMIP5}
+      - {dataset: GFDL-CM3, project: CMIP5}
+      - {dataset: GFDL-ESM2G, project: CMIP5}
+      - {dataset: GFDL-ESM2M, project: CMIP5}
+      - {dataset: GISS-E2-H, project: CMIP5}
+      - {dataset: GISS-E2-H-CC, project: CMIP5}
+      - {dataset: GISS-E2-R, project: CMIP5}
+      - {dataset: GISS-E2-R-CC, project: CMIP5}
+      - {dataset: HadCM3, project: CMIP5}
+      - {dataset: HadGEM2-AO, project: CMIP5}
+      - {dataset: HadGEM2-CC, project: CMIP5}
+      - {dataset: HadGEM2-ES, project: CMIP5}
+      - {dataset: inmcm4, project: CMIP5}
+      - {dataset: IPSL-CM5A-LR, project: CMIP5}
+      - {dataset: IPSL-CM5A-MR, project: CMIP5}
+      - {dataset: IPSL-CM5B-LR, project: CMIP5}
+      - {dataset: MIROC-ESM, project: CMIP5}
+      - {dataset: MIROC-ESM-CHEM, project: CMIP5}
+      - {dataset: MIROC4h, project: CMIP5}
+      - {dataset: MIROC5, project: CMIP5}
+      - {dataset: MPI-ESM-LR, project: CMIP5}
+      - {dataset: MPI-ESM-MR, project: CMIP5}
+      - {dataset: MPI-ESM-P, project: CMIP5}
+      - {dataset: MRI-CGCM3, project: CMIP5}
+      - {dataset: MRI-ESM1, project: CMIP5}
+      - {dataset: NorESM1-M, project: CMIP5}
+      - {dataset: NorESM1-ME, project: CMIP5}
+      - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}      
+    scripts:
+      fig_faq_2_pattern_cor: &fig09_6_pattern_cor
+        script: ipcc_ar5/ch09_fig09_6.ncl
+
+  fig_faq_2_rlut:
+    description: Calculate pattern correlation for all-sky longwave radiation
+    variables:
+      rlut:
+        preprocessor: regrid_4_5
+        reference_dataset: CERES-EBAF
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+    scripts:
+      fig_faq_2_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  fig_faq_2_pr:
+    description: Calculate pattern correlation for precipitation
+    variables:
+      pr:
+        preprocessor: regrid_4_5
+        reference_dataset: GPCP-SG
+        alternative_dataset: GHCN
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanCM4}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CMCC-CMS}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      #- {dataset: EC-EARTH} cannot concatenate cubes
+      - {dataset: FIO-ESM}
+      #- {dataset: GFDL-CM2p1}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+      #- {dataset: CMAP, project: OBS, type: mergedanaly, version: 1, tier: 2}
+    scripts:
+      fig_faq_2_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  fig_faq_2_swcre:
+    description: Calculate pattern correlation for shortwave cloud radiative effect
+    variables:
+      swcre:
+        preprocessor: regrid_4_5
+        reference_dataset: CERES-EBAF
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        mip: Amon
+        field: T2Ms
+        start_year: 1980
+        end_year: 1999
+        derive: true
+        force_derivation: false
+    additional_datasets:
+      - {dataset: ACCESS1-0}
+      - {dataset: ACCESS1-3}
+      - {dataset: bcc-csm1-1}
+      - {dataset: bcc-csm1-1-m}
+      - {dataset: BNU-ESM}
+      - {dataset: CanESM2}
+      - {dataset: CCSM4}
+      - {dataset: CESM1-BGC}
+      - {dataset: CESM1-CAM5}
+      - {dataset: CESM1-FASTCHEM}
+      - {dataset: CESM1-WACCM}
+      - {dataset: CMCC-CESM}
+      - {dataset: CMCC-CM}
+      - {dataset: CNRM-CM5}
+      - {dataset: CNRM-CM5-2}
+      - {dataset: FGOALS-g2}
+      - {dataset: FIO-ESM}
+      - {dataset: GFDL-CM3}
+      - {dataset: GFDL-ESM2G}
+      - {dataset: GFDL-ESM2M}
+      - {dataset: GISS-E2-H}
+      - {dataset: GISS-E2-H-CC}
+      - {dataset: GISS-E2-R}
+      - {dataset: GISS-E2-R-CC}
+      - {dataset: HadCM3}
+      - {dataset: HadGEM2-AO}
+      - {dataset: HadGEM2-CC}
+      - {dataset: HadGEM2-ES}
+      - {dataset: inmcm4}
+      - {dataset: IPSL-CM5A-LR}
+      - {dataset: IPSL-CM5A-MR}
+      - {dataset: IPSL-CM5B-LR}
+      - {dataset: MIROC-ESM}
+      - {dataset: MIROC-ESM-CHEM}
+      - {dataset: MIROC4h}
+      - {dataset: MIROC5}
+      - {dataset: MPI-ESM-LR}
+      - {dataset: MPI-ESM-MR}
+      - {dataset: MPI-ESM-P}
+      - {dataset: MRI-CGCM3}
+      - {dataset: MRI-ESM1}
+      - {dataset: NorESM1-M}
+      - {dataset: NorESM1-ME}
+      - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+      - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+      - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+    scripts:
+      fig_faq_2_pattern_cor:
+        <<: *fig09_6_pattern_cor
+
+  ### COLLECT CORRELATIONS AND PLOT ###########################################
+  fig_faq_2_cor_collect:
+    description: Wrapper to collect and plot previously calculated correlations
+    scripts:
+      fig_faq_2_cor_collect:
+        script: ipcc_ar5/ch09_fig09_6_collect.ncl
+        ancestors: ['*/fig_faq_2_pattern_cor']
+
 
 
