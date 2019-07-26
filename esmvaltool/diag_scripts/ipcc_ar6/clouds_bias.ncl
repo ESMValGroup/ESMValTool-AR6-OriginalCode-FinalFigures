@@ -4,16 +4,17 @@
 ; PROJECT-NAME EMBRACE
 ; ############################################################################
 ; Description
-;   Calculates the multi-model mean bias, root mean square difference and relative
-;   difference of annual mean 2-d cloud variables compared with a
-;   reference dataset (observations).
+;   Calculates the multi-model mean bias, absolute difference, relative 
+;   difference and root mean square difference of annual mean 2-d cloud 
+;   variables compared with a reference dataset (observations).
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;   none
 ;
 ; Optional diag_script_info attributes (diagnostic specific)
-;   plot_rms_diff: additionally also plot root mean square differences (True, False)
+;   plot_abs_diff: additionally also plot absolute differences (True, False)
 ;   plot_rel_diff: additionally also plot relative differences (True, False)
+;   plot_rms_diff: additionally also plot root mean square differences (True, False)
 ;   projection:    map projection, e.g., Mollweide, Mercator
 ;   timemean:      time averaging, i.e. "seasonalclim" (DJF, MAM, JJA, SON),
 ;                  "annualclim" (annual mean)
@@ -69,6 +70,7 @@ begin
   ; are supported
 
   ; Set default values for non-required diag_script_info attributes
+  set_default_att(diag_script_info, "plot_abs_diff", False)
   set_default_att(diag_script_info, "plot_rms_diff", False)
   set_default_att(diag_script_info, "plot_rel_diff", False)
   set_default_att(diag_script_info, "projection", "CylindricalEquidistant")
@@ -116,8 +118,9 @@ begin
     error_msg("f", DIAG_SCRIPT, "", "no reference dataset defined in recipe")
   end if
 
-  plot_rms_diff = diag_script_info@plot_rms_diff
+  plot_abs_diff = diag_script_info@plot_abs_diff
   plot_rel_diff = diag_script_info@plot_rel_diff
+  plot_rms_diff = diag_script_info@plot_rms_diff
 
   ; get reference dataset
 
@@ -158,14 +161,79 @@ begin
   ref_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
   delete(A0)
 
-  rmsdiff = calculate_metric(mm_mon, ref_mon, "RMSDxy")
+  dim = dimsizes(mmdata)
+  data = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
+  data_mon = new((/dim_MOD-2, 12, dim(0), dim(1)/) ,float)
+
+  ii = 0
+
+  do imod = 0, dim_MOD - 1
+
+    if(imod .ne. mm_ind .and. imod .ne. ref_ind) then
+      log_info("processing " + names(imod))
+
+      if (isvar("data1")) then
+        delete(data1)
+      end if
+
+      if (isvar("A0")) then
+        delete(A0)
+      end if
+
+      A0 = read_data(info0[imod])
+
+      data(ii,:,:) = time_operations(A0, -1, -1, "average", timemean, True)
+      data_mon(ii,:,:,:) = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+
+      ii = ii + 1
+
+      delete(A0)
+
+    end if
+
+  end do
 
   ; differences between multi-model mean and reference data set
+  ; (multi-model bias)
 
   diff = mmdata - refdata
   mmdata@diag_script = DIAG_SCRIPT
   copy_VarMeta(mmdata, diff)
-  copy_VarMeta(mmdata, rmsdiff)
+
+  diff_i    = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
+  absdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
+  rmsdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
+  reldiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
+
+  do ii=0,dim_MOD-3
+
+    ;difference
+    diff_i(ii,:,:) = data(ii,:,:) - refdata
+
+    ;absolute difference
+    absdiff_i(ii,:,:) = abs(diff_i(ii,:,:))
+
+    ; root mean square error
+    rmsdiff_i(ii,:,:) = calculate_metric(data_mon(ii,:,:,:), ref_mon, "RMSDxy")
+
+    ; relative difference
+    ; replace "epsilon" values with missing value
+    datam = where(abs(data).lt.1.e-6, data@_FillValue, data)
+    reldiff_i(ii,:,:) = 100.0 * (diff_i(ii,:,:) / datam(ii,:,:))
+
+  end do
+
+  ; multi-model mean of absolute difference between models and reference
+  ; data set 
+
+  absdiff = dim_avg_n_Wrap(absdiff_i, 0)
+  copy_VarMeta(diff, absdiff)
+
+  rmsdiff = dim_avg_n_Wrap(rmsdiff_i, 0)
+  copy_VarMeta(diff, rmsdiff)
+
+  reldiff = dim_avg_n_Wrap(reldiff_i, 0)
+  copy_VarMeta(diff, reldiff) 
 
   delete(refdata)
 
@@ -174,6 +242,7 @@ begin
   if (var0.eq."pr") then
     mmdata = convert_units(mmdata, "mm/day")
     diff = convert_units(diff, "mm/day")
+    absdiff = convert_units(absdiff, "mm/day")
     rmsdiff = convert_units(rmsdiff, "mm/day")
     ; for plotting IPCC AR5 fig 9.4
     diff@res_cnLevels = ispan(-20, 20, 5) * 0.1
@@ -227,7 +296,7 @@ begin
   end if
   diff@var_units  = diff@units
 
-  plots = new((/4, numseas/), graphic)
+  plots = new((/5, numseas/), graphic)
 
   ; --------------------------------------------------------------------
   ; plot contour map
@@ -255,18 +324,20 @@ begin
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_temperature_10.rgb")
-printVarSummary(pal)
-print("pal: " + pal)
     mmdata@res_cnFillColors = pal(::-1,:)
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_temperature_10.rgb")
     diff@res_cnFillColors = pal2(::-1,:)
-    if (plot_rms_diff) then
+    if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_temperature_10.rgb")
     end if
     if (plot_rel_diff) then
       pal4 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+    if (plot_rms_diff) then
+      pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_temperature_10.rgb")
     end if
   elseif (var0.eq."pr") then
@@ -278,13 +349,17 @@ print("pal: " + pal)
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_precipitation_10.rgb")
     diff@res_cnFillColors = pal2
-    if (plot_rms_diff) then
+    if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_precipitation_10.rgb")
     end if
     if (plot_rel_diff) then
       pal4 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_precipitation_10.rgb")
+    end if
+    if (plot_rms_diff) then
+      pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_precipitation_11.rgb")
     end if
   else
     mmdata@res_cnLevels = fspan(min(mmdata), max(mmdata), 20)
@@ -295,14 +370,50 @@ print("pal: " + pal)
   plotsperline = (/2, 0/)
   plotind = (/0, 1/)  ; mmm and mean bias are always plotted
 
+  ; absolute differences
+
+  if (plot_abs_diff) then
+    copy_VarMeta(diff, absdiff)
+    if (isvar("pal3")) then
+      delete(absdiff@res_cnFillColors)
+      absdiff@res_cnFillColors = pal3(4:0,:)
+      nt = dimsizes(pal3(4:0,:))
+      n = nt(0)
+    else
+      n = dimsizes(diff@res_cnLevels)
+    end if
+
+    mx = max(diff@res_cnLevels)
+    delete(absdiff@res_cnLevels)
+
+    tmp = fspan(0.0, mx, n)
+
+    absdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
+    delete(tmp)
+
+    absdiff@res_tiMainString = "Multi Model Mean of Absolute Error"
+
+    iadd = 2
+    itmp = array_append_record(plotind, iadd, 0)
+    delete(plotind)
+    plotind = itmp
+    delete(itmp)
+    plotsperline(1) = plotsperline(1) + 1
+  end if
+
   ; root mean square differences
 
   if (plot_rms_diff) then
     copy_VarMeta(diff, rmsdiff)
-    if (isvar("pal3")) then
+    if (isvar("pal5")) then
       delete(rmsdiff@res_cnFillColors)
-      rmsdiff@res_cnFillColors = pal3(5:9,:)
-      nt = dimsizes(pal3(5:9,:))
+      if (var0 .eq. "tas") then
+        rmsdiff@res_cnFillColors = pal5(4:0,:)
+        nt = dimsizes(pal5(4:0,:))
+      elseif (var0 .eq. "pr") then
+        rmsdiff@res_cnFillColors = pal5(5:10,:)
+        nt = dimsizes(pal5(5:10,:))
+      end if
       n = nt(0)
     else
       n = dimsizes(diff@res_cnLevels)
@@ -315,9 +426,14 @@ print("pal: " + pal)
     rmsdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
     delete(tmp)
 
-    rmsdiff@res_tiMainString = "Root Mean Square Error of Multi Model Mean"
+    if (var0 .eq. "pr") then
+      delete(rmsdiff@res_cnLevels)
+      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
+    end if
 
-    iadd = 2
+    rmsdiff@res_tiMainString = "Multi Model Mean of Root Mean Square Error"
+
+    iadd = 3
     itmp = array_append_record(plotind, iadd, 0)
     delete(plotind)
     plotind = itmp
@@ -328,11 +444,6 @@ print("pal: " + pal)
   ; relative differences
 
   if (plot_rel_diff) then
-    ; replace "epsilon" values with missing value
-    mm = where(abs(mmdata).lt.1.0e-6, mmdata@_FillValue, mmdata)
-
-    reldiff = 100.0 * diff / mm
-
     copy_VarMeta(diff, reldiff)
     delete(reldiff@res_cnLevels)
     reldiff@res_cnLevels = fspan(-80.0, 80.0, 9)
@@ -342,12 +453,9 @@ print("pal: " + pal)
     if (isvar("pal4")) then
       delete(reldiff@res_cnFillColors)
       reldiff@res_cnFillColors = pal4
-      if(var0.eq."tas") then
-        reldiff@res_cnFillColors = pal4(::-1,:)
-      end if
     end if
 
-    iadd = 3
+    iadd = 4
     itmp = array_append_record(plotind, iadd, 0)
     delete(plotind)
     plotind = itmp
@@ -384,21 +492,27 @@ print("pal: " + pal)
         pres@txString = season(is)
         plots(0, is) = contour_map(wks, mmdata(is, :, :), var0)
         plots(1, is) = contour_map(wks, diff(is, :, :), var0)
+        if (plot_abs_diff) then
+          plots(2, is) = contour_map(wks, absdiff(is, :, :), var0)
+        end if
         if (plot_rms_diff) then
-          plots(2, is) = contour_map(wks, rmsdiff(is, :, :), var0)
+          plots(3, is) = contour_map(wks, rmsdiff(is, :, :), var0)
         end if
         if (plot_rel_diff) then
-          plots(3, is) = contour_map(wks, reldiff(is, :, :), var0)
+          plots(4, is) = contour_map(wks, reldiff(is, :, :), var0)
         end if
         gsn_panel(wks, plots(plotind, is), plotsperline, pres)
       else
         plots(0, 0) = contour_map(wks, mmdata, var0)
         plots(1, 0) = contour_map(wks, diff, var0)
+        if (plot_abs_diff) then
+          plots(2, 0) = contour_map(wks, absdiff, var0)
+        end if
         if (plot_rms_diff) then
-          plots(2, 0) = contour_map(wks, rmsdiff, var0)
+          plots(3, 0) = contour_map(wks, rmsdiff, var0)
         end if
         if (plot_rel_diff) then
-          plots(3, 0) = contour_map(wks, reldiff, var0)
+          plots(4, 0) = contour_map(wks, reldiff, var0)
         end if
         gsn_panel(wks, plots(plotind, 0), plotsperline, pres)
       end if
@@ -407,6 +521,9 @@ print("pal: " + pal)
 
       caption = "Multi model values, from top left to bottom right: " \
                 + "mean, bias"
+      if (plot_abs_diff) then
+        caption = caption + ", absolute error"
+      end if
       if (plot_rms_diff) then
         caption = caption + ", root mean square error"
       end if
@@ -432,6 +549,12 @@ print("pal: " + pal)
   diff@long_name = var0 + " (multi-model bias)"
   nc_outfile = ncdf_write(diff, nc_filename)
 
+  if (isvar("absdiff")) then
+    absdiff@var = var0 + "_abs_bias"
+    absdiff@long_name = var0 + " (multi-model absolute bias)"
+    nc_outfile = ncdf_write(absdiff, nc_filename)
+  end if
+
   if (isvar("rmsdiff")) then
     rmsdiff@var = var0 + "_rms_bias"
     rmsdiff@long_name = var0 + " (multi-model root mean square difference)"
@@ -450,7 +573,7 @@ print("pal: " + pal)
   ; ------------------------------------------------------------------------
 
   statistics = (/"clim", "diff"/)
-  domain = ("glob")
+  domain = ("global")
   plottype = ("geo")
   prov_caption = caption + " for variable " + var0 \
     + " (" + allseas + "), reference = " + names(ref_ind) + "."
