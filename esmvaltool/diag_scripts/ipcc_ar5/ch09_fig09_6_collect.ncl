@@ -84,8 +84,8 @@ print("file_list = " + file_list)
   var_order = (/"tas","pr","rlut","swcre"/)
 
   ; Loop over files in list, read and append data
-  do ii = 0, dimsizes(file_list) - 1
-;  do ii = 0, dimsizes(var_order) - 1
+;  do ii = 0, dimsizes(file_list) - 1
+  do ii = 0, dimsizes(var_order) - 1
 
     data_temp = ncdf_read(file_list(ii), "cor")
     ii_new = ind(data_temp@corvar .eq. var_order)
