@@ -161,6 +161,7 @@ def annual_average(cube,):
     cube.aggregated_by('year', iris.analysis.MEAN)
     return cube
 
+
 def add_aux_times(cube):
     """
     Check for presence and add aux times if absent.
@@ -288,7 +289,6 @@ def make_fig_3_23(
 
     """
     metadatas = diagtools.get_input_files(cfg)
-
 
     ####
     # Load the data for each layer as a separate cube

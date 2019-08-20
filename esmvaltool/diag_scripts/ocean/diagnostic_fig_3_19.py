@@ -1,25 +1,7 @@
 """
-Transects diagnostics
-=====================
+Diagnostics for fig 3.21
+========================
 
-Diagnostic to produce images of a transect. These plost show either latitude or
-longitude against depth, and the cube value is used as the colour scale.
-
-Note that this diagnostic assumes that the preprocessors do the bulk of the
-hard work, and that the cube received by this diagnostic (via the settings.yml
-and metadata.yml files) has no time component, and one of the latitude or
-longitude coordinates has been reduced to a single value.
-
-An approproate preprocessor for a 3D+time field would be::
-
-  preprocessors:
-    prep_transect:
-      time_average:
-      extract_slice: # Atlantic Meridional Transect
-        latitude: [-50.,50.]
-        longitude: 332.
-
-This tool is part of the ocean diagnostic tools package in the ESMValTool.
 
 Author: Lee de Mora (PML)
         ledm@pml.ac.uk
@@ -251,8 +233,10 @@ def make_mean_of_cube_list(cube_list):
     Takes the mean of a list of cubes (not an iris.cube.CubeList).
 
     Assumes all the cubes are the same shape.
+
+    Careful, it will try to do these operators in place, need to make a copy.
     """
-    cube_mean = cube_list[0]
+    cube_mean = cube_list[0].copy()
     for cube in cube_list[1:]:
         cube_mean+=cube
     cube_mean = cube_mean/ float(len(cube_list))
@@ -260,28 +244,44 @@ def make_mean_of_cube_list(cube_list):
     return cube_mean
 
 
-def make_std_of_cube_list(cube_list):
+def make_std_of_cube_list(cube_list, axis):
     """
     Makes the standard deviation of a list of cubes (not an iris.cube.CubeList).
 
-    assumes all the cubes are the same shape and 1D
+    Assumes all the cubes are the same shape and 1D.
     """
     cube_std = cube_list[0].copy()
     out_data = np.zeros_like(cube_std.data)
-    out_mask = np.zeros_like(cube_std.data)
-    out_dict = {}
+
+    if axis.lower() in ['lats', 'lat', 'latitude']:
+        coords = cube_std.coord('latitude').points
+    if axis.lower() in ['lons', 'lon', 'longitude']:
+        coords = cube_std.coord('longitude').points
+
+    out_dict = {coord:[] for coord in coords}
 
     for cube in cube_list:
-        for (d,),  dat in np.ndenumerate(cube.data):
-            if dat == 1e+20:
-                out_mask[d] += 1
-            try:        out_dict[d].append(dat)
-            except:     out_dict[d] = [dat, ]
+        try:
+            model = cube.attributes['model_id']
+        except:
+            print('No model id:', cube.attributes)
+            print(cube.data)
+            model = 'no model'
 
-    for d, dat in out_dict.items():
-        out_data[d] = np.std(dat)
+        print(model, cube.data[0])
+        for l, coord in np.ndenumerate(coords):
+            dat = cube.data.squeeze()[l]
+        #     print(model, l, coord, dat, cube.data.shape)
+            if np.isnan(dat) or np.ma.is_masked(dat):
+                dat = 1.e20
+            out_dict[coord].append(dat)
 
-    #out_data = np.ma.masked_where(out_mask, out_data)
+    for l, coord in np.ndenumerate(coords):
+        dat = np.ma.array(out_dict[coord])
+        dat = np.ma.masked_where((dat > 50.)+(dat < -20.), dat).compressed()
+        print('itr:', l, 'coord:', coord, 'length:', len(dat), 'std:', np.std(dat), '\tdata:', dat)
+        out_data[l] = np.std(dat)
+
     out_data = np.ma.masked_where(cube_std.data.mask, out_data)
     cube_std.data = out_data
     return cube_std
@@ -305,7 +305,6 @@ def load_obs(cfg, groups):
         obs_cube = diagtools.bgc_units(obs_cube, obs_metadata['short_name'])
         obs_key = obs_metadata['dataset']
     return obs_cube, obs_key, obs_filename
-
 
 
 def make_multimodle_zonal_mean_plots(
@@ -354,7 +353,6 @@ def make_multimodle_zonal_mean_plots(
     print (number_models, model_numbers)
     number_models = len(number_models)
 
-
     #####
     # List of cubes to make means/stds.
     project_cubes = {project:{} for project in projects}
@@ -382,7 +380,6 @@ def make_multimodle_zonal_mean_plots(
         # Is this data is a multi-model dataset?
         if dataset.find('MultiModel') > -1: continue
 
-        print('dataset:', dataset, cube.shape)
         new_cube = cube - obs_cube
         if new_cube.data.mean() < -200. :
                 print ("Warning: this model is borken:", dataset, 'mean:', new_cube.data.mean())
@@ -390,17 +387,22 @@ def make_multimodle_zonal_mean_plots(
         if pane in ['a', 'b']:
             plot_details[dataset] = {'c': color, 'ls': '-', 'lw': 1,
                                      'label': dataset}
+            if dataset.find('UKESM') > -1:
+                plot_details[dataset]['lw'] = 2.
+                plot_details[dataset]['c'] = 'k'
+                plot_details[dataset]['ls'] = '--'
             key_word, xlabel = plot_zonal_cube(new_cube, plot_details[dataset])
+
 
         ####
         # Calculate the project lines
         project_cubes[project][dataset] = cube
-    # Plot the project means.
+
+    # Plot the project data range.
     for project in projects:
-        #if project in ['OBS', 'obs4mip']: continue
         for ds, cube in project_cubes[project].items():
-                print(ds, '\t', cube.data.mean() )
-    #assert 0
+            print(ds, '\t', project, '\t', cube.data.min(), '->', cube.data.min())
+
     # Plot the project means.
     for project in projects:
         if project in ['OBS', 'obs4mip']: continue
@@ -422,8 +424,9 @@ def make_multimodle_zonal_mean_plots(
         if pane in 'abc':
                 key_word, xlabel = plot_zonal_cube(project_mean_error, plot_details[project])
                 ylabel = 'SST error ('+r'$^\circ$'+'C)'
+
         if pane in 'c':
-                cube_std = make_std_of_cube_list(errorcubeslist)
+                cube_std = make_std_of_cube_list(errorcubeslist, 'lat')
                 fill_between_two_cubes(project_mean_error - cube_std, project_mean_error + cube_std, mip_color)
 
         if pane in 'd':
@@ -431,14 +434,16 @@ def make_multimodle_zonal_mean_plots(
                 project_mean = make_mean_of_cube_list(cubeslist)
                 key_word, xlabel = plot_zonal_cube(project_mean, plot_details[project])
 
-                cube_std = make_std_of_cube_list(cubeslist)
+                cube_std = make_std_of_cube_list(cubeslist, 'lon')
+                print('project_mean', project_mean.data.min(), project_mean.data.max())
+                print('cube_std', cube_std.data.min(), cube_std.data.max())
+                #assert 0
                 fill_between_two_cubes(project_mean - cube_std, project_mean + cube_std, mip_color)
 
                 plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
                                          'label': obs_key}
                 key_word, xlabel = plot_zonal_cube(obs_cube, plot_details[obs_key])
                 ylabel = 'SST ('+r'$^\circ$'+'C)'
-
 
     #####
     # title and axis lables
@@ -473,8 +478,6 @@ def make_multimodle_zonal_mean_plots(
     plt.close()
 
 
-
-
 def main(cfg):
     """
     Load the config file and some metadata, then pass them the plot making
@@ -487,10 +490,9 @@ def main(cfg):
 
     """
     dpi = 100
-
     #####
     # individual panes
-    for pane in [ 'c', 'd', 'a', 'b',]:
+    for pane in ['a', 'b', 'c', 'd', ]:
         make_multimodle_zonal_mean_plots(cfg, pane=pane, save = True)
 
     #####
@@ -550,12 +552,14 @@ def main(cfg):
 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
-    path = cfg['plot_dir'] + 'fig_3.19'+image_extention
+    path = cfg['plot_dir'] + '/fig_3.19'+image_extention
 
     # Saving files:
     if cfg['write_plots']:
         logger.info('Saving plots to %s', path)
-        plt.savefig(path)
+        fig.savefig(path)
+        fig.savefig(path[:-4] + '.png', dpi=250)
+
 
     plt.close()
 
