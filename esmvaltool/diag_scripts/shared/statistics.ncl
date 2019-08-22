@@ -1329,7 +1329,6 @@ begin
       time_weights = sdays
     end if
 
-<<<<<<< HEAD
     if (metric .eq. "RMSDxy") then
       ;if (isdefined("time_weights")) then
       ;  weights = new(dimsizes(var), float)
@@ -1349,7 +1348,6 @@ begin
           weights(ii, :, :) = time_weights(ii) * area_weights
         end do
       end if
-=======
     ; Annual-mean time-series
     if (dim_names(0).eq."year") then
       time_weights = new(dims_var(0), float)
@@ -1377,7 +1375,6 @@ begin
       do ii = 0, dimsizes(time_weights) - 1
         weights(ii, :, :) = time_weights(ii) * area_weights
       end do
->>>>>>> origin/version2_development
     end if
   end if
 
