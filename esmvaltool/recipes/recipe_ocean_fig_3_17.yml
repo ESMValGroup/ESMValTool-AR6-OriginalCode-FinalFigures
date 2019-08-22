@@ -21,6 +21,10 @@ documentation:
 
 
 datasets:
+  # debugging:
+  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1998, end_year: 2000}
+  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1998, end_year: 2000}
+  # 
   # working datasets
   # - {dataset: CanESM2, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
   # - {dataset: GISS-E2-H, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
@@ -29,10 +33,10 @@ datasets:
   # - {dataset: CanCM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
   # - {dataset: CSIRO-Mk3-6-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2004}
 
-  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
-  - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
-  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
-  - {dataset: CMCC-CESM,  project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
+  # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
+  # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
+  # - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
+  # - {dataset: CMCC-CESM,  project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1975, end_year: 2000}
 
   # - {dataset: HadGEM2-AO, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2001, end_year: 2002}
 
@@ -72,7 +76,7 @@ preprocessors:
       mean_type: mean
     extract_levels:
       #levels: [-1, -40, -80, -120, -160, -200, -240, -280, -320, -360, -400, -440, -480, -520, -560, -600, -640, -680, -720, -760, -800, -840, -880, -920, -960, -1000, -1200, -1400, -1600, -1800, -2000, -2200, -2400, -2600, -2800, -3000, -3200, -3400, -3600, -3800, -4000, -4200, -4400, -4600, -4800, -5000, -5200, -5400, -5600, -5800]
-      levels: [0.1, 0.5, 1, 10, 20, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 680, 720, 760, 800, 840, 880, 920, 960, 1000, 1200, 1400, 1600, 1800, 2000,  2400,  2800,  3200,  3600,  4000,  4400,  4800,  5200,  5600, 6000]
+      levels: [0.1, 25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1250, 1500, 1750, 2000,  2400,  2800,  3200,  3600,  4000,  4400,  4800,  5200]
       scheme: linear
     # multi_model_statistics:
     #   span: overlap
