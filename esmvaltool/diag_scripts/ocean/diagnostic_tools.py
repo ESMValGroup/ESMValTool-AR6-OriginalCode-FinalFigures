@@ -133,7 +133,6 @@ def bgc_units(cube, name):
 
     if name in ['zostoga', ]:
         new_units = 'mm'
-
     if name in ['intpp', ]:
         new_units = 'mol m-2 d-1'
 

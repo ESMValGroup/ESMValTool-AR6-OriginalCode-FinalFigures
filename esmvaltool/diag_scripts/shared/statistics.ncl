@@ -1329,6 +1329,25 @@ begin
       time_weights = sdays
     end if
 
+    if (metric .eq. "RMSDxy") then
+      ;if (isdefined("time_weights")) then
+      ;  weights = new(dimsizes(var), float)
+      ;  do ii = 0, dimsizes(time_weights) - 1
+      ;    weights(ii, :, :) = time_weights(ii)
+      ;  end do
+      ;end if
+       weights = time_weights
+    else
+      if (dim_names(1).eq."lat" .and. dim_names(2).eq."lon") then
+        area_weights = map_area(var&lat, var&lon)
+      end if
+
+      if (isdefined("time_weights").and.isdefined("area_weights")) then
+        weights = new(dimsizes(var), float)
+        do ii = 0, dimsizes(time_weights) - 1
+          weights(ii, :, :) = time_weights(ii) * area_weights
+        end do
+      end if
     ; Annual-mean time-series
     if (dim_names(0).eq."year") then
       time_weights = new(dims_var(0), float)
