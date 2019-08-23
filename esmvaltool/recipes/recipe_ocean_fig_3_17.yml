@@ -72,13 +72,13 @@ diagnostics:
         - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: EC-EARTH, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
+#        - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} includes SSH
         - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MIROC4h, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
+#        - {dataset: MIROC4h, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # Extra field in NetCDF
+#        - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # Extra field in NetCDF
         - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
@@ -148,7 +148,7 @@ diagnostics:
         - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000 }
         - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
+        # - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CanESM2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CMCC-CESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
@@ -159,7 +159,7 @@ diagnostics:
         - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: EC-EARTH, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
+        # - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # includes SSH
         - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
@@ -202,7 +202,7 @@ diagnostics:
         - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
+        # - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
@@ -219,3 +219,4 @@ diagnostics:
       Regional_Ocean_DepthLayers_regrid_transect:
         script: ocean/diagnostic_fig_3_17.py
         observational_dataset: {dataset: WOA, project: OBS,}
+
