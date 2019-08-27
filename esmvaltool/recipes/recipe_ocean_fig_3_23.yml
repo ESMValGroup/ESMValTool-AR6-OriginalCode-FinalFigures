@@ -89,6 +89,7 @@ diagnostics:
           start_year: 1900
           end_year: 2004
           additional_datasets:
+            # CMIP5:
             - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
             - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
             - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
@@ -109,6 +110,20 @@ diagnostics:
             - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
             - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
             - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+
+            # CMIP6:
+            # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/zostoga -type d -maxdepth 0
+            - {dataset: CanESM5, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+            - {dataset: CNRM-CM6-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn}
+            - {dataset: CNRM-ESM2-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn}
+            - {dataset: EC-Earth3, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+            - {dataset: EC-Earth3-Veg, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+            - {dataset: IPSL-CM6A-LR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm}
+            - {dataset: UKESM1-0-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm}
+            - {dataset: GISS-E2-1-G, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+            - {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+
 #        ssha_obs: # Global Sea Level Change observations
 #          short_name: ssha
 #          preprocessor: prep_3_23_obs
