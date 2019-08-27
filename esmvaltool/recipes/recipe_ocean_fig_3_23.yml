@@ -18,28 +18,29 @@ documentation:
 # TODO: Add additional models in CMIP5, CMIP3 and CMIP6
 # TODO: Increase time range to match fig 3.17
 #
-datasets:
+# datasets:
 # Working
-    # - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1} # All zeroes
-    # - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-    # - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    # find /badc/cmip5/data/cmip5/output1/*/*/historical/*/ocean/Omon/r1i1p1/latest/zostoga  -type d
+    #  - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1} # All zeroes
+    #  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+    #  - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
 
  # Not working:
     # - {dataset: ACCESS1-3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
@@ -80,24 +81,44 @@ preprocessors:
 
 diagnostics:
   diag_3_23:
-    # variables:
-    #   zostoga: # Global Average Thermosteric Sea Level Change
-    #     short_name: zostoga
-    #     # preprocessor: prep_3_23
-    #     field: TO1M
-    #     start_year: 1900
-    #     end_year: 2004
-    variables:
+      variables:
+        zostoga: # Global Average Thermosteric Sea Level Change
+          short_name: zostoga
+          # preprocessor: prep_3_23
+          field: TO1M
+          start_year: 1900
+          end_year: 2004
+          additional_datasets:
+            - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1} # All zeroes
+            - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
+            - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
       ssha_obs: # Global Sea Level Change observations
         short_name: ssha
         preprocessor: prep_3_23_obs
         start_year: 2000
         end_year: 2004
-    additional_datasets:
-        # DOI:10.5067/RECSL-000V1
-        # https://podaac.jpl.nasa.gov/dataset/RECON_SEA_LEVEL_OST_L4_V1
-      - {dataset: CCSR, project: OBS, field: TO2Ms, type: recon_sea_level, version: v1, tier: 2}
-      - {dataset: CCSR, project: OBS, field: TO2Ms, version: v1, tier: 2}
+        additional_datasets:
+          # DOI:10.5067/RECSL-000V1
+          # https://podaac.jpl.nasa.gov/dataset/RECON_SEA_LEVEL_OST_L4_V1
+          - {dataset: CCSR, project: OBS, field: TO2Ms, type: recon_sea_level, version: v1, tier: 2}
+          - {dataset: CCSR, project: OBS, field: TO2Ms, version: v1, tier: 2}
 
     scripts:
       diagnostic_3_23:
