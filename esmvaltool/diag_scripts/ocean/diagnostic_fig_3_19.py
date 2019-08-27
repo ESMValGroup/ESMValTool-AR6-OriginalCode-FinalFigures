@@ -458,7 +458,7 @@ def make_multimodle_zonal_mean_plots(
         return plt.gca(), plot_details
 
     # Add Legend outside right.
-    diagtools.add_legend_outside_right(plot_details, plt.gca())
+    diagtools.add_legend_outside_right(plot_details, plt.gca(),fontsize='x-small')
 
     # Load image format extention
     image_extention = diagtools.get_image_format(cfg)
@@ -545,7 +545,8 @@ def main(cfg):
         # labels,
         loc='center left',
         ncol=1,
-        prop={'size': 10},)
+        prop={'size': 8},
+        )
         #bbox_to_anchor=(1., 0.5))
     #legd.draw_frame(False)
     #legd.get_frame().set_alpha(0.)

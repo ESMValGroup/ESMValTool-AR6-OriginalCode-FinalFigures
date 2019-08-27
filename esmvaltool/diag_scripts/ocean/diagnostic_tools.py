@@ -395,7 +395,7 @@ def get_colour_from_cmap(number, total, cmap='jet'):
     return colour
 
 
-def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right'):
+def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right', fontsize = 'small'):
     """
     Add a legend outside the plot, to the right.
 
@@ -461,13 +461,15 @@ def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right'):
             loc='center left',
             ncol=ncols,
             prop={'size': 10},
-            bbox_to_anchor=(1., 0.5))
+            bbox_to_anchor=(1., 0.5),
+            fontsize=fontsize)
     if loc.lower() == 'below':
         legd = ax1.legend(
             loc='upper center',
             ncol=ncols,
             prop={'size': 10},
-            bbox_to_anchor=(0.5, -2. * column_width))
+            bbox_to_anchor=(0.5, -2. * column_width),
+            fontsize=fontsize)
     legd.draw_frame(False)
     legd.get_frame().set_alpha(0.)
 
