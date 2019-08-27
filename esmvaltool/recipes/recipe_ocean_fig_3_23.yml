@@ -109,20 +109,21 @@ diagnostics:
             - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
             - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
             - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1}
-      ssha_obs: # Global Sea Level Change observations
-        short_name: ssha
-        preprocessor: prep_3_23_obs
-        start_year: 2000
-        end_year: 2004
-        additional_datasets:
-          # DOI:10.5067/RECSL-000V1
-          # https://podaac.jpl.nasa.gov/dataset/RECON_SEA_LEVEL_OST_L4_V1
-          - {dataset: CCSR, project: OBS, field: TO2Ms, type: recon_sea_level, version: v1, tier: 2}
-          - {dataset: CCSR, project: OBS, field: TO2Ms, version: v1, tier: 2}
+#        ssha_obs: # Global Sea Level Change observations
+#          short_name: ssha
+#          preprocessor: prep_3_23_obs
+#          start_year: 2000
+#          end_year: 2004
+#          mip: Omon
+#          additional_datasets:
+#            # DOI:10.5067/RECSL-000V1
+#            # https://podaac.jpl.nasa.gov/dataset/RECON_SEA_LEVEL_OST_L4_V1
+#            - {dataset: CCSR, project: OBS, field: TO2Ms, type: recon_sea_level, version: v1, tier: 2}
+#            - {dataset: CCSR, project: OBS, field: TO2Ms, version: v1, tier: 2}
 
-    scripts:
-      diagnostic_3_23:
-        script: ocean/diagnostic_fig_3_23.py
-        # moving_average: 6 years
-        # observational_dataset: {dataset: WOA, project: obs4mips,}
-        # observational_dataset: {dataset: HadISST, project: OBS,}
+      scripts:
+        diagnostic_3_23:
+          script: ocean/diagnostic_fig_3_23.py
+          # moving_average: 6 years
+          # observational_dataset: {dataset: WOA, project: obs4mips,}
+          # observational_dataset: {dataset: HadISST, project: OBS,}
