@@ -33,7 +33,7 @@ import datetime
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
 
-from esmvaltool.preprocessor._time_area import time_slice as extract_time
+from esmvalcore.preprocessor._time import extract_time
 
 
 # This part sends debug statements to stdout
@@ -250,7 +250,11 @@ def make_mean_of_cube_list(cube_list):
     full_times = {}
     times = []
     for cube in cube_list:
+        # make time coords uniform:
+        cube.coord('time').long_name='Time axis'
+        cube.coord('time').attributes={'time_origin': '1850-01-01 00:00:00'} 
         times.append(cube.coord('time').points)
+
         for time in cube.coord('time').points:
             try:
                 full_times[time] += 1
@@ -262,10 +266,27 @@ def make_mean_of_cube_list(cube_list):
             print('FAIL', t, v)
             assert 0
 
+    cube_mean=cube_list[0]
+    #try: iris.coord_categorisation.add_year(cube_mean, 'time')
+    #except: pass
+    #try: iris.coord_categorisation.add_month(cube_mean, 'time')
+    #except: pass
 
-    cube_mean = cube_list[0]
-    for cube in cube_list[1:]:
+    cube_mean.remove_coord('year')
+    #cube.remove_coord('Year')
+    print(cube_mean.metadata[4]['source_id'],  cube_mean.coord('time'))
+
+    for i, cube in enumerate(cube_list[1:]):
+        #try: iris.coord_categorisation.add_year(cube, 'time')
+        #except: pass
+        #try: iris.coord_categorisation.add_month(cube, 'time')
+        #except: pass
+        cube.remove_coord('year')
+        #cube.remove_coord('Year')
+
+        print(i, cube.metadata[4]['source_id'],  cube.coord('time'))
         cube_mean+=cube
+        #print(cube_mean.coord('time'), cube.coord('time'))
     cube_mean = cube_mean/ float(len(cube_list))
     return cube_mean
 
