@@ -60,7 +60,7 @@ from scipy.stats import linregress
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
-from esmvaltool.preprocessor import time_average
+from esmvalcore.preprocessor import time_average
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -328,7 +328,7 @@ def make_pane_a(
         # Downloaded 15/3/2019
         # The full doi for this data set is: 10.5285/5acfd143-1104-7b58-e053-6c86abc0d94b
         # moc_vertical.nc: MOC vertical profiles in NetCDF format
-        obs_filename = "/users/modellers/ledm/workspace/ESMValTool_AR6/run/LocalData/moc_vertical.nc"
+        obs_filename = cfg['auxiliary_data_dir']+"/moc_vertical.nc"
         obs_dataset = "RAPID"
         obs_cube = iris.load_cube(obs_filename)
         obs_cube = obs_cube.collapsed('time', iris.analysis.MEAN)
@@ -455,7 +455,7 @@ def make_pane_bc(
         # Downloaded 15/3/2019
         # The full doi for this data set is: 10.5285/5acfd143-1104-7b58-e053-6c86abc0d94b
         # moc_vertical.nc: MOC vertical profiles in NetCDF format
-        obs_filename = "/users/modellers/ledm/workspace/ESMValTool_AR6/run/LocalData/moc_vertical.nc"
+        obs_filename = cfg['auxiliary_data_dir']+"/moc_vertical.nc"
         obs_dataset = "RAPID"
         obs_cube = iris.load_cube(obs_filename)
         iris.coord_categorisation.add_month(obs_cube, 'time', name='month')
@@ -507,14 +507,14 @@ def make_pane_bc(
 
     # pane specific stuff
     if pane == 'b':
-        plt.title('(b) Distribution of 8 year AMOC trends in CMIP5')
+        plt.title('(b) Distribution of 8 year AMOC trends')
         plt.axhline(-0.55, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
         plt.ylabel('Sv yr'+r'$^{-1}$')
         if not savefig:
             plt.setp( ax.get_xticklabels(), visible=False)
 
     if pane == 'c':
-        plt.title('(c) Distribution of interannual AMOC changes in CMIP5')
+        plt.title('(c) Distribution of interannual AMOC changes')
         plt.axhline(-4.4, c='k', lw=8, alpha=0.1, zorder = 0) # wrong numbers!
         plt.ylabel('Sv')
 

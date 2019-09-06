@@ -274,7 +274,9 @@ def make_mean_of_cube_list(cube_list):
 
     cube_mean.remove_coord('year')
     #cube.remove_coord('Year')
-    print(cube_mean.metadata[4]['source_id'],  cube_mean.coord('time'))
+    try: model_name = cube_mean.metadata[4]['source_id']
+    except: model_name = ''
+    print(model_name,  cube_mean.coord('time'))
 
     for i, cube in enumerate(cube_list[1:]):
         #try: iris.coord_categorisation.add_year(cube, 'time')
@@ -283,8 +285,9 @@ def make_mean_of_cube_list(cube_list):
         #except: pass
         cube.remove_coord('year')
         #cube.remove_coord('Year')
-
-        print(i, cube.metadata[4]['source_id'],  cube.coord('time'))
+        try: model_name = cube_mean.metadata[4]['source_id']
+        except: model_name = ''
+        print(i, model_name, cube.coord('time'))
         cube_mean+=cube
         #print(cube_mean.coord('time'), cube.coord('time'))
     cube_mean = cube_mean/ float(len(cube_list))

@@ -205,30 +205,53 @@ def make_mean_of_cube_list(cube_list, long_name):
 
     Assumes all the cubes are the same shape.
     """
-    cube_mean = cube_list[0]
-    if long_name == 'Sea Water Potential Temperature':
-            units_str = 'kelvin'
-    if long_name == 'Sea Water Salinity':
-            units_str = '1.'
+    removes = []
+    for cube in cube_list:
+        if str(cube.coord(axis='Z').units) in['centimeters', 'cm']:
+            print('This stupid model uses centimeters in the z dimension:', cube.metadata[4]['source_id']) 
+            removes.append(cube)
+            continue
+        cube = standardize_depth_coord(cube)
+    for cube in removes:cube_list.remove(cube)    
 
-    print ('make_mean_of_cube_list: cube -1', cube_mean.data.mean())
+    cube_mean = cube_list[0]
+    #if long_name == 'Sea Water Potential Temperature':
+    #        units_str = 'kelvin'
+    #if long_name == 'Sea Water Salinity':
+    #        units_str = '1.'
+    print('\n\ntaking mean:\n',cube_mean.metadata[4]['source_id'], cube_mean.coord(axis='Z'))
+
+    #print ('make_mean_of_cube_list: cube -1', cube_mean.data.mean())
 
     for i, cube in enumerate(cube_list[1:]):
-        print ('make_mean_of_cube_list: cube', i, cube.data.mean())
-        cube.units = units_str
-        print ('make_mean_of_cube_list: cube', i, cube.data.mean())
-
-        print ('make_mean_of_cube_list: cube_mean, ', i, cube_mean.data.mean())
-        cube_mean.units = units_str
-        print ('make_mean_of_cube_list: cube_mean, ', i, cube_mean.data.mean())
+        #cube.units = units_str
+        #cube_mean.units = units_str
+        print(cube.metadata[4]['source_id'],  cube.data.mean())
         cube_mean+=cube
-        print ('make_mean_of_cube_list: cube_mean, ', i, cube_mean.data.mean())
 
     cube_mean = cube_mean/ float(len(cube_list))
-    cube_mean.units = units_str
-    print ('make_mean_of_cube_list: cube_mean', cube_mean.data.mean())
+    #cube_mean.units = units_str
+    #print ('make_mean_of_cube_list: cube_mean', cube_mean.data.mean())
     # assert 0
     return cube_mean
+
+
+def standardize_depth_coord(cube):
+    """
+    Need to stanardize the depth coordinate to substract them.
+    """
+    cube.coord(axis='Z').long_name='Vertical T levels'
+    cube.coord(axis='Z').attributes={'description':
+        'generic ocean model vertical coordinate (nondimensional or'
+        ' dimensional)',
+        'positive': 'down'}
+    cube.coord(axis='Z').standard_name='depth'
+    try:
+        model_name = cube.metadata[4]['source_id']
+    except:
+        model_name = ''
+    print('standardize_depth_coord: ', model_name,  cube.coord(axis='Z'))
+    return cube
 
 
 def make_multimodelmean_transects(
@@ -272,13 +295,16 @@ def make_multimodelmean_transects(
     short_name = metadatas[filename]['short_name']
     # Take the multimodel mean.
     cube = make_mean_of_cube_list(cubes, metadata['long_name'])
-    cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
+    #cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
+    print('model cube mean:' , cube.data.mean(), cube.units)
 
     cube = make_depth_safe(cube)
     #cubes = make_cube_region_dict(cube)
 
     obs_cube = iris.load_cube(obs_filename)
     obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
+    obs_cube = standardize_depth_coord(obs_cube)
+    print('obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
 
     if metadata['long_name'] == 'Sea Water Potential Temperature':
         contours = [0, 5, 10, 15, 20, 25, 30, 35]
@@ -399,7 +425,8 @@ def make_transects_plots(
     print(obs_filename)
     obs_cube = iris.load_cube(obs_filename)
     obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
-
+    obs_cube = standardize_depth_coord(obs_cube)
+ 
     if metadata['long_name'] == 'Sea Water Potential Temperature':
         contours = [0,5,  10, 15, 20, 25,30,35]
         diff_contours = [-3., -2, -1, 1, 2, 3]
