@@ -78,6 +78,8 @@ preprocessors:
         average_region:
             coord1: longitude
             coord2: latitude
+        regrid_time:
+            frequency: mon
 
 diagnostics:
   diag_3_23:
@@ -118,11 +120,11 @@ diagnostics:
             - {dataset: CNRM-ESM2-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn}
             - {dataset: EC-Earth3, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
             - {dataset: EC-Earth3-Veg, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
-            - {dataset: IPSL-CM6A-LR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm}
-            - {dataset: UKESM1-0-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm}
+            # - {dataset: IPSL-CM6A-LR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn} # coordinate rank
+            # - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm} # time units
+            # - {dataset: UKESM1-0-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm}# time coordinate
             - {dataset: GISS-E2-1-G, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
-            - {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+            # - {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn} # Excessively low 1900 value (-2m!)
 
 #        ssha_obs: # Global Sea Level Change observations
 #          short_name: ssha
