@@ -523,7 +523,11 @@ begin
     res@trYMaxF = diag_script_info@y_max
   end if
 
-  res@tiMainString = diag_script_info@region
+  if (diag_script_info@region .eq. "Global") then
+    res@tiMainString = ""
+  else
+    res@tiMainString = diag_script_info@region
+  end if
 
   if (isatt(diag_script_info, "ts_anomaly")) then
     res@tiYAxisString = var0 + " Anomaly" + " [" + model_arr@units + "]"
