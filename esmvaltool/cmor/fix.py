@@ -105,6 +105,7 @@ def fix_metadata(cubes,
             cube_list = fix.fix_metadata(cube_list)
 
         if len(cube_list) != 1:
+#             cube_list=cube_list[1] #Hack to deal with IPSL-CM6A-LR extra variable. Should resolve in IPSL-CM6A-LR.py
             raise ValueError('Cubes were not reduced to one after'
                              'fixing: %s' % cube_list)
         cube = cube_list[0]

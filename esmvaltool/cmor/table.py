@@ -64,7 +64,7 @@ class CMIP6Info(object):
     """
 
     _CMIP_5to6_varname = {
-        'sic': 'siconc',
+        'sic': 'siconca',
         'sit': 'sithick',
         'tro3': 'o3',
     }

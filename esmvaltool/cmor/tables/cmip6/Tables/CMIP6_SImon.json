@@ -133,7 +133,7 @@
             "ok_min_mean_abs": "", 
             "ok_max_mean_abs": ""
         }, 
-        "siconco": {
+        "siconca": {
             "modeling_realm": "seaIce", 
             "standard_name": "sea_ice_area_fraction", 
             "units": "%", 
@@ -142,7 +142,7 @@
             "long_name": "Sea Ice Area Fraction", 
             "comment": "Area fraction of grid cell covered by sea ice", 
             "dimensions": "longitude latitude time typesi", 
-            "out_name": "siconco", 
+            "out_name": "siconca", 
             "type": "real", 
             "positive": "", 
             "valid_min": "", 
