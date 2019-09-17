@@ -250,7 +250,7 @@ begin
 
   if (var0.eq."tas") then
     mmdata = convert_units(mmdata, "degC")
-    diff@units = "degC"
+    diff@units = "~F34~0~F~ C"
     ; for plotting IPCC AR5 fig 9.2
     diff@res_cnLevels = ispan(-4, 4, 1)
   end if
@@ -470,6 +470,10 @@ begin
   pres@gsnPanelRowSpec = True  ; tell panel what order to plot
   pres@gsnPanelYWhiteSpacePercent = 5
   pres@gsnPanelXWhiteSpacePercent = 5
+  pres@gsnPanelFigureStrings = (/"a)","b)","c)","d)"/)
+  pres@gsnPanelFigureStringsPerimOn = False
+  pres@gsnPanelFigureStringsJust = "TopLeft"
+  pres@gsnPanelFigureStringsFontHeightF = 0.016
 
   plotfile = new(numseas, string)
   plotfile(:) = ""
