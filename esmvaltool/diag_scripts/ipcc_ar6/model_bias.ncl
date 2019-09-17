@@ -487,7 +487,7 @@ begin
         delete(wks)
       end if
 
-      wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "clouds_bias_" + var0 \
+      wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_" + var0 \
                     + "_" + season(is))
 
       plotfile(is) = wks@fullname
@@ -542,7 +542,7 @@ begin
   ; # output to netCDF                        #
   ; ###########################################
 
-  nc_filename = work_dir + "clouds_bias_" + var0 + ".nc"
+  nc_filename = work_dir + "model_bias_" + var0 + ".nc"
   nc_filename@existing = "append"
 
   mmdata@var = var0 + "_mean"
