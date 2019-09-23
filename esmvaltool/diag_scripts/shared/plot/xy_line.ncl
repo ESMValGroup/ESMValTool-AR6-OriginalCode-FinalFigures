@@ -1950,7 +1950,7 @@ begin
     txtres@txFontColor   = "yellow3"
     txtres@txFontHeightF = 0.013
     ref_txt = gsn_add_text(wks, plot, "reference period", \
-                           (ref_start + ref_end) / 0.5, -1., txtres)
+                           0.5*(ref_start + ref_end), res@trYMinF + 0.1, txtres)
 
   end if
 
@@ -1970,19 +1970,19 @@ begin
 
     yy = (/res@trYMinF, res@trYMaxF/)
 
-    vol_name1 = gsn_add_text(wks, plot, "Krakatoa", 1885, 1.1, txres)
+    vol_name1 = gsn_add_text(wks, plot, "Krakatoa", 1885, res@trYMaxF - 0.4, txres)
     xx = (/1883.0, 1883.0/)
     vol1 = gsn_add_polyline(wks, plot(0), xx, yy, vres)
-    vol_name2 = gsn_add_text(wks, plot, "Santa Maria", 1904, 1.1, txres)
+    vol_name2 = gsn_add_text(wks, plot, "Santa Maria", 1904, res@trYMaxF - 0.4, txres)
     xx = (/1902.0, 1902.0/)
     vol2 = gsn_add_polyline(wks, plot(0), xx, yy, vres)
-    vol_name3 = gsn_add_text(wks, plot, "Agung", 1965, 1.1, txres)
+    vol_name3 = gsn_add_text(wks, plot, "Agung", 1965, res@trYMaxF - 0.4, txres)
     xx = (/1963.0, 1963.0/)
     vol3 = gsn_add_polyline(wks, plot(0), xx, yy, vres)
-    vol_name4 = gsn_add_text(wks, plot, "El Chichon", 1984, 1.1, txres)
+    vol_name4 = gsn_add_text(wks, plot, "El Chichon", 1984, res@trYMaxF - 0.4, txres)
     xx = (/1982.0, 1982.0/)
     vol4 = gsn_add_polyline(wks, plot(0), xx, yy, vres)
-    vol_name5 = gsn_add_text(wks, plot, "Pinatubo", 1993, 1.1, txres)
+    vol_name5 = gsn_add_text(wks, plot, "Pinatubo", 1993, res@trYMaxF - 0.4, txres)
     xx = (/1991.0, 1991.0/)
     vol5 = gsn_add_polyline(wks, plot(0), xx, yy, vres)
   end if
