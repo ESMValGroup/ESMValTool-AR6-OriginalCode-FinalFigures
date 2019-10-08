@@ -7,8 +7,8 @@ documentation:
     Producing selected figures from IPCC WGI AR6, chap. 3
 
   authors:
-    - bock_ls
-    - eyri_ve
+    - bock_lisa
+    - eyring_veronika
 
 #  maintainer:
     
@@ -385,15 +385,16 @@ diagnostics:
          start_year: 1850, end_year: 2017, tier: 2}
     scripts:
       tsline_anom:
-        script: ipcc_ar6/tsline_anom_tas.ncl
+        script: ipcc_ar5/tsline.ncl
         time_avg: "yearly"
-        ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
-        ref_start: 1850       #start year of reference period for anomalies
-        ref_end: 1900         #end year of reference period for anomalies
+        ts_anomaly: "anom"
+        ref_start: 1850
+        ref_end: 1900
         ref_mask: True
-        mean_nh_sh: True
         plot_units: "degC"
-        # Plot style
+        y_min: -0.5
+        y_max: 1.6
+        volcanoes: True
         styleset: CMIP5
 
 
