@@ -54,21 +54,25 @@ begin
   ; Filter non-existing files (mp files only useful if cor file exists)
   file_list := file_list(ind(isfilepresent(file_list)))
   mp_file_list := mp_file_list(ind(isfilepresent(file_list)))
+  mp_file_list_new = mp_file_list
 
   ; Set up auxiliary variables
-  var_collect = new(dimsizes(file_list), string)
+  var_name = new(dimsizes(file_list), string)
+  var_diag = new(dimsizes(file_list), string)
   alt_obs = new(dimsizes(file_list), string)
 
   ; Loop over files in list, read and append data
   do ii = 0, dimsizes(file_list) - 1
+
     data_temp = ncdf_read(file_list(ii), "cor")
-    var_collect(ii) = data_temp@corvar
+    var_name(ii) = data_temp@corvar_long
+    var_diag(ii) = data_temp@diagnostics
     alt_obs(ii) = data_temp@alt_obs
 
     ; Make 2D array to store all data
     if (.not.isdefined("data_all")) then
       data_all = new((/dimsizes(data_temp), dimsizes(file_list)/), float)
-      data_all(:, 0) = data_temp
+      data_all(:, ii) = data_temp
       data_all!0 = "models"
       data_all&models = data_temp&models
     else
@@ -106,15 +110,15 @@ begin
     delete(data_temp)
   end do
   data_all!1 = "vars"
-  data_all&vars = var_collect
-  delete(var_collect)
+  data_all&vars = var_name
+  delete(var_name)
 
   ; Get project for models
   projects = new(dimsizes(data_all&models), string)
 
   ; Loop over model-project files to complete project list
-  do ii = 0, dimsizes(mp_file_list) - 1
-    modproj = asciiread(mp_file_list(ii), -1, "string")
+  do ii = 0, dimsizes(mp_file_list_new) - 1
+    modproj = asciiread(mp_file_list_new(ii), -1, "string")
     mods = modproj(:dimsizes(modproj)/2-1)
     projs = modproj(dimsizes(modproj)/2:)
 
@@ -125,6 +129,31 @@ begin
 
   data_all&models@project = projects
   delete(projects)
+
+  ; Sort diagnostics in the order specified in the settings
+    if (isatt(diag_script_info, "diag_order")) then
+      l_ok = True
+      if (dimsizes(data_all&vars).ne. \
+          dimsizes(diag_script_info@diag_order)) then
+        error_msg("w", DIAG_SCRIPT, "", "specified order of diagnostics " + \
+                  "cannot be applied, number of diagnostics does not match")
+        l_ok = False
+      end if
+      pid = new(dimsizes(diag_script_info@diag_order), integer)
+      do ii = 0, dimsizes(diag_script_info@diag_order) - 1
+        tmp = ind(var_diag.eq.diag_script_info@diag_order(ii))
+        if (any(ismissing(tmp)) .or. dimsizes(tmp).gt.1) then
+          error_msg("w", DIAG_SCRIPT, "", "specified order of diagnostics " + \
+                    "cannot be applied, invalid entry in diag_order")
+          break
+        end if
+        pid(ii) = tmp
+        delete(tmp)
+      end do
+      if (l_ok) then
+        data_all := data_all(:, pid)
+      end if
+    end if
 
 ; -------------------------------------------------------------------------
 ; ----------------- Interim Functions -------------------------------------
@@ -353,7 +382,7 @@ begin
   end do
 
   y_min_label = res@trYMinF + 0.2*yspan
-  lb_stride = yspan/res@vpHeightF * font_height * 1.2   ; font_height*3
+  lb_stride = yspan/res@vpHeightF * font_height * 1.5   ; font_height*3
   plabel = projects
   ; Draw Legend
   do iproj = 0, dimsizes(projects)-1
@@ -363,12 +392,13 @@ begin
       plabel(iproj) = "CMIP5"
     end if
     plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, plabel(iproj),\
-                                                 x_val(0), y_min_label + \
+                                                 x_val(0)-0.5, y_min_label + \
                                                  lb_stride*(iproj+1), res_text)
   end do
   res_text@txFontColor = "green"
-  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "OBS", \
-                                               x_val(0), y_min_label, res_text)
+  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "alt. Obs.", \
+                                               x_val(0)-0.5, y_min_label, \
+                                               res_text)
 
   draw(plot)
   frame(wks)
