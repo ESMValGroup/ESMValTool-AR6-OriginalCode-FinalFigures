@@ -384,7 +384,7 @@ begin
     model_arr_stat = new((/3, ntime/), double)
     model_arr_stat!0 = "stat"
     model_arr_stat!1 = "time"
-    model_arr_stat&time = time
+    model_arr_stat&time = model_arr&time
     model_arr_stat&stat = (/"mean", "min", "max"/)
 
     model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
@@ -397,9 +397,9 @@ begin
         model_arr_stat(2, i) = (/statb(14)/)
       elseif (diag_script_info@stat .eq. "5-95") then
         ; 5% quantile
-        model_arr_stat(0, i) = statb(24)
+        model_arr_stat(0, i) = (/statb(24)/)
         ; 95% quantile
-        model_arr_stat(0,i) = statb(25)
+        model_arr_stat(0,i) = (/statb(25)/)
       elseif (diag_script_info@stat .eq. "10-90") then
         ; 10% quantile
         model_arr_stat(1, i) = (/statb(3)/)
