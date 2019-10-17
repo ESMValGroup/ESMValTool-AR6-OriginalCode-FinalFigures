@@ -26,7 +26,10 @@ preprocessors:
     # extract_levels:
     #   levels:  [0., ]
     #   scheme: linear_horizontal_extrapolate_vertical
-    time_average:
+    # time_average:
+    climate_statistics:
+      operator: mean
+      period: full
     regrid:
       target_grid: 1x1
       scheme: linear

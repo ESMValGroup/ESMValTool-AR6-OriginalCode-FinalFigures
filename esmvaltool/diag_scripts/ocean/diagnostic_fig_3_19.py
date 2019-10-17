@@ -387,10 +387,10 @@ def make_multimodle_zonal_mean_plots(
         if pane in ['a', 'b']:
             plot_details[dataset] = {'c': color, 'ls': '-', 'lw': 1,
                                      'label': dataset}
-            if dataset.find('UKESM') > -1:
-                plot_details[dataset]['lw'] = 2.
-                plot_details[dataset]['c'] = 'k'
-                plot_details[dataset]['ls'] = '--'
+#            if dataset.find('UKESM') > -1:
+#                plot_details[dataset]['lw'] = 2.
+#                plot_details[dataset]['c'] = 'k'
+#                plot_details[dataset]['ls'] = '--'
             key_word, xlabel = plot_zonal_cube(new_cube, plot_details[dataset])
 
 
