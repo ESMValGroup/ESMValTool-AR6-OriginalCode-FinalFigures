@@ -216,7 +216,8 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
     xlab = range(2, 13, 2)
     xlabels = ['Feb', 'Apr', 'Jun', 'Aug', 'Oct', 'Dec']
     plt.xticks(xlab, xlabels)
-    plt.ylabel(r'F$_{TA}$ PgC yr$^{-1}$')
+    plt.ylabel(r'nbp PgC yr$^{-1}$')
+    #plt.ylabel(r'F$_{TA}$ PgC yr$^{-1}$')
     axins.patch.set_alpha(0.0)
 
     fig.savefig(filename)
@@ -319,8 +320,8 @@ def main(cfg):
         logger.info("Processing %s", name)
         cube_data = iris.load_cube(data['filename'])
         # FTA is -NBP
-        if data['short_name'] == 'nbp':
-            cube_data = cube_data * (-1)
+        #if data['short_name'] == 'nbp':
+        #    cube_data = cube_data * (-1)
 
         if data['short_name'] == 'co2':
             cube_data = time_slice(cube_data, start_year = data['start_year'], end_year = data['end_year'])
