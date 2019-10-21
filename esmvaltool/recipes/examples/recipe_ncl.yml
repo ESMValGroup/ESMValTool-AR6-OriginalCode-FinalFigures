@@ -6,10 +6,10 @@ documentation:
     Example recipe that plots air temperature.
 
   authors:
-    - righ_ma
+    - righi_mattia
 
   maintainer:
-    - righ_ma
+    - righi_mattia
     
   references:
     - acknow_project
@@ -42,7 +42,6 @@ diagnostics:
     variables:
       ta:
         preprocessor: preprocessor_1
-        field: T3M
         reference_dataset: ERA-Interim
         fx_files: [sftlf]
     additional_datasets:
