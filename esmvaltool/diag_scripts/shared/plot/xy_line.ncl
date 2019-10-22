@@ -1570,32 +1570,41 @@ begin
     overlay(plot, mmm)
   end if
 
-  ; ***********************************************
-  ; legend resources
-  ; ***********************************************
-
-  lgres                    = True
-  lgres@lgItemType         = "Lines"   ; show lines only (default)
-  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
-  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
-  lgres@vpHeightF          = 0.5       ; height of legend (NDC)
-  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
-  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
-
+  ; Resources for a customized legend.
+  lgres                     = True
+  lgres@lgMonoLineThickness = False
+  lgres@lgLabelFontHeightF  = .08      ; legend label font thickness
+  lgres@vpWidthF            = 0.15     ; width of legend (NDC)
+  lgres@vpHeightF           = 0.4      ; height of legend (NDC)
+  lgres@lgPerimOn           = True
+  lgres@lgPerimColor        = 0
+  lgres@lgMonoDashIndex     = False
+  lgres@lgBoxBackground     = 0
+  lgres@lgPerimFill         = 0
+  lgres@lgPerimFillColor    = 0
   if (.not.isatt(diag_script_info, "EMs_in_lg")) then
     diag_script_info@EMs_in_lg = True  ; Set default
   end if
   if (.not.diag_script_info@EMs_in_lg) then
-    idcs_modelnames = annots
+    datasets = metadata_att_as_array(items, "dataset")
+    idcs_modelnames = UNIQ(datasets)
     colors := colors(idcs_modelnames)
     dashes := dashes(idcs_modelnames)
     thicks := thicks(idcs_modelnames)
-    annots := models@name(idcs_modelnames)
+    annots := datasets(idcs_modelnames)
   end if
-  lgres@lgLineColors      = colors
-  lgres@lgDashIndexes     = dashes
-  lgres@lgLineThicknesses = thicks + 0.5
-  labels = annots
+  if (diag_script_info@multi_model_mean) then
+    lgres@lgLineColors      = array_append_record(colors, colors_mmm, 0)
+    lgres@lgDashIndexes     = array_append_record(dashes, dashes_mmm, 0)
+    lgres@lgLineThicknesses = \
+      array_append_record(thicks, thicks_mmm, 0) + 0.5
+    labels = array_append_record(annots, annots_mmm, 0)
+  else
+    lgres@lgLineColors      = colors
+    lgres@lgDashIndexes     = dashes
+    lgres@lgLineThicknesses = thicks + 0.5
+    labels = annots
+  end if
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
 
@@ -1785,7 +1794,7 @@ procedure xy_line_anom(wks[1],
 ;    Defines default ressources, which are overridden by argument res.
 ;    Creates an xy-plot, according to wks & res.
 ;    Adds multi model mean and standard deviation if
-;    diag_script_info@multi_model_mean is set to "y".
+;    diag_script_info@multi_model_mean is set to True.
 ;
 ; Caveats
 ;
@@ -2026,7 +2035,7 @@ begin
 
   lgres@lgLineColors      = colors
   lgres@lgDashIndexes     = dashes
-  lgres@lgLineThicknesses = thicks + 0.5
+  lgres@lgLineThicknesses = thicks + 1
   labels = annots
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
