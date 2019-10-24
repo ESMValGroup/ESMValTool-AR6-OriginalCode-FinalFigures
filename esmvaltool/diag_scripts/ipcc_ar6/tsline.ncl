@@ -335,7 +335,7 @@ begin
     ; Running Mean
     if(diag_script_info@run_ave .gt. 0) then
       run_ave = "running_mean"
-      tmp = runave_Wrap(procmod, 12 * diag_script_info@runave, 0)
+      tmp = runave_Wrap(procmod, 12 * diag_script_info@run_ave, 1)
       delete(procmod)
       procmod = tmp
       delete(tmp)
@@ -435,7 +435,7 @@ begin
   ; *************************************
   out_path = config_user_info@work_dir
   system("mkdir -p " + out_path)
-  out_path1 = out_path + "tsline_" + var0 + "_" + anom + "_" + run_ave + ".nc"
+  out_path1 = out_path + "tsline_" + var0 + "_" + anom + ".nc"
   model_arr@ncdf = out_path
   model_arr@experiment = project0 + "_" + exp0
   model_arr@diag_script = DIAG_SCRIPT

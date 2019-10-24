@@ -38,26 +38,44 @@ cmip6_hist_models: &cmip6_hist_models_tas
   - {dataset: BCC-CSM2-MR, grid: gn}
   - {dataset: BCC-ESM1, grid: gn}
   - {dataset: CAMS-CSM1-0, grid: gn}
-#  - {dataset: CanESM5, grid: gn}
-#  - {dataset: CESM2, grid: gn}
-#  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
-#  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
-#  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-#  #- {dataset: E3SM-1-0} no data from 2000-2014
-#  #- {dataset: EC-Earth3, ensemble: r2i1p1f1} no data from 2008-2014
-#  - {dataset: EC-Earth3-Veg}
-#  - {dataset: GFDL-CM4, grid: gr1}
-#  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
-#  - {dataset: GISS-E2-1-H, grid: gn}
-#  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-#  - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
-#  - {dataset: MIROC6, grid: gn}
-#  - {dataset: MRI-ESM2-0, grid: gn}
-#  - {dataset: SAM0-UNICON, grid: gn}
-#  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  #- {dataset: E3SM-1-0} no data from 2000-2014
+  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  - {dataset: EC-Earth3-Veg}
+  - {dataset: GFDL-CM4, grid: gr1}
+  - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} no data 1951-2000
+  - {dataset: GISS-E2-1-H, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: IPSL-CM6A-LR}
+  #- {dataset: MCM-UA-1-0, grid: gn} no data on DKRZ
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  #- {dataset: NESM3, grid: gn} no data on DKRZ
+  #- {dataset: NorCPM1, grid: gn} no data on DKRZ
+  - {dataset: SAM0-UNICON, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
      start_year: 1850, end_year: 2017, tier: 2}
 
+cmip6_hist_models: &cmip6_histNat_models_tas
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: IPSL-CM6A-LR}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+     start_year: 1850, end_year: 2017, tier: 2}
 
 diagnostics:
 
@@ -71,7 +89,11 @@ diagnostics:
   # Time series of anomalies of annual and global surface temperature
   # **********************************************************************
 
-  fig_3_6:
+  ########################################################################
+  # Europe
+  ########################################################################
+  
+  tas_hist_europe:
     description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
     variables:
       tas:
@@ -87,7 +109,7 @@ diagnostics:
         end_year: 2014
     additional_datasets: *cmip6_hist_models_tas
     scripts:
-      tsline_anom:
+      tsline_anom: &tsline_settings
         script: ipcc_ar6/tsline.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"   
@@ -95,11 +117,54 @@ diagnostics:
         ref_end: 1900
         ref_mask: True
         plot_units: "degC"
-        y_min: -0.5
-        y_max: 1.6
+        #y_min: -1.
+        #y_max: 2.
         volcanoes: True
         write_stat: True
         stat: "MinMax"
         #stat: "5-95"
-        region: "europe"
+        region: "Europe"
+        #region: "Global"
         styleset: CMIP6
+
+  tas_histNat_europe:
+    description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_europe
+        reference_dataset: HadCRUT4
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: hist-nat
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_histNat_models_tas
+    scripts:
+      tsline_anom:
+        <<: *tsline_settings
+
+  fig_3_6:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_europe
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas_*_europe/tsline_anom*']
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP6_hist-nat", "CMIP6_historical"]
+        stat_shading: True
+        #run_ave: 5

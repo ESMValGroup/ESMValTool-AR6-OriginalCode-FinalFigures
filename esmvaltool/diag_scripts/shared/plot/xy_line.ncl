@@ -1915,7 +1915,8 @@ begin
   res@trYMinF  = min(source) - 0.05 * (max(source) - min(source))
   res@trYMaxF  = max(source) + 0.05 * (max(source) - min(source))
   res@tiYAxisOn = True
-  res@tiXAxisString = "Year"
+  ;res@tiXAxisString = "Year"
+  res@tiXAxisString = ""
   res@gsnStringFontHeightF = 0.016
 
   res@xyDashPatterns    = dashes
@@ -2157,7 +2158,8 @@ begin
   res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
   res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
   res@tiYAxisOn = True
-  res@tiXAxisString = "Year"
+  ;res@tiXAxisString = "Year"
+  res@tiXAxisString = ""
   res@gsnStringFontHeightF = 0.016
 
   copy_VarMeta(res_in, res)  ; copy passed resources
@@ -2172,7 +2174,7 @@ begin
 
   cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
-  res@xyLineThicknesses = (/3, 3, 3, 3, 3, 3/)
+  res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
   res@xyLineColors = cmap(1:5,:)
 
   if (nexp .gt. 6) then
@@ -2180,9 +2182,9 @@ begin
               + "more than " + nexp + " experiments")
   end if
 
-  res@pmLegendDisplayMode = "Always"
-  res@xyExplicitLegendLabels = source_mean&experiment
-  res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
+  ; res@pmLegendDisplayMode = "Always"
+  ; res@xyExplicitLegendLabels = source_mean&experiment
+  ; res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
 
   plot(0) = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
 
@@ -2194,6 +2196,7 @@ begin
   if (isatt(diag_script_info, "stat_shading")) then
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
+      res_stat@gsnXYFillOpacities = 0.2
       cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
       copy_VarMeta(res, res_stat)
       res_stat@gsnXYFillColors = cmap(1,:)
@@ -2230,23 +2233,23 @@ begin
     delete(res@xyLineThicknesses)
     delete(res@xyLineColors)
     res@xyDashPatterns    = dashes
-    res@xyLineThicknesses = thicks  ; make 2nd lines thicker
+    res@xyLineThicknesses = (/5/) ; thicks  ; make 2nd lines thicker
     res@xyLineColors      = colors  ; change line color
 
     ref_p = gsn_csm_xy(wks, source_x, source, res)  ; create plot
     overlay(plot(0), ref_p)
   end if
 
-  ; ---------------------------------------------------------------------
-  ; Procedure to attach a box to the given plot, given the lower left
-  ; corner, width, color, and opacity.
-  ; ---------------------------------------------------------------------
-  gsres                = True
-  gsres@gsFillColor    = "yellow"
-  gsres@gsFillOpacityF = 0.2
-  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
-  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
-  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+;  ; ---------------------------------------------------------------------
+;  ; Procedure to attach a box to the given plot, given the lower left
+;  ; corner, width, color, and opacity.
+;  ; ---------------------------------------------------------------------
+;  gsres                = True
+;  gsres@gsFillColor    = "yellow"
+;  gsres@gsFillOpacityF = 0.2
+;  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+;  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+;  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
 
   ; ---------------------------------------------------------------------
   ; Draw some lines to create a legend
