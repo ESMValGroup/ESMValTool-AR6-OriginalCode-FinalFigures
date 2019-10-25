@@ -564,6 +564,10 @@ authors:
     name: Tilmes, Simone
     institute: NCAR, US
     orcid:
+  gillett_nathan:
+    name: Gillett, Nathan
+    institute: CCCma, ECCC, Canada.
+    orcid: https://orcid.org/0000-0002-2957-0002
 
 references:
   # If possible as: "[Last name] et al., [journal abbr.], doi:[doi], [year]."
