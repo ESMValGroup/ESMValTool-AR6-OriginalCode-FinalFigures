@@ -105,7 +105,6 @@ diagnostics:
     #   - {dataset: NorESM1-ME,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
     #   - {dataset: NorESM1-M,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
 
-
     # CMIP5:
     #   - {dataset: CanESM2,          project: CMIP5,    exp: piControl,  ensemble: r1i1p1,  start_year: 2015,  end_year: 3020}
     #   - {dataset: CCSM4,            project: CMIP5,    exp: piControl,  ensemble: r1i1p1,  start_year: 250,  end_year: 1300}
@@ -128,8 +127,10 @@ diagnostics:
     #   - {dataset: NorESM1-M,        project: CMIP5,    exp: piControl,  ensemble: r1i1p1,  start_year: 700,  end_year: 1200}
 
     # CMIP6:
-        # rsync -avLP /badc/cmip6/data/CMIP6/CMIP/*/*/piControl/r1i1p1f?/Omon/msftmyz//gn/latest/*.nc ledm@pmpc1564.npm.ac.uk:/data/sthenno1/scratch/ledm/CMIP5/msftmyz/.
-      - {dataset: GISS-E2-1-G,       project: CMIP6,    exp: piControl,  ensemble: r1i1p1f1,  start_year: 4150,  end_year: 5000, grid: gn}
+        # rsync -avLP /badc/cmip6/data/CMIP6/CMIP/*/*/piControl/r1i1p1f?/Omon/msftyz//gn/latest/*.nc ledm@pmpc1564.npm.ac.uk:/data/sthenno1/scratch/ledm/CMIP6/msftyz/.
+#      - {dataset: GISS-E2-1-G,       project: CMIP6,    exp: piControl,  ensemble: r1i1p1f1,  start_year: 4150,  end_year: 5000, grid: gn}
+#      - {dataset: HadGEM3-GC31-LL,   project: CMIP6,    exp: piControl,  ensemble: r1i1p1f2,  start_year: 1850,  end_year: 2394, grid: gn}
+      - {dataset: UKESM1-0-LL,       project: CMIP6,    exp: piControl,  ensemble: r1i1p1f2,  start_year: 1960,  end_year: 3059, grid: gn}
 
     scripts:
       AMOC_timeseries:

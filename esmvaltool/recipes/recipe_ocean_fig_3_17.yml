@@ -10,9 +10,6 @@ documentation:
   authors:
     - demora_lee
 
-  maintainer:
-    - schl_ma
-
   references:
     - demora2018gmd
 
@@ -148,7 +145,7 @@ diagnostics:
     additional_datasets:
         # ALL CMIP5 - 22/8/2019
         # find /badc/cmip5/data/cmip5/output1/*/*/historical/mon/ocean/Omon/r1i1p1/latest/so -type d
-        # - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000 } # issue with is_lon_circular 
+        # - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000 } # issue with is_lon_circular
         # - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # issue with is_lon_circular
         - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
         # - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
@@ -222,4 +219,3 @@ diagnostics:
       Regional_Ocean_DepthLayers_regrid_transect:
         script: ocean/diagnostic_fig_3_17.py
         observational_dataset: {dataset: WOA, project: OBS,}
-
