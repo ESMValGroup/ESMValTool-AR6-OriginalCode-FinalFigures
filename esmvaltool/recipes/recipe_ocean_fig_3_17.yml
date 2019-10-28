@@ -55,164 +55,164 @@ diagnostics:
     additional_datasets:
         # ALL CMIP5 - 22/8/2019
         # find /badc/cmip5/data/cmip5/output1/*/*/historical/mon/ocean/Omon/r1i1p1/latest/thetao -type d
-#        - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000 }
-#        - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CanESM2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CMCC-CESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CMCC-CMS, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CNRM-CM5-2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CNRM-CM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: EC-EARTH, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#       # - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} includes SSH
-#        - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#       # - {dataset: MIROC4h, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # Extra field in NetCDF
-#       # - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # Extra field in NetCDF
-#       # - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#       # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: MPI-ESM-P, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: MRI-CGCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: MRI-ESM1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GISS-E2-H-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GISS-E2-H, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GISS-E2-R-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GISS-E2-R, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CCSM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: NorESM1-ME, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: HadGEM2-AO, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GFDL-CM2p1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GFDL-CM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CESM1-BGC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CESM1-CAM5-1-FV2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CESM1-CAM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CESM1-FASTCHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-#        - {dataset: CESM1-WACCM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
+#        - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical,  }
+#        - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CanESM2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CMCC-CESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CMCC-CMS, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CNRM-CM5-2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CNRM-CM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: EC-EARTH, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#       # - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, } includes SSH
+#        - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#       # - {dataset: MIROC4h, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, } # Extra field in NetCDF
+#       # - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, } # Extra field in NetCDF
+#       # - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#       # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: MPI-ESM-P, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: MRI-CGCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: MRI-ESM1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GISS-E2-H-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GISS-E2-H, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GISS-E2-R-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GISS-E2-R, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CCSM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: NorESM1-ME, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: HadGEM2-AO, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GFDL-CM2p1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GFDL-CM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CESM1-BGC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CESM1-CAM5-1-FV2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CESM1-CAM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CESM1-FASTCHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#        - {dataset: CESM1-WACCM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 
         # All CMIP6 - 22/8/2019
         # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/thetao -type d -maxdepth 0
-        # - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # missing coordinate
-        # - {dataset: BCC-CSM2-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # coordinate rank
-        # - {dataset: BCC-ESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # lat/lon
-        # - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # lat/lon
-        # - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} #lat/lon
-        - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # extra field in data.
-        # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # time
-        # - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # time
-        - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CESM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GFDL-CM4, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: SAM0-UNICON, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # problem with longitude
+        - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # missing coordinate
+        - {dataset: BCC-CSM2-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # coordinate rank
+        - {dataset: BCC-ESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # lat/lon
+        - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # lat/lon
+        - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } #lat/lon
+        - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data.
+        - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
+        - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
+        - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, }
+        - {dataset: CESM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: GFDL-CM4, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: SAM0-UNICON, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # problem with longitude
         # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
-        - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000,  end_year: 2000,  tier: 2}
+        - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000, end_year: 2000,  tier: 2}
     scripts:
       Regional_Ocean_DepthLayers_regrid_transect:
         script: ocean/diagnostic_fig_3_17.py
         observational_dataset: {dataset: WOA, project: OBS,}
 
-  diag_transect_so:
-    description: Extracting along a trajectory
-    variables:
-      so: # Salinity ocean 3D
-        preprocessor: prep_transect
-        field: TO3M
-        mip: Omon
-        exp: historical
-        start_year: 1999
-        end_year: 2000
-    additional_datasets:
-        # ALL CMIP5 - 22/8/2019
-        # find /badc/cmip5/data/cmip5/output1/*/*/historical/mon/ocean/Omon/r1i1p1/latest/so -type d
-        # - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000 } # issue with is_lon_circular
-        # - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # issue with is_lon_circular
-        - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CanESM2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CMCC-CESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CMCC-CMS, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CNRM-CM5-2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CNRM-CM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: EC-EARTH, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # includes SSH
-        - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: MIROC4h, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MPI-ESM-P, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MRI-CGCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: MRI-ESM1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GISS-E2-H-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GISS-E2-H, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GISS-E2-R-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GISS-E2-R, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CCSM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: NorESM1-ME, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: HadGEM2-AO, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GFDL-CM2p1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GFDL-CM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CESM1-BGC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CESM1-CAM5-1-FV2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CESM1-CAM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CESM1-FASTCHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: CESM1-WACCM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-
-        # All CMIP6 - 22/8/2019
-        # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/so -type d -maxdepth 0
-        # - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # missing coordinate
-        # - {dataset: BCC-CSM2-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # so: does not match coordinate rank
-        # - {dataset: BCC-ESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # lat/lon
-        # - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # lat/lon
-        # - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} #lat/lon
-        - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # extra field in data
-        # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # problem with longitude
-        # - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # time
-        # - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # problem with time units.
-        - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        - {dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: CESM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # Depth in cm?
-        - {dataset: GFDL-CM4, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000}
-        # - {dataset: SAM0-UNICON, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1999, end_year: 2000} # problem with longitude
-        # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
-        # - {dataset: WOA,  project: obs4mips,  level: L3,  version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
-        - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000,  end_year: 2000,  tier: 2}
-    scripts:
-      Regional_Ocean_DepthLayers_regrid_transect:
-        script: ocean/diagnostic_fig_3_17.py
-        observational_dataset: {dataset: WOA, project: OBS,}
+  # diag_transect_so:
+  #   description: Extracting along a trajectory
+  #   variables:
+  #     so: # Salinity ocean 3D
+  #       preprocessor: prep_transect
+  #       field: TO3M
+  #       mip: Omon
+  #       exp: historical
+  #       start_year: 1999
+  #       end_year: 2000
+  #   additional_datasets:
+  #       # ALL CMIP5 - 22/8/2019
+  #       # find /badc/cmip5/data/cmip5/output1/*/*/historical/mon/ocean/Omon/r1i1p1/latest/so -type d
+  #       # - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical,  } # issue with is_lon_circular
+  #       # - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, } # issue with is_lon_circular
+  #       - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       # - {dataset: CanCM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CanESM2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CMCC-CESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CMCC-CMS, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CNRM-CM5-2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CNRM-CM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: EC-EARTH, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       # - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, } # includes SSH
+  #       - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       # - {dataset: MIROC4h, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       # - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       # - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: MPI-ESM-P, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: MRI-CGCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: MRI-ESM1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GISS-E2-H-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GISS-E2-H, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GISS-E2-R-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GISS-E2-R, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CCSM4, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: NorESM1-ME, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: HadGEM2-AO, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GFDL-CM2p1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GFDL-CM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CESM1-BGC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CESM1-CAM5-1-FV2, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CESM1-CAM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CESM1-FASTCHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #       - {dataset: CESM1-WACCM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+  #
+  #       # All CMIP6 - 22/8/2019
+  #       # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/so -type d -maxdepth 0
+  #       # - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # missing coordinate
+  #       # - {dataset: BCC-CSM2-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # so: does not match coordinate rank
+  #       # - {dataset: BCC-ESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # lat/lon
+  #       # - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # lat/lon
+  #       # - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } #lat/lon
+  #       - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
+  #       # - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
+  #       # - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data
+  #       # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # problem with longitude
+  #       # - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
+  #       # - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # problem with time units.
+  #       - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
+  #       - {dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, }
+  #       # - {dataset: CESM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # Depth in cm?
+  #       - {dataset: GFDL-CM4, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
+  #       # - {dataset: SAM0-UNICON, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # problem with longitude
+  #       # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
+  #       # - {dataset: WOA,  project: obs4mips,  level: L3,  version: clim,  tier: 3, start_year: 2000,  end_year: 2000}
+  #       - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000,  end_year: 2000,  tier: 2}
+  #   scripts:
+  #     Regional_Ocean_DepthLayers_regrid_transect:
+  #       script: ocean/diagnostic_fig_3_17.py
+  #       observational_dataset: {dataset: WOA, project: OBS,}
