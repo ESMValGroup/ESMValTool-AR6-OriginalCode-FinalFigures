@@ -193,12 +193,43 @@ begin
 
   end do
 
+  ; convert units for plotting
+  if (var0.eq."pr") then
+    ; kg m-2 s-1 --> mm day-1
+    mmdata = convert_units(mmdata, "mm/day")
+    refdata = convert_units(refdata, "mm/day")
+    ; diff = convert_units(diff, "mm/day")
+    ; absdiff = convert_units(absdiff, "mm/day")
+    ; rmsdiff = convert_units(rmsdiff, "mm/day")
+    ; for plotting IPCC AR5 fig 9.4
+  elseif (var0.eq."tas") then
+    mmdata = convert_units(mmdata, "degC")
+    refdata = convert_units(refdata, "degC")
+  elseif (var0.eq."tos") then
+    if (mmdata@units .eq. "K") then
+      mmdata = convert_units(mmdata, "degC")
+      data_mon = convert_units(data_mon, "degC")
+    end if
+    if (refdata@units .eq. "K") then
+      refdata = convert_units(refdata, "degC")
+      ref_mon = convert_units(ref_mon, "degC")
+    end if
+  end if
+
   ; differences between multi-model mean and reference data set
   ; (multi-model bias)
 
   diff = mmdata - refdata
   mmdata@diag_script = DIAG_SCRIPT
   copy_VarMeta(mmdata, diff)
+
+  if any(var0 .eq. (/"tas","tos"/)) then
+    diff@units = "~F34~0~F~ C"
+    ; for plotting IPCC AR5 fig 9.2
+    diff@res_cnLevels = ispan(-4, 4, 1)
+  elseif (var0 .eq. "pr") then
+    diff@res_cnLevels = ispan(-20, 20, 5) * 0.1
+  end if
 
   diff_i    = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   absdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
@@ -236,24 +267,6 @@ begin
   copy_VarMeta(diff, reldiff) 
 
   delete(refdata)
-
-  ; convert units for plotting (precipitation: kg m-2 s-1 --> mm day-1)
-
-  if (var0.eq."pr") then
-    mmdata = convert_units(mmdata, "mm/day")
-    diff = convert_units(diff, "mm/day")
-    absdiff = convert_units(absdiff, "mm/day")
-    rmsdiff = convert_units(rmsdiff, "mm/day")
-    ; for plotting IPCC AR5 fig 9.4
-    diff@res_cnLevels = ispan(-20, 20, 5) * 0.1
-  end if
-
-  if (var0.eq."tas") then
-    mmdata = convert_units(mmdata, "degC")
-    diff@units = "~F34~0~F~ C"
-    ; for plotting IPCC AR5 fig 9.2
-    diff@res_cnLevels = ispan(-4, 4, 1)
-  end if
 
   ; ========================================================================
   ; ============================= plotting =================================
@@ -361,6 +374,27 @@ begin
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_precipitation_11.rgb")
     end if
+  elseif (var0.eq."tos") then
+    mmdata@res_cnLevels = ispan(-32, 32, 8)
+
+    pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                             + "ipcc-ar6_temperature_10.rgb")
+    mmdata@res_cnFillColors = pal(::-1,:)
+    pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                              + "ipcc-ar6_temperature_10.rgb")
+    diff@res_cnFillColors = pal2(::-1,:)
+    if (plot_abs_diff) then
+      pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+    if (plot_rel_diff) then
+      pal4 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+    if (plot_rms_diff) then
+      pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
   else
     mmdata@res_cnLevels = fspan(min(mmdata), max(mmdata), 20)
   end if
@@ -405,31 +439,34 @@ begin
 
   if (plot_rms_diff) then
     copy_VarMeta(diff, rmsdiff)
-    if (isvar("pal5")) then
-      delete(rmsdiff@res_cnFillColors)
-      if (var0 .eq. "tas") then
-        rmsdiff@res_cnFillColors = pal5(4:0,:)
-        nt = dimsizes(pal5(4:0,:))
-      elseif (var0 .eq. "pr") then
-        rmsdiff@res_cnFillColors = pal5(5:10,:)
-        nt = dimsizes(pal5(5:10,:))
-      end if
-      n = nt(0)
-    else
-      n = dimsizes(diff@res_cnLevels)
-    end if
-    mx = max(diff@res_cnLevels)
-    delete(rmsdiff@res_cnLevels)
-
-    tmp = fspan(0.0, mx, n)
-
-    rmsdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
-    delete(tmp)
-
-    if (var0 .eq. "pr") then
-      delete(rmsdiff@res_cnLevels)
-      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
-    end if
+;    if (isvar("pal5")) then
+;      delete(rmsdiff@res_cnFillColors)
+;      if (var0 .eq. "tas") then
+;        rmsdiff@res_cnFillColors = pal5(4:0,:)
+;        nt = dimsizes(pal5(4:0,:))
+;      elseif (var0 .eq. "pr") then
+;        rmsdiff@res_cnFillColors = pal5(5:10,:)
+;        nt = dimsizes(pal5(5:10,:))
+;      elseif (var0 .eq. "tos") then
+;        rmsdiff@res_cnFillColors = pal5(4:0,:)
+;        nt = dimsizes(pal5(4:0,:))
+;      end if
+;      n = nt(0)
+;    else
+;      n = dimsizes(diff@res_cnLevels)
+;    end if
+;    mx = max(diff@res_cnLevels)
+;    delete(rmsdiff@res_cnLevels)
+;
+;    tmp = fspan(0.0, mx, n)
+;
+;    rmsdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
+;    delete(tmp)
+;
+;    if (var0 .eq. "pr") then
+;      delete(rmsdiff@res_cnLevels)
+;      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
+;    end if
 
     rmsdiff@res_tiMainString = "Multi Model Mean of Root Mean Square Error"
 
