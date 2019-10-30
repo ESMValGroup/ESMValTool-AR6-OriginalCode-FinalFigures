@@ -316,6 +316,16 @@ def make_fig_3_20(
     """
     metadatas = diagtools.get_input_files(cfg)
 
+    assert 0
+    Need to add pi control detrending using relevant years (https://github.com/ESMValGroup/ESMValCore/issues/342)
+    Need to add observational data
+    cmip6 data
+    Put both panes on the same figure
+    colour
+    
+
+
+
     ####
     # Load the data for each layer as a separate cube
     model_cubes = {}
@@ -325,7 +335,7 @@ def make_fig_3_20(
             continue
         cube = iris.load_cube(filename)
         cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
-        
+
         if metadatas[filename]['exp'] == 'historical':
             model_cubes[filename] = cube
         if metadatas[filename]['exp'] == 'piControl':
