@@ -206,30 +206,55 @@ def make_mean_of_cube_list(cube_list, long_name):
     Assumes all the cubes are the same shape.
     """
     removes = []
-    for cube in cube_list:
+    cube_names = sorted(cube_list.keys())
+    for cube_name in cube_names:
+        cube = cube_list[cube_name]
         if str(cube.coord(axis='Z').units) in['centimeters', 'cm']:
-            print('This stupid model uses centimeters in the z dimension:', cube.metadata[4]['source_id']) 
-            removes.append(cube)
+            print('This stupid model uses centimeters in the z dimension:', cube_name) 
+            removes.append(cube_name)
             continue
         cube = standardize_depth_coord(cube)
-    for cube in removes:cube_list.remove(cube)    
+    for cube_name in removes:
+        del cube_list[cube_name]
+    
+    # Remake list after remving fails
+    cube_names = sorted(cube_list.keys())
 
-    cube_mean = cube_list[0]
+    cube_mean = cube_list[cube_names[0]]
     #if long_name == 'Sea Water Potential Temperature':
     #        units_str = 'kelvin'
     #if long_name == 'Sea Water Salinity':
     #        units_str = '1.'
-    print('\n\ntaking mean:\n',cube_mean.metadata[4]['source_id'], cube_mean.coord(axis='Z'))
+    #print('\n\ntaking mean:\n',cube_mean.metadata[4]['source_id'], cube_mean.coord(axis='Z'))
 
     #print ('make_mean_of_cube_list: cube -1', cube_mean.data.mean())
-
-    for i, cube in enumerate(cube_list[1:]):
+    length = 1
+    models_includes = {'pass' : [], 'fail':[]}
+    for i, cube_name in enumerate(cube_names[1:]):
+        cube = cube_list[cube_name]
         #cube.units = units_str
         #cube_mean.units = units_str
-        print(cube.metadata[4]['source_id'],  cube.data.mean())
-        cube_mean+=cube
+        mean = cube.data.mean()
+        print(i, cube_name, cube.units, mean)
+        if np.ma.is_masked(mean):
+            models_includes['fail'].append(cube_name)
+            continue
 
-    cube_mean = cube_mean/ float(len(cube_list))
+        if mean < -200. and 'long_name' == 'Sea Water Potential Temperature':
+            cube.data += 273.15
+         
+        try:
+            cube_mean+=cube
+            length+=1
+            models_includes['pass'].append(cube_name)
+        except: 
+            models_includes['fail'].append(cube_name)
+        
+    print("\n---------\nNote that the mean only includes ", length, "models, out of a possible", len(cube_list))
+    print("Passed Models", models_includes['pass'])
+    print("Failed Models", models_includes['fail'], '\n------------')
+    
+    cube_mean = cube_mean/ float(length)
     #cube_mean.units = units_str
     #print ('make_mean_of_cube_list: cube_mean', cube_mean.data.mean())
     # assert 0
@@ -247,7 +272,7 @@ def standardize_depth_coord(cube):
         'positive': 'down'}
     cube.coord(axis='Z').standard_name='depth'
     try:
-        model_name = cube.metadata[4]['source_id']
+        model_name = cube.metadata[4]['source']
     except:
         model_name = ''
     print('standardize_depth_coord: ', model_name,  cube.coord(axis='Z'))
@@ -256,7 +281,7 @@ def standardize_depth_coord(cube):
 
 def make_multimodelmean_transects(
         cfg,
-        # short_name = 'thetao'
+        short_name = 'thetao'
 ):
     """
     Make a simple plot of the transect for an indivudual model.
@@ -281,21 +306,23 @@ def make_multimodelmean_transects(
     print('obs_filename', obs_filename)
 
     # Load cube and set up units
-    cubes = []
+    cubes = {}
     for filename in sorted(metadatas):
         if filename == obs_filename:
             continue
         metadata = metadatas[filename]
-        # if metadata['short_name'] != short_name: continue
-        if metadata['dataset'] == 'MRI-ESM1': continue
+        if metadata['short_name'] != short_name: continue
+        #if metadata['dataset'] == 'MRI-ESM1': continue
         cube = iris.load_cube(filename)
-        cubes.append(cube)
+        cube = diagtools.bgc_units(cube, metadata['short_name'])
+        cubes[metadata['dataset']] = cube
         print('loading:', metadata['dataset'], cube.data.mean(), cube.units )
-
+    
+    if len(cubes) == 0:
+        return
     short_name = metadatas[filename]['short_name']
     # Take the multimodel mean.
     cube = make_mean_of_cube_list(cubes, metadata['long_name'])
-    #cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
     print('model cube mean:' , cube.data.mean(), cube.units)
 
     cube = make_depth_safe(cube)
@@ -304,7 +331,7 @@ def make_multimodelmean_transects(
     obs_cube = iris.load_cube(obs_filename)
     obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
     obs_cube = standardize_depth_coord(obs_cube)
-    print('obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
+    print('pre: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
 
     if metadata['long_name'] == 'Sea Water Potential Temperature':
         contours = [0, 5, 10, 15, 20, 25, 30, 35]
@@ -321,12 +348,25 @@ def make_multimodelmean_transects(
         diff_fmt = '%1.2f'
         cube.units = '1.'
         obs_cube.units = '1.'
+        obs_cube.data = obs_cube.data * 1000.
+    print('post: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
+
 
     # Add title to plot
     title = ' '.join(
         [metadata['long_name'], ])
 
     title = titlify(title)
+
+    # Saving cubes:
+    output_cube = diagtools.folder(cfg['work_dir']) + 'multi_model_mean_'+short_name+'.nc'
+    logger.info('Saving cubes to %s', output_cube)
+    iris.save(cube, output_cube)
+
+    output_cube = diagtools.folder(cfg['work_dir']) + 'obs_'+short_name+'.nc'
+    logger.info('Saving cubes to %s', output_cube)
+    iris.save(obs_cube, output_cube)
+
 
     cube = cube - obs_cube
     cmap = 'seismic'
@@ -364,6 +404,11 @@ def make_multimodelmean_transects(
     ax2.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
 
     fig.subplots_adjust(hspace=0.01)
+
+    # Saving cubes:
+    output_cube = diagtools.folder(cfg['work_dir']) + 'multi_model_mean_'+short_name+'_diff.nc'
+    logger.info('Saving cubes to %s', output_cube)
+    iris.save(cube, output_cube)
 
     # Load image format extention
     image_extention = diagtools.get_image_format(cfg)
@@ -433,6 +478,7 @@ def make_transects_plots(
     if metadata['long_name'] == 'Sea Water Salinity':
         contours = [30, 31, 32, 33, 34, 35, 36 ]
         diff_contours = [ -1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1 ]
+        obs_cube.data = obs_cube.data * 1000.
     for region, cube in cubes.items():
         # Add title to plot
         title = ' '.join(
@@ -530,8 +576,8 @@ def main(cfg):
 
     """
     #####
-    make_multimodelmean_transects(cfg, ) #short_name = 'thetao')
-    make_multimodelmean_transects(cfg, ) #short_name = 'so')
+    make_multimodelmean_transects(cfg, short_name = 'thetao')
+    make_multimodelmean_transects(cfg, short_name = 'so')
 
     # for index, metadata_filename in enumerate(cfg['input_files']):
     #     logger.info(
