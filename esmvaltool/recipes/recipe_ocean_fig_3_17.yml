@@ -53,7 +53,7 @@ diagnostics:
         #field: TO3M
         mip: Omon
         exp: historical
-        start_year: 1999
+        start_year: 1975
         end_year: 2000
     additional_datasets:
         # ALL CMIP5 - 22/8/2019
