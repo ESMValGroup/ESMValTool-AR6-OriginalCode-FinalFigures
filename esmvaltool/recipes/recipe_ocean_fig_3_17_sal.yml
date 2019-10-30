@@ -32,7 +32,9 @@ preprocessors:
   # --------------------------------------------------
   prep_transect: # For extracting a transect
     custom_order: true
-    time_average:
+    climate_statistics:
+      operator: mean
+      period: full
     regrid:
       target_grid: 1x1
       scheme: linear
@@ -116,15 +118,15 @@ diagnostics:
 
         # All CMIP6 - 22/8/2019
         # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/so -type d -maxdepth 0
-        - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # missing coordinate
+        # - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # missing coordinate
         # - {dataset: BCC-CSM2-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # so: does not match coordinate rank
         # - {dataset: BCC-ESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # lat/lon
         - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # lat/lon
         - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } #lat/lon
         - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
-        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
+        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r2i1p1f2, grid: gn, mip: Omon, exp: historical, } # No so in run1
         - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data
-        - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # problem with longitude
+        # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # problem with longitude
         - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
         - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # problem with time units.
         - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
