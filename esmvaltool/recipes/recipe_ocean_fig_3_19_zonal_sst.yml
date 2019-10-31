@@ -72,9 +72,9 @@ datasets:
     # - {dataset: EC-Earth3 , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn} # tos absent
     - {dataset: EC-Earth3-Veg , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
     - {dataset: IPSL-CM6A-LR , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
-    - {dataset: MIROC6 , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn} 
-    - {dataset: HadGEM3-GC31-LL , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn} 
-    - {dataset: UKESM1-0-LL , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn} 
+    - {dataset: MIROC6 , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
+    - {dataset: HadGEM3-GC31-LL , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn}
+    - {dataset: UKESM1-0-LL , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn}
     - {dataset: GISS-E2-1-G , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
     - {dataset: GISS-E2-1-H , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
     - {dataset: CESM2 , project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn}
@@ -194,6 +194,6 @@ diagnostics:
 
     scripts:
       diagnostic_3_19:
-        script: ocean/diagnostic_fig_3_19.py
+        script: ocean/diagnostic_fig_3_19_zonal_sst.py
         # observational_dataset: {dataset: WOA, project: obs4mips,}
         observational_dataset: {dataset: HadISST, project: OBS,}
