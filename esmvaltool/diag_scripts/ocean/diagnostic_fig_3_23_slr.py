@@ -252,8 +252,13 @@ def make_mean_of_cube_list(cube_list):
     for cube in cube_list:
         # make time coords uniform:
         cube.coord('time').long_name='Time axis'
-        cube.coord('time').attributes={'time_origin': '1850-01-01 00:00:00'} 
+        cube.coord('time').attributes={'time_origin': '1850-01-01 00:00:00'}
         times.append(cube.coord('time').points)
+
+        # remove year coordinate
+        coord_names = [coord[0].long_name for coord in cube.coords() ]
+        if 'year' in coord_names:
+            cube.remove_coord('year')
 
         for time in cube.coord('time').points:
             try:
@@ -271,23 +276,23 @@ def make_mean_of_cube_list(cube_list):
     #except: pass
     #try: iris.coord_categorisation.add_month(cube_mean, 'time')
     #except: pass
-
-    cube_mean.remove_coord('year')
+    coord_names = [coord[0].long_name for coord in cube_mean.coords() ]
+    if 'year' in coord_names:
+        cube_mean.remove_coord('year')
     #cube.remove_coord('Year')
     try: model_name = cube_mean.metadata[4]['source_id']
     except: model_name = ''
-    print(model_name,  cube_mean.coord('time'))
 
     for i, cube in enumerate(cube_list[1:]):
         #try: iris.coord_categorisation.add_year(cube, 'time')
         #except: pass
         #try: iris.coord_categorisation.add_month(cube, 'time')
         #except: pass
-        cube.remove_coord('year')
+
+        #cube.remove_coord('year')
         #cube.remove_coord('Year')
         try: model_name = cube_mean.metadata[4]['source_id']
         except: model_name = ''
-        print(i, model_name, cube.coord('time'))
         cube_mean+=cube
         #print(cube_mean.coord('time'), cube.coord('time'))
     cube_mean = cube_mean/ float(len(cube_list))
@@ -297,6 +302,7 @@ def make_mean_of_cube_list(cube_list):
 def make_fig_3_23(
         cfg,
         metadatas,
+        cutoff,
 ):
     """
     Make a time series plot showing several preprocesssed datasets.
@@ -313,87 +319,148 @@ def make_fig_3_23(
 
     """
     metadatas = diagtools.get_input_files(cfg)
+    #####
+    # create the projects & datasets lists
+    projects = {}
+    datasets_count = 0
+    for i, filename in enumerate(sorted(metadatas)):
+        #metadata = metadatas[filename]
+        project = metadatas[filename]['project']
+        dataset = metadatas[filename]['dataset']
+
+        if dataset.find('MultiModel') > -1: continue
+
+        #if filename == obs_filename:
+        #    continue
+        try:
+            projects[project].append(dataset)
+        except:
+            projects[project] = [dataset, ]
+        print('counting projects', i, project, dataset)
+        datasets_count+=1
+    print(datasets_count)
+    #####
+    # List of cubes to make means/stds.
+    model_numbers = {project:{} for project in projects}
+    for project, datasets in projects.items():
+        for itr, dataset in enumerate(sorted(datasets)):
+            model_numbers[project][dataset] = itr
 
     ####
-    # Load the data for each layer as a separate cube
+    # Load the data as a separate cubes
     model_cubes = {}
+    project_cubes = {project:{} for project in projects}
+
     for filename in sorted(metadatas):
         cube = iris.load_cube(filename)
-        cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
-        model_cubes[filename] = cube
+        project = metadatas[filename]['project']
+        dataset = metadatas[filename]['dataset']
+        if dataset.find('MultiModel') > -1: continue
 
+        cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
+
+        coord_names = [coord[0].long_name for coord in cube.coords() ]
+        if 'year' not in coord_names:
+            iris.coord_categorisation.add_year(cube, 'time')
+
+        # Reduce by average of 1986 - 2005.
+        cube = zero_around(cube)
+
+        # Change to a standard calendar.
+        cube = recalendar(cube, 'Gregorian')
+
+        # Take a moving average, if needed.
+        #cube = moving_average(cube, '10 years')
+
+        #if 'annual_average' in cfg:
+        #cube = annual_average(cube)
+
+        if cutoff != 'None':
+            if cube.data.min() < cutoff:
+                    continue
+
+        model_cubes[filename] = cube
+        project_cubes[project][dataset] = cube
+
+    #####
+    # Load obs data and details
+    # obs_cube, obs_key, obs_filename = diagtools.load_obs(cfg)
+    # obs_cube = ''
+    # obs_key = ''
+    # obs_filename = ''
+
+
+    # Plot the project means first.
     # Load image format extention
     image_extention = diagtools.get_image_format(cfg)
 
     title = ''
     z_units = ''
     plot_details = {}
+    legend_order = []
+    project_colours={'CMIP3': 'green', 'CMIP5': 'blue', 'CMIP6': 'red'}
+    project_cmaps = {'CMIP3': 'cool', 'CMIP5': 'winter', 'CMIP6': 'inferno'}
 
-    #####
-    # Load obs data and details
-    # obs_cube, obs_key, obs_filename = diagtools.load_obs(cfg)
-    obs_cube = ''
-    obs_key = ''
-    obs_filename = ''
+    for project, datasets in sorted(project_cubes.items()):
+        cmap = plt.cm.get_cmap(project_cmaps[project])
+        for dataset, cube in sorted(datasets.items()):
 
-    #####
-    # calculate the projects
-    projects = {}
-    for i, filename in enumerate(sorted(metadatas)):
-        metadata = metadatas[filename]
-        if filename == obs_filename: continue
-        projects[metadata['project']] = True
+            # Is this data is a multi-model dataset?
+            if dataset.find('MultiModel') > -1: continue
 
-    #####
-    # List of cubes to make means/stds.
-    project_cubes = {project:[] for project in projects}
-    # Plot each file in the group
+            if cutoff != 'None':
+                if cube.data.min() < cutoff:
+                        continue
 
-    project_colours={'CMIP3': 'blue', 'CMIP5':'black', 'CMIP6':'green'}
+            # Reduce by average of 1986 - 2005.
+            cube = zero_around(cube)
+            # Change to a standard calendar.
+            cube = recalendar(cube, 'Gregorian')
+            #project_cubes[project].append(cube)
 
-    for index, filename in enumerate(sorted(metadatas)):
-        cube = model_cubes[filename]
-        metadata = metadatas[filename]
+            # Take a moving average, if needed.
+            #if 'moving_average' in cfg:
+            cube = moving_average(cube, '10 years')
 
-        project = metadata['project']
+            #if 'annual_average' in cfg:
+            cube = annual_average(cube)
 
-        # Is this data is a multi-model dataset?
-        if metadata['dataset'].find('MultiModel') > -1: continue
-
-        # Reduce by average of 1986 - 2005.
-        cube = zero_around(cube)
-        # Change to a standard calendar.
-        cube = recalendar(cube, 'Gregorian')
-
-        project_cubes[project].append(cube)
-
-        # Take a moving average, if needed.
-        #if 'moving_average' in cfg:
-        cube = moving_average(cube, '10 years')
-
-        #if 'annual_average' in cfg:
-        cube = annual_average(cube)
-
-        print(project, metadata['dataset'], cube.data.min())
-
-        # Make plots for single models
-        timeplot(
+            #print(project, dataset, cube.data.min())
+            model_number = float(model_numbers[project][dataset])
+            value = model_number / (len(projects[project]) - 1.)
+            colour = cmap(value)
+            print(project, dataset, 'minimum:', cube.data.min())
+            # Make plots for single models
+            timeplot(
                     cube,
-                    c=project_colours[project],
+                    c=colour,
                     ls='-',
-                    lw=0.5,
-                    alpha=0.5,
+                    lw=2.,
+                    alpha=1,
                 )
-    #assert 0
-    for project in projects:
-        cube = make_mean_of_cube_list(project_cubes[project])
+            plot_details[dataset] = {
+                'c': colour,
+                'ls': '-',
+                'lw': 2.,
+                'label': dataset
+            }
+
+            if project not in legend_order:
+                legend_order.append(project)
+
+            legend_order.append(dataset)
+
+    for project in sorted(projects):
+        cube_list = [cube for cube in project_cubes[project].values()]
+        cube = make_mean_of_cube_list(cube_list)
 
         plot_details[project] = {
             'c': project_colours[project],
-            'ls': '-',
-            'lw': 2.,
+            'ls': '--',
+            'lw': 2.5,
             'label': project
         }
+
         timeplot(
                     cube,
                     color=plot_details[project]['c'],
@@ -401,6 +468,7 @@ def make_fig_3_23(
                     ls=plot_details[project]['ls'],
                     lw=plot_details[project]['lw'],
                 )
+
     # Draw horizontal line at zero
     plt.axhline(0., c='k', ls='--', lw=0.5)
 
@@ -412,12 +480,16 @@ def make_fig_3_23(
     plt.ylabel('Thermal Expansion (mm)')
 
     # Resize and add legend outside thew axes.
-    plt.gcf().set_size_inches(8., 4.)
+    plt.gcf().set_size_inches(8., 8.)
+    # project0 = [project for project in sorted(projects.keys())][0]
     diagtools.add_legend_outside_right(
-         plot_details, plt.gca(), column_width=0.1)
+         plot_details, plt.gca(), column_width=0.2, fontsize='x-small',
+         order=legend_order,
+         nrows=50)#datasets_count+len(projects.keys()))
+
 
     # Saving image:
-    path = diagtools.folder(cfg['plot_dir'])+'fig_3_23' +image_extention
+    path = diagtools.folder(cfg['plot_dir'])+'fig_3_23_' + str(cutoff) + image_extention
     logger.info('Saving plots to %s', path)
     plt.savefig(path)
     plt.close()
@@ -441,10 +513,12 @@ def main(cfg):
 
         #######
         # Multi model time series
-        make_fig_3_23(
-            cfg,
-            metadatas,
-        )
+        for cutoff in ['None', -120.,]:
+            make_fig_3_23(
+                cfg,
+                metadatas,
+                cutoff
+            )
     logger.info('Success')
 
 
