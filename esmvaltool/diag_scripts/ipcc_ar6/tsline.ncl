@@ -70,7 +70,6 @@ begin
   enter_msg(DIAG_SCRIPT, "")
 
   var0 = variable_info[0]@short_name
-  field_type0 = variable_info[0]@field
   exp0 = variable_info[0]@exp
   project0 = input_file_info[0]@project
   info_items = select_metadata_by_name(input_file_info, var0)
