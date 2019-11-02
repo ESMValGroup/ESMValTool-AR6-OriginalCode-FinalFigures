@@ -82,6 +82,7 @@ print("var0 = " + var0)
   info_sftlf = select_metadata_by_name(input_file_info, "sftlf")
 
   datasetnames = metadata_att_as_array(info_tas, "dataset")
+  datasetnames := array_append_record(datasetnames, "MultiModelMean", 0)
   dim_MOD = ListCount(info_tas)
 
   log_info("++++++++++++++++++++++++++++++++++++++++++")
@@ -145,9 +146,6 @@ print("var0 = " + var0)
     time = ispan(start_year, end_year, 1)
   end if
 
-  ; get multi-model mean index
-  mmm_ind = ind(datasetnames .eq. "MultiModelMean")
-
   ; Set index of the reference dataset and read it
 ;  if (isatt(variable_info[0], "reference_dataset")) then
 ;  if (isatt(metadata_att_as_array(info_tas, "reference_dataset"))) then
@@ -179,7 +177,7 @@ print("ref_dataset = " + metadata_att_as_array(info_tas, "reference_dataset"))
                   "(needed for anomaly)")
       end if
 
-      anom_ref = new((/dim_MOD/), double)
+      anom_ref = new((/dim_MOD+1/), double)
       anom_ref!0 = "model"
       anom_ref&model = datasetnames
     end if
@@ -191,15 +189,21 @@ print("ref_dataset = " + metadata_att_as_array(info_tas, "reference_dataset"))
   model_arr_stddev = 0
 
   ; Create model array
-  model_arr = new((/dim_MOD, ntime/), double)
+  model_arr = new((/dim_MOD+1, ntime/), double)
   model_arr!0 = "model"
   model_arr!1 = "time"
   model_arr&model = datasetnames
+;  model_arr&model = array_append_record(datasetnames, "MultiModelMean", 0)
+print("model_arr&model = " + model_arr&model)
   model_arr&time = time
   model_arr@_FillValue = 1e+20
   model_arr = model_arr@_FillValue
   model_arr@units = "degC"
   delete(time)
+
+  ; get multi-model mean index
+  mmm_ind = ind(datasetnames .eq. "MultiModelMean")
+print("mmm_ind = " + mmm_ind)
 
   ; Loop over models
   do imod = 0, dim_MOD - 1
@@ -368,7 +372,7 @@ print("ref_dataset = " + metadata_att_as_array(info_tas, "reference_dataset"))
   end if
 
   ; calculate multi model statistics
-  if (diag_script_info@write_stat) then
+  ;if (diag_script_info@write_stat) then
     ;if (isatt(variable_info[0], "reference_dataset")) then
       ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
                     datasetnames.ne.ref_dataset(0))
@@ -383,9 +387,13 @@ print("ref_dataset = " + metadata_att_as_array(info_tas, "reference_dataset"))
     model_arr_stat&time = model_arr&time
     model_arr_stat&stat = (/"mean", "min", "max"/)
 
-    model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
+    ;model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
+;    tmp = new((/dim_MOD+1, ntime/), float)
+;    copy_VarMeta(model_arr,tmp)
+;printVarSummary(tmp)
     do i = 0, ntime-1
       statb = stat_dispersion(model_arr(ind_mod, i), False)
+      model_arr_stat(0,i) = (/statb(0)/)
       if (diag_script_info@stat .eq. "MinMax") then
         ; min
         model_arr_stat(1,i) = (/statb(2)/)
@@ -402,8 +410,18 @@ print("ref_dataset = " + metadata_att_as_array(info_tas, "reference_dataset"))
         ; 90% quantile
         model_arr_stat(2, i) = (/statb(13)/)
       end if
+;      tmp(0:dim_MOD-1,i) = model_arr(:,i)
+;printVarSummary(tmp)
+;      tmp(dim_MOD,i) = (/statb(0)/)
+;printVarSummary(tmp)
+;      model_arr(dim_MOD,i) = (/statb(0)/)
     end do
-  end if
+  ;end if
+;  model_arr := tmp
+;  model_arr&model := array_append_record(model_arr&model, "MultiModelMean", 0)
+  model_arr(mmm_ind, :) = dim_avg_n(model_arr(ind_mod,:),0) 
+  anom_ref(mmm_ind) = avg(anom_ref(ind_mod))
+print("model_arr(mmm_ind,:) = " + model_arr(dim_MOD,:))
 
   ; Convert time coordinate to years (required by the plot routine)
   if (time_avg.eq."monthly") then
@@ -514,6 +532,8 @@ print("ref_dataset = " + metadata_att_as_array(info_tas, "reference_dataset"))
   ref_end = diag_script_info@ref_end
   res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
     + " Mean " + varname + " (" + units + ")"
+
+print(info_items)
 
   if (anom .eq. "anom") then
     xy_line_anom(wks, anom_ref, model_arr, model_arr&time, \

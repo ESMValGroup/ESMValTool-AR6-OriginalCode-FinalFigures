@@ -1811,7 +1811,7 @@ local funcname, scriptname, verbosity, res, res_in, res_stddev, source, \
 begin
 
   funcname = "xy_line_anom"
-  scriptname = "plot_scripts/ncl/xy_line.ncl"
+  scriptname = "diag_scripts/shared/plot/xy_line.ncl"
   enter_msg(scriptname, funcname)
 
   ; Select colors and other plotting attributes
@@ -1822,6 +1822,12 @@ begin
   annots = project_style(items, diag_script_info, "annots")
   avgstd = project_style(items, diag_script_info, "avgstd")
 
+  colors := array_append_record(colors, "(/1,0,0/)", 0)
+  dashes := array_append_record(dashes, 0, 0)
+  thicks := array_append_record(thicks, 3., 0)
+  annots := array_append_record(annots, "MultiModelMean", 0)
+  avgstd := array_append_record(avgstd, 1, 0)
+  
   ;; individual case for HadCRUT4 observations
   ;; FIX-ME: mean value comes from climatology file (absolute.nc).
   ;; There are no missing values as in the anomaly data.
@@ -1932,23 +1938,39 @@ begin
 
   if (diag_script_info@ts_anomaly .eq. "anom") then
 
-    if (diag_script_info@ref_value) then
-      ; Add right panel with mean values in anomaly plot
+    ;if (diag_script_info@ref_value) then
+    ;  ; Add right panel with mean values in anomaly plot
 
-      var = fspan(0., 2., 3)
-      mean = new((/dimsizes(source_mean), 3/), double)
-      mean(:, 0) = source_mean(:)
-      mean(:, 1) = source_mean(:)
-      mean(:, 2) = source_mean(:)
+    ;  var = fspan(0., 2., 3)
+    ;  mean = new((/dimsizes(source_mean), 3/), double)
+    ;  mean(:, 0) = source_mean(:)
+    ;  mean(:, 1) = source_mean(:)
+    ;  mean(:, 2) = source_mean(:)
 
-      plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
-    end if
+    ;  plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
+
+    ;  getvalues plot2
+    ;    "trXMinF"   : xmin
+    ;    "trYMinF"   : ymin
+    ;    "trXMaxF"   : xmax
+    ;    "trYMaxF"   : ymax
+    ;  end getvalues
+
+    ;  xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
+    ;  ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
+
+    ;  gnres = True
+    ;  gnres@gsFillColor     = "Gray70"
+    ;  gnres@tfPolyDrawOrder = "PreDraw"
+    ;  plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
+ 
+    ;end if
 
     ; ---------------------------------------------------------------------
     ; yellow shading of reference period
     ; ---------------------------------------------------------------------
     gsres                = True
-    gsres@gsFillColor    = "yellow"
+    gsres@gsFillColor    = "Grey70" ;"yellow"
     gsres@gsFillOpacityF = 0.1
     xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
     ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
@@ -1956,7 +1978,7 @@ begin
 
     txtres               = True
     txtres@txFont        = "helvetica-bold"
-    txtres@txFontColor   = "yellow3"
+    txtres@txFontColor   = "Grey40"
     txtres@txFontHeightF = 0.013
     ref_txt = gsn_add_text(wks, plot, "reference period", \
                            0.5*(ref_start + ref_end), res@trYMinF + 0.1, txtres)
@@ -2018,6 +2040,23 @@ begin
     mean(:, 2) = source_mean(:)
 
     plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
+
+    getvalues plot2
+      "trXMinF"   : xmin
+      "trYMinF"   : ymin
+      "trXMaxF"   : xmax
+      "trYMaxF"   : ymax
+    end getvalues
+
+    xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
+    ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
+
+    gnres = True
+    gnres@gsFillColor     = "Gray70"
+    gnres@gsFillOpacityF = 0.1
+    gnres@tfPolyDrawOrder = "PreDraw"
+    plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
+ 
     newplot = gsn_attach_plots(plot(0), plot2, res, res0)
   end if
 
