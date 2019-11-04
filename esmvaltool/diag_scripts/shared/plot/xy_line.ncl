@@ -1570,41 +1570,22 @@ begin
     overlay(plot, mmm)
   end if
 
-  ; Resources for a customized legend.
-  lgres                     = True
-  lgres@lgMonoLineThickness = False
-  lgres@lgLabelFontHeightF  = .08      ; legend label font thickness
-  lgres@vpWidthF            = 0.15     ; width of legend (NDC)
-  lgres@vpHeightF           = 0.4      ; height of legend (NDC)
-  lgres@lgPerimOn           = True
-  lgres@lgPerimColor        = 0
-  lgres@lgMonoDashIndex     = False
-  lgres@lgBoxBackground     = 0
-  lgres@lgPerimFill         = 0
-  lgres@lgPerimFillColor    = 0
-  if (.not.isatt(diag_script_info, "EMs_in_lg")) then
-    diag_script_info@EMs_in_lg = True  ; Set default
-  end if
-  if (.not.diag_script_info@EMs_in_lg) then
-    datasets = metadata_att_as_array(items, "dataset")
-    idcs_modelnames = UNIQ(datasets)
-    colors := colors(idcs_modelnames)
-    dashes := dashes(idcs_modelnames)
-    thicks := thicks(idcs_modelnames)
-    annots := datasets(idcs_modelnames)
-  end if
-  if (diag_script_info@multi_model_mean) then
-    lgres@lgLineColors      = array_append_record(colors, colors_mmm, 0)
-    lgres@lgDashIndexes     = array_append_record(dashes, dashes_mmm, 0)
-    lgres@lgLineThicknesses = \
-      array_append_record(thicks, thicks_mmm, 0) + 0.5
-    labels = array_append_record(annots, annots_mmm, 0)
-  else
-    lgres@lgLineColors      = colors
-    lgres@lgDashIndexes     = dashes
-    lgres@lgLineThicknesses = thicks + 0.5
-    labels = annots
-  end if
+  ; ***********************************************
+  ; legend resources
+  ; ***********************************************
+
+  lgres                    = True
+  lgres@lgItemType         = "Lines"   ; show lines only (default)
+  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+  lgres@vpHeightF          = 0.5       ; height of legend (NDC)
+  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+
+  lgres@lgLineColors      = colors
+  lgres@lgDashIndexes     = dashes
+  lgres@lgLineThicknesses = thicks + 1
+  labels = annots
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
 
@@ -1828,30 +1809,6 @@ begin
   annots := array_append_record(annots, "MultiModelMean", 0)
   avgstd := array_append_record(avgstd, 1, 0)
   
-  ;; individual case for HadCRUT4 observations
-  ;; FIX-ME: mean value comes from climatology file (absolute.nc).
-  ;; There are no missing values as in the anomaly data.
-  ;datasetnames = metadata_att_as_array(items, "dataset")
-  ;if (any(datasetnames.eq."HadCRUT4-clim")) then
-  ;  ind_wo_clim = ind(datasetnames .ne. "HadCRUT4-clim")
-  ;  tmp1 = colors(ind_wo_clim)
-  ;  delete(colors)
-  ;  colors = tmp1
-  ;  tmp2 = dashes(ind_wo_clim)
-  ;  delete(dashes)
-  ;  dashes = tmp2
-  ;  tmp3 = thicks(ind_wo_clim)
-  ;  delete(thicks)
-  ;  thicks = tmp3
-  ;  tmp4 = annots(ind_wo_clim)
-  ;  delete(annots)
-  ;  annots = tmp4
-  ;  tmp5 = avgstd(ind_wo_clim)
-  ;  delete(avgstd)
-  ;  avgstd = tmp5
-  ;  delete([/tmp1, tmp2, tmp3, tmp4, tmp5/])
-  ;end if
-
   ; ************************************************
   ; plotting parameters
   ; ************************************************
