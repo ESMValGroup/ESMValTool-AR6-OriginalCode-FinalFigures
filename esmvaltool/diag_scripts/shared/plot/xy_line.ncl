@@ -1811,7 +1811,7 @@ local funcname, scriptname, verbosity, res, res_in, res_stddev, source, \
 begin
 
   funcname = "xy_line_anom"
-  scriptname = "plot_scripts/ncl/xy_line.ncl"
+  scriptname = "diag_scripts/shared/plot/xy_line.ncl"
   enter_msg(scriptname, funcname)
 
   ; Select colors and other plotting attributes
@@ -1822,6 +1822,12 @@ begin
   annots = project_style(items, diag_script_info, "annots")
   avgstd = project_style(items, diag_script_info, "avgstd")
 
+  colors := array_append_record(colors, "(/1,0,0/)", 0)
+  dashes := array_append_record(dashes, 0, 0)
+  thicks := array_append_record(thicks, 3., 0)
+  annots := array_append_record(annots, "MultiModelMean", 0)
+  avgstd := array_append_record(avgstd, 1, 0)
+  
   ;; individual case for HadCRUT4 observations
   ;; FIX-ME: mean value comes from climatology file (absolute.nc).
   ;; There are no missing values as in the anomaly data.
@@ -1915,7 +1921,8 @@ begin
   res@trYMinF  = min(source) - 0.05 * (max(source) - min(source))
   res@trYMaxF  = max(source) + 0.05 * (max(source) - min(source))
   res@tiYAxisOn = True
-  res@tiXAxisString = "Year"
+  ;res@tiXAxisString = "Year"
+  res@tiXAxisString = ""
   res@gsnStringFontHeightF = 0.016
 
   res@xyDashPatterns    = dashes
@@ -1932,23 +1939,39 @@ begin
 
   if (diag_script_info@ts_anomaly .eq. "anom") then
 
-    if (diag_script_info@ref_value) then
-      ; Add right panel with mean values in anomaly plot
+    ;if (diag_script_info@ref_value) then
+    ;  ; Add right panel with mean values in anomaly plot
 
-      var = fspan(0., 2., 3)
-      mean = new((/dimsizes(source_mean), 3/), double)
-      mean(:, 0) = source_mean(:)
-      mean(:, 1) = source_mean(:)
-      mean(:, 2) = source_mean(:)
+    ;  var = fspan(0., 2., 3)
+    ;  mean = new((/dimsizes(source_mean), 3/), double)
+    ;  mean(:, 0) = source_mean(:)
+    ;  mean(:, 1) = source_mean(:)
+    ;  mean(:, 2) = source_mean(:)
 
-      plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
-    end if
+    ;  plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
+
+    ;  getvalues plot2
+    ;    "trXMinF"   : xmin
+    ;    "trYMinF"   : ymin
+    ;    "trXMaxF"   : xmax
+    ;    "trYMaxF"   : ymax
+    ;  end getvalues
+
+    ;  xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
+    ;  ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
+
+    ;  gnres = True
+    ;  gnres@gsFillColor     = "Gray70"
+    ;  gnres@tfPolyDrawOrder = "PreDraw"
+    ;  plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
+ 
+    ;end if
 
     ; ---------------------------------------------------------------------
     ; yellow shading of reference period
     ; ---------------------------------------------------------------------
     gsres                = True
-    gsres@gsFillColor    = "yellow"
+    gsres@gsFillColor    = "Grey70" ;"yellow"
     gsres@gsFillOpacityF = 0.1
     xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
     ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
@@ -1956,7 +1979,7 @@ begin
 
     txtres               = True
     txtres@txFont        = "helvetica-bold"
-    txtres@txFontColor   = "yellow3"
+    txtres@txFontColor   = "Grey40"
     txtres@txFontHeightF = 0.013
     ref_txt = gsn_add_text(wks, plot, "reference period", \
                            0.5*(ref_start + ref_end), res@trYMinF + 0.1, txtres)
@@ -2018,6 +2041,23 @@ begin
     mean(:, 2) = source_mean(:)
 
     plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
+
+    getvalues plot2
+      "trXMinF"   : xmin
+      "trYMinF"   : ymin
+      "trXMaxF"   : xmax
+      "trYMaxF"   : ymax
+    end getvalues
+
+    xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
+    ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
+
+    gnres = True
+    gnres@gsFillColor     = "Gray70"
+    gnres@gsFillOpacityF = 0.1
+    gnres@tfPolyDrawOrder = "PreDraw"
+    plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
+ 
     newplot = gsn_attach_plots(plot(0), plot2, res, res0)
   end if
 
@@ -2157,7 +2197,8 @@ begin
   res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
   res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
   res@tiYAxisOn = True
-  res@tiXAxisString = "Year"
+  ;res@tiXAxisString = "Year"
+  res@tiXAxisString = ""
   res@gsnStringFontHeightF = 0.016
 
   copy_VarMeta(res_in, res)  ; copy passed resources
@@ -2172,7 +2213,7 @@ begin
 
   cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
-  res@xyLineThicknesses = (/3, 3, 3, 3, 3, 3/)
+  res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
   res@xyLineColors = cmap(1:5,:)
 
   if (nexp .gt. 6) then
@@ -2180,9 +2221,9 @@ begin
               + "more than " + nexp + " experiments")
   end if
 
-  res@pmLegendDisplayMode = "Always"
-  res@xyExplicitLegendLabels = source_mean&experiment
-  res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
+  ; res@pmLegendDisplayMode = "Always"
+  ; res@xyExplicitLegendLabels = source_mean&experiment
+  ; res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
 
   plot(0) = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
 
@@ -2194,6 +2235,7 @@ begin
   if (isatt(diag_script_info, "stat_shading")) then
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
+      res_stat@gsnXYFillOpacities = 0.2
       cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
       copy_VarMeta(res, res_stat)
       res_stat@gsnXYFillColors = cmap(1,:)
@@ -2230,23 +2272,23 @@ begin
     delete(res@xyLineThicknesses)
     delete(res@xyLineColors)
     res@xyDashPatterns    = dashes
-    res@xyLineThicknesses = thicks  ; make 2nd lines thicker
+    res@xyLineThicknesses = (/5/) ; thicks  ; make 2nd lines thicker
     res@xyLineColors      = colors  ; change line color
 
     ref_p = gsn_csm_xy(wks, source_x, source, res)  ; create plot
     overlay(plot(0), ref_p)
   end if
 
-  ; ---------------------------------------------------------------------
-  ; Procedure to attach a box to the given plot, given the lower left
-  ; corner, width, color, and opacity.
-  ; ---------------------------------------------------------------------
-  gsres                = True
-  gsres@gsFillColor    = "yellow"
-  gsres@gsFillOpacityF = 0.2
-  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
-  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
-  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+;  ; ---------------------------------------------------------------------
+;  ; Procedure to attach a box to the given plot, given the lower left
+;  ; corner, width, color, and opacity.
+;  ; ---------------------------------------------------------------------
+;  gsres                = True
+;  gsres@gsFillColor    = "yellow"
+;  gsres@gsFillOpacityF = 0.2
+;  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+;  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+;  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
 
   ; ---------------------------------------------------------------------
   ; Draw some lines to create a legend
