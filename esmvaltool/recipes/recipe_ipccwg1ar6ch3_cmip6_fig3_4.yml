@@ -45,7 +45,6 @@ diagnostics:
       tas:
         preprocessor: clim_5x5
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: piControl
         ensemble: r1i1p1f1
