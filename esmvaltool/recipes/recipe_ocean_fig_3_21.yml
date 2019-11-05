@@ -3,10 +3,10 @@
 ---
 documentation:
   description: |
-    Recipe to produce figure 3.5 for IPCC WG1
+    Recipe to produce figure 3.21 for IPCC WG1
 
   authors:
-    - demora_lee
+    - demo_le
 
   references:
     - demora2018gmd
@@ -26,10 +26,7 @@ preprocessors:
     # extract_levels:
     #   levels:  [0., ]
     #   scheme: linear_horizontal_extrapolate_vertical
-    # time_average:
-    climate_statistics:
-      operator: mean
-      period: full
+    time_average:
     regrid:
       target_grid: 1x1
       scheme: linear

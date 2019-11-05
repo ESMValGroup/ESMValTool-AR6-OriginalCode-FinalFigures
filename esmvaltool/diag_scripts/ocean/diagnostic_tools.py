@@ -395,7 +395,8 @@ def get_colour_from_cmap(number, total, cmap='jet'):
     return colour
 
 
-def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right', fontsize = 'small'):
+def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right',
+        fontsize = 'small', order = [], nrows = 25, ncols=4):
     """
     Add a legend outside the plot, to the right.
 
@@ -430,14 +431,14 @@ def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right', f
     legend_size = len(plot_details) + 1
     box = ax1.get_position()
     if loc.lower() == 'right':
-        nrows = 25
+        #nrows = 25
         ncols = int(legend_size / nrows) + 1
         ax1.set_position([
             box.x0, box.y0, box.width * (1. - column_width * ncols), box.height
         ])
 
     if loc.lower() == 'below':
-        ncols = 4
+        #ncols = 4
         nrows = int(legend_size / ncols) + 1
         ax1.set_position([
             box.x0, box.y0 + (nrows * column_width), box.width,
@@ -445,7 +446,10 @@ def add_legend_outside_right(plot_details, ax1, column_width=0.1, loc='right', f
         ])
 
     # Add emply plots to dummy axis.
-    for index in sorted(plot_details):
+    if order == []:
+        order = sorted(plot_details.keys())
+
+    for index in order:
         colour = plot_details[index]['c']
 
         linewidth = plot_details[index].get('lw', 1)

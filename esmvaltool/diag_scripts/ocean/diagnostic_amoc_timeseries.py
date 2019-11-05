@@ -60,7 +60,7 @@ from scipy.stats import linregress
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
-from esmvalcore.preprocessor import time_average
+from esmvalcore.preprocessor import climate_statistics
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -582,7 +582,8 @@ def make_pane_a(
     for filename in sorted(metadatas.keys()):
         dataset = metadatas[filename]['dataset']
         cube = load_cube(filename, metadatas[filename])
-        cubes[dataset] = time_average(cube)
+        cubes[dataset] = climate_statistics(cube, operator='mean',
+                                            period='full')
     cmap = plt.cm.get_cmap('jet')
 
     #####
@@ -900,9 +901,9 @@ def  make_figure(cfg, debug=False, timeseries=False):
         path = cfg['plot_dir'] + '/fig_3.24'+image_extention
 
     # Watermark
-    fig.text(0.95, 0.05, 'Draft',
-             fontsize=50, color='gray',
-             ha='right', va='bottom', alpha=0.5)
+    # fig.text(0.95, 0.05, 'Draft',
+    #          fontsize=50, color='gray',
+    #          ha='right', va='bottom', alpha=0.5)
 
     # Saving files:
     if cfg['write_plots']:
@@ -929,7 +930,7 @@ def main(cfg):
     # overall plots:
     #make_figure(cfg, timeseries= True)
     make_figure(cfg, timeseries= False)
-    assert 0
+    return
 
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='b')
