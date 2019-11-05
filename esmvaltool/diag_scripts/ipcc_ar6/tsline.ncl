@@ -234,6 +234,7 @@ begin
       end do
       A0_monavg_ref = time_operations(tmp, ref_start, ref_end, "average", \
                                       "monthlyclim", True)
+      delete(tmp)
 
       ; calculate anomaly for each grid point
       do i = 0, dimsizes(A0&time) - 1
