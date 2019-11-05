@@ -23,7 +23,8 @@
 ;    order: order in which experiments should be plotted
 ;    run_ave: if not equal 0 than calculate running mean over this number
 ;             of years
-;    header: if true, region name as header
+;    header: if true, region name as header     
+;    stat_shading: if true: shading of reference period
 ;
 ; Caveats
 ;
@@ -79,6 +80,7 @@ begin
   set_default_att(diag_script_info, "region", "Global")
   set_default_att(diag_script_info, "run_ave", 0)
   set_default_att(diag_script_info, "header", True)
+  set_default_att(diag_script_info, "stat_shading", False)
 
   ; Determine time range
   start_year = diag_script_info@start_year
@@ -180,13 +182,13 @@ begin
 
     if(isatt(diag_script_info, "order")) then
       ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
-      if (ii_n .gt. dimsizes(data_mean&experiment)-1) then
-        error_msg("f", DIAG_SCRIPT, "", "diag_script_info@order not " \
-                  + "well defined (less experiments available)")
-      elseif (all(ismissing(ii_n))) then
+      if (all(ismissing(ii_n))) then
         error_msg("f", DIAG_SCRIPT, "", "Collected experiment " + \
                   data_temp@experiment + " does not appear in " + \
                   "diag_script_info@order")
+      elseif (ii_n .gt. dimsizes(data_mean&experiment)-1) then
+        error_msg("f", DIAG_SCRIPT, "", "diag_script_info@order not " \
+                  + "well defined (less experiments available)")
       end if
     else
       ii_n = ii
@@ -200,11 +202,6 @@ begin
     end if
     idx1 = ind(date(0).eq.data_mean&time)
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
-print("date(0) = " + date(0))
-print("data_mean&time = " + data_mean&time)
-print("date(dimsizes(date) - 1) = " + date(dimsizes(date) - 1))
-print("idx1 = " + idx1)
-print("idx2 = " + idx2)
     delete(date)
 
     ; Running Mean
@@ -336,8 +333,13 @@ print("idx2 = " + idx2)
     res@trYMaxF = diag_script_info@y_max
   end if
 
-  res@tmXBMode         = "Manual"
-  res@tmXBTickSpacingF = 50
+  if (xmin .eq. 1850) then
+    res@tmXBMode         = "Manual"
+    res@tmXBTickSpacingF = 50
+  elseif (xmin .eq. 1950) then
+    res@tmXBMode         = "Manual"
+    res@tmXBTickSpacingF = 20
+  end if
 
   if (diag_script_info@header) then
     res@tiMainString = diag_script_info@region

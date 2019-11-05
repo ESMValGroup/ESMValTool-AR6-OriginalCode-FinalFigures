@@ -1896,34 +1896,6 @@ begin
 
   if (diag_script_info@ts_anomaly .eq. "anom") then
 
-    ;if (diag_script_info@ref_value) then
-    ;  ; Add right panel with mean values in anomaly plot
-
-    ;  var = fspan(0., 2., 3)
-    ;  mean = new((/dimsizes(source_mean), 3/), double)
-    ;  mean(:, 0) = source_mean(:)
-    ;  mean(:, 1) = source_mean(:)
-    ;  mean(:, 2) = source_mean(:)
-
-    ;  plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
-
-    ;  getvalues plot2
-    ;    "trXMinF"   : xmin
-    ;    "trYMinF"   : ymin
-    ;    "trXMaxF"   : xmax
-    ;    "trYMaxF"   : ymax
-    ;  end getvalues
-
-    ;  xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
-    ;  ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
-
-    ;  gnres = True
-    ;  gnres@gsFillColor     = "Gray70"
-    ;  gnres@tfPolyDrawOrder = "PreDraw"
-    ;  plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
- 
-    ;end if
-
     ; ---------------------------------------------------------------------
     ; yellow shading of reference period
     ; ---------------------------------------------------------------------
@@ -2236,16 +2208,30 @@ begin
     overlay(plot(0), ref_p)
   end if
 
-;  ; ---------------------------------------------------------------------
-;  ; Procedure to attach a box to the given plot, given the lower left
-;  ; corner, width, color, and opacity.
-;  ; ---------------------------------------------------------------------
-;  gsres                = True
-;  gsres@gsFillColor    = "yellow"
-;  gsres@gsFillOpacityF = 0.2
-;  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
-;  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
-;  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+  if (diag_script_info@ts_anomaly .eq. "anom" .and. \
+      diag_script_info@stat_shading) then
+
+    ; ---------------------------------------------------------------------
+    ; yellow shading of reference period
+    ; ---------------------------------------------------------------------
+    gsres                = True
+    gsres@gsFillColor    = "Grey70" ;"yellow"
+    gsres@gsFillOpacityF = 0.1
+    xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+    ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+    newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+
+    txtres               = True
+    txtres@txFont        = "helvetica-bold"
+    txtres@txFontColor   = "Grey40"
+    txtres@txFontHeightF = 0.013
+    ref_txt = gsn_add_text(wks, plot, "reference period", \
+                           0.5*(ref_start + ref_end), \
+                           res@trYMinF + 0.05 * (res@trYMaxF - res@trYMinF), \
+                           txtres)
+
+  end if
+
 
   ; ---------------------------------------------------------------------
   ; Draw some lines to create a legend
