@@ -303,6 +303,8 @@ def make_fig_3_23(
         cfg,
         metadatas,
         cutoff,
+        model = 'all',
+        experiment = 'all',
 ):
     """
     Make a time series plot showing several preprocesssed datasets.
@@ -324,27 +326,42 @@ def make_fig_3_23(
     projects = {}
     datasets_count = 0
     for i, filename in enumerate(sorted(metadatas)):
-        #metadata = metadatas[filename]
+
+        # metadata = metadatas[filename]
         project = metadatas[filename]['project']
         dataset = metadatas[filename]['dataset']
+        exp = metadatas[filename]['exp']
+
+        if model in ['all', None]:
+            pass
+        else:
+            if dataset != model: continue
+        if experiment in ['all', None]:
+            pass
+        else:
+            if exp != experiment: continue
 
         if dataset.find('MultiModel') > -1: continue
 
+        unique_key = '-'.join([dataset, exp])
         #if filename == obs_filename:
         #    continue
         try:
-            projects[project].append(dataset)
+            projects[project].append(unique_key)
         except:
-            projects[project] = [dataset, ]
-        print('counting projects', i, project, dataset)
+            projects[project] = [unique_key, ]
+        print('counting projects', i, project, unique_key)
         datasets_count+=1
     print(datasets_count)
+    if datasets_count == 0:
+        print("No datasets")
+        return
     #####
     # List of cubes to make means/stds.
     model_numbers = {project:{} for project in projects}
-    for project, datasets in projects.items():
-        for itr, dataset in enumerate(sorted(datasets)):
-            model_numbers[project][dataset] = itr
+    for project, unique_keys in projects.items():
+        for itr, unique_key in enumerate(sorted(unique_keys)):
+            model_numbers[project][unique_key] = itr
 
     ####
     # Load the data as a separate cubes
@@ -355,7 +372,20 @@ def make_fig_3_23(
         cube = iris.load_cube(filename)
         project = metadatas[filename]['project']
         dataset = metadatas[filename]['dataset']
-        if dataset.find('MultiModel') > -1: continue
+        exp = metadatas[filename]['exp']
+        unique_key = '-'.join([dataset, exp])
+
+        if unique_key.find('MultiModel') > -1: continue
+
+        if model in ['all', None]: pass
+        else:
+            if model != dataset:
+                continue
+
+        if experiment in ['all', None]:
+            pass
+        else:
+            if exp != experiment: continue
 
         cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
 
@@ -380,7 +410,7 @@ def make_fig_3_23(
                     continue
 
         model_cubes[filename] = cube
-        project_cubes[project][dataset] = cube
+        project_cubes[project][unique_key] = cube
 
     #####
     # Load obs data and details
@@ -401,12 +431,12 @@ def make_fig_3_23(
     project_colours={'CMIP3': 'green', 'CMIP5': 'blue', 'CMIP6': 'red'}
     project_cmaps = {'CMIP3': 'cool', 'CMIP5': 'winter', 'CMIP6': 'inferno'}
 
-    for project, datasets in sorted(project_cubes.items()):
+    for project, unique_keys in sorted(project_cubes.items()):
         cmap = plt.cm.get_cmap(project_cmaps[project])
-        for dataset, cube in sorted(datasets.items()):
+        for unique_key, cube in sorted(unique_keys.items()):
 
             # Is this data is a multi-model dataset?
-            if dataset.find('MultiModel') > -1: continue
+            if unique_key.find('MultiModel') > -1: continue
 
             if cutoff != 'None':
                 if cube.data.min() < cutoff:
@@ -425,11 +455,14 @@ def make_fig_3_23(
             #if 'annual_average' in cfg:
             cube = annual_average(cube)
 
-            #print(project, dataset, cube.data.min())
-            model_number = float(model_numbers[project][dataset])
-            value = model_number / (len(projects[project]) - 1.)
+            #print(project, unique_key, cube.data.min())
+            model_number = float(model_numbers[project][unique_key])
+            if len(projects[project])==1:
+                value = 0
+            else:
+                value = model_number / (len(projects[project]) - 1.)
             colour = cmap(value)
-            print(project, dataset, 'minimum:', cube.data.min())
+            print(project, unique_key, 'minimum:', cube.data.min())
             # Make plots for single models
             timeplot(
                     cube,
@@ -438,17 +471,17 @@ def make_fig_3_23(
                     lw=2.,
                     alpha=1,
                 )
-            plot_details[dataset] = {
+            plot_details[unique_key] = {
                 'c': colour,
                 'ls': '-',
                 'lw': 2.,
-                'label': dataset
+                'label': unique_key
             }
 
             if project not in legend_order:
                 legend_order.append(project)
 
-            legend_order.append(dataset)
+            legend_order.append(unique_key)
 
     for project in sorted(projects):
         cube_list = [cube for cube in project_cubes[project].values()]
@@ -479,17 +512,22 @@ def make_fig_3_23(
     plt.xlabel('Year')
     plt.ylabel('Thermal Expansion (mm)')
 
+    if experiment in ['all', None]:
+        pass
+    else:
+        plt.title(experiment.title())
+
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 8.)
     # project0 = [project for project in sorted(projects.keys())][0]
     diagtools.add_legend_outside_right(
-         plot_details, plt.gca(), column_width=0.2, fontsize='x-small',
+         plot_details, plt.gca(), column_width=0.24, fontsize='x-small',
          order=legend_order,
          nrows=50)#datasets_count+len(projects.keys()))
 
 
     # Saving image:
-    path = diagtools.folder(cfg['plot_dir'])+'fig_3_23_' + str(cutoff) + image_extention
+    path = diagtools.folder(cfg['plot_dir'])+'_'.join(['fig_3_23_', model, experiment, str(cutoff)+ image_extention])
     logger.info('Saving plots to %s', path)
     plt.savefig(path)
     plt.close()
@@ -506,10 +544,37 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
+
     for index, metadata_filename in enumerate(cfg['input_files']):
         logger.info('metadata filename:\t%s', metadata_filename)
 
         metadatas = diagtools.get_input_files(cfg, index=index)
+        datasets = {}
+        experiments = {}
+        for i, filename in enumerate(sorted(metadatas)):
+            #metadata = metadatas[filename]
+            datasets[metadatas[filename]['dataset']] =True
+            experiments[metadatas[filename]['exp']] =True
+
+        #######
+        # Time series for individual models:
+        for model in datasets.keys():
+            make_fig_3_23(
+                cfg,
+                metadatas,
+                'None',
+                model = model
+            )
+
+        #######
+        # Time series for individual experiments:
+        for experiment in experiments.keys():
+            make_fig_3_23(
+                cfg,
+                metadatas,
+                'None',
+                experiment = experiment
+            )
 
         #######
         # Multi model time series
