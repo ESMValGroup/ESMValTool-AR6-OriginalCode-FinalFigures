@@ -107,7 +107,7 @@ begin
     end if
   end if
 
-  if (units_from.eq."mole mole-1") then
+  if (units_from.eq."mole mole-1" .or. units_from.eq."mol mol-1") then
     if (any(units_to.eq.(/"ppm", "ppmv", "umol/mol"/))) then
       out = out * 1.e6
       out@units = units_to

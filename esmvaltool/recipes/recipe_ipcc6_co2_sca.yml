@@ -6,10 +6,10 @@ documentation:
   description: |
     Producing selected figures from IPCC WGI AR6, chap. 3
   authors:
-    - gier_be
+    - gier_bettina
 
 #  maintainer:
-    
+
   references:
     - flato13ipcc
 
@@ -19,32 +19,32 @@ documentation:
 
 preprocessors:
   nbp_mean:
-    average_region:
-      coord1: latitude
-      coord2: longitude
+    area_statistics:
+      operator: mean
+
 
   co2_surface:
     extract_levels:
       levels: 100000
       scheme: linear
-    average_region:
-      coord1: latitude
-      coord2: longitude
+    area_statistics:
+      operator: mean
+
 
 diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
-  # Sect. 3.6.1 (ZOD fig. 3.40)
+  # Sect. 3.6.1 (FOD fig. 3.28)
   # **********************************************************************
-  # Changes to the ampitude of the seasonal cycle fo atmospheric CO2
+  # Changes to the amplitude of the net land carbon flux (nbp)
   # **********************************************************************
-  # status: 
+  # status:
   # **********************************************************************
 
   fig_3_38_co2:
-    description: Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+    description: calculate trend of nbp sca
     variables:
-      nbp:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
         preprocessor: nbp_mean
         project: CMIP6
         ensemble: r1i1p1f1
@@ -53,35 +53,21 @@ diagnostics:
         mip: Lmon
         start_year: 1961
         end_year: 2014 #2010
+        #derive: true
         additional_datasets:
-          - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 3, start_year: 1986, end_year: 2008}
-          - {dataset: CanESM5, grid: gn, ensemble: r2i1p1f1}
+          #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 3, start_year: 1986, end_year: 2008}
+          #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 2018, tier: 3, start_year: 1986, end_year: 2014}
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2}
           - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2}
           - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r6i1p1f1}
           - {dataset: GISS-E2-1-G, grid: gn}
+          - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
+          - {dataset: GISS-E2-1-H, grid: gn}
           - {dataset: CESM2, grid: gn}
-     # co2:
-     #   preprocessor: co2_surface
-     #   #derive: True
-     #   project: CMIP5
-     #   ensemble: r1i1p1
-     #   field: T0M
-     #   exp: esmHistorical
-     #   mip: Amon
-     #   start_year: 1970
-     #   end_year: 2010 #2010
-     #   additional_datasets:
-     #     - {dataset: ESRL, project: OBS, type: ground, version: MLO, tier: 2, start_year: 1973, end_year: 2010}
-     #     - {dataset: ESRL, project: OBS, type: ground, version: GLOB, tier: 2, start_year: 1980, end_year: 2010}
-     #     - {dataset: BNU-ESM}
-     #     - {dataset: CanESM2}
-     #     - {dataset: CESM1-BGC}
-      #    - {dataset: FIO-ESM}
-      #    - {dataset: GFDL-ESM2G, start_year: 1861} # 10^35 co2 - missing values badly?
-      #    - {dataset: GFDL-ESM2M, start_year: 1861} # 10^35 co2 - missing values badly?
-      #    - {dataset: MIROC-ESM}
-      #    - {dataset: MPI-ESM-LR}
-      #    - {dataset: MRI-ESM1}
+          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+          - {dataset: SAM0-UNICON, grid: gn}
     scripts:
       fig_3_38_co2:
         script: ipcc_ar6/CO2_SCA_trend.py

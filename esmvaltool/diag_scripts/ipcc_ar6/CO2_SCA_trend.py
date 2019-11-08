@@ -108,14 +108,14 @@ def get_provenance_record():
         'statistics': ['mean', 'stddev', 'trend'],
         'domains': ['global'],
         'plot_types': ['times', 'seas'],
-        'authors': ['gier_be'],
-        'references': ['zhao2016'],
+        'authors': ['gier_bettina'],
+        'references': ['zhao2016bg'],
         'realms': ['atmos'],
         'themes': ['phys']
     }
     return record
 
-def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filename):    
+def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filename):
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
 
@@ -123,7 +123,7 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
     CMIP6_colors = [(0, 0, 0), (112/255., 160/255., 205/255.), (178/255., 178/255., 178/255.), (196/255., 121/255., 0), (0/255., 52/255., 102/255.), (0, 79/255., 0)]
     CMIP6_shading = [(128/255., 128/255., 128/255.), (91/255., 174/255., 178/255.), (191/255., 191/255., 191/255.), (204/255., 174/255., 113/255.), (67/255., 147/255., 195/255.), (223/255., 237/255., 195/255.)]
     fig, ax = plt.subplots()#plt.figure(figsize=(6, 4))
-                
+
     # Compute MMM Shading
     mmm_amps = {}
     for dataset in dataset_groups['mmm_datasets']:
@@ -306,7 +306,7 @@ def main(cfg):
     if 'co2data' in cfg:
         for dataset in cfg['co2data']:
             #logger.info(dataset)
-            cfg['input_data'][dataset] = {'filename': cfg['co2data'][dataset][0], 
+            cfg['input_data'][dataset] = {'filename': cfg['co2data'][dataset][0],
                                           'dataset': dataset, 'short_name': 'co2',
                                           'start_year': cfg['co2data'][dataset][1],
                                           'end_year': cfg['co2data'][dataset][2],
@@ -374,7 +374,7 @@ def main(cfg):
         else:
             if data['short_name'] == 'nbp':
                 dataset_groups['plot_sca'].append(name)
-    # Plot data 
+    # Plot data
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
     plot_path = get_plot_filename('SCA_trend_xy_' + str(min_year) + '_' + str(max_year), cfg)
