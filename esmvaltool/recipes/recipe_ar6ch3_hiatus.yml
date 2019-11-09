@@ -1125,6 +1125,7 @@ diagnostics:
 #          - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r9i1p1f2, grid: gn, exp: historical, end_year: 2014}
 
       tasa:
+        preprocessor: pp
         mip: Amon
         frequency: mon
         project: CMIP6

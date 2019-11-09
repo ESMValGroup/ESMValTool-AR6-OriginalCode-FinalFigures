@@ -610,7 +610,9 @@ begin
       tsRefPattern = read_data(infoTasa[iTasRefPattern])
     end if
   end if
-  
+  tsRefGMST&time = cd_calendar(tsRefGMST&time, -1)
+  tsRefPattern&time = cd_calendar(tsRefPattern&time, -1)
+
 ;  if (isvar("ts")) then
 ;    delete(ts)
 ;  end if
@@ -836,8 +838,8 @@ begin
 ;   3.2 Trend pattern, unblended, masked
     tas2 = tas
     if (masking) then
-      stime = max((/tas&time(0), tsRefPattern&time(0)/))
-      etime = min((/tas&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
+      stime = syear_hiatus*100+1 ;max((/tas&time(0), tsRefPattern&time(0)/))
+      etime = eyear_hiatus*100+12 ;min((/tas&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
       tas2({stime:etime}, :, :) = apply_mask_ref(tas({stime:etime}, :, :), \
                                                  tsRefPattern({stime:etime}, :, :))
     end if
@@ -874,8 +876,8 @@ begin
 ;   3.4 Trend pattern, blended, masked
       ts2 = ts
       if (masking) then
-        stime = max((/ts&time(0), tsRefPattern&time(0)/))
-        etime = min((/ts&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
+        stime = syear_hiatus*100+1 ;max((/ts&time(0), tsRefPattern&time(0)/))
+        etime = eyear_hiatus*100+12; min((/ts&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
         ts2({stime:etime}, :, :) = apply_mask_ref(ts({stime:etime}, :, :), \
                                                  tsRefPattern({stime:etime}, :, :))
       end if
@@ -953,8 +955,8 @@ begin
 ;   4.2 Unblended, masked
     tas2 = tas
     if (masking) then
-      stime = max((/tas&time(0), tsRefGMST&time(0)/))
-      etime = min((/tas&time(dimsizes(tas&time)-1), tsRefGMST&time(dimsizes(tsRefGMST&time)-1)/))
+      stime = syear_hiatus*100+1 ;max((/tas&time(0), tsRefGMST&time(0)/))
+      etime = eyear_hiatus*100+12 ;min((/tas&time(dimsizes(tas&time)-1), tsRefGMST&time(dimsizes(tsRefGMST&time)-1)/))
       tas2({stime:etime}, :, :) = apply_mask_ref(tas({stime:etime}, :, :), \
                                                  tsRefGMST({stime:etime}, :, :))
     end if
@@ -998,8 +1000,8 @@ begin
 ;   4.4 Blended, masked
       ts2 = ts
       if (masking) then
-        stime = max((/ts&time(0), tsRefGMST&time(0)/))
-        etime = min((/ts&time(dimsizes(ts&time)-1), tsRefGMST&time(dimsizes(tsRefGMST&time)-1)/))
+        stime = syear_hiatus*100+1;max((/ts&time(0), tsRefGMST&time(0)/))
+        etime = eyear_hiatus*100+12;min((/ts&time(dimsizes(ts&time)-1), tsRefGMST&time(dimsizes(tsRefGMST&time)-1)/))
         ts2({stime:etime}, :, :) = apply_mask_ref(ts({stime:etime}, :, :), \
                                                   tsRefGMST({stime:etime}, :, :))
       end if
