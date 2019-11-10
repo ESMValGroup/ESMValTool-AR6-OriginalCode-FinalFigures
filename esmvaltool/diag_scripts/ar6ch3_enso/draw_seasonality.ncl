@@ -493,11 +493,8 @@ begin
     overlay(mme_plot, plot)
   end do
   
-  mean_cmip5 = 0.
-  stdv_cmip5 = 0.
+  w = 0.3 ; width of bars for MME
   nmodel_cmip5 = 0
-  mean_cmip6 = 0.
-  stdv_cmip6 = 0.
   nmodel_cmip6 = 0
   do ii = 0, nmodels-1
     center = get_modelling_center(models(ii))
@@ -510,49 +507,81 @@ begin
     idummy = idummy + 1
     delete(center)
     if (projects(ii).eq."CMIP6") then
-      mean_cmip6 = mean_cmip6 + seasonality(ii)
-      stdv_cmip6 = stdv_cmip6 + (seasonality(ii))^2
       nmodel_cmip6 = nmodel_cmip6 + 1
+      if (isvar("seasonality_cmip6")) then
+        tmp = seasonality_cmip6
+        delete(seasonality_cmip6)
+        seasonality_cmip6 = new(nmodel_cmip6, typeof(seasonality))
+        seasonality_cmip6 = array_append_record(tmp, seasonality(ii), 0)
+        delete(tmp)
+      else
+        seasonality_cmip6 = seasonality(ii)
+      end if
     end if
     if (projects(ii).eq."CMIP5") then
-      mean_cmip5 = mean_cmip5 + seasonality(ii)
-      stdv_cmip5 = stdv_cmip5 + (seasonality(ii))^2
       nmodel_cmip5 = nmodel_cmip5 + 1
+      if (isvar("seasonality_cmip5")) then
+        tmp = seasonality_cmip5
+        delete(seasonality_cmip5)
+        seasonality_cmip5 = new(nmodel_cmip5, typeof(seasonality))
+        seasonality_cmip5 = array_append_record(tmp, seasonality(ii), 0)
+        delete(tmp)
+      else
+        seasonality_cmip5 = seasonality(ii)
+      end if
     end if
   end do
   if (nmodel_cmip6.gt.2) then
-    mean_cmip6 = mean_cmip6 / tofloat(nmodel_cmip6)
-    stdv_cmip6 = stdv_cmip6 / tofloat(nmodel_cmip6) - mean_cmip6*mean_cmip6
-    stdv_cmip6 = sqrt(stdv_cmip6)
-    mean_cmip6@project = "CMIP6"
-    lnres@gsLineColor      = get_color(mean_cmip6)
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6, icolcmip6/), (/mean_cmip6-stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    median = dim_median(seasonality_cmip6)
+    qsort(seasonality_cmip6)
+    x25  = round(0.25*dimsizes(seasonality_cmip6), 3) - 1
+    x75  = round(0.75*dimsizes(seasonality_cmip6), 3) - 1
+    percentile25 = seasonality_cmip6(x25)
+    percentile75 = seasonality_cmip6(x75)
+    xmax = max(seasonality_cmip6)
+    xmin = min(seasonality_cmip6)
+    median@project = "CMIP6"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, mme_plot, \
+                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6-stdv_cmip6, mean_cmip6-stdv_cmip6/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6, icolcmip6/), \
+                                                    (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6+stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6-w, icolcmip6+w/), \
+                                                    (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip6)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, mme_plot, icolcmip6, mean_cmip6, mkres)
-    idummy = idummy + 1
+    delete(seasonality_cmip6)
   end if
   if (nmodel_cmip5.gt.2) then
-    mean_cmip5 = mean_cmip5 / tofloat(nmodel_cmip5)
-    stdv_cmip5 = stdv_cmip5 / tofloat(nmodel_cmip5) - mean_cmip5*mean_cmip5
-    stdv_cmip5 = sqrt(stdv_cmip5)
-    mean_cmip5@project = "CMIP5"
-    lnres@gsLineColor      = get_color(mean_cmip5)
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5, icolcmip5/), (/mean_cmip5-stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    median = dim_median(seasonality_cmip5)
+    qsort(seasonality_cmip5)
+    x25  = round(0.25*dimsizes(seasonality_cmip5), 3) - 1
+    x75  = round(0.75*dimsizes(seasonality_cmip5), 3) - 1
+    percentile25 = seasonality_cmip5(x25)
+    percentile75 = seasonality_cmip5(x75)
+    xmax = max(seasonality_cmip5)
+    xmin = min(seasonality_cmip5)
+    median@project = "CMIP5"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, mme_plot, \
+                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5-stdv_cmip5, mean_cmip5-stdv_cmip5/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5, icolcmip5/), \
+                                                    (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5+stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5-w, icolcmip5+w/), \
+                                                    (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip5)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, mme_plot, icolcmip5, mean_cmip5, mkres)
-    idummy = idummy + 1
+    delete(seasonality_cmip5)
   end if
 
   pres@gsnPanelTop = 0.5

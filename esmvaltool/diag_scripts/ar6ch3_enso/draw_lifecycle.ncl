@@ -855,6 +855,7 @@ begin
 ; ===================================== Individual Models =======================================
 
   plots = new((/2, 2/), "graphic")
+  w = 0.3 ; width of bars for MME
   
   do ii = 0, ListCount(el)-1
     if (isvar("centers")) then
@@ -926,7 +927,7 @@ begin
   mkres@gsMarkerThicknessF = 2.0
   mkres@gsMarkerSizeF    = 0.01
   lnres = True
-  lnres@gsLineThicknessF = 2.
+  lnres@gsLineThicknessF = 1.5
   
   res@trYMaxF = 38.
   res@trYMinF = 10.
@@ -968,11 +969,7 @@ begin
     plots(0, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
   end do
   
-  mean_cmip5 = 0.
-  stdv_cmip5 = 0.
   nmodel_cmip5 = 0
-  mean_cmip6 = 0.
-  stdv_cmip6 = 0.
   nmodel_cmip6 = 0
   do ii = 0, ListCount(el)-1
     center = get_modelling_center(el[ii]@dataset)
@@ -991,58 +988,84 @@ begin
     delete(center)
     if (y.gt.0.) then
       if (el[ii]@project.eq."CMIP6") then
-        mean_cmip6 = mean_cmip6 + y
-        stdv_cmip6 = stdv_cmip6 + y^2
         nmodel_cmip6 = nmodel_cmip6 + 1
+        if (isvar("el_cmip6_composited")) then
+          tmp = el_cmip6_composited
+          delete(el_cmip6_composited)
+          el_cmip6_composited = new(nmodel_cmip6, typeof(y))
+          el_cmip6_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          el_cmip6_composited = y
+        end if
       elseif (el[ii]@project.eq."CMIP5") then
-        mean_cmip5 = mean_cmip5 + y
-        stdv_cmip5 = stdv_cmip5 + y^2
         nmodel_cmip5 = nmodel_cmip5 + 1
+        if (isvar("el_cmip5_composited")) then
+          tmp = el_cmip5_composited
+          delete(el_cmip5_composited)
+          el_cmip5_composited = new(nmodel_cmip5, typeof(y))
+          el_cmip5_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          el_cmip5_composited = y
+        end if
       end if
     end if
   end do
   if (nmodel_cmip6.gt.2) then
-    mean_cmip6 = mean_cmip6 / tofloat(nmodel_cmip6)
-    stdv_cmip6 = stdv_cmip6 / tofloat(nmodel_cmip6-1) \
-                 - mean_cmip6^2 * tofloat(nmodel_cmip6) / tofloat(nmodel_cmip6-1)
-    stdv_cmip6 = sqrt(stdv_cmip6)
-    mean_cmip6@project = "CMIP6"
-    lnres@gsLineColor      = get_color(mean_cmip6)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6, icolcmip6/), (/mean_cmip6-stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    median = dim_median(el_cmip6_composited)
+    qsort(el_cmip6_composited)
+    x25  = round(0.25*dimsizes(el_cmip6_composited), 3) - 1
+    x75  = round(0.75*dimsizes(el_cmip6_composited), 3) - 1
+    percentile25 = el_cmip6_composited(x25)
+    percentile75 = el_cmip6_composited(x75)
+    xmax = max(el_cmip6_composited)
+    xmin = min(el_cmip6_composited)
+    median@project = "CMIP6"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(0, 0), \
+                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6-stdv_cmip6, mean_cmip6-stdv_cmip6/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6, icolcmip6/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6+stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6-w, icolcmip6+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip6)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(0, 0), icolcmip6, mean_cmip6, mkres)
-    idummy = idummy + 1
+    delete(el_cmip6_composited)
   end if
   if (nmodel_cmip5.gt.2) then
-    mean_cmip5 = mean_cmip5 / tofloat(nmodel_cmip5)
-    stdv_cmip5 = stdv_cmip5 / tofloat(nmodel_cmip5-1) \
-                 - mean_cmip5^2 * tofloat(nmodel_cmip5) / tofloat(nmodel_cmip5-1)
-    stdv_cmip5 = sqrt(stdv_cmip5)
-    mean_cmip5@project = "CMIP5"
-    lnres@gsLineColor      = get_color(mean_cmip5)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5, icolcmip5/), (/mean_cmip5-stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    median = dim_median(el_cmip5_composited)
+    qsort(el_cmip5_composited)
+    x25  = round(0.25*dimsizes(el_cmip5_composited), 3) - 1
+    x75  = round(0.75*dimsizes(el_cmip5_composited), 3) - 1
+    percentile25 = el_cmip5_composited(x25)
+    percentile75 = el_cmip5_composited(x75)
+    xmax = max(el_cmip5_composited)
+    xmin = min(el_cmip5_composited)
+    median@project = "CMIP5"
+    polyres = True
+    polyres@gsFillColor      = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(0, 0), \
+                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5-stdv_cmip5, mean_cmip5-stdv_cmip5/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5, icolcmip5/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5+stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5-w, icolcmip5+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip5)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(0, 0), icolcmip5, mean_cmip5, mkres)
-    idummy = idummy + 1
+    delete(el_cmip5_composited)
   end if
 
-  mean_cmip5 = 0.
-  stdv_cmip5 = 0.
   nmodel_cmip5 = 0
-  mean_cmip6 = 0.
-  stdv_cmip6 = 0.
   nmodel_cmip6 = 0
   do ii = 0, ListCount(la)-1
     center = get_modelling_center(la[ii]@dataset)
@@ -1061,51 +1084,81 @@ begin
     delete(center)
     if (y.gt.0.) then
       if (la[ii]@project.eq."CMIP6") then
-        mean_cmip6 = mean_cmip6 + y
-        stdv_cmip6 = stdv_cmip6 + y^2
         nmodel_cmip6 = nmodel_cmip6 + 1
+        if (isvar("la_cmip6_composited")) then
+          tmp = la_cmip6_composited
+          delete(la_cmip6_composited)
+          la_cmip6_composited = new(nmodel_cmip6, typeof(y))
+          la_cmip6_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          la_cmip6_composited = y
+        end if
       elseif (la[ii]@project.eq."CMIP5") then
-        mean_cmip5 = mean_cmip5 + y
-        stdv_cmip5 = stdv_cmip5 + y^2
         nmodel_cmip5 = nmodel_cmip5 + 1
+        if (isvar("la_cmip5_composited")) then
+          tmp = la_cmip5_composited
+          delete(la_cmip5_composited)
+          la_cmip5_composited = new(nmodel_cmip5, typeof(y))
+          la_cmip5_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          la_cmip5_composited = y
+        end if
       end if
     end if
   end do
   if (nmodel_cmip6.gt.2) then
-    mean_cmip6 = mean_cmip6 / tofloat(nmodel_cmip6)
-    stdv_cmip6 = stdv_cmip6 / tofloat(nmodel_cmip6-1) \
-                 - mean_cmip6^2 * tofloat(nmodel_cmip6) / tofloat(nmodel_cmip6-1)
-    stdv_cmip6 = sqrt(stdv_cmip6)
-    mean_cmip6@project = "CMIP6"
-    lnres@gsLineColor      = get_color(mean_cmip6)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6, icolcmip6/), (/mean_cmip6-stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    median = dim_median(la_cmip6_composited)
+    qsort(la_cmip6_composited)
+    x25  = round(0.25*dimsizes(la_cmip6_composited), 3) - 1
+    x75  = round(0.75*dimsizes(la_cmip6_composited), 3) - 1
+    percentile25 = la_cmip6_composited(x25)
+    percentile75 = la_cmip6_composited(x75)
+    xmax = max(la_cmip6_composited)
+    xmin = min(la_cmip6_composited)
+    median@project = "CMIP6"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(0, 1), \
+                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6-stdv_cmip6, mean_cmip6-stdv_cmip6/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6, icolcmip6/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6+stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6-w, icolcmip6+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip6)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(0, 1), icolcmip6, mean_cmip6, mkres)
-    idummy = idummy + 1
+    delete(la_cmip6_composited)
   end if
   if (nmodel_cmip5.gt.2) then
-    mean_cmip5 = mean_cmip5 / tofloat(nmodel_cmip5)
-    stdv_cmip5 = stdv_cmip5 / tofloat(nmodel_cmip5-1) \
-                 - mean_cmip5^2 * tofloat(nmodel_cmip5) / tofloat(nmodel_cmip5-1)
-    stdv_cmip5 = sqrt(stdv_cmip5)
-    mean_cmip5@project = "CMIP5"
-    lnres@gsLineColor      = get_color(mean_cmip5)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5, icolcmip5/), (/mean_cmip5-stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    median = dim_median(la_cmip5_composited)
+    qsort(la_cmip5_composited)
+    x25  = round(0.25*dimsizes(la_cmip5_composited), 3) - 1
+    x75  = round(0.75*dimsizes(la_cmip5_composited), 3) - 1
+    percentile25 = la_cmip5_composited(x25)
+    percentile75 = la_cmip5_composited(x75)
+    xmax = max(la_cmip5_composited)
+    xmin = min(la_cmip5_composited)
+    median@project = "CMIP5"
+    polyres = True
+    polyres@gsFillColor      = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(0, 1), \
+                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5-stdv_cmip5, mean_cmip5-stdv_cmip5/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5, icolcmip5/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5+stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5-w, icolcmip5+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip5)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(0, 1), icolcmip5, mean_cmip5, mkres)
-    idummy = idummy + 1
+    delete(la_cmip5_composited)
   end if
   
 ; -----------------------------------------------------------
@@ -1132,11 +1185,7 @@ begin
     plots(1, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
   end do
   
-  mean_cmip5 = 0.
-  stdv_cmip5 = 0.
   nmodel_cmip5 = 0
-  mean_cmip6 = 0.
-  stdv_cmip6 = 0.
   nmodel_cmip6 = 0
   do ii = 0, ListCount(el)-1
     center = get_modelling_center(el[ii]@dataset)
@@ -1149,59 +1198,84 @@ begin
     delete(center)
     if (y.gt.0.) then
       if (el[ii]@project.eq."CMIP6") then
-        mean_cmip6 = mean_cmip6 + y
-        stdv_cmip6 = stdv_cmip6 + y^2
         nmodel_cmip6 = nmodel_cmip6 + 1
+        if (isvar("el_cmip6_composited")) then
+          tmp = el_cmip6_composited
+          delete(el_cmip6_composited)
+          el_cmip6_composited = new(nmodel_cmip6, typeof(y))
+          el_cmip6_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          el_cmip6_composited = y
+        end if
       elseif (el[ii]@project.eq."CMIP5") then
-        mean_cmip5 = mean_cmip5 + y
-        stdv_cmip5 = stdv_cmip5 + y^2
         nmodel_cmip5 = nmodel_cmip5 + 1
+        if (isvar("el_cmip5_composited")) then
+          tmp = el_cmip5_composited
+          delete(el_cmip5_composited)
+          el_cmip5_composited = new(nmodel_cmip5, typeof(y))
+          el_cmip5_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          el_cmip5_composited = y
+        end if
       end if
     end if
   end do
   if (nmodel_cmip6.gt.2) then
-    mean_cmip6 = mean_cmip6 / tofloat(nmodel_cmip6)
-    stdv_cmip6 = stdv_cmip6 / tofloat(nmodel_cmip6-1) \
-                 - mean_cmip6^2 * tofloat(nmodel_cmip6) / tofloat(nmodel_cmip6-1)
-    stdv_cmip6 = sqrt(stdv_cmip6)
-
-    mean_cmip6@project = "CMIP6"
-    lnres@gsLineColor      = get_color(mean_cmip6)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6, icolcmip6/), (/mean_cmip6-stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    median = dim_median(el_cmip6_composited)
+    qsort(el_cmip6_composited)
+    x25  = round(0.25*dimsizes(el_cmip6_composited), 3) - 1
+    x75  = round(0.75*dimsizes(el_cmip6_composited), 3) - 1
+    percentile25 = el_cmip6_composited(x25)
+    percentile75 = el_cmip6_composited(x75)
+    xmax = max(el_cmip6_composited)
+    xmin = min(el_cmip6_composited)
+    median@project = "CMIP6"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(1, 0), \
+                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6-stdv_cmip6, mean_cmip6-stdv_cmip6/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6, icolcmip6/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6+stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6-w, icolcmip6+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip6)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 0), icolcmip6, mean_cmip6, mkres)
-    idummy = idummy + 1
+    delete(el_cmip6_composited)
   end if
   if (nmodel_cmip5.gt.2) then
-    mean_cmip5 = mean_cmip5 / tofloat(nmodel_cmip5)
-    stdv_cmip5 = stdv_cmip5 / tofloat(nmodel_cmip5-1) \
-                 - mean_cmip5^2 * tofloat(nmodel_cmip5) / tofloat(nmodel_cmip5-1)
-    stdv_cmip5 = sqrt(stdv_cmip5)
-    mean_cmip5@project = "CMIP5"
-    lnres@gsLineColor      = get_color(mean_cmip5)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5, icolcmip5/), (/mean_cmip5-stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    median = dim_median(el_cmip5_composited)
+    qsort(el_cmip5_composited)
+    x25  = round(0.25*dimsizes(el_cmip5_composited), 3) - 1
+    x75  = round(0.75*dimsizes(el_cmip5_composited), 3) - 1
+    percentile25 = el_cmip5_composited(x25)
+    percentile75 = el_cmip5_composited(x75)
+    xmax = max(el_cmip5_composited)
+    xmin = min(el_cmip5_composited)
+    median@project = "CMIP5"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(1, 0), \
+                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5-stdv_cmip5, mean_cmip5-stdv_cmip5/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5, icolcmip5/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5+stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5-w, icolcmip5+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip5)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 0), icolcmip5, mean_cmip5, mkres)
-    idummy = idummy + 1
+    delete(el_cmip5_composited)
   end if
 
-  mean_cmip5 = 0.
-  stdv_cmip5 = 0.
   nmodel_cmip5 = 0
-  mean_cmip6 = 0.
-  stdv_cmip6 = 0.
   nmodel_cmip6 = 0
   do ii = 0, ListCount(la)-1
     center = get_modelling_center(la[ii]@dataset)
@@ -1214,52 +1288,84 @@ begin
     delete(center)
     if (y.gt.0) then
       if (la[ii]@project.eq."CMIP6") then
-        mean_cmip6 = mean_cmip6 + y
-        stdv_cmip6 = stdv_cmip6 + y^2
         nmodel_cmip6 = nmodel_cmip6 + 1
+        if (isvar("la_cmip6_composited")) then
+          tmp = la_cmip6_composited
+          delete(la_cmip6_composited)
+          la_cmip6_composited = new(nmodel_cmip6, typeof(y))
+          la_cmip6_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          la_cmip6_composited = y
+        end if
       elseif (la[ii]@project.eq."CMIP5") then
-        mean_cmip5 = mean_cmip5 + y
-        stdv_cmip5 = stdv_cmip5 + y^2
         nmodel_cmip5 = nmodel_cmip5 + 1
+        if (isvar("la_cmip5_composited")) then
+          tmp = la_cmip5_composited
+          delete(la_cmip5_composited)
+          la_cmip5_composited = new(nmodel_cmip5, typeof(y))
+          la_cmip5_composited = array_append_record(tmp, y, 0)
+          delete(tmp)
+        else
+          la_cmip5_composited = y
+        end if
       end if
     end if
   end do
   if (nmodel_cmip6.gt.2) then
-    mean_cmip6 = mean_cmip6 / tofloat(nmodel_cmip6)
-    stdv_cmip6 = stdv_cmip6 / tofloat(nmodel_cmip6-1) \
-                 - mean_cmip6^2 * tofloat(nmodel_cmip6) / tofloat(nmodel_cmip6-1)
-    stdv_cmip6 = sqrt(stdv_cmip6)
-    mean_cmip6@project = "CMIP6"
-    lnres@gsLineColor      = get_color(mean_cmip6)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6, icolcmip6/), (/mean_cmip6-stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    median = dim_median(la_cmip6_composited)
+    qsort(la_cmip6_composited)
+    x25  = round(0.25*dimsizes(la_cmip6_composited), 3) - 1
+    x75  = round(0.75*dimsizes(la_cmip6_composited), 3) - 1
+    percentile25 = la_cmip6_composited(x25)
+    percentile75 = la_cmip6_composited(x75)
+    xmax = max(la_cmip6_composited)
+    xmin = min(la_cmip6_composited)
+    median@project = "CMIP6"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(1, 1), \
+                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6-stdv_cmip6, mean_cmip6-stdv_cmip6/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6, icolcmip6/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6-0.1, icolcmip6+0.1/), (/mean_cmip6+stdv_cmip6, mean_cmip6+stdv_cmip6/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6-w, icolcmip6+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip6)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 1), icolcmip6, mean_cmip6, mkres)
-    idummy = idummy + 1
+    delete(la_cmip6_composited)
   end if
   if (nmodel_cmip5.gt.2) then
-    mean_cmip5 = mean_cmip5 / tofloat(nmodel_cmip5)
-    stdv_cmip5 = stdv_cmip5 / tofloat(nmodel_cmip5-1) \
-                 - mean_cmip5^2 * tofloat(nmodel_cmip5) / tofloat(nmodel_cmip5-1)
-    stdv_cmip5 = sqrt(stdv_cmip5)
-    mean_cmip5@project = "CMIP5"
-    lnres@gsLineColor      = get_color(mean_cmip5)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5, icolcmip5/), (/mean_cmip5-stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    median = dim_median(la_cmip5_composited)
+    qsort(la_cmip5_composited)
+    x25  = round(0.25*dimsizes(la_cmip5_composited), 3) - 1
+    x75  = round(0.75*dimsizes(la_cmip5_composited), 3) - 1
+    percentile25 = la_cmip5_composited(x25)
+    percentile75 = la_cmip5_composited(x75)
+    xmax = max(la_cmip5_composited)
+    xmin = min(la_cmip5_composited)
+    median@project = "CMIP5"
+    polyres = True
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) = gsn_add_polygon(wks, plots(1, 1), \
+                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
+                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5-stdv_cmip5, mean_cmip5-stdv_cmip5/), lnres)
+    lnres@gsLineColor := get_color(median)
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5, icolcmip5/), \
+                                                       (/xmin, xmax/), lnres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5-0.1, icolcmip5+0.1/), (/mean_cmip5+stdv_cmip5, mean_cmip5+stdv_cmip5/), lnres)
+    lnres@gsLineColor := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5-w, icolcmip5+w/), \
+                                                       (/median, median/), lnres)
     idummy = idummy + 1
-    mkres@gsMarkerColor    = get_color(mean_cmip5)
-    mkres@gsMarkerIndex    = 6
-    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 1), icolcmip5, mean_cmip5, mkres)
-    idummy = idummy + 1
+    delete(la_cmip5_composited)
   end if
+
+
   
 ;  res@trYMaxF = 48.
 ;  res@trYMinF = 6.
