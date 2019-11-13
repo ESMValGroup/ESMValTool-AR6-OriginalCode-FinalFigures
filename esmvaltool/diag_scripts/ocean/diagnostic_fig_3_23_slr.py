@@ -305,6 +305,7 @@ def make_fig_3_23(
         cutoff,
         model = 'all',
         experiment = 'all',
+        exp_colours_key = False
 ):
     """
     Make a time series plot showing several preprocesssed datasets.
@@ -431,6 +432,8 @@ def make_fig_3_23(
     project_colours={'CMIP3': 'green', 'CMIP5': 'blue', 'CMIP6': 'red'}
     project_cmaps = {'CMIP3': 'cool', 'CMIP5': 'winter', 'CMIP6': 'inferno'}
 
+    exp_colours={'historical': 'purple', 'hist-aer': 'blue', 'hist-GHG': 'red', 'hist-nat': 'green'}
+
     for project, unique_keys in sorted(project_cubes.items()):
         cmap = plt.cm.get_cmap(project_cmaps[project])
         for unique_key, cube in sorted(unique_keys.items()):
@@ -461,8 +464,16 @@ def make_fig_3_23(
                 value = 0
             else:
                 value = model_number / (len(projects[project]) - 1.)
-            colour = cmap(value)
-            print(project, unique_key, 'minimum:', cube.data.min())
+
+            colour = 'black'
+            if exp_colours_key:
+                for exp, col in exp_colours.items():
+                    if unique_key.find(exp) > -1:
+                        colour = col
+                        unique_key = exp
+            else:
+                colour = cmap(value)
+            print(project, unique_key, 'minimum:', cube.data.min(), colour)
             # Make plots for single models
             timeplot(
                     cube,
@@ -478,12 +489,14 @@ def make_fig_3_23(
                 'label': unique_key
             }
 
-            if project not in legend_order:
+            if project not in legend_order and not exp_colours_key:
                 legend_order.append(project)
 
             legend_order.append(unique_key)
 
     for project in sorted(projects):
+        if exp_colours_key:
+            continue
         cube_list = [cube for cube in project_cubes[project].values()]
         cube = make_mean_of_cube_list(cube_list)
 
@@ -501,7 +514,7 @@ def make_fig_3_23(
                     ls=plot_details[project]['ls'],
                     lw=plot_details[project]['lw'],
                 )
-
+    exp_colours_key
     # Draw horizontal line at zero
     plt.axhline(0., c='k', ls='--', lw=0.5)
 
@@ -517,6 +530,8 @@ def make_fig_3_23(
     else:
         plt.title(experiment.title())
 
+    if exp_colours_key:
+        legend_order = sorted(list(set(legend_order)))
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 8.)
     # project0 = [project for project in sorted(projects.keys())][0]
@@ -527,7 +542,13 @@ def make_fig_3_23(
 
 
     # Saving image:
-    path = diagtools.folder(cfg['plot_dir'])+'_'.join(['fig_3_23_', model, experiment, str(cutoff)+ image_extention])
+    if exp_colours_key:
+        path = diagtools.folder(cfg['plot_dir'])+'_'.join(['fig_3_23_samecolours',
+             str(cutoff)+ image_extention])
+    else:
+        path = diagtools.folder(cfg['plot_dir'])+'_'.join(['fig_3_23_',
+            model, experiment, str(cutoff)+ image_extention])
+
     logger.info('Saving plots to %s', path)
     plt.savefig(path)
     plt.close()
@@ -551,6 +572,13 @@ def main(cfg):
         metadatas = diagtools.get_input_files(cfg, index=index)
         datasets = {}
         experiments = {}
+        make_fig_3_23(
+            cfg,
+            metadatas,
+            -120.,
+            exp_colours_key=True,
+        )
+
         for i, filename in enumerate(sorted(metadatas)):
             #metadata = metadatas[filename]
             datasets[metadatas[filename]['dataset']] =True
@@ -584,6 +612,7 @@ def main(cfg):
                 metadatas,
                 cutoff
             )
+
     logger.info('Success')
 
 

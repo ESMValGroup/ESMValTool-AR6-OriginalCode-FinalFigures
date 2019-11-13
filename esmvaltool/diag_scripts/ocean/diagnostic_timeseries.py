@@ -58,6 +58,9 @@ import numpy as np
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
 
+from esmvalcore.preprocessor._time import climate_statistics
+
+
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 
@@ -173,6 +176,41 @@ def moving_average(cube, window):
     return cube
 
 
+def calc_anomaly(cube, average_period):
+    """
+    Calculate the anomaly.
+
+    Parameters
+    ----------
+    cube: iris.cube.Cube
+        Input cube
+    average_period: list
+        A description of the window to use for the anomaly subtraction.
+
+    Returns
+    ----------
+    iris.cube.Cube:
+        A cube
+
+    """
+    datetime = diagtools.guess_calendar_datetime(cube)
+    starttime = datetime(average_period[0], 1, 1)
+    endtime = datetime(average_period[1], 1, 1)
+    time_units = cube.coord('time').units
+
+    t_1 = time_units.date2num(starttime)
+    t_2 = time_units.date2num(endtime)
+    constraint = iris.Constraint(
+        time=lambda t: (t_1 < time_units.date2num(t.point) < t_2))
+    cube_slice = climate_statistics(cube.extract(constraint),
+                                    operator='mean', period='full')
+    cube.data = cube.data - cube_slice.data
+    return cube
+
+
+
+
+
 def make_time_series_plots(
         cfg,
         metadata,
@@ -264,6 +302,7 @@ def make_time_series_plots(
 def multi_model_time_series(
         cfg,
         metadata,
+        average_period = []
 ):
     """
     Make a time series plot showing several preprocesssed datasets.
@@ -278,7 +317,8 @@ def multi_model_time_series(
         the opened global config dictionairy, passed by ESMValTool.
     metadata: dict
         The metadata dictionairy for a specific model.
-
+    average_period: list
+        The period to calculate the anomaly
     """
 
     ####
@@ -319,6 +359,11 @@ def multi_model_time_series(
             else:
                 cube = model_cubes[filename][layer]
 
+            # Take a moving average_period, if needed.
+            if average_period:
+                cube = calc_anomaly(model_cubes[filename][layer],
+                                      average_period)
+
             if 'MultiModel' in metadata[filename]['dataset']:
                 timeplot(
                     cube,
@@ -357,6 +402,15 @@ def multi_model_time_series(
         # Add title, legend to plots
         if layer:
             title = ' '.join([title, '(', str(layer), str(z_units), ')'])
+
+        if average_period:
+            title += ' Anomaly ('+str(int(average_period[0]))+'-'+str(int(average_period[1]))+ ')'
+            anomalykey = str(average_period[0])+'-'+str(average_period[1])
+            plt.axhline(0., c='k', ls='--', lw=0.5, alpha=1., zorder = 10) 
+
+        else:
+            anomalykey = ''
+
         plt.title(title)
         plt.legend(loc='best')
         plt.ylabel(str(model_cubes[filename][layer].units))
@@ -367,7 +421,7 @@ def multi_model_time_series(
                 cfg,
                 metadata[filename],
                 prefix='MultipleModels_',
-                suffix='_'.join(['timeseries',
+                suffix='_'.join(['timeseries', anomalykey,
                                  str(layer) + image_extention]),
                 metadata_id_list=[
                     'field', 'short_name', 'preprocessor', 'diagnostic',
@@ -400,12 +454,24 @@ def main(cfg):
         logger.info('metadata filename:\t%s', metadata_filename)
 
         metadatas = diagtools.get_input_files(cfg, index=index)
+        if 'anomaly' in cfg.keys():
+            average_period = cfg['anomaly']
+        else:
+            average_period = None
 
         #######
         # Multi model time series
+        # Subtract anomaly
         multi_model_time_series(
             cfg,
             metadatas,
+            average_period = average_period
+        )
+
+        multi_model_time_series(
+            cfg,
+            metadatas,
+            average_period = None
         )
 
         for filename in sorted(metadatas):
