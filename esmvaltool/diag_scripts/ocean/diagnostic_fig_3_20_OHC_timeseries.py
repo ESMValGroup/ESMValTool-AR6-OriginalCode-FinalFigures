@@ -316,15 +316,10 @@ def make_fig_3_20(
     """
     metadatas = diagtools.get_input_files(cfg)
 
-    assert 0
-    Need to add pi control detrending using relevant years (https://github.com/ESMValGroup/ESMValCore/issues/342)
-    Need to add observational data
-    cmip6 data
-    Put both panes on the same figure
-    colour
-    
-
-
+    #TODO add pi control detrending using relevant years (https://github.com/ESMValGroup/ESMValCore/issues/342)
+    #TODO Need to add observational data
+    #TODO Put both panes on the same figure
+    #TODO colour scales.
 
     ####
     # Load the data for each layer as a separate cube
