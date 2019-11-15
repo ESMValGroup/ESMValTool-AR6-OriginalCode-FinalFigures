@@ -176,7 +176,7 @@ def moving_average(cube, window):
     return cube
 
 
-def calc_anomaly(cube, average_period):
+def calc_anomaly(cube, anomaly_period):
     """
     Calculate the anomaly.
 
@@ -184,7 +184,7 @@ def calc_anomaly(cube, average_period):
     ----------
     cube: iris.cube.Cube
         Input cube
-    average_period: list
+    anomaly_period: list
         A description of the window to use for the anomaly subtraction.
 
     Returns
@@ -194,15 +194,17 @@ def calc_anomaly(cube, average_period):
 
     """
     datetime = diagtools.guess_calendar_datetime(cube)
-    starttime = datetime(average_period[0], 1, 1)
-    endtime = datetime(average_period[1], 1, 1)
+    starttime = datetime(anomaly_period[0], 1, 1)
+    endtime = datetime(anomaly_period[1], 12, 31)
     time_units = cube.coord('time').units
 
     t_1 = time_units.date2num(starttime)
     t_2 = time_units.date2num(endtime)
     constraint = iris.Constraint(
         time=lambda t: (t_1 < time_units.date2num(t.point) < t_2))
-    cube_slice = climate_statistics(cube.extract(constraint),
+    cube_slice = cube.extract(constraint)
+    print(cube_slice)
+    cube_slice = climate_statistics(cube_slice,
                                     operator='mean', period='full')
     cube.data = cube.data - cube_slice.data
     return cube
@@ -302,7 +304,7 @@ def make_time_series_plots(
 def multi_model_time_series(
         cfg,
         metadata,
-        average_period = []
+        anomaly_period = []
 ):
     """
     Make a time series plot showing several preprocesssed datasets.
@@ -317,7 +319,7 @@ def multi_model_time_series(
         the opened global config dictionairy, passed by ESMValTool.
     metadata: dict
         The metadata dictionairy for a specific model.
-    average_period: list
+    anomaly_period: list
         The period to calculate the anomaly
     """
 
@@ -360,10 +362,10 @@ def multi_model_time_series(
             else:
                 cube = model_cubes[filename][layer]
 
-            # Take a moving average_period, if needed.
-            if average_period:
+            # Take a moving anomaly_period, if needed.
+            if anomaly_period:
                 cube = calc_anomaly(model_cubes[filename][layer],
-                                      average_period)
+                                      anomaly_period)
 
             if 'MultiModel' in metadata[filename]['dataset']:
                 timeplot(
@@ -404,10 +406,10 @@ def multi_model_time_series(
         if layer:
             title = ' '.join([title, '(', str(layer), str(z_units), ')'])
 
-        if average_period:
-            title += ' Anomaly ('+str(int(average_period[0]))+'-'+str(int(average_period[1]))+ ')'
-            anomalykey = str(average_period[0])+'-'+str(average_period[1])
-            plt.axhline(0., c='k', ls='--', lw=0.5, alpha=1., zorder = 10) 
+        if anomaly_period:
+            title += ' Anomaly ('+str(int(anomaly_period[0]))+'-'+str(int(anomaly_period[1]))+ ')'
+            anomalykey = str(anomaly_period[0])+'-'+str(anomaly_period[1])
+            plt.axhline(0., c='k', ls='--', lw=0.5, alpha=1., zorder = 10)
 
         else:
             anomalykey = ''
@@ -456,24 +458,30 @@ def main(cfg):
 
         metadatas = diagtools.get_input_files(cfg, index=index)
         if 'anomaly' in cfg.keys():
-            average_period = cfg['anomaly']
+            anomaly_period = cfg['anomaly']
         else:
-            average_period = None
+            anomaly_period = None
 
         #######
         # Multi model time series
         # Subtract anomaly
-        multi_model_time_series(
-            cfg,
-            metadatas,
-            average_period = average_period
-        )
+        if anomaly_period:
+            multi_model_time_series(
+                cfg,
+                metadatas,
+                anomaly_period = anomaly_period
+            )
 
-        multi_model_time_series(
-            cfg,
-            metadatas,
-            average_period = None
-        )
+            multi_model_time_series(
+               cfg,
+                metadatas,
+                anomaly_period = None
+            )
+        else:
+            multi_model_time_series(
+                cfg,
+                metadatas,
+            )
 
         for filename in sorted(metadatas):
             if metadatas[filename]['frequency'] != 'fx':
