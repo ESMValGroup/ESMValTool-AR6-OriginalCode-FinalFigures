@@ -2140,10 +2140,11 @@ begin
   nexp     = tmp(0)
   delete(tmp)
 
-  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
+  ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
   res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
-  res@xyLineColors = cmap(1:5,:)
+  res@xyLineColors = cmap(0:3,:)
 
   if (nexp .gt. 6) then
     error_msg("w", scriptname, funcname, "Color palette not defined for " \
@@ -2165,9 +2166,10 @@ begin
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
       res_stat@gsnXYFillOpacities = 0.2
-      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
+      ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
       copy_VarMeta(res, res_stat)
-      res_stat@gsnXYFillColors = cmap(1,:)
+      res_stat@gsnXYFillColors = cmap(0,:)
       delete(res_stat@xyLineColors)
       ; We don't want the line, so make it transparent.
       res_stat@xyLineColor = -1
@@ -2175,18 +2177,24 @@ begin
                                 res_stat)
       overlay(plot(0), shading_plot)
       if(nexp .ge. 2) then
-        res_stat@gsnXYFillColors = cmap(2,:)
+        res_stat@gsnXYFillColors = cmap(1,:)
         shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 3) then
-        res_stat@gsnXYFillColors = cmap(3,:)
+        res_stat@gsnXYFillColors = cmap(2,:)
         shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
-      if(nexp .gt. 3) then
+      if(nexp .ge. 4) then
+        res_stat@gsnXYFillColors = cmap(3,:)
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .gt. 4) then
         error_msg("w", scriptname, funcname, "Color palette not defined for " \
                   + nexp + " experiments")
       end if
@@ -2209,7 +2217,7 @@ begin
   end if
 
   if (diag_script_info@ts_anomaly .eq. "anom" .and. \
-      diag_script_info@stat_shading) then
+      diag_script_info@ref_shading) then
 
     ; ---------------------------------------------------------------------
     ; yellow shading of reference period

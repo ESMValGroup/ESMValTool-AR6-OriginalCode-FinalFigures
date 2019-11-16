@@ -234,7 +234,6 @@ begin
       end do
       A0_monavg_ref = time_operations(tmp, ref_start, ref_end, "average", \
                                       "monthlyclim", True)
-      delete(tmp)
 
       ; calculate anomaly for each grid point
       do i = 0, dimsizes(A0&time) - 1
@@ -257,7 +256,6 @@ begin
         delete(year)
         delete(month)
         delete(date)
-        delete(tmp)
         delete(A0_monavg_ref)
 
         ; calculate global mean of reference period
@@ -279,6 +277,8 @@ begin
         anom_ref(imod) = anom_ref_tmp
         ; delete(anom_ref_tmp)
       end if
+
+      delete(tmp)
 
     end if
 

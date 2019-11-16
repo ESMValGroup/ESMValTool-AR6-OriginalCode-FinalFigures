@@ -24,7 +24,8 @@
 ;    run_ave: if not equal 0 than calculate running mean over this number
 ;             of years
 ;    header: if true, region name as header     
-;    stat_shading: if true: shading of reference period
+;    stat_shading: if true: shading of statistic range
+;    ref_shading: if true: shading of reference period
 ;
 ; Caveats
 ;
@@ -81,6 +82,7 @@ begin
   set_default_att(diag_script_info, "run_ave", 0)
   set_default_att(diag_script_info, "header", True)
   set_default_att(diag_script_info, "stat_shading", False)
+  set_default_att(diag_script_info, "ref_shading", False)
 
   ; Determine time range
   start_year = diag_script_info@start_year
