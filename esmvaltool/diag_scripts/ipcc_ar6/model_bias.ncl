@@ -403,8 +403,8 @@ begin
     mmdata@res_cnLevels = ispan(-30, 30, 5)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_temperature_14.rgb")
-    mmdata@res_cnFillColors = pal(::-1,:)
+                             + "ipcc-ar6_temperature_div_14.rgb")
+    mmdata@res_cnFillColors = pal
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_temperature_10.rgb")
     diff@res_cnFillColors = pal2(::-1,:)
