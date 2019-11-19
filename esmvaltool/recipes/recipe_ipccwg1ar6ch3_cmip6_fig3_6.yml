@@ -210,7 +210,6 @@ diagnostics:
         preprocessor: clim_ref_global
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -242,7 +241,6 @@ diagnostics:
         preprocessor: clim_ref_global
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -260,7 +258,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_global
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -288,7 +285,6 @@ diagnostics:
         preprocessor: clim_ref_global_land
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -308,7 +304,6 @@ diagnostics:
         preprocessor: clim_ref_global_land
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -327,7 +322,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_global_land
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -356,7 +350,6 @@ diagnostics:
         preprocessor: clim_ref_global_ocean
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -376,7 +369,6 @@ diagnostics:
         preprocessor: clim_ref_global_ocean
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -395,7 +387,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_global_ocean
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -424,7 +415,6 @@ diagnostics:
         preprocessor: clim_ref_europe
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -444,7 +434,6 @@ diagnostics:
         preprocessor: clim_ref_europe
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -463,7 +452,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_europe
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -492,7 +480,6 @@ diagnostics:
         preprocessor: clim_ref_asia
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -512,7 +499,6 @@ diagnostics:
         preprocessor: clim_ref_asia
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -531,7 +517,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_asia
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -560,7 +545,6 @@ diagnostics:
         preprocessor: clim_ref_africa
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -580,7 +564,6 @@ diagnostics:
         preprocessor: clim_ref_africa
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -599,7 +582,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_africa
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -628,7 +610,6 @@ diagnostics:
         preprocessor: clim_ref_north_america
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -648,7 +629,6 @@ diagnostics:
         preprocessor: clim_ref_north_america
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -667,7 +647,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_north_america
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -696,7 +675,6 @@ diagnostics:
         preprocessor: clim_ref_south_america
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -716,7 +694,6 @@ diagnostics:
         preprocessor: clim_ref_south_america
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -735,7 +712,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_south_america
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -764,7 +740,6 @@ diagnostics:
         preprocessor: clim_ref_antarctica
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -784,7 +759,6 @@ diagnostics:
         preprocessor: clim_ref_antarctica
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -803,7 +777,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_antarctica
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
@@ -832,7 +805,6 @@ diagnostics:
         preprocessor: clim_ref_australasia
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: historical
         ensemble: r1i1p1f1
@@ -852,7 +824,6 @@ diagnostics:
         preprocessor: clim_ref_australasia
         reference_dataset: HadCRUT4
         mip: Amon
-        field: T2Ms
         project: CMIP6
         exp: hist-nat
         ensemble: r1i1p1f1
@@ -871,7 +842,6 @@ diagnostics:
       tas:
         preprocessor: clim_ref_australasia
         mip: Amon
-        field: T2Ms
         reference_dataset: HadCRUT4   
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,

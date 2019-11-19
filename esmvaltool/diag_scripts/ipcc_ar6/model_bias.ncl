@@ -153,12 +153,20 @@ begin
 
   A0 = read_data(info0[mm_ind])
   mmdata = time_operations(A0, -1, -1, "average", timemean, True)
-  mm_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+  if (dimsizes(A0&time).gt.12) then
+    mm_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+  else
+    mm_mon = A0
+  end if
   delete(A0)
 
   A0 = read_data(info0[ref_ind])
   refdata = time_operations(A0, -1, -1, "average", timemean, True)
-  ref_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+  if (dimsizes(A0&time).gt.12) then
+    ref_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+  else
+    ref_mon = A0
+  end if
   delete(A0)
 
   dim = dimsizes(mmdata)
@@ -193,6 +201,31 @@ begin
 
   end do
 
+  ; convert units for plotting
+  if (var0.eq."pr") then
+    ; kg m-2 s-1 --> mm day-1
+    mmdata = convert_units(mmdata, "mm/day")
+    refdata = convert_units(refdata, "mm/day")
+    ; diff = convert_units(diff, "mm/day")
+    ; absdiff = convert_units(absdiff, "mm/day")
+    ; rmsdiff = convert_units(rmsdiff, "mm/day")
+    ; for plotting IPCC AR5 fig 9.4
+  elseif (var0.eq."tas") then
+    mmdata = convert_units(mmdata, "degC")
+    refdata = convert_units(refdata, "degC")
+  elseif (var0.eq."tos" .or. var0.eq."thetao") then
+    if (mmdata@units .eq. "K") then
+      mmdata = convert_units(mmdata, "degC")
+      data_mon = convert_units(data_mon, "degC")
+    end if
+    if (refdata@units .eq. "K") then
+      refdata = convert_units(refdata, "degC")
+      ref_mon = convert_units(ref_mon, "degC")
+    end if
+  elseif (var0.eq."so") then
+    refdata = refdata * 1000.
+  end if
+
   ; differences between multi-model mean and reference data set
   ; (multi-model bias)
 
@@ -200,28 +233,51 @@ begin
   mmdata@diag_script = DIAG_SCRIPT
   copy_VarMeta(mmdata, diff)
 
+  if any(var0 .eq. (/"tas","tos","thetao"/)) then
+    diff@units = "~F34~0~F~ C"
+    ; for plotting IPCC AR5 fig 9.2
+    diff@res_cnLevels = ispan(-4, 4, 1)
+  elseif (var0 .eq. "pr") then
+    diff@res_cnLevels = ispan(-20, 20, 5) * 0.1
+  elseif (var0 .eq. "so") then
+    diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
+  end if
+
   diff_i    = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   absdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   rmsdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   reldiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
 
-  do ii=0,dim_MOD-3
+  if (plot_rms_diff .or. plot_abs_diff .or. plot_rel_diff) then
 
-    ;difference
-    diff_i(ii,:,:) = data(ii,:,:) - refdata
+    ii = 0
 
-    ;absolute difference
-    absdiff_i(ii,:,:) = abs(diff_i(ii,:,:))
+    do imod=0,dim_MOD-1
 
-    ; root mean square error
-    rmsdiff_i(ii,:,:) = calculate_metric(data_mon(ii,:,:,:), ref_mon, "RMSDxy")
+      if(imod .ne. mm_ind .and. imod .ne. ref_ind) then
+        log_info("processing " + names(imod))
 
-    ; relative difference
-    ; replace "epsilon" values with missing value
-    datam = where(abs(data).lt.1.e-6, data@_FillValue, data)
-    reldiff_i(ii,:,:) = 100.0 * (diff_i(ii,:,:) / datam(ii,:,:))
+        ;difference
+        diff_i(ii,:,:) = data(ii,:,:) - refdata
 
-  end do
+        ;absolute difference
+        absdiff_i(ii,:,:) = abs(diff_i(ii,:,:))
+
+        ; root mean square error
+        rmsdiff_i(ii,:,:) = calculate_metric(data_mon(ii,:,:,:), ref_mon, "RMSDxy")
+
+        ; relative difference
+        ; replace "epsilon" values with missing value
+        datam = where(abs(data).lt.1.e-6, data@_FillValue, data)
+        reldiff_i(ii,:,:) = 100.0 * (diff_i(ii,:,:) / datam(ii,:,:))
+
+        ii = ii + 1
+
+      end if
+
+    end do
+
+  end if
 
   ; multi-model mean of absolute difference between models and reference
   ; data set 
@@ -235,25 +291,7 @@ begin
   reldiff = dim_avg_n_Wrap(reldiff_i, 0)
   copy_VarMeta(diff, reldiff) 
 
-  delete(refdata)
-
-  ; convert units for plotting (precipitation: kg m-2 s-1 --> mm day-1)
-
-  if (var0.eq."pr") then
-    mmdata = convert_units(mmdata, "mm/day")
-    diff = convert_units(diff, "mm/day")
-    absdiff = convert_units(absdiff, "mm/day")
-    rmsdiff = convert_units(rmsdiff, "mm/day")
-    ; for plotting IPCC AR5 fig 9.4
-    diff@res_cnLevels = ispan(-20, 20, 5) * 0.1
-  end if
-
-  if (var0.eq."tas") then
-    mmdata = convert_units(mmdata, "degC")
-    diff@units = "~F34~0~F~ C"
-    ; for plotting IPCC AR5 fig 9.2
-    diff@res_cnLevels = ispan(-4, 4, 1)
-  end if
+  ;delete(refdata)
 
   ; ========================================================================
   ; ============================= plotting =================================
@@ -361,6 +399,36 @@ begin
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_precipitation_11.rgb")
     end if
+  elseif (var0.eq."tos" .or. var0.eq."thetao") then
+    mmdata@res_cnLevels = ispan(-30, 30, 5)
+
+    pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                             + "ipcc-ar6_temperature_div_14.rgb")
+    mmdata@res_cnFillColors = pal
+    pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                              + "ipcc-ar6_temperature_10.rgb")
+    diff@res_cnFillColors = pal2(::-1,:)
+    if (plot_abs_diff) then
+      pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+    if (plot_rel_diff) then
+      pal4 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+    if (plot_rms_diff) then
+      pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                                + "ipcc-ar6_temperature_10.rgb")
+    end if
+  elseif (var0.eq."so") then
+    mmdata@res_cnLevels = ispan(310, 370, 5) * 0.1
+
+    pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                             + "ipcc-ar6_others_seq_14.rgb")
+    mmdata@res_cnFillColors = pal
+    pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                              + "ipcc-ar6_others_div_14.rgb")
+    diff@res_cnFillColors = pal2
   else
     mmdata@res_cnLevels = fspan(min(mmdata), max(mmdata), 20)
   end if
@@ -405,31 +473,34 @@ begin
 
   if (plot_rms_diff) then
     copy_VarMeta(diff, rmsdiff)
-    if (isvar("pal5")) then
-      delete(rmsdiff@res_cnFillColors)
-      if (var0 .eq. "tas") then
-        rmsdiff@res_cnFillColors = pal5(4:0,:)
-        nt = dimsizes(pal5(4:0,:))
-      elseif (var0 .eq. "pr") then
-        rmsdiff@res_cnFillColors = pal5(5:10,:)
-        nt = dimsizes(pal5(5:10,:))
-      end if
-      n = nt(0)
-    else
-      n = dimsizes(diff@res_cnLevels)
-    end if
-    mx = max(diff@res_cnLevels)
-    delete(rmsdiff@res_cnLevels)
-
-    tmp = fspan(0.0, mx, n)
-
-    rmsdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
-    delete(tmp)
-
-    if (var0 .eq. "pr") then
-      delete(rmsdiff@res_cnLevels)
-      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
-    end if
+;    if (isvar("pal5")) then
+;      delete(rmsdiff@res_cnFillColors)
+;      if (var0 .eq. "tas") then
+;        rmsdiff@res_cnFillColors = pal5(4:0,:)
+;        nt = dimsizes(pal5(4:0,:))
+;      elseif (var0 .eq. "pr") then
+;        rmsdiff@res_cnFillColors = pal5(5:10,:)
+;        nt = dimsizes(pal5(5:10,:))
+;      elseif (var0 .eq. "tos") then
+;        rmsdiff@res_cnFillColors = pal5(4:0,:)
+;        nt = dimsizes(pal5(4:0,:))
+;      end if
+;      n = nt(0)
+;    else
+;      n = dimsizes(diff@res_cnLevels)
+;    end if
+;    mx = max(diff@res_cnLevels)
+;    delete(rmsdiff@res_cnLevels)
+;
+;    tmp = fspan(0.0, mx, n)
+;
+;    rmsdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
+;    delete(tmp)
+;
+;    if (var0 .eq. "pr") then
+;      delete(rmsdiff@res_cnLevels)
+;      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
+;    end if
 
     rmsdiff@res_tiMainString = "Multi Model Mean of Root Mean Square Error"
 
@@ -548,6 +619,10 @@ begin
   mmdata@var = var0 + "_mean"
   mmdata@long_name = var0 + " (multi-model mean)"
   nc_outfile = ncdf_write(mmdata, nc_filename)
+
+  refdata@var = var0 + "_ref"
+  refdata@long_name = var0 + " (reference data)"
+  nc_outfile = ncdf_write(refdata, nc_filename)
 
   diff@var = var0 + "_bias"
   diff@long_name = var0 + " (multi-model bias)"

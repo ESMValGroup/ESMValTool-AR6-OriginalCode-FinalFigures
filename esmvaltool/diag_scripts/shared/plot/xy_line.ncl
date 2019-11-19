@@ -1570,41 +1570,22 @@ begin
     overlay(plot, mmm)
   end if
 
-  ; Resources for a customized legend.
-  lgres                     = True
-  lgres@lgMonoLineThickness = False
-  lgres@lgLabelFontHeightF  = .08      ; legend label font thickness
-  lgres@vpWidthF            = 0.15     ; width of legend (NDC)
-  lgres@vpHeightF           = 0.4      ; height of legend (NDC)
-  lgres@lgPerimOn           = True
-  lgres@lgPerimColor        = 0
-  lgres@lgMonoDashIndex     = False
-  lgres@lgBoxBackground     = 0
-  lgres@lgPerimFill         = 0
-  lgres@lgPerimFillColor    = 0
-  if (.not.isatt(diag_script_info, "EMs_in_lg")) then
-    diag_script_info@EMs_in_lg = True  ; Set default
-  end if
-  if (.not.diag_script_info@EMs_in_lg) then
-    datasets = metadata_att_as_array(items, "dataset")
-    idcs_modelnames = UNIQ(datasets)
-    colors := colors(idcs_modelnames)
-    dashes := dashes(idcs_modelnames)
-    thicks := thicks(idcs_modelnames)
-    annots := datasets(idcs_modelnames)
-  end if
-  if (diag_script_info@multi_model_mean) then
-    lgres@lgLineColors      = array_append_record(colors, colors_mmm, 0)
-    lgres@lgDashIndexes     = array_append_record(dashes, dashes_mmm, 0)
-    lgres@lgLineThicknesses = \
-      array_append_record(thicks, thicks_mmm, 0) + 0.5
-    labels = array_append_record(annots, annots_mmm, 0)
-  else
-    lgres@lgLineColors      = colors
-    lgres@lgDashIndexes     = dashes
-    lgres@lgLineThicknesses = thicks + 0.5
-    labels = annots
-  end if
+  ; ***********************************************
+  ; legend resources
+  ; ***********************************************
+
+  lgres                    = True
+  lgres@lgItemType         = "Lines"   ; show lines only (default)
+  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+  lgres@vpHeightF          = 0.5       ; height of legend (NDC)
+  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+
+  lgres@lgLineColors      = colors
+  lgres@lgDashIndexes     = dashes
+  lgres@lgLineThicknesses = thicks + 1
+  labels = annots
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
 
@@ -1828,30 +1809,6 @@ begin
   annots := array_append_record(annots, "MultiModelMean", 0)
   avgstd := array_append_record(avgstd, 1, 0)
   
-  ;; individual case for HadCRUT4 observations
-  ;; FIX-ME: mean value comes from climatology file (absolute.nc).
-  ;; There are no missing values as in the anomaly data.
-  ;datasetnames = metadata_att_as_array(items, "dataset")
-  ;if (any(datasetnames.eq."HadCRUT4-clim")) then
-  ;  ind_wo_clim = ind(datasetnames .ne. "HadCRUT4-clim")
-  ;  tmp1 = colors(ind_wo_clim)
-  ;  delete(colors)
-  ;  colors = tmp1
-  ;  tmp2 = dashes(ind_wo_clim)
-  ;  delete(dashes)
-  ;  dashes = tmp2
-  ;  tmp3 = thicks(ind_wo_clim)
-  ;  delete(thicks)
-  ;  thicks = tmp3
-  ;  tmp4 = annots(ind_wo_clim)
-  ;  delete(annots)
-  ;  annots = tmp4
-  ;  tmp5 = avgstd(ind_wo_clim)
-  ;  delete(avgstd)
-  ;  avgstd = tmp5
-  ;  delete([/tmp1, tmp2, tmp3, tmp4, tmp5/])
-  ;end if
-
   ; ************************************************
   ; plotting parameters
   ; ************************************************
@@ -1938,34 +1895,6 @@ begin
   plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
 
   if (diag_script_info@ts_anomaly .eq. "anom") then
-
-    ;if (diag_script_info@ref_value) then
-    ;  ; Add right panel with mean values in anomaly plot
-
-    ;  var = fspan(0., 2., 3)
-    ;  mean = new((/dimsizes(source_mean), 3/), double)
-    ;  mean(:, 0) = source_mean(:)
-    ;  mean(:, 1) = source_mean(:)
-    ;  mean(:, 2) = source_mean(:)
-
-    ;  plot2 = gsn_csm_xy(wks, var, mean, res0)  ; create plot
-
-    ;  getvalues plot2
-    ;    "trXMinF"   : xmin
-    ;    "trYMinF"   : ymin
-    ;    "trXMaxF"   : xmax
-    ;    "trYMaxF"   : ymax
-    ;  end getvalues
-
-    ;  xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
-    ;  ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
-
-    ;  gnres = True
-    ;  gnres@gsFillColor     = "Gray70"
-    ;  gnres@tfPolyDrawOrder = "PreDraw"
-    ;  plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
- 
-    ;end if
 
     ; ---------------------------------------------------------------------
     ; yellow shading of reference period
@@ -2211,10 +2140,11 @@ begin
   nexp     = tmp(0)
   delete(tmp)
 
-  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
+  ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
   res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
-  res@xyLineColors = cmap(1:5,:)
+  res@xyLineColors = cmap(0:3,:)
 
   if (nexp .gt. 6) then
     error_msg("w", scriptname, funcname, "Color palette not defined for " \
@@ -2236,9 +2166,10 @@ begin
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
       res_stat@gsnXYFillOpacities = 0.2
-      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
+      ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
       copy_VarMeta(res, res_stat)
-      res_stat@gsnXYFillColors = cmap(1,:)
+      res_stat@gsnXYFillColors = cmap(0,:)
       delete(res_stat@xyLineColors)
       ; We don't want the line, so make it transparent.
       res_stat@xyLineColor = -1
@@ -2246,18 +2177,24 @@ begin
                                 res_stat)
       overlay(plot(0), shading_plot)
       if(nexp .ge. 2) then
-        res_stat@gsnXYFillColors = cmap(2,:)
+        res_stat@gsnXYFillColors = cmap(1,:)
         shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 3) then
-        res_stat@gsnXYFillColors = cmap(3,:)
+        res_stat@gsnXYFillColors = cmap(2,:)
         shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
-      if(nexp .gt. 3) then
+      if(nexp .ge. 4) then
+        res_stat@gsnXYFillColors = cmap(3,:)
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .gt. 4) then
         error_msg("w", scriptname, funcname, "Color palette not defined for " \
                   + nexp + " experiments")
       end if
@@ -2279,16 +2216,30 @@ begin
     overlay(plot(0), ref_p)
   end if
 
-;  ; ---------------------------------------------------------------------
-;  ; Procedure to attach a box to the given plot, given the lower left
-;  ; corner, width, color, and opacity.
-;  ; ---------------------------------------------------------------------
-;  gsres                = True
-;  gsres@gsFillColor    = "yellow"
-;  gsres@gsFillOpacityF = 0.2
-;  xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
-;  ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
-;  newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+  if (diag_script_info@ts_anomaly .eq. "anom" .and. \
+      diag_script_info@ref_shading) then
+
+    ; ---------------------------------------------------------------------
+    ; yellow shading of reference period
+    ; ---------------------------------------------------------------------
+    gsres                = True
+    gsres@gsFillColor    = "Grey70" ;"yellow"
+    gsres@gsFillOpacityF = 0.1
+    xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+    ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+    newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+
+    txtres               = True
+    txtres@txFont        = "helvetica-bold"
+    txtres@txFontColor   = "Grey40"
+    txtres@txFontHeightF = 0.013
+    ref_txt = gsn_add_text(wks, plot, "reference period", \
+                           0.5*(ref_start + ref_end), \
+                           res@trYMinF + 0.05 * (res@trYMaxF - res@trYMinF), \
+                           txtres)
+
+  end if
+
 
   ; ---------------------------------------------------------------------
   ; Draw some lines to create a legend
