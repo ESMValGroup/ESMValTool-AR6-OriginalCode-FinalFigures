@@ -1,5 +1,36 @@
 # ESMValTool
 # recipe_ar6ch3_hiatus.yml
+#
+# Create "CMOR_tasaga.dat" file as
+#
+#SOURCE: CMIP5 (adapted from tas)
+#!============
+#variable_entry:    tasaga
+#!============
+#modeling_realm:    atmos
+#!----------------------------------
+#! Variable attributes:
+#!----------------------------------
+#standard_name:
+#units:             K
+#cell_methods:      time: mean
+#cell_measures:     area: areacella
+#long_name:         Global-mean Near-Surface Air Temperature Anomaly
+#!----------------------------------
+#! Additional variable information:
+#!----------------------------------
+#dimensions:        time
+#out_name:          tasaga
+#type:              real
+#valid_min:         -20.0
+#valid_max:         20.0
+#ok_min_mean_abs:   -20
+#ok_max_mean_abs:   20.
+#!----------------------------------
+#!
+#
+# and save it to $CONDA_PREFIX/envs/esmvaltool/lib/python3.7/site-packages/esmvalcore/cmor/tables/custom/
+#
 ---
 documentation:
 
