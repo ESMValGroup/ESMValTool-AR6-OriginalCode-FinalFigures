@@ -1,7 +1,7 @@
 ; #############################################################################
-; DIAGNOSTIC PLOT SCRIPT for reproducing IPCC ch. 9 fig. 9.6
-; Author: Bettina Gier (DLR, Germany)
-; CRESCENDO project
+; DIAGNOSTIC PLOT SCRIPT for extending IPCC ch. 9 fig. 9.6
+; Author: Bettina Gier (DLR, Germany), Lisa Bock (DLR, Germany)
+; IPCC-AR6 project
 ; #############################################################################
 ;
 ; Description
@@ -11,6 +11,7 @@
 ; Required diag_script_info attributes (diagnostics specific)
 ;
 ; Optional diag_script_info attributes (diagnostic specific)
+;     plot_median: if True, median is plotted
 ;     diag_script_info@diag_order: give order of plotting variables on the
 ;                                  x-axis
 ;
@@ -44,6 +45,9 @@ begin
     file_type = "ps"
   end if
 
+  ; Set default values for non-required diag_script_info attributes
+  set_default_att(diag_script_info, "plot_median", False)
+
 ; -----------------------------------------------------------------------------
 ; ------------------- Collecting Data -----------------------------------------
 ; -----------------------------------------------------------------------------
@@ -57,13 +61,27 @@ begin
   mp_file_list := mp_file_list(ind(isfilepresent(file_list)))
 
   ; Set up auxiliary variables
+  var_name = new(dimsizes(file_list), string)
   var_collect = new(dimsizes(file_list), string)
   var_diag = new(dimsizes(file_list), string)
   alt_obs = new(dimsizes(file_list), string)
 
   ; Loop over files in list, read and append data
   do ii = 0, dimsizes(file_list) - 1
+
     data_temp = ncdf_read(file_list(ii), "cor")
+    var_name(ii) = data_temp@corvar_long
+    if (var_name(ii) .eq. "Near-Surface Air Temperature") then
+      var_name(ii) = "   Near-Surface ~C~ Air Temperature"
+    elseif (var_name(ii) .eq. "Precipitation") then
+      var_name(ii) = "Precipitation"
+    elseif (var_name(ii) .eq. "Sea Level Pressure") then
+      var_name(ii) = "Sea Level ~C~ Pressure"
+    elseif (var_name(ii) .eq. "TOA Shortwave Cloud Radiative Effect") then
+      var_name(ii) = "TOA Shortwave Cloud ~C~      Radiative Effect"
+    elseif (var_name(ii) .eq. "TOA Outgoing Longwave Radiation") then
+      var_name(ii) = "     TOA Outgoing ~C~ Longwave Radiation"
+    end if
     var_collect(ii) = data_temp@corvar
     var_diag(ii) = data_temp@diagnostics
     alt_obs(ii) = data_temp@alt_obs
@@ -115,8 +133,8 @@ begin
     delete(data_temp)
   end do
   data_all!1 = "vars"
-  data_all&vars = var_collect
-  delete(var_collect)
+  data_all&vars = var_name
+  delete(var_name)
 
   ; Get project for models
   projects = new(dimsizes(data_all&models), string)
@@ -213,7 +231,19 @@ begin
   n_var = dimsizes(data_all&vars)
 
   nr_projects = dimsizes(projects)
-  x_val = ispan(1, n_var*nr_projects, nr_projects)
+  if (nr_projects .eq. 2) then
+    x_val = new(n_var,float)
+    do i = 0, n_var-1
+      x_val(i) = 1 + i * 3
+    end do
+  elseif (nr_projects .eq. 3) then
+    x_val = new(n_var,float)
+    do i = 0, n_var-1
+      x_val(i) = 1.5 + i * 4
+    end do
+  else
+    x_val = ispan(1, n_var*nr_projects, nr_projects)
+  end if 
 
   ; Mean and Median of Ensemble - without alt obs
   obs_ind = get1Dindex(data_all&models, alt_obs)
@@ -230,12 +260,16 @@ begin
   end if
   ; Split by project
   means = new((/nr_projects, n_var/), float)
-  median = new((/nr_projects, n_var/), float)
+  if (diag_script_info@plot_median) then
+    median = new((/nr_projects, n_var/), float)
+  end if
 
   do iproj = 0, nr_projects - 1
     mod_proj_ind = ind(data_all&models@project(mod_ind).eq.projects(iproj))
     means(iproj, :) = dim_avg_n(data_all(mod_proj_ind, :), 0)
-    median(iproj, :) = dim_median_n(data_all(mod_proj_ind, :), 0)
+    if (diag_script_info@plot_median) then
+      median(iproj, :) = dim_median_n(data_all(mod_proj_ind, :), 0)
+    end if
     delete(mod_proj_ind)
   end do
 
@@ -251,13 +285,14 @@ begin
   ; Calc limits
   y_min = min(data_all)
   y_min := decimalPlaces(y_min-0.05, 1, True)
-  x_max = max(x_val) + nr_projects
+  x_max = max(x_val) + nr_projects * 0.5
 
   ; Set half line length
-  l_length = 0.3
+  l_length = 0.1
 
   ; Project Colors - TODO: let them be specified in cfg
-  fcolors = (/"black", "blue", "red"/)
+  fcolors = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+            + "ipcc-ar6_line_03.rgb")
 
   res = True
   res@gsnDraw          = False
@@ -280,11 +315,12 @@ begin
   res@tmXBLabels = data_all&vars
   res@tmXBValues = x_val
   res@tmXBMode = "Explicit"
-  res@tmXBLabelAngleF = 90.
-  res@tmXBLabelJust = "CenterRight"
   res@tmXBLabelFontHeightF = font_height
+  if (n_var .gt. 3) then
+    res@tmXBLabelFontHeightF = font_height * 0.5
+  end if
   ; Set Marker Size to be half of line_length
-  marker_size = res@vpWidthF * l_length / (res@trXMaxF - res@trXMinF)
+  marker_size = res@vpWidthF * 3 * l_length / (res@trXMaxF - res@trXMinF)
 
   ; Resources for model lines
   res_lines                   = True                  ; polyline mods desired
@@ -301,7 +337,7 @@ begin
   ; Resources for obs data markers
   res_circ = True
   res_circ@gsMarkerIndex = 16
-  res_circ@gsMarkerColor = "green"
+  res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
   res_circ@gsMarkerSizeF = marker_size
   res_circ@gsMarkerOpacityF = 0.4
 
@@ -327,24 +363,26 @@ begin
   ; New x_val according to median!
   x_val_proj = new((/nr_projects, n_var/), float)
   ; space between projects in graph
-  if nr_projects.eq.1 then
-    d_proj = 1.5  ; offset
+  if (nr_projects.eq.1) then
+    d_proj = 1.  ; offset
   else
     d_proj = 1    ; (nr_projects - 1.)/nr_projects
   end if
   do iproj = 0, nr_projects - 1
     do ivar = 0, n_var - 1
-      x_val_proj(iproj, ivar) = ivar*nr_projects - 0.5 + d_proj*(iproj+1)
+      x_val_proj(iproj, ivar) = ivar*(1 + nr_projects) - 0.5 + d_proj*(iproj+1.)
     end do
   end do
   ; Start with blank plot! gs and xy marker sizes are different..
   plot = gsn_csm_blank_plot(wks, res)
 
-  do iproj = 0, nr_projects - 1
-    res_circm@gsMarkerColor = fcolors(iproj)
-    plot@$unique_string("dum_median")$ = gsn_add_polymarker( \
-      wks, plot, x_val_proj(iproj, :), median(iproj, :), res_circm)
-  end do
+  if (diag_script_info@plot_median) then
+    do iproj = 0, nr_projects - 1
+      res_circm@gsMarkerColor = fcolors(iproj,:)
+      plot@$unique_string("dum_median")$ = gsn_add_polymarker( \
+        wks, plot, x_val_proj(iproj, :), median(iproj, :), res_circm)
+    end do
+  end if
 
   ; add lines for individual models
   do ivar = 0, dimsizes(data_all(0, :))-1
@@ -355,10 +393,10 @@ begin
         proj_center = x_val_proj(iproj, ivar)
         xx = (/proj_center-l_length, proj_center+l_length/)
         ; Plot lines for mean
-        xx_mean = (/proj_center-l_length*1.5, proj_center+l_length*1.5/)
+        xx_mean = (/proj_center-l_length*3., proj_center+l_length*3./)
         yy_mean = (/means(iproj, ivar), means(iproj, ivar)/)
-        res_mlines@gsLineColor = fcolors(iproj)
-        res_lines@gsLineColor = fcolors(iproj)
+        res_mlines@gsLineColor = fcolors(iproj,:)
+        res_lines@gsLineColor = fcolors(iproj,:)
         plot@$unique_string("dum")$ = gsn_add_polyline( \
           wks, plot, xx_mean, yy_mean, res_mlines)
         do imod = 0, dimsizes(data_all(:, 0)) - 1
@@ -374,8 +412,10 @@ begin
             end if
           end if
         end do
-        plot@$unique_string("dum_ci")$ = gsn_add_polymarker( \
-          wks, plot, x_val_proj(iproj, ivar), median(iproj, ivar), res_circw)
+        if (diag_script_info@plot_median) then
+          plot@$unique_string("dum_ci")$ = gsn_add_polymarker( \
+            wks, plot, x_val_proj(iproj, ivar), median(iproj, ivar), res_circw)
+        end if
       end if
       delete(proj_mods)
     end do
@@ -387,22 +427,23 @@ begin
   end do
 
   y_min_label = res@trYMinF + 0.1*yspan
-  lb_stride = yspan/res@vpHeightF * font_height * 1.2   ; font_height*3
+  lb_stride = yspan/res@vpHeightF * font_height * 2. 
   plabel = projects
   ; Draw Legend
   do iproj = 0, dimsizes(projects)-1
-    res_text@txFontColor = fcolors(iproj)
+    res_text@txFontColor = fcolors(iproj,:)
     ; CMIP5 label has to be reduced to CMIP5 sometimes
     if str_match_ind_ic(plabel, "CMIP5").eq.iproj then
       plabel(iproj) = "CMIP5"
     end if
     plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, plabel(iproj),\
-                                                 x_val(0), y_min_label + \
-                                                 lb_stride*(iproj+1), res_text)
+                                                 x_val(0)-0.5, y_min_label + \
+                                                 lb_stride*(iproj+1.2), res_text)
   end do
-  res_text@txFontColor = "green"
-  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "OBS", \
-                                               x_val(0), y_min_label, res_text)
+  res_text@txFontColor = res_circ@gsMarkerColor
+  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "alternative Observations", \
+                                               x_val(0)-0.5, y_min_label, \
+                                               res_text)
 
   draw(plot)
   frame(wks)
