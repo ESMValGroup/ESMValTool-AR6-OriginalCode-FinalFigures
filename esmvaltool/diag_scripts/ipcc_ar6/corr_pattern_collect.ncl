@@ -73,8 +73,14 @@ begin
     var_name(ii) = data_temp@corvar_long
     if (var_name(ii) .eq. "Near-Surface Air Temperature") then
       var_name(ii) = "   Near-Surface ~C~ Air Temperature"
-    elseif (var_name(ii) .eq. ""Sea Level Pressure") then
+    elseif (var_name(ii) .eq. "Precipitation") then
+      var_name(ii) = "Precipitation"
+    elseif (var_name(ii) .eq. "Sea Level Pressure") then
       var_name(ii) = "Sea Level ~C~ Pressure"
+    elseif (var_name(ii) .eq. "TOA Shortwave Cloud Radiative Effect") then
+      var_name(ii) = "TOA Shortwave Cloud ~C~      Radiative Effect"
+    elseif (var_name(ii) .eq. "TOA Outgoing Longwave Radiation") then
+      var_name(ii) = "     TOA Outgoing ~C~ Longwave Radiation"
     end if
     var_collect(ii) = data_temp@corvar
     var_diag(ii) = data_temp@diagnostics
@@ -310,6 +316,9 @@ begin
   res@tmXBValues = x_val
   res@tmXBMode = "Explicit"
   res@tmXBLabelFontHeightF = font_height
+  if (n_var .gt. 3) then
+    res@tmXBLabelFontHeightF = font_height * 0.5
+  end if
   ; Set Marker Size to be half of line_length
   marker_size = res@vpWidthF * 3 * l_length / (res@trXMaxF - res@trXMinF)
 
