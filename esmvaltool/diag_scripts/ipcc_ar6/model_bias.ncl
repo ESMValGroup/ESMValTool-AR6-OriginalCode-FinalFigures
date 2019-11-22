@@ -206,10 +206,6 @@ begin
     ; kg m-2 s-1 --> mm day-1
     mmdata = convert_units(mmdata, "mm/day")
     refdata = convert_units(refdata, "mm/day")
-    ; diff = convert_units(diff, "mm/day")
-    ; absdiff = convert_units(absdiff, "mm/day")
-    ; rmsdiff = convert_units(rmsdiff, "mm/day")
-    ; for plotting IPCC AR5 fig 9.4
   elseif (var0.eq."tas") then
     mmdata = convert_units(mmdata, "degC")
     refdata = convert_units(refdata, "degC")
@@ -235,12 +231,12 @@ begin
 
   if any(var0 .eq. (/"tas","tos","thetao"/)) then
     diff@units = "~F34~0~F~ C"
-    ; for plotting IPCC AR5 fig 9.2
-    diff@res_cnLevels = ispan(-4, 4, 1)
+    diff@res_cnLevels = ispan(-6, 6, 1)
   elseif (var0 .eq. "pr") then
-    diff@res_cnLevels = ispan(-20, 20, 5) * 0.1
-  elseif (var0 .eq. "so") then
     diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
+  elseif (var0 .eq. "so") then
+    ;diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
+    diff@res_cnLevels = ispan(-8, 8, 1)
   end if
 
   diff_i    = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
@@ -357,15 +353,17 @@ begin
   copy_VarMeta(diff, mmdata)
   delete(mmdata@res_cnLevels)
 
+  mmdata@res_tiMainString = "Multi Model Mean"
+
+
   if (var0.eq."tas") then
-    mmdata@res_cnLevels = ispan(-32, 32, 8)
+    mmdata@res_tiMainString = "Multi Model Mean Surface Temperature"
+    mmdata@res_cnLevels = ispan(-35, 35, 5)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_temperature_10.rgb")
-    mmdata@res_cnFillColors = pal(::-1,:)
-    pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                              + "ipcc-ar6_temperature_10.rgb")
-    diff@res_cnFillColors = pal2(::-1,:)
+                             + "ipcc-ar6_temperature_div.rgb")
+    mmdata@res_cnFillPalette = pal
+    diff@res_cnFillPalette = pal
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_temperature_10.rgb")
@@ -376,17 +374,18 @@ begin
     end if
     if (plot_rms_diff) then
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                                + "ipcc-ar6_temperature_10.rgb")
+                                + "ipcc-ar6_temperature_div.rgb")
     end if
   elseif (var0.eq."pr") then
-    mmdata@res_cnLevels = ispan(2, 10, 2)
+    mmdata@res_tiMainString = "Multi Model Mean Precipitation"
+    mmdata@res_cnLevels = ispan(1, 10, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_precipitation_11.rgb")
-    mmdata@res_cnFillColors = pal(5:10,:)
+                             + "ipcc-ar6_precipitation_seq.rgb")
+    mmdata@res_cnFillPalette = pal
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                              + "ipcc-ar6_precipitation_10.rgb")
-    diff@res_cnFillColors = pal2
+                              + "ipcc-ar6_precipitation_div.rgb")
+    diff@res_cnFillPalette = pal2
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_precipitation_10.rgb")
@@ -397,17 +396,16 @@ begin
     end if
     if (plot_rms_diff) then
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                                + "ipcc-ar6_precipitation_11.rgb")
+                                + "ipcc-ar6_precipitation_div.rgb")
     end if
   elseif (var0.eq."tos" .or. var0.eq."thetao") then
+    mmdata@res_tiMainString = "Multi Model Mean Sea Surface Temperature"
     mmdata@res_cnLevels = ispan(-30, 30, 5)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_temperature_div_14.rgb")
-    mmdata@res_cnFillColors = pal
-    pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                              + "ipcc-ar6_temperature_10.rgb")
-    diff@res_cnFillColors = pal2(::-1,:)
+                             + "ipcc-ar6_temperature_div.rgb")
+    mmdata@res_cnFillPalette = pal
+    diff@res_cnFillPalette = pal
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_temperature_10.rgb")
@@ -421,19 +419,19 @@ begin
                                 + "ipcc-ar6_temperature_10.rgb")
     end if
   elseif (var0.eq."so") then
-    mmdata@res_cnLevels = ispan(310, 370, 5) * 0.1
+    mmdata@res_tiMainString = "Multi Model Mean Sea Surface Salinity"
+    ;mmdata@res_cnLevels = ispan(310, 370, 5) * 0.1
+    mmdata@res_cnLevels = ispan(26, 37, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_others_seq_14.rgb")
-    mmdata@res_cnFillColors = pal
+                             + "ipcc-ar6_misc_seq_1.rgb")
+    mmdata@res_cnFillPalette = pal
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                              + "ipcc-ar6_others_div_14.rgb")
-    diff@res_cnFillColors = pal2
+                              + "ipcc-ar6_misc_div.rgb")
+    diff@res_cnFillPalette = pal2
   else
     mmdata@res_cnLevels = fspan(min(mmdata), max(mmdata), 20)
   end if
-
-  mmdata@res_tiMainString = "Multi Model Mean"
 
   plotsperline = (/2, 0/)
   plotind = (/0, 1/)  ; mmm and mean bias are always plotted
