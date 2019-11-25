@@ -49,69 +49,83 @@ preprocessors:
 
 
 datasets:
-  - {dataset: CAMS-CSM1-0, grid: gn}
-  - {dataset: CanESM5, grid: gn}
-  - {dataset: CESM2, grid: gn}
-  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
-  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-  #- {dataset: E3SM-1-0} no data from 2000-2014
-  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
-  - {dataset: EC-Earth3-Veg}
-  - {dataset: GISS-E2-1-G, grid: gn}
-  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-  - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
-  - {dataset: SAM0-UNICON, grid: gn}
-  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: ACCESS1-0}
+  - {dataset: ACCESS1-3}
+  - {dataset: BNU-ESM}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-BGC}
+  # - {dataset: CESM1-CAM5-1-FV}
+  - {dataset: CESM1-CAM5}
+  - {dataset: CESM1-FASTCHEM}
+  - {dataset: CESM1-WACCM}
+  - {dataset: CMCC-CESM}
+  # - {dataset: CMCC-CM}
+  # - {dataset: CMCC-CMS}
+  # - {dataset: CNRM-CM5-2}
+  - {dataset: CNRM-CM5}
+  - {dataset: CSIRO-Mk3-6-0}
+  # - {dataset: FGOALS-g2}
+  - {dataset: GFDL-CM3}
+  - {dataset: GFDL-ESM2G}
+  - {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H-CC}
+  # - {dataset: GISS-E2-H}
+  - {dataset: GISS-E2-R-CC}
+  - {dataset: GISS-E2-R}
+  # - {dataset: HadGEM2-CC}
+  # - {dataset: HadGEM2-ES}
+  - {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: IPSL-CM5B-LR}
+  - {dataset: MPI-ESM-LR}
+  - {dataset: MPI-ESM-MR}
+  - {dataset: MPI-ESM-P}
+  - {dataset: MRI-CGCM3}
+  - {dataset: NorESM1-M}
+  - {dataset: NorESM1-ME}
 
-cmip6_hist_models_tas_era: &cmip6_hist_models_tas_era
-  - {dataset: BCC-CSM2-MR, grid: gn}
-  - {dataset: BCC-ESM1, grid: gn}
-  - {dataset: GFDL-CM4, grid: gr1}
-  - {dataset: GFDL-ESM4, grid: gr1}
-  - {dataset: GISS-E2-1-H, grid: gn}
-  - {dataset: MIROC6, grid: gn}
-  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-  - {dataset: MPI-ESM1-2-HR, grid: gn}
-  - {dataset: MRI-ESM2-0, grid: gn}
-  - {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+cmip5_hist_models_tas_era: &cmip5_hist_models_tas_era
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: inmcm4}
+  - {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
   #- {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 
-cmip6_hist_models_pr_gpcp: &cmip6_hist_models_pr_gpcp
-  - {dataset: BCC-CSM2-MR, grid: gn}
-  - {dataset: BCC-ESM1, grid: gn}
-  - {dataset: GFDL-CM4, grid: gr1}
-  - {dataset: GFDL-ESM4, grid: gr1}
-  - {dataset: GISS-E2-1-H, grid: gn}
-  - {dataset: MIROC6, grid: gn}
-  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-  - {dataset: MPI-ESM1-2-HR, grid: gn}
-  - {dataset: MRI-ESM2-0, grid: gn}
+cmip5_hist_models_pr_gpcp: &cmip5_hist_models_pr_gpcp
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: inmcm4}
+  - {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
   - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3,
               tier: 1}
 
-cmip6_hist_models_tos_woa: &cmip6_hist_models_tos_woa
-  - {dataset: GFDL-CM4, grid: gr}
-  - {dataset: GFDL-ESM4, grid: gr}
-  - {dataset: GISS-E2-1-H, grid: gr}
+cmip5_hist_models_tos_woa: &cmip5_hist_models_tos_woa
   - {dataset: WOA, project: OBS, type: clim, version: 2013v2, tier: 2, start_year: 2000, end_year: 2000}
   #- {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
 
 
 diagnostics:
 
-#  # **********************************************************************
-#  # IPCC WGI AR6, chap. 3
-#  # Fig. 3.2 (ZOD fig. 3.9)
-#  # Sect. 3.3
-#  # similar to fig. IPCC AR5, chap. 9, 9.2 a/b/c
-#  # Lisa
-#  # **********************************************************************
-#  # Multi model mean, multi model mean bias, root mean square error and 
-#  # mean relative error
-#  # (geographical distributions)
-#  # **********************************************************************
-#
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Fig. 3.2 (ZOD fig. 3.9)
+  # Sect. 3.3
+  # similar to fig. IPCC AR5, chap. 9, 9.2 a/b/c
+  # Lisa
+  # **********************************************************************
+  # Multi model mean, multi model mean bias, root mean square error and 
+  # mean relative error
+  # (geographical distributions)
+  # **********************************************************************
+
 #  fig_3_2:
 #    description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
 #    variables:
@@ -119,13 +133,12 @@ diagnostics:
 #        preprocessor: clim
 #        reference_dataset: ERA-Interim
 #        mip: Amon
-#        project: CMIP6
+#        project: CMIP5
 #        exp: historical
-#        ensemble: r1i1p1f1
-#        grid: gr
-#        start_year: 1995
-#        end_year: 2014
-#    additional_datasets: *cmip6_hist_models_tas_era
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#    additional_datasets: *cmip5_hist_models_tas_era
 #    scripts:
 #      fig_3_2: &fig-3-2_and_3-9_settings
 #        script: ipcc_ar6/model_bias.ncl
@@ -153,14 +166,14 @@ diagnostics:
 #      pr:
 #        preprocessor: clim
 #        reference_dataset: GPCP-SG
-#        project: CMIP6
+#        project: CMIP5
 #        mip: Amon
 #        grid: gr
 #        exp: historical
-#        ensemble: r1i1p1f1
-#        start_year: 1995
-#        end_year: 2014
-#    additional_datasets: *cmip6_hist_models_pr_gpcp
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#    additional_datasets: *cmip5_hist_models_pr_gpcp
 #    scripts:
 #      fig_3_9:
 #        script: ipcc_ar6/model_bias.ncl
@@ -187,14 +200,14 @@ diagnostics:
       thetao:
         preprocessor: clim_surface
         reference_dataset: WOA
-        project: CMIP6
+        project: CMIP5
         mip: Omon
         grid: gn
         exp: historical
-        ensemble: r1i1p1f1
-        start_year: 1995
-        end_year: 2014
-    additional_datasets: *cmip6_hist_models_tos_woa
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models_tos_woa
     scripts:
       fig_3_19:
         script: ipcc_ar6/model_bias.ncl
@@ -210,14 +223,14 @@ diagnostics:
       so:
         preprocessor: clim_surface
         reference_dataset: WOA
-        project: CMIP6
+        project: CMIP5
         mip: Omon
         grid: gn
         exp: historical
-        ensemble: r1i1p1f1
-        start_year: 1995
-        end_year: 2014
-    additional_datasets: *cmip6_hist_models_tos_woa
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models_tos_woa
     scripts:
       fig_3_19:
         script: ipcc_ar6/model_bias.ncl

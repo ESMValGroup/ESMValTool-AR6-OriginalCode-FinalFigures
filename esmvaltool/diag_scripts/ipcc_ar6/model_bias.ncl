@@ -235,6 +235,7 @@ begin
   elseif (var0 .eq. "pr") then
     diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
   elseif (var0 .eq. "so") then
+    diff@units = "0.001"
     ;diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
     diff@res_cnLevels = ispan(-8, 8, 1)
   end if
