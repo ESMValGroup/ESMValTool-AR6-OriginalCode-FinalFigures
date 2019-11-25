@@ -26,6 +26,9 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 dpi = 100
 
+high_res_datasets = ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
+        'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+
 def titlify(title):
     """
     Check whether a title is too long then add it to current figure.
@@ -348,7 +351,11 @@ def make_multimodle_zonal_mean_plots(
         if filename == obs_filename: continue
         if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
-        projects[metadata['project']] = True
+        if metadata['dataset'] in high_res_datasets:
+            projects['HighRes'] = True =
+        else:
+            projects[metadata['project']] = True
+
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
     print (number_models, model_numbers)
     number_models = len(number_models)
@@ -363,7 +370,10 @@ def make_multimodle_zonal_mean_plots(
         metadata = metadatas[filename]
         short_name = metadata['short_name']
         dataset = metadata['dataset']
-        project = metadata['project']
+        if dataset in high_res_datasets:
+            project = 'HighRes'
+        else:
+            project = metadata['project']
 
         if metadata['variable_group'] not in groups:
             continue
@@ -418,6 +428,8 @@ def make_multimodle_zonal_mean_plots(
                 mip_color  = 'dodgerblue'
         elif project == 'CMIP6':
                 mip_color  = 'green'
+        elif project == 'HighRes':
+                mip_color = 'purple'
         else:  assert 0
         plot_details[project] = {'c': mip_color, 'ls': '-', 'lw': 2,
                                              'label': project}
@@ -514,7 +526,7 @@ def main(cfg):
     # Make legend order
     legend_order = []
     obs = ['HadISST', 'WOA', 'CORA']
-    projects = ['CMIP6', 'CMIP5', 'CMIP3',] #'WOA', 'OBS']
+    projects = ['CMIP6', 'CMIP5', 'CMIP3', 'HighRes'] #'WOA', 'OBS']
     for ob in obs:
         if ob in plot_details.keys(): legend_order.append(ob)
     for proj in projects:

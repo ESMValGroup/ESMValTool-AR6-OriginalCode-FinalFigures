@@ -423,7 +423,6 @@ def make_time_series_analysis(
             logger.info('Saving plots to %s', path)
             plt.savefig(path)
 
-
         plt.close()
 
 
@@ -503,8 +502,8 @@ def make_pane_a_data_only(
     text = 'Slope: '+str(round(slopes.mean(), 3))
     text += '\nVariabillty: '+str(round(variabillty.mean(), 3))
 
-    plt.text(0.1, 0.1, text, fontsize=16,
-         horizontalalignment='center',
+    plt.text(0.05, 0.1, text, fontsize=10,
+         horizontalalignment='left',
          verticalalignment='center',
          transform = ax.transAxes)
 
@@ -819,7 +818,7 @@ def make_pane_bc(
                          meanline = False,
                          showfliers = True,
                          labels = sorted(trends.keys()))
-        plt.xticks(rotation=45)
+        plt.xticks(rotation=30, ha="right")
         plt.setp(box['fliers'], markersize=1.0)
 
     if savefig:
