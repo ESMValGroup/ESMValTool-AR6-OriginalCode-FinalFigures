@@ -21,45 +21,45 @@ documentation:
 #
 datasets:
     # CMIP5:
-    - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-
+#    # - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # no historical fx files.
+#    - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
     - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
+#    - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # can't cat
+#    - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
 
-    - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # All zeroes
-    - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
 
-    # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-    # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#    # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
 
 
     # CMIP6:
-    # # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/zostoga -type d -maxdepth 0
-    - {dataset: CanESM5, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-    - {dataset: CNRM-CM6-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-    - {dataset: CNRM-ESM2-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-    # - {dataset: EC-Earth3, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # no data
-    - {dataset: EC-Earth3-Veg, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-    # - {dataset: IPSL-CM6A-LR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # coordinate rank
-    - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm, start_year: 1960, end_year: 2014} # time units
-    - {dataset: UKESM1-0-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm, start_year: 1960, end_year: 2014} # time coordinate
-    - {dataset: GISS-E2-1-G, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-    - {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # Excessively low 1900 value (-2m!)
+    # - {dataset: CanESM5, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # No FX files.
+    # - {dataset: CNRM-CM6-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014} # No fx files.
+    #- {dataset: CNRM-ESM2-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+    #- {dataset: EC-Earth3, project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f1, grid: gn, start_year: 1960, end_year: 2007} # no data
+    #- {dataset: EC-Earth3-Veg, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    #- {dataset: IPSL-CM6A-LR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # coordinate rank
+    #- {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014} # time units
+    #- {dataset: UKESM1-0-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014} # time coordinate
+    #- {dataset: GISS-E2-1-G, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    #- {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014} # Excessively low 1900 value (-2m!)
 
 
 preprocessors:
