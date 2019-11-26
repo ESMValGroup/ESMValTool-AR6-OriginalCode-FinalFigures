@@ -26,8 +26,6 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 dpi = 100
 
-high_res_datasets = ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
-        'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
 
 def titlify(title):
     """
@@ -351,7 +349,7 @@ def make_multimodle_zonal_mean_plots(
         if filename == obs_filename: continue
         if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
-        if metadata['dataset'] in high_res_datasets:
+        if metadata['exp'] in 'hist-1950':
             projects['HighRes'] = True =
         else:
             projects[metadata['project']] = True
@@ -370,7 +368,7 @@ def make_multimodle_zonal_mean_plots(
         metadata = metadatas[filename]
         short_name = metadata['short_name']
         dataset = metadata['dataset']
-        if dataset in high_res_datasets:
+        if metadata['exp'] in 'hist-1950':
             project = 'HighRes'
         else:
             project = metadata['project']
@@ -402,7 +400,6 @@ def make_multimodle_zonal_mean_plots(
 #                plot_details[dataset]['c'] = 'k'
 #                plot_details[dataset]['ls'] = '--'
             key_word, xlabel = plot_zonal_cube(new_cube, plot_details[dataset])
-
 
         ####
         # Calculate the project lines
@@ -445,6 +442,7 @@ def make_multimodle_zonal_mean_plots(
                 cubeslist = [cube  for cube in project_cubes[project].values()]
                 project_mean = make_mean_of_cube_list(cubeslist)
                 key_word, xlabel = plot_zonal_cube(project_mean, plot_details[project])
+                key_word = 'Equatorial SST'
 
                 cube_std = make_std_of_cube_list(cubeslist, 'lon')
                 print('project_mean', project_mean.data.min(), project_mean.data.max())
@@ -543,8 +541,6 @@ def main(cfg):
         linestyle = plot_details[index].get('ls', '-')
         label = plot_details[index].get('label', str(index))
         plt.plot([], [], c=colour, lw=linewidth, ls=linestyle, label=label)
-
-
 
     # handles, labels = plt.gca().get_legend_handles_labels()
     # print (handles, labels, legend_order)
