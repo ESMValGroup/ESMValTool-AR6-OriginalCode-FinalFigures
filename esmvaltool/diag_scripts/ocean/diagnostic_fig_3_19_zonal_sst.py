@@ -350,11 +350,11 @@ def make_multimodle_zonal_mean_plots(
         if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
         # highlight only the HiResMIP models
-        if 'exp' in metadata:
-            if metadata['exp'] in 'hist-1950':
-                projects['HighRes'] = True
+        if 'activity' in metadata:
+            if metadata['activity'] == 'HighResMIP':
+                project = 'HighRes'
             else:
-                projects[metadata['project']] = True
+                project = metadata['project']
 
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
     print (number_models, model_numbers)
