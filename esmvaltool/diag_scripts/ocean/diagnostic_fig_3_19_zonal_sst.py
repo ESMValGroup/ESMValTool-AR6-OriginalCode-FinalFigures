@@ -442,7 +442,6 @@ def make_multimodle_zonal_mean_plots(
                 cubeslist = [cube  for cube in project_cubes[project].values()]
                 project_mean = make_mean_of_cube_list(cubeslist)
                 key_word, xlabel = plot_zonal_cube(project_mean, plot_details[project])
-                key_word = 'Equatorial SST'
 
                 cube_std = make_std_of_cube_list(cubeslist, 'lon')
                 print('project_mean', project_mean.data.min(), project_mean.data.max())
@@ -453,6 +452,7 @@ def make_multimodle_zonal_mean_plots(
                 plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
                                          'label': obs_key}
                 key_word, xlabel = plot_zonal_cube(obs_cube, plot_details[obs_key])
+                key_word = 'Equatorial SST'
                 ylabel = 'SST ('+r'$^\circ$'+'C)'
 
     #####
