@@ -352,9 +352,9 @@ def make_multimodle_zonal_mean_plots(
         # highlight only the HiResMIP models
         if 'activity' in metadata:
             if metadata['activity'] == 'HighResMIP':
-                project = 'HighRes'
+                projects['HighRes'] = True 
             else:
-                project = metadata['project']
+                projects[metadata['project']] = True
 
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
     print (number_models, model_numbers)
