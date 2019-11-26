@@ -349,10 +349,12 @@ def make_multimodle_zonal_mean_plots(
         if filename == obs_filename: continue
         if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
-        if metadata['exp'] in 'hist-1950':
-            projects['HighRes'] = True
-        else:
-            projects[metadata['project']] = True
+        # highlight only the HiResMIP models
+        if 'exp' in metadata:
+            if metadata['exp'] in 'hist-1950':
+                projects['HighRes'] = True
+            else:
+                projects[metadata['project']] = True
 
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
     print (number_models, model_numbers)
