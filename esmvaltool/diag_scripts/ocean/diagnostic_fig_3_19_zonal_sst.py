@@ -26,6 +26,7 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 dpi = 100
 
+
 def titlify(title):
     """
     Check whether a title is too long then add it to current figure.
@@ -348,7 +349,11 @@ def make_multimodle_zonal_mean_plots(
         if filename == obs_filename: continue
         if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
-        projects[metadata['project']] = True
+        if metadata['exp'] in 'hist-1950':
+            projects['HighRes'] = True
+        else:
+            projects[metadata['project']] = True
+
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
     print (number_models, model_numbers)
     number_models = len(number_models)
@@ -363,7 +368,10 @@ def make_multimodle_zonal_mean_plots(
         metadata = metadatas[filename]
         short_name = metadata['short_name']
         dataset = metadata['dataset']
-        project = metadata['project']
+        if metadata['exp'] in 'hist-1950':
+            project = 'HighRes'
+        else:
+            project = metadata['project']
 
         if metadata['variable_group'] not in groups:
             continue
@@ -393,7 +401,6 @@ def make_multimodle_zonal_mean_plots(
 #                plot_details[dataset]['ls'] = '--'
             key_word, xlabel = plot_zonal_cube(new_cube, plot_details[dataset])
 
-
         ####
         # Calculate the project lines
         project_cubes[project][dataset] = cube
@@ -418,6 +425,8 @@ def make_multimodle_zonal_mean_plots(
                 mip_color  = 'dodgerblue'
         elif project == 'CMIP6':
                 mip_color  = 'green'
+        elif project == 'HighRes':
+                mip_color = 'purple'
         else:  assert 0
         plot_details[project] = {'c': mip_color, 'ls': '-', 'lw': 2,
                                              'label': project}
@@ -433,6 +442,7 @@ def make_multimodle_zonal_mean_plots(
                 cubeslist = [cube  for cube in project_cubes[project].values()]
                 project_mean = make_mean_of_cube_list(cubeslist)
                 key_word, xlabel = plot_zonal_cube(project_mean, plot_details[project])
+                key_word = 'Equatorial SST'
 
                 cube_std = make_std_of_cube_list(cubeslist, 'lon')
                 print('project_mean', project_mean.data.min(), project_mean.data.max())
@@ -514,7 +524,7 @@ def main(cfg):
     # Make legend order
     legend_order = []
     obs = ['HadISST', 'WOA', 'CORA']
-    projects = ['CMIP6', 'CMIP5', 'CMIP3',] #'WOA', 'OBS']
+    projects = ['CMIP6', 'CMIP5', 'CMIP3', 'HighRes'] #'WOA', 'OBS']
     for ob in obs:
         if ob in plot_details.keys(): legend_order.append(ob)
     for proj in projects:
@@ -532,8 +542,6 @@ def main(cfg):
         label = plot_details[index].get('label', str(index))
         plt.plot([], [], c=colour, lw=linewidth, ls=linestyle, label=label)
 
-
-
     # handles, labels = plt.gca().get_legend_handles_labels()
     # print (handles, labels, legend_order)
     # assert 0
@@ -545,7 +553,7 @@ def main(cfg):
         # labels,
         loc='center left',
         ncol=1,
-        prop={'size': 8},
+        prop={'size': 6.5},  # legend font size to get all the CMIP5/6/HiRes
         )
         #bbox_to_anchor=(1., 0.5))
     #legd.draw_frame(False)

@@ -20,6 +20,7 @@ documentation:
 # TODO: Increase time range to match fig 3.17
 #
 datasets:
+<<<<<<< HEAD
     # CMIP5:
 #    # - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
 #    # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # no historical fx files.
@@ -61,6 +62,80 @@ datasets:
     #- {dataset: GISS-E2-1-G, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
     #- {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014} # Excessively low 1900 value (-2m!)
 
+    # # CMIP5:
+    # - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    #
+    # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1969, end_year: 1973}
+    # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    #
+    # - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # All zeroes
+    # - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    #
+    # - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    # # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    #
+    #
+    # # CMIP6:
+    # # # find */*/historical/r1i1p1f?/Omon/zostoga -type d -maxdepth 0
+    # - {dataset: AWI-CM-1-1-MR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: BCC-CSM2-MR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: BCC-ESM1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: CAMS-CSM1-0, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    #
+    # - {dataset: CanESM5, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: CNRM-CM6-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: CNRM-ESM2-1, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: EC-Earth3-Veg, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: IPSL-CM6A-LR, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # coordinate rank
+    # - {dataset: MIROC6, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm, start_year: 1960, end_year: 2014} # time units
+    # - {dataset: UKESM1-0-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm, start_year: 1960, end_year: 2014} # time coordinate
+    #
+    # - {dataset: GISS-E2-1-G, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: GISS-E2-1-H, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # Excessively low 1900 value (-2m!)
+    #
+    # - {dataset: CESM2, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: CESM2-WACCM, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: GFDL-CM4, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+    # - {dataset: SAM0-UNICON, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+
+
+
+# AWI/AWI-CM-1-1-MR/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_AWI-CM-1-1-MR_historical_r1i1p1f1_gn_201101-201412.nc
+# BCC/BCC-CSM2-MR/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_BCC-CSM2-MR_historical_r1i1p1f1_gn_201001-201412.nc
+# BCC/BCC-ESM1/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_BCC-ESM1_historical_r1i1p1f1_gn_201001-201412.nc
+# CAMS/CAMS-CSM1-0/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_CAMS-CSM1-0_historical_r1i1p1f1_gn_200001-201412.nc
+# CCCma/CanESM5/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_CanESM5_historical_r1i1p1f1_gn_201101-201412.nc
+# CNRM-CERFACS/CNRM-CM6-1/historical/r1i1p1f2/Omon/thetao/gn/latest/thetao_Omon_CNRM-CM6-1_historical_r1i1p1f2_gn_200001-201412.nc
+# CNRM-CERFACS/CNRM-ESM2-1/historical/r1i1p1f2/Omon/thetao/gn/latest/thetao_Omon_CNRM-ESM2-1_historical_r1i1p1f2_gn_200001-201412.nc
+# EC-Earth-Consortium/EC-Earth3-Veg/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_EC-Earth3-Veg_historical_r1i1p1f1_gn_201401-201412.nc
+# IPSL/IPSL-CM6A-LR/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_IPSL-CM6A-LR_historical_r1i1p1f1_gn_195001-201412.nc
+# MIROC/MIROC6/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_MIROC6_historical_r1i1p1f1_gn_201001-201412.nc
+# MOHC/HadGEM3-GC31-LL/historical/r1i1p1f3/Omon/thetao/gn/latest/thetao_Omon_HadGEM3-GC31-LL_historical_r1i1p1f3_gn_200001-201412.nc
+# MOHC/UKESM1-0-LL/historical/r1i1p1f2/Omon/thetao/gn/latest/thetao_Omon_UKESM1-0-LL_historical_r1i1p1f2_gn_200001-201412.nc
+# NASA-GISS/GISS-E2-1-G/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_GISS-E2-1-G_historical_r1i1p1f1_gn_201101-201412.nc
+# NASA-GISS/GISS-E2-1-H/historical/r1i1p1f1/Omon/thetao/gr/latest/thetao_Omon_GISS-E2-1-H_historical_r1i1p1f1_gr_201001-201412.nc
+#
+# NCAR/CESM2/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_CESM2_historical_r1i1p1f1_gn_185001-201412.nc
+# NCAR/CESM2-WACCM/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_CESM2-WACCM_historical_r1i1p1f1_gn_185001-201412.nc
+# NOAA-GFDL/GFDL-CM4/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_GFDL-CM4_historical_r1i1p1f1_gn_201001-201412.nc
+# SNU/SAM0-UNICON/historical/r1i1p1f1/Omon/thetao/gn/latest/thetao_Omon_SAM0-UNICON_historical_r1i1p1f1_gn_201001-201412.nc
+
 
 preprocessors:
     prep_3_20_700:
@@ -100,14 +175,14 @@ diagnostics:
         #   start_year: 1960
         #   end_year: 2005
 
-        ohc700: # Global Average Thermosteric Sea Level Change
-          short_name: ohc
-          preprocessor: prep_3_20_700
-          derive: true
-          force_derivation: false
-          # field: TO1M
-          # start_year: 1960
-          # end_year: 2005
+        # ohc700: # Global Average Thermosteric Sea Level Change
+        #   short_name: ohc
+        #   preprocessor: prep_3_20_700
+        #   derive: true
+        #   force_derivation: false
+        #   # field: TO1M
+        #   # start_year: 1960
+        #   # end_year: 2005
 
 
       scripts:
