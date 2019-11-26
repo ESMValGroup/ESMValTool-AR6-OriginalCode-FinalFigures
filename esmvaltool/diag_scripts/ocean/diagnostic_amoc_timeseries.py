@@ -595,6 +595,7 @@ def make_pane_a(
         value = float(model_numbers[dataset] ) / (number_models - 1.)
 
         max_index = np.argmax(cubes[dataset].data)
+        print(dataset, cubes[dataset].data.shape, max_index)
 
         label = ' '.join([metadatas[filename]['dataset'],
                           ':',
@@ -926,8 +927,9 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
+    make_pane_a(cfg)
     # overall plots:
-    #make_figure(cfg, timeseries= True)
+    make_figure(cfg, timeseries= True)
     make_figure(cfg, timeseries= False)
     return
 
@@ -947,7 +949,7 @@ def main(cfg):
     make_pane_bc(cfg, pane='c', time_res="annual")
     make_pane_bc(cfg, pane='b',time_res="annual")
 
-    #make_pane_a(cfg)
+    #
 
 
 

@@ -30,7 +30,7 @@ datasets:
     # - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
     # - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
     #
-    - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+    - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1969, end_year: 1973}
     # - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
     #
     # - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
@@ -133,14 +133,14 @@ diagnostics:
         #   start_year: 1960
         #   end_year: 2005
 
-        ohc700: # Global Average Thermosteric Sea Level Change
-          short_name: ohc
-          preprocessor: prep_3_20_700
-          derive: true
-          force_derivation: false
-          # field: TO1M
-          # start_year: 1960
-          # end_year: 2005
+        # ohc700: # Global Average Thermosteric Sea Level Change
+        #   short_name: ohc
+        #   preprocessor: prep_3_20_700
+        #   derive: true
+        #   force_derivation: false
+        #   # field: TO1M
+        #   # start_year: 1960
+        #   # end_year: 2005
 
 
       scripts:
