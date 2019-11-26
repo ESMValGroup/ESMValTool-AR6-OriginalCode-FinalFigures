@@ -370,11 +370,12 @@ def make_multimodle_zonal_mean_plots(
         metadata = metadatas[filename]
         short_name = metadata['short_name']
         dataset = metadata['dataset']
-        if metadata['exp'] in 'hist-1950':
-            project = 'HighRes'
-        else:
-            project = metadata['project']
-
+        # correct selection of HiResMIP models
+        if 'activity' in metadata:
+            if metadata['activity'] == 'HighResMIP':
+                project = 'HighRes'
+            else:
+                project = metadata['project']
         if metadata['variable_group'] not in groups:
             continue
 
