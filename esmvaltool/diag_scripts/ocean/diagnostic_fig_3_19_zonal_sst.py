@@ -350,7 +350,7 @@ def make_multimodle_zonal_mean_plots(
         if metadata['variable_group'] not in groups: continue
         number_models[metadata['dataset']] = True
         if metadata['exp'] in 'hist-1950':
-            projects['HighRes'] = True =
+            projects['HighRes'] = True
         else:
             projects[metadata['project']] = True
 
@@ -553,7 +553,7 @@ def main(cfg):
         # labels,
         loc='center left',
         ncol=1,
-        prop={'size': 8},
+        prop={'size': 6.5},  # legend font size to get all the CMIP5/6/HiRes
         )
         #bbox_to_anchor=(1., 0.5))
     #legd.draw_frame(False)
