@@ -355,6 +355,8 @@ def make_multimodle_zonal_mean_plots(
                 projects['HighRes'] = True 
             else:
                 projects[metadata['project']] = True
+        else:
+            projects[metadata['project']] = True
 
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
     print (number_models, model_numbers)
@@ -376,6 +378,8 @@ def make_multimodle_zonal_mean_plots(
                 project = 'HighRes'
             else:
                 project = metadata['project']
+        else:
+            project = metadata['project']
         if metadata['variable_group'] not in groups:
             continue
 
