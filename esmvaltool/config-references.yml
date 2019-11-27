@@ -619,6 +619,7 @@ references:
   gregory04grl: "Gregory et al., Geophys. Res. Lett., 31, L03205, doi:10.1029/2003GL018747, 2004"
   gregory08jgr: "Gregory, J. M. and Forster, P. M., J. Geophys. Res., 113, doi:10.1029/2008JD010405, 2008."
   hagemann13james: "Hagemann et al., J. Adv. Model. Earth Syst., 5, doi:10.1029/2012MS000173, 2013."
+  hall06grl: "Hall, A. et al., Geophys. Res. Lett., doi:10.1029/2005GL025127, 2006."
   jones13jgr: "Jones et al., J. Geophys. Res. Atmos., 118, 4001-4024, doi:10.1002/jgrd.50239, 2013."
   jones15james: "Jones et al., J. Adv. Model. Earth Syst., 7, 1554-1575, doi:10.1002/2014MS000416, 2015."
   kerry06jclim: "Kerry H. et al, J. Climate, 19, 3681-3703, doi:10.1175/JCLI3814.1, 2006."
@@ -668,6 +669,7 @@ references:
   weedon14wrr: "Weedon, G. P. et al., Water Resour. Res., 50, 7505-7514, doi:10.1002/2014WR015638, 2014."
   weigel: "Weigel, A P., et al., Q. J. Royal Meteorol. Soc. 134, 630, 241-260. doi:10.1002/qj.210"
   wenzel14jgr: "Wenzel et al., J. Geophys. Res. Biogeosci., 119(5), doi:2013JG002591, 2014."
+  wenzel16jclim: "Wenzel et al., J. Climate, 29, doi:10.1175/JCLI-D-15-0412.1, 2016."
   williams09climdyn: "Williams and Webb, Clim. Dynam., 33, 141-157, doi:10.1007/s00382-008-0443-1, 2009."
   zhang11wcc: "Zhang et al., WIREs Clim. Change, doi:10.1002/wcc.147, 2011."
   # Observations
@@ -793,6 +795,7 @@ plot_types:
   times: time series
   zonal: zonal mean
   pro: profile  # (any other kind of line chart)
+  box: boxplot
   other: other plot types
 
 statistics:
@@ -812,4 +815,5 @@ statistics:
   median: median
   detrend: detrend
   smpi: single metric performance index statistics
+  mder: multiple diagnostic ensemble regression
   other: other statistics
