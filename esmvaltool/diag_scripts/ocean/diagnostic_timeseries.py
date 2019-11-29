@@ -54,6 +54,7 @@ import os
 import iris
 import matplotlib.pyplot as plt
 import numpy as np
+import cftime 
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
@@ -195,7 +196,10 @@ def calc_anomaly(cube, anomaly_period):
     """
     datetime = diagtools.guess_calendar_datetime(cube)
     starttime = datetime(anomaly_period[0], 1, 1)
-    endtime = datetime(anomaly_period[1], 12, 31)
+    if datetime == cftime.Datetime360Day:
+        endtime = datetime(anomaly_period[1], 12, 30)
+    else:
+        endtime = datetime(anomaly_period[1], 12, 31)
     time_units = cube.coord('time').units
 
     t_1 = time_units.date2num(starttime)
