@@ -263,10 +263,23 @@ def get_26North(cube):
     """
     Extract 26.5 North. (RAPID array)
     """
-    latitude = cube.coord('latitude').points
-    closest_lat = np.min(np.abs(latitude - 26.5))
-    cube = cube.extract(iris.Constraint(latitude=closest_lat))
-    print('get_26North:',cube.data.shape)
+    coord_names = [cu.standard_name for cu in cube.coords()]
+    print(coord_names)
+    if 'latitude' in coord_names:
+        latitude = cube.coord('latitude').points
+        closest_lat = np.argmin(np.abs(latitude - 26.5))
+        cube = cube.extract(iris.Constraint(latitude=latitude[closest_lat]))
+
+    elif 'grid_latitude' in coord_names:
+        latitude = cube.coord('grid_latitude').points
+        closest_lat = np.argmin(np.abs(latitude - 26.5))
+        cube = cube.extract(iris.Constraint(grid_latitude=latitude[closest_lat]))
+    else: assert 0
+    # print(closest_lat, latitude[closest_lat])
+    # cube = cube.extract(iris.Constraint(latitude=latitude[closest_lat]))
+    #print('get_26North: pre', cube.data.shape, latitude, latitude[closest_lat])
+    #cube = cube.extract(iris.Constraint(latitude=latitude[closest_lat]))
+    print('get_26North: post', cube.data.shape)
     return cube
 
 
@@ -286,9 +299,11 @@ def load_cube(filename, metadata):
 
     """
     cube = iris.load_cube(filename)
-    print('load_cube',cube.data.shape, cube.coords)
+    print('load_cube',cube.data.shape, cube.units)
     cube = diagtools.bgc_units(cube, metadata['short_name'])
-    print('load_cube', cube.data.shape)
+    print('load_cube', cube.data.shape, cube.units)
+    
+  
     return cube
 
 
@@ -362,9 +377,12 @@ def make_pane_a(
         print(dataset, short_name)
         cube = load_cube(filename, metadatas[filename])
         cube = get_26North(cube)
-
-        cubes[dataset] = climate_statistics(cube, operator='mean',
-                                            period='full')
+        print('post get_26North:', cube.shape)  
+        if len(cube.coords('time')) and len(cube.coord('time').points) >1 :
+            cubes[dataset] = climate_statistics(cube, operator='mean',
+                                                period='full')
+        else:
+            cubes[dataset] = cube
     cmap = plt.cm.get_cmap('jet')
 
     #####
@@ -383,7 +401,8 @@ def make_pane_a(
             value = 0.5
 
         max_index = np.argmax(cubes[dataset].data)
-
+        #print(dataset, short_name, max_index, cubes[dataset].data[max_index] )
+        #print(cubes[dataset])
         label = ' '.join([metadatas[filename]['dataset'],
                           ':',
                           '('+str(round(cubes[dataset].data[max_index] , 1)),
@@ -391,6 +410,7 @@ def make_pane_a(
                           str(int(cubes[dataset].coord('depth').points[max_index])),
                           str(cubes[dataset].coord('depth').units)+')'
                           ])
+        print(label)
         if filename == obs_filename:
             plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
                                      'label': label}
@@ -412,7 +432,6 @@ def make_pane_a(
                  marker = 'd',
                  markersize = '10',
                  )
-
     add_obs = True
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
@@ -613,7 +632,7 @@ def make_pane_bc(
                          showfliers = True,
                          labels = sorted(trends.keys()))
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
-        plt.xticks(rotation=30, ha="right")
+        plt.xticks(rotation=30, ha="right", fontsize=8) 
         plt.setp(box['fliers'], markersize=1.0)
 
     if savefig:
@@ -636,7 +655,6 @@ def make_pane_bc(
     if not savefig:
         return fig, ax
    # Save the pane as its own image.
-
 
     plt.axhline(0., ls='--', color='k', lw=0.5)
     if timeseries:

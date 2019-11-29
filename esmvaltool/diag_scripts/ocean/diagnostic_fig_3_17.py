@@ -240,9 +240,18 @@ def make_mean_of_cube_list(cube_list, long_name):
             models_includes['fail'].append(cube_name)
             continue
 
-        if mean < -200. and 'long_name' == 'Sea Water Potential Temperature':
-            cube.data += 273.15
-         
+
+        if long_name == 'Sea Water Potential Temperature':
+            if mean < -200.:
+                cube.data += 273.15
+
+        if long_name == 'Sea Water Salinity':
+            if 0.02 < mean < 0.04:
+                cube.data = cube.data * 1000.
+            if abs(mean) < 1E-10:
+                models_includes['fail'].append(cube_name)
+                continue
+ 
         try:
             cube_mean+=cube
             length+=1

@@ -320,13 +320,16 @@ def make_fig_3_20(
     #TODO Need to add observational data
     #TODO Put both panes on the same figure
     #TODO colour scales.
-
+    if variable_group == 'ohcga': 
+        variable_groups = ['ohc_ofx', 'ohc_omon'] #['ohcga_Omon', 'ohcga_Ofx']
+    if variable_group == 'ohc700': variable_groups = ['ohc700_ofx', 'ohc700_omon']
+         
     ####
     # Load the data for each layer as a separate cube
     model_cubes = {}
     piControl_cubes = {}
     for filename in sorted(metadatas):
-        if metadatas[filename]['variable_group'] != variable_group:
+        if metadatas[filename]['variable_group'] in variable_groups:
             continue
         cube = iris.load_cube(filename)
         cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
@@ -353,7 +356,7 @@ def make_fig_3_20(
     # calculate the projects
     projects = {}
     for i, filename in enumerate(sorted(metadatas)):
-        if metadatas[filename]['variable_group'] != variable_group:
+        if metadatas[filename]['variable_group'] in variable_groups:
             continue
         metadata = metadatas[filename]
         if filename == obs_filename: continue
@@ -367,7 +370,7 @@ def make_fig_3_20(
     project_colours={'CMIP3': 'blue', 'CMIP5':'black', 'CMIP6':'green'}
 
     for index, filename in enumerate(sorted(metadatas)):
-        if metadatas[filename]['variable_group'] != variable_group:
+        if metadatas[filename]['variable_group'] in variable_groups:
             continue
         cube = model_cubes[filename]
         metadata = metadatas[filename]

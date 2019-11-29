@@ -20,7 +20,6 @@ documentation:
 # TODO: Increase time range to match fig 3.17
 #
 datasets:
-<<<<<<< HEAD
     # CMIP5:
 #    # - {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
 #    # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # no historical fx files.
