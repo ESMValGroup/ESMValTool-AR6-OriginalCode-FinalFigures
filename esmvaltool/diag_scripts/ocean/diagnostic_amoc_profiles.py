@@ -538,11 +538,11 @@ def make_pane_bc(
         print (cube.data.shape)
         if time_res=='monthly':
             cube = cube.aggregated_by(['month','year'], iris.analysis.MEAN)
-        if time_res=='annual':
+        elif time_res=='annual':
             cube = cube.aggregated_by(['year',], iris.analysis.MEAN)
-        if time_res=="April-March":
+        elif time_res=="April-March":
             cube = annual_mean_from_april(cube)
-
+        else: assert 0
         if pane == 'b':
             #cube = get_max_amoc(cube)
             #cube = cube.aggregated_by('year', iris.analysis.MEAN)
@@ -571,11 +571,11 @@ def make_pane_bc(
         #obs_cube = obs_cube.aggregated_by(['month','year'], iris.analysis.MEAN)
         if time_res=="April-March":
             obs_cube = annual_mean_from_april(obs_cube)
-        if time_res=='monthly':
+        elif time_res=='monthly':
             obs_cube = obs_cube.aggregated_by(['month','year'], iris.analysis.MEAN)
-        if time_res=='annual':
+        elif time_res=='annual':
             obs_cube = obs_cube.aggregated_by(['year',], iris.analysis.MEAN)
-
+        else: assert 0
         if pane == 'b':
             #obs_cube = get_max_amoc(obs_cube)
             new_times, slopes, intercepts = calculate_basic_trend(obs_cube)
