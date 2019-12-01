@@ -9,6 +9,7 @@
 ;
 ; History
 ;    20191030 kosaka_yu: written.
+;    20191130 kosaka_yu: bug fix for monsoon circulation index.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;    none
@@ -24,6 +25,15 @@ load "$diag_scripts/shared/plot/style.ncl"
 load "$diag_scripts/shared/plot/contour_maps.ncl"
 
 load "$diag_scripts/ar6ch3_monsoon/monsoon_indices.ncl"
+
+function correct_FillValue_uv(x)
+local y
+begin
+  y = x
+  y = where(abs(x).gt.1.e+5, y@_FillValue, y)
+  y = where(isnan_ieee(y), y@_FillValue, y)
+  return(y)
+end
 
 begin
 
@@ -191,7 +201,7 @@ begin
 ;
 ;    end if
     pr = read_data(infoPr[ii])
-    print(dataset+"")
+;    print(dataset+"")
     
     if (any(pr@units.eq.(/"mm/s", "kg/m^2/s", "mm s-1", "kg m-2 s-1" /))) then
       pr = pr*86400.
@@ -222,6 +232,14 @@ begin
     domain@dataset = dataset
     nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
     nc_outfile = ncdf_write(domain, nc_filename)
+
+    MPI@var = "MPI"
+    MPI@diag_script = DIAG_SCRIPT
+    MPI@dataset = dataset
+    nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
+    nc_outfile = ncdf_write(MPI, nc_filename)
+    
+
     delete(prClim)
     delete(prClimANN)
     delete(prRange)
@@ -240,6 +258,7 @@ begin
         u = utmp
         delete(utmp)
       end if
+      u = correct_FillValue_uv(u)
       uClim = get_clim(u, syear_clim, eyear_clim, smonth_monsoonyr, emonth_monsoonyr)
       uMonsoon = summer_minus_winter(uClim, opt)
       
@@ -264,6 +283,7 @@ begin
         v = vtmp
         delete(vtmp)
       end if
+      v = correct_FillValue_uv(v)
       vClim = get_clim(v, syear_clim, eyear_clim, smonth_monsoonyr, emonth_monsoonyr)
       vMonsoon = summer_minus_winter(vClim, opt)
     
@@ -376,9 +396,9 @@ begin
     work_dir = config_user_info@work_dir + "/"
     system("mkdir -p " + work_dir)    
     if (isatt(infoPr[ii], "ensemble")) then
-      nc_filename = work_dir + "GMprecip_monsoon_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
+      nc_filename = work_dir + "GMprecip_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
     else
-      nc_filename = work_dir + "GMprecip_monsoon_summer_"+infoPr[ii]@dataset+".nc"
+      nc_filename = work_dir + "GMprecip_summer_"+infoPr[ii]@dataset+".nc"
     end if
     
     if (nc_filename.ne."") then
@@ -401,9 +421,9 @@ begin
     NHMpr@dataset = infoPr[ii]@dataset
 
     if (isatt(infoPr[ii], "ensemble")) then
-      nc_filename = work_dir + "NHMprecip_monsoon_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
+      nc_filename = work_dir + "NHMprecip_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
     else
-      nc_filename = work_dir + "NHMprecip_monsoon_summer_"+infoPr[ii]@dataset+".nc"
+      nc_filename = work_dir + "NHMprecip_summer_"+infoPr[ii]@dataset+".nc"
     end if
     if (nc_filename.ne."") then
       nc_outfile = ncdf_write(NHMpr, nc_filename)
@@ -425,9 +445,9 @@ begin
     SHMpr@dataset = infoPr[ii]@dataset
 
     if (isatt(infoPr[ii], "ensemble")) then
-      nc_filename = work_dir + "SHMprecip_monsoon_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
+      nc_filename = work_dir + "SHMprecip_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
     else
-      nc_filename = work_dir + "SHMprecip_monsoon_summer_"+infoPr[ii]@dataset+".nc"
+      nc_filename = work_dir + "SHMprecip_summer_"+infoPr[ii]@dataset+".nc"
     end if
     if (nc_filename.ne."") then
       nc_outfile = ncdf_write(SHMpr, nc_filename)
@@ -459,28 +479,32 @@ begin
         if (.not.isatt(u, "_FillValue")) then
           u@_FillValue = default_fillvalue(typeof(u))
         end if
+        u = correct_FillValue_uv(u)
         ud = u(:, {85000.}, :, :)
         ud = u(:, {85000.}, :, :) - u(:, {20000.}, :, :)
         delete(u)
         delete(time)
 
-        syear_out = syear
-        eyear_out = eyear
-        if (smonth_NHsummer.gt.emonth_NHsummer .or. smonth_SHsummer.gt.emonth_SHsummer) then
-          syear_out = syear_out + 1
-        elseif (smonth.gt.min((/smonth_NHsummer, smonth_SHsummer/))) then
-          syear_out = syear_out + 1
-        end if
-        if (emonth.lt.max((/emonth_NHsummer, emonth_SHsummer/))) then
-          eyear_out = eyear_out - 1
-        end if
-      
-        udSummer = ud({syear_out*100+1:eyear_out*100+12:12}, :, :)
-        udSummer&time = ispan(syear_out, eyear_out, 1)
-        udSummer = (/summer(ud, opt)/)
+;        syear_out = syear
+;        eyear_out = eyear
+;        if (smonth_NHsummer.gt.emonth_NHsummer .or. smonth_SHsummer.gt.emonth_SHsummer) then
+;          syear_out = syear_out + 1
+;        elseif (smonth.gt.min((/smonth_NHsummer, smonth_SHsummer/))) then
+;          syear_out = syear_out + 1
+;        end if
+;        if (emonth.lt.max((/emonth_NHsummer, emonth_SHsummer/))) then
+;          eyear_out = eyear_out - 1
+;        end if
+;      
+;        udSummer = ud({syear_out*100+1:eyear_out*100+12:12}, :, :)
+;        udSummer&time = ispan(syear_out, eyear_out, 1)
+;        udSummer = (/summer(ud, opt)/)
+        udSummer = summer(ud, opt)
         delete(ud)
+
+        udSummer = lonFlip(udSummer)
         
-        udNHSM = udSummer(:, {0.:20.}, {120.:240.})
+        udNHSM = udSummer(:, {0.:20.}, {-120.:120.})
         delete(udSummer)
       
         wgty = latRegWgt(udNHSM&lat, typeof(udNHSM), 0)
@@ -503,9 +527,9 @@ begin
         work_dir = config_user_info@work_dir + "/"
         system("mkdir -p " + work_dir)    
         if (isatt(infoU[ii], "ensemble")) then
-          nc_filename = work_dir + "NHMcirculation_monsoon_summer_"+infoU[ii]@dataset+"_"+infoU[ii]@ensemble+".nc"
+          nc_filename = work_dir + "NHMcirculation_summer_"+infoU[ii]@dataset+"_"+infoU[ii]@ensemble+".nc"
         else
-          nc_filename = work_dir + "NHMcirculation_monsoon_summer_"+infoU[ii]@dataset+".nc"
+          nc_filename = work_dir + "NHMcirculation_summer_"+infoU[ii]@dataset+".nc"
         end if
     
         if (nc_filename.ne."") then
