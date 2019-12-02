@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cf_units
 import datetime
+from scipy.stats import linregress
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
@@ -62,7 +63,7 @@ def timeplot(cube, **kwargs):
     if len(cubedata.compressed()) == 1:
         plt.axhline(cubedata.compressed(), **kwargs)
         return
-
+    print('Adding', kwargs, 'to plot.')
     times = diagtools.cube_time_to_float(cube)
     plt.plot(times, cubedata, **kwargs)
 
@@ -189,6 +190,40 @@ def zero_around(cube, year_initial=1971., year_final=1971.):
     cube.data = cube.data - mean
     return cube
 
+
+def detrend(cfg, metadata, cube, pi_cube, method = 'linear regression'):
+    """
+    Detrend the historical cube using the pi_control cube.
+    """
+    if cube.data.shape != pi_cube.data.shape:
+        print(cube.data.shape, pi_cube.data.shape)
+        assert 0
+
+    decimal_time = diagtools.cube_time_to_float(cube)
+    if method == 'linear regression':
+        linreg = linregress( np.arange(len(decimal_time)), pi_cube.data)
+        line = [ (t * linreg.slope) + linreg.intercept for t in np.arange(len(decimal_time))]
+
+    fig = plt.figure()
+    plt.plot(decimal_time, cube.data, label = 'historical')
+    plt.plot(decimal_time, pi_cube.data, label = 'PI control')
+    plt.plot(decimal_time, line, label = 'PI control '+method)
+
+    detrended = cube.data - np.array(line)
+    cube.data = detrended
+    plt.plot(decimal_time, detrended, label = 'Detrended historical')
+
+    plt.axhline(0., c = 'k', ls=':' )
+    plt.legend()
+    dataset = metadata['dataset']
+    plt.title(dataset +' detrending ('+method+')')
+
+    image_extention = diagtools.get_image_format(cfg)
+    path = diagtools.folder(cfg['plot_dir']) + 'detrending_' + dataset + image_extention
+    logger.info('Saving detrending plots to %s', path)
+    plt.savefig(path)
+    plt.close()
+    return cube
 
 def make_new_time_array(times, new_datetime):
     """
@@ -320,25 +355,32 @@ def make_fig_3_20(
     #TODO Need to add observational data
     #TODO Put both panes on the same figure
     #TODO colour scales.
-    if variable_group == 'ohcga': 
-        variable_groups = ['ohc_ofx', 'ohc_omon'] #['ohcga_Omon', 'ohcga_Ofx']
-    if variable_group == 'ohc700': variable_groups = ['ohc700_ofx', 'ohc700_omon']
-         
+    if variable_group == 'ohcgt':
+        variable_groups = ['ohc_ofx', 'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
+    if variable_group == 'ohc700':
+        variable_groups = ['ohc700_ofx', 'ohc700_omon', 'ohc700']
+
     ####
     # Load the data for each layer as a separate cube
     model_cubes = {}
     piControl_cubes = {}
+    data_loaded = False
     for filename in sorted(metadatas):
-        if metadatas[filename]['variable_group'] in variable_groups:
+        print(variable_group, variable_groups, metadatas[filename]['variable_group'])
+        if metadatas[filename]['variable_group'] not in variable_groups:
             continue
+        data_loaded = True
         cube = iris.load_cube(filename)
         cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
 
+        dataset = metadatas[filename]['dataset']
         if metadatas[filename]['exp'] == 'historical':
             model_cubes[filename] = cube
         if metadatas[filename]['exp'] == 'piControl':
-            piControl_cubes[filename] = cube
+            piControl_cubes[dataset] = cube
 
+    if not data_loaded:
+        return
     # Load image format extention
     image_extention = diagtools.get_image_format(cfg)
 
@@ -356,7 +398,7 @@ def make_fig_3_20(
     # calculate the projects
     projects = {}
     for i, filename in enumerate(sorted(metadatas)):
-        if metadatas[filename]['variable_group'] in variable_groups:
+        if metadatas[filename]['variable_group'] not in variable_groups:
             continue
         metadata = metadatas[filename]
         if filename == obs_filename: continue
@@ -370,38 +412,37 @@ def make_fig_3_20(
     project_colours={'CMIP3': 'blue', 'CMIP5':'black', 'CMIP6':'green'}
 
     for index, filename in enumerate(sorted(metadatas)):
-        if metadatas[filename]['variable_group'] in variable_groups:
+        if metadatas[filename]['variable_group'] not in variable_groups:
+            continue
+
+        metadata = metadatas[filename]
+        dataset = metadata['dataset']
+        project = metadata['project']
+        if metadatas[filename]['exp'] == 'piControl':
             continue
         cube = model_cubes[filename]
-        metadata = metadatas[filename]
-
-        project = metadata['project']
+        pi_cube = piControl_cubes[dataset]
 
         # Is this data is a multi-model dataset?
         if metadata['dataset'].find('MultiModel') > -1:
             continue
 
-        # Reduce by average of 1986 - 2005.
-        cube = zero_around(cube)
+        # do the various operations.
+        cube = zero_around(cube, year_initial=1971., year_final=1971.)
+        pi_time = pi_cube.coord('time')
+        pi_year = pi_time.units.num2date(pi_time.points)[0].year + 11.
+        pi_cube = zero_around(pi_cube, year_initial=pi_year-5., year_final=pi_year+5.)
+        cube = detrend(cfg, metadata, cube, pi_cube)
 
         # Change to a standard calendar.
         cube = recalendar(cube, 'Gregorian')
 
         project_cubes[project].append(cube)
 
-        # Take a moving average, if needed.
-        #if 'moving_average' in cfg:
 
         coord_names = [coord[0].long_name for coord in cube.coords() ]
         if 'year' not in coord_names:
             iris.coord_categorisation.add_year(cube, 'time')
-
-        # cube = moving_average(cube, '10 years')
-
-        #if 'annual_average' in cfg:
-        # cube = annual_average(cube)
-
-        print(project, metadata['dataset'], cube.data.min())
 
         # Make plots for single models
         timeplot(
@@ -469,7 +510,7 @@ def main(cfg):
 
         #######
         # Multi model time series
-        for variable_group in ['ohcga', 'ohc700']:
+        for variable_group in ['ohcgt', 'ohc700']:
             make_fig_3_20(
                 cfg,
                 metadatas,

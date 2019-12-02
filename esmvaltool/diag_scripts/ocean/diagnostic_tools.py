@@ -220,7 +220,14 @@ def cube_time_to_float(cube):
     for dtime in dtimes:
         # TODO: it would be better to have a calendar dependent value
         # for daysperyear, as this is not accurate for 360 day calendars.
-        daysperyear = 365.25
+        if times.units.calendar == '365_day':
+            daysperyear = 365.
+        elif times.units.calendar == '360_day':
+            daysperyear = 360.
+        elif times.units.calendar == 'gregorian':
+            daysperyear = 365.25
+        else:
+            assert 0
 
         try:
             dayofyr = dtime.dayofyr
