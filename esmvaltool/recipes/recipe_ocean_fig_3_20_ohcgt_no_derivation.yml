@@ -119,40 +119,40 @@ preprocessors:
 diagnostics:
   diag_3_20:
       variables:
-        # thetaoga_Omon: # Global Average Thermosteric Sea Level Change
-        #   short_name: thetaoga
-        #   preprocessor: prep_3_20
-        #   #derive: true
-        #   #force_derivation: false
-        #   additional_datasets:
-        #     - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-        #     - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
-        #         # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
-        # #
-        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm, start_year: 1960, end_year: 2014}
-        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gm, start_year: 1960, end_year: 2014}
-        # #       # job r1i1p1f3 uses same time scale as pi control
-        # #
-        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm, start_year: 1960, end_year: 2014}
-        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gm, start_year: 2360, end_year: 2414}
-        # #      # 1850 historical is 1440 (subtract 410)
-        # volcello_Omon:
-        #   short_name: volcello
-        #   preprocessor: prep_vol_omon
-        #   #derive: true
-        #   #force_derivation: false
-        #   additional_datasets:
-        #     - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-        #     - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
-        #         # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
-        # #
-        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
-        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-        # #       # job r1i1p1f3 uses same time scale as pi control
-        # #
-        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414}
-        # #      # 1850 in historical is 1850+400 (add 400)
+        thetaoga_Omon: # Global Average Thermosteric Sea Level Change
+          short_name: thetaoga
+          preprocessor: prep_3_20
+          #derive: true
+          #force_derivation: false
+          additional_datasets:
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
+                # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        #
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm, start_year: 1960, end_year: 2014}
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gm, start_year: 1960, end_year: 2014}
+        #       # job r1i1p1f3 uses same time scale as pi control
+        #
+            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm, start_year: 1960, end_year: 2014}
+            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gm, start_year: 2360, end_year: 2414}
+        #      # 1850 historical is 1440 (subtract 410)
+        volcello_Omon:
+          short_name: volcello
+          preprocessor: prep_vol_omon
+          #derive: true
+          #force_derivation: false
+          additional_datasets:
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
+                # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        #
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+        #       # job r1i1p1f3 uses same time scale as pi control
+        #
+            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414}
+        #      # 1850 in historical is 1850+400 (add 400)
 
         thetaoga_Ofx: # Global Average Thermosteric Sea Level Change
           short_name: thetaoga
@@ -174,7 +174,9 @@ diagnostics:
 
              - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1660, end_year: 1705}
-             # 1850 = 1850
+             # 1850 = 1850 #
+             # THis can't be, as the PI stops at 1879.
+             # Lets assume that 1850 is actually 1550.  - subtract 300
 
              - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
@@ -200,7 +202,7 @@ diagnostics:
              - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              # 1850 = 1850 #
 
-            # # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # can't cat
+             # # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # can't cat
 
              - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1990, end_year: 2035}
@@ -232,11 +234,11 @@ diagnostics:
              # CMIP6
              - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
              - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
-            #  # 219000.0days = 600 years (subtract 1250),
-            #
-            # - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            # - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
-            # # 99645.0 days is 273 years (subtract 1577),
+             #  # 219000.0days = 600 years (subtract 1250),
+
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+             # 99645.0 days is 273 years (subtract 1577),
 
         volcello_Ofx: # Global Average Thermosteric Sea Level Change
           short_name: volcello
@@ -251,16 +253,15 @@ diagnostics:
              # branch time 9? 259 - 1850 = 259, subtract 1591
 
              - {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 4434, end_year: 4479}
+             - {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 4434, end_year: 4479}
              # 1850 = 4324, add 2474
 
              - {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1660, end_year: 1705}
              # - {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              # 1850 = 1850
 
              - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
+             - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
 
              - {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              - {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
@@ -297,10 +298,10 @@ diagnostics:
              - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
              - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
-            #
-            # - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            # - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
-            # # 99645.0 days is 273 years (subtract 1577),
+
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+             # 99645.0 days is 273 years (subtract 1577),
       scripts:
         # diagnostic_3_20_ts:
         #   script: ocean/diagnostic_timeseries.py
