@@ -529,7 +529,10 @@ def make_fig_3_20(
 
     # Add title, legend to plots
     plt.xlabel('Year')
-    #plt.ylabel('Thermal Expansion (mm)')
+    if variable_group == 'ohcgt':
+        plt.ylabel('Change in Global Total Heat Content, J')
+    else:
+        plt.ylabel('Change in Heat Content, J')
 
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 4.)
