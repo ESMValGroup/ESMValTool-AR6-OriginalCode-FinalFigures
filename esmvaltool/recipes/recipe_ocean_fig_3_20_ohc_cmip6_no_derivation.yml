@@ -102,34 +102,61 @@ preprocessors:
         regrid_time:
             frequency: year
 
+    prep_vol_omon:
+        custom_order: true
+        annual_statistics:
+            operator: mean
+        regrid_time:
+            frequency: year
+        volume_statistics:
+            operator: weightless_sum
 
-
+    prep_vol_ofx:
+        custom_order: true
+        volume_statistics:
+            operator: weightless_sum
+            
 diagnostics:
   diag_3_20:
       variables:
-        ohcgt_Omon: # Global Average Thermosteric Sea Level Change
-          short_name: ohcgt_omon
+        thetaoga_Omon: # Global Average Thermosteric Sea Level Change
+          short_name: thetaoga
           preprocessor: prep_3_20
-          derive: true
-          force_derivation: false
+          #derive: true
+          #force_derivation: false
           additional_datasets:
             - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
                 # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        #
+        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
+        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+        #       # job r1i1p1f3 uses same time scale as pi control
+        #
+        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 1550, end_year: 1604}
+        #      # 1850 historical is 1440 (subtract 410)
+        volcello_Omon:
+          short_name: volcello
+          preprocessor: prep_vol_omon
+          #derive: true
+          #force_derivation: false
+          additional_datasets:
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
+                # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        #
+        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
+        #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+        #       # job r1i1p1f3 uses same time scale as pi control
+        #
+        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+        #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414}
+        #      # 1850 in historical is 1850+400 (add 400)
 
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm, start_year: 1960, end_year: 2014}
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gm, start_year: 1960, end_year: 2014}
-              # job r1i1p1f3 uses same time scale as pi control
-
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm, start_year: 1960, end_year: 2014}
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gm, start_year: 2360, end_year: 2414}
-            # 1850 in historical is 1850+400 (add 400)
-
-        ohcgt_Ofx: # Global Average Thermosteric Sea Level Change
-          short_name: ohcgt_ofx
+        thetaoga_Ofx: # Global Average Thermosteric Sea Level Change
+          short_name: thetaoga
           preprocessor: prep_3_20
-          derive: true
-          force_derivation: false
           additional_datasets:
             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
@@ -138,10 +165,20 @@ diagnostics:
             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
             # 99645.0 days is 273 years (subtract 1577),
+        volcello_Ofx: # Global Average Thermosteric Sea Level Change
+          short_name: volcello
+          preprocessor: prep_vol_ofx
+          additional_datasets:
+            - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
+             # 219000.0days = 600 years (subtract 1250),
 
+            - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+            # 99645.0 days is 273 years (subtract 1577),
       scripts:
-        diagnostic_3_20_ts:
-          script: ocean/diagnostic_timeseries.py
+        # diagnostic_3_20_ts:
+        #   script: ocean/diagnostic_timeseries.py
           # anomaly: [1970, 1972]
         diagnostic_3_20:
-          script: ocean/diagnostic_fig_3_20_OHC_timeseries.py
+          script: ocean/diagnostic_fig_3_20_OHC_noppderive_timeseries.py
