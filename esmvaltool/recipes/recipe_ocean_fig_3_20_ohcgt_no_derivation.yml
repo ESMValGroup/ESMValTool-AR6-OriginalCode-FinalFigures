@@ -243,7 +243,7 @@ diagnostics:
              # 1850 = 1850
 
              - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
+             # - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
 
              - {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
              - {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
