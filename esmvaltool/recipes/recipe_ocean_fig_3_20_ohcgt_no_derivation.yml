@@ -198,7 +198,7 @@ diagnostics:
           preprocessor: prep_vol_ofx
           additional_datasets:
             - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-            - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455}
+            # - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455} # no picontrol volcello
 
 
             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}

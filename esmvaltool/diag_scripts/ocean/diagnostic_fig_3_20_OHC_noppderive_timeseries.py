@@ -468,7 +468,10 @@ def make_fig_3_20(
         cube = hist_cubes[filename]
         pi_cube = piControl_cubes[dataset]
         vol_cube =  hist_vol_cubes[dataset]
-        pi_vol_cube =  piControl_vol_cubes[dataset]
+        if dataset  in piControl_vol_cubes:
+            pi_vol_cube =  piControl_vol_cubes[dataset]
+        else:
+            pi_vol_cube = vol_cube
 
         cube = derive_ohc(cube, vol_cube)
         pi_cube = derive_ohc(pi_cube, pi_vol_cube)
