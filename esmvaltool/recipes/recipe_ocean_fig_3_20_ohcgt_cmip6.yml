@@ -115,13 +115,13 @@ diagnostics:
             - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
                 # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
 
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gm, start_year: 1960, end_year: 2014}
+            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gm, start_year: 1960, end_year: 2014}
               # job r1i1p1f3 uses same time scale as pi control
 
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 1550, end_year: 1604}
-             # 1850 historical is 1440 (subtract 410)
+            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gm, start_year: 1960, end_year: 2014}
+            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gm, start_year: 2360, end_year: 2414}
+            # 1850 in historical is 1850+400 (add 400)
 
         ohcgt_Ofx: # Global Average Thermosteric Sea Level Change
           short_name: ohcgt_ofx
