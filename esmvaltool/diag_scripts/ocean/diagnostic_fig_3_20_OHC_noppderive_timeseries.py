@@ -390,7 +390,9 @@ def make_fig_3_20(
     if variable_group == 'ohcgt':
         variable_groups = ['thetaoga_Ofx', 'thetaoga_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
         volume_groups = [ 'volcello_Ofx' ,'volcello_Omon']#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
-
+    if variable_group == 'ohc700':
+            variable_groups = ['thetao700_Ofx', 'thetao700_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
+            volume_groups = [ 'volcello700_Ofx' ,'volcello700_Omon']#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
     #if variable_group == 'ohc700':
     #    variable_groups = ['thetao700_ofx', 'thetao_omon', 'volcello_Ofx' ,'volcello_Omon']
 
@@ -534,8 +536,8 @@ def make_fig_3_20(
     plt.xlabel('Year')
     if variable_group == 'ohcgt':
         plt.ylabel('Change in Global Total Heat Content, J')
-    else:
-        plt.ylabel('Change in Heat Content, J')
+    if variable_group == 'ohc700':
+        plt.ylabel('Change in Heat Content in top 700m, J')
 
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 4.)
@@ -567,7 +569,7 @@ def main(cfg):
 
         #######
         # Multi model time series
-        for variable_group in ['ohcgt', ]: #'ohc700']:
+        for variable_group in ['ohcgt', 'ohc700']: #'ohc700']:
             make_fig_3_20(
                 cfg,
                 metadatas,
