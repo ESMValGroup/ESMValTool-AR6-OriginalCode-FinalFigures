@@ -224,9 +224,10 @@ def cube_time_to_float(cube):
             daysperyear = 365.
         elif times.units.calendar == '360_day':
             daysperyear = 360.
-        elif times.units.calendar == 'gregorian':
+        elif times.units.calendar in ['gregorian', 'proleptic_gregorian', 'julian']:
             daysperyear = 365.25
         else:
+            print("Calendar Not recoginised:", str(times.units.calendar))
             assert 0
 
         try:
