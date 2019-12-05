@@ -106,7 +106,9 @@ begin
     if (isatt(diag_script_info, "plot_units")) then
       var_all = convert_units(var_all, diag_script_info@plot_units)
       if (l_diff)
-        var_diff = convert_units(var_diff, diag_script_info@plot_units)
+        if (var0 .ne. "ta") then
+          var_diff = convert_units(var_diff, diag_script_info@plot_units)
+        end if
       end if
     end if
 
@@ -115,6 +117,11 @@ begin
     plot_var@res_tiMainString = annots(imod)
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
     plot_var@res_cnLevels = diag_script_info@abs_levs
+    if (isatt(diag_script_info, "abs_col")) then
+      pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                               + diag_script_info@abs_col)
+      plot_var@res_cnFillPalette = pal
+    end if
     plot_var@res_trYMinF = diag_script_info@zonal_ymin
     plot_var@res_gsnLeftString = \
       plot_var@long_name + " [" + format_units(plot_var@units) + "]"
@@ -154,6 +161,12 @@ begin
     plot_var@res_gsnSpreadColorEnd = -2
     wks = gsn_open_wks(file_type, plotpath_diff)
     gsn_merge_colormaps(wks, "temp_19lev", "gray70")
+    if (isatt(diag_script_info, "diff_col")) then
+      pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                               + diag_script_info@diff_col)
+      plot_var@res_cnFillPalette = pal
+      delete(plot_var@res_gsnSpreadColorEnd)
+    end if
     plot = zonalmean_profile(wks, plot_var, var0)
     delete(plot_var@res_cnLevels)
 
