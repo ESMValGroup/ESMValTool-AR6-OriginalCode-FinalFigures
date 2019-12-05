@@ -1,0 +1,216 @@
+# ESMValTool
+# recipe_lauer13jclim.yml
+---
+documentation:
+  description: |
+    Diagnostics of clouds and hydrological cycle reproducing selected figures
+    from Lauer and Hamilton (2013).
+
+  authors:
+    - lauer_axel
+
+  maintainer:
+    - lauer_axel
+
+  references:
+    - lauer13jclim
+
+  projects:
+    - esmval
+    - embrace
+
+datasets:
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: BCC-ESM1, grid: gn}
+  - {dataset: CAMS-CSM1-0, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: E3SM-1-0}
+  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  - {dataset: EC-Earth3-Veg}
+  - {dataset: GFDL-CM4, grid: gr1}
+  - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
+  - {dataset: GISS-E2-1-H, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: IPSL-CM6A-LR}
+  #- {dataset: MCM-UA-1-0, grid: gn} no data
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: NESM3, grid: gn}
+  #- {dataset: NorCPM1, institute: NCC, ensemble: r24i1p1f1, grid: gn} no data
+  - {dataset: SAM0-UNICON, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+
+
+preprocessors:
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_fillvalues:
+      threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+diagnostics:
+
+  # ==========================================================================
+  # Lauer and Hamilton (2013) - Figure 1
+  # Geographical distribution of multi-year annual/seasonal means (panel plot)
+  # ==========================================================================
+
+#  clouds_fig1_lwp:
+#    description: climatological annual means
+#    themes:
+#      - clouds
+#    realms:
+#      - atmos
+#    variables:
+#      lwp:
+#        preprocessor: clim
+#        reference_dataset: UWisc
+#        mip: Amon
+#        derive: true
+#    additional_datasets:
+#      - {dataset: UWisc, project: OBS, type: sat, version: v2,
+#         start_year: 1988, end_year: 2007, tier: 3}
+#    scripts:
+#      clim: &clim_settings
+#        script: clouds/clouds.ncl
+#        # projection
+#        # ----------
+#        # map projection, e.g., Mollweide, Mercator, CylindricalEquidistant
+#        projection: Robinson
+#        # timemean
+#        # --------
+#        # - annualclim: 1 plot (annual mean)
+#        # - seasonalclim: 4 plots (DJF, MAM, JJA, SON)
+#        timemean: annualclim
+#        showdiff: false
+#
+#  clouds_fig1_clt:
+#    description: climatological annual means
+#    themes:
+#      - clouds
+#    realms:
+#      - atmos
+#    variables:
+#      clt:
+#        preprocessor: clim
+#        reference_dataset: MODIS
+#        mip: Amon
+#    additional_datasets:
+#      - {dataset: MODIS, project: obs4mips, level: L3, version: C5,
+#         start_year: 2001, end_year: 2010, tier: 1}
+#    scripts:
+#      clim:
+#        <<: *clim_settings
+
+  clouds_fig1_tas:
+    description: climatological annual means
+    themes:
+      - clouds
+    realms:
+      - atmos
+    variables:
+      tas:
+        preprocessor: clim
+        reference_dataset: ERA5
+        mip: Amon
+        project: CMIP6
+        grid: gr
+        exp: historical
+        ensemble: r1i1p1f1
+        start_year: 1986
+        end_year: 2005
+    additional_datasets:
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, 
+         start_year: 1986, end_year: 2005, tier: 3}
+    scripts:
+      clim: &clim_settings
+        script: clouds/clouds.ncl
+        # projection
+        # ----------
+        # map projection, e.g., Mollweide, Mercator, CylindricalEquidistant
+        projection: Robinson
+        # timemean
+        # --------
+        # - annualclim: 1 plot (annual mean)
+        # - seasonalclim: 4 plots (DJF, MAM, JJA, SON)
+        timemean: annualclim
+
+  clouds_fig1_pr:
+    description: climatological annual means
+    themes:
+      - clouds
+    realms:
+      - atmos
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        mip: Amon
+        project: CMIP6
+        grid: gr
+        exp: historical
+        ensemble: r1i1p1f1
+        start_year: 1986
+        end_year: 2005
+    additional_datasets:
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2,
+         start_year: 1986, end_year: 2005, tier: 1}
+    scripts:
+      clim:
+        <<: *clim_settings
+
+#  clouds_fig1_swcre:
+#    description: climatological annual means
+#    themes:
+#      - clouds
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      swcre:
+#        preprocessor: clim
+#        reference_dataset: CERES-EBAF
+#        mip: Amon
+#        derive: true
+#    additional_datasets:
+#      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7,
+#         start_year: 2001, end_year: 2010, tier: 1}
+#    scripts:
+#      clim:
+#        <<: *clim_settings
+#
+#  clouds_fig1_lwcre:
+#    description: climatological annual means
+#    themes:
+#      - clouds
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      lwcre:
+#        preprocessor: clim
+#        reference_dataset: CERES-EBAF
+#        mip: Amon
+#        derive: true
+#    additional_datasets:
+#      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7,
+#         start_year: 2001, end_year: 2010, tier: 1}
+#    scripts:
+#      clim:
+#        <<: *clim_settings
+
+
