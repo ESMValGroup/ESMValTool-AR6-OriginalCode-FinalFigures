@@ -167,6 +167,11 @@ begin
   ; Set dataset names
   datasetnames = metadata_att_as_array(info_items, "dataset")
 
+  ; Save projects
+  projectnames = metadata_att_as_array(info_items, "project")
+print("projectnames")
+print(projectnames)
+
   ; Save list of preproc files for provenance in collect.ncl
   preproc_files = metadata_att_as_array(info_items, "filename")
 
@@ -218,6 +223,9 @@ begin
     if (isdim(grading, "reference")) then
       grading&reference = datasetnames(ref_inds)
     end if
+    grading@projects = str_join(remove_index(projectnames, ref_inds), " ")
+print("grading@projects")
+print(grading@projects)
 
     ; Special case Taylor
     if (any(diag_script_info@metric.eq."taylor")) then
