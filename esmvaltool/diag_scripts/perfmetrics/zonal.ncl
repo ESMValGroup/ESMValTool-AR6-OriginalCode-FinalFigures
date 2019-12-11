@@ -84,7 +84,14 @@ begin
     ; Calculate difference
     if (l_diff) then
       var_diff = var_all(:, :, 0)
-      var_diff = var_all(:, :, 0) - var_ref(:, :, 0)
+      if (isatt(diag_script_info, "diff_rel")) then
+        if (diag_script_info@diff_rel) then
+          var_tmp = where(abs(var_all).lt.1e-6, var_all@_FillValue, var_all)
+          var_diff = (var_all(:, :, 0) - var_ref(:, :, 0))/var_tmp(:, :, 0)
+        end if
+      else
+        var_diff = var_all(:, :, 0) - var_ref(:, :, 0)
+      end if
     end if
 
     ; Write output
@@ -106,7 +113,8 @@ begin
     if (isatt(diag_script_info, "plot_units")) then
       var_all = convert_units(var_all, diag_script_info@plot_units)
       if (l_diff)
-        if (var0 .ne. "ta") then
+        if (.not. any(var0 .eq. (/"ta", "hus"/))) then
+print("convert var_diff")
           var_diff = convert_units(var_diff, diag_script_info@plot_units)
         end if
       end if
