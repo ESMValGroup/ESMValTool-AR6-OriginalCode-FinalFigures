@@ -475,7 +475,9 @@ def make_fig_3_20(
         else:
             pi_vol_cube = vol_cube
 
+        print('deriving:', project, dataset, 'historical')
         cube = derive_ohc(cube, vol_cube)
+        print('deriving:', project, dataset, 'piControl')
         pi_cube = derive_ohc(pi_cube, pi_vol_cube)
 
 
@@ -508,6 +510,10 @@ def make_fig_3_20(
                     lw=0.5,
                     alpha=0.5,
                 )
+        # save cube:
+        output_cube = diagtools.folder(cfg['work_dir']) + '_'.join(['OHC','zeroed','detrended','recalendared',project, dataset])+'.nc'
+        logger.info('Saving cubes to %s', output_cube)
+        iris.save(cube, output_cube)
 
     for project in projects:
         cube = make_mean_of_cube_list(project_cubes[project])
@@ -525,6 +531,10 @@ def make_fig_3_20(
                     ls=plot_details[project]['ls'],
                     lw=plot_details[project]['lw'],
                 )
+        output_cube = diagtools.folder(cfg['work_dir']) + '_'.join(['OHC','zeroed','detrended','recalendared',project, 'mean'])+'.nc'
+        logger.info('Saving project cubes to %s', output_cube)
+        iris.save(cube, output_cube)
+
 
     # Draw horizontal line at zero
     plt.axhline(0., c='k', ls='--', lw=0.5)
