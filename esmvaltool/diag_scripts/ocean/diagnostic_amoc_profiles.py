@@ -289,7 +289,6 @@ def get_max_amoc(cube):
     """
     cube = cube.collapsed('depth', iris.analysis.MAX)
     print('get_max_amoc:',cube.data.shape)
-
     return cube
 
 
@@ -302,8 +301,6 @@ def load_cube(filename, metadata):
     print('load_cube',cube.data.shape, cube.units)
     cube = diagtools.bgc_units(cube, metadata['short_name'])
     print('load_cube', cube.data.shape, cube.units)
-
-
     return cube
 
 
@@ -320,6 +317,63 @@ def count_models(metadatas, obs_filename):
     print (number_models, model_numbers)
     number_models = len(number_models)
     return model_numbers, number_models, projects
+
+
+
+def make_mean_of_cube_list(cube_list):
+    """
+    Takes the mean of a list of cubes (not an iris.cube.CubeList).
+
+    Assumes all the cubes are the same shape.
+    """
+    # Fix empty times
+    full_times = {}
+    times = []
+    for cube in cube_list:
+        # make time coords uniform:
+        cube.coord('time').long_name='Time axis'
+        cube.coord('time').attributes={'time_origin': '1950-01-01 00:00:00'}
+        times.append(cube.coord('time').points)
+
+        for time in cube.coord('time').points:
+            print(cube.name, time, cube.coord('time').units)
+            try:
+                full_times[time] += 1
+            except:
+                full_times[time] = 1
+
+    for t, v in sorted(full_times.items()):
+        if v != len(cube_list):
+            print('FAIL', t, v, '!=', len(cube_list),'\nfull times:',  full_times)
+            assert 0
+
+    cube_mean=cube_list[0]
+    #try: iris.coord_categorisation.add_year(cube_mean, 'time')
+    #except: pass
+    #try: iris.coord_categorisation.add_month(cube_mean, 'time')
+    #except: pass
+
+    cube_mean.remove_coord('year')
+    #cube.remove_coord('Year')
+    try: model_name = cube_mean.metadata[4]['source_id']
+    except: model_name = ''
+    print(model_name,  cube_mean.coord('time'))
+
+    for i, cube in enumerate(cube_list[1:]):
+        #try: iris.coord_categorisation.add_year(cube, 'time')
+        #except: pass
+        #try: iris.coord_categorisation.add_month(cube, 'time')
+        #except: pass
+        cube.remove_coord('year')
+        #cube.remove_coord('Year')
+        try: model_name = cube_mean.metadata[4]['source_id']
+        except: model_name = ''
+        print(i, model_name, cube.coord('time'))
+        cube_mean+=cube
+        #print(cube_mean.coord('time'), cube.coord('time'))
+    cube_mean = cube_mean/ float(len(cube_list))
+    return cube_mean
+
 
 
 def make_pane_a(
