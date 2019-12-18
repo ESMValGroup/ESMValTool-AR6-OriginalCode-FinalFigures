@@ -302,8 +302,8 @@ def load_cube(filename, metadata):
     print('load_cube',cube.data.shape, cube.units)
     cube = diagtools.bgc_units(cube, metadata['short_name'])
     print('load_cube', cube.data.shape, cube.units)
-    
-  
+
+
     return cube
 
 
@@ -369,20 +369,27 @@ def make_pane_a(
         obs_metadata = metadatas[obs_filename]
 
     cubes = {}
+    projects = {}
+    for filename in sorted(metadatas.keys()):
+        project =  metadatas[filename]['project']
+        projects[project] = []
+
     for filename in sorted(metadatas.keys()):
         dataset = metadatas[filename]['dataset']
         short_name = metadatas[filename]['short_name']
+        project =  metadatas[filename]['project']
         if short_name == 'amoc':
             continue
         print(dataset, short_name)
         cube = load_cube(filename, metadatas[filename])
         cube = get_26North(cube)
-        print('post get_26North:', cube.shape)  
+        print('post get_26North:', cube.shape)
         if len(cube.coords('time')) and len(cube.coord('time').points) >1 :
             cubes[dataset] = climate_statistics(cube, operator='mean',
                                                 period='full')
         else:
             cubes[dataset] = cube
+        projects[project].append(cube)
     cmap = plt.cm.get_cmap('jet')
 
     #####
@@ -392,6 +399,7 @@ def make_pane_a(
     plot_details = {}
     for filename in sorted(metadatas.keys()):
         dataset =  metadatas[filename]['dataset']
+        project =  metadatas[filename]['project']
         short_name = metadatas[filename]['short_name']
         if short_name == 'amoc':
             continue
@@ -410,21 +418,30 @@ def make_pane_a(
                           str(int(cubes[dataset].coord('depth').points[max_index])),
                           str(cubes[dataset].coord('depth').units)+')'
                           ])
+
         print(label)
+        colour = cmap(value)
+        if project == 'CMIP5':
+            colour = 'dodgerblue'
+        elif project == 'CMIP6':
+            colour = 'red'
+
         if filename == obs_filename:
             plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
                                      'label': label}
         else:
-            plot_details[dataset] = {'c': cmap(value),
+            plot_details[dataset] = {'c': colour,
                                      'ls': '-',
                                      'lw': 1,
                                      'label': label}
+
         qplt.plot(cubes[dataset], cubes[dataset].coord('depth'),
              color = plot_details[dataset]['c'],
              linewidth = plot_details[dataset]['lw'],
              linestyle = plot_details[dataset]['ls'],
              label = label
              )
+
         # Add a marker at the maximum
         plt.plot(cubes[dataset].data[max_index],
                  cubes[dataset].coord('depth').points[max_index],
@@ -432,6 +449,40 @@ def make_pane_a(
                  marker = 'd',
                  markersize = '10',
                  )
+
+    for project in projects:
+        colour = cmap(value)
+        if project == 'CMIP5':
+            colour = 'darkblue'
+        if project == 'CMIP6':
+            colour = 'darkred'
+
+        cube = make_mean_of_cube_list(projects[project])
+
+        max_index = np.argmax(cube.data)
+
+        label = ' '.join([project,
+                          ':',
+                          '('+str(round(cube.data[max_index] , 1)),
+                          str(cube.units)+',',
+                          str(int(cube.coord('depth').points[max_index])),
+                          str(cube.coord('depth').units)+')'
+                          ])
+
+        plot_details[project] = {
+            'c': colour,
+            'ls': '-',
+            'lw': 2.,
+            'label': label
+        }
+
+        plt.plot(cube.data[max_index],
+                 cube.coord('depth').points[max_index],
+                 c =  colour,
+                 marker = 'd',
+                 markersize = '10',
+                 )
+
     add_obs = True
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
@@ -545,6 +596,11 @@ def make_pane_bc(
 
     metadatas = diagtools.get_input_files(cfg)
 
+    projects = {}
+    for filename in sorted(metadatas.keys()):
+        project =  metadatas[filename]['project']
+        projects[project] = []
+
     #####
     # Load the CMIP data and calculate the trend or interannual variability
     trends = {}
@@ -572,6 +628,9 @@ def make_pane_bc(
             #cube = get_max_amoc(cube)
             #cube = cube.aggregated_by('year', iris.analysis.MEAN)
             trends[dataset] = calculate_interannual(cube)
+        projects.append(dataset)
+
+    box_order = []
 
     #####
     # Add observational data.
@@ -607,6 +666,18 @@ def make_pane_bc(
     # calculate the number of models
     model_numbers, number_models, projects= count_models(metadatas, obs_filename)
 
+    ####
+    # Add project datasets
+    for project, datasets in sorted(projects.items()):
+        if len(datasets) == 0: continue
+        box_order.append(project)
+        for dataset in datasets:
+            trends[project].append(trends[dataset])
+        if project == 'CMIP6':
+            box_order.extend(sorted(datasets))
+
+    box_order.append(obs_dataset)
+
     if timeseries:
         # Draw the trend/variability as a time series
         cmap = plt.cm.get_cmap('jet')
@@ -622,7 +693,7 @@ def make_pane_bc(
             plt.plot(trends[dataset], c = color, lw=lw, label = dataset)
     else:
         # Draw the trend/variability as a box and whisker diagram.
-        box_data = [trends[dataset] for dataset in sorted(trends)]
+        box_data = [trends[dataset] for dataset in box_order]
         box = ax.boxplot(box_data,
                          0,
                          sym = 'k.',
@@ -632,7 +703,7 @@ def make_pane_bc(
                          showfliers = True,
                          labels = sorted(trends.keys()))
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
-        plt.xticks(rotation=30, ha="right", fontsize=8) 
+        plt.xticks(rotation=30, ha="right", fontsize=8)
         plt.setp(box['fliers'], markersize=1.0)
 
     if savefig:
