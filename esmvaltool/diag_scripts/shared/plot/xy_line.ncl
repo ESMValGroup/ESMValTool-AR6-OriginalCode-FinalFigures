@@ -2005,7 +2005,8 @@ begin
 
   lgres@lgLineColors      = colors
   lgres@lgDashIndexes     = dashes
-  lgres@lgLineThicknesses = thicks + 1
+  ;lgres@lgLineThicknesses = thicks + 3
+  lgres@lgLineThicknessF = 3
   labels = annots
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
