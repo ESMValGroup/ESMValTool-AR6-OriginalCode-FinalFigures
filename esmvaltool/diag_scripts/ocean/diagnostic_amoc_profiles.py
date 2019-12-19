@@ -61,6 +61,8 @@ from scipy.stats import linregress
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
 from esmvalcore.preprocessor import climate_statistics
+from esmvalcore.preprocessor._regrid import extract_levels
+
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -329,6 +331,8 @@ def make_mean_of_cube_list(cube_list):
     # Fix empty times
     full_times = {}
     times = []
+    print(cube_list)
+    levels = []
     for cube in cube_list:
         # make time coords uniform:
         cube.coord('time').long_name='Time axis'
@@ -336,43 +340,53 @@ def make_mean_of_cube_list(cube_list):
         times.append(cube.coord('time').points)
 
         for time in cube.coord('time').points:
-            print(cube.name, time, cube.coord('time').units)
+            print(time, cube.coord('time').units,':', cube.coord('time').units.num2date(time))
             try:
                 full_times[time] += 1
             except:
                 full_times[time] = 1
+        level_points = cube.coord(axis='Z').points
+        if len(level_points) > len(levels):
+            levels = level_points
 
-    for t, v in sorted(full_times.items()):
-        if v != len(cube_list):
-            print('FAIL', t, v, '!=', len(cube_list),'\nfull times:',  full_times)
-            assert 0
+    for i, cube in enumerate(cube_list):
+        print('regridding vertical' ) #cube.coord(axis='Z'))
+        cube = extract_levels(cube, levels, 'linear_horizontal_extrapolate_vertical')
+        cube_list[i] = cube
+        #rint(depth in cube.coord('depth').points)
 
-    cube_mean=cube_list[0]
+    #for t, v in sorted(full_times.items()):
+    #    if v != len(cube_list):
+    #        print('FAIL', t, v, '!=', len(cube_list),'\nfull times:',  full_times)
+    #        assert 0
+
+    cube_mean=cube_list[0].data
     #try: iris.coord_categorisation.add_year(cube_mean, 'time')
     #except: pass
     #try: iris.coord_categorisation.add_month(cube_mean, 'time')
     #except: pass
 
-    cube_mean.remove_coord('year')
+    #cube_mean.remove_coord('year')
     #cube.remove_coord('Year')
-    try: model_name = cube_mean.metadata[4]['source_id']
-    except: model_name = ''
-    print(model_name,  cube_mean.coord('time'))
+    #try: model_name = cube_mean.metadata[4]['source_id']
+    #except: model_name = ''
+    #print(model_name,  cube_mean.coord('time'))
 
     for i, cube in enumerate(cube_list[1:]):
         #try: iris.coord_categorisation.add_year(cube, 'time')
         #except: pass
         #try: iris.coord_categorisation.add_month(cube, 'time')
         #except: pass
-        cube.remove_coord('year')
+        #cube.remove_coord('year')
         #cube.remove_coord('Year')
-        try: model_name = cube_mean.metadata[4]['source_id']
-        except: model_name = ''
-        print(i, model_name, cube.coord('time'))
-        cube_mean+=cube
+        #try: model_name = cube_mean.metadata[4]['source_id']
+        #except: model_name = ''
+        #print(i, model_name, cube.coord('time'))
+        cube_mean+=cube.data
         #print(cube_mean.coord('time'), cube.coord('time'))
     cube_mean = cube_mean/ float(len(cube_list))
-    return cube_mean
+    cube.data = cube_mean
+    return cube
 
 
 
@@ -448,9 +462,10 @@ def make_pane_a(
 
     #####
     # calculate the number of models
-    model_numbers, number_models, projects= count_models(metadatas, obs_filename)
+    model_numbers, number_models, projects_numbers= count_models(metadatas, obs_filename)
 
     plot_details = {}
+    labeldone = {'CMIP5': False, 'CMIP6':False}
     for filename in sorted(metadatas.keys()):
         dataset =  metadatas[filename]['dataset']
         project =  metadatas[filename]['project']
@@ -477,24 +492,37 @@ def make_pane_a(
         colour = cmap(value)
         if project == 'CMIP5':
             colour = 'dodgerblue'
+            label = 'Individual CMIP5 models'
         elif project == 'CMIP6':
             colour = 'red'
+            label = 'Individual CMIP6 models'
 
         if filename == obs_filename:
-            plot_details[obs_key] = {'c': 'black', 'ls': '-', 'lw': 2,
-                                     'label': label}
+            plot_details[dataset] = {'c': 'black', 'ls': '-', 'lw': 3,
+                                     'label': label, 'zorder':10}
         else:
             plot_details[dataset] = {'c': colour,
                                      'ls': '-',
                                      'lw': 1,
-                                     'label': label}
-
-        qplt.plot(cubes[dataset], cubes[dataset].coord('depth'),
-             color = plot_details[dataset]['c'],
-             linewidth = plot_details[dataset]['lw'],
-             linestyle = plot_details[dataset]['ls'],
-             label = label
-             )
+                                     #'label': label,
+                                      'zorder': 1 }
+        if not labeldone[project]:
+            qplt.plot(cubes[dataset], cubes[dataset].coord('depth'),
+                color = plot_details[dataset]['c'],
+                linewidth = plot_details[dataset]['lw'],
+                linestyle = plot_details[dataset]['ls'],
+                label = label,
+                zorder=plot_details[dataset]['zorder']
+                )
+            labeldone[project] = True
+        else:
+             qplt.plot(cubes[dataset], cubes[dataset].coord('depth'),
+                 color = plot_details[dataset]['c'],
+                 linewidth = plot_details[dataset]['lw'],
+                 linestyle = plot_details[dataset]['ls'],
+                 # label = label,
+                 zorder=plot_details[dataset]['zorder']
+                 )
 
         # Add a marker at the maximum
         plt.plot(cubes[dataset].data[max_index],
@@ -502,6 +530,7 @@ def make_pane_a(
                  c =  plot_details[dataset]['c'],
                  marker = 'd',
                  markersize = '10',
+                 zorder=plot_details[dataset]['zorder']
                  )
 
     for project in projects:
@@ -526,15 +555,25 @@ def make_pane_a(
         plot_details[project] = {
             'c': colour,
             'ls': '-',
-            'lw': 2.,
-            'label': label
+            'lw': 3.,
+            'label': label,
+            'zorder': 10,
         }
+
+        qplt.plot(cube, cube.coord('depth'),
+             color = plot_details[project]['c'],
+             linewidth = plot_details[project]['lw'],
+             linestyle = plot_details[project]['ls'],
+             label = label,
+             zorder=plot_details[project]['zorder']
+             )
 
         plt.plot(cube.data[max_index],
                  cube.coord('depth').points[max_index],
-                 c =  colour,
+                 c = colour,
                  marker = 'd',
                  markersize = '10',
+                 zorder = plot_details[project]['zorder']
                  )
 
     add_obs = True
@@ -562,7 +601,7 @@ def make_pane_a(
 
         plot_details[obs_dataset] = {'c': 'black',
                                  'ls': '-',
-                                 'lw': 1,
+                                 'lw': 3,
                                  'label': label}
 
         qplt.plot(obs_cube, obs_cube.coord('depth'),
@@ -661,6 +700,7 @@ def make_pane_bc(
     for filename in sorted(metadatas.keys()):
         dataset = metadatas[filename]['dataset']
         short_name = metadatas[filename]['short_name']
+        project =  metadatas[filename]['project']
         if short_name != 'amoc':
             continue
         cube = load_cube(filename, metadatas[filename])
@@ -682,7 +722,7 @@ def make_pane_bc(
             #cube = get_max_amoc(cube)
             #cube = cube.aggregated_by('year', iris.analysis.MEAN)
             trends[dataset] = calculate_interannual(cube)
-        projects.append(dataset)
+        projects[project].append(dataset)
 
     box_order = []
 
@@ -718,17 +758,26 @@ def make_pane_bc(
 
     #####
     # calculate the number of models
-    model_numbers, number_models, projects= count_models(metadatas, obs_filename)
+    model_numbers, number_models, projects_numbers= count_models(metadatas, obs_filename)
 
     ####
     # Add project datasets
-    for project, datasets in sorted(projects.items()):
-        if len(datasets) == 0: continue
+    for project in sorted(projects.keys()):
+        datasets = projects[project]
+        if len(datasets) == 0: 
+            continue
         box_order.append(project)
+        trends[project] = []
         for dataset in datasets:
-            trends[project].append(trends[dataset])
+            print(project, dataset)
+            print('trends[dataset]:',project, dataset, len(trends[dataset]))
+            trends[project].extend(list(trends[dataset]))
+            #except: trends[project] = trends[dataset]
+            print('trends[project]:',project,len(trends[project]))
+
         if project == 'CMIP6':
             box_order.extend(sorted(datasets))
+    #assert 0
 
     box_order.append(obs_dataset)
 
@@ -743,7 +792,7 @@ def make_pane_bc(
                 lw = 1.
             except:
                 color = 'black'
-                lw = 2.5
+                lw = 3
             plt.plot(trends[dataset], c = color, lw=lw, label = dataset)
     else:
         # Draw the trend/variability as a box and whisker diagram.
@@ -755,7 +804,7 @@ def make_pane_bc(
                          showmeans= False,
                          meanline = False,
                          showfliers = True,
-                         labels = sorted(trends.keys()))
+                         labels = box_order) #sorted(trends.keys()))
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
         plt.xticks(rotation=30, ha="right", fontsize=8)
         plt.setp(box['fliers'], markersize=1.0)
@@ -866,6 +915,11 @@ def main(cfg):
     # make_timeseriespane_bc(cfg, pane='c')
     make_pane_a(cfg)
 
+    make_figure(cfg, timeseries= False)
+
+
+    #make_pane_a(cfg)
+
     make_pane_bc(cfg, pane='b', timeseries=False)
     make_pane_bc(cfg, pane='c', timeseries=False)
 
@@ -874,7 +928,7 @@ def main(cfg):
 
     # overall plots:
     # make_figure(cfg, timeseries= True)
-    make_figure(cfg, timeseries= False)
+    #make_figure(cfg, timeseries= False)
 
     logger.info('Success')
 
