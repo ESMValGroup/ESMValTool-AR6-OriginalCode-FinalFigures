@@ -9,6 +9,7 @@
 ;
 ; History
 ;    20190319 kosaka_yu: written.
+;    20191201 kosaka_yu: modified to enable various global averaging.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;    none
@@ -16,108 +17,6 @@
 ; Optional diag_script_info attributes (diagnostic specific)
 ;
 ; ############################################################################
-
-function regrid(x, target, opt)
-local method, y, loni, lati, lono, lato, regrid_scheme, dx, dy, xsize, ysize, cres, \
-      irectilinear, orectilinear, regopt
-begin
-  regrid_scheme = "linear"
-  if (opt) then
-    if (isatt(opt, "regrid_scheme")) then
-      method = opt@regrid_scheme
-    end if
-  end if
-  loni = x&lon
-  lati = x&lat
-
-  if (isstring(target)) then
-    cres = str_split(target, "x")
-    if (is_string_numeric(cres(0))) then
-      dx = tofloat(cres(0))
-    else
-      error_msg("f", DIAG_SCRIPT, "", "regrid: Cannot read the target grid :"+target)
-    end if
-    if (is_string_numeric(cres(1))) then
-      dy = tofloat(cres(1))
-    else
-      error_msg("f", DIAG_SCRIPT, "", "regrid: Cannot read the target grid :"+target)
-    end if
-    xsize = toint(360./dx)
-    ysize = toint(180./dy)
-    lono = fspan(dx/2., 360.-dx/2., xsize)
-    lato = fspan(-90.+dy/2., 90.-dy/2., ysize)
-    if (opt) then
-      if (isatt(opt, "lon_offset")) then
-        lono = lono + opt@lon_offset
-      end if
-      if (isatt(opt, "lat_offset")) then
-        lato = lato + opt@lat_offset
-      end if
-    end if
-    lono@standard_name = "longitude"
-    lono@units = "degrees_east"
-    lono@axis = "X"
-    lato@standard_name = "latitude"
-    lato@units = "degrees_north"
-    lato@axis = "Y"
-  else
-    lono = target&lon
-    lato = target&lat
-  end if
-
-  if (dimsizes(dimsizes(loni)).eq.1 .and. dimsizes(dimsizes(lati)).eq.1) then
-    irectilinear = True
-  else
-    irectilinear = False
-  end if
-  if (dimsizes(dimsizes(lono)).eq.1 .and. dimsizes(dimsizes(lato)).eq.1) then
-    orectilinear = True
-  else
-    orectilinear = False
-  end if
-  
-  if (regrid_scheme.eq."area_weighted") then
-    if (irectilinear.and.orectilinear) then
-      y = area_conserve_remap_Wrap(loni, lati, x, lono, lato, False)
-    else
-      error_msg("w", DIAG_SCRIPT, "", "regrid: area_weighted regridding of " \
-                                      +"non-rectilinear grid is unsupported.")
-      y = lono
-      copy_VarAtts(x, y)
-      y = y@_FillValue
-;      y!0 = lat
-;      y!1 = lon
-;      y&lat = lato
-;      y&lon = lono
-    end if
-  elseif (regrid_scheme.eq."linear") then
-    if (irectilinear.and.orectilinear) then
-      y = linint2_Wrap(loni, lati, x, True, lono, lato, 0)
-    elseif (orectilinear) then
-      y = linint2_points_Wrap(loni, lati, x, True, lono, lato, 0)
-    else
-      error_msg("w", DIAG_SCRIPT, "", "regrid: linear regridding to " \
-                                      +"non-rectilinear grid is unsupported.")
-      y = lato
-      copy_VarAtts(x, y)
-      y = y@_FillValue
-;      y!0 = "lat"
-;      y!1 = "lon"
-;      y&lat = lato
-;      y&lon = lono
-    end if
-  elseif (regrid_scheme.eq."nearest") then
-    regopt = True
-    regopt@method = 1
-    y = triple2grid(loni, lati, x, lono, lato, regopt)
-  else
-    error_msg("w", DIAG_SCRIPT, "", "regrid: Cannot apply the requested regridding scheme :" \
-              +regrid_scheme)
-    y = x
-    y = y@_FillValue
-  end if
-  return(y)
-end
 
 function fillLand(x[*][*][*])
 local y, z, i, j, imax, jmax, wgt, tmp, iter, yave
@@ -195,23 +94,87 @@ begin
   return(y)
 end
 
-function global_mean(x, individual_hemisphere)
-local x, individual_hemisphere, nh, sh, gm, lat, wgty
+function global_mean(x, method)
+local x, y, method, individual_hemisphere, nh, sh, gm, lat, wgty, area, lats, latn, lat_bnds, ii, ave_band
 begin
   lat = x&lat
-  if (any(lat.eq.0.)) then
+  d2r = get_d2r(typeof(lat))
+  if (method.eq."HadCRUT4") then
+    if (any(lat.eq.0.)) then
       error_msg("f", DIAG_SCRIPT, "", "Grid point exactly on the equator is UNSUPPORTED.")
-  end if
-  wgty = latRegWgt(lat, typeof(x), 0)
-  if (individual_hemisphere) then
+    end if
+    wgty = latRegWgt(lat, typeof(lat), 0)
     y = x
-    y( :, {:0.}, :) = y@_FillValue
+    y(:, {:0.}, :) = y@_FillValue
     nh = wgt_areaave_Wrap(y, wgty, 1., 0)  ; Assume equatorially symmetric grid, no grid point on the equator
     y = x
-    y( :, {0.:}, :) = y@_FillValue
+    y(:, {0.:}, :) = y@_FillValue
     sh = wgt_areaave_Wrap(y, wgty, 1., 0)  ; Assume equatorially symmetric grid, no grid point on the equator
+    gm = x(:, 0, 0)
     gm = (nh + sh)/2.
+  elseif (method.eq."GISTEMP") then
+    gm = x(:, 0, 0)
+    gm = 0.
+    do ii = 0, 7
+      if (ii.eq.0) then
+        latn = 90.
+        lats = 64.2
+        area = 0.05
+      elseif (ii.eq.1) then
+        latn = 64.2
+        lats = 44.4
+        area = 0.1
+      elseif (ii.eq.2) then
+        latn = 44.4
+        lats = 23.6
+        area = 0.15
+      elseif (ii.eq.3) then
+        latn = 23.6
+        lats = 0.
+        area = 0.2
+      elseif (ii.eq.4) then
+        latn = 0.
+        lats = -23.6
+        area = 0.2
+      elseif (ii.eq.5) then
+        latn = -23.6
+        lats = -44.4
+        area = 0.15
+      elseif (ii.eq.6) then
+        latn = -44.4
+        lats = -64.2
+        area = 0.1
+      elseif (ii.eq.7) then
+        latn = -64.2
+        lats = -90.
+        area = 0.05
+      end if
+      y = x(:, {lats:latn}, :)
+      jmax = dimsizes(y&lat)
+      lat_bnds = new((/jmax, 2/), typeof(y&lat))
+      wgty = new(jmax, typeof(y&lat))
+      do j = 1, jmax-1
+        lat_bnds(j-1, 1) = (y&lat(j-1) + y&lat(j))/2.
+        lat_bnds(j, 0) = lat_bnds(j-1, 1)
+      end do
+      if (isMonotonic(y&lat).eq.1) then
+        lat_bnds(0, 0) = lats
+        lat_bnds(jmax-1, 1) = latn
+      else
+        lat_bnds(0, 0) = latn
+        lat_bnds(jmax-1, 1) = lats
+      end if
+      wgty = (cos(lat_bnds(:, 0)*d2r) + cos(lat_bnds(:, 1)*d2r)) \
+              * abs(lat_bnds(:, 1) - lat_bnds(:, 0)) / 2.
+      ave_band = wgt_areaave(y, wgty, 1., 0)
+      gm = gm + ave_band * area
+      delete(y)
+      delete(ave_band)
+      delete(wgty)
+      delete(lat_bnds)
+    end do
   else
+    wgty = latRegWgt(lat, typeof(lat), 0)
     gm = wgt_areaave_Wrap(x, wgty, 1., 0)
   end if
   return(gm)

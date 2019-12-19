@@ -137,38 +137,6 @@ end
 ;  return(newpdf)
 ;end
 
-function get_percentile(x0, x)
-local X, i, imax, percentile, x0, x
-begin
-  if (any(ismissing(x))) then
-    X = x(ind(.not.ismissing(x)))
-  else
-    X = x
-  end if
-  qsort(X)
-  imax = dimsizes(X)
-  if (x0.lt.X(0)) then
-    percentile = 0.
-;    i = 0
-  elseif (x0.ge.X(dimsizes(X)-1)) then
-    percentile = 100.
-;    i = dimsizes(X)-2
-  else
-    i = ind_nearest_coord(x0, X, 0)
-    if (x0.eq.X(i)) then
-      percentile = tofloat(i)
-    elseif (x0.lt.X(i)) then
-      percentile = tofloat(i)-0.5
-;      i = i - 1
-    else
-      percentile = tofloat(i)+0.5
-    end if
-    percentile = percentile / tofloat(imax) * 100.
-  end if
-;  print("i="+i+" imax="+imax+" "+sprintf("%5.3f", X(i))+" "+sprintf("%5.3f", x0)+" "+sprintf("%5.3f", X(i+1))+" ")
-  return(percentile)
-end
-
 begin
 
   enter_msg(DIAG_SCRIPT, "")

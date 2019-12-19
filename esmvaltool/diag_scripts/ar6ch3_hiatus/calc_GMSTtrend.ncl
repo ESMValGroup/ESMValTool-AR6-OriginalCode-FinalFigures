@@ -9,6 +9,7 @@
 ;
 ; History
 ;    20191101 kosaka_yu: written.
+;    20191202 kosaka_yu: updated for version 2.0.0b3.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;    none
@@ -155,57 +156,62 @@ begin
 
 ; 0.1 Configuration of blending and global averaging
   
-  blending = False
-  if (isatt(diag_script_info, "blend")) then
-    blending = diag_script_info@blend
+  method_GMST = "Cowtan2015" ; "HadCRUT4", "GISTEMP", "NOAAGlobalTemp", "BerkeleyEarth", "global", "GSAT"
+  if (isatt(diag_script_info, "method_GMST")) then
+    method_GMST = diag_script_info@method_GMST
   end if
 
-  masking = False
-  if (isatt(diag_script_info, "mask")) then
-    masking = diag_script_info@mask
+  anomaly = True
+  blending = True
+  masking = True
+  if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4", "GISTEMP", "NOAAGlobalTemp"/))) then
+    anomaly  = True
+    blending = True
+    masking  = True
+    if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4"/))) then
+      masking_dataset_GMST = "HadCRUT4"
+      syear_clim = 1961
+      eyear_clim = 1990
+    elseif (method_GMST.eq."GISTEMP") then
+      masking_dataset_GMST = "GISTEMP"
+      syear_clim = 1951
+      eyear_clim = 1980
+    elseif (method_GMST.eq."NOAAGlobalTemp") then
+      masking_dataset_GMST = "NOAAGlobalTemp"
+      syear_clim = 1971
+      eyear_clim = 2000
+    end if
+   elseif (any(method_GMST.eq.(/"BerkeleyEarth", "CowtanWay", "global"/))) then
+    anomaly  = True
+    blending = True
+    masking  = False
+    if (method_GMST.eq."BerkeleyEarth") then
+      syear_clim = 1951
+      eyear_clim = 1980
+    elseif (method_GMST.eq."CowtanWay") then
+      syear_clim = 1961
+      eyear_clim = 1990
+    elseif (method_GMST.eq."global") then
+      syear_clim = 1961
+      eyear_clim = 1990
+    end if
+  elseif (method_GMST.eq."GSAT") then
+    anomaly  = True
+    blending = False
+    masking  = False
+    syear_clim = 1961
+    eyear_clim = 1990
   end if
 
-  masking_dataset_GMST = "HadCRUT4"
-  varList = metadata_att_as_array(variable_info, "short_name")
-  iVarTas = ind(varList.eq."tas")
-  if (isatt(variable_info[iVarTas], "reference_dataset")) then
-    masking_dataset_GMST = variable_info[iVarTas]@reference_dataset
-  end if
   if (isatt(diag_script_info, "mask_ref_dataset_GMST")) then
     masking_dataset_GMST = diag_script_info@mask_ref_dataset_GMST
   end if
-  delete(varList)
   
   masking_dataset_pattern = masking_dataset_GMST
   if (isatt(diag_script_info, "mask_ref_dataset_pattern")) then
     masking_dataset_pattern = diag_script_info@mask_ref_dataset_pattern
   end if
 
-  anomaly = True
-  if (isatt(diag_script_info, "anomaly")) then
-    anomaly = diag_script_info@anomaly
-  end if
-
-  syear_clim = 1986
-  eyear_clim = 2005
-  if (isatt(diag_script_info, "syear_clim")) then
-    syear_clim = diag_script_info@syear_clim
-  end if
-  if (isatt(diag_script_info, "eyear_clim")) then
-    eyear_clim = diag_script_info@eyear_clim
-  end if
-
-  each_hemisphere = False
-  if (isatt(diag_script_info, "individual_hemisphere")) then
-    each_hemisphere = diag_script_info@individual_hemisphere
-  end if
-
-  ; Configuration of regridding sftlf/sftof
-  regrid_scheme = "linear"
-  if (isatt(diag_script_info, "regrid_scheme")) then
-    regrid_scheme = diag_script_info@regrid_scheme
-  end if
-  
 ; 0.2 Configuration of trend
   
   syear_hiatus = 1998
@@ -216,6 +222,12 @@ begin
   if (isatt(diag_script_info, "eyear_hiatus")) then
     eyear_hiatus = diag_script_info@eyear_hiatus
   end if
+
+  do_post_all = True
+  if (isatt(diag_script_info, "do_post")) then  ; post-hiatus period
+    do_post_all = diag_script_info@do_post
+  end if
+
   syear_post = 2013
   eyear_post = 2028
   if (isatt(diag_script_info, "syear_post")) then  ; post-hiatus period
@@ -239,28 +251,27 @@ begin
     emonth_ann = diag_script_info@emonth_ann
   end if
 
-;  syear_deseasonalize = syear_hiatus  ; if not annual mean (i.e. monthly), period to define climatology to deseasonalize
-;  eyear_deseasonalize = eyear_post
-;  if (isatt(diag_script_info, "syear_deseasonalize")) then
-;    syear_deseasonalize = diag_script_info@syear_deseasonalize
-;  end if
-;  if (isatt(diag_script_info, "eyear_deseasonalize")) then
-;    eyear_deseasonalize = diag_script_info@eyear_deseasonalize
-;  end if
   syear_deseasonalize = syear_clim
   eyear_deseasonalize = eyear_clim
   if (.not.annual .and. .not.anomaly) then
     error_msg("f", DIAG_SCRIPT, "", "monthly trend must be based on anomaly.")    
   end if
   
-  method = "least_square"  ; "least_square" or "sen"
-  if (isatt(diag_script_info, "method")) then
-    method = diag_script_info@method
+  method_trend = "least_square"  ; "least_square" or "sen"
+  if (isatt(diag_script_info, "method_trend")) then
+    method_trend = diag_script_info@method_trend
   end if
 
-; 0.3 Parameters
+; 0.3 Output trend pattern?
+  do_pattern = True
+  if (isatt(diag_script_info, "do_pattern")) then
+    do_pattern = diag_script_info@do_pattern
+  end if
+  
+; 0.4 Parameters
   obs_projects = (/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/)
   reanalyses = (/"ERA5", "ERA-Interim", "JRA-55", "JRA-25", "CFSR", "MERRA", "MERRA2", "NCEP", "NCEP2", "ERA-20C", "20CR"/)
+
 ; =========================================================================
 ;
 ;         1. Get dataset lists and prepare for blending and masking
@@ -301,7 +312,7 @@ begin
   end if
     
 ; 1.2 Get dataset number of reference dataset for masking  
-  if (masking.or.blending) then
+  if (masking) then
   ; Find reference data (e.g. HadCRUT4 median) for masking in GMST calculation
     if (any(dataset_names_tas.eq.masking_dataset_GMST)) then
       dataset_names = dataset_names_tas
@@ -360,6 +371,13 @@ begin
     iTasRefPattern@var = refVar
     delete(dataset_names)
   end if
+;  print("-----------------------")
+;  print("making dataset for GMST")
+;  print(infoTasa[iTasRefGMST])
+;  print("-----------------------")
+;  print("making dataset for Pattern")
+;  print(infoTasa[iTasRefPattern])
+;  print("-----------------------")
   
 ; 1.3 Find all observational data (needed?)
   do i = 0, ListCount(infoTas)-1
@@ -389,29 +407,34 @@ begin
     infoSiconc = select_metadata_by_name(input_file_info, var)
     var = "siconca"
     infoSiconca = select_metadata_by_name(input_file_info, var)
-;    var = "sftlf"
-;    infoSftlf = select_metadata_by_name(input_file_info, var)
+    var = "sftlf"
+    infoSftlf = select_metadata_by_name(input_file_info, var)
+    var = "sftof"
+    infoSftof = select_metadata_by_name(input_file_info, var)
 
     iTos     = new(ListCount(infoTas), "integer")
     iSic     = new(ListCount(infoTas), "integer")
     iSiconc  = new(ListCount(infoTas), "integer")
     iSiconca = new(ListCount(infoTas), "integer")
-;    iSftlf   = new(ListCount(infoTas), "integer")
+    iSftlf   = new(ListCount(infoTas), "integer")
+    iSftof   = new(ListCount(infoTas), "integer")
     NameSic  = new(ListCount(infoTas), "string")
+    Namelof  = new(ListCount(infoTas), "string")
     do i = 0, ListCount(infoTas)-1
       if (all(infoTas[i]@project.ne.obs_projects)) then
         project    = infoTas[i]@project
         experiment = infoTas[i]@exp
         dataset    = infoTas[i]@dataset
         ensemble   = infoTas[i]@ensemble
+; find tos file
         do j = 0, ListCount(infoTos)-1
           if (infoTos[j]@project.eq.project .and. infoTos[j]@exp.eq.experiment .and. infoTos[j]@dataset.eq.dataset .and. infoTos[j]@ensemble.eq.ensemble) then
             iTos(i) = j
             break
           end if
         end do
-        print(infoTas[i]@filename)
         infoTas[i]@tos_filename = infoTos[iTos(i)]@filename
+; find sea ice file
         do j = 0, ListCount(infoSic)-1
           if (infoSic[j]@project.eq.project .and. infoSic[j]@exp.eq.experiment .and. infoSic[j]@dataset.eq.dataset .and. infoSic[j]@ensemble.eq.ensemble) then
             iSic(i) = j
@@ -446,12 +469,58 @@ begin
           infoTas[i]@sic_filename = infoSic[iSic(i)]@filename
           infoTas[i]@sic_varname  = "sic"
         end if
-;        do j = 0, ListCount(infoSftlf)-1
-;          if (infoSftlf[j]@project.eq.project .and. infoSftlf[j]@dataset.eq.dataset) then
-;            iSftlf(i) = j
-;            break
-;          end if
-;        end do
+; find land/ocean fraction file
+        do j = 0, ListCount(infoSftlf)-1
+          if (infoSftlf[j]@project.eq.project .and. infoSftlf[j]@exp.eq.experiment .and. infoSftlf[j]@dataset.eq.dataset .and. infoSftlf[j]@ensemble.eq.ensemble) then
+            iSftlf(i) = j
+            Namelof(i) = "sftlf"
+            break
+          end if
+        end do
+        if (ismissing(iSftlf(i))) then
+          do j = 0, ListCount(infoSftlf)-1
+            if (infoSftlf[j]@project.eq.project .and. infoSftlf[j]@exp.eq.experiment .and. infoSftlf[j]@dataset.eq.dataset) then
+              iSftlf(i) = j
+              Namelof(i) = "sftlf"
+              break
+            end if
+          end do
+        end if
+        if (ismissing(iSftlf(i))) then
+          do j = 0, ListCount(infoSftlf)-1
+            if (infoSftlf[j]@project.eq.project .and. infoSftlf[j]@dataset.eq.dataset) then
+              iSftlf(i) = j
+              Namelof(i) = "sftlf"
+              break
+            end if
+          end do
+        end if
+        if (ismissing(iSftlf(i))) then
+          do j = 0, ListCount(infoSftof)-1
+            if (infoSftof[j]@project.eq.project .and. infoSftof[j]@dataset.eq.dataset) then
+              iSftof(i) = j
+              Namelof(i) = "sftof"
+              break
+            end if
+          end do
+          if (.not.ismissing(iSftof(i))) then
+            infoTas[i]@lof_filename = infoSftof[iSftof(i)]@filename
+            infoTas[i]@lof_varname  = "sftof"
+          else
+            do j = 0, ListCount(infoSftlf)-1
+              if (infoSftlf[j]@project.eq.project) then
+                iSftlf(i) = j
+                Namelof(i) = "sftlf"
+                break
+              end if
+            end do
+            infoTas[i]@lof_filename = infoSftlf[iSftlf(i)]@filename
+            infoTas[i]@lof_varname  = "sftlf"
+          end if
+        else
+          infoTas[i]@lof_filename = infoSftlf[iSftlf(i)]@filename
+          infoTas[i]@lof_varname  = "sftlf"
+        end if
 ;        infoTas[i]@sftlf_filename = infoSftlf[iSftlf(i)]@filename
       else
         iTos(i)     = iTos@_FillValue
@@ -459,77 +528,14 @@ begin
         iSiconc(i)  = iSiconc@_FillValue
         iSiconca(i) = iSiconca@_FillValue
         NameSic(i)  = ""
-;        iSftlf(i)   = iSftlf@_FillValue
+        iSftlf(i)   = iSftlf@_FillValue
+        iSftof(i)   = iSftof@_FillValue
+        Namelof(i)  = ""
       end if
     end do
-
-; 1.5 Find a sftlf/sftof file for each dataset, regrid and save them
-    do ii = 0, ListCount(infoTas)-1
-;      if (isatt(infoTas[ii], "ensemble").and.any(infoTas[ii]@project.eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
-      if (all(infoTas[ii]@project.ne.obs_projects)) then
-        paths = systemfunc("ls " + work_dir + "sftlf_*.nc")
-        if (.not.all(ismissing(paths))) then
-          if (any(paths.eq.work_dir+"sftlf_"+infoTas[ii]@dataset+"_"+infoTas[ii]@ensemble+".nc")) then
-            continue
-          end if
-        end if
-        delete(paths)
-
-        if (isatt(infoTas[ii], "sftlf").and..not.ismissing(infoTas[ii]@sftlf)) then
-          print("INFO    Reading in file = "+infoTas[ii]@sftlf)
-          f = addfile(infoTas[ii]@sftlf, "r")
-          sftlf_org = f->sftlf
-        elseif (isatt(infoTos[iTos(ii)], "sftof").and..not.ismissing(infoTos[iTos(ii)]@sftof)) then
-          print("INFO    Reading in file = "+infoTos[iTos(ii)]@sftof)
-          f = addfile(infoTos[iTos(ii)]@sftof, "r")
-          sftlf_org = f->sftof
-          sftlf_org = 100.-sftlf_org
-        else
-          if (NameSic(ii).eq."sic") then
-            if (isatt(infoSic[iSic(ii)], "sftof").and..not.ismissing(infoSic[iSic(ii)]@sftof)) then
-              print("INFO    Reading in file = "+infoSic[iSic(ii)]@sftof)
-              f = addfile(infoSic[iSic(ii)]@sftof, "r")
-              sftlf_org = f->sftof
-              sftlf_org = 100.-sftlf_org
-            end if
-          elseif (NameSic(ii).eq."siconc") then
-            if (isatt(infoSiconc[iSiconc(ii)], "sftof").and..not.ismissing(infoSiconc[iSiconc(ii)]@sftof)) then
-              print("INFO    Reading in file = "+infoSiconc[iSiconc(ii)]@sftof)
-              f = addfile(infoSiconc[iSiconc(ii)]@sftof, "r")
-              sftlf_org = f->sftof
-              sftlf_org = 100.-sftlf_org
-            end if
-          elseif (NameSic(ii).eq."siconca") then
-            if (isatt(infoSiconca[iSiconca(ii)], "sftof").and..not.ismissing(infoSiconca[iSiconca(ii)]@sftof)) then
-              print("INFO    Reading in file = "+infoSiconca[iSiconca(ii)]@sftof)
-              f = addfile(infoSiconca[iSiconca(ii)]@sftof, "r")
-              sftlf_org = f->sftof
-              sftlf_org = 100.-sftlf_org
-            end if
-          end if
-        end if
-        if (isvar("sftlf_org")) then
-          tsRef = read_data(infoTas[ii]) ; for regridding
-          opt_regrid = True
-          opt_regrid@regrid_scheme = regrid_scheme
-          sftlf = regrid(sftlf_org, tsRef(0, :, :), opt_regrid)
-          delete(sftlf_org)
-          delete(tsRef)
-          ;save for check and reuse
-          if (.not.all(ismissing(sftlf))) then
-            sftlf@diag_script = DIAG_SCRIPT
-            sftlf@var = "sftlf"
-            nc_filename = work_dir + "sftlf_"+infoTas[ii]@dataset+"_"+infoTas[ii]@ensemble+".nc"
-            nc_outfile = ncdf_write(sftlf, nc_filename)
-            delete(nc_filename)
-            delete(nc_outfile)
-          end if
-          delete(sftlf)
-        end if
-      end if
-    end do
+    
   end if
-
+  
   projects = metadata_att_as_array(infoTas, "project")
   ncmip6 = num(projects.eq."CMIP6")
   ncmip5 = num(projects.eq."CMIP5")
@@ -609,10 +615,10 @@ begin
     else
       tsRefPattern = read_data(infoTasa[iTasRefPattern])
     end if
+;    printVarSummary(tsRefGMST)
+    tsRefGMST&time = cd_calendar(tsRefGMST&time, -1)
+    tsRefPattern&time = cd_calendar(tsRefPattern&time, -1)
   end if
-  tsRefGMST&time = cd_calendar(tsRefGMST&time, -1)
-  tsRefPattern&time = cd_calendar(tsRefPattern&time, -1)
-
 ;  if (isvar("ts")) then
 ;    delete(ts)
 ;  end if
@@ -647,7 +653,7 @@ begin
     
 ; 2.2 Convert to anomaly
     if (anomaly) then
-      tas = calc_anom(tas, syear_clim, eyear_clim) ; Correct? Or after blending? Also for tos...
+      tas = calc_anom(tas, syear_clim, eyear_clim)
     else
       if (any(tas@units.eq.(/"C", "degC", "degrees_C"/))) then
         tas = tas + 273.15
@@ -704,36 +710,19 @@ begin
       sic = where(sic.gt.1., 1., sic)
 
 ;   2.3.4 Read sftlf
-;      sftlf = read_data(infoSftlf[iSftlf(ii)])
-      paths = systemfunc("ls "+work_dir+"sftlf_*.nc")
-      do ifile = 0, dimsizes(paths)-1
-        str = str_split(paths(ifile), "/")
-        filename = str(dimsizes(str)-1)
-        delete(str)
-        if (isStrSubset(filename, infoTas[ii]@dataset) .and. isStrSubset(filename, infoTas[ii]@ensemble)) then
-          f = addfile(paths(ifile), "r")
-          sftlf = f->sftlf
-          delete(f)
-          infoTas[ii]@sftlf_filename = paths(ifile)
+      if (Namelof(ii).eq."sftlf") then
+        sftlf = read_data(infoSftlf[iSftlf(ii)])
+      else
+        sftof = read_data(infoSftof[iSftof(ii)])
+        sftlf = sftof
+        if (max(sftlf).gt.2.) then
+          sftlf = 100. - sftof
+        else
+          sftlf = 1. - sftof
         end if
-        if (.not.isvar("sftlf")) then ; if both sftlf and sftof are unavailble or regrid fails, use another model's regridded sftlf
-          if (isStrSubset(filename, infoTas[ii]@dataset)) then
-            f = addfile(paths(ifile), "r")
-            sftlf = f->sftlf
-            delete(f)
-            infoTas[ii]@sftlf_filename = paths(ifile)
-          end if
-        end if
-        if (.not.isvar("sftlf")) then
-          f = addfile(paths(0), "r")  ; Would be better to search for a model from same institute, shares common name, etc
-          sftlf = f->sftlf
-          delete(f)
-          infoTas[ii]@sftlf_filename = paths(0)
-        end if
-        delete(filename)
-      end do
-      delete(paths)
-
+        delete(sftof)
+      end if
+      
 ;   2.3.5 Scale sftlf to [0, 1]
       if (max(sftlf).gt.2.) then
         sftlf = sftlf / 100.
@@ -745,7 +734,7 @@ begin
       sftlf = where(sftlf.gt.1., 1., sftlf)
 
 ;   2.3.6 Apply blending
-      ts = blend_tas_tos(tas, tos, sic, sftlf)
+      ts = blend_tas_tos(tas, tos, sic, sftlf, method_GMST)
 
       delete(tos)
       delete(sic)
@@ -784,117 +773,108 @@ begin
       ens_cmip5(icmip5)   = infoTas[ii]@ensemble
     end if
     
-;    ; For HadCRUT4 and CowtanWay, get ensemble number
-;    if (isStrSubset(infoTas[ii]@dataset, "HadCRUT4").or.\
-;        isStrSubset(infoTas[ii]@dataset, "CowtanWay")) then
-;      if (isStrSubset(infoTas[ii]@filename, "_median_")) then
-;        ensObs = 0
-;      else
-;        str = str_split(infoTas[ii]@filename, "_")
-;        i = str_match_ind(str, "ens")
-;        ensObs = toint(str_sub_str(str(i), "ens", ""))
-;        delete(str)
-;        delete(i)
-;      end if
-;      nensObs = 101
-;    end if
-    
     etime  = tas&time(dimsizes(tas&time)-1)
     eyear  = etime/100
     emonth = etime - eyear*100
-    if (annual) then
-      if (etime.ge.eyear_post*100+emonth_ann) then
-        do_post = True
+    if (do_post_all) then
+      if (annual) then
+        if (etime.ge.eyear_post*100+emonth_ann) then
+          do_post = True
+        else
+          do_post = False
+        end if
       else
-        do_post = False
+        if (eyear.ge.eyear_post) then
+          do_post = True
+        else
+          do_post = False
+        end if
       end if
     else
-      if (eyear.ge.eyear_post) then
-        do_post = True
-      else
-        do_post = False
-      end if
+      do_post = False
     end if
 
+    if (do_pattern) then
 ;   3.1 Trend pattern, unblended, unmasked
-    trend1 = calc_trend(tas, syear_hiatus, eyear_hiatus, method, \
-                        annual, smonth_ann, emonth_ann)
-    trend2 = trend1
-    trend2 = trend2@_FillValue
-    if (do_post) then
-      trend2 = calc_trend(tas, syear_post, eyear_post, method, \
+      trend1 = calc_trend(tas, syear_hiatus, eyear_hiatus, method_trend, \
                           annual, smonth_ann, emonth_ann)
-    end if
-    if (infoTas[ii]@project.eq."CMIP6") then
-      SAThiatusCMIP6(icmip6, :, :) = trend1
-      SATpostCMIP6(icmip6, :, :)   = trend2
-    elseif (infoTas[ii]@project.eq."CMIP5") then
-      SAThiatusCMIP5(icmip5, :, :) = trend1
-      SATpostCMIP5(icmip5, :, :)   = trend2
-    elseif (any(infoTas[ii]@project.eq.obs_projects)) then
-      pushObsList(SAThiatusObs, trend1, infoTas[ii])
-    end if
-        
-;   3.2 Trend pattern, unblended, masked
-    tas2 = tas
-    if (masking) then
-      stime = syear_hiatus*100+1 ;max((/tas&time(0), tsRefPattern&time(0)/))
-      etime = eyear_hiatus*100+12 ;min((/tas&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
-      tas2({stime:etime}, :, :) = apply_mask_ref(tas({stime:etime}, :, :), \
-                                                 tsRefPattern({stime:etime}, :, :))
-    end if
-    trend1 = calc_trend(tas2, syear_hiatus, eyear_hiatus, method, \
-                        annual, smonth_ann, emonth_ann)
-    delete(tas2)
-    if (infoTas[ii]@project.eq."CMIP6") then
-      mSAThiatusCMIP6(icmip6, :, :) = trend1
-    elseif (infoTas[ii]@project.eq."CMIP5") then
-      mSAThiatusCMIP5(icmip5, :, :) = trend1
-    elseif (any(infoTas[ii]@project.eq.obs_projects)) then
-      pushObsList(mSAThiatusObs, trend1, infoTas[ii])
-    end if
-
-    if (blended) then
-;   3.3 Trend pattern, blended, unmasked
-      trend1 = calc_trend(ts, syear_hiatus, eyear_hiatus, method, \
-                          annual, smonth_ann, emonth_ann)
+      trend2 = trend1
       trend2 = trend2@_FillValue
       if (do_post) then
-        trend2 = calc_trend(ts, syear_post, eyear_post, method, \
+        trend2 = calc_trend(tas, syear_post, eyear_post, method_trend, \
                             annual, smonth_ann, emonth_ann)
       end if
       if (infoTas[ii]@project.eq."CMIP6") then
-        TShiatusCMIP6(icmip6, :, :) = trend1
-        TSpostCMIP6(icmip6, :, :)   = trend2
+        SAThiatusCMIP6(icmip6, :, :) = trend1
+        SATpostCMIP6(icmip6, :, :)   = trend2
       elseif (infoTas[ii]@project.eq."CMIP5") then
-        TShiatusCMIP5(icmip5, :, :) = trend1
-        TSpostCMIP5(icmip5, :, :)   = trend2
+        SAThiatusCMIP5(icmip5, :, :) = trend1
+        SATpostCMIP5(icmip5, :, :)   = trend2
       elseif (any(infoTas[ii]@project.eq.obs_projects)) then
-        pushObsList(TShiatusObs, trend1, infoTas[ii])
+        pushObsList(SAThiatusObs, trend1, infoTas[ii])
       end if
+        
+;   3.2 Trend pattern, unblended, masked
+      tas2 = tas
+      if (masking) then
+        stime = syear_hiatus*100+1 ;max((/tas&time(0), tsRefPattern&time(0)/))
+        etime = eyear_hiatus*100+12 ;min((/tas&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
+        tas2({stime:etime}, :, :) = apply_mask_ref(tas({stime:etime}, :, :), \
+                                                   tsRefPattern({stime:etime}, :, :))
+      end if
+      trend1 = calc_trend(tas2, syear_hiatus, eyear_hiatus, method_trend, \
+                          annual, smonth_ann, emonth_ann)
+                          delete(tas2)
+      if (infoTas[ii]@project.eq."CMIP6") then
+        mSAThiatusCMIP6(icmip6, :, :) = trend1
+      elseif (infoTas[ii]@project.eq."CMIP5") then
+        mSAThiatusCMIP5(icmip5, :, :) = trend1
+      elseif (any(infoTas[ii]@project.eq.obs_projects)) then
+        pushObsList(mSAThiatusObs, trend1, infoTas[ii])
+      end if
+
+      if (blended) then
+;   3.3 Trend pattern, blended, unmasked
+        trend1 = calc_trend(ts, syear_hiatus, eyear_hiatus, method_trend, \
+                            annual, smonth_ann, emonth_ann)
+        trend2 = trend2@_FillValue
+        if (do_post) then
+          trend2 = calc_trend(ts, syear_post, eyear_post, method_trend, \
+                              annual, smonth_ann, emonth_ann)
+        end if
+        if (infoTas[ii]@project.eq."CMIP6") then
+          TShiatusCMIP6(icmip6, :, :) = trend1
+          TSpostCMIP6(icmip6, :, :)   = trend2
+        elseif (infoTas[ii]@project.eq."CMIP5") then
+          TShiatusCMIP5(icmip5, :, :) = trend1
+          TSpostCMIP5(icmip5, :, :)   = trend2
+        elseif (any(infoTas[ii]@project.eq.obs_projects)) then
+          pushObsList(TShiatusObs, trend1, infoTas[ii])
+        end if
       
 ;   3.4 Trend pattern, blended, masked
-      ts2 = ts
-      if (masking) then
-        stime = syear_hiatus*100+1 ;max((/ts&time(0), tsRefPattern&time(0)/))
-        etime = eyear_hiatus*100+12; min((/ts&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
-        ts2({stime:etime}, :, :) = apply_mask_ref(ts({stime:etime}, :, :), \
-                                                 tsRefPattern({stime:etime}, :, :))
+        ts2 = ts
+        if (masking) then
+          stime = syear_hiatus*100+1 ;max((/ts&time(0), tsRefPattern&time(0)/))
+          etime = eyear_hiatus*100+12; min((/ts&time(dimsizes(ts&time)-1), tsRefPattern&time(dimsizes(tsRefPattern&time)-1)/))
+          ts2({stime:etime}, :, :) = apply_mask_ref(ts({stime:etime}, :, :), \
+                                                   tsRefPattern({stime:etime}, :, :))
+        end if
+        trend1 = calc_trend(ts2, syear_hiatus, eyear_hiatus, method_trend, \
+                            annual, smonth_ann, emonth_ann)
+        delete(ts2)
+        if (infoTas[ii]@project.eq."CMIP6") then
+          mTShiatusCMIP6(icmip6, :, :) = trend1
+        elseif (infoTas[ii]@project.eq."CMIP5") then
+          mTShiatusCMIP5(icmip5, :, :) = trend1
+        elseif (any(infoTas[ii]@project.eq.obs_projects)) then
+          pushObsList(mTShiatusObs, trend1, infoTas[ii])
+        end if
       end if
-      trend1 = calc_trend(ts2, syear_hiatus, eyear_hiatus, method, \
-                          annual, smonth_ann, emonth_ann)
-      delete(ts2)
-      if (infoTas[ii]@project.eq."CMIP6") then
-        mTShiatusCMIP6(icmip6, :, :) = trend1
-      elseif (infoTas[ii]@project.eq."CMIP5") then
-        mTShiatusCMIP5(icmip5, :, :) = trend1
-      elseif (any(infoTas[ii]@project.eq.obs_projects)) then
-        pushObsList(mTShiatusObs, trend1, infoTas[ii])
-      end if
-    end if
 
-    delete(trend1)
-    delete(trend2)
+      delete(trend1)
+      delete(trend2)
+    end if
     
 ; =========================================================================
 ;
@@ -923,19 +903,19 @@ begin
     end if
 
 ;   4.1 Unblended, unmasked
-    GMST = global_mean(tas, each_hemisphere)
+    GMST = global_mean(tas, "global")
     GMST@project  = infoTas[ii]@project
     GMST@dataset  = infoTas[ii]@dataset
     if (isatt(infoTas[ii], "ensemble")) then
       GMST@ensemble = infoTas[ii]@ensemble
     end if
 
-    trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method, \
+    trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method_trend, \
                         annual, smonth_ann, emonth_ann)
     trend2 = trend1
     trend2 = trend2@_FillValue
     if (do_post) then
-      trend2 = calc_trend(GMST, syear_post, eyear_post, method, \
+      trend2 = calc_trend(GMST, syear_post, eyear_post, method_trend, \
                           annual, smonth_ann, emonth_ann)
     end if
     if (infoTas[ii]@project.eq."CMIP6") then
@@ -951,6 +931,7 @@ begin
     elseif (any(infoTas[ii]@project.eq.obs_projects)) then
       pushObsList(GSAThiatusObs, trend1, infoTas[ii])
     end if
+    delete(GMST)
     
 ;   4.2 Unblended, masked
     tas2 = tas
@@ -960,9 +941,9 @@ begin
       tas2({stime:etime}, :, :) = apply_mask_ref(tas({stime:etime}, :, :), \
                                                  tsRefGMST({stime:etime}, :, :))
     end if
-    GMST = global_mean(tas2, each_hemisphere)
-    trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method, \
-                       annual, smonth_ann, emonth_ann)
+    GMST = global_mean(tas2, method_GMST)
+    trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method_trend, \
+                        annual, smonth_ann, emonth_ann)
     delete(tas2)
     if (infoTas[ii]@project.eq."CMIP6") then
       mGSAThiatusCMIP6(icmip6) = trend1
@@ -975,12 +956,12 @@ begin
     
     if (blended) then    
 ;   4.3 Blended, unmasked
-      GMST = global_mean(ts, each_hemisphere)
-      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method, \
+      GMST = global_mean(ts, "global")
+      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method_trend, \
                           annual, smonth_ann, emonth_ann)
       trend2 = trend2@_FillValue
       if (do_post) then
-        trend2 = calc_trend(GMST, syear_post, eyear_post, method, \
+        trend2 = calc_trend(GMST, syear_post, eyear_post, method_trend, \
                             annual, smonth_ann, emonth_ann)
       end if
       if (infoTas[ii]@project.eq."CMIP6") then
@@ -1005,8 +986,8 @@ begin
         ts2({stime:etime}, :, :) = apply_mask_ref(ts({stime:etime}, :, :), \
                                                   tsRefGMST({stime:etime}, :, :))
       end if
-      GMST = global_mean(ts, each_hemisphere)
-      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method, \
+      GMST = global_mean(ts2, method_GMST)
+      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method_trend, \
                           annual, smonth_ann, emonth_ann)
       delete(ts2)
       if (infoTas[ii]@project.eq."CMIP6") then
@@ -1098,6 +1079,8 @@ begin
 
   if (isvar("infoTasa")) then
     do ii = 0, ListCount(infoTasa)-1
+
+
 ; =========================================================================
 ;
 ;         5. Calculate trend pattern of tasa and save
@@ -1119,14 +1102,16 @@ begin
 ;      end if
 
 ; 5.3 Calculate trend pattern
-      trend1 = calc_trend(ts, syear_hiatus, eyear_hiatus, method, \
-                          annual, smonth_ann, emonth_ann)
-      pushObsList(SAThiatusObs, trend1, infoTasa[ii])
-      pushObsList(mSAThiatusObs, trend1, infoTasa[ii])
-      pushObsList(TShiatusObs, trend1, infoTasa[ii])
-      pushObsList(mTShiatusObs, trend1, infoTasa[ii])
-      delete(trend1)
-
+      if (do_pattern) then
+        trend1 = calc_trend(ts, syear_hiatus, eyear_hiatus, method_trend, \
+                            annual, smonth_ann, emonth_ann)
+        pushObsList(SAThiatusObs, trend1, infoTasa[ii])
+        pushObsList(mSAThiatusObs, trend1, infoTasa[ii])
+        pushObsList(TShiatusObs, trend1, infoTasa[ii])
+        pushObsList(mTShiatusObs, trend1, infoTasa[ii])
+        delete(trend1)
+      end if
+      
 ; =========================================================================
 ;
 ;         6. Calculate GMST trend and save
@@ -1149,13 +1134,13 @@ begin
       end if
 
 ; 6.1 Calculate GMST and its trend
-      GMST = global_mean(ts, each_hemisphere)
+      GMST = global_mean(ts, method_GMST)
       GMST@project  = infoTasa[ii]@project
       GMST@dataset  = infoTasa[ii]@dataset
       if (isatt(infoTasa[ii], "ensemble")) then
         GMST@ensemble = infoTasa[ii]@ensemble
       end if
-      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method, \
+      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method_trend, \
                           annual, smonth_ann, emonth_ann)
       pushObsList(GSAThiatusObs, trend1, infoTasa[ii])
       pushObsList(mGSAThiatusObs, trend1, infoTasa[ii])
@@ -1183,7 +1168,7 @@ begin
       end if
 
 ; 7.2 Calculate GMST trend
-      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method, \
+      trend1 = calc_trend(GMST, syear_hiatus, eyear_hiatus, method_trend, \
                           annual, smonth_ann, emonth_ann)
       pushObsList(GSAThiatusObs, trend1, infoTasaga[ii])
       pushObsList(mGSAThiatusObs, trend1, infoTasaga[ii])
@@ -1200,68 +1185,68 @@ begin
 ;
 ; =========================================================================
 
+  if (do_pattern) then
 ; 8.1 Model trend patterns
   
-  SAThiatusCMIP6@diag_script = DIAG_SCRIPT 
-  mSAThiatusCMIP6@diag_script = DIAG_SCRIPT
-  TShiatusCMIP6@diag_script = DIAG_SCRIPT
-  mTShiatusCMIP6@diag_script = DIAG_SCRIPT
+    SAThiatusCMIP6@diag_script = DIAG_SCRIPT 
+    mSAThiatusCMIP6@diag_script = DIAG_SCRIPT
+    TShiatusCMIP6@diag_script = DIAG_SCRIPT
+    mTShiatusCMIP6@diag_script = DIAG_SCRIPT
 
-  SAThiatusCMIP6@var = "trend"
-  mSAThiatusCMIP6@var = "trend"
-  TShiatusCMIP6@var = "trend"
-  mTShiatusCMIP6@var = "trend"
+    SAThiatusCMIP6@var = "trend"
+    mSAThiatusCMIP6@var = "trend"
+    TShiatusCMIP6@var = "trend"
+    mTShiatusCMIP6@var = "trend"
 
-  SATpostCMIP6@diag_script = DIAG_SCRIPT 
-  TSpostCMIP6@diag_script = DIAG_SCRIPT
+    SATpostCMIP6@diag_script = DIAG_SCRIPT 
+    TSpostCMIP6@diag_script = DIAG_SCRIPT
 
-  SATpostCMIP6@var = "trend"
-  TSpostCMIP6@var = "trend"
+    SATpostCMIP6@var = "trend"
+    TSpostCMIP6@var = "trend"
 
-  printVarSummary(SAThiatusCMIP6)
-  printVarSummary(GSAThiatusCMIP6)
-  nc_filename = work_dir + "trendPattern_unblended_unmasked_hiatus_cmip6.nc"
-  nc_outfile = ncdf_write(SAThiatusCMIP6, nc_filename)
-  nc_filename = work_dir + "trendPattern_unblended_unmasked_post_cmip6.nc"
-  nc_outfile = ncdf_write(SATpostCMIP6, nc_filename)
-  nc_filename = work_dir + "trendPattern_unblended_masked_hiatus_cmip6.nc"
-  nc_outfile = ncdf_write(mSAThiatusCMIP6, nc_filename)
-  nc_filename = work_dir + "trendPattern_blended_unmasked_hiatus_cmip6.nc"
-  nc_outfile = ncdf_write(TShiatusCMIP6, nc_filename)
-  nc_filename = work_dir + "trendPattern_blended_unmasked_post_cmip6.nc"
-  nc_outfile = ncdf_write(TSpostCMIP6, nc_filename)
-  nc_filename = work_dir + "trendPattern_blended_masked_hiatus_cmip6.nc"
-  nc_outfile = ncdf_write(mTShiatusCMIP6, nc_filename)
+    nc_filename = work_dir + "trendPattern_unblended_unmasked_hiatus_cmip6.nc"
+    nc_outfile = ncdf_write(SAThiatusCMIP6, nc_filename)
+    nc_filename = work_dir + "trendPattern_unblended_unmasked_post_cmip6.nc"
+    nc_outfile = ncdf_write(SATpostCMIP6, nc_filename)
+    nc_filename = work_dir + "trendPattern_unblended_masked_hiatus_cmip6.nc"
+    nc_outfile = ncdf_write(mSAThiatusCMIP6, nc_filename)
+    nc_filename = work_dir + "trendPattern_blended_unmasked_hiatus_cmip6.nc"
+    nc_outfile = ncdf_write(TShiatusCMIP6, nc_filename)
+    nc_filename = work_dir + "trendPattern_blended_unmasked_post_cmip6.nc"
+    nc_outfile = ncdf_write(TSpostCMIP6, nc_filename)
+    nc_filename = work_dir + "trendPattern_blended_masked_hiatus_cmip6.nc"
+    nc_outfile = ncdf_write(mTShiatusCMIP6, nc_filename)
 
-  SAThiatusCMIP5@diag_script = DIAG_SCRIPT
-  mSAThiatusCMIP5@diag_script = DIAG_SCRIPT
-  TShiatusCMIP5@diag_script = DIAG_SCRIPT
-  mTShiatusCMIP5@diag_script = DIAG_SCRIPT
+    SAThiatusCMIP5@diag_script = DIAG_SCRIPT
+    mSAThiatusCMIP5@diag_script = DIAG_SCRIPT
+    TShiatusCMIP5@diag_script = DIAG_SCRIPT
+    mTShiatusCMIP5@diag_script = DIAG_SCRIPT
 
-  SAThiatusCMIP5@var = "trend"
-  mSAThiatusCMIP5@var = "trend"
-  TShiatusCMIP5@var = "trend"
-  mTShiatusCMIP5@var = "trend"
+    SAThiatusCMIP5@var = "trend"
+    mSAThiatusCMIP5@var = "trend"
+    TShiatusCMIP5@var = "trend"
+    mTShiatusCMIP5@var = "trend"
 
-  SATpostCMIP5@diag_script = DIAG_SCRIPT
-  TSpostCMIP5@diag_script = DIAG_SCRIPT
+    SATpostCMIP5@diag_script = DIAG_SCRIPT
+    TSpostCMIP5@diag_script = DIAG_SCRIPT
   
-  SATpostCMIP5@var = "trend"
-  TSpostCMIP5@var = "trend"
+    SATpostCMIP5@var = "trend"
+    TSpostCMIP5@var = "trend"
 
-  nc_filename = work_dir + "trendPattern_unblended_unmasked_hiatus_cmip5.nc"
-  nc_outfile = ncdf_write(SAThiatusCMIP5, nc_filename)
-  nc_filename = work_dir + "trendPattern_unblended_unmasked_post_cmip5.nc"
-  nc_outfile = ncdf_write(SATpostCMIP5, nc_filename)
-  nc_filename = work_dir + "trendPattern_unblended_masked_hiatus_cmip5.nc"
-  nc_outfile = ncdf_write(mSAThiatusCMIP5, nc_filename)
-  nc_filename = work_dir + "trendPattern_blended_unmasked_hiatus_cmip5.nc"
-  nc_outfile = ncdf_write(TShiatusCMIP5, nc_filename)
-  nc_filename = work_dir + "trendPattern_blended_unmasked_post_cmip5.nc"
-  nc_outfile = ncdf_write(TSpostCMIP5, nc_filename)
-  nc_filename = work_dir + "trendPattern_blended_masked_hiatus_cmip5.nc"
-  nc_outfile = ncdf_write(mTShiatusCMIP5, nc_filename)
-
+    nc_filename = work_dir + "trendPattern_unblended_unmasked_hiatus_cmip5.nc"
+    nc_outfile = ncdf_write(SAThiatusCMIP5, nc_filename)
+    nc_filename = work_dir + "trendPattern_unblended_unmasked_post_cmip5.nc"
+    nc_outfile = ncdf_write(SATpostCMIP5, nc_filename)
+    nc_filename = work_dir + "trendPattern_unblended_masked_hiatus_cmip5.nc"
+    nc_outfile = ncdf_write(mSAThiatusCMIP5, nc_filename)
+    nc_filename = work_dir + "trendPattern_blended_unmasked_hiatus_cmip5.nc"
+    nc_outfile = ncdf_write(TShiatusCMIP5, nc_filename)
+    nc_filename = work_dir + "trendPattern_blended_unmasked_post_cmip5.nc"
+    nc_outfile = ncdf_write(TSpostCMIP5, nc_filename)
+    nc_filename = work_dir + "trendPattern_blended_masked_hiatus_cmip5.nc"
+    nc_outfile = ncdf_write(mTShiatusCMIP5, nc_filename)
+  end if
+  
 ; 8.2 Model GMST/GSAT trends
   
   GSAThiatusCMIP6@diag_script = DIAG_SCRIPT 
@@ -1280,6 +1265,29 @@ begin
   GSATpostCMIP6@var = "trend"
   GMSTpostCMIP6@var = "trend"
 
+  GSAThiatusCMIP6@blended = False
+  GSAThiatusCMIP6@masked = False
+  
+  mGSAThiatusCMIP6@blended = False
+  mGSAThiatusCMIP6@masked = True
+  mGSAThiatusCMIP6@mask_reference = masking_dataset_GMST
+
+  GMSThiatusCMIP6@blended = True
+  GMSThiatusCMIP6@blend_method = method_GMST
+  GMSThiatusCMIP6@masked = False
+
+  mGMSThiatusCMIP6@blended = True
+  mGMSThiatusCMIP6@blend_method = method_GMST
+  mGMSThiatusCMIP6@masked = True
+  mGMSThiatusCMIP6@mask_reference = masking_dataset_GMST
+
+  GSATpostCMIP6@blended = False
+  GSATpostCMIP6@masked = False
+
+  GMSTpostCMIP6@blended = True
+  GMSTpostCMIP6@blend_method = method_GMST
+  GMSTpostCMIP6@masked = False
+  
   nc_filename = work_dir + "trendGMST_unblended_unmasked_hiatus_cmip6.nc"
   nc_outfile = ncdf_write(GSAThiatusCMIP6, nc_filename)
   nc_filename = work_dir + "trendGMST_unblended_unmasked_post_cmip6.nc"
@@ -1309,6 +1317,29 @@ begin
   GSATpostCMIP5@var = "trend"
   GMSTpostCMIP5@var = "trend"
 
+  GSAThiatusCMIP5@blended = False
+  GSAThiatusCMIP5@masked = False
+  
+  mGSAThiatusCMIP5@blended = False
+  mGSAThiatusCMIP5@masked = True
+  mGSAThiatusCMIP5@mask_reference = masking_dataset_GMST
+
+  GMSThiatusCMIP5@blended = True
+  GMSThiatusCMIP5@blend_method = method_GMST
+  GMSThiatusCMIP5@masked = False
+
+  mGMSThiatusCMIP5@blended = True
+  mGMSThiatusCMIP5@blend_method = method_GMST
+  mGMSThiatusCMIP5@masked = True
+  mGMSThiatusCMIP5@mask_reference = masking_dataset_GMST
+  
+  GSATpostCMIP5@blended = False
+  GSATpostCMIP5@masked = False
+
+  GMSTpostCMIP5@blended = True
+  GMSTpostCMIP5@blend_method = method_GMST
+  GMSTpostCMIP5@masked = False
+
   nc_filename = work_dir + "trendGMST_unblended_unmasked_hiatus_cmip5.nc"
   nc_outfile = ncdf_write(GSAThiatusCMIP5, nc_filename)
   nc_filename = work_dir + "trendGMST_unblended_unmasked_post_cmip5.nc"
@@ -1323,47 +1354,51 @@ begin
   nc_outfile = ncdf_write(mGMSThiatusCMIP5, nc_filename)
 
 ; 8.3 Obs trend patterns    
-  do ii = 0, ListCount(SAThiatusObs)-1
-    tr = SAThiatusObs[ii]
-    tr@diag_script = DIAG_SCRIPT
-    tr@var = "trend"
-    nc_filename = work_dir + "trendPattern_unblended_unmasked_hiatus_"+tr@dataset+".nc"
-    nc_outfile = ncdf_write(tr, nc_filename)
-    delete(tr)
-  end do
+  if (do_pattern) then
+    do ii = 0, ListCount(SAThiatusObs)-1
+      tr = SAThiatusObs[ii]
+      tr@diag_script = DIAG_SCRIPT
+      tr@var = "trend"
+      nc_filename = work_dir + "trendPattern_unblended_unmasked_hiatus_"+tr@dataset+".nc"
+      nc_outfile = ncdf_write(tr, nc_filename)
+      delete(tr)
+    end do
 
-  do ii = 0, ListCount(mSAThiatusObs)-1
-    tr = mSAThiatusObs[ii]
-    tr@diag_script = DIAG_SCRIPT
-    tr@var = "trend"
-    nc_filename = work_dir + "trendPattern_unblended_masked_hiatus_"+tr@dataset+".nc"
-    nc_outfile = ncdf_write(tr, nc_filename)
-    delete(tr)
-  end do
+    do ii = 0, ListCount(mSAThiatusObs)-1
+      tr = mSAThiatusObs[ii]
+      tr@diag_script = DIAG_SCRIPT
+      tr@var = "trend"
+      nc_filename = work_dir + "trendPattern_unblended_masked_hiatus_"+tr@dataset+".nc"
+      nc_outfile = ncdf_write(tr, nc_filename)
+      delete(tr)
+    end do
 
-  do ii = 0, ListCount(TShiatusObs)-1
-    tr = TShiatusObs[ii]
-    tr@diag_script = DIAG_SCRIPT
-    tr@var = "trend"
-    nc_filename = work_dir + "trendPattern_blended_unmasked_hiatus_"+tr@dataset+".nc"
-    nc_outfile = ncdf_write(tr, nc_filename)
-    delete(tr)
-  end do
+    do ii = 0, ListCount(TShiatusObs)-1
+      tr = TShiatusObs[ii]
+      tr@diag_script = DIAG_SCRIPT
+      tr@var = "trend"
+      nc_filename = work_dir + "trendPattern_blended_unmasked_hiatus_"+tr@dataset+".nc"
+      nc_outfile = ncdf_write(tr, nc_filename)
+      delete(tr)
+    end do
 
-  do ii = 0, ListCount(mTShiatusObs)-1
-    tr = mTShiatusObs[ii]
-    tr@diag_script = DIAG_SCRIPT
-    tr@var = "trend"
-    nc_filename = work_dir + "trendPattern_blended_masked_hiatus_"+tr@dataset+".nc"
-    nc_outfile = ncdf_write(tr, nc_filename)
-    delete(tr)
-  end do
+    do ii = 0, ListCount(mTShiatusObs)-1
+      tr = mTShiatusObs[ii]
+      tr@diag_script = DIAG_SCRIPT
+      tr@var = "trend"
+      nc_filename = work_dir + "trendPattern_blended_masked_hiatus_"+tr@dataset+".nc"
+      nc_outfile = ncdf_write(tr, nc_filename)
+      delete(tr)
+    end do
+  end if
 
 ; 8.4 Obs GMST/GSAT trends
   do ii = 0, ListCount(GSAThiatusObs)-1
     tr = GSAThiatusObs[ii]
     tr@diag_script = DIAG_SCRIPT
     tr@var = "trend"
+    tr@blended = False
+    tr@masked = False
     nc_filename = work_dir + "trendGMST_unblended_unmasked_hiatus_"+tr@dataset+".nc"
     nc_outfile = ncdf_write(tr, nc_filename)
     delete(tr)
@@ -1373,6 +1408,9 @@ begin
     tr = mGSAThiatusObs[ii]
     tr@diag_script = DIAG_SCRIPT
     tr@var = "trend"
+    tr@blended = False
+    tr@masked = True
+    tr@mask_reference = masking_dataset_GMST
     nc_filename = work_dir + "trendGMST_unblended_masked_hiatus_"+tr@dataset+".nc"
     nc_outfile = ncdf_write(tr, nc_filename)
     delete(tr)
@@ -1382,6 +1420,9 @@ begin
     tr = GMSThiatusObs[ii]
     tr@diag_script = DIAG_SCRIPT
     tr@var = "trend"
+    tr@blended = True
+    tr@blend_method = method_GMST
+    tr@masked = False
     nc_filename = work_dir + "trendGMST_blended_unmasked_hiatus_"+tr@dataset+".nc"
     nc_outfile = ncdf_write(tr, nc_filename)
     delete(tr)
@@ -1391,6 +1432,10 @@ begin
     tr = mGMSThiatusObs[ii]
     tr@diag_script = DIAG_SCRIPT
     tr@var = "trend"
+    tr@blended = True
+    tr@masked = True
+    tr@blend_method = method_GMST
+    tr@mask_reference = masking_dataset_GMST
     nc_filename = work_dir + "trendGMST_blended_masked_hiatus_"+tr@dataset+".nc"
     nc_outfile = ncdf_write(tr, nc_filename)
     delete(tr)

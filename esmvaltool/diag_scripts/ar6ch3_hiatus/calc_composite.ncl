@@ -73,6 +73,8 @@ begin
   return(name)
 end
 
+load "$diag_scripts/ar6ch3_hiatus/percentiles.ncl"
+
 begin
 
   enter_msg(DIAG_SCRIPT, "")
@@ -191,8 +193,7 @@ begin
     else
       error_msg("f", DIAG_SCRIPT, "", "Unsupported: composite_threshold = "+composite_threshold)
     end if
-    jj = toint(tofloat(dimsizes(tmp))*0.05)
-    thresholdHiatusGMSTtrend = (tmp(jj)+tmp(jj+1))/2.
+    thresholdHiatusGMSTtrend = percentile_val(tmp, factor)
     delete(tmp)
   elseif (any(composite_threshold.eq.(/"mean", "median", "max"/))) then
     tmp = new(ListCount(trendHiatusGMSTobs), "float")
