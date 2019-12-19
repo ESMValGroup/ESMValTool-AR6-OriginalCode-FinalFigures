@@ -180,274 +180,10 @@ preprocessors:
     #  exclude: [reference_dataset, alternative_dataset]
 
 
-#datasets:
-#  #- &cmip3 {dataset: bccr_bcm2_0,  institute: BCCR, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
-#  - &cmip3 {dataset: cccma_cgcm3_1,  institute: CCCMA, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
-#  #- {<<: *cmip3, dataset: cccma_cgcm3_1, institute: CCCMA}
-#  - {<<: *cmip3, dataset: cccma_cgcm3_1_t63, institute: CCCMA}
-#  - {<<: *cmip3, dataset: csiro_mk3_0, institute: CSIRO}
-#  #- {<<: *cmip3, dataset: gfdl_cm2_0, institute: GFDL}
-#  #- {<<: *cmip3, dataset: gfdl_cm2_1, institute: GFDL}
-#  - {<<: *cmip3, dataset: giss_model_e_h, institute: NASA}
-#  - {<<: *cmip3, dataset: giss_model_e_r, institute: NASA}
-#  - {<<: *cmip3, dataset: iap_fgoals1_0_g, institute: LASG}
-#  - {<<: *cmip3, dataset: inmcm3_0, institute: INM}
-#  - {<<: *cmip3, dataset: ipsl_cm4, institute: IPSL}
-#  - {<<: *cmip3, dataset: miroc3_2_hires, institute: NIES}
-#  - {<<: *cmip3, dataset: miroc3_2_medres, institute: NIES}
-#  #- {<<: *cmip3, dataset: miub_echo_g, institute: MIUB-KMA}
-#  - {<<: *cmip3, dataset: mpi_echam5, institute: MPIM}
-#  #- {<<: *cmip3, dataset: mri_cgcm2_3_2a, institute: MRI}
-#  - {<<: *cmip3, dataset: ncar_ccsm3_0, institute: NCAR}
-#  - {<<: *cmip3, dataset: ncar_pcm1, institute: NCAR}
-#  - {<<: *cmip3, dataset: ukmo_hadcm3, institute: UKMO}
-#  - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
-
 
 diagnostics:
 
-  ### The diagnostics are ordered by runtime, to optimize tasks execution #####
 
-#  ### sm: SOIL MOISTURE #######################################################
-#  sm:
-#    description: Soil moisture
-#    themes:
-#      - phys
-#    realms:
-#      - land
-#    variables:
-#      sm:
-#        preprocessor: ppNOLEV1thr10
-#        reference_dataset: ESACCI-SOILMOISTURE
-#        mip: Lmon
-#        derive: true
-#        force_derivation: false
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1995
-#        end_year: 2004
-#    additional_datasets:
-#      - {dataset: ACCESS1-0}
-#      - {dataset: ACCESS1-3}
-#      - {dataset: bcc-csm1-1}
-#      - {dataset: CanCM4}
-#      - {dataset: CanESM2}
-#      - {dataset: CCSM4}
-#      - {dataset: CESM1-BGC}
-#      - {dataset: CESM1-CAM5}
-#      - {dataset: CESM1-FASTCHEM}
-#      - {dataset: CESM1-WACCM}
-#      - {dataset: CNRM-CM5}
-#      - {dataset: CSIRO-Mk3-6-0}
-#      - {dataset: FGOALS-g2}
-#      - {dataset: FGOALS-s2}
-#      - {dataset: GFDL-ESM2G}
-#      - {dataset: GFDL-ESM2M}
-#      - {dataset: HadCM3}
-#      - {dataset: HadGEM2-CC}
-#      - {dataset: HadGEM2-ES}
-#      - {dataset: inmcm4}
-#      - {dataset: IPSL-CM5A-LR}
-#      - {dataset: IPSL-CM5A-MR}
-#      - {dataset: IPSL-CM5B-LR}
-#      - {dataset: MIROC4h}
-#      - {dataset: MIROC5}
-#      - {dataset: MIROC-ESM}
-#      - {dataset: MIROC-ESM-CHEM}
-#      - {dataset: MRI-CGCM3}
-#      - {dataset: NorESM1-M}
-#      - {dataset: NorESM1-ME}
-#
-#      - {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CESM2, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CESM2-WACCM, institute: NCAR, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, project: CMIP6}
-#      - {dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, project: CMIP6}
-#      - {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      - {dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr, project: CMIP6}
-#      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, project: CMIP6}
-#      - {dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: MPI-ESM1-2-HR, ensemble: r10i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
-#
-#      - {dataset: ESACCI-SOILMOISTURE, project: OBS, type: sat,
-#         version: L3S-SSMV-COMBINED-v4.2, tier: 2}
-#    scripts:
-#      grading: &grading_settings
-#        script: perfmetrics/main.ncl
-#        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-#        plot_type: cycle_latlon
-#        # Time average ('opt' argument of time_operations.ncl)
-#        time_avg: monthlyclim
-#        # Region ('global', 'trop', 'nhext', 'shext')
-#        region: global
-#        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
-#        plot_stddev: ref_model
-#        # Plot legend in a separate file
-#        legend_outside: true
-#        # Plot style
-#        styleset: CMIP5
-#        # Calculate grading
-#        calc_grading: true
-#        # Metric ('RMSD', 'BIAS', taylor')
-#        metric: [RMSD]
-#        # Normalization ('mean', 'median', 'centered_median', 'none')
-#        normalization: [centered_median]
-
-
-#  ### ta: AIR TEMPERATURE (zonal) #############################################
-#  taZONAL:
-#    description: Air temperature zonal mean
-#    themes:
-#      - phys
-#    realms:
-#      - atmos
-#    variables:
-#      ta:
-#        preprocessor: ppALL
-#        reference_dataset: ERA-Interim
-#        alternative_dataset: NCEP
-#        mip: Amon
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1990
-#        end_year: 1995
-#    additional_datasets:
-#      - {dataset: ACCESS1-0}
-#      - {dataset: ACCESS1-3}
-#      - {dataset: bcc-csm1-1}
-#      - {dataset: bcc-csm1-1-m}
-#      - {dataset: BNU-ESM}
-#      - {dataset: CanCM4}
-#      - {dataset: CanESM2}
-#      - {dataset: CCSM4}
-#      - {dataset: CESM1-BGC}
-#      - {dataset: CESM1-CAM5}
-#      - {dataset: CESM1-CAM5-1-FV2}
-#      - {dataset: CESM1-FASTCHEM}
-#      - {dataset: CESM1-WACCM}
-#      - {dataset: CMCC-CESM}
-#      - {dataset: CMCC-CM}
-#      - {dataset: CMCC-CMS}
-#      - {dataset: CNRM-CM5}
-#      - {dataset: CNRM-CM5-2}
-#      - {dataset: CSIRO-Mk3-6-0}
-#      - {dataset: EC-EARTH, ensemble: r6i1p1}
-#      - {dataset: FGOALS-g2}
-#      - {dataset: FGOALS-s2}
-#      - {dataset: FIO-ESM}
-#      - {dataset: GFDL-CM2p1}
-#      - {dataset: GFDL-CM3}
-#      - {dataset: GFDL-ESM2G}
-#      - {dataset: GFDL-ESM2M}
-#      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-#      - {dataset: GISS-E2-H-CC}
-#      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-#      - {dataset: GISS-E2-R-CC}
-#      - {dataset: HadCM3}
-#      - {dataset: HadGEM2-AO}
-#      - {dataset: HadGEM2-CC}
-#      - {dataset: HadGEM2-ES}
-#      - {dataset: inmcm4}
-#      - {dataset: IPSL-CM5A-LR}
-#      - {dataset: IPSL-CM5A-MR}
-#      - {dataset: IPSL-CM5B-LR}
-#      - {dataset: MIROC4h}
-#      - {dataset: MIROC5}
-#      - {dataset: MIROC-ESM}
-#      - {dataset: MIROC-ESM-CHEM}
-#      - {dataset: MPI-ESM-LR}
-#      - {dataset: MPI-ESM-MR}
-#      - {dataset: MPI-ESM-P}
-#      - {dataset: MRI-CGCM3}
-#      - {dataset: MRI-ESM1}
-#      - {dataset: NorESM1-M}
-#      - {dataset: NorESM1-ME}
-#
-#      - {dataset: AWI-CM-1-1-MR, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CESM2, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CESM2-WACCM, institute: NCAR, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, project: CMIP6}
-#      - {dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, project: CMIP6}
-#      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-#      #- {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      - {dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, project: CMIP6}
-#      - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr, project: CMIP6}
-#      - {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, project: CMIP6}
-#      #- {dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: MPI-ESM1-2-HR, ensemble: r10i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: NESM3, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
-#
-#      - &cmip3 {dataset: bccr_bcm2_0,  institute: BCCR, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
-#      - {<<: *cmip3, dataset: cccma_cgcm3_1, institute: CCCMA}
-#      - {<<: *cmip3, dataset: cccma_cgcm3_1_t63, institute: CCCMA}
-#      - {<<: *cmip3, dataset: csiro_mk3_0, institute: CSIRO}
-#      #- {<<: *cmip3, dataset: gfdl_cm2_0, institute: GFDL}
-#      #- {<<: *cmip3, dataset: gfdl_cm2_1, institute: GFDL}
-#      - {<<: *cmip3, dataset: giss_model_e_h, institute: NASA}
-#      - {<<: *cmip3, dataset: giss_model_e_r, institute: NASA}
-#      - {<<: *cmip3, dataset: iap_fgoals1_0_g, institute: LASG}
-#      - {<<: *cmip3, dataset: inmcm3_0, institute: INM}
-#      - {<<: *cmip3, dataset: ipsl_cm4, institute: IPSL}
-#      - {<<: *cmip3, dataset: miroc3_2_hires, institute: NIES}
-#      - {<<: *cmip3, dataset: miroc3_2_medres, institute: NIES}
-#      #- {<<: *cmip3, dataset: miub_echo_g, institute: MIUB-KMA}
-#      - {<<: *cmip3, dataset: mpi_echam5, institute: MPIM}
-#      #- {<<: *cmip3, dataset: mri_cgcm2_3_2a, institute: MRI}
-#      - {<<: *cmip3, dataset: ncar_ccsm3_0, institute: NCAR}
-#      - {<<: *cmip3, dataset: ncar_pcm1, institute: NCAR}
-#      - {<<: *cmip3, dataset: ukmo_hadcm3, institute: UKMO}
-#      #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
-#
-#      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-#         version: 1, tier: 3}
-#      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-#    scripts:
-#      zonal: &zonal_settings
-#        script: perfmetrics/main.ncl
-#        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-#        plot_type: zonal
-#        # Time average ('opt' argument of time_operations.ncl)
-#        time_avg: annualclim
-#        # Region ('global', 'trop', 'nhext', 'shext')
-#        region: global
-#        # Draw difference plots
-#        plot_diff: true
-#        # Calculate t-test in difference plots
-#        t_test: true
-#        # Confidence level for the t-test
-#        conf_level: 0.95
-#        # Mask non-significant values with stippling
-#        stippling: true
-#        # Contour levels for absolute plot
-#        abs_levs: [200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
-#        # Contour levels for difference plot
-#        diff_levs: [-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10]
-#
-#
   ### clt: TOTAL CLOUD COVER ##################################################
   clt:
     description: Total cloud cover
@@ -464,8 +200,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -559,8 +295,8 @@ diagnostics:
       #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ESACCI-CLOUD, project: OBS, type: sat,
-         version: AVHRR-fv3.0, tier: 2}
-      - {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2}
+         version: AVHRR-fv3.0, tier: 2, start_year: 1982}
+      - {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2, start_year: 1982}
     scripts:
       latlon: &latlon_settings
         script: perfmetrics/main.ncl
@@ -623,8 +359,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -760,8 +496,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -871,14 +607,15 @@ diagnostics:
       - atmos
     variables:
       pr:
-        preprocessor: ppNOLEV1
+        preprocessor: ppNOLEV2
         reference_dataset: GPCP-SG
+        alternative_dataset: GHCN
         mip: Amon
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -981,6 +718,7 @@ diagnostics:
 
       - {dataset: GPCP-SG, project: obs4mips, level: L3,
          version: v2.2, tier: 1}
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
     scripts:
       grading:
         <<: *grading_settings
@@ -1002,8 +740,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1124,8 +862,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1248,8 +986,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1340,7 +1078,7 @@ diagnostics:
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B,
-         version: Ed2-7, tier: 1, start_year: 2002, end_year: 2005}
+         version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}
     scripts:
       latlon:
         <<: *latlon_settings
@@ -1371,8 +1109,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1461,7 +1199,7 @@ diagnostics:
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B,
-         version: Ed2-7, tier: 1, start_year: 2002, end_year: 2005}
+         version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}
     scripts:
       latlon:
         <<: *latlon_settings
@@ -1490,8 +1228,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1585,7 +1323,7 @@ diagnostics:
       #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B,
-         version: Ed2-7, tier: 1, start_year: 2002, end_year: 2005}
+         version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}
     scripts:
       grading:
         <<: *grading_settings
@@ -1607,8 +1345,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1700,7 +1438,7 @@ diagnostics:
       #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: AIRS, project: obs4mips, level: L3,
-         version: RetStd-v5, tier: 1, start_year: 2002, end_year: 2005}
+         version: RetStd-v5, tier: 1, start_year: 2003, end_year: 2010}
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
     scripts:
@@ -1723,8 +1461,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1815,7 +1553,7 @@ diagnostics:
       #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B,
-         version: Ed2-7, tier: 1, start_year: 2002, end_year: 2005}
+         version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}
     scripts:
       grading:
         <<: *grading_settings
@@ -1837,8 +1575,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -1963,8 +1701,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -2087,8 +1825,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -2213,8 +1951,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -2337,8 +2075,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -2475,8 +2213,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -2607,8 +2345,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -2733,8 +2471,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1990
-        end_year: 1995
+        start_year: 1980
+        end_year: 1999
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
