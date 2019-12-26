@@ -215,6 +215,8 @@ begin
   else
     if (isStrSubset(composite_threshold, "HadCRUT4")) then
       name = "HadCRUT4"
+    elseif (isStrSubset(composite_threshold, "HadCRUT5")) then
+      name = "HadCRUT5"
     elseif (isStrSubset(composite_threshold, "CowtanWay")) then
       name = "CowtanWay"
     else

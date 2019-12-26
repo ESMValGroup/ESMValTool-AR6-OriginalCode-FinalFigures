@@ -27,7 +27,7 @@ begin
   stime = max((/SAT&time(0), SST&time(0), SIC&time(0)/))
   etime = min((/SAT&time(dimsizes(SAT&time)-1), SST&time(dimsizes(SST&time)-1), SIC&time(dimsizes(SIC&time)-1)/))
   lf = sftlf
-  if (any(method.eq.(/"HadCRUT4", "Cowtan2015"/))) then
+  if (any(method.eq.(/"HadCRUT4", "Cowtan2015", "HadCRUT5"/))) then ; Need to check HadCRUT5 method
     lftmp = new(array_append_record(2, dimsizes(lf), 0), typeof(lf))
     lftmp(0, :, :) = lf
     lftmp(1, :, :) = 0.25

@@ -79,10 +79,10 @@ procedure pushObsList(ObsList, array, info)
 local ens, nens, dims, dimsnew, dataset_names, i, str
 begin
   ; For HadCRUT4 and CowtanWay, get ensemble number
-  if (isStrSubset(info@dataset, "HadCRUT4").or.\
+  if (isStrSubset(info@dataset, "HadCRUT").or.\
       isStrSubset(info@dataset, "CowtanWay")) then
-    if (isStrSubset(info@filename, "_median_")) then
-      ens = 0
+    if (isStrSubset(info@filename, "_median_").or.isStrSubset(info@filename, "_mean_")) then
+      ens = 0      
     else
       str = str_split(info@filename, "_")
       i = str_match_ind(str, "ens")
@@ -90,8 +90,13 @@ begin
       delete(str)
       delete(i)
     end if
-    nens = 101
-
+    if (isStrSubset(info@dataset, "HadCRUT4").or.\
+        isStrSubset(info@dataset, "CowtanWay")) then
+      nens = 101
+    elseif (isStrSubset(info@dataset, "HadCRUT5")) then
+      nense = 201
+    end if
+      
     if (ListCount(ObsList).lt.1) then
       dims = dimsizes(array)
       if (dimsizes(dims).eq.1) then
@@ -100,7 +105,7 @@ begin
         dimsnew = array_append_record(nens, dims, 0)
       end if
       delete(dims)
-      ListAppend(ObsList, new(dimsnew, typeof(array))) ; ens = 0: median
+      ListAppend(ObsList, new(dimsnew, typeof(array))) ; ens = 0: median or mean
       i = ListCount(ObsList) - 1
       ObsList[i]!0 = "ensemble"
       ObsList[i]&ensemble = ispan(0, nens-1, 1)
@@ -164,12 +169,16 @@ begin
   anomaly = True
   blending = True
   masking = True
-  if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4", "GISTEMP", "NOAAGlobalTemp"/))) then
+  if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4", "HadCRUT5", "GISTEMP", "NOAAGlobalTemp"/))) then
     anomaly  = True
     blending = True
     masking  = True
     if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4"/))) then
       masking_dataset_GMST = "HadCRUT4"
+      syear_clim = 1961
+      eyear_clim = 1990
+    elseif (method_GMST.eq."HadCRUT5")) then
+      masking_dataset_GMST = "HadCRUT5"
       syear_clim = 1961
       eyear_clim = 1990
     elseif (method_GMST.eq."GISTEMP") then
@@ -329,7 +338,9 @@ begin
       delete(iTasRefGMST)
       do i = 0, npaths-1
         if ((refVar.eq."tas".and.isStrSubset(infoTas[tmpRefData(i)]@filename, "_median_")) .or.\
-            (refVar.eq."tasa".and.isStrSubset(infoTasa[tmpRefData(i)]@filename, "_median_"))) then
+            (refVar.eq."tas".and.isStrSubset(infoTas[tmpRefData(i)]@filename, "_mean_")) .or.\
+            (refVar.eq."tasa".and.isStrSubset(infoTasa[tmpRefData(i)]@filename, "_median_")) .or.\
+            (refVar.eq."tasa".and.isStrSubset(infoTasa[tmpRefData(i)]@filename, "_mean_"))) then
           iTasRefGMST = tmpRefData(i)
           break
         end if
@@ -358,7 +369,9 @@ begin
       delete(iTasRefPattern)
       do i = 0, npaths-1
         if ((refVar.eq."tas".and.isStrSubset(infoTas[tmpRefData(i)]@filename, "_median_")) .or.\
-            (refVar.eq."tasa".and.isStrSubset(infoTasa[tmpRefData(i)]@filename, "_median_"))) then
+            (refVar.eq."tas".and.isStrSubset(infoTas[tmpRefData(i)]@filename, "_mean_")) .or.\
+            (refVar.eq."tasa".and.isStrSubset(infoTasa[tmpRefData(i)]@filename, "_median_")) .or.\
+            (refVar.eq."tasa".and.isStrSubset(infoTasa[tmpRefData(i)]@filename, "_mean_"))) then
           iTasRefPattern = tmpRefData(i)
           break
         end if
