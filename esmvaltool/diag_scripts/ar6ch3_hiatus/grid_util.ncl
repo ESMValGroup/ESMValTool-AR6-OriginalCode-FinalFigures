@@ -99,7 +99,7 @@ local x, y, method, individual_hemisphere, nh, sh, gm, lat, wgty, area, lats, la
 begin
   lat = x&lat
   d2r = get_d2r(typeof(lat))
-  if (any(method.eq.(/"HadCRUT4", "HadCRUT5"/)) then
+  if (any(method.eq.(/"HadCRUT4", "HadCRUT5"/))) then
     if (any(lat.eq.0.)) then
       error_msg("f", DIAG_SCRIPT, "", "Grid point exactly on the equator is UNSUPPORTED.")
     end if

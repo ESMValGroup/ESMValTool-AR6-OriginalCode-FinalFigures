@@ -94,7 +94,7 @@ begin
         isStrSubset(info@dataset, "CowtanWay")) then
       nens = 101
     elseif (isStrSubset(info@dataset, "HadCRUT5")) then
-      nense = 201
+      nens = 201
     end if
       
     if (ListCount(ObsList).lt.1) then
@@ -177,7 +177,7 @@ begin
       masking_dataset_GMST = "HadCRUT4"
       syear_clim = 1961
       eyear_clim = 1990
-    elseif (method_GMST.eq."HadCRUT5")) then
+    elseif (method_GMST.eq."HadCRUT5") then
       masking_dataset_GMST = "HadCRUT5"
       syear_clim = 1961
       eyear_clim = 1990
@@ -1159,6 +1159,7 @@ begin
       pushObsList(mGSAThiatusObs, trend1, infoTasa[ii])
       pushObsList(GMSThiatusObs, trend1, infoTasa[ii])
       pushObsList(mGMSThiatusObs, trend1, infoTasa[ii])
+      delete(GMST)
       delete(trend1)
       delete(ts)
     end do
@@ -1172,10 +1173,15 @@ begin
 ;
 ; =========================================================================
 ; 7.1 Read tasaga
+print(infoTasaga[ii])
       GMST = read_data(infoTasaga[ii])
+print("A")
       GMST&time = cd_calendar(GMST&time, -1)
+print("B")
       GMST@project  = infoTasaga[ii]@project
+print("C")
       GMST@dataset  = infoTasaga[ii]@dataset
+print("D")
       if (isatt(infoTasaga[ii], "ensemble")) then
         GMST@ensemble = infoTasaga[ii]@ensemble
       end if
