@@ -252,6 +252,7 @@ begin
       dataset = infoU[ii]@dataset
       
       u = read_data(infoU[ii])
+print(""+dataset)
       if (dimsizes(dimsizes(u)).gt.3) then
         utmp = u(:, {85000.}, :, :)
         delete(u)
@@ -259,8 +260,12 @@ begin
         delete(utmp)
       end if
       u = correct_FillValue_uv(u)
+printVarSummary(u)
+print("u: "+max(u)+" "+min(u))
       uClim = get_clim(u, syear_clim, eyear_clim, smonth_monsoonyr, emonth_monsoonyr)
+print("uClim: "+max(uClim)+" "+min(uClim))
       uMonsoon = summer_minus_winter(uClim, opt)
+print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
       
       uMonsoon@var = "u"
       uMonsoon@diag_script = DIAG_SCRIPT

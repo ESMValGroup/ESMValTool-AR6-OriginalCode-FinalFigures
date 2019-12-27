@@ -576,56 +576,27 @@ begin
   range = max((/max(abs(GMprObs)), max(abs(GMprMME)), \
                 max(abs(GMprModels))/))
 
-  if (range.gt.700.) then
-    rests@trYMaxF = 1000.
-  elseif (range.gt.500.) then
-    rests@trYMaxF = 600.
-  elseif (range.gt.400.) then
-    rests@trYMaxF = 500.
-  elseif (range.gt.300.) then
-    rests@trYMaxF = 400.
-  elseif (range.gt.250.) then
-    rests@trYMaxF = 300.
-  elseif (range.gt.200.) then
-    rests@trYMaxF = 250.
-  elseif (range.gt.150.) then
-    rests@trYMaxF = 200.
-  elseif (range.gt.100.) then
-    rests@trYMaxF = 150.
-  elseif (range.gt.75.) then
+
+  if (range.gt.80.) then
     rests@trYMaxF = 100.
-  elseif (range.gt.50.) then
+  elseif (range.gt.70.) then
     rests@trYMaxF = 80.
+  elseif (range.gt.60.) then
+    rests@trYMaxF = 70.
+  elseif (range.gt.50.) then
+    rests@trYMaxF = 60.
   else
     rests@trYMaxF = 50.
   end if
-;  if (range.gt.4.) then
-;    rests@trYMaxF = 4.5
-;  elseif(range.gt.3.5) then
-;    rests@trYMaxF = 4.
-;  elseif(range.gt.3.) then
-;    rests@trYMaxF = 3.5
-;  elseif(range.gt.2.5) then
-;    rests@trYMaxF = 3.
-;  elseif(range.gt.2.) then
-;    rests@trYMaxF = 2.5
-;  elseif(range.gt.1.5) then
-;    rests@trYMaxF = 2.
-;  elseif(range.gt.1.) then
-;    rests@trYMaxF = 1.5
-;  elseif(range.gt.0.5) then
-;    rests@trYMaxF = 1.
-;  else
-;    rests@trYMaxF = 0.5
-;  end if
+
   rests@trYMinF = -rests@trYMaxF
   minyear = min((/min(GMprObs&time), min(GMprMME&time), \
                   min(GMprModels&time)/))
-  minyear = toint(minyear/10)*10
+  minyear = toint(minyear/5)*5
   maxyear = max((/max(GMprObs&time), max(GMprMME&time), \
                   max(GMprModels&time)/))
-  if (.not.mod(maxyear,10).eq.0) then    
-    maxyear = (toint(maxyear/10)+1)*10
+  if (.not.mod(maxyear,5).eq.0) then    
+    maxyear = (toint(maxyear/5)+1)*5
   end if
   rests@trXMinF = 1880  ; minyear
   rests@trXMaxF = maxyear
@@ -646,7 +617,8 @@ begin
 
 
   rests@xyLineThicknessF = 0.5
-  rests@xyLineColor       = "grey50"
+  rests@xyLineColor      = (/37, 81., 204./)/255.
+  rests@xyLineOpacityF   = 0.5
   if (moving_ave.gt.0) then
     rests@tiMainString = "Global summer monsoon precipitation ("+GMprModels@units+", "+moving_ave+"-yr moving ave)"
   else
@@ -667,28 +639,24 @@ begin
     restsu = rests
     range = max((/max(abs(NHMuObs)), max(abs(NHMuMME)), \
                   max(abs(NHMuModels))/))
-    if (range.gt.10.) then
-      restsu@trYMaxF = 15
-    elseif (range.gt.7.5) then
-      restsu@trYMaxF = 10.
-    elseif (range.gt.6.) then
-      restsu@trYMaxF = 7.
-    elseif (range.gt.5.) then
-      restsu@trYMaxF = 6.
-    elseif (range.gt.3.) then
-      restsu@trYMaxF = 5.
-    elseif (range.gt.2.) then
+    if (range.gt.3.) then
+      restsu@trYMaxF = 3.5
+    elseif (range.gt.2.8) then
       restsu@trYMaxF = 3.
-    elseif (range.gt.1.5) then
+    elseif (range.gt.2.6) then
+      restsu@trYMaxF = 2.8
+    elseif (range.gt.2.4) then
+      restsu@trYMaxF = 2.6
+    elseif (range.gt.2.2) then
+      restsu@trYMaxF = 2.4
+    elseif (range.gt.2.) then
+      restsu@trYMaxF = 2.2
+    elseif (range.gt.1.8) then
       restsu@trYMaxF = 2.
-    elseif (range.gt.1.) then
-      restsu@trYMaxF = 1.5
-    elseif (range.gt.0.75) then
-      restsu@trYMaxF = 1.
-    elseif (range.gt.0.5) then
-      restsu@trYMaxF = 0.8
+    elseif (range.gt.1.6) then
+      restsu@trYMaxF = 1.8
     else
-      restsu@trYMaxF = 0.5
+      restsu@trYMaxF = 1.6
     end if
 ;    restsu@trYMaxF = 3.
     restsu@trYMinF = -restsu@trYMaxF
@@ -703,12 +671,13 @@ begin
 
   lres@gsLineThicknessF = rests@xyLineThicknessF
   lres@gsLineColor      = rests@xyLineColor
+  lres@gsLineOpacityF   = rests@xyLineOpacityF
   gsn_polyline_ndc(wks, (/0.64, 0.67/), (/yLegend, yLegend/), lres)
   gsn_text_ndc(wks, "individual runs", 0.68, yLegend, txres)
 
   rests@tiMainString = ""
   rests@xyLineThicknessF = 2.5
-  rests@xyLineColor       = "black"
+  rests@xyLineOpacityF   = 1.
   GMprMME@long_names = ""
   plot = gsn_csm_xy(wks, GMprMME&time, GMprMME, rests)
   overlay(plotts(0), plot)
@@ -720,7 +689,7 @@ begin
   if (isvar("NHMuMME")) then
     restsu@tiMainString = ""
     restsu@xyLineThicknessF = 2.5
-    restsu@xyLineColor      = "black"
+    restsu@xyLineOpacityF   = 1.
     NHMprMME@long_names = ""
     plot = gsn_csm_xy(wks, NHMuMME&time, NHMuMME, restsu)
     overlay(plotts(2), plot)
@@ -728,6 +697,7 @@ begin
 
   lres@gsLineThicknessF = rests@xyLineThicknessF
   lres@gsLineColor      = rests@xyLineColor
+  lres@gsLineOpacityF   = rests@xyLineOpacityF
   gsn_polyline_ndc(wks, (/0.51, 0.54/), (/yLegend, yLegend/), lres)
   gsn_text_ndc(wks, "MME mean", 0.55, yLegend, txres)
 

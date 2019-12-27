@@ -200,7 +200,7 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
-      exclude: [reference_dataset, alternative_dataset]
+      exclude: [GPCC-SG, CMAP, GPCC, CRU-TS, ERA5, ERA-Interim, JRA-55, MERRA2]
 
   pp_land:
     regrid:
@@ -220,7 +220,7 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
-      exclude: [reference_dataset]
+      exclude: [GPCC-SG, CMAP, GPCC, CRU-TS, ERA5, ERA-Interim, JRA-55, MERRA2]
 
   pp850+200:
     extract_levels:
@@ -232,7 +232,7 @@ preprocessors:
     multi_model_statistics:
       span: overlap
       statistics: [mean]
-      exclude: [reference_dataset]
+      exclude: [GPCC-SG, CMAP, GPCC, CRU-TS, ERA5, ERA-Interim, JRA-55, MERRA2]
 
 diagnostics:
 
