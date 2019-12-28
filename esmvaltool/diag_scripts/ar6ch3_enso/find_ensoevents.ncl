@@ -43,11 +43,26 @@ begin
     target_month = diag_script_info@detect_month
   end if
   
-  threshold = 0.75  ; degrees
+  threshold = 0.75
   if (isatt(diag_script_info, "detect_threshold")) then
     threshold = diag_script_info@detect_threshold
   end if
 
+  threshold_unit = "deg"
+  if (isatt(diag_script_info, "unit_threshold")) then
+    threshold_unit = diag_script_info@unit_threshold
+  end if
+  if (any(threshold_unit.eq.(/"degree", "degrees", "degC", "degK", \
+                              "Degree", "Degrees", "DegC", "DegK", "Deg"/))) then
+    threshold_unit = "deg"
+  elseif (any(threshold_unit.eq.(/"sigma", "std_dev", "stddev", "s.d."/))) then
+    threshold_unit = "stdv"
+  end if
+
+;  threshold = 0.5
+;  threshold_unit = "deg"
+
+  
   ; segment length
   annual_lags = (/-3, 4/)
   
@@ -73,6 +88,9 @@ begin
     
     ; Pick up ENSO event
     idx   = Nino({syear*100+target_month:eyear*100+target_month:12})
+    if (threshold_unit.eq."stdv") then
+      idx = idx / stddev(idx)
+    end if
     idx_el = ind(idx.gt.abs(threshold))
     idx_la = ind(idx.lt.-abs(threshold))
     if (.not.all(ismissing(idx_el))) then
