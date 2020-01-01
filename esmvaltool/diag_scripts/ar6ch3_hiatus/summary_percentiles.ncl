@@ -132,11 +132,12 @@ begin
       write_table(ofile, "a", [/hlist/], "%s")
       
       if (isvar("trend_cmip6").or.isvar("trend_cmip5")) then
-        hlist = "           min      2.5%      5%      10%    median     mean     90%      95%     97.5%     max "
+        hlist = "           min      2.5%     3.75%     5%      10%    median     mean     90%      95%     97.5%     max "
         write_table(ofile, "a", [/hlist/], "%s")
         if (isvar("trend_cmip6")) then
           hlist = "cmip6:   "+sprintf(fmt, min(trend_cmip6))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip6, 0.025))+" " \
+                             +sprintf(fmt, percentile_val(trend_cmip6, 0.0375))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip6, 0.05))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip6, 0.1))+" " \
                              +sprintf(fmt, dim_median(trend_cmip6))+" " \
@@ -150,6 +151,7 @@ begin
         if (isvar("trend_cmip5")) then
           hlist = "cmip5:   "+sprintf(fmt, min(trend_cmip5))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip5, 0.025))+" " \
+                             +sprintf(fmt, percentile_val(trend_cmip5, 0.0375))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip5, 0.05))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip5, 0.1))+" " \
                              +sprintf(fmt, dim_median(trend_cmip5))+" " \
@@ -164,6 +166,7 @@ begin
           trend_cmip = array_append_record(trend_cmip5, trend_cmip6, 0)
           hlist = "cmip5+6: "+sprintf(fmt, min(trend_cmip))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip, 0.025))+" " \
+                             +sprintf(fmt, percentile_val(trend_cmip, 0.0375))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip, 0.05))+" " \
                              +sprintf(fmt, percentile_val(trend_cmip, 0.1))+" " \
                              +sprintf(fmt, dim_median(trend_cmip))+" " \

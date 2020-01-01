@@ -284,7 +284,7 @@ sftof_all: &sftof_all
 #  - {project: CMIP5, dataset: MRI-ESM1, ensemble: r0i0p0, exp: historical}
   
 tas_all: &tas_all
-  - {dataset: HadCRUT4, project: OBS, type: median, version: 4.6, tier: 2, end_year: 2018}
+  #- {dataset: HadCRUT4, project: OBS, type: median, version: 4.6, tier: 2, end_year: 2018}
   #- {project: CMIP5, dataset: ACCESS1-0, ensemble: r1i1p1, exp: [historical, rcp45]} #sic=0 everywhere after regridding
   #- {project: CMIP5, dataset: ACCESS1-3, ensemble: r1i1p1, exp: [historical, rcp45]} #sic=0 everywhere after regridding
   #- {project: CMIP5, dataset: BNU-ESM, ensemble: r1i1p1, exp: [historical, rcp45]} #wrong sic longitude data
@@ -1757,7 +1757,7 @@ diagnostics:
         script: ar6ch3_hiatus/calc_GMSTtrend.ncl
         method_GMST: HadCRUT5
         mask_ref_dataset_GMST: HadCRUT5
-        mask_ref_dataset_pattern: GISTEMP
+        mask_ref_dataset_pattern: HadCRUT5
         syear_hiatus: 1998
         eyear_hiatus: 2012
         syear_post: 2012
@@ -1774,7 +1774,7 @@ diagnostics:
         masking_pattern: True
         composite_threshold: max
         composite_dataset: cmip6
-        obs_pattern: GISTEMP
+        obs_pattern: HadCRUT5
         ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendHadCRUT5_maskHadCRUT5']
       plot_blendHadCRUT5_maskHadCRUT5_obsmax: &plot_settings
         script: ar6ch3_hiatus/draw.ncl
@@ -1787,12 +1787,12 @@ diagnostics:
       plot_blendHadCRUT5_maskHadCRUT5_obsmean: 
         <<: *plot_settings
         ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendHadCRUT5_maskHadCRUT5_obsmean']
-      composite_blendHadCRUT5_maskHadCRUT5_HadCRUT5med:
+      composite_blendHadCRUT5_maskHadCRUT5_HadCRUT5mean:
         <<: *composite_settings
-        composite_threshold: HadCRUT5median 
-      plot_blendHadCRUT5_maskHadCRUT5_HadCRUT5med:
+        composite_threshold: HadCRUT5mean 
+      plot_blendHadCRUT5_maskHadCRUT5_HadCRUT5mean:
         <<: *plot_settings
-        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendHadCRUT5_maskHadCRUT5_HadCRUT5med']
+        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendHadCRUT5_maskHadCRUT5_HadCRUT5mean']
 
       trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5:
         <<: *trend_settings
@@ -1810,13 +1810,13 @@ diagnostics:
       plot_blendCowtan2015_maskHadCRUT5_obsmean: 
         <<: *plot_settings
         ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendCowtan2015_maskHadCRUT5_obsmean']
-      composite_blendCowtan2015_maskHadCRUT5_HadCRUT5med:
+      composite_blendCowtan2015_maskHadCRUT5_HadCRUT5mean:
         <<: *composite_settings
-        composite_threshold: HadCRUT5median
+        composite_threshold: HadCRUT5mean
         ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5']
-      plot_blendCowtan2015_maskHadCRUT5_HadCRUT5med:
+      plot_blendCowtan2015_maskHadCRUT5_HadCRUT5mean:
         <<: *plot_settings
-        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendCowtan2015_maskHadCRUT5_HadCRUT5med']
+        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendCowtan2015_maskHadCRUT5_HadCRUT5mean']
 
       trendHiatusPosthiatus_blendCowtan2015_maskCowtanWay:
         <<: *trend_settings

@@ -269,7 +269,7 @@ begin
     nbinsobs = 100
   else
     nbins = 25   ; For probability distribution
-    nbinsobs = 50
+    nbinsobs = 40
   end if
     
   resPDF = True
