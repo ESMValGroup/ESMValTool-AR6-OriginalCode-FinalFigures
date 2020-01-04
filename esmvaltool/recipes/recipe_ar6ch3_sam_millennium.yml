@@ -93,7 +93,7 @@ diagnostics:
         
     scripts:
       draw_samindex_millenium:
-        script: ar6ch3_sam_millenium/draw_samindex_millenium.ncl
+        script: ar6ch3_sam_millennium/draw_samindex_millennium.ncl
         syear_ref: 1961
         eyear_ref: 1990
         nyears_running_mean: 7
