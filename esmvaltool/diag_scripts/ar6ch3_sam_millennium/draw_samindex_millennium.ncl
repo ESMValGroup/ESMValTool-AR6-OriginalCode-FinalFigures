@@ -301,13 +301,13 @@ begin
   rests@tmYLMode          = "Manual"
   rests@tmYLTickSpacingF  = 2.
   rests@tmYLTickStartF    = -4.
-  rests@tmYLTickEndF      = 2.
+  rests@tmYLTickEndF      = 4.
   rests@tmYRMode          = rests@tmYLMode
   rests@tmYRTickSpacingF  = rests@tmYLTickSpacingF
   rests@tmYRTickStartF    = rests@tmYLTickStartF
   rests@tmYRTickEndF      = rests@tmYLTickEndF
   rests@vpWidthF          = 0.6
-  rests@vpHeightF         = 0.6
+  rests@vpHeightF         = 0.7
   rests@tiMainFontHeightF = 0.015
   rests@tiMainOffsetYF = -0.008
 
@@ -315,16 +315,16 @@ begin
   rests@xyLineThicknessF = 0.5
 
   restsL = rests
-  restsL@trYMaxF           = 2.
+  restsL@trYMaxF           = 3.5 ;2.
   restsL@trYMinF           = -13.
   restsL@xyLineColor       = sam_abram@color
   restsL@tiMainString = "SAM index"
   restsR = rests
-  restsR@trYMaxF           = 6.
+  restsR@trYMaxF           = 7.5 ;6.
   restsR@trYMinF           = -9.
   restsR@xyLineColor       = sam_villalba@color
   restsR2 = rests
-  restsR2@trYMaxF           = 12.
+  restsR2@trYMaxF           = 13.5 ;12.
   restsR2@trYMinF           = -3.
   restsR2@xyLineColor       = "grey"
   restsR2@tmYRTickEndF      = 4.
