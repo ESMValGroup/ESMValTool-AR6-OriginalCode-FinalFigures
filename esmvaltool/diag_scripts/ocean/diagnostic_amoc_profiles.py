@@ -764,7 +764,7 @@ def make_pane_bc(
     # Add project datasets
     for project in sorted(projects.keys()):
         datasets = projects[project]
-        if len(datasets) == 0: 
+        if len(datasets) == 0:
             continue
         box_order.append(project)
         trends[project] = []
@@ -849,6 +849,140 @@ def make_pane_bc(
     plt.close()
 
 
+def make_amoc_trends(
+    savefig = True,
+    panes = [],
+    fig=None,
+    axes=None,
+    ):
+    cfg = {'auxiliary_data_dir': '/users/modellers/ledm/workspace/ESMValTool_AR6/run/auxiliary_data'}
+    preprocesed_filename = cfg['auxiliary_data_dir']+"/Figure_AR6_DAMIP_AMOC_26N_1000m.json"
+    #
+    data_str = open(preprocesed_filename, 'r').read()
+    data = json.loads(data_str)
+
+    # with open(preprocesed_filename, 'r') as handle:
+    #     json_load = json.load(handle)
+    #
+    # amoc_c5_ts = np.ma.asarray(json_load["amoc_c5_ts"])  # Note the use of numpy masked arrays (np.ma)
+    # amoc_c6_ts = np.ma.asarray(json_load["amoc_c6_ts"])
+    # cmip5_models = json_load["cmip5_models"]
+    # cmip6_models = json_load["cmip6_models"]
+    # year = np.asarray(json_load["year"])
+
+    years = np.ma.array(data['year'])
+    models = {i:model for i,model in enumerate(data['damip6_models'])}
+    #experiments = {'historical':0, 'hist-aer':1, 'hist-GHG':2, 'hist-nat':3, 'hist-stratO3':4}
+    experiments = {'HIST':0, 'AER':1, 'GHG':2, 'NAT':3, 'hist-stratO3':4}
+
+    latitudes = {'26.5N':0, '35N':1}
+    ensembles = [i for i in range(10)]
+
+    time_series = np.ma.array(data['amoc_damip6_ts'])
+    time_series = np.ma.masked_where(time_series==None, time_series)
+    # (7, 5, 10, 2, 251)
+    #model = 0
+    #exp = 1
+    #ensemble = 2
+    #lat = 3
+    #time = 4
+
+    time_ranges = {'1850-2014': (1849,2014), '1940-1985': (1940,1985),  '1985-2014': (1985,2014), }
+
+    # pane a: 1850-2014 8 year trends
+    # trends = {exp:{} for exp in experiments}
+
+    latitude = '26.5N'
+    lat = latitudes['26.5N']
+
+    trends = {}
+    for exp in experiments:
+        trends[exp] = {}
+        for time_range, range_values in time_ranges.items():
+            trends[exp][time_range] = []
+
+    for time_range, range_values in time_ranges.items(): #['1850-2014', '1940-1985', '1985-2014']:
+        arr_min_index = np.argmin(np.abs(np.array(years) - range_values[0])) -1
+        if arr_min_index<0: arr_min_index=0
+        arr_max_index = np.argmin(np.abs(np.array(years) - range_values[1])) +1
+        years2014 = years[arr_min_index:arr_max_index]
+        sliice = slice(arr_min_index, arr_max_index, )
+        print(time_range, arr_max_index, arr_min_index, sliice, years[arr_min_index] , '->',years[arr_max_index])
+        #continue
+        for experiment in ['GHG', 'NAT', 'AER','HIST']:
+            exp = experiments[experiment]
+            for mod, model in models.items():
+                for ens in ensembles:
+                    dat = time_series[mod,exp,ens,lat, sliice]
+                    #print( dat, type(dat))
+                    if not len(dat.compressed()):
+                        continue
+                        #dat = np.ma.masked_where((years > 2015) + dat.mask, dat)
+                    #if len(dat.compressed())!= len(years2014.compressed()):
+                #        print(len(dat.compressed()), '!=', len(years2014.compressed()))
+                #        assert 0
+                    new_times, slopes, intercepts = calculate_basic_trend(years2014, dat)
+                    #print(model,experiment,'ensemble:', ens, ', mean slope:', slopes.mean())
+                    trends[experiment][time_range].extend( slopes)
+
+                #kwargs = dict(histtype='stepfilled', alpha=0.3, normed=True, bins=40)
+
+    if savefig:
+        fig = plt.figure()
+        fig.set_size_inches(9., 4.)
+        time_ranges_subplot = {'1850-2014': 131, '1940-1985': 132,  '1985-2014': 133, }
+    else:
+        time_ranges_subplot = {'1850-2014': axes[0], '1940-1985': axes[1],  '1985-2014': axes[2], }
+        # time_ranges_subplot = {'1850-2014': axes[0], '1940-1985': axes[1],  '1985-2014': axes[2], }
+
+    for time_range, subplot in time_ranges_subplot.items(): #['1850-2014', '1940-1985', '1985-2014']:
+        # fig = plt.figure()
+        # for experiment in ['GHG', 'NAT', 'AER', 'HIST']:
+        #     plt.hist(trends[experiment][time_range], bins=50,histtype='stepfilled', normed=True, alpha=0.5, label = experiment)
+        # plt.title(' '.join(['AMOC', latitude, time_range]))
+        # plt.legend()
+        # plt.savefig('tmp'+time_range+'.png')
+        # plt.close()
+
+        if savefig:
+            ax = plt.subplot(subplot)
+            if subplot not in [131, 311]:
+                plt.setp(ax.get_yticklabels(), visible=False)
+        else:
+            ax = subplot
+
+        ax.set_ylim([-0.55,0.5])
+
+        box_order =  ['GHG', 'NAT', 'AER', 'HIST']
+        box_data = [trends[experiment][time_range] for experiment in box_order]
+        plt.axhline(0., ls='--', color='k', lw=0.5)
+        box = ax.boxplot(box_data,
+                         0,
+                         sym = 'k.',
+                         whis = [ 5, 95],
+                         showmeans= False,
+                         meanline = False,
+                         showfliers = False,
+                         labels = box_order) #sorted(trends.keys()))
+        # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
+        # plt.xticks(rotation=30, ha="right", fontsize=8)
+        # plt.setp(box['fliers'], markersize=1.0)
+        plt.title(' '.join([time_range]))
+
+    if not savefig:
+        return fig, axes
+
+    # Load image format extention and path
+    image_extention = diagtools.get_image_format(cfg)
+    path = cfg['plot_dir'] + '/fig_3.24_def_amoc_trends'+image_extention
+
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path)
+    plt.close()
+
+
 def  make_figure(cfg, debug=False, timeseries=False):
     """
     Make the entire figure.
@@ -861,20 +995,36 @@ def  make_figure(cfg, debug=False, timeseries=False):
     """
     fig = plt.figure()
     fig.set_size_inches(w=11,h=7)
-    gs1 = gridspec.GridSpec(2,5)
 
-    # fig.subplots_adjust(wspace=0.25, hspace=0.1)
+    # axa = plt.subplot2grid((2,5), (0,0), colspan=2, rowspan=2)
+    # fig, axa = make_pane_a(cfg, fig=fig, ax=axa)
+    # axb = plt.subplot2grid((2,5), (0,2), colspan=3, rowspan=1)
+    # fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb, timeseries=timeseries)
+    # axc = plt.subplot2grid((2,5), (1,2), colspan=3, rowspan=1)
+    # fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
+    # plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
 
-    axa = plt.subplot2grid((2,5), (0,0), colspan=2, rowspan=2)
+    # (rows, columns)
+    axa = plt.subplot2grid((3,3), (0,0), colspan=1, rowspan=2)
     fig, axa = make_pane_a(cfg, fig=fig, ax=axa)
 
-    axb = plt.subplot2grid((2,5), (0,2), colspan=3, rowspan=1)
+    axb = plt.subplot2grid((3,3), (0,1), colspan=2, rowspan=1)
     fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb, timeseries=timeseries)
 
-    axc = plt.subplot2grid((2,5), (1,2), colspan=3, rowspan=1)
+    axc = plt.subplot2grid((3,3), (1,1), colspan=2, rowspan=1)
     fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
+    #fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
 
-    plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
+    #plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
+    axd = plt.subplot2grid((3,3), (2,0), colspan=1, rowspan=1)
+    axe = plt.subplot2grid((3,3), (2,1), colspan=1, rowspan=1)
+    axf = plt.subplot2grid((3,3), (2,2), colspan=1, rowspan=1)
+    fig, axes = make_amoc_trends(
+        savefig = False,
+        panes = ['d', 'e', 'f'],
+        fig=fig,
+        axes=[axd, axe, axf],
+        )
 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
@@ -883,18 +1033,12 @@ def  make_figure(cfg, debug=False, timeseries=False):
     else:
         path = cfg['plot_dir'] + '/fig_3.24'+image_extention
 
-    # Watermark
-    # fig.text(0.95, 0.05, 'Draft',
-    #          fontsize=50, color='gray',
-    #          ha='right', va='bottom', alpha=0.5)
-
     # Saving files:
     if cfg['write_plots']:
         logger.info('Saving plots to %s', path)
         plt.savefig(path)
 
     plt.close()
-
 
 
 def main(cfg):
@@ -922,7 +1066,7 @@ def main(cfg):
 
     make_pane_bc(cfg, pane='b', timeseries=False)
     make_pane_bc(cfg, pane='c', timeseries=False)
-
+    make_amoc_trends(savefig=True)
     #make_pane_bc(cfg, pane='c', timeseries=True)
     #make_pane_bc(cfg, pane='b', timeseries=True)
 
