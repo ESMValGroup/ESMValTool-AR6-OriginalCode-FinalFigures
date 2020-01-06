@@ -1058,16 +1058,16 @@ def main(cfg):
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='b')
     # make_timeseriespane_bc(cfg, pane='c')
-    make_pane_a(cfg)
 
     make_figure(cfg, timeseries= False)
+    make_amoc_trends(savefig=True)
 
-
+    return
+    make_pane_a(cfg)
     #make_pane_a(cfg)
 
     make_pane_bc(cfg, pane='b', timeseries=False)
     make_pane_bc(cfg, pane='c', timeseries=False)
-    make_amoc_trends(savefig=True)
     #make_pane_bc(cfg, pane='c', timeseries=True)
     #make_pane_bc(cfg, pane='b', timeseries=True)
 
