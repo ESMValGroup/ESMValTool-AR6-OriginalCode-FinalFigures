@@ -54,6 +54,8 @@ import iris
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import json
+
 
 from scipy.stats import linregress
 
@@ -1010,6 +1012,7 @@ def  make_figure(cfg, debug=False, timeseries=False):
     axe = plt.subplot2grid((3,3), (2,1), colspan=1, rowspan=1)
     axf = plt.subplot2grid((3,3), (2,2), colspan=1, rowspan=1)
     fig, axes = make_amoc_trends(
+        cfg,
         savefig = False,
         panes = ['d', 'e', 'f'],
         fig=fig,
