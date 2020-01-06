@@ -664,7 +664,7 @@ def make_pane_a(
     #     metadata['long_name'],
     # ])
     # plt.title(title)
-    plt.title('(a) AMOC streamfunction profiles at 26.5N')
+    plt.title('(a) AMOC streamfunction profiles')# at 26.5N')
 
     # Add Legend outside right.
     # diagtools.add_legend_outside_right(plot_details, plt.gca())
@@ -971,8 +971,11 @@ def make_amoc_trends(
         fig = plt.figure()
         fig.set_size_inches(9., 4.)
         time_ranges_subplot = {'1850-2014': 131, '1940-1985': 132,  '1985-2014': 133, }
+        time_ranges_panes = {'1850-2014': '(a)', '1940-1985': '(b)',  '1985-2014': '(c)', }
+
     else:
         time_ranges_subplot = {'1850-2014': axes[0], '1940-1985': axes[1],  '1985-2014': axes[2], }
+        time_ranges_panes = {'1850-2014': '(d)', '1940-1985': '(e)',  '1985-2014': '(f)', }
         # time_ranges_subplot = {'1850-2014': axes[0], '1940-1985': axes[1],  '1985-2014': axes[2], }
 
     for time_range, subplot in time_ranges_subplot.items(): #['1850-2014', '1940-1985', '1985-2014']:
@@ -990,12 +993,12 @@ def make_amoc_trends(
                 plt.setp(ax.get_yticklabels(), visible=False)
         else:
             ax = subplot
-
+        print(time_range, subplot)
         ax.set_ylim([-0.55,0.5])
 
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
         box_data = [trends[experiment][time_range] for experiment in box_order]
-        plt.axhline(0., ls='--', color='k', lw=0.5)
+        ax.axhline(0., ls='--', color='k', lw=0.5)
         box = ax.boxplot(box_data,
                          0,
                          sym = 'k.',
@@ -1007,7 +1010,8 @@ def make_amoc_trends(
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
         # plt.xticks(rotation=30, ha="right", fontsize=8)
         # plt.setp(box['fliers'], markersize=1.0)
-        plt.title(' '.join([time_range]))
+        print(time_range, time_ranges_panes[time_range])
+        ax.set_title(' '.join([time_ranges_panes[time_range], time_range]))
 
     if not savefig:
         return fig, axes
@@ -1066,7 +1070,9 @@ def  make_figure(cfg, debug=False, timeseries=False):
     axc = plt.subplot2grid((3,3), (1,1), colspan=2, rowspan=1)
     fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
     #fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
-
+    
+    #plt.subplots_adjust(bottom=0.15, wspace=0.2, hspace=0.4)
+    plt.tight_layout()
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
     if timeseries:
@@ -1100,7 +1106,7 @@ def main(cfg):
     # make_timeseriespane_bc(cfg, pane='c')
 
     make_figure(cfg, timeseries= False)
-    make_amoc_trends(savefig=True)
+    make_amoc_trends(cfg, savefig=True)
 
     return
     make_pane_a(cfg)
