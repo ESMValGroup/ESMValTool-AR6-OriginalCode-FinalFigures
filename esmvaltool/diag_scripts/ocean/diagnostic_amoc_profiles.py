@@ -230,6 +230,43 @@ def calculate_basic_trend(cube, ): #window = '8 years'):
     return np.array(new_times), np.array(slopes), np.array(intercepts)
 
 
+def calculate_basic_trend_arr(years, data): #window = '8 years'):
+    """
+    Calculate the 8 year window trend.
+
+        xx=(1:8);
+        x=[xx*0+1;xx];
+        for i=1:length(time2)-7
+        b=regress(amoc_anave(i:i+7)',x');
+        amoc_trend_slope(i)=b(2);
+        end
+    """
+    # Assume annual data
+    slopes, intercepts, new_times = [], [], []
+    years = np.ma.array([float(y) for y in years])
+    for itr in range(len(data) -7):
+
+        eight_years_data = list(data[itr:itr+8].compressed())
+        eight_years_times = list(years[itr:itr+8].compressed())
+        #print(itr, len(eight_years_data))
+        #for var in [eight_years_times, eight_years_data]:
+        #    print(var, type(var))
+        if len(eight_years_data) != 8:
+            #print("Not the correct number of data: "+str(len(eight_years_data)) )
+            continue
+        if len(eight_years_data) != len(eight_years_times):
+            #print("Not the correct number of data/years: "+str(len(eight_years_data))
+            #    +' vs '+str(len(eight_years_times)))
+            continue
+
+        lnregs = linregress(eight_years_times, eight_years_data)
+        slopes.append(lnregs[0])
+        intercepts.append(lnregs[1])
+        new_times.append(np.mean(eight_years_times))
+
+    return np.array(new_times), np.array(slopes), np.array(intercepts)
+
+
 def annual_mean_from_april(cube, ):
     """
     Calculate the annual mean from April-March.
@@ -922,7 +959,7 @@ def make_amoc_trends(
                     #if len(dat.compressed())!= len(years2014.compressed()):
                 #        print(len(dat.compressed()), '!=', len(years2014.compressed()))
                 #        assert 0
-                    new_times, slopes, intercepts = calculate_basic_trend(years2014, dat)
+                    new_times, slopes, intercepts = calculate_basic_trend_arr(years2014, dat)
                     #print(model,experiment,'ensemble:', ens, ', mean slope:', slopes.mean())
                     trends[experiment][time_range].extend( slopes)
 
