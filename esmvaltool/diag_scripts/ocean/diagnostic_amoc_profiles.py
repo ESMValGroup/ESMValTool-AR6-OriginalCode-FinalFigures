@@ -850,12 +850,13 @@ def make_pane_bc(
 
 
 def make_amoc_trends(
+    cfg,
     savefig = True,
     panes = [],
     fig=None,
     axes=None,
     ):
-    cfg = {'auxiliary_data_dir': '/users/modellers/ledm/workspace/ESMValTool_AR6/run/auxiliary_data'}
+    #cfg = {'auxiliary_data_dir': '/users/modellers/ledm/workspace/ESMValTool_AR6/run/auxiliary_data'}
     preprocesed_filename = cfg['auxiliary_data_dir']+"/Figure_AR6_DAMIP_AMOC_26N_1000m.json"
     #
     data_str = open(preprocesed_filename, 'r').read()
@@ -1004,17 +1005,6 @@ def  make_figure(cfg, debug=False, timeseries=False):
     # fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
     # plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
 
-    # (rows, columns)
-    axa = plt.subplot2grid((3,3), (0,0), colspan=1, rowspan=2)
-    fig, axa = make_pane_a(cfg, fig=fig, ax=axa)
-
-    axb = plt.subplot2grid((3,3), (0,1), colspan=2, rowspan=1)
-    fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb, timeseries=timeseries)
-
-    axc = plt.subplot2grid((3,3), (1,1), colspan=2, rowspan=1)
-    fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
-    #fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
-
     #plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
     axd = plt.subplot2grid((3,3), (2,0), colspan=1, rowspan=1)
     axe = plt.subplot2grid((3,3), (2,1), colspan=1, rowspan=1)
@@ -1025,6 +1015,17 @@ def  make_figure(cfg, debug=False, timeseries=False):
         fig=fig,
         axes=[axd, axe, axf],
         )
+
+    # (rows, columns)
+    axa = plt.subplot2grid((3,3), (0,0), colspan=1, rowspan=2)
+    fig, axa = make_pane_a(cfg, fig=fig, ax=axa)
+
+    axb = plt.subplot2grid((3,3), (0,1), colspan=2, rowspan=1)
+    fig, axb = make_pane_bc(cfg, pane='b', fig=fig, ax=axb, timeseries=timeseries)
+
+    axc = plt.subplot2grid((3,3), (1,1), colspan=2, rowspan=1)
+    fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
+    #fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
