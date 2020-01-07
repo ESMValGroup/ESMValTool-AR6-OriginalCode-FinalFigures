@@ -8,8 +8,9 @@
 ;    Outputs:
 ;
 ; History
-;    20190316 kosa_yu: written.
+;    20200105 kosaka_yu: show shading instead of lines; use duration based on composite
 ;    20191012 kosaka_yu: updated for ESMValTool 2.0.0b2
+;    20190316 kosa_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;    none
@@ -28,10 +29,10 @@ load "$diag_scripts/shared/plot/contourplot.ncl"
 load "$diag_scripts/ar6ch3_enso/modelling_center.ncl"
 load "$diag_scripts/ar6ch3_enso/setting_mme.ncl"
 
-procedure CalcMetrics(ts)
+procedure CalcMetrics(ts, duration_threshold, duration_threshold_unit)
 local nevent, t0, x, t_pos_seg, t_neg_seg, t, tlast, nseg_pos, nseg_neg, i, ipos, ineg, \
       n, nref, duration, t_peak, mag_peak, lag_peak, tmp, date, ens, interval, int, is, idx, \
-      seg_bnds, tmpbnds, nonoverlap, nonoverlapping_events, iis
+      seg_bnds, tmpbnds, nonoverlap, nonoverlapping_events, iis, thres
 begin
   idx = ts
   ; Event frequency
@@ -47,7 +48,16 @@ begin
   end if
   ts@mag_ref  = x(t0)  ; magnitude at target_month
   delete(x)
-  
+
+  if (duration_threshold_unit.eq."deg") then
+    thres = duration_threshold
+  elseif (duration_threshold_unit.eq."stdv") then
+    thres = duration_threshold * ts@stdv_ref
+  else
+    error_msg("f", DIAG_SCRIPT, "", \
+              "Undefined duration_threshold_unit: "+duration_threshold_unit)
+  end if
+
   t_peak = new(nevent, "integer")
   mag_peak= new(nevent, "float")
   lag_peak= new(nevent, "float")
@@ -163,8 +173,21 @@ begin
     if (t_pos_seg(0, nref).le.0 .or. t_pos_seg(1, nref).ge.dimsizes(idx(i, :))-1) then
       duration(i) = duration@_FillValue
     else
-      duration(i) = t_pos_seg(1, nref) + idx(i, t_pos_seg(1, nref))/(idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref)+1))
-      duration(i) = duration(i) - (t_pos_seg(0, nref) - idx(i, t_pos_seg(1, nref))/(idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref)-1)))
+      if (thres.eq.0.) then
+        duration(i) = t_pos_seg(1, nref) + idx(i, t_pos_seg(1, nref))/(idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref)+1))
+        duration(i) = duration(i) - (t_pos_seg(0, nref) - idx(i, t_pos_seg(1, nref))/(idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref)-1)))
+      else
+        t = t0
+        do while (.not.ismissing(idx(i, t)) .and. (idx(i, t).gt.thres))
+          duration(i) = duration(i) + 1
+          t = t + 1
+        end do
+        t = t0 - 1
+        do while (.not.ismissing(idx(i, t)) .and. (idx(i, t).gt.thres))
+          duration(i) = duration(i) + 1
+          t = t - 1
+        end do
+      end if
     end if
 
     if (isvar("t_pos_seg")) then
@@ -184,10 +207,9 @@ begin
     is = ind(idx@ens.eq.ens(n))
     date = new((/dimsizes(is), 2/), "integer")
     do i = 0, dimsizes(is)-1
-;print(ens(n)+" idx@year = "+idx@year(is(i))+" "+lag_peak(is(i)))
-;      if (ismissing(idx@year(is(i))).or.ismissing(lag_peak(is(i)))) then
-;        continue
-;      end if
+      if (ismissing(idx@year(is(i))).or.ismissing(lag_peak(is(i)))) then
+        continue
+      end if
       date(i, 0) = idx@year(is(i))
       date(i, 1) = idx@reference_month + toint(lag_peak(is(i)))
       do while (date(i, 1).lt.1)
@@ -269,20 +291,89 @@ begin
 ;printVarSummary(idx)
 end
 
+function duration_composite(x, multiyear_as_single, duration_threshold, duration_threshold_unit)
+local x, ts, d, dims, t, lag, thres
+begin
+  x!0 = "event"
+  dims = dimsizes(x)
+  x&event = ispan(0, dims(0)-1, 1)
+  delete(dims)
+  ts = x(0, :)
+  if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
+    ts = dim_avg_n(where(conform(x, x@nonoverlap, 0), \
+                         x, x@_FillValue), 0)
+  else
+    ts = dim_avg_n(x, 0)
+  end if
+  t = toint(x@time_ref)
+  if (ts(t).lt.0.) then
+    ts = -ts
+  end if
+  if (duration_threshold_unit.eq."deg") then
+    thres = duration_threshold
+  elseif (duration_threshold_unit.eq."stdv") then
+    thres = duration_threshold * x@stdv_ref
+  else
+    error_msg("f", DIAG_SCRIPT, "", \
+              "Undefined duration_threshold_unit: "+duration_threshold_unit)
+  end if
+
+  if (ts(t).gt.thres) then
+    d = 1.
+    lag = -1
+    do while (ts(t+lag).gt.thres)
+      d = d + 1.
+      lag = lag - 1
+    end do
+    lag = 1
+    do while (ts(t+lag).gt.thres)
+      d = d + 1.
+      lag = lag + 1
+    end do
+  else
+    d = default_fillvalue("float")
+  end if
+;  print(x@dataset+" peak = "+ts(t)+" threshold = "+thres+" duration = "+d)
+  return(d)
+end
+  
 begin
 
   enter_msg(DIAG_SCRIPT, "")
 
   obs_projects = (/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/)
   
-;  line_only = False
-  add_shading = False ; Unsupported now
-
   multiyear_as_single = "metric_only"                      ; Regard a multiyear event as a single event for
   if (isatt(diag_script_info, "multiyear_as_single")) then ; "always"
-    allow_overlap = diag_script_info@multiyear_as_single   ; "metric_only" (bottom plots only)
+    multiyear_as_single = diag_script_info@multiyear_as_single   ; "metric_only" (bottom plots only)
   end if                                                   ; "never"
- 
+
+  duration_threshold = 0.25
+  if (isatt(diag_script_info, "duration_threshold")) then
+    duration_threshold = diag_script_info@duration_threshold
+  end if
+  duration_threshold_unit = "stdv"
+  if (isatt(diag_script_info, "unit_duration_threshold")) then
+    duration_threshold_unit = diag_script_info@unit_duration_threshold
+  end if
+  if (any(duration_threshold_unit.eq.(/"degree", "degrees", "degC", "degK", \
+    "Degree", "Degrees", "DegC", "DegK", "Deg"/))) then
+    duration_threshold_unit = "deg"
+  elseif (any(duration_threshold_unit.eq.(/"sigma", "std_dev", "stddev", "s.d."/))) then
+    duration_threshold_unit = "stdv"
+  end if
+  
+  duration_individual = False
+  if (isatt(diag_script_info, "duration_individual")) then
+    duration_individual = diag_script_info@duration_individual
+  end if
+
+;=============
+;  multiyear_as_single = "always"
+;  duration_threshold = 0.
+;  duration_threshold_unit = "stdv"
+;  duration_individual = True
+;=============
   
   input_dir = diag_script_info@input_files
   paths_el = systemfunc("ls "+input_dir+"/ElNino_*.nc")
@@ -365,7 +456,7 @@ begin
     ens = "no_ens"
     el_ref@ens  = ens
     el_ref@year := year
-    CalcMetrics(el_ref)
+    CalcMetrics(el_ref, duration_threshold, duration_threshold_unit)
     delete(paths)
     delete(ens)
     delete(year)
@@ -403,7 +494,7 @@ begin
     ens = "no_ens"
     la_ref@ens  = ens
     la_ref@year := year
-    CalcMetrics(la_ref)
+    CalcMetrics(la_ref, duration_threshold, duration_threshold_unit)
     delete(paths)
     delete(ens)
     delete(year)
@@ -443,7 +534,7 @@ begin
       end do
       tmp@ens := ens
       tmp@year := year
-      CalcMetrics(tmp)
+      CalcMetrics(tmp, duration_threshold, duration_threshold_unit)
       delete(ens)
       delete(year)
       
@@ -482,7 +573,7 @@ begin
       end do
       tmp@ens := ens
       tmp@year := year
-      CalcMetrics(tmp)
+      CalcMetrics(tmp, duration_threshold, duration_threshold_unit)
       delete(ens)
       delete(year)
       
@@ -597,7 +688,7 @@ begin
 
   txres = True
   txres@txFontHeightF = 0.02
-  txres@txJust = "topleft"
+  txres@txJust = "centerleft"
 
   rests@tiMainFontHeightF = 0.028
   rests@tiMainOffsetYF = -0.008
@@ -625,146 +716,243 @@ begin
   res@project = "CMIP5"
   color_cmip5 = get_color(res)
 
-;  if (add_shading) then
-;    resp@gsFillColor =  "grey30"
-;    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
-;                                    lagpoly, make_poly(el_obs), resp)
-;    idummy = idummy + 1
-;    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(1), \
-;                                    lagpoly, make_poly(la_obs), resp)
-;    idummy = idummy + 1
-;  end if
+;  el_cmip5 = el[0](0, :)
+;  el_cmip6 = el[0](0, :)
+;  el_cmip5 = 0.
+;  ncmip5 = 0
+;  el_cmip6 = 0.
+;  ncmip6 = 0
+;  do i = 0, ListCount(el)-1
+;    delete(rests@xyLineColor)
+;    rests@xyLineColor = get_color(el[i])
+;    rests@xyDashPattern =  get_lineindex(el[i])
+;    rests@xyLineThicknessF = 0.5
+;    rests@xyLineOpacityF = 0.5
+;    if (multiyear_as_single .eq. "always") then
+;      ts = dim_avg_n(where(conform(el[i]@nonoverlap, el[i], 0), \
+;                           el[i], el[i]@_FillValue), 0)
+;    else
+;      ts = dim_avg_n(el[i], 0)
+;    end if
+;    plot = gsn_csm_xy(wks, lag, ts, rests)
+;    overlay(ENSOPlots(0), plot)
+;    if (el[i]@project.eq."CMIP5") then
+;      el_cmip5 = el_cmip5 + ts
+;      ncmip5 = ncmip5 + 1
+;    elseif (el[i]@project.eq."CMIP6") then
+;      el_cmip6 = el_cmip6 + ts
+;      ncmip6 = ncmip6 + 1
+;    end if
+;  end do
+;
+;  el_cmip5 = el_cmip5 / tofloat(ncmip5)
+;  el_cmip6 = el_cmip6 / tofloat(ncmip6)
 
-;  if (add_shading) then
-;    resp@gsFillColor = "transparent"
-;    resp@gsLineOpacityF = 1.
-;    if (isvar("el_cmip5")) then
-;      resp@gsLineColor =  get_color(el_cmip5)
-;      dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
-;                                      lagpoly, make_poly(el_cmip5), resp)
-;      idummy = idummy + 1
-;    end if
-;    if (isvar("la_cmip5")) then
-;      resp@gsLineColor =  get_color(la_cmip5)
-;      dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(1), \
-;                                      lagpoly, make_poly(la_cmip5), resp)
-;      idummy = idummy + 1
-;    end if
-;    if (isvar("el_cmip6")) then
-;      resp@gsLineColor =  get_color(el_cmip6)
-;      dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
-;                                      lagpoly, make_poly(el_cmip6), resp)
-;                                      idummy = idummy + 1
-;    end if
-;    if (isvar("la_cmip6")) then
-;      resp@gsLineColor =  get_color(la_cmip6)
-;      dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(1), \
-;                                      lagpoly, make_poly(la_cmip6), resp)
-;                                      idummy = idummy + 1
-;    end if
-;    resp@gsLineColor =  "grey30"
-;    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
-;                                    lagpoly, make_poly(el_obs), resp)
-;    idummy = idummy + 1
-;    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(1), \
-;                                    lagpoly, make_poly(la_obs), resp)
-;    idummy = idummy + 1                                    
-;  end if
-
-  el_cmip5 = el[0](0, :)
-  el_cmip6 = el[0](0, :)
-  el_cmip5 = 0.
-  ncmip5 = 0
-  el_cmip6 = 0.
-  ncmip6 = 0
   do i = 0, ListCount(el)-1
-    delete(rests@xyLineColor)
-    rests@xyLineColor = get_color(el[i])
-    rests@xyDashPattern =  get_lineindex(el[i])
-    rests@xyLineThicknessF = 0.5
-    rests@xyLineOpacityF = 0.5
+    dims = dimsizes(el[i])
+    el[i]!0 = "event"
+    el[i]&event = ispan(0, dims(0)-1, 1)
+    delete(dims)
     if (multiyear_as_single .eq. "always") then
-      ts = dim_avg_n(where(conform(el[i]@nonoverlap, el[i], 0), \
+      ts = el[i](0, :)
+      ts = dim_avg_n(where(conform(el[i], el[i]@nonoverlap, 0), \
                            el[i], el[i]@_FillValue), 0)
     else
-      ts = dim_avg_n(el[i], 0)
+      ts = dim_avg_n_Wrap(el[i], 0)
     end if
-    plot = gsn_csm_xy(wks, lag, ts, rests)
-    overlay(ENSOPlots(0), plot)
     if (el[i]@project.eq."CMIP5") then
-      el_cmip5 = el_cmip5 + ts
-      ncmip5 = ncmip5 + 1
+      if (isvar("el_cmip5")) then
+        dims = dimsizes(el_cmip5)
+        dims(0) = dims(0) + 1
+        tmp = el_cmip5
+        delete(el_cmip5)
+        el_cmip5 = new(dims, typeof(tmp))
+        el_cmip5(0:dims(0)-2, :) = tmp
+        el_cmip5(dims(0)-1, :) = (/ts/)
+        delete(tmp)
+        delete(dims)
+      else
+        el_cmip5 = new((/1, dimsizes(ts)/), typeof(ts))
+        el_cmip5(0, :) = ts
+      end if
     elseif (el[i]@project.eq."CMIP6") then
-      el_cmip6 = el_cmip6 + ts
-      ncmip6 = ncmip6 + 1
+      if (isvar("el_cmip6")) then
+        dims = dimsizes(el_cmip6)
+        dims(0) = dims(0) + 1
+        tmp = el_cmip6
+        delete(el_cmip6)
+        el_cmip6 = new(dims, typeof(tmp))
+        el_cmip6(0:dims(0)-2, :) = tmp
+        el_cmip6(dims(0)-1, :) = (/ts/)
+        delete(tmp)
+        delete(dims)
+      else
+        el_cmip6 = new((/1, dimsizes(ts)/), typeof(ts))
+        el_cmip6(0, :) = ts
+      end if
     end if
   end do
-  el_cmip5 = el_cmip5 / tofloat(ncmip5)
-  el_cmip6 = el_cmip6 / tofloat(ncmip6)
-  el_cmip5@project = "CMIP5"
-  el_cmip6@project = "CMIP6"
+  el_cmip5!0 = "model"
+  el_cmip6!0 = "model"
+  dims = dimsizes(el_cmip5)
+  el_cmip5&model = ispan(0, dims(0)-1, 1)
+  dims = dimsizes(el_cmip6)
+  el_cmip6&model = ispan(0, dims(0)-1, 1)
+  delete(dims)
+
+  resp = True
+  resp@gsLineOpacityF = 0.2
+  if (isvar("el_cmip5")) then
+print(el_cmip5@project)
+    resp@gsFillColor :=  get_color(el_cmip5)
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
+                                    lagpoly, make_poly(el_cmip5), resp)
+    idummy = idummy + 1
+  end if
+  if (isvar("el_cmip6")) then
+    resp@gsFillColor :=  get_color(el_cmip6)
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
+                                    lagpoly, make_poly(el_cmip6), resp)
+    idummy = idummy + 1
+  end if
+
+  el_cmip5_mean = dim_avg_n_Wrap(el_cmip5, 0)
+  el_cmip6_mean = dim_avg_n_Wrap(el_cmip6, 0)
+  el_cmip5_mean@project = "CMIP5"
+  el_cmip6_mean@project = "CMIP6"
   rests@xyDashPattern =  0
   rests@xyLineThicknessF = 3.
   rests@xyLineOpacityF = 1.
-  rests@xyLineColor = get_color(el_cmip5)
-  plot = gsn_csm_xy(wks, lag, el_cmip5, rests)
+  rests@xyLineColor := get_color(el_cmip5_mean)
+  plot = gsn_csm_xy(wks, lag, el_cmip5_mean, rests)
   overlay(ENSOPlots(0), plot)
-  rests@xyLineColor = get_color(el_cmip6)
-  plot = gsn_csm_xy(wks, lag, el_cmip6, rests)
+  rests@xyLineColor := get_color(el_cmip6_mean)
+  plot = gsn_csm_xy(wks, lag, el_cmip6_mean, rests)
   overlay(ENSOPlots(0), plot)
+
+
   
-  la_cmip5 = la[0](0, :)
-  la_cmip6 = la[0](0, :)
-  la_cmip5 = 0.
-  ncmip5 = 0
-  la_cmip6 = 0.
-  ncmip6 = 0
+;  la_cmip5 = la[0](0, :)
+;  la_cmip6 = la[0](0, :)
+;  la_cmip5 = 0.
+;  ncmip5 = 0
+;  la_cmip6 = 0.
+;  ncmip6 = 0
+;  do i = 0, ListCount(la)-1
+;    delete(rests@xyLineColor)
+;    rests@xyLineColor = get_color(la[i])
+;    rests@xyDashPattern =  get_lineindex(la[i])
+;    rests@xyLineThicknessF = 0.5
+;    rests@xyLineOpacityF = 0.5
+;    if (multiyear_as_single .eq. "always") then
+;      ts = dim_avg_n(where(conform(la[i]@nonoverlap, la[i], 0), \
+;                           la[i], la[i]@_FillValue), 0)
+;    else
+;      ts = dim_avg_n(la[i], 0)
+;    end if
+;    plot = gsn_csm_xy(wks, lag, ts, rests)
+;    overlay(ENSOPlots(1), plot)
+;    if (la[i]@project.eq."CMIP5") then
+;      la_cmip5 = la_cmip5 + ts
+;      ncmip5 = ncmip5 + 1
+;    elseif (la[i]@project.eq."CMIP6") then
+;      la_cmip6 = la_cmip6 + ts
+;      ncmip6 = ncmip6 + 1
+;    end if
+;    delete(ts)
+;  end do
+;  la_cmip5 = la_cmip5 / tofloat(ncmip5)
+;  la_cmip6 = la_cmip6 / tofloat(ncmip6)
+
   do i = 0, ListCount(la)-1
-    delete(rests@xyLineColor)
-    rests@xyLineColor = get_color(la[i])
-    rests@xyDashPattern =  get_lineindex(la[i])
-    rests@xyLineThicknessF = 0.5
-    rests@xyLineOpacityF = 0.5
+    dims = dimsizes(la[i])
+    la[i]!0 = "event"
+    la[i]&event = ispan(0, dims(0)-1, 1)
+    delete(dims)
     if (multiyear_as_single .eq. "always") then
-      ts = dim_avg_n(where(conform(la[i]@nonoverlap, la[i], 0), \
+      ts = la[i](0, :)
+      ts = dim_avg_n(where(conform(la[i], la[i]@nonoverlap, 0), \
                            la[i], la[i]@_FillValue), 0)
     else
-      ts = dim_avg_n(la[i], 0)
+      ts = dim_avg_n_Wrap(la[i], 0)
     end if
-    plot = gsn_csm_xy(wks, lag, ts, rests)
-    overlay(ENSOPlots(1), plot)
     if (la[i]@project.eq."CMIP5") then
-      la_cmip5 = la_cmip5 + ts
-      ncmip5 = ncmip5 + 1
+      if (isvar("la_cmip5")) then
+        dims = dimsizes(la_cmip5)
+        dims(0) = dims(0) + 1
+        tmp = la_cmip5
+        delete(la_cmip5)
+        la_cmip5 = new(dims, typeof(tmp))
+        la_cmip5(0:dims(0)-2, :) = tmp
+        la_cmip5(dims(0)-1, :) = (/ts/)
+        delete(tmp)
+        delete(dims)
+      else
+        la_cmip5 = new((/1, dimsizes(ts)/), typeof(ts))
+        la_cmip5(0, :) = ts
+      end if
     elseif (la[i]@project.eq."CMIP6") then
-      la_cmip6 = la_cmip6 + ts
-      ncmip6 = ncmip6 + 1
+      if (isvar("la_cmip6")) then
+        dims = dimsizes(la_cmip6)
+        dims(0) = dims(0) + 1
+        tmp = la_cmip6
+        delete(la_cmip6)
+        la_cmip6 = new(dims, typeof(tmp))
+        la_cmip6(0:dims(0)-2, :) = tmp
+        la_cmip6(dims(0)-1, :) = (/ts/)
+        delete(tmp)
+        delete(dims)
+      else
+        la_cmip6 = new((/1, dimsizes(ts)/), typeof(ts))
+        la_cmip6(0, :) = ts
+      end if
     end if
-    delete(ts)
   end do
-  la_cmip5 = la_cmip5 / tofloat(ncmip5)
-  la_cmip6 = la_cmip6 / tofloat(ncmip6)
-  la_cmip5@project = "CMIP5"
-  la_cmip6@project = "CMIP6"
+  la_cmip5!0 = "model"
+  la_cmip6!0 = "model"
+  dims = dimsizes(la_cmip5)
+  la_cmip5&model = ispan(0, dims(0)-1, 1)
+  dims = dimsizes(la_cmip6)
+  la_cmip6&model = ispan(0, dims(0)-1, 1)
+  delete(dims)
+
+  if (isvar("la_cmip5")) then
+    resp@gsFillColor :=  get_color(la_cmip5)
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(1), \
+                                    lagpoly, make_poly(la_cmip5), resp)
+    idummy = idummy + 1
+  end if
+  if (isvar("la_cmip6")) then
+    resp@gsFillColor :=  get_color(la_cmip6)
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(1), \
+                                    lagpoly, make_poly(la_cmip6), resp)
+    idummy = idummy + 1
+  end if
+
+  la_cmip5_mean = dim_avg_n_Wrap(la_cmip5, 0)
+  la_cmip6_mean = dim_avg_n_Wrap(la_cmip6, 0)  
+  la_cmip5_mean@project = "CMIP5"
+  la_cmip6_mean@project = "CMIP6"
   rests@xyDashPattern =  0
   rests@xyLineThicknessF = 3.
   rests@xyLineOpacityF = 1.
-  rests@xyLineColor = get_color(la_cmip5)
-  plot = gsn_csm_xy(wks, lag, la_cmip5, rests)
+  rests@xyLineColor = get_color(la_cmip5_mean)
+  plot = gsn_csm_xy(wks, lag, la_cmip5_mean, rests)
   overlay(ENSOPlots(1), plot)
-  rests@xyLineColor = get_color(la_cmip6)
-  plot = gsn_csm_xy(wks, lag, la_cmip6, rests)
+  rests@xyLineColor = get_color(la_cmip6_mean)
+  plot = gsn_csm_xy(wks, lag, la_cmip6_mean, rests)
   overlay(ENSOPlots(1), plot)
+
   
   do i = 0, ListCount(el_obs)-1
     delete(rests@xyLineColor)
     rests@xyLineColor = get_color(el_obs[i])
     rests@xyDashPattern =  get_lineindex(el_obs[i])
-    rests@xyLineThicknessF = 3.
+    rests@xyLineThicknessF = 1.5
     rests@xyLineOpacityF = 1.
     if (multiyear_as_single .eq. "always") then
       plot = gsn_csm_xy(wks, lag, \
-                        dim_avg_n(where(conform(el_obs[i]@nonoverlap, el_obs[i], 0), \
+                        dim_avg_n(where(conform(el_obs[i], el_obs[i]@nonoverlap, 0), \
                                         el_obs[i], el_obs[i]@_FillValue), 0), \
                         rests)
     else
@@ -776,11 +964,11 @@ begin
     delete(rests@xyLineColor)
     rests@xyLineColor = get_color(la_obs[i])
     rests@xyDashPattern =  get_lineindex(la_obs[i])
-    rests@xyLineThicknessF = 3.
+    rests@xyLineThicknessF = 1.5
     rests@xyLineOpacityF = 1.
     if (multiyear_as_single .eq. "always") then
       plot = gsn_csm_xy(wks, lag, \
-                        dim_avg_n(where(conform(la_obs[i]@nonoverlap, la_obs[i], 0), \
+                        dim_avg_n(where(conform(la_obs[i], la_obs[i]@nonoverlap, 0), \
                                         la_obs[i], la_obs[i]@_FillValue), 0), \
                         rests)
     else
@@ -810,32 +998,56 @@ begin
 ;    overlay(ENSOPlots(1), plot)
 ;  end if
 
+  j = 0
+  lres = True
   do i = 0, ListCount(el_obs)-1
-    if (isatt(txres, "txFontColor")) then
-      delete(txres@txFontColor)
-    end if
-    txres@txFontColor = get_color(el_obs[i])
-    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), el_obs[i]@dataset, -23., rests@trYMaxF-0.1, txres)
+    y = rests@trYMaxF-0.2-0.3*j
+    lres@gsLineColor = get_color(el_obs[i])
+    lres@gsLineDashPattern =  get_lineindex(el_obs[i])
+    lres@gsLineThicknessF = 1.5
+    lres@gsLineOpacityF = 1.
+    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), (/-23., -18./), (/y, y/), lres)
     idummy = idummy + 1
-    i = i + 1
+    txres@txFontColor := get_color(el_obs[i])
+    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), el_obs[i]@dataset, -17., y, txres)
+    idummy = idummy + 1
+    j = j + 1
   end do
   if (isvar("el_cmip6")) then
-    if (isatt(txres, "txFontColor")) then
-      delete(txres@txFontColor)
-    end if
-    txres@txFontColor = get_color(el_cmip6)
-    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), "CMIP6", -23., rests@trYMaxF-0.1-0.3*i, txres)
+    y = rests@trYMaxF-0.2-0.3*j
+    resp@gsLineOpacityF = 0.2
+    resp@gsFillColor :=  get_color(el_cmip6)
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), (/-23., -18., -18., -23./), \
+                                    (/y+0.1, y+0.1, y-0.1, y-0.1/), resp)
     idummy = idummy + 1
-    i = i + 1
+    lres@gsLineColor = get_color(el_cmip6)
+    lres@gsLineDashPattern =  get_lineindex(el_cmip6)
+    lres@gsLineThicknessF = 3.
+    lres@gsLineOpacityF = 1.
+    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), (/-23., -18./), (/y, y/), lres)
+    idummy = idummy + 1
+    txres@txFontColor := get_color(el_cmip6)
+    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), "CMIP6", -17., y, txres)
+    idummy = idummy + 1
+    j = j + 1
   end if
   if (isvar("el_cmip5")) then
-    if (isatt(txres, "txFontColor")) then
-      delete(txres@txFontColor)
-    end if
-    txres@txFontColor = get_color(el_cmip5)
-    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), "CMIP5", -23., rests@trYMaxF-0.1-0.3*i, txres)
+    y = rests@trYMaxF-0.2-0.3*j
+    resp@gsLineOpacityF = 0.2
+    resp@gsFillColor :=  get_color(el_cmip5)
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), (/-23., -18., -18., -23./), \
+                                    (/y+0.1, y+0.1, y-0.1, y-0.1/), resp)
     idummy = idummy + 1
-    i = i + 1
+    lres@gsLineColor = get_color(el_cmip5)
+    lres@gsLineDashPattern =  get_lineindex(el_cmip5)
+    lres@gsLineThicknessF = 3.
+    lres@gsLineOpacityF = 1.
+    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), (/-23., -18./), (/y, y/), lres)
+    idummy = idummy + 1
+    txres@txFontColor := get_color(el_cmip5)
+    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), "CMIP5", -17., y, txres)
+    idummy = idummy + 1
+    j = j + 1
   end if
   
   pres = True
@@ -843,6 +1055,8 @@ begin
   pres@gsnMaximize = False
 ;  pres@gsnPanelXWhiteSpacePercent = 0.
 ;  pres@gsnPanelYWhiteSpacePercent = 8.
+  pres@gsnPanelLeft = 0.08
+  pres@gsnPanelRight = 0.92
   pres@gsnPanelBottom = 0.63
 ;  pres@gsnPanelFigureStrings = (/ "(a) El Nino", "(b) La Nina" /)
 ;  pres@gsnPanelFigureStringsFontHeightF = 0.015
@@ -909,64 +1123,89 @@ begin
   res@tmXTOn = False
   res@tmXMajorGrid = True
   res@tmYMajorGrid = True
-  res@tmXMajorGridLineDashPattern = 11
-  res@tmYMajorGridLineDashPattern = 11
+  res@tmXMajorGridLineDashPattern = 0 ;11
+  res@tmYMajorGridLineDashPattern = 0 ;11
   res@tmXMajorGridLineColor = "grey"
-  res@tmYMajorGridLineColor = "grey"
+  res@tmYMajorGridLineColor = "transparent" ;"grey"
   res@tmXMajorGridThicknessF = 0.005
-  res@tmYMajorGridThicknessF = 0.005
+  res@tmYMajorGridThicknessF = 0. ;0.005
 
   res@tmXBMode = "Explicit"
+  res@tmXBLabelFontHeightF = 0.015
   res@tmXBValues = col
   res@tmXBLabels = names
-  res@tmXBLabelAngleF = 45.
+  res@tmXBLabelAngleF = 60. ;45.
   res@tmXBLabelJust = "CenterRight"
-
 
   mkres = True
   mkres@gsMarkerThicknessF = 2.0
   mkres@gsMarkerSizeF    = 0.01
   lnres = True
-  lnres@gsLineThicknessF = 1.5
+  lnres@gsLineThicknessF = 2.
   
-  res@trYMaxF = 38.
-  res@trYMinF = 10.
+  res@trYMaxF = 28. ;38.
+  res@trYMinF = 8. ;10.
   res@tmYLMode = "Manual"
   res@tmYLTickStartF = 0.
   res@tmYLTickEndF = 132.
-  res@tmYLTickSpacingF = 12.
+  res@tmYLTickSpacingF = 6.
+  res@tmYLMinorPerMajor = 2
+  res@tmYLLabelFontHeightF = 0.018
   res@tiMainFontHeightF = 0.025
   res@tiMainOffsetYF = -0.008
+  if (isvar("y")) then
+    delete(y)
+  end if
   do ii = 0, ListCount(el_obs)-1
     res@xyLineColor = get_color(el_obs[ii])
-    res@xyLineThicknessF = 2.
-    res@xyDashPattern = 1
+    res@xyLineThicknessF = 1.
+    res@xyDashPattern = get_lineindex(el_obs[ii])
     if (ii.eq.0) then
       res@tiMainString = "(c) El Nino duration (months)"
     else
       res@tiMainString = ""
     end if
-    if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
-      duration = el_obs[ii]@duration
-      y = avg(where(el_obs[ii]@nonoverlap, duration, duration@_FillValue))
-      delete(duration)
+    if (duration_individual) then
+      if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
+        duration = el_obs[ii]@duration
+        y = avg(where(el_obs[ii]@nonoverlap, duration, duration@_FillValue))
+        delete(duration)
+      else
+        y = avg(el_obs[ii]@duration)
+      end if
     else
-      y = avg(el_obs[ii]@duration)
+      y = duration_composite(el_obs[ii], multiyear_as_single, \
+      duration_threshold, duration_threshold_unit)
     end if
-    plots(0, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+    if (ii.eq.0) then
+      plots(0, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+    else
+      plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+      overlay(plots(0, 0), plot)
+    end if
     if (ii.eq.0) then
       res@tiMainString = "(d) La Nina duration (months)"
     else
       res@tiMainString = ""
     end if
-    if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
-      duration = la_obs[ii]@duration
-      y = avg(where(la_obs[ii]@nonoverlap, duration, duration@_FillValue))
-      delete(duration)
+    if (duration_individual) then
+      if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
+        duration = la_obs[ii]@duration
+        y = avg(where(la_obs[ii]@nonoverlap, duration, duration@_FillValue))
+        delete(duration)
+      else
+        y = avg(la_obs[ii]@duration)
+      end if
     else
-      y = avg(la_obs[ii]@duration)
+      y = duration_composite(la_obs[ii], multiyear_as_single, \
+                             duration_threshold, duration_threshold_unit)
     end if
-    plots(0, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+    if (ii.eq.0) then
+      plots(0, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+    else
+      plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+      overlay(plots(0, 1), plot)
+    end if
   end do
   
   nmodel_cmip5 = 0
@@ -976,12 +1215,17 @@ begin
     i = ind(center(0).eq.centers)
     mkres@gsMarkerColor    = get_color(el[ii])
     mkres@gsMarkerIndex    = get_markerindex(el[ii])
-    if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
-      duration = el[ii]@duration
-      y = avg(where(el[ii]@nonoverlap, duration, duration@_FillValue))
-      delete(duration)
+    if (duration_individual) then
+      if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
+        duration = el[ii]@duration
+        y = avg(where(el[ii]@nonoverlap, duration, duration@_FillValue))
+        delete(duration)
+      else
+        y = avg(el[ii]@duration)
+      end if
     else
-      y = avg(el[ii]@duration)
+      y = duration_composite(el[ii], multiyear_as_single, \
+                             duration_threshold, duration_threshold_unit)
     end if
     dummy(idummy) = gsn_add_polymarker(wks, plots(0, 0), i, y, mkres)
     idummy = idummy + 1
@@ -1011,6 +1255,7 @@ begin
         end if
       end if
     end if
+    delete(y)
   end do
   if (nmodel_cmip6.gt.2) then
     median = dim_median(el_cmip6_composited)
@@ -1028,6 +1273,7 @@ begin
     median@project = "CMIP6"
     polyres = True
     polyres@gsFillColor = get_color(median)
+    polyres@gsFillOpacityF = 1.
     dummy(idummy) = gsn_add_polygon(wks, plots(0, 0), \
                     (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
                     (/percentile25, percentile75, percentile75, percentile25/), polyres)
@@ -1059,6 +1305,7 @@ begin
     median@project = "CMIP5"
     polyres = True
     polyres@gsFillColor      = get_color(median)
+    polyres@gsFillOpacityF = 1.
     dummy(idummy) = gsn_add_polygon(wks, plots(0, 0), \
                     (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
                     (/percentile25, percentile75, percentile75, percentile25/), polyres)
@@ -1082,12 +1329,17 @@ begin
     i = ind(center(0).eq.centers)
     mkres@gsMarkerColor    = get_color(la[ii])
     mkres@gsMarkerIndex    = get_markerindex(la[ii])
-    if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
-      duration = la[ii]@duration
-      y = avg(where(la[ii]@nonoverlap, duration, duration@_FillValue))
-      delete(duration)
+    if (duration_individual) then
+      if (any(multiyear_as_single .eq. (/"always", "metric_only"/))) then
+        duration = la[ii]@duration
+        y = avg(where(la[ii]@nonoverlap, duration, duration@_FillValue))
+        delete(duration)
+      else
+        y = avg(la[ii]@duration)
+      end if
     else
-      y = avg(la[ii]@duration)
+      y = duration_composite(la[ii], multiyear_as_single, \
+                             duration_threshold, duration_threshold_unit)
     end if
     dummy(idummy) = gsn_add_polymarker(wks, plots(0, 1), i, y, mkres)
     idummy = idummy + 1
@@ -1117,6 +1369,7 @@ begin
         end if
       end if
     end if
+    delete(y)
   end do
   if (nmodel_cmip6.gt.2) then
     median = dim_median(la_cmip6_composited)
@@ -1441,6 +1694,8 @@ begin
   pres@gsnMaximize = False
 ;  pres@gsnPanelXWhiteSpacePercent = 0.2
 ;  pres@gsnPanelYWhiteSpacePercent = 8.
+  pres@gsnPanelLeft = 0.
+  pres@gsnPanelRight = 1.
   pres@gsnPanelTop = 0.63
 ;  pres@gsnPanelFigureStrings = (/ "(a) El Nino", "(b) La Nina" /)
   pres@gsnPanelFigureStringsFontHeightF = 0.012

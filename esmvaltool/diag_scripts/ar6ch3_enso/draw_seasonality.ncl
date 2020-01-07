@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200105 kosaka_yu: show shading instead of lines
 ;    20191024 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -27,13 +28,22 @@ load "$diag_scripts/shared/plot/contourplot.ncl"
 load "$diag_scripts/ar6ch3_enso/modelling_center.ncl"
 load "$diag_scripts/ar6ch3_enso/setting_mme.ncl"
 
-function expand_season(time, x)
-local y
+function expand_season(x)
+local y, dims
 begin
-  y = new(14, typeof(x))
-  y(1:12) = x
-  y(0) = (x(0)+x(11))/2.
-  y(13) = (x(0)+x(11))/2.
+  if (dimsizes(dimsizes(x)).eq.1) then
+    y = new(14, typeof(x))
+    y(1:12) = x
+    y(0)  = (x(0)+x(11))/2.
+    y(13) = (x(0)+x(11))/2.
+  elseif (dimsizes(dimsizes(x)).eq.2) then
+    dims = dimsizes(x)
+    y = new((/dims(0), 14/), typeof(x))
+    y(:, 1:12) = x
+    y(:, 0)    = (x(:, 0)+x(:, 11))/2.
+    y(:, 13)   = (x(:, 0)+x(:, 11))/2.
+    delete(dims)
+  end if
   return(y)
 end
   
@@ -250,9 +260,35 @@ begin
   nmodels_cmip6 = 0
   do i = 0, nmodels-1
     if (projects(i).eq."CMIP5") then
+      if (isvar("stdv_cmip5")) then
+        tmp = stdv_cmip5
+        delete(stdv_cmip5)
+        dims = dimsizes(tmp)
+        stdv_cmip5 = new((/dims(0)+1, dims(1)/), typeof(tmp))
+        stdv_cmip5(0:dims(0)-1, :) = tmp
+        stdv_cmip5(dims(0), :) = stdv(i, :)
+        delete(tmp)
+        delete(dims)
+      else
+        stdv_cmip5 = stdv(0:0, :)
+        stdv_cmip5(0, :) = stdv(i, :)
+      end if
       stdv_cmip5mean = stdv_cmip5mean + stdv(i, :)
       nmodels_cmip5 = nmodels_cmip5+1
     elseif (projects(i).eq."CMIP6") then
+      if (isvar("stdv_cmip6")) then
+        tmp = stdv_cmip6
+        delete(stdv_cmip6)
+        dims = dimsizes(tmp)
+        stdv_cmip6 = new((/dims(0)+1, dims(1)/), typeof(tmp))
+        stdv_cmip6(0:dims(0)-1, :) = tmp
+        stdv_cmip6(dims(0), :) = stdv(i, :)
+        delete(tmp)
+        delete(dims)
+      else
+        stdv_cmip6 = stdv(0:0, :)
+        stdv_cmip6(0, :) = stdv(i, :)
+      end if
       stdv_cmip6mean = stdv_cmip6mean + stdv(i, :)
       nmodels_cmip6 = nmodels_cmip6+1
     end if
@@ -304,7 +340,7 @@ begin
 
   txres = True
   txres@txFontHeightF = 0.012
-  txres@txJust = "topleft"
+  txres@txJust = "centerleft"
 
   rests@xyLineThicknessF = 0.01
   rests@tiMainFontHeightF = 0.02
@@ -316,44 +352,46 @@ begin
   rests@xyDashPattern = 0
   rests@xyLineThicknessF = 0.25
 ;  if (add_shading) then
-;    res_cmip = True
-;    res_cmip@dataset = "CMIP5"
-;    resp@gsFillColor = get_color(res_cmip)
-;    resp@gsFillOpacityF = 0.2
-;    dummy(idummy) = gsn_add_polygon(wks, ENSOPlot, \
-;                                    monthpoly, make_poly(mean, stdv), resp)
-;    idummy = idummy + 1
-;    res_cmip@dataset = "CMIP6"
-;    resp@gsFillColor = get_color(res_cmip)
-;    dummy(idummy) = gsn_add_polygon(wks, ENSOPlot, \
-;                                    monthpoly, make_poly(mean, stdv), resp)
-;    idummy = idummy + 1
+    res_cmip = True
+    res_cmip@dataset = "CMIP5"
+    res_cmip@project = "CMIP5"
+    resp@gsFillColor = get_color(res_cmip)
+    resp@gsFillOpacityF = 0.2
+    dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, \
+                                    monthpoly, make_poly(expand_season(stdv_cmip5)), resp)
+    idummy = idummy + 1
+    res_cmip@dataset = "CMIP6"
+    res_cmip@project = "CMIP6"
+    resp@gsFillColor = get_color(res_cmip)
+    dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, \
+                                    monthpoly, make_poly(expand_season(stdv_cmip6)), resp)
+    idummy = idummy + 1
 ; end if
 
-  res_cmip = True
-  do i = 0, nmodels-1
-    res_cmip@dataset = models(i)
-    res_cmip@project = projects(i)
-    rests@xyLineColor = get_color(res_cmip)
-    rests@xyDashPattern =  get_lineindex(res_cmip)
-    rests@xyLineThicknessF = 0.5
-    rests@xyLineOpacityF = 0.5
-    plot = gsn_csm_xy(wks, month, expand_season(month, stdv(i, :)), rests)
-    overlay(seasonality_plot, plot)
-  end do
+;  res_cmip = True
+;  do i = 0, nmodels-1
+;    res_cmip@dataset = models(i)
+;    res_cmip@project = projects(i)
+;    rests@xyLineColor = get_color(res_cmip)
+;    rests@xyDashPattern =  get_lineindex(res_cmip)
+;    rests@xyLineThicknessF = 0.5
+;    rests@xyLineOpacityF = 0.5
+;    plot = gsn_csm_xy(wks, month, expand_season(stdv(i, :)), rests)
+;    overlay(seasonality_plot, plot)
+;  end do
 
   res_cmip@project = "CMIP6"
   rests@xyLineColor = get_color(res_cmip)
   rests@xyDashPattern =  get_lineindex(res_cmip)
   rests@xyLineThicknessF = 3.
   rests@xyLineOpacityF = 1.
-  plot = gsn_csm_xy(wks, month, expand_season(month, stdv_cmip6mean), rests)
+  plot = gsn_csm_xy(wks, month, expand_season(stdv_cmip6mean), rests)
   overlay(seasonality_plot, plot)
   res_cmip@project = "CMIP5"
   rests@xyLineColor = get_color(res_cmip)
   rests@xyDashPattern =  get_lineindex(res_cmip)
   rests@xyLineThicknessF = 3.
-  plot = gsn_csm_xy(wks, month, expand_season(month, stdv_cmip5mean), rests)
+  plot = gsn_csm_xy(wks, month, expand_season(stdv_cmip5mean), rests)
   overlay(seasonality_plot, plot)
 
   res_obs = True
@@ -362,29 +400,51 @@ begin
     res_obs@dataset = obs(i)
     rests@xyLineColor = get_color(res_obs)
     rests@xyDashPattern =  get_lineindex(res_obs)
-    rests@xyLineThicknessF = 3.
-    plot = gsn_csm_xy(wks, month, expand_season(month, stdv_obs(i, :)), rests)
+    rests@xyLineThicknessF = 1.5
+    plot = gsn_csm_xy(wks, month, expand_season(stdv_obs(i, :)), rests)
     overlay(seasonality_plot, plot)
 
     lres = True
     lres@gsLineColor = rests@xyLineColor
     lres@gsLineDashPattern = rests@xyDashPattern
     lres@gsLineThicknessF = rests@xyLineThicknessF
-    dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/1.+i*3.4, 1+i*3.4+0.5/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
+    dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/1.+i*3., 1+i*3.+0.8/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
     idummy = idummy + 1    
     txres@txFontColor = get_color(res_obs)
-    txres@txFontColor = get_color(res_obs)
-    dummy(idummy) = gsn_add_text(wks, seasonality_plot, obs(i), 1.+i*3.4+0.6, rests@trYMaxF-0.06, txres)
+    dummy(idummy) = gsn_add_text(wks, seasonality_plot, obs(i), 1.+i*3.+0.9, rests@trYMaxF-0.1, txres)
     idummy = idummy + 1    
   end do
   
   res_cmip@project = "CMIP6"
+  x = 4.2+3.*(nobs-1)
+  resp@gsLineOpacityF = 0.2
+  resp@gsFillColor := get_color(res_cmip)
+  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, (/x, x, x+0.9, x+0.9/), \
+                                  (/rests@trYMaxF-0.03, rests@trYMaxF-0.17, rests@trYMaxF-0.17, rests@trYMaxF-0.03/), resp)
+  idummy = idummy + 1
+  lres@gsLineColor = get_color(res_cmip)
+  lres@gsLineDashPattern = get_lineindex(res_cmip)
+  lres@gsLineThicknessF = 3.
+  dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/x, x+0.9/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
+  idummy = idummy + 1
+
   txres@txFontColor = get_color(res_cmip)
-  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP6", 4.2+2.8*(nobs-1), rests@trYMaxF-0.06, txres)
+  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP6", x+1., rests@trYMaxF-0.1, txres)
   idummy = idummy + 1
   res_cmip@project = "CMIP5"
+  x = 7.+3.*(nobs-1)
+  resp@gsLineOpacityF = 0.2
+  resp@gsFillColor := get_color(res_cmip)
+  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, (/x, x, x+0.9, x+0.9/), \
+                                  (/rests@trYMaxF-0.03, rests@trYMaxF-0.17, rests@trYMaxF-0.17, rests@trYMaxF-0.03/), resp)
+  idummy = idummy + 1
+  lres@gsLineColor = get_color(res_cmip)
+  lres@gsLineDashPattern = get_lineindex(res_cmip)
+  lres@gsLineThicknessF = 3.
+  dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/x, x+0.9/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
+  idummy = idummy + 1
   txres@txFontColor = get_color(res_cmip)
-  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP5", 7.+2.8*(nobs-1), rests@trYMaxF-0.06, txres)
+  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP5", x+1., rests@trYMaxF-0.1, txres)
   idummy = idummy + 1
   
   pres = True
@@ -445,24 +505,24 @@ begin
   res@gsnFrame = False
   res@trXMinF = col(0) - 0.5
   res@trXMaxF = col(ncols-1) + 0.5
-  res@vpWidthF = 0.6; 0.4
+  res@vpWidthF = 0.5; 0.4
   res@vpHeightF = 0.2 ;0.15
   res@tmXTOn = False
   res@tmXMajorGrid = True
   res@tmYMajorGrid = True
-  res@tmXMajorGridLineDashPattern = 11
-  res@tmYMajorGridLineDashPattern = 11
+  res@tmXMajorGridLineDashPattern = 0 ;11
+  res@tmYMajorGridLineDashPattern = 0 ;11
   res@tmXMajorGridLineColor = "grey"
   res@tmYMajorGridLineColor = "grey"
   res@tmXMajorGridThicknessF = 0.005
-  res@tmYMajorGridThicknessF = 0.005
+  res@tmYMajorGridThicknessF = 0. ;0.005
 
   res@tmXBMode = "Explicit"
   res@tmXBValues = col
   res@tmXBLabels = names
-  res@tmXBLabelAngleF = 45.
+  res@tmXBLabelAngleF = 60. ;45.
   res@tmXBLabelJust = "CenterRight"
-  res@tmXBLabelFontHeightF = 0.014
+  res@tmXBLabelFontHeightF = 0.01
 
   mkres = True
   mkres@gsMarkerThicknessF = 2.0

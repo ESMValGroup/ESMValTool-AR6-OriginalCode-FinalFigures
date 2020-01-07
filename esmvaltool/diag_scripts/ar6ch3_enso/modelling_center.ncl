@@ -52,9 +52,13 @@ begin
     center = "CAS"
   elseif (model.eq."CESM2") then
     center = "NCAR"
+  elseif (model.eq."CESM2-FV2") then
+    center = "NCAR"
   elseif (model.eq."CESM2-SE") then
     center = "NCAR"
   elseif (model.eq."CESM2-WACCM") then
+    center = "NCAR"
+  elseif (model.eq."CESM2-WACCM-FV2") then
     center = "NCAR"
   elseif (model.eq."CIESM") then
     center = "THU"
@@ -81,6 +85,8 @@ begin
   elseif (model.eq."CSIRO-Mk3L-1-3") then
     center = "UTAS"
   elseif (model.eq."E3SM-1-0") then
+    center = "E3SM-Project"
+  elseif (model.eq."E3SM-1-1") then
     center = "E3SM-Project"
   elseif (model.eq."EC-Earth3-AerChem") then
     center = "EC-Earth-Consortium"

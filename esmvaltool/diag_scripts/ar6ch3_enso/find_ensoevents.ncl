@@ -88,8 +88,9 @@ begin
     
     ; Pick up ENSO event
     idx   = Nino({syear*100+target_month:eyear*100+target_month:12})
+    stdv_idx = stddev(idx)
     if (threshold_unit.eq."stdv") then
-      idx = idx / stddev(idx)
+      idx = idx / stdv_idx
     end if
     idx_el = ind(idx.gt.abs(threshold))
     idx_la = ind(idx.lt.-abs(threshold))
@@ -124,7 +125,7 @@ begin
       do n = 0, nmax
         if (name.eq."El Nino") then
           yr = years_el(n)
-        else
+           else
           yr = years_la(n)
         end if
         ENSOidx = new((/12*(annual_lags(1)-annual_lags(0)+1)+1/), typeof(Nino), Nino@_FillValue)
@@ -164,7 +165,8 @@ begin
         ENSOidx@year = yr
         ENSOidx@reference_month = target_month
         ENSOidx@long_name = "ENSO index time series for selected "+name+" event"        
-
+        ENSOidx@stdv_ref = stdv_idx
+        
         if (any(Nino@project.eq.obs_projects)) then
           nc_filename = work_dir+head+"_"+Nino@dataset+"_"+sprinti("%0.3i", n)+".nc"
         else

@@ -57,9 +57,9 @@ begin
     error_msg("f", DIAG_SCRIPT, "", "variable "+var+" is missing.")
   end if
   iVarTs = ind(varList.eq.var)
-  if (isatt(variable_info[iVarTs], "reference_dataset")) then
-    refname = variable_info[iVarTs]@reference_dataset
-  end if
+;  if (isatt(variable_info[iVarTs], "reference_dataset")) then
+;    refname = variable_info[iVarTs]@reference_dataset
+;  end if
 
  ; ========================================================================
   
@@ -157,9 +157,14 @@ begin
     f = addfile(infoTs[ii]@filename, "r")
     if (isfilevar(f, "lat_bnds")) then
       lat_bnds = f->lat_bnds
-    else
+    end if
+    ysize = dimsizes(ts&lat)
+    if (.not.isvar("lat_bnds") .or. any(abs(lat_bnds(1:ysize-1, 0)-lat_bnds(0:ysize-2, 1)).gt.0.01)) then
+      print(infoTs[ii]@dataset+" : Creating lat_bnds")
       lat = ts&lat
-      ysize = dimsizes(lat)
+      if (isvar("lat_bnds")) then
+        delete(lat_bnds)
+      end if
       lat_bnds = new((/ysize, 2/), typeof(ts&lat))
       lat_bnds(1:ysize-1, 0) = (lat(0:ysize-2) + lat(1:ysize-1))/2.
       lat_bnds(0:ysize-2, 1) = (lat(0:ysize-2) + lat(1:ysize-1))/2.
@@ -168,11 +173,17 @@ begin
       delete(lat)
 ;      print(lat_bnds)
     end if
+
     if (isfilevar(f, "lon_bnds")) then
       lon_bnds = f->lon_bnds
-    else
+    end if
+    xsize = dimsizes(ts&lon)
+    if (.not.isvar("lon_bnds") .or. any(abs(lon_bnds(1:xsize-1, 0)-lon_bnds(0:xsize-2, 1)).gt.0.01)) then
+      print(infoTs[ii]@dataset+" : Creating lon_bnds")
       lon = ts&lon
-      xsize = dimsizes(lon)
+      if (isvar("lon_bnds")) then
+        delete(lon_bnds)
+      end if
       lon_bnds = new((/xsize, 2/), typeof(ts&lon))
       lon_bnds(1:xsize-1, 0) = (lon(0:xsize-2) + lon(1:xsize-1))/2.
       lon_bnds(0:xsize-2, 1) = (lon(0:xsize-2) + lon(1:xsize-1))/2.
@@ -182,7 +193,7 @@ begin
 ;      print(lon_bnds)
     end if
     delete(f)
-    
+
     time = cd_calendar(ts&time, -1)
     ts&time = time
     syear_data = time(0)/100
@@ -193,7 +204,7 @@ begin
       ts@_FillValue = default_fillvalue(typeof(ts))
     end if
     delete(time)
-    
+
     if (isvar("syear_save")) then
       syear = syear_save
     else
@@ -218,7 +229,8 @@ begin
     if (detrend) then
       do mon = 1, 12
 ;        trend = ts({syear*100+mon:eyear*100+mon:12}, :, :)
-        trend = dtrend_leftdim(ts({syear*100+mon:eyear*100+mon:12}, :, :), True)
+;        trend = dtrend_leftdim(ts({syear*100+mon:eyear*100+mon:12}, :, :), True)
+        trend = dtrend_n(ts({syear*100+mon:eyear*100+mon:12}, :, :), True, 0)
         syr = syear
         eyr = eyear
         if (smonth_data.gt.mon) then
@@ -287,7 +299,7 @@ begin
     Nino@project = infoTs[ii]@project
     Nino@dataset = infoTs[ii]@dataset
     Nino@esize = esize
-    Nino@reference_dataset = infoTs[ii]@reference_dataset
+;    Nino@reference_dataset = infoTs[ii]@reference_dataset
     Nino@long_name = "ENSO index time series"
 
     if (any(infoTs[ii]@project.eq.(/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/))) then
@@ -297,6 +309,8 @@ begin
       Nino@ensemble = infoTs[ii]@ensemble
     end if
     nc_outfile = ncdf_write(Nino, nc_filename)
+
+    delete(Nino)
   end do
     
   leave_msg(DIAG_SCRIPT, "")
