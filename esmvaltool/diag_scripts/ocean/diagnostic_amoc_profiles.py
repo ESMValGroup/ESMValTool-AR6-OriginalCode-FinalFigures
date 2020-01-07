@@ -56,9 +56,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import json
 
-
 from scipy.stats import linregress
-
+import cf_units
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
@@ -342,6 +341,14 @@ def load_cube(filename, metadata):
     print('load_cube',cube.data.shape, cube.units)
     cube = diagtools.bgc_units(cube, metadata['short_name'])
     print('load_cube', cube.data.shape, cube.units)
+    depth = cube.coord('depth')
+    if str(depth.units) == 'centimeters':
+        print('Bad depth units:',depth.units)
+        depth.units = cf_units.Unit('m')
+        depth.points = depth.points/100.
+        if depth.bounds[0,1] < depth.points[0]:
+            depth.bounds = depth.bounds/100.
+        print('fixed units:', cube.coord('depth'))
     return cube
 
 
@@ -391,6 +398,9 @@ def make_mean_of_cube_list(cube_list):
     for i, cube in enumerate(cube_list):
         print('regridding vertical' ) #cube.coord(axis='Z'))
         cube = extract_levels(cube, levels, 'linear_horizontal_extrapolate_vertical')
+        print('post_regrid:',cube.data.max())
+        cube.data = np.ma.masked_where(cube.data > 100000., cube.data)
+        print('post_regrid (masked):',cube.data.max())
         cube_list[i] = cube
         #rint(depth in cube.coord('depth').points)
 
@@ -426,7 +436,6 @@ def make_mean_of_cube_list(cube_list):
     cube_mean = cube_mean/ float(len(cube_list))
     cube.data = cube_mean
     return cube
-
 
 
 def make_pane_a(
@@ -490,13 +499,15 @@ def make_pane_a(
         print(dataset, short_name)
         cube = load_cube(filename, metadatas[filename])
         cube = get_26North(cube)
-        print('post get_26North:', cube.shape)
+         
+        print('post get_26North:', cube.shape, cube.data.max(), cube.units)
         if len(cube.coords('time')) and len(cube.coord('time').points) >1 :
             cubes[dataset] = climate_statistics(cube, operator='mean',
                                                 period='full')
         else:
             cubes[dataset] = cube
         projects[project].append(cube)
+
     cmap = plt.cm.get_cmap('jet')
 
     #####
@@ -1108,7 +1119,6 @@ def main(cfg):
     make_figure(cfg, timeseries= False)
     make_amoc_trends(cfg, savefig=True)
 
-    return
     make_pane_a(cfg)
     #make_pane_a(cfg)
 
