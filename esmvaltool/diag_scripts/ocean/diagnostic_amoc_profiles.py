@@ -907,6 +907,8 @@ def make_amoc_trends(
     axes=None,
     ):
     #cfg = {'auxiliary_data_dir': '/users/modellers/ledm/workspace/ESMValTool_AR6/run/auxiliary_data'}
+    # Data downloaded from: https://github.com/mattofficeuk/AR6/tree/master/JSON_data
+    # Data produced by Matt Menary outside of ESMValTool. 
     preprocesed_filename = cfg['auxiliary_data_dir']+"/Figure_AR6_DAMIP_AMOC_26N_1000m.json"
     #
     data_str = open(preprocesed_filename, 'r').read()
