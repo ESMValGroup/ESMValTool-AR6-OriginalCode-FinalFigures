@@ -868,8 +868,8 @@ def make_pane_bc(
         plt.title('(b) Distribution of 8 year AMOC trends')
         plt.axhline(-0.53, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
         plt.ylabel('Sv yr'+r'$^{-1}$')
-        if not savefig:
-            plt.setp( ax.get_xticklabels(), visible=False)
+        #if not savefig:
+        #    plt.setp( ax.get_xticklabels(), visible=False)
 
     if pane == 'c':
         plt.title('(c) Distribution of interannual AMOC changes')
@@ -1009,8 +1009,8 @@ def make_amoc_trends(
             ax = subplot
         print(time_range, subplot)
         ax.set_ylim([-0.55,0.5])
-        if time_ranges_panes[time_range] == '(d)':
-           ax.set_ylabel('Sv yr'+r'$^{-1}$')
+        #if time_ranges_panes[time_range] == '(d)':
+        ax.set_ylabel('Sv yr'+r'$^{-1}$')
 
 
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
