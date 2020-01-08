@@ -499,7 +499,7 @@ def make_pane_a(
         print(dataset, short_name)
         cube = load_cube(filename, metadatas[filename])
         cube = get_26North(cube)
-         
+
         print('post get_26North:', cube.shape, cube.data.max(), cube.units)
         if len(cube.coords('time')) and len(cube.coord('time').points) >1 :
             cubes[dataset] = climate_statistics(cube, operator='mean',
@@ -705,6 +705,7 @@ def make_pane_bc(
         ax=None,
         timeseries = False,
         time_res="April-March",
+        decadal = True
 ):
     """
     Make a box and whiskers plot for panes b and c.
@@ -766,6 +767,8 @@ def make_pane_bc(
             #cube = get_max_amoc(cube)
             #cube = cube.aggregated_by('year', iris.analysis.MEAN)
             new_times, slopes, intercepts = calculate_basic_trend(cube)
+            if decadal:
+                slopes = slopes *10.
             trends[dataset] = slopes
             #trends[dataset] = calculate_trend(cube)
         if pane == 'c':
@@ -802,6 +805,8 @@ def make_pane_bc(
         if pane == 'b':
             #obs_cube = get_max_amoc(obs_cube)
             new_times, slopes, intercepts = calculate_basic_trend(obs_cube)
+            if decadal:
+                slopes = slopes *10.
             trends[obs_dataset] = slopes
         if pane == 'c':
             #obs_cube = get_max_amoc(obs_cube)
@@ -867,7 +872,10 @@ def make_pane_bc(
     if pane == 'b':
         plt.title('(b) Distribution of 8 year AMOC trends')
         plt.axhline(-0.53, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
-        plt.ylabel('Sv yr'+r'$^{-1}$')
+        if decadal:
+            ax.set_ylabel('Sv/decade')
+        else:
+            plt.ylabel('Sv yr'+r'$^{-1}$')
         #if not savefig:
         #    plt.setp( ax.get_xticklabels(), visible=False)
 
@@ -906,10 +914,11 @@ def make_amoc_trends(
     panes = [],
     fig=None,
     axes=None,
+    decadal=True
     ):
     #cfg = {'auxiliary_data_dir': '/users/modellers/ledm/workspace/ESMValTool_AR6/run/auxiliary_data'}
     # Data downloaded from: https://github.com/mattofficeuk/AR6/tree/master/JSON_data
-    # Data produced by Matt Menary outside of ESMValTool. 
+    # Data produced by Matt Menary outside of ESMValTool.
     preprocesed_filename = cfg['auxiliary_data_dir']+"/Figure_AR6_DAMIP_AMOC_26N_1000m.json"
     #
     data_str = open(preprocesed_filename, 'r').read()
@@ -977,6 +986,8 @@ def make_amoc_trends(
                 #        assert 0
                     new_times, slopes, intercepts = calculate_basic_trend_arr(years2014, dat)
                     #print(model,experiment,'ensemble:', ens, ', mean slope:', slopes.mean())
+                    if decadal:
+                        slopes = slopes*10.
                     trends[experiment][time_range].extend( slopes)
 
                 #kwargs = dict(histtype='stepfilled', alpha=0.3, normed=True, bins=40)
@@ -1035,12 +1046,20 @@ def make_amoc_trends(
         else:
             ax = subplot
         print(time_range, subplot)
-        ax.set_ylim([-0.55,0.5])
-        #if time_ranges_panes[time_range] == '(d)':
-        ax.set_ylabel('Sv yr'+r'$^{-1}$')
 
+        #if time_ranges_panes[time_range] == '(d)':
+        if decadal:
+            ax.set_ylabel('Sv/decade')
+            ax.set_ylim([-5.5,5.])
+            ax.yaxis.set_ticks([-5,-2.5, 0., 2.5, 5.])
+        else:
+            ax.set_ylabel('Sv yr'+r'$^{-1}$')
+            ax.set_ylim([-0.55,0.5])
+            ax.yaxis.set_ticks([-0.5,-0.25, 0., 0.25, 0.5])
 
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
+        box_colours =  {'GHG': 'red', 'NAT':'green', 'AER':'blue', 'HIST':'purple'}
+
         box_data = [trends[experiment][time_range] for experiment in box_order]
         ax.axhline(0., ls='--', color='k', lw=0.5)
         box = ax.boxplot(box_data,
@@ -1056,6 +1075,9 @@ def make_amoc_trends(
         # plt.setp(box['fliers'], markersize=1.0)
         print(time_range, time_ranges_panes[time_range])
         ax.set_title(' '.join([time_ranges_panes[time_range], time_range]))
+
+        for box_label, patch in zip(box_order,box['boxes']):
+            patch.set_facecolor(box_colours[box_label])
 
     if not savefig:
         return fig, axes
