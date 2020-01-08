@@ -778,7 +778,8 @@ def make_pane_bc(
 
     #####
     # Add observational data.
-    add_obs = True
+    add_obs = False
+    obs_filename=''
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
         # Downloaded 15/3/2019
@@ -808,7 +809,7 @@ def make_pane_bc(
 
     #####
     # calculate the number of models
-    model_numbers, number_models, projects_numbers= count_models(metadatas, obs_filename)
+    model_numbers, number_models, projects_numbers = count_models(metadatas, obs_filename)
 
     ####
     # Add project datasets
@@ -828,8 +829,8 @@ def make_pane_bc(
         if project == 'CMIP6':
             box_order.extend(sorted(datasets))
     #assert 0
-
-    box_order.append(obs_dataset)
+    if add_obs:
+        box_order.append(obs_dataset)
 
     if timeseries:
         # Draw the trend/variability as a time series
@@ -1008,6 +1009,9 @@ def make_amoc_trends(
             ax = subplot
         print(time_range, subplot)
         ax.set_ylim([-0.55,0.5])
+        if time_ranges_panes[time_range] == '(d)':
+           ax.set_ylabel('Sv yr'+r'$^{-1}$')
+
 
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
         box_data = [trends[experiment][time_range] for experiment in box_order]
