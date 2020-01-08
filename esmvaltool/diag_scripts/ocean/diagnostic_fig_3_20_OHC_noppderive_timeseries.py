@@ -19,6 +19,8 @@ import numpy as np
 import cf_units
 import datetime
 from scipy.stats import linregress
+from scipy.io import loadmat
+
 from dask import array as da
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
@@ -221,6 +223,14 @@ def zero_around(cube, year_initial=1971., year_final=1971.):
     mean = new_cube.data.mean()
     cube.data = cube.data - mean
     return cube
+
+
+def zero_around_dat(times, data, year=1971.):
+    """
+    Zero around the time range provided.
+    """
+    index = np.argmin(np.abs(np.array(times) - year))
+    return data - np.ma.mean(data[index-1:index+2])
 
 
 def detrend(cfg, metadata, cube, pi_cube, method = 'linear regression'):
@@ -441,6 +451,8 @@ def make_fig_3_20(
     obs_cube = ''
     obs_key = ''
     obs_filename = ''
+    matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
+    matdata = loadmat(matfile)
 
     #####
     # calculate the projects
@@ -456,7 +468,7 @@ def make_fig_3_20(
     project_cubes = {project:[] for project in projects}
 
     # Plot each file in the group
-    project_colours={'CMIP3': 'blue', 'CMIP5':'black', 'CMIP6':'green'}
+    project_colours={'CMIP3': 'blue', 'CMIP5':'purple', 'CMIP6':'green', 'obs': 'black'}
 
     for index, filename in enumerate(sorted(metadatas)):
         if metadatas[filename]['variable_group'] not in variable_groups:
@@ -535,6 +547,50 @@ def make_fig_3_20(
         logger.info('Saving project cubes to %s', output_cube)
         iris.save(cube, output_cube)
 
+
+    # Add observations
+    add_obs = True
+    if add_obs:
+        matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
+        matdata = loadmat(matfile)
+        # depths = matdata['dep']
+        depths = ['0-300 m', '0-700 m','700-2000 m','>2000 m','Full-depth']
+        obs_years = matdata['time_yr'][0] + 0.5
+        hc_data = matdata['hc_global']
+
+        def strip_name(array): return str(array[0][0]).strip(' ')
+        def zetta_to_joules(dat): return dat * 1.E21
+
+        hc_global = {}
+        for z, depth in enumerate(depths):
+            hc_global[depth] = {}
+            for ii, array in enumerate(matdata['hc_yr_fname']):
+                name = strip_name(array)
+                series = hc_data[ii,z,:]
+                series = np.ma.masked_invalid(series)
+                series = zero_around_dat(obs_years, series)
+                series = zetta_to_joules(series)
+                hc_global[depth][name] = series
+
+        if variable_group == 'ohcgt':
+            obs_series = hc_global['Full-depth']['Domingues+Ishii+Purkey (Full)']
+        if variable_group == 'ohc700':
+            obs_series = hc_global['0-700 m']['Domingues+Ishii+Purkey (Full)']
+
+        project = 'obs'
+        plot_details[project] = {
+            'c': project_colours[project],
+            'ls': '-',
+            'lw': 2.,
+            'label': 'Observations',
+            }
+        #print(obs_series)
+        plt.plot(obs_years,
+                 obs_series,
+                 c = plot_details['obs']['c'],
+                 lw = plot_details['obs']['lw'],
+                 ls = plot_details['obs']['ls'],
+                 )
 
     # Draw horizontal line at zero
     plt.axhline(0., c='k', ls='--', lw=0.5)
