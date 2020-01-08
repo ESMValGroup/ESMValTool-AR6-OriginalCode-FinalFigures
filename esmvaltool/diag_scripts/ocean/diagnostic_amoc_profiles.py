@@ -781,7 +781,7 @@ def make_pane_bc(
 
     #####
     # Add observational data.
-    add_obs = False
+    add_obs = True
     obs_filename=''
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
@@ -808,9 +808,14 @@ def make_pane_bc(
             if decadal:
                 slopes = slopes *10.
             trends[obs_dataset] = slopes
+            for nt, osd,slope in zip(new_times, obs_cube.data, slopes):
+                print(nt,osd,slope)
+
         if pane == 'c':
             #obs_cube = get_max_amoc(obs_cube)
             trends[obs_dataset] = calculate_interannual(obs_cube)
+        #assert 0 
+        
 
     #####
     # calculate the number of models
@@ -871,10 +876,11 @@ def make_pane_bc(
     # pane specific stuff
     if pane == 'b':
         plt.title('(b) Distribution of 8 year AMOC trends')
-        plt.axhline(-0.53, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
         if decadal:
             ax.set_ylabel('Sv/decade')
+            plt.axhline(-5.3, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
         else:
+            plt.axhline(-0.53, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
             plt.ylabel('Sv yr'+r'$^{-1}$')
         #if not savefig:
         #    plt.setp( ax.get_xticklabels(), visible=False)
@@ -1069,6 +1075,7 @@ def make_amoc_trends(
                          showmeans= False,
                          meanline = False,
                          showfliers = False,
+                         patch_artist=True, 
                          labels = box_order) #sorted(trends.keys()))
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
         # plt.xticks(rotation=30, ha="right", fontsize=8)
@@ -1078,6 +1085,11 @@ def make_amoc_trends(
 
         for box_label, patch in zip(box_order,box['boxes']):
             patch.set_facecolor(box_colours[box_label])
+
+        for element in ['medians',]: #'whiskers', 'fliers', 'means', 'medians', 'caps']:
+            plt.setp(box[element], color='black', lw=1.5)
+
+
 
     if not savefig:
         return fig, axes
@@ -1170,10 +1182,9 @@ def main(cfg):
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='b')
     # make_timeseriespane_bc(cfg, pane='c')
-
+    make_figure(cfg, timeseries= False)
     make_amoc_trends(cfg, savefig=True)
 
-    make_figure(cfg, timeseries= False)
 
     make_pane_a(cfg)
     #make_pane_a(cfg)
