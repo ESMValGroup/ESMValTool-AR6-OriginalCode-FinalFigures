@@ -992,6 +992,33 @@ def make_amoc_trends(
         time_ranges_panes = {'1850-2014': '(d)', '1940-1985': '(e)',  '1985-2014': '(f)', }
         # time_ranges_subplot = {'1850-2014': axes[0], '1940-1985': axes[1],  '1985-2014': axes[2], }
 
+    # make Table data:
+    for calc in ['mean',  'min',  5, 25, 'median', 75, 95, 'max',]:
+        print('\n\nTime range, \t', end = '')
+        box_order =  ['GHG', 'NAT', 'AER', 'HIST']
+        for experiment in box_order:
+            if type(calc) == type(5):
+                print('pc'+str(calc)+ ' '+experiment,',\t', end='')
+            else:
+                print(calc+ ' '+experiment,',\t', end='')
+
+        for time_range, subplot in time_ranges_subplot.items():
+            print('\n', time_range, ',\t', end='')
+            for experiment in box_order:
+                data = trends[experiment][time_range]
+                if calc == 'mean':
+                    print(round(np.mean(data), 4), ',\t', end='')
+                if calc == 'median':
+                    print(round(np.median(data), 4), ',\t', end='')
+                if calc == 'min':
+                    print(round(np.min(data), 4), ',\t', end='')
+                if calc == 'max':
+                    print(round(np.max(data), 4), ',\t', end='')
+                if type(calc) == type(5):
+                    print(round(np.percentile(data, calc), 4), ',\t', end='')
+    print('\n\n')
+
+
     for time_range, subplot in time_ranges_subplot.items(): #['1850-2014', '1940-1985', '1985-2014']:
         # fig = plt.figure()
         # for experiment in ['GHG', 'NAT', 'AER', 'HIST']:
@@ -1087,7 +1114,7 @@ def  make_figure(cfg, debug=False, timeseries=False):
     axc = plt.subplot2grid((3,3), (1,1), colspan=2, rowspan=1)
     fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
     #fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
-    
+
     #plt.subplots_adjust(bottom=0.15, wspace=0.2, hspace=0.4)
     plt.tight_layout()
     # Load image format extention and path
@@ -1122,8 +1149,9 @@ def main(cfg):
     # make_timeseriespane_bc(cfg, pane='b')
     # make_timeseriespane_bc(cfg, pane='c')
 
-    make_figure(cfg, timeseries= False)
     make_amoc_trends(cfg, savefig=True)
+
+    make_figure(cfg, timeseries= False)
 
     make_pane_a(cfg)
     #make_pane_a(cfg)
