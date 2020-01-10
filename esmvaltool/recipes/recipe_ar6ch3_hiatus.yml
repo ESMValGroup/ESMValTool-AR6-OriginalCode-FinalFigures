@@ -461,7 +461,6 @@ tas_all: &tas_all
   #- {project: CMIP6, dataset: CESM2, ensemble: r8i1p1f1, grid: gn, exp: historical, end_year: 2014} #preprocessor failure for siconc(a)
   #- {project: CMIP6, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: CESM2, ensemble: r10i1p1f1, grid: gn, exp: historical, end_year: 2014} #preprocessor failure for siconc(a)
-  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r10i1p1f2, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r3i1p1f2, grid: gr, exp: historical, end_year: 2014}
@@ -471,6 +470,7 @@ tas_all: &tas_all
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r7i1p1f2, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r8i1p1f2, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r10i1p1f2, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r2i1p1f2, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r3i1p1f2, grid: gr, exp: historical, end_year: 2014}
@@ -514,13 +514,14 @@ tas_all: &tas_all
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tos
   #- {project: CMIP6, dataset: E3SM-1-0, ensemble: r3i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tos
-  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014} #siconc falied concatanation with ssp245
+  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014} #concatenation failure in tos with ssp245
   #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r2i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tas
   #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r3i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tas
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, exp: [historical, ssp245]}
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r2i1p1f1, grid: gr, exp: historical, end_year: 2014} #no 2008-2014 data in tas
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r22i1p1f1, grid: gr, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gr, exp: historical, end_year: 2014} #no 2008-2014 data in tos
+  #- {project: CMIP6, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, exp: [historical, ssp245]} #siconc preprocessor failure
   #- {project: CMIP6, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} #preprocessor failure
   #- {project: CMIP6, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} #siconc preprocessor failure
   - {project: CMIP6, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -560,6 +561,10 @@ tas_all: &tas_all
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
+  - {project: CMIP6, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1, exp: historical, end_year: 2014} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r3i1p1f1, grid: gr1, exp: historical, end_year: 2014} ###################################################
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014} # siconc failed to concatenate with ssp245
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, grid: gr, exp: historical, end_year: 2014} # failed to concatenate with ssp245
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, grid: gr, exp: historical, end_year: 2014}
@@ -606,18 +611,29 @@ tas_all: &tas_all
   - {project: CMIP6, dataset: MIROC6, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MIROC6, ensemble: r10i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]}
-  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r5i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r6i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r7i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r8i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} ###############################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r3i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r4i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r5i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r6i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r7i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r8i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r9i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r10i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r2i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r3i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r4i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: NESM3, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} # concatenation failure with ssp245; metadata fix failure
+  - {project: CMIP6, dataset: NESM3, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} ##############################################################
   - {project: CMIP6, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -861,13 +877,14 @@ tos_all: &tos_all
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tos
   #- {project: CMIP6, dataset: E3SM-1-0, ensemble: r3i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tos
-  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} #concatanation failure with ssp245
+  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} #concatenation failure with ssp245
   #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} #no tas
   #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r3i1p1f1, grid: gn, exp: historical, end_year: 2014} #no tas
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} 
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} #no 2008-2014 data in tas
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r22i1p1f1, grid: gn, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gn, exp: historical, end_year: 2014} #no 2008-2014 data in tos
+  #- {project: CMIP6, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #siconc preprocessor failure
   #- {project: CMIP6, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr, exp: [historical, ssp245]} #siconc preprocessor failure
   #- {project: CMIP6, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #siconc preprocessor failure
   - {project: CMIP6, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -907,6 +924,10 @@ tos_all: &tos_all
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
+  - {project: CMIP6, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1, exp: historical, end_year: 2014} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r3i1p1f1, grid: gr1, exp: historical, end_year: 2014} ###################################################
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} # siconc failed to concatenate with ssp245
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} # failed to concatenate with ssp245
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -953,18 +974,29 @@ tos_all: &tos_all
   - {project: CMIP6, dataset: MIROC6, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MIROC6, ensemble: r10i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]}
-  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r5i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r6i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r7i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r8i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} ###############################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r3i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r4i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r5i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r6i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r7i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r8i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r9i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r10i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r2i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r3i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r4i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: NESM3, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} # concatenation failure with ssp245; metadata fix failure
+  - {project: CMIP6, dataset: NESM3, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} ##############################################################
   - {project: CMIP6, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -1210,13 +1242,14 @@ siconc_all: &siconc_all
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tos
   #- {project: CMIP6, dataset: E3SM-1-0, ensemble: r3i1p1f1, grid: gr, exp: historical, end_year: 2014} #no tos
-  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} #concatanation failure with ssp245
+  #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} #concatanation failure with ssp245
   #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} #no tas
   #- {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r3i1p1f1, grid: gn, exp: historical, end_year: 2014} #no tas
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #preprocessor failure; use siconca
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} #no 2008-2014 data in tas
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r22i1p1f1, grid: gn, exp: historical, end_year: 2014} #preprocessor failure; use siconca
   #- {project: CMIP6, dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gn, exp: historical, end_year: 2014} #no 2008-2014 data in tos
+  #- {project: CMIP6, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #preprocessor failue
   #- {project: CMIP6, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #preprocessor failure; also for gr
   #- {project: CMIP6, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr, exp: [historical, ssp245]} #preprocessor failure (both gn and gr)
   - {project: CMIP6, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014}
@@ -1233,6 +1266,10 @@ siconc_all: &siconc_all
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: [historical, ssp245], end_year: 2020}
+  - {project: CMIP6, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1, exp: [historical, ssp245]} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1, exp: historical, end_year: 2014} ###################################################
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r3i1p1f1, grid: gr1, exp: historical, end_year: 2014} ###################################################
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} # failed to concatenate with ssp245
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} # failed to concatenate with ssp245
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -1279,18 +1316,29 @@ siconc_all: &siconc_all
   - {project: CMIP6, dataset: MIROC6, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MIROC6, ensemble: r10i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]}
-  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r5i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r6i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r7i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r8i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} ###############################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r3i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r4i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r5i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r6i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r7i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r8i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r9i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
+  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r10i1p1f1, grid: gn, exp: [historical, ssp245]} #####################################################
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r2i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r3i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r4i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, exp: [historical, ssp245]}
   - {project: CMIP6, dataset: NESM3, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014} # concatenation failure with ssp245; metadata fix failure
+  - {project: CMIP6, dataset: NESM3, ensemble: r2i1p1f1, grid: gn, exp: historical, end_year: 2014} ##############################################################
   - {project: CMIP6, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
@@ -1318,6 +1366,7 @@ siconca_all: &siconca_all
   #- {project: CMIP6, dataset: CESM2, ensemble: r8i1p1f1, grid: gn, exp: historical, end_year: 2014} #preprocessor failure
   #- {project: CMIP6, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, exp: historical, end_year: 2014}
   #- {project: CMIP6, dataset: CESM2, ensemble: r10i1p1f1, grid: gn, exp: historical, end_year: 2014} # preprocessor failure; also siconca failed
+  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, exp: historical, end_year: 2014} #concatenation failure in tos with ssp245
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, exp: [historical, ssp245]} 
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r22i1p1f1, grid: gr, exp: historical, end_year: 2014}
   - {project: CMIP6, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, exp: historical, end_year: 2014}
