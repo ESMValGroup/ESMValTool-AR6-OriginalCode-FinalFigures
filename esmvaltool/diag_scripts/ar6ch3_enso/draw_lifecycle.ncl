@@ -66,75 +66,138 @@ begin
   
 ;printVarSummary(idx)
   do i = 0, nevent-1
-;    print(i+" "+idx@year(i)+" "+idx(i,toint(idx@time_ref)))
-  ; Divide into single-signed segments
-    sign = sign_matlab(idx(i, :))
-    npos = 0
-    nneg = 0
-    do j = 0, dimsizes(sign)-2
-      if (ismissing(sign(j)).or.ismissing(sign(j+1))) then
-        continue
-      end if
-      if (abs(sign(j+1) - sign(j)).gt.1) then
-        if (sign(j).gt.0) then
+    ; Divide into segments
+;    if (thres.eq.0.) then
+;      sign = sign_matlab(idx(i, :))
+;      npos = 0
+;      nneg = 0
+;      do j = 0, dimsizes(sign)-2
+;        if (ismissing(sign(j)).or.ismissing(sign(j+1))) then
+;          continue
+;        end if
+;        if (abs(sign(j+1) - sign(j)).gt.1) then
+;          if (sign(j).gt.0) then
+;            npos = npos + 1
+;          else
+;            nneg = nneg + 1
+;          end if
+;          if (isvar("seg_bnds")) then
+;            tmpbnds = seg_bnds
+;            delete(seg_bnds)
+;            seg_bnds = array_append_record(tmpbnds, tofloat(j)+0.5, 0)
+;            delete(tmpbnds)
+;          else
+;            seg_bnds = tofloat(j)+0.5
+;          end if
+;        elseif (j.gt.0.and.sign(j).eq.0) then
+;          if (abs(sign(j-1)-sign(j+1)).gt.1) then
+;            if (sign(j-1).gt.0) then
+;              npos = npos + 1
+;            else
+;              nneg = nneg + 1
+;            end if
+;            if (isvar("seg_bnds")) then
+;              tmpbnds = seg_bnds
+;              delete(seg_bnds)
+;              seg_bnds = array_append_record(tmpbnds, tofloat(j), 0)
+;              delete(tmpbnds)
+;            else
+;              seg_bnds = tofloat(j)
+;            end if
+;          end if
+;        end if
+;      end do
+;      if (.not.isvar("seg_bnds")) then
+;        continue
+;      end if
+;
+;      j = toint(seg_bnds(dimsizes(seg_bnds)-1)+1.)
+;      if (sign(j).gt.0) then
+;        npos = npos + 1
+;      else
+;        nneg = nneg + 1
+;      end if
+;    
+;      t_pos_seg = new((/2, npos/), "integer")
+;      t_neg_seg = new((/2, nneg/), "integer")    
+;      t_pos_seg = t_pos_seg@_FillValue
+;      t_neg_seg = t_neg_seg@_FillValue
+;      ipos = 0
+;      ineg = 0
+;      do j = 0, dimsizes(seg_bnds)-1
+;        if (sign(toint(seg_bnds(j)-0.5)).gt.0) then
+;          t_pos_seg(1, ipos) = toint(seg_bnds(j)-0.5)
+;          ipos = ipos + 1
+;          t_neg_seg(0, ineg) = toint(seg_bnds(j)+1.)
+;        else
+;          t_neg_seg(1, ineg) = toint(seg_bnds(j)-0.5)
+;          ineg = ineg + 1
+;          t_pos_seg(0, ipos) = toint(seg_bnds(j)+1.)
+;        end if
+;      end do
+;      delete(seg_bnds)
+;      delete(sign)
+;    else
+      npos = 0
+      nneg = 0
+      do j = 0, dimsizes(idx(i, :))-2
+        if (ismissing(idx(i, j)).or.ismissing(idx(i, j+1))) then
+          continue
+        end if
+        if (idx(i, j).gt.thres .and. idx(i, j+1).le.thres) then
+          if (isvar("t_pos_seg")) then
+            t_pos_seg(1, npos-1) = j
+          else
+            npos = 1
+            t_pos_seg = new((/2, npos/), "integer")
+            t_pos_seg(1, npos-1) = j
+          end if
+        elseif (idx(i, j).le.thres .and. idx(i, j+1).gt.thres) then
           npos = npos + 1
-        else
+          if (isvar("t_pos_seg")) then
+            tmp = t_pos_seg
+            delete(t_pos_seg)
+            t_pos_seg = new((/2, npos/), "integer")
+            t_pos_seg(:, 0:npos-2) = tmp
+            delete(tmp)
+            t_pos_seg(0, npos-1) = j+1
+          else
+            t_pos_seg = new((/2, npos/), "integer")
+            t_pos_seg(0, npos-1) = j+1
+          end if
+        end if
+        if (idx(i, j).lt.-thres .and. idx(i, j+1).ge.-thres) then
+          if (isvar("t_neg_seg")) then
+            t_neg_seg(1, nneg-1) = j
+          else
+            nneg = 1
+            t_neg_seg = new((/2, nneg/), "integer")
+            t_neg_seg(1, nneg-1) = j
+          end if
+        elseif (idx(i, j).ge.-thres .and. idx(i, j+1).lt.-thres) then
           nneg = nneg + 1
-        end if
-        if (isvar("seg_bnds")) then
-          tmpbnds = seg_bnds
-          delete(seg_bnds)
-          seg_bnds = array_append_record(tmpbnds, tofloat(j)+0.5, 0)
-          delete(tmpbnds)
-        else
-          seg_bnds = tofloat(j)+0.5
-        end if
-      elseif (j.gt.0.and.sign(j).eq.0) then
-        if (abs(sign(j-1)-sign(j+1)).gt.1) then
-          if (sign(j-1).gt.0) then
-            npos = npos + 1
+          if (isvar("t_neg_seg")) then
+            tmp = t_neg_seg
+            delete(t_neg_seg)
+            t_neg_seg = new((/2, nneg/), "integer")
+            t_neg_seg(:, 0:nneg-2) = tmp
+            delete(tmp)
+            t_neg_seg(0, nneg-1) = j+1
           else
-            nneg = nneg + 1
-          end if
-          if (isvar("seg_bnds")) then
-            tmpbnds = seg_bnds
-            delete(seg_bnds)
-            seg_bnds = array_append_record(tmpbnds, tofloat(j), 0)
-            delete(tmpbnds)
-          else
-            seg_bnds = tofloat(j)
+            t_neg_seg = new((/2, nneg/), "integer")
+            t_neg_seg(0, nneg-1) = j+1
           end if
         end if
+      end do
+      if (.not.isvar("t_pos_seg")) then
+        npos = 1
+        t_pos_seg = new((/2, 1/), "integer")
       end if
-    end do
-    if (.not.isvar("seg_bnds")) then
-      continue
-    end if
-
-    j = toint(seg_bnds(dimsizes(seg_bnds)-1)+1.)
-    if (sign(j).gt.0) then
-      npos = npos + 1
-    else
-      nneg = nneg + 1
-    end if
-    
-    t_pos_seg = new((/2, npos/), "integer")
-    t_neg_seg = new((/2, nneg/), "integer")    
-    t_pos_seg = t_pos_seg@_FillValue
-    t_neg_seg = t_neg_seg@_FillValue
-    ipos = 0
-    ineg = 0
-    do j = 0, dimsizes(seg_bnds)-1
-      if (sign(toint(seg_bnds(j)-0.5)).gt.0) then
-        t_pos_seg(1, ipos) = toint(seg_bnds(j)-0.5)
-        ipos = ipos + 1
-        t_neg_seg(0, ineg) = toint(seg_bnds(j)+1.)
-      else
-        t_neg_seg(1, ineg) = toint(seg_bnds(j)-0.5)
-        ineg = ineg + 1
-        t_pos_seg(0, ipos) = toint(seg_bnds(j)+1.)
+      if (.not.isvar("t_neg_seg")) then
+        nneg = 1
+        t_neg_seg = new((/2, 1/), "integer")
       end if
-    end do
+;    end if    
     if (ismissing(t_pos_seg(0,0))) then
       t_pos_seg(0, 0) = min(where(ismissing(idx(i, :)), 99999, ispan(0, dimsizes(idx&time)-1, 1)))
     end if
@@ -147,8 +210,6 @@ begin
     if (ismissing(t_neg_seg(1, nneg-1))) then
       t_neg_seg(1, nneg-1) = max(where(ismissing(idx(i, :)), -1, ispan(0, dimsizes(idx&time)-1, 1)))
     end if
-    delete(seg_bnds)
-    delete(sign)
     
 ;    do j = 0, npos-1
 ;      print("positive: "+t_pos_seg(0, j)+" "+t_pos_seg(1, j))
@@ -370,7 +431,7 @@ begin
 
 ;=============
 ;  multiyear_as_single = "always"
-;  duration_threshold = 0.
+;  duration_threshold = 0.25
 ;  duration_threshold_unit = "stdv"
 ;  duration_individual = True
 ;=============
@@ -803,7 +864,7 @@ begin
   resp = True
   resp@gsLineOpacityF = 0.2
   if (isvar("el_cmip5")) then
-print(el_cmip5@project)
+;print(el_cmip5@project)
     resp@gsFillColor :=  get_color(el_cmip5)
     dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
                                     lagpoly, make_poly(el_cmip5), resp)
