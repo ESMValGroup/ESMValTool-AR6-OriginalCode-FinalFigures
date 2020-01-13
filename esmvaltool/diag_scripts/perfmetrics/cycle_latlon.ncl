@@ -42,6 +42,10 @@ begin
     ; Read data
     var = read_data(info_items[imod])
 
+    if (var0 .eq. "tos" .and. var@units .eq. "K") then
+      var = convert_units(var, "degC")
+    end if
+
     ; Extract region
     var_reg = area_operations(var, region(0), region(1), \
                               region(2), region(3), "extract", True)
