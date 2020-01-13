@@ -608,7 +608,7 @@ def make_fig_3_20(
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 4.)
     diagtools.add_legend_outside_right(
-         plot_details, plt.gca(), column_width=0.1)
+         plot_details, plt.gca(), column_width=0.12)
 
     # Saving image:
     path = diagtools.folder(cfg['plot_dir']) + 'fig_3_20_' + variable_group + image_extention

@@ -268,6 +268,27 @@ def calculate_basic_trend_arr(years, data): #window = '8 years'):
     return np.array(new_times), np.array(slopes), np.array(intercepts)
 
 
+def calculate_full_trend_arr(years, data):
+    """
+    Calculate the slope over the whole range.
+    """
+    years = np.ma.array(years)
+    data = np.ma.array(data)
+    print('calculate_full_trend_arr', years, data)
+
+    if len(years) != len(data):
+        print('Not the same length for linear regression')
+        assert 0
+   
+    years = np.ma.masked_where(years.mask + data.mask, years)
+    data = np.ma.masked_where(years.mask + data.mask, data)
+    #print('calculate_full_trend_arr', years.shape, data.shape)
+    years = list(years.compressed())
+    data  = list(data.compressed())
+    lnregs = linregress(years, data)
+    return lnregs[0]
+
+
 def annual_mean_from_april(cube, ):
     """
     Calculate the annual mean from April-March.
@@ -781,7 +802,7 @@ def make_pane_bc(
 
     #####
     # Add observational data.
-    add_obs = True
+    add_obs = False
     obs_filename=''
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
@@ -814,9 +835,7 @@ def make_pane_bc(
         if pane == 'c':
             #obs_cube = get_max_amoc(obs_cube)
             trends[obs_dataset] = calculate_interannual(obs_cube)
-        #assert 0 
         
-
     #####
     # calculate the number of models
     model_numbers, number_models, projects_numbers = count_models(metadatas, obs_filename)
@@ -865,11 +884,22 @@ def make_pane_bc(
                          showmeans= False,
                          meanline = False,
                          showfliers = True,
+                         patch_artist=True,
                          labels = box_order) #sorted(trends.keys()))
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
         plt.xticks(rotation=30, ha="right", fontsize=8)
         plt.setp(box['fliers'], markersize=1.0)
 
+        for element in ['medians',]: #'whiskers', 'fliers', 'means', 'medians', 'caps']:
+             plt.setp(box[element], color='black', lw=1.2)
+        
+        box_colours = {'CMIP5': 'dodgerblue', 'CMIP6': 'red'}
+        for box_label, patch in zip(box_order,box['boxes']):
+            if box_label in ['CMIP5', 'CMIP6']:
+                patch.set_facecolor(box_colours[box_label])
+            else:
+                patch.set_facecolor('white')
+ 
     if savefig:
         plt.subplots_adjust(bottom=0.25)
 
@@ -889,6 +919,9 @@ def make_pane_bc(
         plt.title('(c) Distribution of interannual AMOC changes')
         plt.axhline(-4.4, c='k', lw=8, alpha=0.1, zorder = 0) # wrong numbers!
         plt.ylabel('Sv')
+
+    ax.axhline(0., ls='--', color='k', lw=0.5)
+
 
     # If putting all the panes in one figure, return them now.
     if not savefig:
@@ -976,7 +1009,7 @@ def make_amoc_trends(
         arr_max_index = np.argmin(np.abs(np.array(years) - range_values[1])) +1
         years2014 = years[arr_min_index:arr_max_index]
         sliice = slice(arr_min_index, arr_max_index, )
-        print(time_range, arr_max_index, arr_min_index, sliice, years[arr_min_index] , '->',years[arr_max_index])
+        # print(time_range, arr_max_index, arr_min_index, sliice, years[arr_min_index] , '->',years[arr_max_index])
         #continue
         for experiment in ['GHG', 'NAT', 'AER','HIST']:
             exp = experiments[experiment]
@@ -990,11 +1023,14 @@ def make_amoc_trends(
                     #if len(dat.compressed())!= len(years2014.compressed()):
                 #        print(len(dat.compressed()), '!=', len(years2014.compressed()))
                 #        assert 0
-                    new_times, slopes, intercepts = calculate_basic_trend_arr(years2014, dat)
+                    print(mod,exp,ens,lat, sliice)
+                    slopes = calculate_full_trend_arr(years2014, dat)
+                    
+                    #new_times, slopes, intercepts = calculate_basic_trend_arr(years2014, dat)
                     #print(model,experiment,'ensemble:', ens, ', mean slope:', slopes.mean())
                     if decadal:
                         slopes = slopes*10.
-                    trends[experiment][time_range].extend( slopes)
+                    trends[experiment][time_range].append( slopes)
 
                 #kwargs = dict(histtype='stepfilled', alpha=0.3, normed=True, bins=40)
 
@@ -1010,6 +1046,7 @@ def make_amoc_trends(
         # time_ranges_subplot = {'1850-2014': axes[0], '1940-1985': axes[1],  '1985-2014': axes[2], }
 
     # make Table data:
+    means = {}
     for calc in ['mean',  'min',  5, 25, 'median', 75, 95, 'max',]:
         print('\n\nTime range, \t', end = '')
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
@@ -1025,6 +1062,7 @@ def make_amoc_trends(
                 data = trends[experiment][time_range]
                 if calc == 'mean':
                     print(round(np.mean(data), 4), ',\t', end='')
+                    means[(experiment,time_range )] = np.mean(data)
                 if calc == 'median':
                     print(round(np.median(data), 4), ',\t', end='')
                 if calc == 'min':
@@ -1056,15 +1094,16 @@ def make_amoc_trends(
         #if time_ranges_panes[time_range] == '(d)':
         if decadal:
             ax.set_ylabel('Sv/decade')
-            ax.set_ylim([-5.5,5.])
-            ax.yaxis.set_ticks([-5,-2.5, 0., 2.5, 5.])
+            ax.set_ylim([-1.6,1.35])
+            ax.yaxis.set_ticks([-1.5,-1.,-0.5, 0., 0.5, 1.])
         else:
             ax.set_ylabel('Sv yr'+r'$^{-1}$')
             ax.set_ylim([-0.55,0.5])
             ax.yaxis.set_ticks([-0.5,-0.25, 0., 0.25, 0.5])
 
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
-        box_colours =  {'GHG': 'red', 'NAT':'green', 'AER':'blue', 'HIST':'purple'}
+        #box_colours =  {'GHG': 'red', 'NAT':'green', 'AER':'blue', 'HIST':'purple'}
+        box_colours =  {'GHG': 'tomato', 'NAT':'yellowgreen', 'AER':'cornflowerblue', 'HIST':'plum'}
 
         box_data = [trends[experiment][time_range] for experiment in box_order]
         ax.axhline(0., ls='--', color='k', lw=0.5)
@@ -1073,9 +1112,10 @@ def make_amoc_trends(
                          sym = 'k.',
                          whis = [ 5, 95],
                          showmeans= False,
-                         meanline = False,
+                         #meanline = False,
                          showfliers = False,
-                         patch_artist=True, 
+                         patch_artist=True,
+                         meanline=True, 
                          labels = box_order) #sorted(trends.keys()))
         # Boxes indicate 25th to 75th percentiles, whiskers indicate 1st and 99th percentiles, and dots indicate outliers.
         # plt.xticks(rotation=30, ha="right", fontsize=8)
@@ -1086,10 +1126,18 @@ def make_amoc_trends(
         for box_label, patch in zip(box_order,box['boxes']):
             patch.set_facecolor(box_colours[box_label])
 
-        for element in ['medians',]: #'whiskers', 'fliers', 'means', 'medians', 'caps']:
-            plt.setp(box[element], color='black', lw=1.5)
-
-
+        # for element in ['medians',]: #'whiskers', 'fliers', 'means', 'medians', 'caps']:
+        #     plt.setp(box[element], color='black', lw=1.5)
+        # ypos_dict={}
+        # ypos_dict[(box_label, time_range)] =  
+        for box_label, med in zip(box_order,box['medians']):
+            plt.setp(med , color='black', lw=1.2)
+            xpos = np.mean(med.get_xdata())
+            ypos = np.mean(med.get_ydata())
+            yoff = 1.15 # + 0.45 
+            label = "{:.2f}".format(round(means[(box_label, time_range)], 2))
+            ax.text(xpos, yoff, label, va='center', ha="center",color='black', size='x-small' )
+            print(xpos, yoff, label)
 
     if not savefig:
         return fig, axes
@@ -1105,7 +1153,7 @@ def make_amoc_trends(
     plt.close()
 
 
-def  make_figure(cfg, debug=False, timeseries=False):
+def make_figure(cfg, debug=False, timeseries=False):
     """
     Make the entire figure.
 
@@ -1130,6 +1178,7 @@ def  make_figure(cfg, debug=False, timeseries=False):
     axd = plt.subplot2grid((3,3), (2,0), colspan=1, rowspan=1)
     axe = plt.subplot2grid((3,3), (2,1), colspan=1, rowspan=1)
     axf = plt.subplot2grid((3,3), (2,2), colspan=1, rowspan=1)
+
     fig, axes = make_amoc_trends(
         cfg,
         savefig = False,
@@ -1182,21 +1231,16 @@ def main(cfg):
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='b')
     # make_timeseriespane_bc(cfg, pane='c')
+
     make_figure(cfg, timeseries= False)
     make_amoc_trends(cfg, savefig=True)
 
 
-    make_pane_a(cfg)
+    #make_pane_a(cfg)
     #make_pane_a(cfg)
 
-    make_pane_bc(cfg, pane='b', timeseries=False)
-    make_pane_bc(cfg, pane='c', timeseries=False)
-    #make_pane_bc(cfg, pane='c', timeseries=True)
-    #make_pane_bc(cfg, pane='b', timeseries=True)
-
-    # overall plots:
-    # make_figure(cfg, timeseries= True)
-    #make_figure(cfg, timeseries= False)
+    #make_pane_bc(cfg, pane='b', timeseries=False)
+    #make_pane_bc(cfg, pane='c', timeseries=False)
 
     logger.info('Success')
 
