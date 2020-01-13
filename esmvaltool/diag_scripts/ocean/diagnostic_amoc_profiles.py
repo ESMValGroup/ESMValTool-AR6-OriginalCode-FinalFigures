@@ -980,16 +980,14 @@ def make_amoc_trends(
                     #print( dat, type(dat))
                     if not len(dat.compressed()):
                         continue
-                        #dat = np.ma.masked_where((years > 2015) + dat.mask, dat)
-                    #if len(dat.compressed())!= len(years2014.compressed()):
-                #        print(len(dat.compressed()), '!=', len(years2014.compressed()))
-                #        assert 0
+                        # dat = np.ma.masked_where((years > 2015) + dat.mask, dat)
+                    # if len(dat.compressed())!= len(years2014.compressed()):
+                    #    print(len(dat.compressed()), '!=', len(years2014.compressed()))
                     new_times, slopes, intercepts = calculate_basic_trend_arr(years2014, dat)
                     #print(model,experiment,'ensemble:', ens, ', mean slope:', slopes.mean())
                     if decadal:
                         slopes = slopes*10.
                     trends[experiment][time_range].extend( slopes)
-
                 #kwargs = dict(histtype='stepfilled', alpha=0.3, normed=True, bins=40)
 
     if savefig:

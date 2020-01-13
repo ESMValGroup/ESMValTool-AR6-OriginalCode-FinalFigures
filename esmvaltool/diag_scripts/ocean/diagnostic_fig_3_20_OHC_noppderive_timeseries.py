@@ -551,6 +551,7 @@ def make_fig_3_20(
     # Add observations
     add_obs = True
     if add_obs:
+        # Data sent via email!
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
         # depths = matdata['dep']

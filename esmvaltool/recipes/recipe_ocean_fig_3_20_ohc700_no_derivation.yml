@@ -16,7 +16,6 @@ documentation:
     - ukesm
 
 
-
 preprocessors:
 
     prep_3_20:
@@ -26,11 +25,11 @@ preprocessors:
             z_max: 700
         annual_statistics:
             operator: mean
-        regrid_time:
-            frequency: year
         volume_statistics:
             operator: mean
             fx_files: [volcello, ]
+        regrid_time:
+            frequency: year
 
     prep_vol_omon:
         custom_order: true
@@ -39,10 +38,10 @@ preprocessors:
             z_max: 700
         annual_statistics:
             operator: mean
-        regrid_time:
-            frequency: year
         volume_statistics:
             operator: weightless_sum
+        regrid_time:
+            frequency: year
 
     prep_vol_ofx:
         custom_order: true
