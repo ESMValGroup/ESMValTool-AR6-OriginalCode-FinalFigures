@@ -322,8 +322,10 @@ begin
     if(diag_script_info@run_ave .gt. 0) then
       run_ave = "running_mean"
       tmp = runave_Wrap(procmod, 12 * diag_script_info@run_ave, 1)
-      delete(procmod)
-      procmod = tmp
+      ;delete(procmod)
+      n = dimsizes(tmp)
+printVarSummary(n)
+      procmod(0:n-2) = tmp(0:n-2)
       delete(tmp)
     else
       run_ave = ""

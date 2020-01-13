@@ -209,12 +209,17 @@ begin
     ; Running Mean
     if(diag_script_info@run_ave .gt. 0) then
       run_ave = "running_mean"
-      ;tmp = runave_Wrap(data_temp(0,:), 12 * diag_script_info@run_ave, 1)
-      tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
-      ;delete(data_temp)
-      ;data_temp(0,:) = tmp
-      data_temp = tmp
-      delete(tmp)
+;      ;tmp = runave_Wrap(data_temp(0,:), 12 * diag_script_info@run_ave, 1)
+;      tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
+;      ;delete(data_temp)
+;      ;data_temp(0,:) = tmp
+;      n_all = dimsizes(data_temp)
+;      n = n_all(1)
+;printVarSummary(n)
+;print(n)
+;      data_temp(:,0:n-2) = tmp(:,0:n-2)
+;      tmp = new(
+;      delete(tmp)
     else
       run_ave = ""
     end if
