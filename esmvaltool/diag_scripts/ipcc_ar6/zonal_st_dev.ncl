@@ -37,14 +37,14 @@ begin
 
   enter_msg(DIAG_SCRIPT, "")
 
-  var0 = variable_info[0]@short_name
+  var0 = variable_info[1]@short_name
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
   dim_VAR = ListCount(variable_info)
 
   if (dim_VAR .gt. 1) then
-    var1 = variable_info[1]@short_name
+    var1 = variable_info[0]@short_name
     info_items1 = select_metadata_by_name(input_file_info, var1)
     datasetnames1 = metadata_att_as_array(info_items1, "dataset")
     dim_MOD1 = ListCount(info_items1)
@@ -102,6 +102,17 @@ begin
     A0_timavg = time_operations(procmod, -1, -1, "average", "yearly", True)
     delete(procmod)
 
+    ;; Detrend
+    if (info_items[imod]@project .eq. "OBS") then
+        tmp = runave_n_Wrap(A0_timavg,5,0,0)
+        ;tmp = dtrend_n(A0_timavg, False, 0)
+        ;tmp = dtrend(A0_timavg, False)
+        copy_VarMeta(A0_timavg, tmp)
+        delete(A0_timavg)
+        A0_timavg = tmp
+        delete(tmp)
+    end if
+
     ;; calculate zonal standard deviation
     A0_stddev = dim_stddev_n_Wrap(A0_timavg,0)
     delete(A0_timavg)
@@ -141,7 +152,7 @@ begin
   ; Set resources
   res = True
 
-  res@tiMainString = "Zonal standard deviation ~C~ ~Z75~" + variable_info[0]@long_name
+  res@tiMainString = "Zonal standard deviation ~C~~Z75~  " + variable_info[1]@long_name
   res@tiXAxisString = "Latitude"
 
   if (model_arr@units .eq. "degC") then
