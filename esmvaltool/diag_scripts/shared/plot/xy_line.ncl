@@ -2118,6 +2118,9 @@ begin
   res@tmXBMinorLengthF = 0.003
   res@tmYLMinorLengthF = 0.003
 
+printVarSummary(source)
+print("source = " + source)
+
   if (isatt(diag_script_info, "ref")) then
     min_tmp = (/min(source_mean), min(source), min(source_stat)/)
     max_tmp = (/max(source_mean), max(source), max(source_stat)/)
@@ -2175,6 +2178,8 @@ begin
       delete(res_stat@xyLineColors)
       ; We don't want the line, so make it transparent.
       res_stat@xyLineColor = -1
+print("source_x = " + source_x)
+print("source_stat(0:1, 0, :) = " + source_stat(0:1, 0, :))
       shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                 res_stat)
       overlay(plot(0), shading_plot)
