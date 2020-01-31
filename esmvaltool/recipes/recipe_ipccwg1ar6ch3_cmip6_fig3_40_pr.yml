@@ -37,6 +37,22 @@ preprocessors:
       statistics: [mean]
       exclude: [reference_dataset]
 
+  clim_5x5_land_50S-70S:
+    mask_landsea:
+      mask_out: sea
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: -70.
+      end_latitude: -50.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
 
 Datasets_CMIP6_historical: &cmip6_historical_models_pr
 #  - {dataset: AWI-CM-1-1-MR, grid: gn, start_year: 1851}
@@ -145,7 +161,7 @@ diagnostics:
         exp: hist-nat
     additional_datasets: *cmip6_histNat_models_pr
 
-  fig_3_11_50N-90N:
+  fig_3_11_50N-90N: &diag_pr_collect
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
     variables:
       pr:
@@ -157,7 +173,7 @@ diagnostics:
     additional_datasets:
       - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
     scripts:
-      collect: 
+      collect: &tsline_collect 
         <<: *tsline_settings_pr
         script: ipcc_ar6/tsline_collect.ncl
         ancestors: [pr, 'pr_*_50N-90N/tsline*']
@@ -167,4 +183,46 @@ diagnostics:
         order: ["CMIP6_historical", "CMIP6_hist-nat"]
         stat_shading: True
         ref_shading: False 
+
+  ########################################################################
+  # 50-70S
+  ########################################################################
+
+  pr_hist_50S-70S:
+    <<: *diag_pr
+    variables:
+      pr:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_50S-70S
+    scripts:
+      tsline:
+        <<: *tsline_settings_pr
+        region: "50S-70S"
+
+  pr_histNat_50S-70S:
+    <<: *diag_pr
+    variables:
+      pr:
+        <<: *var_pr
+        exp: hist-nat
+    additional_datasets: *cmip6_histNat_models_pr
+    scripts:
+      tsline:
+        <<: *tsline_settings_pr
+        region: "50S-70S"
+
+  fig_3_11_50S-70S:
+    <<: *diag_pr_collect
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_50S-70S
+        mip: Amon
+        reference_dataset: GHCN
+        start_year: 1950
+        end_year: 2014
+    scripts:
+      collect: 
+        <<: *tsline_collect
+        ancestors: [pr, 'pr_*_50S-70S/tsline*']
+        region: "50S-70S"
 

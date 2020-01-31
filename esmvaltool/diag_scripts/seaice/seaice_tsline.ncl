@@ -224,6 +224,20 @@ printVarSummary(val_ext)
       end if
     end if
 
+print("ref_ind = " + ref_ind)
+print("imod = " + imod)
+print("diag_script_info@region = " + diag_script_info@region)
+    if (imod .eq. ref_ind .and. diag_script_info@region .eq. "Antarctic") then
+      printVarSummary(sic)  
+      date = cd_calendar(sic&time, 0)
+      year := date(:, 0)
+print("year = " + year)
+      sel_ind = ind(year .lt. 1979)
+      sic(sel_ind,:,:) = sic@_FillValue
+      ;sic = where(sic&time.ge.1979, sic, sic@_FillValue)
+      delete(date)
+    end if
+
     ; Look for area variable
     if (any(datasets(imod).eq.areadatasets)) then
 
@@ -318,7 +332,7 @@ printVarSummary(val_ext)
     val_area(imod, idx1:idx2) = tofloat(sic_sum_area)
 
     ; Clean up
-    delete([/sic, area, arealat, sic_sum_ext, sic_sum_area/])
+    delete([/date, sic, area, arealat, sic_sum_ext, sic_sum_area/])
 
   end do  ; imod
 
