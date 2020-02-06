@@ -95,18 +95,17 @@ preprocessors:
 
     prep_3_20:
         custom_order: true
-        # regrid_time:
-        #     frequency: mon
         extract_volume:
             z_min: 0
             z_max: 700
         annual_statistics:
             operator: mean
-        regrid_time:
-            frequency: year
         volume_statistics:
             operator: mean
             fx_files: [volcello, ]
+        regrid_time:
+            frequency: year
+
 
     prep_vol_omon:
         custom_order: true
@@ -115,10 +114,11 @@ preprocessors:
             z_max: 700
         annual_statistics:
             operator: mean
-        regrid_time:
-            frequency: year
         volume_statistics:
             operator: weightless_sum
+        regrid_time:
+            frequency: year
+
 
     prep_vol_ofx:
         custom_order: true
@@ -127,6 +127,7 @@ preprocessors:
             z_max: 700
         volume_statistics:
             operator: weightless_sum
+
 
 diagnostics:
   diag_3_20:
