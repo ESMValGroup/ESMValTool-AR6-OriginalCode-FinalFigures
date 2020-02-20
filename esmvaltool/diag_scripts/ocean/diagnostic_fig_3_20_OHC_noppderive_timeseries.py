@@ -550,7 +550,7 @@ def make_fig_3_20(
 
 
     # Add observations
-    add_obs = True
+    add_obs = False
     if add_obs:
         # Data sent via email!
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
@@ -558,6 +558,7 @@ def make_fig_3_20(
         # depths = matdata['dep']
         depths = ['0-300 m', '0-700 m','700-2000 m','>2000 m','Full-depth']
         obs_years = matdata['time_yr'][0] + 0.5
+        obs_years = np.ma.masked_where(obs_years < 1960., obs_years)
         hc_data = matdata['hc_global']
 
         def strip_name(array): return str(array[0][0]).strip(' ')
@@ -572,14 +573,15 @@ def make_fig_3_20(
                 series = np.ma.masked_invalid(series)
                 series = zero_around_dat(obs_years, series)
                 series = zetta_to_joules(series)
+                series = np.ma.masked_where(obs_years.mask, series)
                 hc_global[depth][name] = series
 
         if variable_group == 'ohcgt':
             obs_series = hc_global['Full-depth']['Domingues+Ishii+Purkey (Full)']
         if variable_group == 'ohc700':
             obs_series = hc_global['0-700 m']['Domingues+Ishii+Purkey (Full)']
-            print(obs_series, hc_global.keys(), hc_global['0-700 m'])
-            assert 0
+            #print(obs_series, hc_global.keys(), hc_global['0-700 m'])
+            #assert 0
         project = 'obs'
         plot_details[project] = {
             'c': project_colours[project],
@@ -596,12 +598,13 @@ def make_fig_3_20(
                  )
     # Add observations
     add_all_obs = True
-    if add_obs:
+    if add_all_obs:
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
         # depths = matdata['dep']
         depths = ['0-300 m', '0-700 m','700-2000 m','>2000 m','Full-depth']
         obs_years = matdata['time_yr'][0] + 0.5
+        obs_years = np.ma.masked_where(obs_years < 1960., obs_years)
         hc_data = matdata['hc_global']
 
         def strip_name(array): return str(array[0][0]).strip(' ')
@@ -616,7 +619,9 @@ def make_fig_3_20(
                 series = np.ma.masked_invalid(series)
                 series = zero_around_dat(obs_years, series)
                 series = zetta_to_joules(series)
+                series = np.ma.masked_where(obs_years.mask, series)
                 hc_global[depth][name] = series
+
         if variable_group == 'ohcgt':
             obs_series = hc_global['Full-depth']
         elif variable_group == 'ohc700':
@@ -640,7 +645,7 @@ def make_fig_3_20(
             plt.plot(obs_years,
                      obs_series[name],
                      c = plot_details['obs']['c'],
-                     lw = plot_details['obs']['lw'],
+                     lw = 0.5, #plot_details['obs']['lw'],
                      ls = plot_details['obs']['ls'],
                      )
 
