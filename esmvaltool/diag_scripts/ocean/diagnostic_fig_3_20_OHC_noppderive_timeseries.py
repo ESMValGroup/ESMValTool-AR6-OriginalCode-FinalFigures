@@ -617,28 +617,32 @@ def make_fig_3_20(
                 series = zero_around_dat(obs_years, series)
                 series = zetta_to_joules(series)
                 hc_global[depth][name] = series
-
         if variable_group == 'ohcgt':
-            obs_series = hc_global['Full-depth']['Domingues+Ishii+Purkey (Full)']
-        if variable_group == 'ohc700':
-            obs_series = hc_global['0-700 m']['Domingues+Ishii+Purkey (Full)']
-            print(obs_series, hc_global.keys(), hc_global['0-700 m'])
+            obs_series = hc_global['Full-depth']
+        elif variable_group == 'ohc700':
+            obs_series = hc_global['0-700 m']
+        elif variable_group == 'ohc7002000':
+            obs_series = hc_global['700-2000 m']
+        elif variable_group == 'ohc2000':
+            obs_series = hc_global['>2000 m']
+        else:
+            print('Unable to determine depth:', variable_group)
             assert 0
-        project = 'obs'
-        plot_details[project] = {
-            'c': project_colours[project],
-            'ls': '-',
-            'lw': 2.,
-            'label': 'Observations',
-            }
-        #print(obs_series)
-        plt.plot(obs_years,
-                 obs_series,
-                 c = plot_details['obs']['c'],
-                 lw = plot_details['obs']['lw'],
-                 ls = plot_details['obs']['ls'],
-                 )
-    
+        for name in obs_series.keys():
+            if np.isnan(obs_series[name].max()): continue
+            project = 'obs'
+            plot_details[project] = {
+                'c': project_colours[project],
+                'ls': '-',
+                'lw': 2.,
+                'label': 'Observations',
+                }
+            plt.plot(obs_years,
+                     obs_series[name],
+                     c = plot_details['obs']['c'],
+                     lw = plot_details['obs']['lw'],
+                     ls = plot_details['obs']['ls'],
+                     )
 
     # Draw horizontal line at zero
     plt.axhline(0., c='k', ls='--', lw=0.5)
