@@ -141,7 +141,7 @@ begin
   ; Set resources
   res = True
 
-  res@tiMainString = "Zonal standard deviation ~C~ ~Z75~" + variable_info[0]@long_name
+  res@tiMainString = "Zonal standard deviation ~C~~Z75~" + variable_info[0]@long_name
   res@tiXAxisString = "Latitude"
 
   if (model_arr@units .eq. "degC") then
