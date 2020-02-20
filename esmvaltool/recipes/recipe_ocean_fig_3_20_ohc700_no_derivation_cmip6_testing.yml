@@ -78,194 +78,194 @@ preprocessors:
 diagnostics:
   diag_3_20:
       variables:
-        thetao700_Omon: 
-          short_name: thetao
-          preprocessor: prep_3_20
-          # CMIP6, thetao, volume has time dimension 
-          additional_datasets:
+        # thetao700_Omon:
+        #   short_name: thetao
+        #   preprocessor: prep_3_20
+        #   # CMIP6, thetao, volume has time dimension
+        #   additional_datasets:
         #    - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
         #    - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
-                # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        #         # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        # # #
+        # #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
+        # #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+        # # #       # job r1i1p1f3 uses same time scale as pi control
+        # # #
+        # # #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014} # for hist r1i1p1f2, Bad file?
+        # # #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414} # for hist r1i1p1f2,
+        # # #      # 1850 historical is 1440 (subtract 410)
+        # #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+        # #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
+        # # #      # 1850 is 2165: (add 315)
         #
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-        #       # job r1i1p1f3 uses same time scale as pi control
-        #
-        #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014} # for hist r1i1p1f2, Bad file?
-        #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414} # for hist r1i1p1f2,
-        #      # 1850 historical is 1440 (subtract 410)
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
-        #      # 1850 is 2165: (add 315)
-
-        volcello700_Omon:
-          short_name: volcello
-          preprocessor: prep_vol_omon
-          # # CMIP6, volune, volune has time dimension.
-          additional_datasets:
+        # volcello700_Omon:
+        #   short_name: volcello
+        #   preprocessor: prep_vol_omon
+        #   # # CMIP6, volune, volune has time dimension.
+        #   additional_datasets:
         #    - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
         #    - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
-                # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
-        #
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-        #       # job r1i1p1f3 uses same time scale as pi control
-        #
-        #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014} # for hist r1i1p1f2,
-        #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414} # for hist r1i1p1f2,
-        #      # 1850 in historical is 1850+400 (add 400)
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
-        #      # 1850 in historical is 1850+400 (add 400)
+        #         # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
+        # #
+        # #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
+        # #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+        # # #       # job r1i1p1f3 uses same time scale as pi control
+        # # #
+        # # #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2014} # for hist r1i1p1f2,
+        # # #    - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2360, end_year: 2414} # for hist r1i1p1f2,
+        # # #      # 1850 in historical is 1850+400 (add 400)
+        # #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+        # #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
+        # # #      # 1850 in historical is 1850+400 (add 400)
 
-        thetao700_Ofx: 
+        thetao700_Ofx:
           short_name: thetao
           preprocessor: prep_3_20_CMIP5
           # CMIP5 and CMIP6 temperature data.
           additional_datasets:
-             # CMIP5
-             #- {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # No FX
-             #- {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455}
-             # 1850 = 300., subtract 1550,
-             # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # no historical fx files.
-
-             - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
-             # branch time 9? 259 - 1850 = 259, subtract 1591
-
-             - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} #nofx
-             - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 4434, end_year: 4479}
-             # 1850 = 4324, add 2474
-
-             - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1660, end_year: 1705}
-             # 1850 = 1850 #
-             # THis can't be, as the PI stops at 1879.
-             # Lets assume that 1850 is actually 1550.  - subtract 300
-
-             - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
-             # 1850 = 3684, add 1834.
-
-             # # - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # # - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # CMIP5
+            #  #- {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # No FX
+            #  #- {dataset: ACCESS1-0, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455}
+            #  # 1850 = 300., subtract 1550,
+            #  # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # no historical fx files.
              #
-
-             - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # 1850 = 1850 #
-
-             - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # 1850 = 1850 #
-
-             - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # 1850 = 1850 #
-
-             - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # 1850 = 1850 #
-
-             # # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # can't cat
-
-             - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1990, end_year: 2035}
-             # 1850 = 1880
-
-             - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # 1850 = 1850 #
-
-             - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 2960, end_year: 3005}
-             # 1850 = 2850, add 1000.
-
-             - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 2060, end_year: 2105}
-             # 1850 = 1950, add 100.
-
-             # - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # No picontrol,. only esmControl
-
-             - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year:  810, end_year:  855}
-             # 1850 = 700, subtract 1150
-
-             - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1011, end_year: 1056}
-             # 1850 = 901, subtract 945.
+            #  - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
+            #  # branch time 9? 259 - 1850 = 259, subtract 1591
+             #
+            #  - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} #nofx
+            #  - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 4434, end_year: 4479}
+            #  # 1850 = 4324, add 2474
+             #
+            #  - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: CMCC-CM, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1660, end_year: 1705}
+            #  # 1850 = 1850 #
+            #  # THis can't be, as the PI stops at 1879.
+            #  # Lets assume that 1850 is actually 1550.  - subtract 300
+             #
+            #  - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: CMCC-CMS, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
+            #  # 1850 = 3684, add 1834.
+             #
+            #  # # - {dataset: GISS-E2-R-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # # - {dataset: GISS-E2-R, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  #
+             #
+            #  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: HadGEM2-CC, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # 1850 = 1850 #
+             #
+            #  - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # 1850 = 1850 #
+             #
+            #  - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # 1850 = 1850 #
+             #
+            #  - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # 1850 = 1850 #
+             #
+            #  # # - {dataset: MIROC5, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # can't cat
+             #
+            #  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: MPI-ESM-LR, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1990, end_year: 2035}
+            #  # 1850 = 1880
+             #
+            #  - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: MPI-ESM-MR, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  # 1850 = 1850 #
+             #
+            #  - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: MPI-ESM-P, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 2960, end_year: 3005}
+            #  # 1850 = 2850, add 1000.
+             #
+            #  - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: MRI-CGCM3, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year: 2060, end_year: 2105}
+            #  # 1850 = 1950, add 100.
+             #
+            #  # - {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  #- {dataset: MRI-ESM1, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # No picontrol,. only esmControl
+             #
+            #  - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: NorESM1-M, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year:  810, end_year:  855}
+            #  # 1850 = 700, subtract 1150
+             #
+            #  - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+            #  - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1011, end_year: 1056}
+            #  # 1850 = 901, subtract 945.
 
              # CMIP6
-             #- {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # wrong units?
-             #- {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
+             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # wrong units?
+             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
 
-             #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # too slow.
-             #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # too slow.
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
              # 99645.0 days is 273 years (subtract 1577),
 
         volcello700_Ofx: # Global Average Thermosteric Sea Level Change
           short_name: volcello
           preprocessor: prep_vol_ofx
           additional_datasets:
-             # CMIP5
-#             - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455} # no picontrol volcello
-
-             - {dataset: CCSM4, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             - {dataset: CCSM4, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
-             # branch time 9? 259 - 1850 = 259, subtract 1591
-
-#             - {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} #nofx
-             #- {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 4434, end_year: 4479}
-             # 1850 = 4324, add 2474
-
-             - {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # - {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             # 1850 = 1850
-
-             - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
-
-             - {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-
-             - {dataset: HadGEM2-ES, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: HadGEM2-ES, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-
-             - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: IPSL-CM5A-LR, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-
-             - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: IPSL-CM5A-MR, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-
-             - {dataset: MPI-ESM-LR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: MPI-ESM-LR, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1990, end_year: 2035}
-             # 1850 = 1880
-
-             - {dataset: MPI-ESM-MR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: MPI-ESM-MR, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-
-             - {dataset: MPI-ESM-P, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: MPI-ESM-P, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 2960, end_year: 3005}
-
-             - {dataset: MRI-CGCM3, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: MRI-CGCM3, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 2060, end_year: 2105}
-
-             - {dataset: NorESM1-M, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: NorESM1-M, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year:  810, end_year:  855}
-
-             - {dataset: NorESM1-ME, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-             #- {dataset: NorESM1-ME, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1011, end_year: 1056}
+#              # CMIP5
+# #             - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              # - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455} # no picontrol volcello
+#
+#              - {dataset: CCSM4, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              - {dataset: CCSM4, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
+#              # branch time 9? 259 - 1850 = 259, subtract 1591
+#
+# #             - {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} #nofx
+#              #- {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 4434, end_year: 4479}
+#              # 1850 = 4324, add 2474
+#
+#              - {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              # - {dataset: CMCC-CM, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              # 1850 = 1850
+#
+#              - {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: CMCC-CMS, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 3794, end_year: 3839}
+#
+#              - {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: HadGEM2-CC, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
+#              - {dataset: HadGEM2-ES, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: HadGEM2-ES, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
+#              - {dataset: IPSL-CM5A-LR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: IPSL-CM5A-LR, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
+#              - {dataset: IPSL-CM5A-MR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: IPSL-CM5A-MR, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
+#              - {dataset: MPI-ESM-LR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: MPI-ESM-LR, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1990, end_year: 2035}
+#              # 1850 = 1880
+#
+#              - {dataset: MPI-ESM-MR, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: MPI-ESM-MR, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#
+#              - {dataset: MPI-ESM-P, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: MPI-ESM-P, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 2960, end_year: 3005}
+#
+#              - {dataset: MRI-CGCM3, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: MRI-CGCM3, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year: 2060, end_year: 2105}
+#
+#              - {dataset: NorESM1-M, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: NorESM1-M, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year:  810, end_year:  855}
+#
+#              - {dataset: NorESM1-ME, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+#              #- {dataset: NorESM1-ME, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1011, end_year: 1056}
 
              # CMIP6
-             #- {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-             #- {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
+             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
 
-             # - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # too slow
-             # - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # too slow
+             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
              # 99645.0 days is 273 years (subtract 1577),
       scripts:
         #diagnostic_3_20_ts:
