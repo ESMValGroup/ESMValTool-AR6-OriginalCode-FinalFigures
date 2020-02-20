@@ -41,9 +41,22 @@ preprocessors:
         volume_statistics:
             operator: mean
             fx_files: [{short_name: volcello, mip: fx, exp: historical}]
-
         regrid_time:
             frequency: yr
+
+    prep_3_20_CMIP6:
+        custom_order: true
+        extract_volume:
+            z_min: 0
+            z_max: 700
+        annual_statistics:
+            operator: mean
+        volume_statistics:
+            operator: mean
+            fx_files: [{short_name: volcello, mip: Ofx, exp: piControl}]
+        regrid_time:
+            frequency: yr
+
 
     prep_vol_omon:
         custom_order: true
@@ -118,7 +131,7 @@ diagnostics:
         # #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
         # # #      # 1850 in historical is 1850+400 (add 400)
 
-        thetao700_Ofx:
+        thetao700_fx:
           short_name: thetao
           preprocessor: prep_3_20_CMIP5
           # CMIP5 and CMIP6 temperature data.
@@ -129,8 +142,8 @@ diagnostics:
             #  # 1850 = 300., subtract 1550,
             #  # - {dataset: bcc-csm1-1-m, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} # no historical fx files.
              #
-            #  - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-            #  - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
+             - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+             - {dataset: CCSM4, project: CMIP5, mip: Omon, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
             #  # branch time 9? 259 - 1850 = 259, subtract 1591
              #
             #  - {dataset: CMCC-CESM, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} #nofx
@@ -196,6 +209,11 @@ diagnostics:
             #  - {dataset: NorESM1-ME, project: CMIP5, mip: Omon, exp: piControl,  ensemble: r1i1p1, start_year: 1011, end_year: 1056}
             #  # 1850 = 901, subtract 945.
 
+        thetao700_Ofx:
+          short_name: thetao
+          preprocessor: prep_3_20_CMIP6
+          # CMIP5 and CMIP6 temperature data.
+          additional_datasets:
              # CMIP6
              - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # wrong units?
              - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
@@ -213,8 +231,8 @@ diagnostics:
 # #             - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
 #              # - {dataset: ACCESS1-0, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year:  410, end_year: 455} # no picontrol volcello
 #
-#              - {dataset: CCSM4, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
-#              - {dataset: CCSM4, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
+             - {dataset: CCSM4, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005}
+             - {dataset: CCSM4, project: CMIP5, mip: fx, exp: piControl, ensemble: r1i1p1, start_year:  369, end_year:   414}
 #              # branch time 9? 259 - 1850 = 259, subtract 1591
 #
 # #             - {dataset: CMCC-CESM, project: CMIP5, mip: fx, exp: historical, ensemble: r1i1p1, start_year: 1960, end_year: 2005} #nofx

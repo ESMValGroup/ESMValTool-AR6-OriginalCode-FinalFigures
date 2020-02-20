@@ -401,7 +401,7 @@ def make_fig_3_20(
         variable_groups = ['thetaoga_Ofx', 'thetaoga_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
         volume_groups = [ 'volcello_Ofx' ,'volcello_Omon']#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
     if variable_group == 'ohc700':
-            variable_groups = ['thetao700_Ofx', 'thetao700_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
+            variable_groups = ['thetao700_Ofx', 'thetao700_fx', 'thetao700_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
             volume_groups = [ 'volcello700_Ofx' ,'volcello700_Omon']#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
     #if variable_group == 'ohc700':
     #    variable_groups = ['thetao700_ofx', 'thetao_omon', 'volcello_Ofx' ,'volcello_Omon']
