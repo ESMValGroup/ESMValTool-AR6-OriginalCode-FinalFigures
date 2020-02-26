@@ -143,7 +143,7 @@ diagnostics:
 
         volcello700_CMIP6_Omon:
           short_name: volcello
-          preprocessor: prep_vol_Omon
+          preprocessor: calc_total_vol_Omon
           # # CMIP6, volune, volune has time dimension.
           additional_datasets:
         #
