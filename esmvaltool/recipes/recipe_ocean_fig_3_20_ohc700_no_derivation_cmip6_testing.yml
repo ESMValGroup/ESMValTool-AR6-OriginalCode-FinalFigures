@@ -183,8 +183,8 @@ diagnostics:
             - {dataset: ACCESS-CM2, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: ACCESS-CM2, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1060, end_year: 1114}
 
-            - {dataset: MPI-ESM1-2-HR,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: MPI-ESM1-2-HR,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            # - {dataset: MPI-ESM1-2-HR,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            # - {dataset: MPI-ESM1-2-HR,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
 
             # - {dataset: CESM2-FV2,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             # - {dataset: CESM2-FV2,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 141, end_year: 195}
@@ -203,6 +203,7 @@ diagnostics:
             #  SAM0-UNICON: no pi control thetao data.
             #  CESM2-FV2: is not listed in CMIP6_CV.json, https://github.com/ESMValGroup/ESMValCore/issues/518
             #  CESM2-WACCM- FV2: is not listed in CMIP6_CV.json, https://github.com/ESMValGroup/ESMValCore/issues/518
+            #  MPI-ESM1-2-HR: No picontrol thetao
 
         # Total VOLUME
         volcello700_CMIP6_Ofx: # Global Average Thermosteric Sea Level Change
@@ -220,7 +221,7 @@ diagnostics:
 
             - {dataset: ACCESS-CM2, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
-            - {dataset: MPI-ESM1-2-HR, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
+            # - {dataset: MPI-ESM1-2-HR, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
             # - {dataset: CESM2-FV2, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
