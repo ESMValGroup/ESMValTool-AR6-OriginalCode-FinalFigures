@@ -219,8 +219,8 @@ diagnostics:
              - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
 
-             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # too slow.
-             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+             #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # no pi control thetao data.
+             #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
              # 99645.0 days is 273 years (subtract 1577),
 
         volcello700_Ofx: # Global Average Thermosteric Sea Level Change
@@ -282,8 +282,8 @@ diagnostics:
              - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
 
-             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # too slow
-             - {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
+             #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # no pi control data.
+             #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  383, end_year:  437}
              # 99645.0 days is 273 years (subtract 1577),
       scripts:
         #diagnostic_3_20_ts:
