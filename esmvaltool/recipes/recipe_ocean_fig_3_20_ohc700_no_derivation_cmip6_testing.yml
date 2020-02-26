@@ -1,4 +1,4 @@
-calc_total_vol_Omon# ESMValTool
+# ESMValTool
 # recipe_OceanPhysics.yml
 ---
 documentation:
@@ -135,7 +135,7 @@ diagnostics:
                 # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
 
             - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 0000, end_year: 0000}
+            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1710, end_year: 1764}
 
             # notes:
             #     NorESM2-MM has no piControl data (26/2/2020)
