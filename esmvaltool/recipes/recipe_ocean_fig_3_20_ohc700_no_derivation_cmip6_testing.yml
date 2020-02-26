@@ -146,7 +146,6 @@ diagnostics:
           preprocessor: prep_vol_Omon
           # # CMIP6, volune, volune has time dimension.
           additional_datasets:
-
         #
         #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
         #     - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
@@ -158,12 +157,10 @@ diagnostics:
         #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
         #     - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
         # #      # 1850 in historical is 1850+400 (add 400)
-
         # Working here:
-           - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-           - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
                 # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
-
             - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1710, end_year: 1764}
 
