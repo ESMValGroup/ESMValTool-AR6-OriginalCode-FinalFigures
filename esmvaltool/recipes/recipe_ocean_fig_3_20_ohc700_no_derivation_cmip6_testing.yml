@@ -215,8 +215,8 @@ diagnostics:
           # CMIP5 and CMIP6 temperature data.
           additional_datasets:
              # CMIP6
-             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # wrong units?
-             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
+             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014} # wrong units?
+             - {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gr, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
 
              #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # no pi control thetao data.
@@ -278,8 +278,8 @@ diagnostics:
 #              #- {dataset: NorESM1-ME, project: CMIP5, mip: fx, exp: piControl,  ensemble: r1i1p1, start_year: 1011, end_year: 1056}
 
              # CMIP6
-             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  710, end_year:  764}
+             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014}
+             - {dataset: CESM2,           project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gr, start_year:  710, end_year:  764}
              #  # 219000.0days = 600 years (subtract 1250),
 
              #- {dataset: SAM0-UNICON,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014} # no pi control data.
