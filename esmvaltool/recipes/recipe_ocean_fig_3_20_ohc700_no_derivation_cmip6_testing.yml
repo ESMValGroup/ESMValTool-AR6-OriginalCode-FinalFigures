@@ -168,7 +168,7 @@ diagnostics:
         # Time independent CMIP6 volcello
         thetao700_CMIP6_Ofx:
           short_name: thetao
-          preprocessor: prep_3_20_CMIP6
+          preprocessor: prep_3_20_CMIP6_Ofx
           additional_datasets:
              #- {dataset: CESM2,           project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014} # wrong units?
              #- {dataset: CESM2,           project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gr, start_year:  710, end_year:  764}
