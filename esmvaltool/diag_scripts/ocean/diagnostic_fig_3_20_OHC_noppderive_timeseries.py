@@ -401,10 +401,12 @@ def make_fig_3_20(
         variable_groups = ['thetaoga_Ofx', 'thetaoga_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
         volume_groups = [ 'volcello_Ofx' ,'volcello_Omon']#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
     if variable_group == 'ohc700':
-            variable_groups = ['thetao700_Ofx', 'thetao700_fx', 'thetao700_Omon' ]#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
-            volume_groups = [ 'volcello700_Ofx' ,'volcello700_Omon']#'ohc_omon', 'ohcgt_Omon', 'ohcgt_Ofx', 'ohcgt']
-    #if variable_group == 'ohc700':
-    #    variable_groups = ['thetao700_ofx', 'thetao_omon', 'volcello_Ofx' ,'volcello_Omon']
+            variable_groups = ['thetao700_Ofx', 'thetao700_fx', 'thetao700_Omon',
+                               'thetao700_CMIP6_Ofx', 'thetao700_CMIP6_Omon',
+                               'thetao700_CMIP5_fx']
+            volume_groups = ['volcello700_Ofx' ,'volcello700_Omon',
+                             'volcello700_CMIP6_Ofx', 'volcello700_CMIP6_Omon']
+                             'volcello700_CMIP5_fx']
 
     ####
     # Load the data for each layer as a separate cube
