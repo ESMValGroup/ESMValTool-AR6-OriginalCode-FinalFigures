@@ -134,12 +134,11 @@ diagnostics:
             - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
                 # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
 
-            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1710, end_year: 1764}
-
             # notes:
             #     NorESM2-MM has no piControl data (26/2/2020)
             #     GFDL-ESM4 has no historical thetao (26/2/2020)
+            #     NorESM2-LM: native grid (gn) is time dependent, but regridded grid (gr) is time independent
+
 
         volcello700_CMIP6_Omon:
           short_name: volcello
@@ -161,8 +160,7 @@ diagnostics:
             - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
                 # 1850 historical is 365, (subtract 1485) so 1960 is 475 and 2014 is 529
-            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1710, end_year: 1764}
+
 
         ########################################################################
         # Time independent CMIP6 volcello
@@ -198,12 +196,17 @@ diagnostics:
             - {dataset: MCM-UA-1-0,  project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             - {dataset: MCM-UA-1-0,  project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 111, end_year: 165}
 
+
+            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014}
+            - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gr, start_year: 1710, end_year: 1764}
+
             # Notes:
             #  MPI-ESM1-2-LR: has no piControl
             #  SAM0-UNICON: no pi control thetao data.
             #  CESM2-FV2: is not listed in CMIP6_CV.json, https://github.com/ESMValGroup/ESMValCore/issues/518
             #  CESM2-WACCM- FV2: is not listed in CMIP6_CV.json, https://github.com/ESMValGroup/ESMValCore/issues/518
             #  MPI-ESM1-2-HR: No picontrol thetao
+            #  NorESM2-LM: native grid (gn) is time dependent, but regridded grid (gr) is time independent
 
         # Total VOLUME
         volcello700_CMIP6_Ofx: # Global Average Thermosteric Sea Level Change
@@ -231,6 +234,7 @@ diagnostics:
 
             - {dataset: MCM-UA-1-0,  project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
+            - {dataset: NorESM2-LM,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 1960}
 
         ########################################################################
         # Time independent CMIP5 volcello
