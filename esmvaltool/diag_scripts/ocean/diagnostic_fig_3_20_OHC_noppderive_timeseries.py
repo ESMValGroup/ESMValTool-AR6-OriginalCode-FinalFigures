@@ -375,7 +375,8 @@ def make_mean_of_cube_list(cube_list):
 def make_fig_3_20(
         cfg,
         metadatas,
-        variable_group
+        variable_group,
+        plot_projects = 'All'
 ):
     """
     Make a time series plot showing several preprocesssed datasets.
@@ -481,6 +482,10 @@ def make_fig_3_20(
         project = metadata['project']
         if metadatas[filename]['exp'] == 'piControl':
             continue
+        if plot_projects == 'all':
+            pass
+        elif plot_projects != project:
+            continue
         cube = hist_cubes[filename]
         pi_cube = piControl_cubes[dataset]
         if dataset not in hist_vol_cubes: continue
@@ -531,6 +536,10 @@ def make_fig_3_20(
         iris.save(cube, output_cube)
 
     for project in projects:
+        if plot_projects == 'all':
+            pass
+        elif plot_projects != project:
+            continue
         cube = make_mean_of_cube_list(project_cubes[project])
 
         plot_details[project] = {
@@ -552,6 +561,7 @@ def make_fig_3_20(
 
 
     # Add observations
+
     add_obs = False
     if add_obs:
         # Data sent via email!
@@ -599,7 +609,11 @@ def make_fig_3_20(
                  ls = plot_details['obs']['ls'],
                  )
     # Add observations
-    add_all_obs = True
+    if plot_projects == 'all':
+        add_all_obs = True
+    elif plot_projects != 'obs':
+        add_all_obs = True
+
     if add_all_obs:
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
@@ -670,7 +684,7 @@ def make_fig_3_20(
          plot_details, plt.gca(), column_width=0.12)
 
     # Saving image:
-    path = diagtools.folder(cfg['plot_dir']) + 'fig_3_20_' + variable_group + image_extention
+    path = diagtools.folder(cfg['plot_dir']) + 'fig_3_20_' + variable_group + '_'+plot_projects + image_extention
     logger.info('Saving plots to %s', path)
     plt.savefig(path)
     plt.close()
@@ -695,10 +709,12 @@ def main(cfg):
         #######
         # Multi model time series
         for variable_group in ['ohcgt', 'ohc700']: #'ohc700']:
+            for plot_projects in ['all', 'CMIP5', 'CMIP6', 'obs']
             make_fig_3_20(
                 cfg,
                 metadatas,
-                variable_group
+                variable_group,
+                plot_projects = plot_projects,
             )
     logger.info('Success')
 
