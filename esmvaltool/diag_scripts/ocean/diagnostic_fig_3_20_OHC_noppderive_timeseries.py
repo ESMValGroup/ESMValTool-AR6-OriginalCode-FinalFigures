@@ -709,13 +709,13 @@ def main(cfg):
         #######
         # Multi model time series
         for variable_group in ['ohcgt', 'ohc700']: #'ohc700']:
-            for plot_projects in ['all', 'CMIP5', 'CMIP6', 'obs']
-            make_fig_3_20(
-                cfg,
-                metadatas,
-                variable_group,
-                plot_projects = plot_projects,
-            )
+            for plot_projects in ['all', 'CMIP5', 'CMIP6', 'obs']:
+                make_fig_3_20(
+                    cfg,
+                    metadatas,
+                    variable_group,
+                    plot_projects = plot_projects,
+                )
     logger.info('Success')
 
 
