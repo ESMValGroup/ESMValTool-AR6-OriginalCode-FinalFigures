@@ -187,14 +187,14 @@ diagnostics:
             # - {dataset: CESM2-FV2,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             # - {dataset: CESM2-FV2,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 141, end_year: 195}
 
-            - {dataset: CESM2-WACCM,  project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: CESM2-WACCM,  project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 166, end_year: 220}
+            - {dataset: CESM2-WACCM,  project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014}
+            - {dataset: CESM2-WACCM,  project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gr, start_year: 166, end_year: 220}
 
             # - {dataset: CESM2-WACCM-FV2,  project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
             # - {dataset: CESM2-WACCM-FV2,  project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 141, end_year: 195}
 
-            - {dataset: MCM-UA-1-0,  project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
-            - {dataset: MCM-UA-1-0,  project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 111, end_year: 165}
+            #- {dataset: MCM-UA-1-0,  project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+            #- {dataset: MCM-UA-1-0,  project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 111, end_year: 165}
 
 
             - {dataset: NorESM2-LM,     project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 2014}
@@ -207,7 +207,8 @@ diagnostics:
             #  CESM2-WACCM- FV2: is not listed in CMIP6_CV.json, https://github.com/ESMValGroup/ESMValCore/issues/518
             #  MPI-ESM1-2-HR: No picontrol thetao
             #  NorESM2-LM: native grid (gn) is time dependent, but regridded grid (gr) is time independent
-
+            #  MCM-UA-1-0: native grid has a negative value in the longitude coordinate and no regridded product is available.
+            #
         # Total VOLUME
         volcello700_CMIP6_Ofx: # Global Average Thermosteric Sea Level Change
           short_name: volcello
@@ -228,11 +229,11 @@ diagnostics:
 
             # - {dataset: CESM2-FV2, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
-            - {dataset: CESM2-WACCM, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
+            - {dataset: CESM2-WACCM, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 1960}
 
             # - {dataset: CESM2-WACCM-FV2, project: CMIP6, mip: Ofx, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
-            - {dataset: MCM-UA-1-0,  project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
+            #- {dataset: MCM-UA-1-0,  project: CMIP6, mip: Ofx, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 1960}
 
             - {dataset: NorESM2-LM,     project: CMIP6, mip: Ofx, exp: historical, ensemble: r1i1p1f1, grid: gr, start_year: 1960, end_year: 1960}
 
