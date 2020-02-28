@@ -613,7 +613,8 @@ def make_fig_3_20(
         add_all_obs = True
     elif plot_projects != 'obs':
         add_all_obs = True
-
+    else:
+        add_all_obs = False
     if add_all_obs:
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
