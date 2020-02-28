@@ -374,7 +374,6 @@ def make_mean_of_cube_list(cube_list):
 
 def make_fig_3_20(
         cfg,
-        metadatas,
         variable_group,
         plot_projects = 'All'
 ):
@@ -409,8 +408,8 @@ def make_fig_3_20(
                              'volcello700_CMIP6_Ofx', 'volcello700_CMIP6_Omon',
                              'volcello700_CMIP5_fx']
 
-    linestyles = ['-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.',]
-    linethicknesses = [0.5,0.5,0.5,0.5, 1.,1.,1.,1., 1.5,1.5,1.5,1.5,]
+    linestyles = ['-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.','-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.',]
+    linethicknesses = [0.5,0.5,0.5,0.5, 1.,1.,1.,1., 1.5,1.5,1.5,1.5, 2.,2.,2.,2., 2.5,2.5,2.5,2.5,2.5,2.5,]
 
     ####
     # Load the data for each layer as a separate cube
@@ -421,8 +420,6 @@ def make_fig_3_20(
     data_loaded = False
     for filename in sorted(metadatas):
         dataset = metadatas[filename]['dataset']
-
-        print(variable_group, variable_groups, metadatas[filename]['variable_group'])
         if metadatas[filename]['variable_group'] in variable_groups:
             data_loaded = True
             cube = iris.load_cube(filename)
@@ -438,10 +435,22 @@ def make_fig_3_20(
             cube = iris.load_cube(filename)
             cube = diagtools.bgc_units(cube, metadatas[filename]['short_name'])
 
-            if metadatas[filename]['exp'] == 'historical':
-                hist_vol_cubes[dataset] = cube
-            if metadatas[filename]['exp'] == 'piControl':
-                piControl_vol_cubes[dataset] = cube
+            # Volume has a time component.
+            if metadatas[filename]['mip'] in ['Omon', 'Oyr',]:
+                if metadatas[filename]['exp'] == 'historical':
+                    hist_vol_cubes[dataset] = cube
+                if metadatas[filename]['exp'] == 'piControl':
+                    piControl_vol_cubes[dataset] = cube
+
+            # volume has no time component
+            if metadatas[filename]['mip'] in ['Ofx', 'fx',]:
+                if metadatas[filename]['exp'] == 'historical':
+                    hist_vol_cubes[dataset] = cube
+                    piControl_vol_cubes[dataset] = cube  
+                if metadatas[filename]['exp'] == 'piControl':
+                    hist_vol_cubes[dataset] = cube
+                    piControl_vol_cubes[dataset] = cube
+
 
     if not data_loaded:
         return
@@ -476,24 +485,32 @@ def make_fig_3_20(
     # Plot each file in the group
     project_colours={'CMIP3': 'blue', 'CMIP5':'purple', 'CMIP6':'green', 'obs': 'black'}
 
+    linecount=-1
     for index, filename in enumerate(sorted(metadatas)):
-        if metadatas[filename]['variable_group'] not in variable_groups:
-            continue
-
         metadata = metadatas[filename]
         dataset = metadata['dataset']
         project = metadata['project']
+        if metadatas[filename]['variable_group'] not in variable_groups:
+            continue
+
+        #print(index, dataset,project,metadatas[filename]['variable_group'])
+
         if metadatas[filename]['exp'] == 'piControl':
+            print(metadatas[filename]['exp'], '==', 'piControl')
             continue
         if plot_projects == 'all':
             pass
         elif plot_projects != project:
+            print(plot_projects, '!=', project)
             continue
         cube = hist_cubes[filename]
         pi_cube = piControl_cubes[dataset]
-        if dataset not in hist_vol_cubes: continue
+        if dataset not in hist_vol_cubes: 
+            print(dataset, 'not in', hist_vol_cubes.keys())
+            print('ie, can not find volume cube for', dataset) 
+            continue
         vol_cube =  hist_vol_cubes[dataset]
-        if dataset  in piControl_vol_cubes:
+        if dataset in piControl_vol_cubes:
             pi_vol_cube =  piControl_vol_cubes[dataset]
         else:
             pi_vol_cube = vol_cube
@@ -534,17 +551,19 @@ def make_fig_3_20(
                     alpha=0.5,
                 )
         else:
+                print('plotting:', dataset,project, linecount, project_colours[project],linestyles[linecount],linethicknesses[linecount])
+                linecount+=1
                 plot_details[dataset] = {
                     'c': project_colours[project],
-                    'ls': linestyles[index],
-                    'lw': linethicknesses[i],
+                    'ls': linestyles[linecount],
+                    'lw': linethicknesses[linecount],
                     'label': dataset
                 }
                 timeplot(
                         cube,
                         c=project_colours[project],
-                        ls=linestyles[index],
-                        lw=linethicknesses[i],
+                        ls=linestyles[linecount],
+                        lw=linethicknesses[linecount],
                         alpha=0.5,
                 )
 
@@ -673,6 +692,7 @@ def make_fig_3_20(
 
         for i, name in enumerate(sorted(obs_series.keys())):
             if np.isnan(obs_series[name].max()): continue
+            if len(obs_series[name].compressed()) == 0: continue
             project = 'obs'
             if plot_projects == 'all':
                 plot_details[project] = {
@@ -689,7 +709,7 @@ def make_fig_3_20(
                          )
             else:
                 plot_details[name] = {
-                    'c': name,
+                    'c': project_colours[project],
                     'ls': linestyles[i],
                     'lw': linethicknesses[i],
                     'label': name,
@@ -737,18 +757,12 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
-    for index, metadata_filename in enumerate(cfg['input_files']):
-        logger.info('metadata filename:\t%s', metadata_filename)
-
-        metadatas = diagtools.get_input_files(cfg, index=index)
-
-        #######
-        # Multi model time series
-        for variable_group in ['ohcgt', 'ohc700']: #'ohc700']:
-            for plot_projects in ['all', 'CMIP5', 'CMIP6', 'obs']:
-                make_fig_3_20(
+    metadatas = diagtools.get_input_files(cfg)
+    for variable_group in ['ohc700', 'ohcgt', ]: 
+        for plot_projects in ['CMIP6', 'all', 'CMIP5',  'obs']:
+            logger.info('main %s, %s', variable_group, plot_projects)
+            make_fig_3_20(
                     cfg,
-                    metadatas,
                     variable_group,
                     plot_projects = plot_projects,
                 )
