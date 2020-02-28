@@ -407,6 +407,13 @@ def make_fig_3_20(
             volume_groups = ['volcello700_Ofx' ,'volcello700_Omon',
                              'volcello700_CMIP6_Ofx', 'volcello700_CMIP6_Omon',
                              'volcello700_CMIP5_fx']
+    if variable_group == 'ohc7002000':
+            variable_groups = ['thetao7002000_Ofx', 'thetao7002000_fx', 'thetao7002000_Omon',
+                               'thetao7002000_CMIP6_Ofx', 'thetao7002000_CMIP6_Omon',
+                               'thetao7002000_CMIP5_fx']
+            volume_groups = ['volcello7002000_Ofx' ,'volcello7002000_Omon',
+                             'volcello7002000_CMIP6_Ofx', 'volcello7002000_CMIP6_Omon',
+                             'volcello7002000_CMIP5_fx']
 
     linestyles = ['-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.','-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.',]
     linethicknesses = [0.5,0.5,0.5,0.5, 1.,1.,1.,1., 1.5,1.5,1.5,1.5, 2.,2.,2.,2., 2.5,2.5,2.5,2.5,2.5,2.5,]
@@ -446,7 +453,7 @@ def make_fig_3_20(
             if metadatas[filename]['mip'] in ['Ofx', 'fx',]:
                 if metadatas[filename]['exp'] == 'historical':
                     hist_vol_cubes[dataset] = cube
-                    piControl_vol_cubes[dataset] = cube  
+                    piControl_vol_cubes[dataset] = cube
                 if metadatas[filename]['exp'] == 'piControl':
                     hist_vol_cubes[dataset] = cube
                     piControl_vol_cubes[dataset] = cube
@@ -505,9 +512,9 @@ def make_fig_3_20(
             continue
         cube = hist_cubes[filename]
         pi_cube = piControl_cubes[dataset]
-        if dataset not in hist_vol_cubes: 
+        if dataset not in hist_vol_cubes:
             print(dataset, 'not in', hist_vol_cubes.keys())
-            print('ie, can not find volume cube for', dataset) 
+            print('ie, can not find volume cube for', dataset)
             continue
         vol_cube =  hist_vol_cubes[dataset]
         if dataset in piControl_vol_cubes:
@@ -629,6 +636,7 @@ def make_fig_3_20(
             obs_series = hc_global['Full-depth']['Domingues+Ishii+Purkey (Full)']
         if variable_group == 'ohc700':
             obs_series = hc_global['0-700 m']['Domingues+Ishii+Purkey (Full)']
+
             #print(obs_series, hc_global.keys(), hc_global['0-700 m'])
             #assert 0
         project = 'obs'
@@ -733,6 +741,8 @@ def make_fig_3_20(
         plt.ylabel('Change in Global Total Heat Content, J')
     if variable_group == 'ohc700':
         plt.ylabel('Change in Heat Content in top 700m, J')
+    if variable_group == 'ohc7002000':
+        plt.ylabel('Change in Heat Content in 700m-2000m, J')
 
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 4.)
@@ -758,7 +768,7 @@ def main(cfg):
 
     """
     metadatas = diagtools.get_input_files(cfg)
-    for variable_group in ['ohc700', 'ohcgt', ]: 
+    for variable_group in ['ohc2000700','ohc700', 'ohcgt', ]:
         for plot_projects in ['CMIP6', 'all', 'CMIP5',  'obs']:
             logger.info('main %s, %s', variable_group, plot_projects)
             make_fig_3_20(
