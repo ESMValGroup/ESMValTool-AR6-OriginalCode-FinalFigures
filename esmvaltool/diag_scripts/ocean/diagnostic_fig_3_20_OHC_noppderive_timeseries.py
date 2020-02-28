@@ -405,7 +405,7 @@ def make_fig_3_20(
                                'thetao700_CMIP6_Ofx', 'thetao700_CMIP6_Omon',
                                'thetao700_CMIP5_fx']
             volume_groups = ['volcello700_Ofx' ,'volcello700_Omon',
-                             'volcello700_CMIP6_Ofx', 'volcello700_CMIP6_Omon']
+                             'volcello700_CMIP6_Ofx', 'volcello700_CMIP6_Omon',
                              'volcello700_CMIP5_fx']
 
     ####
