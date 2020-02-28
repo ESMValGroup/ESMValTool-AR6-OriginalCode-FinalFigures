@@ -409,6 +409,9 @@ def make_fig_3_20(
                              'volcello700_CMIP6_Ofx', 'volcello700_CMIP6_Omon',
                              'volcello700_CMIP5_fx']
 
+    linestyles = ['-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.',]
+    linethicknesses = [0.5,0.5,0.5,0.5, 1.,1.,1.,1., 1.5,1.5,1.5,1.5,]
+
     ####
     # Load the data for each layer as a separate cube
     hist_cubes = {}
@@ -500,7 +503,6 @@ def make_fig_3_20(
         print('deriving:', project, dataset, 'piControl')
         pi_cube = derive_ohc(pi_cube, pi_vol_cube)
 
-
         # Is this data is a multi-model dataset?
         if metadata['dataset'].find('MultiModel') > -1:
             continue
@@ -523,13 +525,29 @@ def make_fig_3_20(
             iris.coord_categorisation.add_year(cube, 'time')
 
         # Make plots for single models
-        timeplot(
+        if plot_projects == 'all':
+            timeplot(
                     cube,
                     c=project_colours[project],
                     ls='-',
                     lw=0.5,
                     alpha=0.5,
                 )
+        else:
+                plot_details[dataset] = {
+                    'c': project_colours[project],
+                    'ls': linestyles[index],
+                    'lw': linethicknesses[i],
+                    'label': dataset
+                }
+                timeplot(
+                        cube,
+                        c=project_colours[project],
+                        ls=linestyles[index],
+                        lw=linethicknesses[i],
+                        alpha=0.5,
+                )
+
         # save cube:
         output_cube = diagtools.folder(cfg['work_dir']) + '_'.join(['OHC','zeroed','detrended','recalendared',project, dataset])+'.nc'
         logger.info('Saving cubes to %s', output_cube)
@@ -541,6 +559,7 @@ def make_fig_3_20(
         elif plot_projects != project:
             continue
         cube = make_mean_of_cube_list(project_cubes[project])
+
 
         plot_details[project] = {
             'c': project_colours[project],
@@ -561,7 +580,6 @@ def make_fig_3_20(
 
 
     # Add observations
-
     add_obs = False
     if add_obs:
         # Data sent via email!
@@ -611,10 +629,12 @@ def make_fig_3_20(
     # Add observations
     if plot_projects == 'all':
         add_all_obs = True
-    elif plot_projects != 'obs':
+    elif plot_projects == 'obs':
         add_all_obs = True
     else:
         add_all_obs = False
+
+
     if add_all_obs:
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
@@ -650,21 +670,36 @@ def make_fig_3_20(
         else:
             print('Unable to determine depth:', variable_group)
             assert 0
-        for name in obs_series.keys():
+
+        for i, name in enumerate(sorted(obs_series.keys())):
             if np.isnan(obs_series[name].max()): continue
             project = 'obs'
-            plot_details[project] = {
-                'c': project_colours[project],
-                'ls': '-',
-                'lw': 2.,
-                'label': 'Observations',
-                }
-            plt.plot(obs_years,
-                     obs_series[name],
-                     c = plot_details['obs']['c'],
-                     lw = 0.5, #plot_details['obs']['lw'],
-                     ls = plot_details['obs']['ls'],
-                     )
+            if plot_projects == 'all':
+                plot_details[project] = {
+                    'c': project_colours[project],
+                    'ls': '-',
+                    'lw': 2.,
+                    'label': 'Observations',
+                    }
+                plt.plot(obs_years,
+                         obs_series[name],
+                         c = plot_details['obs']['c'],
+                         lw = 0.5,
+                         ls = plot_details['obs']['ls'],
+                         )
+            else:
+                plot_details[name] = {
+                    'c': name,
+                    'ls': linestyles[i],
+                    'lw': linethicknesses[i],
+                    'label': name,
+                    }
+                plt.plot(obs_years,
+                         obs_series[name],
+                         c = plot_details[name]['c'],
+                         lw = plot_details[name]['lw'],
+                         ls = plot_details[name]['ls'],
+                         )
 
     # Draw horizontal line at zero
     plt.axhline(0., c='k', ls='--', lw=0.5)
