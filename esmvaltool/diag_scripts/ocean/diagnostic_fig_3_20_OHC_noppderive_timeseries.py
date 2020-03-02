@@ -414,7 +414,13 @@ def make_fig_3_20(
             volume_groups = ['volcello7002000_Ofx' ,'volcello7002000_Omon',
                              'volcello7002000_CMIP6_Ofx', 'volcello7002000_CMIP6_Omon',
                              'volcello7002000_CMIP5_fx']
-
+    if variable_group == 'ohc2000':
+            variable_groups = ['thetao2000_Ofx', 'thetao2000_fx', 'thetao2000_Omon',
+                               'thetao2000_CMIP6_Ofx', 'thetao2000_CMIP6_Omon',
+                               'thetao2000_CMIP5_fx']
+            volume_groups = ['volcello2000_Ofx' ,'volcello2000_Omon',
+                             'volcello2000_CMIP6_Ofx', 'volcello2000_CMIP6_Omon',
+                             'volcello2000_CMIP5_fx']
     linestyles = ['-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.','-', ':', '--', '-.', '-', ':', '--', '-.','-', ':', '--', '-.',]
     linethicknesses = [0.5,0.5,0.5,0.5, 1.,1.,1.,1., 1.5,1.5,1.5,1.5, 2.,2.,2.,2., 2.5,2.5,2.5,2.5,2.5,2.5,]
 
@@ -743,7 +749,8 @@ def make_fig_3_20(
         plt.ylabel('Change in Heat Content in top 700m, J')
     if variable_group == 'ohc7002000':
         plt.ylabel('Change in Heat Content in 700m-2000m, J')
-
+    if variable_group == 'ohc2000':
+        plt.ylabel('Change in Heat Content below 2000m, J')
     # Resize and add legend outside thew axes.
     plt.gcf().set_size_inches(8., 4.)
     diagtools.add_legend_outside_right(
@@ -768,7 +775,7 @@ def main(cfg):
 
     """
     metadatas = diagtools.get_input_files(cfg)
-    for variable_group in ['ohc7002000','ohc700', 'ohcgt', ]:
+    for variable_group in ['ohc2000','ohc7002000','ohc700', 'ohcgt', ]:
         for plot_projects in ['CMIP6', 'all', 'CMIP5',  'obs']:
             logger.info('main %s, %s', variable_group, plot_projects)
             make_fig_3_20(
