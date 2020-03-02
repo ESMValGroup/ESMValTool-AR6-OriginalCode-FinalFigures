@@ -2,9 +2,19 @@
 Fig 3.20 diagnostics
 =======================
 
-Diagnostic to produce figures of the time development of a OHC.
+Diagnostic to produce figures of the time development of the Ocean
+heat content at various depth ranges.
 
-This one derives the OHC in place. This should be quicker.
+This one derives the OHC in place. This is quicker than deriving it in
+ESMValTool.
+
+There are four recipes that call this diagnostic:
+Currently called :
+- recipe_ocean_fig_3_20_ohcgt_no_derivation.yml
+- recipe_ocean_fig_3_20_ohc700_no_derivation_cmip6_testing.yml
+- recipe_ocean_fig_3_20_ohc7002000_no_derivation_cmip6_testing.yml
+- recipe_ocean_fig_3_20_ohc2000_no_derivation_cmip6_testing.yml
+
 
 Author: Lee de Mora (PML)
         ledm@pml.ac.uk

@@ -1,10 +1,11 @@
 # ESMValTool
-# recipe_OceanPhysics.yml
+# recipe_ocean_fig_3_20_ohc700_no_derivation_cmip6_testing.yml
 ---
 documentation:
   description: |
     Recipe to produce figure 3.20 for IPCC WG1
     Ocean heat content change
+    This recipe covers the values between the surface and 700m.
 
   authors:
     - demora_lee
@@ -78,10 +79,10 @@ preprocessors:
 diagnostics:
   diag_3_20:
       variables:
-        thetao700_Omon: 
+        thetao700_Omon:
           short_name: thetao
           preprocessor: prep_3_20
-          # CMIP6, thetao, volume has time dimension 
+          # CMIP6, thetao, volume has time dimension
           additional_datasets:
         #    - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
         #    - {dataset: GFDL-CM4,        project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year:  475, end_year:  529}
@@ -118,7 +119,7 @@ diagnostics:
             - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329} # for hist r2i1p1f2,
         #      # 1850 in historical is 1850+400 (add 400)
 
-        thetao700_Ofx: 
+        thetao700_Ofx:
           short_name: thetao
           preprocessor: prep_3_20_CMIP5
           # CMIP5 and CMIP6 temperature data.

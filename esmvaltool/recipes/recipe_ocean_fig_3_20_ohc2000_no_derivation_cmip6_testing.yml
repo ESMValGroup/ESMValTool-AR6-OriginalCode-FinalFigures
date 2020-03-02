@@ -1,10 +1,11 @@
 # ESMValTool
-# recipe_OceanPhysics.yml
+# recipe_ocean_fig_3_20_ohc2000_no_derivation_cmip6_testing.yml
 ---
 documentation:
   description: |
     Recipe to produce figure 3.20 for IPCC WG1
-    Ocean heat content change
+    Ocean heat content change.
+    This recipe covers the values below 2000m.
 
   authors:
     - demora_lee
@@ -18,7 +19,7 @@ documentation:
 
 preprocessors:
 
-# We have several different ways to calculate this:
+# We have tried several different ways to calculate this:
 # First:
 # CMIP5 has volcello in the mip fx with no time component in the historical exp.
 # CMIP6 has two different volcello datasets:
