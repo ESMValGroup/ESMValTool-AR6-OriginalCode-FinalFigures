@@ -768,7 +768,7 @@ def main(cfg):
 
     """
     metadatas = diagtools.get_input_files(cfg)
-    for variable_group in ['ohc2000700','ohc700', 'ohcgt', ]:
+    for variable_group in ['ohc7002000','ohc700', 'ohcgt', ]:
         for plot_projects in ['CMIP6', 'all', 'CMIP5',  'obs']:
             logger.info('main %s, %s', variable_group, plot_projects)
             make_fig_3_20(
