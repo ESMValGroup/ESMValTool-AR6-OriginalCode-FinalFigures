@@ -50,6 +50,7 @@ class siconc(Fix):
         iris.cube.CubeList
 
         """
+        print ('Running fixes for CESM2')
         typesi = iris.coords.AuxCoord(
             'siconc',
             standard_name='area_type',

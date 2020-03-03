@@ -50,8 +50,28 @@ diagnostics:
         end_year: 2019
 #        fx_files: [sftlf]
         additional_datasets: &damip_simulations
+#          - {dataset: EC-Earth3, ensemble: r1i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r2i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r4i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r6i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r9i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r11i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r12i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r13i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r14i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r15i1p1f1}
+##          - {dataset: EC-Earth3, ensemble: r16i1p1f1} #NetCDF file 'unknown file format' 
+#          - {dataset: EC-Earth3, ensemble: r17i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r18i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r19i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r20i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+#          - {dataset: EC-Earth3, ensemble: r24i1p1f1}
           - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1}
           - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r11i1p1f1}
           - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-nat}
           - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-nat}
           - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-nat}
@@ -93,10 +113,20 @@ diagnostics:
           - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-stratO3}
           - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-stratO3}
 #          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
-#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}
+#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn}
+#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn}
+#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}#Stops in 2014.
+#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: hist-nat} 
 #          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
 #          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
+#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
+#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
           - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2}
           - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-GHG}
           - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-GHG}
           - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-GHG}
@@ -259,7 +289,9 @@ diagnostics:
           - {dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn, exp: hist-GHG}
           - {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: hist-GHG}
           - {dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: hist-GHG}
+          - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn, exp: hist-aer}
           - {dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn, exp: hist-aer}
+          - {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: hist-aer}
           - {dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: hist-aer}
           - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
           - {dataset: MRI-ESM2-0, ensemble: r2i1p1f1, grid: gn}
@@ -281,6 +313,15 @@ diagnostics:
           - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
           - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
           - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-sol}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-sol}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-sol}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-volc}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-volc}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-volc}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
           - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-aer}
           - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-aer}
           - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-aer}
@@ -293,21 +334,22 @@ diagnostics:
           - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-stratO3}
           - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-stratO3}
           - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-stratO3}
-          - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
-          - {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn}
-#          - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}#lat,lon contcatenate error.
-          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+#          - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+#          - {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn}
+##          - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}#lat,lon contcatenate error.
+#          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
 #          - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1} #time coordinate error
+#          - {dataset: EC-Earth3-Veg, ensemble: r2i1p1f1}
 #          - {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1}
-          - {dataset: EC-Earth3, ensemble: r4i1p1f1}
-          - {dataset: EC-Earth3, ensemble: r6i1p1f1}
-          - {dataset: EC-Earth3, ensemble: r9i1p1f1}
-          - {dataset: EC-Earth3, ensemble: r11i1p1f1}
-          - {dataset: EC-Earth3, ensemble: r13i1p1f1}
-          - {dataset: EC-Earth3, ensemble: r15i1p1f1}
 #          - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1} #gr1 causes problems for tos.
 #          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
-          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-nat}
+#          - {dataset: GFDL-ESM4, ensemble: r2i1p1f1, grid: gr1, exp: hist-nat}
+#          - {dataset: GFDL-ESM4, ensemble: r3i1p1f1, grid: gr1, exp: hist-nat}
+#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-aer}
+#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-GHG}
+#          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+#          - {dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn} 
 #          - {dataset: NESM3, ensemble: r1i1p1f1, grid: gn} #problem with time coordinate.
 #          - {dataset: NESM3, ensemble: r2i1p1f1, grid: gn} 
 #          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn} #problem reading times.

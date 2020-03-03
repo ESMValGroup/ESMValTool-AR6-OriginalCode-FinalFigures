@@ -22,7 +22,7 @@ class allvars(Fix):
         iris.cube.Cube
 
         """
-
+        print ('Running fixes for MIROC6')
         for cube in cubes:
             latitude = cube.coord('latitude')
             latitude.var_name = 'lat'

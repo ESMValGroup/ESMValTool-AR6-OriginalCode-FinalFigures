@@ -29,6 +29,11 @@ class allvars(Fix):
 
             longitude = cube.coord(standard_name='longitude')
             longitude.var_name = 'lon'
+
+            time=cube.coord(standard_name='time')
+            print ('IPSL_CM6A-LR*****')
+            print (time.time_origin)
+            time.time_origin='1850-01-01 00:00:00' 
         print ('**************** IPSL_CM6A_LR.py ******************')
         print (cubes)
         print (len(cubes))

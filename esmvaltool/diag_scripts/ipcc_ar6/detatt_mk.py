@@ -231,7 +231,7 @@ def rct_mc(C, x0, ne, n1, n2, nmc=10000, flag_plotden=0):
 		
 #################################################################################
 
-def tls(x,y,cn1,cn2='None',ne=1,rof_flag=1,CI_flag=1,alpha=0.10,flag_2S=0,flag_3S=0,flag_4S=0,error_flag=0):
+def tls(x,y,cn1,cn2='None',ne=1,rof_flag=1,CI_flag=1,alpha=0.10,flag_2S=0,flag_3S=0,flag_4S=0,error_flag=0,RCT_flag=True):
 	
 	# returns the coefficients from a total least squares regression
 	# expects x and y to have column data (and should be centered)
@@ -312,7 +312,7 @@ def tls(x,y,cn1,cn2='None',ne=1,rof_flag=1,CI_flag=1,alpha=0.10,flag_2S=0,flag_3
 	###########################
 	#residual consistency test#
 	###########################
-	if cn2 is not 'None':
+	if RCT_flag:
 		lam = s**2
 		if rof_flag==0:
 			w2 = cn2
@@ -338,6 +338,10 @@ def tls(x,y,cn1,cn2='None',ne=1,rof_flag=1,CI_flag=1,alpha=0.10,flag_2S=0,flag_3
 	#calculate CIs#
 	###############
 	if CI_flag==1:
+		if rof_flag==0: #NPG - copied here, so code will run even if RCT_flag not set.
+			w2 = cn2
+		else:
+			w2 = np.dot(cl12,cn2)
 		betaCI = np.empty((m,2))
 
 		lam2_hat = np.empty((m+1,1))
@@ -347,7 +351,9 @@ def tls(x,y,cn1,cn2='None',ne=1,rof_flag=1,CI_flag=1,alpha=0.10,flag_2S=0,flag_3
 			lam2_hat[j] = lam[j]/(np.dot(np.dot(um.T,np.dot(w2,w2.T)),um)/p2)
 			
 		#use m-sphere or whatever, as in AS03 and Ribes code
-		npt = 10000
+		npt = 10000 #Original version. Replaced with 2000 to speed up code for testing.
+#		npt = 2000 
+
 		if m==1:
 			pts = np.array([1,-1])
 			pts = np.expand_dims(pts,axis=1)
@@ -425,7 +431,7 @@ def tls(x,y,cn1,cn2='None',ne=1,rof_flag=1,CI_flag=1,alpha=0.10,flag_2S=0,flag_3
 	out = {}
 	out['beta'] = beta
 	
-	if cn2 is not 'None':
+	if RCT_flag==1:
 		out['rc_pvalue'] = rc_pvalue
 		out['rc_mcCI'] = rc_mcCI
 	if CI_flag==1:
