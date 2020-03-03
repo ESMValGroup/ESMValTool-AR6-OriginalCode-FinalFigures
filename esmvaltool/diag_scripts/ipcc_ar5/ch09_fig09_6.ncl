@@ -22,10 +22,10 @@
 ;
 ;
 ; Modification history
-;    20190205-A_gier_be: Adapted to new ncl structure
-;    20181012-A_gier_be: Ported to v2
-;    20171020-A_laue_ax: added tags for reporting
-;    20170404-A_gier_be: written.
+;    20190205-gier_bettina: Adapted to new ncl structure
+;    20181012-gier_bettina: Ported to v2
+;    20171020-lauer_axel: added tags for reporting
+;    20170404-gier_bettina: written.
 ;
 ; #############################################################################
 
@@ -37,8 +37,8 @@ begin
   enter_msg(DIAG_SCRIPT, "")
 
   var0 = variable_info[0]@short_name
-  field_type0 = variable_info[0]@field
   info_items = select_metadata_by_name(input_file_info, var0)
+  infiles = metadata_att_as_array(info_items, "filename")
   datasetnames = metadata_att_as_array(info_items, "dataset")
   projectnames = metadata_att_as_array(info_items, "project")
   dim_MOD = ListCount(info_items)
@@ -58,23 +58,9 @@ begin
     alt_ref = False
   end if
 
-  ; alltags = array_append_record(tags, \
-  ; (/"PT_other", "ST_clim", "ST_corr", "DM_global"/), 0)
-
 end
 
 begin
-  authors = "A_gier_be"
-
-  ; Check field type
-  plot_fields = (/"T2Ms"/)
-  if (field_type0.ne.plot_fields) then
-    error_msg("f", DIAG_SCRIPT, "", "can't use field " + field_type0 + \
-              " for this diag_script, currently only (" + \
-              str_join(plot_fields, ", ") + ") supported.")
-  end if
-  delete(plot_fields)
-
   ; Output directories
   ncdf_dir = config_user_info@work_dir + "pattern_cor.nc"
   modproj_dir = config_user_info@work_dir + "modprojnames.txt"
@@ -86,6 +72,9 @@ begin
 ; -------------------- Compute correlation for one var ------------------------
 ; -----------------------------------------------------------------------------
 
+  ; Save list of preproc files for provenance in collect.ncl
+  preproc_files = metadata_att_as_array(info_items, "filename")
+
   ; Reference model
   mod_idx = ispan(0, dim_MOD - 1, 1)
   mod_ind_woref = mod_idx(ind(mod_idx.ne.ref_ind))
@@ -96,8 +85,7 @@ begin
   all_cor!0 = "models"
   all_cor&models = datasetnames(mod_ind_woref)
   ; Pass on alt models
-  if isatt(variable_info[0], "alternative_dataset").and. \
-    any(datasetnames.eq.variable_info[0]@alternative_dataset) then
+  if alt_ref then
     all_cor@alt_obs =  variable_info[0]@alternative_dataset
   else
     all_cor@alt_obs = "none"
@@ -135,10 +123,22 @@ begin
 
   ; Write data
   all_cor@corvar = var0
+  all_cor@corvar_long = variable_info[0]@long_name
   all_cor@var = "cor"
   all_cor@diag_script = DIAG_SCRIPT
+  all_cor@diagnostics = variable_info[0]@diagnostic
   all_cor@ncdf = ncdf_dir
+  all_cor@input = str_join(infiles, ",")
   ncdf_outfile = ncdf_write(all_cor, ncdf_dir)
+
+  ; Write provenance
+  statistics = (/"corr", "clim"/)
+  domains = (/"global"/)
+  plottype = "other"
+  authors = (/"gier_bettina", "bock_lisa"/)
+  references = (/"flato13ipcc"/)
+  log_provenance(ncdf_outfile, "n/a", "n/a", statistics, domains, "other", \
+                 authors, references, preproc_files)
 
   ; Write list of models with project (arrays get squished as attributes)
   modnames = datasetnames(mod_ind_woref)
