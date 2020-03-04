@@ -1,30 +1,9 @@
 ; #############################################################################
-; DIAGNOSTIC SCRIPT for reproducing IPCC ch. 9 fig. 9.6
+; DIAGNOSTIC SCRIPT for reproducing Friedlingstein 14 fig 1
 ; Author: Bettina Gier (Uni Bremen & DLR, Germany)
 ; CRESCENDO project
 ; #############################################################################
-;
-; Description
-;    Calculates centred pattern correlations for annual mean climatologies
-;    and plots them. Like IPCC ch. 9 fig 9.6
-;
-; Required diag_script_info attributes (diagnostics specific)
-;
-; Optional diag_script_info attributes (diagnostic specific)
-;
-; Required variable_info attributes (variable specific)
-;     none
-;
-; Optional variable_info attributes (variable specific)
-;     none
-;
-; Caveats
-;
-;
-; Modification history
-;    20190213-A_gier_be: written.
-;
-; #############################################################################
+
 load "$diag_scripts/../interface_scripts/interface.ncl"
 load "$diag_scripts/shared/latlon.ncl"
 load "$diag_scripts/shared/statistics.ncl"
@@ -76,7 +55,8 @@ begin
     ref_lsinks&time = ref_lnsinks&time + 1
   end if
   end if
-  ref_co2 = 379. ; TODO: Implement actual co2 global ref data
+  ref_co2 =  397.12 ; value for 2014!
+  ; 2005 = 379. ; TODO: Implement actual co2 global ref data
 
 
   ; Plot file type
@@ -88,6 +68,24 @@ begin
   ; Create Plot dir
   plot_dir = config_user_info@plot_dir
   system("mkdir -p " + plot_dir)
+
+
+  ; N-Cycle Models
+  n_cycle_mods = (/"BNU-ESM", "CESM1-BGC", "NorESM1-ME", \
+                   "UKESM1-0-LL", "NorESM2-LM", \
+                   "EC-Earth3-Veg", "CESM2", "CESM2-WACCM", \
+                   "SAM0-UNICON", "MIROC-ES2L", "MPI-ESM1-2-LR"/)
+  ; Models with prescribed land use change
+  pluc_mods = (/"bcc-csm1-1", "inmcm4", "MRI-ESM1"/)
+
+  ; IPCC colors
+  black = (/0., 0., 0./)
+  lightblue = (/112./255., 160./255., 205./255./)
+  orange = (/196./255., 121./255., 0./)
+  orange_shade =  (/204./255., 174./255., 113./255./)
+  lightgrey = (/178./255., 178./255., 178./255./)
+  darkblue = (/0., 52./255., 102./255./)
+  darkgreen = (/0., 79./255., 0./)
 end
 
 begin
@@ -99,41 +97,80 @@ begin
   ;   models: List of models to pick colors for
   ; Description:
   ;   Returns array of colors based on model parameters
-  ;   like Nitrogen Cycle or presricbed land use change
+  ;   like Nitrogen Cycle or prescribed land use change
   ; Modification history
-  ;   20190220_A_gier_be: written.
+  ;   20190220_A_gier_bettina: written.
   local n_cycle_mods, pluc_mods, colors
   begin
   ; FOR COLORS
   ; TODO: Complete list + add CMIP6 models
   ; N-Cycle Models
   n_cycle_mods = (/"BNU-ESM", "CESM1-BGC", "NorESM1-ME", \
-                   "UKESM1-0-LL", "NorESM2-LM"/)
+                   "UKESM1-0-LL", "NorESM2-LM", \
+                   "EC-Earth3-Veg", "CESM2", "CESM2-WACCM", \
+                   "SAM0-UNICON", "GFDL-ESM4"/)
   ; Models with prescribed land use change
   pluc_mods = (/"bcc-csm1-1", "inmcm4", "MRI-ESM1"/)
+
+  ; IPCC colors
+  black = (/0., 0., 0./)
+  lightblue = (/112./255., 160./255., 205./255./)
+  orange = (/196./255., 121./255., 0./)
+  orange_shade =  (/204./255., 174./255., 113./255./)
+  lightgrey = (/178./255., 178./255., 178./255./)
+  darkblue = (/0., 52./255., 102./255./)
+  darkgreen = (/0., 79./255., 0./)
+  black_shade = (/128./255., 128./255., 128./255/)
+  darkblue_shade = (/67./255., 147./255., 195./255./)
+  lightblue_shade = (/92./255., 174./255., 178./255./)
+  darkgreen_shade = (/223./255.,  237./255., 195./255./)
 
   ; Set up array to hold colors
   colors = new((/dimsizes(models), 3/), float)
 
   do idat = 0, dimsizes(models) - 1
-    if any(n_cycle_mods.eq.models(idat)) then
-      colors(idat, :) = (/112/255., 160/255., 205/255./)
-    else if any(pluc_mods.eq.models(idat)) then
-      colors(idat, :) = (/196/255., 121/255., 0/255./)
+    if models(idat).eq."BCC-CSM2-MR" then
+      colors(idat, :) = darkgreen
+    else if models(idat).eq."CanESM5" then
+      colors(idat, :) = black
+    else if models(idat).eq."NorESM2-LM" then
+      colors(idat, :) = lightblue_shade
+    else if models(idat).eq."CNRM-ESM2-1" then
+      colors(idat, :) = black_shade
+    else if models(idat).eq."GFDL-ESM4" then
+      colors(idat, :) = lightgrey
+    else if models(idat).eq."UKESM1-0-LL" then
+      colors(idat, :) = lightblue
+    else if models(idat).eq."CESM2" then
+      colors(idat, :) = darkblue_shade
     else
-      colors(idat, :) = (/0/255., 0/266., 0/255./)
+      colors(idat, :) = lightblue_shade
+    end if
+    end if
+    end if
+    end if
+    end if
     end if
     end if
   end do
+  ;do idat = 0, dimsizes(models) - 1
+  ;  if any(n_cycle_mods.eq.models(idat)) then
+  ;    colors(idat, :) = (/112/255., 160/255., 205/255./)
+  ;  else if any(pluc_mods.eq.models(idat)) then
+  ;    colors(idat, :) = (/196/255., 121/255., 0/255./)
+  ;  else
+  ;    colors(idat, :) = (/0/255., 0/266., 0/255./)
+  ;  end if
+  ;  end if
+  ;end do
 
   return(colors)
-
   end
+
 end
 
 begin
-  leave_msg(DIAG_SCRIPT, "")
-
+  ;leave_msg(DIAG_SCRIPT, "")
   ; Loop over variables
   do ivar = 0, dim_VAR - 1
 
@@ -159,14 +196,17 @@ begin
 
     ; Loop over models
     do idat = 0, dimsizes(datasetnames) - 1
-      if var.eq."nbp" .and. datasetnames(idat).eq."MPI-ESM-LR" then
-        continue
-      end if
+      ;if var.eq."nbp" .and. datasetnames(idat).eq."MPI-ESM-LR" then
+      ;  continue
+      ;end if
 
       ; Read in data
       tmp_mod = read_data(info_items[idat])
       data_yearly = time_operations(tmp_mod, info_items[idat]@start_year, info_items[idat]@end_year, \
                                     "average", "yearly", True)
+       if var.eq."co2" .and. datasetnames(idat).eq."CanESM5" then
+        data_yearly = data_yearly * 1e-6 ;Gives units in ppmv, correcting here as not ESGF data yet!
+       end if
       ; Compute Index
       idx1 = ind(start_years(idat).eq.temp_array&time)
       idx2 = ind(end_years(idat).eq.temp_array&time)
@@ -179,6 +219,11 @@ begin
 ;                               info_items[idat]@end_year, "average", "yearly", True))
       end if
       copy_VarAtts(tmp_mod, temp_array)
+
+       ;if var.eq."fgco2" then
+       ; print(datasetnames(idat))
+       ; print(avg(data_yearly))
+       ;end if
 
       delete(tmp_mod)
       delete(data_yearly)
@@ -206,6 +251,13 @@ begin
     delete([/datasetnames, var, info_items, start_years, end_years/])
 
   end do ; End loop over variables
+
+  ; TODO: MAKE THIS NICER! READ OBS DATA
+  test = addfile("/work/bd0854/b309137/data_ext/Tier2/ESRL/OBS_ESRL_ground_GLOB_T0M_co2_198001-201812.nc", "r")
+  co2_glob_full = test->co2
+  delete(test)
+  co2_glob = time_operations(co2_glob_full, 1980, 2014, "average", "yearly", True)
+
   ; --------------------- PLOTTING --------------------------------------------
 
   outfile = plot_dir + "carbon_global_" + start_year + "-" + end_year
@@ -224,20 +276,27 @@ begin
   res@vpWidthF = 0.8
   res@xyMonoDashPattern = True
   res@xyDashPattern = 0
+  res@xyLineThicknessF = 2.
   res@xyLineColors = color_picker_co2(co2_arr&datasets)
 
   plot_co2 = gsn_csm_xy(wks, co2_arr&time, co2_arr, res)
+  ; Add obs
+  lnres = True
+  lnres@gsLineColor = orange
+  lnres@gsLineThicknessF = 3.
+  plot_co2_obs = gsn_add_polyline(wks,plot_co2,co2_glob&year,co2_glob,lnres)
+
 
   ; Add Obs to CO2 Plot
   resM = True
-  resM@gsMarkerColor = "red"
+  resM@gsMarkerColor = orange
   resM@gsMarkerIndex = 16
   resM@gsClipOn = False
   resM@gsMarkerSizeF = 0.015
 
   txres = True
   txres@txFontHeightF = 0.04
-  txres@txFontColor   = "red"
+  txres@txFontColor   = orange
   txres@txJust = "CenterLeft"
 
   plot_co2@obs = gsn_add_text(wks, plot_co2, "   ~F37~Z", res@trXMaxF, ref_co2(0), txres)
@@ -251,13 +310,12 @@ begin
   plot_fgco2 = gsn_csm_xy(wks, fgco2_arr&time, fgco2_arr, res)
   ; Add Observations:
   gsres = True
-  gsres@gsFillColor = "red"
+  gsres@gsFillColor = orange
 
   do iobs = 0, dimsizes(ref_osinks(:,0)) - 1
     if ref_osinks&time(iobs).gt.end_year then
       continue
     end if
-    print("in loop: " + iobs)
     wdth = 0.01 * (res@trXMaxF - res@trXMinF)
     xbox = (/ref_osinks&time(iobs) - wdth, ref_osinks&time(iobs) + wdth, \
              ref_osinks&time(iobs) + wdth, ref_osinks&time(iobs) - wdth, \
@@ -267,8 +325,6 @@ begin
              ref_osinks(iobs, 0) + ref_osinks(iobs, 1), \
              ref_osinks(iobs, 0) + ref_osinks(iobs, 1), \
              ref_osinks(iobs, 0) - ref_osinks(iobs, 1)/)
-    print("x values " + xbox(0) + " to " + xbox(1))
-    print("y values " + ybox(0) + " to " + ybox(2))
     plot_fgco2@$unique_string("osink")$ = gsn_add_polygon(wks, plot_fgco2, \
                   xbox, ybox, gsres)
   end do
@@ -285,7 +341,7 @@ begin
 
   ; Add Observations:
   gsres = True
-  gsres@gsFillColor = "red"
+  gsres@gsFillColor = orange
 
   do iobs = 0, dimsizes(ref_lsinks(:,0)) - 1
     if ref_lsinks&time(iobs).gt.end_year then
@@ -305,7 +361,7 @@ begin
   plot_nbp@lsink_txt = gsn_add_text(wks, plot_nbp, "   F~B~L", res@trXMaxF, \
                        ref_lsinks(dimsizes(ref_lsinks(:,0))-1, 0), txres)
 
-  gsres@gsFillColor = "indianred1"
+  gsres@gsFillColor = orange_shade
 
   do iobs = 0, dimsizes(ref_lsinks(:,0)) - 1
     if ref_lnsinks&time(iobs).gt.end_year then
@@ -326,6 +382,7 @@ begin
   plot_nbp@lnsink_txt = gsn_add_text(wks, plot_nbp, "   F~B~LN", res@trXMaxF, \
                        ref_lnsinks(dimsizes(ref_lnsinks(:,0))-1, 0), txres)
 
+
   ; --- PANELING
   pres = True
   pres@gsnMaximize = True
@@ -340,6 +397,100 @@ begin
   pres@gsnPanelFigureStringsFontHeightF = 0.012                   ; make figure strings slightly bigger
 
   gsn_panel(wks, (/plot_co2, plot_fgco2, plot_nbp/), (/3, 1/), pres)
+
+  ;; Add Legend
+
+  ; Initialize with OBS
+
+  ; list of all models
+  model_list = co2_arr&datasets
+  do imod = 0, dimsizes(fgco2_arr&datasets) - 1
+    if .not. any(fgco2_arr&datasets(imod) .eq. model_list) then
+      model_list := array_append_record(model_list, fgco2_arr&datasets(imod), 0)
+    end if
+  end do
+  do imod = 0, dimsizes(nbp_arr&datasets) - 1
+    if .not. any(nbp_arr&datasets(imod) .eq. model_list) then
+      model_list := array_append_record(model_list, nbp_arr&datasets(imod), 0)
+    end if
+  end do
+
+  do imod = 0, dimsizes(model_list) - 1
+    if any(model_list(imod) .eq. n_cycle_mods) then
+      if (.not.isdefined("nmods")) then
+        nmods = model_list(imod)
+      else
+        nmod_new = array_append_record(nmods, model_list(imod), 0)
+        delete(nmods)
+        nmods = nmod_new
+        delete(nmod_new)
+      end if
+    else
+      if (.not.isdefined("omods")) then
+        omods = model_list(imod)
+      else
+        omods_new = array_append_record(omods, model_list(imod), 0)
+        delete(omods)
+        omods = omods_new
+        delete(omods_new)
+      end if
+    end if
+  end do
+
+  my_labels = new(dimsizes(model_list)+3, string)
+  my_labels(0) = "OBS"
+  my_labels(1) = "N-cycle models"
+  my_labels(2:1+dimsizes(nmods)) = nmods
+  my_labels(2+dimsizes(nmods)) = "Other Models"
+  my_labels(3+ dimsizes(nmods):) = omods
+
+  my_colors = new((/dimsizes(my_labels), 3/), float)
+  my_colors(0, :) = orange
+  my_colors(1, :) = darkblue
+  my_colors(2:1+dimsizes(nmods), :) = color_picker_co2(nmods)
+  my_colors(2+dimsizes(nmods), :) = black
+  my_colors(3+dimsizes(nmods):dimsizes(model_list)+2, :) = color_picker_co2(omods)
+
+  my_opacities = new(dimsizes(my_labels), float)
+  my_opacities = 1.
+  my_opacities(1) = 0.
+  my_opacities(2+dimsizes(nmods)) = 0.
+
+  my_lt = new(dimsizes(my_labels), float)
+  my_lt = 5.
+
+  label_colors = new(dimsizes(my_labels), string)
+  label_colors = "black"
+  label_colors(1) = "blue"
+  label_colors(2+dimsizes(nmods)) = "darkgrey"
+
+
+  gres = True
+  gres@YPosPercent = 93.5               ; expressed as %, 0->100, sets position of bottom border of legend
+                                      ;  when gres@Position="Bottom" (Default = 95.)
+  gres@XPosPercent = 75.               ; expressed as %, 0->100, sets position of left border of legend
+                                      ;  (Default = 5.)
+  gres@Position = "Top"            ; YPosPercent setting reflects the "Top" or "Bottom" of legend
+                                      ;  (Default="Top")
+  gres@ItemSpacePercent = 2.          ; expressed as %, 0->100, space between legend items (Default = 5.)
+  gres@LineLabelWhiteSpacePercent = 2 ; expressed as %, 0->100, space between line and label (Default = 3.)
+
+
+  lineres = True
+  lineres@lgLineColors = my_colors ; line colors
+  lineres@lgLineOpacity = my_opacities              ; line opacities
+  lineres@lgLineThicknesses = my_lt         ; line thicknesses
+  ;lineres@lgDashIndexes = (/0,1,14/)                   ; line types
+  lineres@LineLengthPercent = 5                        ; expressed as %, 0->100, length of line
+
+  textres = True
+  textres@lgLabels = my_labels ; labels (req)
+  textres@lgLabelFontHeight = 0.008                          ; label font heights
+  textres@lgLabelColors = "black"                  ; label font colors
+ ; textres@lgLineOpacity = my_opacities                                    ; 0->1, label opacities
+
+  simple_legend_ndc(wks,gres,lineres,textres)
+
 
   frame(wks)
 

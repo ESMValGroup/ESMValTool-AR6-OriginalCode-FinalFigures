@@ -1,4 +1,3 @@
-
 # ESMValTool
 # recipe_ipcc6_co2.yml
 ---
@@ -78,9 +77,9 @@ diagnostics:
           #- {dataset: BCC-CSM2-MR, grid: gn} #esmvalcore.cmor.check.CMORCheckError: There were errors in variable fgco2:
           #fgco2: does not match coordinate rank
           - {dataset: CanESM5, grid: gn}
-          - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
+          # - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2} #too low, due to carbon leak
           - {dataset: NorESM2-LM, grid: gn}
-          - {dataset: GFDL-ESM4, grid: gr} #depth0m: does not exist
+          - {dataset: GFDL-ESM4, grid: gr}
 
 #   #       - {dataset: bcc-csm1-1, exp: esmHistorical} # Multi-dimensional coordinate not supported: 'latitude'
 #   #       - {dataset: bcc-csm1-1-m, exp: esmHistorical} # Multi-dimensional coordinate not supported: 'latitude'
@@ -129,9 +128,18 @@ diagnostics:
         start_year: 1850
         end_year: 2014 #2010
         additional_datasets:
-          - {dataset: BCC-CSM2-MR, grid: gn}
-          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2}
-          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2, mip: AERmon}
+          - {dataset: BCC-CSM2-MR, grid: gn} # -> sorta got retracted?
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f3} #some problem with f3 FIX! f2 works
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: CESM2, grid: gn, ensemble: r2i1p1f1}
+          - {dataset: GFDL-ESM4, grid: gr1}
+        # - {dataset: MIROC-ES2L, grid: gn} #There were errors in variable co2:
+            #plev: standard_name should be air_pressure, not None
+          # plev: units should be Pa, not 1
+          # co2: does not match coordinate rank
+
+
+          #- {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2, mip: AERmon} needs special stuff!
 #          - {dataset: BNU-ESM}
 #          - {dataset: CanESM2}
 #          - {dataset: CESM1-BGC}
