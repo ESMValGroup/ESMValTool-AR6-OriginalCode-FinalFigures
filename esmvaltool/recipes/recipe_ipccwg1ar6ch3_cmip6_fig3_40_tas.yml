@@ -145,6 +145,8 @@ preprocessors:
       exclude: [reference_dataset]
 
 cmip6_hist_models: &cmip6_hist_models_tas
+  - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
   #- {dataset: AWI-CM-1-1-MR, grid: gn} start 1851
   - {dataset: BCC-CSM2-MR, grid: gn}
   - {dataset: BCC-ESM1, grid: gn}
@@ -152,70 +154,55 @@ cmip6_hist_models: &cmip6_hist_models_tas
   - {dataset: CanESM5, grid: gn}
   - {dataset: CESM2, grid: gn}
   - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
+  - {dataset: CIESM}
   - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-  #- {dataset: E3SM-1-0} no data from 2000-2014
+  - {dataset: E3SM-1-0} #no data from 2000-2014
   - {dataset: EC-Earth3, ensemble: r22i1p1f1}
   - {dataset: EC-Earth3-Veg}
   - {dataset: FGOALS-f3-L}
-  #- {dataset: FGOALS-g3} just some years available
-#  - {dataset: GFDL-CM4, grid: gr1}
+  - {dataset: FGOALS-g3, grid: gn} #just some years available
+  - {dataset: GFDL-CM4, grid: gr1}
   - {dataset: GFDL-ESM4, grid: gr1}
   - {dataset: GISS-E2-1-G, grid: gn}
-  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} no data 1951-2000
+  - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #no data 1951-2000
   - {dataset: GISS-E2-1-H, grid: gn}
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1}
   - {dataset: IPSL-CM6A-LR}
-  #- {dataset: MCM-UA-1-0, grid: gn} no data on DKRZ
+  - {dataset: KACE-1-0-G}
+  - {dataset: MCM-UA-1-0, grid: gn} #no data on DKRZ
   - {dataset: MIROC6, grid: gn}
   - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn}
   - {dataset: MPI-ESM1-2-HR, grid: gn}
   - {dataset: MPI-ESM1-2-LR, grid: gn}
   - {dataset: MRI-ESM2-0, grid: gn}
   - {dataset: NESM3, grid: gn} 
-  #- {dataset: NorCPM1, grid: gn} no data on DKRZ
+  - {dataset: NorCPM1, grid: gn, institute: NCC}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC}
+  - {dataset: NorESM2-MM, grid: gn, institute: NCC}
   - {dataset: SAM0-UNICON, grid: gn}
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-     start_year: 1850, end_year: 2014, tier: 2}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
 
 cmip6_hist_models: &cmip6_hist-nat_models_tas
   - {dataset: BCC-CSM2-MR, grid: gn}
   - {dataset: CanESM5, grid: gn}
   - {dataset: CESM2, grid: gn}
   - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
-  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
-  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-  - {dataset: IPSL-CM6A-LR}
-  - {dataset: MRI-ESM2-0, grid: gn}
-  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-     start_year: 1850, end_year: 2014, tier: 2}
-
-cmip6_hist_models: &cmip6_hist-GHG_models_tas
-  - {dataset: BCC-CSM2-MR, grid: gn}
-  - {dataset: CanESM5, grid: gn}
-  - {dataset: CESM2, grid: gn}
-  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+  - {dataset: GFDL-ESM4, grid: gr1}
   - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
   - {dataset: IPSL-CM6A-LR}
   - {dataset: MIROC6, grid: gn}
   - {dataset: MRI-ESM2-0, grid: gn}
-  - {dataset: NorESM2-LM, grid: gn}
-  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-     start_year: 1850, end_year: 2014, tier: 2}
-
-cmip6_hist_models: &cmip6_hist-aer_models_tas
-  - {dataset: BCC-CSM2-MR, grid: gn}
-  - {dataset: CanESM5, grid: gn}
-  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
-  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
-  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-  - {dataset: IPSL-CM6A-LR}
-  - {dataset: MIROC6, grid: gn}
-  - {dataset: MRI-ESM2-0, grid: gn}
-  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-     start_year: 1850, end_year: 2014, tier: 2}
+  - {dataset: NorESM2-LM}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
 
 diagnostics:
 
@@ -263,7 +250,7 @@ diagnostics:
         stat: "MinMax"
         region: "Global"
         styleset: CMIP6
-        run_ave: 2
+        yr_mean: 5
 
   tas_hist-nat_global:
     <<: *diag_tas
@@ -272,22 +259,6 @@ diagnostics:
         <<: *var_tas
         exp: hist-nat
     additional_datasets: *cmip6_hist-nat_models_tas
-
-#  tas_hist-GHG_global:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#
-#  tas_hist-aer_global:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
 
   fig_3_6_global: &diag_tas_collect
     description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
@@ -307,11 +278,9 @@ diagnostics:
         start_year: 1850
         end_year: 2014
         ref: ["HadCRUT4"]
-        #order: ["CMIP6_hist-aer", "CMIP6_hist-GHG", "CMIP6_hist-nat", "CMIP6_historical"]
-        order: ["CMIP6_historical", "CMIP6_hist-nat", "CMIP6_hist-aer", "CMIP6_hist-GHG"]
+        order: ["CMIP6_historical", "CMIP6_hist-nat"]
         stat_shading: True
         ref_shading: False
-        run_ave: 0
 
 
   ########################################################################
@@ -341,32 +310,6 @@ diagnostics:
       tsline_anom:
         <<: *tsline_settings
         region: "Global Land"
-
-#  tas_hist-GHG_global_land:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_global_land
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Global Land"
-#
-#  tas_hist-aer_global_land:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_global_land
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Global Land"
 
   fig_3_6_global_land:
     <<: *diag_tas_collect
@@ -410,32 +353,6 @@ diagnostics:
         <<: *tsline_settings
         region: "Global Ocean"
 
-#  tas_hist-GHG_global_ocean:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_global_ocean
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Global Ocean"
-#
-#  tas_hist-aer_global_ocean:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_global_ocean
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Global Ocean"
-
   fig_3_6_global_ocean:
     <<: *diag_tas_collect
     variables:
@@ -477,32 +394,6 @@ diagnostics:
       tsline_anom:
         <<: *tsline_settings
         region: "Europe"
-
-#  tas_hist-GHG_europe:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_europe
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Europe"
-#
-#  tas_hist-aer_europe:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_europe
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Europe"
 
   fig_3_6_europe:
     <<: *diag_tas_collect
@@ -546,32 +437,6 @@ diagnostics:
         <<: *tsline_settings
         region: "Asia"
 
-#  tas_hist-GHG_asia:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_asia
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Asia"
-#
-#  tas_hist-aer_asia:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_asia
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Asia"
-
   fig_3_6_asia:
     <<: *diag_tas_collect
     variables:
@@ -612,32 +477,6 @@ diagnostics:
     scripts:
       tsline_anom:
         <<: *tsline_settings
-        region: "Africa"
-
-#  tas_hist-GHG_africa:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_africa
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Africa"
-#
-#  tas_hist-aer_africa:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_africa
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
         region: "Africa"
 
   fig_3_6_africa:
@@ -682,32 +521,6 @@ diagnostics:
         <<: *tsline_settings
         region: "North America"
 
-#  tas_hist-GHG_north_america:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_north_america
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "North America"
-#
-#  tas_hist-aer_north_america:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_north_america
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "North America"
-
   fig_3_6_north_america:
     <<: *diag_tas_collect
     variables:
@@ -750,32 +563,6 @@ diagnostics:
         <<: *tsline_settings
         region: "South America"
 
-#  tas_hist-GHG_south_america:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_south_america
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "South America"
-#
-#  tas_hist-aer_south_america:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_south_america
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "South America"
-
   fig_3_6_south_america:
     <<: *diag_tas_collect
     variables:
@@ -800,11 +587,13 @@ diagnostics:
       tas:
         <<: *var_tas
         preprocessor: clim_ref_antarctica
+        start_year: 1950
+        end_year: 2014
     scripts:
       tsline_anom:
         <<: *tsline_settings
         ref_start: 1950
-        ref_end: 2010
+        ref_end: 2000
         region: "Antarctica"
 
   tas_hist-nat_antarctica:
@@ -814,39 +603,15 @@ diagnostics:
         <<: *var_tas
         preprocessor: clim_ref_antarctica
         exp: hist-nat
+        start_year: 1950
+        end_year: 2014
     additional_datasets: *cmip6_hist-nat_models_tas
     scripts:
       tsline_anom:
         <<: *tsline_settings
         ref_start: 1950
-        ref_end: 2010
+        ref_end: 2000
         region: "Antarctica"
-
-#  tas_hist-GHG_antarctica:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_antarctica
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Antarctica"
-#
-#  tas_hist-aer_antarctica:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_antarctica
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Antarctica"
 
   fig_3_6_antarctica:
     <<: *diag_tas_collect
@@ -859,7 +624,7 @@ diagnostics:
       collect: 
         <<: *tsline_collect
         ref_start: 1950
-        ref_end: 2010
+        ref_end: 2000
         region: "Antarctica"
         ancestors: [tas, 'tas_*_antarctica/tsline_anom*']
 
@@ -891,32 +656,6 @@ diagnostics:
       tsline_anom:
         <<: *tsline_settings
         region: "Australasia"
-
-#  tas_hist-GHG_australasia:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_australasia
-#        exp: hist-GHG
-#    additional_datasets: *cmip6_hist-GHG_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Australasia"
-#
-#  tas_hist-aer_australasia:
-#    <<: *diag_tas
-#    variables:
-#      tas:
-#        <<: *var_tas
-#        preprocessor: clim_ref_australasia
-#        exp: hist-aer
-#    additional_datasets: *cmip6_hist-aer_models_tas
-#    scripts:
-#      tsline_anom:
-#        <<: *tsline_settings
-#        region: "Australasia"
 
   fig_3_6_australasia:
     <<: *diag_tas_collect
