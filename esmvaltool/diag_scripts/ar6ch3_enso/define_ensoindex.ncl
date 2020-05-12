@@ -5,9 +5,10 @@
 ; ############################################################################
 ; Description
 ;
-;    Outputs: 
+;    Outputs:
 ;
 ; History
+;    20200511 kosaka_yu: cleaned to meet the code style.
 ;    20191024 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -52,7 +53,7 @@ begin
   var = "ts"
   varList = metadata_att_as_array(input_file_info, "short_name")
   varList := get_unique_values(varList)
-  
+
   if (all(varList.ne.var)) then
     error_msg("f", DIAG_SCRIPT, "", "variable "+var+" is missing.")
   end if
@@ -61,12 +62,12 @@ begin
 ;    refname = variable_info[iVarTs]@reference_dataset
 ;  end if
 
- ; ========================================================================
-  
+  ; ========================================================================
+
   ; prepare time filtering
   wgt = (/ 1., 2., 3., 2., 1./)
   wgt = wgt / sum(wgt)
-    
+
   ; prepare index domain
   if (domain.eq."Nino3") then
     W = 210.
@@ -122,7 +123,7 @@ begin
     error_msg("f", DIAG_SCRIPT, "", "Index "+domain+" is undefined.")
   end if
   d2r = get_d2r("double")
-  
+
   ; Get file list
   infoTs = select_metadata_by_name(input_file_info, var)
 
@@ -131,24 +132,25 @@ begin
     esize = 0
     do i = 0, ListCount(infoTs)-1
       if (isatt(infoTs[i], "exp").and.isatt(infoTs[ii], "exp")) then
-        if (all((/infoTs[ i]@project, infoTs[ i]@dataset, infoTs[ i]@exp/).eq. \
-                (/infoTs[ii]@project, infoTs[ii]@dataset, infoTs[ii]@exp/))) then
+        if (all((/infoTs[i]@project, infoTs[i]@dataset, infoTs[i]@exp/).eq. \
+                (/infoTs[ii]@project, infoTs[ii]@dataset, infoTs[ii]@exp/))) \
+          then
           esize = esize + 1
         end if
-      elseif (.not.isatt(infoTs[i], "exp").and..not.isatt(infoTs[ii], "exp")) then
-        if (all((/infoTs[ i]@project, infoTs[ i]@dataset/).eq. \
+      elseif (.not.isatt(infoTs[i], "exp").and..not.isatt(infoTs[ii], "exp")) \
+        then
+        if (all((/infoTs[i]@project, infoTs[i]@dataset/).eq. \
                 (/infoTs[ii]@project, infoTs[ii]@dataset/))) then
           esize = esize + 1
         end if
       end if
-     end do
+    end do
 
     ; Read data
     Ts = read_data(infoTs[ii])
     ts = tofloat(Ts)
     copy_VarMeta(Ts, ts)
     delete(Ts)
-;    ts = read_data(infoTs[ii])
     if (ts@units.eq."K") then  ; K -> degC
       ts = ts - 273.15
       ts@units = "degC"
@@ -159,7 +161,8 @@ begin
       lat_bnds = f->lat_bnds
     end if
     ysize = dimsizes(ts&lat)
-    if (.not.isvar("lat_bnds") .or. any(abs(lat_bnds(1:ysize-1, 0)-lat_bnds(0:ysize-2, 1)).gt.0.01)) then
+    if (.not.isvar("lat_bnds") .or. \
+        any(abs(lat_bnds(1:ysize-1, 0)-lat_bnds(0:ysize-2, 1)).gt.0.01)) then
       print(infoTs[ii]@dataset+" : Creating lat_bnds")
       lat = ts&lat
       if (isvar("lat_bnds")) then
@@ -168,17 +171,20 @@ begin
       lat_bnds = new((/ysize, 2/), typeof(ts&lat))
       lat_bnds(1:ysize-1, 0) = (lat(0:ysize-2) + lat(1:ysize-1))/2.
       lat_bnds(0:ysize-2, 1) = (lat(0:ysize-2) + lat(1:ysize-1))/2.
-      lat_bnds(0, 0) = max((/lat_bnds(0, 1) - (lat_bnds(1, 1) - lat_bnds(1, 0)), -90./))
-      lat_bnds(ysize-1, 1) = min((/lat_bnds(ysize-1, 0) + (lat_bnds(ysize-2, 1) - lat_bnds(ysize-2, 0)), 90./))
+      lat_bnds(0, 0) \
+        = max((/lat_bnds(0, 1) - (lat_bnds(1, 1) - lat_bnds(1, 0)), -90./))
+      lat_bnds(ysize-1, 1) \
+        = min((/lat_bnds(ysize-1, 0) + (lat_bnds(ysize-2, 1) \
+              - lat_bnds(ysize-2, 0)), 90./))
       delete(lat)
-;      print(lat_bnds)
     end if
 
     if (isfilevar(f, "lon_bnds")) then
       lon_bnds = f->lon_bnds
     end if
     xsize = dimsizes(ts&lon)
-    if (.not.isvar("lon_bnds") .or. any(abs(lon_bnds(1:xsize-1, 0)-lon_bnds(0:xsize-2, 1)).gt.0.01)) then
+    if (.not.isvar("lon_bnds") .or. \
+        any(abs(lon_bnds(1:xsize-1, 0)-lon_bnds(0:xsize-2, 1)).gt.0.01)) then
       print(infoTs[ii]@dataset+" : Creating lon_bnds")
       lon = ts&lon
       if (isvar("lon_bnds")) then
@@ -188,9 +194,9 @@ begin
       lon_bnds(1:xsize-1, 0) = (lon(0:xsize-2) + lon(1:xsize-1))/2.
       lon_bnds(0:xsize-2, 1) = (lon(0:xsize-2) + lon(1:xsize-1))/2.
       lon_bnds(0, 0) = lon_bnds(0, 1) - (lon_bnds(1, 1) - lon_bnds(1, 0))
-      lon_bnds(xsize-1, 1) = lon_bnds(xsize-1, 0) + (lon_bnds(xsize-2, 1) - lon_bnds(xsize-2, 0))
+      lon_bnds(xsize-1, 1) \
+        = lon_bnds(xsize-1, 0) + (lon_bnds(xsize-2, 1) - lon_bnds(xsize-2, 0))
       delete(lon)
-;      print(lon_bnds)
     end if
     delete(f)
 
@@ -215,7 +221,7 @@ begin
     else
       eyear = eyear_data - 3
     end if
-    
+
     ; Anomalies
     clim = clmMonTLL(ts({syear*100+1:eyear*100+12}, :, :))
     do t = 0, dimsizes(ts&time)-1
@@ -228,8 +234,6 @@ begin
     ; Detrend
     if (detrend) then
       do mon = 1, 12
-;        trend = ts({syear*100+mon:eyear*100+mon:12}, :, :)
-;        trend = dtrend_leftdim(ts({syear*100+mon:eyear*100+mon:12}, :, :), True)
         trend = dtrend_n(ts({syear*100+mon:eyear*100+mon:12}, :, :), True, 0)
         syr = syear
         eyr = eyear
@@ -240,13 +244,15 @@ begin
           eyr = eyr - 1
         end if
         ts({syr*100+mon:eyr*100+mon:12}, :, :) \
-           = ts({syr*100+mon:eyr*100+mon:12}, :, :) \
-           - conform(ts({syr*100+mon:eyr*100+mon:12}, :, :), reshape(trend@slope, dimsizes(ts(0, :, :))), (/1, 2/)) \
-           * conform(ts({syr*100+mon:eyr*100+mon:12}, :, :), tofloat(ispan(syr, eyr, 1)) - (syear+eyear)/2., 0)
+          = ts({syr*100+mon:eyr*100+mon:12}, :, :) \
+          - conform(ts({syr*100+mon:eyr*100+mon:12}, :, :), \
+                    reshape(trend@slope, dimsizes(ts(0, :, :))), (/1, 2/)) \
+          * conform(ts({syr*100+mon:eyr*100+mon:12}, :, :), \
+                    tofloat(ispan(syr, eyr, 1)) - (syear+eyear)/2., 0)
         delete(trend)
       end do
     end if
-    
+
     ; Time smoothing
     ts = wgt_runave_n(ts, wgt, 0, 0)
 
@@ -270,7 +276,9 @@ begin
     j = j0
     dy(j) = (lat_bnds(j, 1) - S) * (cos(lat_bnds(j, 1)*d2r) + cos(S*d2r)) / 2.
     do j = j0+1, j1-1
-      dy(j) = (lat_bnds(j, 1) - lat_bnds(j, 0)) * (cos(lat_bnds(j, 1)*d2r) + cos(lat_bnds(j, 0)*d2r)) / 2.
+      dy(j) = (lat_bnds(j, 1) \
+               - lat_bnds(j, 0)) * (cos(lat_bnds(j, 1)*d2r) \
+                                    + cos(lat_bnds(j, 0)*d2r)) / 2.
     end do
     j = j1
     dy(j) = (N - lat_bnds(j, 0)) * (cos(N*d2r) + cos(lat_bnds(j, 0)*d2r)) / 2.
@@ -284,12 +292,12 @@ begin
     i = i1
     dx(i) = E - lon_bnds(i, 0)
     delete([/i0, i1, j0, j1/])
-    
+
     Nino = wgt_areaave_Wrap(ts, dy, dx, 0)
     delete(ts)
     delete([/dy, dx/])
     delete([/lat_bnds, lon_bnds/])
-        
+
     ; Output
     work_dir = config_user_info@work_dir + "/"
     system("mkdir -p "+work_dir)
@@ -302,17 +310,19 @@ begin
 ;    Nino@reference_dataset = infoTs[ii]@reference_dataset
     Nino@long_name = "ENSO index time series"
 
-    if (any(infoTs[ii]@project.eq.(/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/))) then
-      nc_filename = work_dir+"ENSOindex_"+infoTs[ii]@dataset+".nc"
+    if (any(infoTs[ii]@project.eq.\
+        (/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/))) then
+      nc_filename = work_dir + "ENSOindex_" + infoTs[ii]@dataset + ".nc"
     else
-      nc_filename = work_dir+"ENSOindex_"+infoTs[ii]@dataset+"_"+infoTs[ii]@ensemble+".nc"
+      nc_filename = work_dir + "ENSOindex_" + infoTs[ii]@dataset \
+                     + "_"+infoTs[ii]@ensemble + ".nc"
       Nino@ensemble = infoTs[ii]@ensemble
     end if
     nc_outfile = ncdf_write(Nino, nc_filename)
 
     delete(Nino)
   end do
-    
+
   leave_msg(DIAG_SCRIPT, "")
 
 end

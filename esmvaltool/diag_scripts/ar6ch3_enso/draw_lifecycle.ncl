@@ -8,7 +8,10 @@
 ;    Outputs:
 ;
 ; History
-;    20200105 kosaka_yu: show shading instead of lines; use duration based on composite
+;    20200511 kosaka_yu: cleaned to meet the code style;
+;                        removed bottom two panels that are removed from SOD
+;    20200105 kosaka_yu: show shading instead of lines;
+;                        use duration based on composite
 ;    20191012 kosaka_yu: updated for ESMValTool 2.0.0b2
 ;    20190316 kosa_yu: written.
 ;
@@ -30,15 +33,16 @@ load "$diag_scripts/ar6ch3_enso/modelling_center.ncl"
 load "$diag_scripts/ar6ch3_enso/setting_mme.ncl"
 
 procedure CalcMetrics(ts, duration_threshold, duration_threshold_unit)
-local nevent, t0, x, t_pos_seg, t_neg_seg, t, tlast, nseg_pos, nseg_neg, i, ipos, ineg, \
-      n, nref, duration, t_peak, mag_peak, lag_peak, tmp, date, ens, interval, int, is, idx, \
+local nevent, t0, x, t_pos_seg, t_neg_seg, t, tlast, nseg_pos, nseg_neg, \
+      i, ipos, ineg, n, nref, duration, t_peak, mag_peak, lag_peak, tmp, \
+      date, ens, interval, int, is, idx, \
       seg_bnds, tmpbnds, nonoverlap, nonoverlapping_events, iis, thres
 begin
   idx = ts
   ; Event frequency
   nevent = dimsizes(idx(:, 0))
   ts@frequency = tofloat(nevent) / tofloat(idx@esize)
-;printVarSummary(idx)
+
   ; Magnitude at reference month
   t0 = toint(idx@time_ref)
   x = dim_avg_n(idx, 0)  ; El Nino
@@ -59,12 +63,11 @@ begin
   end if
 
   t_peak = new(nevent, "integer")
-  mag_peak= new(nevent, "float")
-  lag_peak= new(nevent, "float")
-  duration= new(nevent, "float")
+  mag_peak = new(nevent, "float")
+  lag_peak = new(nevent, "float")
+  duration = new(nevent, "float")
   nonoverlap = new(nevent, "logical")
-  
-;printVarSummary(idx)
+
   do i = 0, nevent-1
     ; Divide into segments
 ;    if (thres.eq.0.) then
@@ -117,9 +120,9 @@ begin
 ;      else
 ;        nneg = nneg + 1
 ;      end if
-;    
+;
 ;      t_pos_seg = new((/2, npos/), "integer")
-;      t_neg_seg = new((/2, nneg/), "integer")    
+;      t_neg_seg = new((/2, nneg/), "integer")
 ;      t_pos_seg = t_pos_seg@_FillValue
 ;      t_neg_seg = t_neg_seg@_FillValue
 ;      ipos = 0
@@ -138,86 +141,94 @@ begin
 ;      delete(seg_bnds)
 ;      delete(sign)
 ;    else
-      npos = 0
-      nneg = 0
-      do j = 0, dimsizes(idx(i, :))-2
-        if (ismissing(idx(i, j)).or.ismissing(idx(i, j+1))) then
-          continue
-        end if
-        if (idx(i, j).gt.thres .and. idx(i, j+1).le.thres) then
-          if (isvar("t_pos_seg")) then
-            t_pos_seg(1, npos-1) = j
-          else
-            npos = 1
-            t_pos_seg = new((/2, npos/), "integer")
-            t_pos_seg(1, npos-1) = j
-          end if
-        elseif (idx(i, j).le.thres .and. idx(i, j+1).gt.thres) then
-          npos = npos + 1
-          if (isvar("t_pos_seg")) then
-            tmp = t_pos_seg
-            delete(t_pos_seg)
-            t_pos_seg = new((/2, npos/), "integer")
-            t_pos_seg(:, 0:npos-2) = tmp
-            delete(tmp)
-            t_pos_seg(0, npos-1) = j+1
-          else
-            t_pos_seg = new((/2, npos/), "integer")
-            t_pos_seg(0, npos-1) = j+1
-          end if
-        end if
-        if (idx(i, j).lt.-thres .and. idx(i, j+1).ge.-thres) then
-          if (isvar("t_neg_seg")) then
-            t_neg_seg(1, nneg-1) = j
-          else
-            nneg = 1
-            t_neg_seg = new((/2, nneg/), "integer")
-            t_neg_seg(1, nneg-1) = j
-          end if
-        elseif (idx(i, j).ge.-thres .and. idx(i, j+1).lt.-thres) then
-          nneg = nneg + 1
-          if (isvar("t_neg_seg")) then
-            tmp = t_neg_seg
-            delete(t_neg_seg)
-            t_neg_seg = new((/2, nneg/), "integer")
-            t_neg_seg(:, 0:nneg-2) = tmp
-            delete(tmp)
-            t_neg_seg(0, nneg-1) = j+1
-          else
-            t_neg_seg = new((/2, nneg/), "integer")
-            t_neg_seg(0, nneg-1) = j+1
-          end if
-        end if
-      end do
-      if (.not.isvar("t_pos_seg")) then
-        npos = 1
-        t_pos_seg = new((/2, 1/), "integer")
+    npos = 0
+    nneg = 0
+    do j = 0, dimsizes(idx(i, :))-2
+      if (ismissing(idx(i, j)).or.ismissing(idx(i, j+1))) then
+        continue
       end if
-      if (.not.isvar("t_neg_seg")) then
-        nneg = 1
-        t_neg_seg = new((/2, 1/), "integer")
+      if (idx(i, j).gt.thres .and. idx(i, j+1).le.thres) then
+        if (isvar("t_pos_seg")) then
+          t_pos_seg(1, npos-1) = j
+        else
+          npos = 1
+          t_pos_seg = new((/2, npos/), "integer")
+          t_pos_seg(1, npos-1) = j
+        end if
+      elseif (idx(i, j).le.thres .and. idx(i, j+1).gt.thres) then
+        npos = npos + 1
+        if (isvar("t_pos_seg")) then
+          tmp = t_pos_seg
+          delete(t_pos_seg)
+          t_pos_seg = new((/2, npos/), "integer")
+          t_pos_seg(:, 0:npos-2) = tmp
+          delete(tmp)
+          t_pos_seg(0, npos-1) = j+1
+        else
+          t_pos_seg = new((/2, npos/), "integer")
+          t_pos_seg(0, npos-1) = j+1
+        end if
       end if
-;    end if    
-    if (ismissing(t_pos_seg(0,0))) then
-      t_pos_seg(0, 0) = min(where(ismissing(idx(i, :)), 99999, ispan(0, dimsizes(idx&time)-1, 1)))
+      if (idx(i, j).lt.-thres .and. idx(i, j+1).ge.-thres) then
+        if (isvar("t_neg_seg")) then
+          t_neg_seg(1, nneg-1) = j
+        else
+          nneg = 1
+          t_neg_seg = new((/2, nneg/), "integer")
+          t_neg_seg(1, nneg-1) = j
+        end if
+      elseif (idx(i, j).ge.-thres .and. idx(i, j+1).lt.-thres) then
+        nneg = nneg + 1
+        if (isvar("t_neg_seg")) then
+          tmp = t_neg_seg
+          delete(t_neg_seg)
+          t_neg_seg = new((/2, nneg/), "integer")
+          t_neg_seg(:, 0:nneg-2) = tmp
+          delete(tmp)
+          t_neg_seg(0, nneg-1) = j+1
+        else
+          t_neg_seg = new((/2, nneg/), "integer")
+          t_neg_seg(0, nneg-1) = j+1
+        end if
+      end if
+    end do
+    if (.not.isvar("t_pos_seg")) then
+      npos = 1
+      t_pos_seg = new((/2, 1/), "integer")
     end if
-    if (ismissing(t_neg_seg(0,0))) then
-      t_neg_seg(0, 0) = min(where(ismissing(idx(i, :)), 99999, ispan(0, dimsizes(idx&time)-1, 1)))
+    if (.not.isvar("t_neg_seg")) then
+      nneg = 1
+      t_neg_seg = new((/2, 1/), "integer")
+    end if
+;    end if
+    if (ismissing(t_pos_seg(0, 0))) then
+      t_pos_seg(0, 0) \
+        = min(where(ismissing(idx(i, :)), 99999, \
+                    ispan(0, dimsizes(idx&time)-1, 1)))
+    end if
+    if (ismissing(t_neg_seg(0, 0))) then
+      t_neg_seg(0, 0) \
+        = min(where(ismissing(idx(i, :)), 99999, \
+                    ispan(0, dimsizes(idx&time)-1, 1)))
     end if
     if (ismissing(t_pos_seg(1, npos-1))) then
-      t_pos_seg(1, npos-1) = max(where(ismissing(idx(i, :)), -1, ispan(0, dimsizes(idx&time)-1, 1)))
+      t_pos_seg(1, npos-1) \
+        = max(where(ismissing(idx(i, :)), -1, \
+                    ispan(0, dimsizes(idx&time)-1, 1)))
     end if
     if (ismissing(t_neg_seg(1, nneg-1))) then
-      t_neg_seg(1, nneg-1) = max(where(ismissing(idx(i, :)), -1, ispan(0, dimsizes(idx&time)-1, 1)))
+      t_neg_seg(1, nneg-1) \
+        = max(where(ismissing(idx(i, :)), -1, \
+                    ispan(0, dimsizes(idx&time)-1, 1)))
     end if
-    
+
 ;    do j = 0, npos-1
 ;      print("positive: "+t_pos_seg(0, j)+" "+t_pos_seg(1, j))
 ;    end do
 ;    do j = 0, nneg - 1
 ;      print("negative: "+t_neg_seg(0, j)+" "+t_neg_seg(1, j))
 ;    end do
-    
+
   ; Find reference segment
     do n = 0, npos-1
       if (t_pos_seg(0, n).le.t0.and.t0.le.t_pos_seg(1, n)) then
@@ -226,17 +237,25 @@ begin
       end if
     end do
   ; Find peak
-    t_peak(i) = t_pos_seg(0, nref) + maxind(idx(i, t_pos_seg(0, nref):t_pos_seg(1, nref)))
-    mag_peak(i)  = idx(i, t_peak(i)) ; magnitude at peak
-    lag_peak(i)  = t_peak(i) - t0    ; magnitude lag relative to reference month
+    t_peak(i) \
+      = t_pos_seg(0, nref) \
+      + maxind(idx(i, t_pos_seg(0, nref):t_pos_seg(1, nref)))
+    mag_peak(i)  = idx(i, t_peak(i))  ; magnitude at peak
+    lag_peak(i)  = t_peak(i) - t0  ; magnitude lag relative to reference month
   ; Get duration
     duration(i) = 0.
-    if (t_pos_seg(0, nref).le.0 .or. t_pos_seg(1, nref).ge.dimsizes(idx(i, :))-1) then
+    if (t_pos_seg(0, nref).le.0 .or. \
+        t_pos_seg(1, nref).ge.dimsizes(idx(i, :))-1) then
       duration(i) = duration@_FillValue
     else
       if (thres.eq.0.) then
-        duration(i) = t_pos_seg(1, nref) + idx(i, t_pos_seg(1, nref))/(idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref)+1))
-        duration(i) = duration(i) - (t_pos_seg(0, nref) - idx(i, t_pos_seg(1, nref))/(idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref)-1)))
+        duration(i) \
+          = t_pos_seg(1, nref) \
+          + idx(i, t_pos_seg(1, nref)) \
+          / (idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref) + 1))
+        duration(i) = duration(i) \
+          - (t_pos_seg(0, nref) - idx(i, t_pos_seg(1, nref)) \
+             / (idx(i, t_pos_seg(1, nref)) - idx(i, t_pos_seg(1, nref) - 1)))
       else
         t = t0
         do while (.not.ismissing(idx(i, t)) .and. (idx(i, t).gt.thres))
@@ -259,9 +278,9 @@ begin
     end if
   end do
 
-  ts@lag_peak = lag_peak ; avg(lag_peak)
-  ts@mag_peak = mag_peak ; avg(mag_peak)
-  ts@duration = duration ; avg(duration)
+  ts@lag_peak = lag_peak  ; avg(lag_peak)
+  ts@mag_peak = mag_peak  ; avg(mag_peak)
+  ts@duration = duration  ; avg(duration)
 
   ens = get_unique_values(idx@ens)
   do n = 0, dimsizes(ens)-1
@@ -303,7 +322,6 @@ begin
       end if
       delete(iis)
     end do
-;print(yyyymm+" "+nonoverlap_1mem)
     do i = 0, dimsizes(is)-1
       nonoverlap(is(i)) = nonoverlap_1mem(i)
     end do
@@ -311,14 +329,14 @@ begin
     delete(yyyymm)
 
     delete(date)
-    qsort(nonoverlapping_events)    
+    qsort(nonoverlapping_events)
     date = new((/dimsizes(nonoverlapping_events), 2/), "integer")
     date(:, 0) = nonoverlapping_events/100
     date(:, 1) = nonoverlapping_events - date(:, 0)*100
-  
-    do i = 0, dimsizes(nonoverlapping_events)-2 ; dimsizes(is)-2
+
+    do i = 0, dimsizes(nonoverlapping_events)-2  ; dimsizes(is)-2
 ; ----------------------------------------------
-;      if (date(i+1, 0)-date(i, 0).le.1) then   ; 
+;      if (date(i+1, 0)-date(i, 0).le.1) then   ;
 ;        continue                               ; OK?
 ;      end if                                   ;
 ; ----------------------------------------------
@@ -340,7 +358,6 @@ begin
     delete(date)
     delete(is)
   end do
-;print("Missing nonoverlap identification = "+num(ismissing(nonoverlap)))
   ts@nonoverlap = nonoverlap
   if (isvar("interval")) then
     ts@interval_to_subsequent_same = avg(interval)
@@ -349,10 +366,10 @@ begin
     ts@interval_to_subsequent_same = -1
   end if
 
-;printVarSummary(idx)
 end
 
-function duration_composite(x, multiyear_as_single, duration_threshold, duration_threshold_unit)
+function duration_composite(x, multiyear_as_single, \
+                            duration_threshold, duration_threshold_unit)
 local x, ts, d, dims, t, lag, thres
 begin
   x!0 = "event"
@@ -394,20 +411,23 @@ begin
   else
     d = default_fillvalue("float")
   end if
-;  print(x@dataset+" peak = "+ts(t)+" threshold = "+thres+" duration = "+d)
   return(d)
 end
-  
+
 begin
 
   enter_msg(DIAG_SCRIPT, "")
 
   obs_projects = (/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/)
-  
-  multiyear_as_single = "metric_only"                      ; Regard a multiyear event as a single event for
-  if (isatt(diag_script_info, "multiyear_as_single")) then ; "always"
-    multiyear_as_single = diag_script_info@multiyear_as_single   ; "metric_only" (bottom plots only)
-  end if                                                   ; "never"
+
+  multiyear_as_single = "metric_only"
+  ; Regard a multiyear event as a single event for
+  ; "always"
+  ; "metric_only" (bottom plots only)
+  ; "never"
+  if (isatt(diag_script_info, "multiyear_as_single")) then
+    multiyear_as_single = diag_script_info@multiyear_as_single
+  end if
 
   duration_threshold = 0.25
   if (isatt(diag_script_info, "duration_threshold")) then
@@ -418,28 +438,23 @@ begin
     duration_threshold_unit = diag_script_info@unit_duration_threshold
   end if
   if (any(duration_threshold_unit.eq.(/"degree", "degrees", "degC", "degK", \
-    "Degree", "Degrees", "DegC", "DegK", "Deg"/))) then
+                                       "Degree", "Degrees", "DegC", "DegK", \
+                                       "Deg"/))) then
     duration_threshold_unit = "deg"
-  elseif (any(duration_threshold_unit.eq.(/"sigma", "std_dev", "stddev", "s.d."/))) then
+  elseif (any(duration_threshold_unit.eq.(/"sigma", "std_dev", \
+                                           "stddev", "s.d."/))) then
     duration_threshold_unit = "stdv"
   end if
-  
+
   duration_individual = False
   if (isatt(diag_script_info, "duration_individual")) then
     duration_individual = diag_script_info@duration_individual
   end if
 
-;=============
-;  multiyear_as_single = "always"
-;  duration_threshold = 0.25
-;  duration_threshold_unit = "stdv"
-;  duration_individual = True
-;=============
-  
   input_dir = diag_script_info@input_files
   paths_el = systemfunc("ls "+input_dir+"/ElNino_*.nc")
-  paths_la = systemfunc("ls "+input_dir+"/LaNina_*.nc")  
-  
+  paths_la = systemfunc("ls "+input_dir+"/LaNina_*.nc")
+
   do i = 0, dimsizes(paths_el)-1
     f = addfile(paths_el(i), "r")
     tmp = f->ENSOindex
@@ -528,7 +543,7 @@ begin
     i = ListCount(el_obs) - 1
     el_obs[i] = el_ref
     delete(el_ref)
-    
+
     paths = systemfunc("ls "+input_dir+"/LaNina_"+obs_names(ii)+"_*.nc")
     la_ref = new((/dimsizes(paths), tsize/), "float")
     do i = 0, dimsizes(paths)-1
@@ -567,10 +582,11 @@ begin
     la_obs[i] = la_ref
     delete(la_ref)
   end do
-  
+
   do ii = 0, dimsizes(dataset_names)-1
-    
-    paths = systemfunc("ls "+input_dir+"/ElNino_"+dataset_names(ii)+"_r*_???.nc")
+
+    paths = systemfunc("ls " + input_dir + "/ElNino_" \
+                       + dataset_names(ii) + "_r*_???.nc")
     if (.not.all(ismissing(paths))) then
       tmp = new((/dimsizes(paths), tsize/), "float")
       do i = 0, dimsizes(paths)-1
@@ -598,7 +614,7 @@ begin
       CalcMetrics(tmp, duration_threshold, duration_threshold_unit)
       delete(ens)
       delete(year)
-      
+
       if (.not.isdefined("el")) then
         el = NewList("fifo")
       end if
@@ -608,8 +624,9 @@ begin
       delete(tmp)
     end if
     delete(paths)
-    
-    paths = systemfunc("ls "+input_dir+"/LaNina_"+dataset_names(ii)+"_r*_???.nc")
+
+    paths = systemfunc("ls " + input_dir + "/LaNina_"\
+                       + dataset_names(ii) + "_r*_???.nc")
     if (.not.all(ismissing(paths))) then
       tmp = new((/dimsizes(paths), tsize/), "float")
       do i = 0, dimsizes(paths)-1
@@ -637,7 +654,7 @@ begin
       CalcMetrics(tmp, duration_threshold, duration_threshold_unit)
       delete(ens)
       delete(year)
-      
+
       if (.not.isdefined("la")) then
         la = NewList("fifo")
       end if
@@ -648,7 +665,7 @@ begin
     end if
     delete(paths)
   end do
-  
+
 ;  do ii = 0, ListCount(el)-1
 ;    if (el[ii]@project.eq."CMIP6") then
 ;      if (.not.isvar("el_cmip6")) then
@@ -656,7 +673,8 @@ begin
 ;      else
 ;        tmp = el_cmip6
 ;        delete(el_cmip6)
-;        el_cmip6 = new((/dimsizes(tmp(:, 0))+dimsizes(el[ii](:, 0)), dimsizes(tmp(0, :))/), typeof(tmp))
+;        el_cmip6 = new((/dimsizes(tmp(:, 0))+dimsizes(el[ii](:, 0)), \
+;                       dimsizes(tmp(0, :))/), typeof(tmp))
 ;        el_cmip6(0:dimsizes(tmp(:, 0))-1, :) = tmp
 ;        el_cmip6(dimsizes(tmp(:, 0)):,    :) = el[ii]
 ;        delete(tmp)
@@ -667,7 +685,8 @@ begin
 ;      else
 ;        tmp = el_cmip5
 ;        delete(el_cmip5)
-;        el_cmip5 = new((/dimsizes(tmp(:, 0))+dimsizes(el[ii](:, 0)), dimsizes(tmp(0, :))/), typeof(tmp))
+;        el_cmip5 = new((/dimsizes(tmp(:, 0))+dimsizes(el[ii](:, 0)), \
+;                       dimsizes(tmp(0, :))/), typeof(tmp))
 ;        el_cmip5(0:dimsizes(tmp(:, 0))-1, :) = tmp
 ;        el_cmip5(dimsizes(tmp(:, 0)):,    :) = el[ii]
 ;        delete(tmp)
@@ -681,7 +700,8 @@ begin
 ;      else
 ;        tmp = la_cmip6
 ;        delete(la_cmip6)
-;        la_cmip6 = new((/dimsizes(tmp(:, 0))+dimsizes(la[ii](:, 0)), dimsizes(tmp(0, :))/), typeof(tmp))
+;        la_cmip6 = new((/dimsizes(tmp(:, 0))+dimsizes(la[ii](:, 0)), \
+;                       dimsizes(tmp(0, :))/), typeof(tmp))
 ;        la_cmip6(0:dimsizes(tmp(:, 0))-1, :) = tmp
 ;        la_cmip6(dimsizes(tmp(:, 0)):,    :) = la[ii]
 ;        delete(tmp)
@@ -692,7 +712,8 @@ begin
 ;      else
 ;        tmp = la_cmip5
 ;        delete(la_cmip5)
-;        la_cmip5 = new((/dimsizes(tmp(:, 0))+dimsizes(la[ii](:, 0)), dimsizes(tmp(0, :))/), typeof(tmp))
+;        la_cmip5 = new((/dimsizes(tmp(:, 0))+dimsizes(la[ii](:, 0)), \
+;                       dimsizes(tmp(0, :))/), typeof(tmp))
 ;        la_cmip5(0:dimsizes(tmp(:, 0))-1, :) = tmp
 ;        la_cmip5(dimsizes(tmp(:, 0)):,    :) = la[ii]
 ;        delete(tmp)
@@ -703,7 +724,7 @@ begin
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                 "enso_lifecycle")
 
-; ===================================== CMIP5, CMIP6 and obs =======================================
+; ========================= CMIP5, CMIP6 and obs ========================
 
   ENSOPlots = new(2, "graphic")
   dummy   = new(500, "graphic")
@@ -711,7 +732,7 @@ begin
 
   lag = el_obs[0]&time
   lagpoly = array_append_record(lag, lag(::-1), 0)
-  
+
   rests := True
   rests@gsnDraw           = False
   rests@gsnFrame          = False
@@ -720,28 +741,29 @@ begin
   rests@xyDashPattern     = 0
   rests@xyMonoLineColor   = False
   rests@gsnYRefLine       = 0.
-  rests@trXMinF = -24. ;lag(0)
-  rests@trXMaxF = 47 ;lag(dimsizes(lag)-1)
+  rests@trXMinF = -24
+  rests@trXMaxF = 47
   rests@trYMinF = -2.5
   rests@trYMaxF = 2.5
   rests@tmXTOn = False
-  rests@tmYROn = False
+;  rests@tmYROn = False
   rests@tmXBMode          = "Explicit"
   rests@tmXBLabelFontHeightF = 0.02
   rests@tmXBMajorThicknessF = 0.
   ; ======= Need adjustment =======
-  rests@tmXBMajorLengthF = 0.009  ;0.01
-  rests@tmXBMajorOutwardLengthF = 0.01  ;0.01
+  rests@tmXBMajorLengthF = 0.009
+  rests@tmXBMajorOutwardLengthF = 0.01
   rests@tmXBMinorOutwardLengthF = 0.01
   rests@tmYLMajorLengthF = 0.01
   rests@tmYLMajorOutwardLengthF = 0.01
   ; ===============================
   rests@tmYLLabelFontHeightF = 0.02
-  rests@tmXBValues        = (/-18, -6, 6, 18, 30, 42, 54, 66, 78/) 
-  rests@tmXBLabels        = (/"yr(-2)", "yr(-1)", "yr(0)", "yr(1)", "yr(2)", "yr(3)", "yr(4)", "yr(5)", "yr(6)"/)
+  rests@tmXBValues = (/-18, -6, 6, 18, 30, 42, 54, 66, 78/)
+  rests@tmXBLabels = (/"yr(-2)", "yr(-1)", "yr(0)", "yr(1)", "yr(2)", \
+                       "yr(3)", "yr(4)", "yr(5)", "yr(6)"/)
   rests@tmXBMinorValues   = lag
   rests@tmLabelAutoStride = False
-  
+
   resp = True
   resp@gsFillOpacityF = 0.1
   resp@gsLineThicknessF = 0.4
@@ -755,17 +777,21 @@ begin
   rests@tiMainOffsetYF = -0.008
   rests@xyLineThicknessF = 0.01
   rests@tiMainString = "(a) El Nino"
-  ENSOPlots(0) = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/0., 0./), rests)
+  ENSOPlots(0) \
+    = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/0., 0./), rests)
   rests@tiMainString = "(b) La Nina"
-  ENSOPlots(1) = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/0., 0./), rests) 
-    
+  ENSOPlots(1) \
+    = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/0., 0./), rests)
+
   rests@xyLineColor = "grey50"
   rests@xyDashPattern = 1
   rests@xyLineThicknessF = 0.1
   do i = 0, 8
-    plot = gsn_csm_xy(wks, (/-24.5+12.*i, -24.5+12*i/), (/rests@trYMinF, rests@trYMaxF/), rests)
+    plot = gsn_csm_xy(wks, (/-24.5+12.*i, -24.5+12*i/), \
+                      (/rests@trYMinF, rests@trYMaxF/), rests)
     overlay(ENSOPlots(0), plot)
-    plot = gsn_csm_xy(wks, (/-24.5+12.*i, -24.5+12.*i/), (/rests@trYMinF, rests@trYMaxF/), rests)
+    plot = gsn_csm_xy(wks, (/-24.5+12.*i, -24.5+12.*i/), \
+                      (/rests@trYMinF, rests@trYMaxF/), rests)
     overlay(ENSOPlots(1), plot)
   end do
 
@@ -864,7 +890,6 @@ begin
   resp = True
   resp@gsLineOpacityF = 0.2
   if (isvar("el_cmip5")) then
-;print(el_cmip5@project)
     resp@gsFillColor :=  get_color(el_cmip5)
     dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
                                     lagpoly, make_poly(el_cmip5), resp)
@@ -891,8 +916,6 @@ begin
   plot = gsn_csm_xy(wks, lag, el_cmip6_mean, rests)
   overlay(ENSOPlots(0), plot)
 
-
-  
 ;  la_cmip5 = la[0](0, :)
 ;  la_cmip6 = la[0](0, :)
 ;  la_cmip5 = 0.
@@ -991,7 +1014,7 @@ begin
   end if
 
   la_cmip5_mean = dim_avg_n_Wrap(la_cmip5, 0)
-  la_cmip6_mean = dim_avg_n_Wrap(la_cmip6, 0)  
+  la_cmip6_mean = dim_avg_n_Wrap(la_cmip6, 0)
   la_cmip5_mean@project = "CMIP5"
   la_cmip6_mean@project = "CMIP6"
   rests@xyDashPattern =  0
@@ -1004,7 +1027,6 @@ begin
   plot = gsn_csm_xy(wks, lag, la_cmip6_mean, rests)
   overlay(ENSOPlots(1), plot)
 
-  
   do i = 0, ListCount(el_obs)-1
     delete(rests@xyLineColor)
     rests@xyLineColor = get_color(el_obs[i])
@@ -1012,10 +1034,12 @@ begin
     rests@xyLineThicknessF = 1.5
     rests@xyLineOpacityF = 1.
     if (multiyear_as_single .eq. "always") then
-      plot = gsn_csm_xy(wks, lag, \
-                        dim_avg_n(where(conform(el_obs[i], el_obs[i]@nonoverlap, 0), \
-                                        el_obs[i], el_obs[i]@_FillValue), 0), \
-                        rests)
+      plot \
+        = gsn_csm_xy(wks, lag, \
+                     dim_avg_n(where(conform(el_obs[i], \
+                                             el_obs[i]@nonoverlap, 0), \
+                                     el_obs[i], el_obs[i]@_FillValue), 0), \
+                     rests)
     else
       plot = gsn_csm_xy(wks, lag, dim_avg_n(el_obs[i], 0), rests)
     end if
@@ -1028,10 +1052,12 @@ begin
     rests@xyLineThicknessF = 1.5
     rests@xyLineOpacityF = 1.
     if (multiyear_as_single .eq. "always") then
-      plot = gsn_csm_xy(wks, lag, \
-                        dim_avg_n(where(conform(la_obs[i], la_obs[i]@nonoverlap, 0), \
-                                        la_obs[i], la_obs[i]@_FillValue), 0), \
-                        rests)
+      plot \
+        = gsn_csm_xy(wks, lag, \
+                     dim_avg_n(where(conform(la_obs[i], \
+                                             la_obs[i]@nonoverlap, 0), \
+                                     la_obs[i], la_obs[i]@_FillValue), 0), \
+                     rests)
     else
       plot = gsn_csm_xy(wks, lag, dim_avg_n(la_obs[i], 0), rests)
     end if
@@ -1067,10 +1093,12 @@ begin
     lres@gsLineDashPattern =  get_lineindex(el_obs[i])
     lres@gsLineThicknessF = 1.5
     lres@gsLineOpacityF = 1.
-    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), (/-23., -18./), (/y, y/), lres)
+    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), \
+                                     (/-23., -18./), (/y, y/), lres)
     idummy = idummy + 1
     txres@txFontColor := get_color(el_obs[i])
-    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), el_obs[i]@dataset, -17., y, txres)
+    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), \
+                                 el_obs[i]@dataset, -17., y, txres)
     idummy = idummy + 1
     j = j + 1
   end do
@@ -1078,17 +1106,20 @@ begin
     y = rests@trYMaxF-0.2-0.3*j
     resp@gsLineOpacityF = 0.2
     resp@gsFillColor :=  get_color(el_cmip6)
-    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), (/-23., -18., -18., -23./), \
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
+                                    (/-23., -18., -18., -23./), \
                                     (/y+0.1, y+0.1, y-0.1, y-0.1/), resp)
     idummy = idummy + 1
     lres@gsLineColor = get_color(el_cmip6)
     lres@gsLineDashPattern =  get_lineindex(el_cmip6)
     lres@gsLineThicknessF = 3.
     lres@gsLineOpacityF = 1.
-    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), (/-23., -18./), (/y, y/), lres)
+    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), \
+                                     (/-23., -18./), (/y, y/), lres)
     idummy = idummy + 1
     txres@txFontColor := get_color(el_cmip6)
-    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), "CMIP6", -17., y, txres)
+    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), \
+                                 "CMIP6", -17., y, txres)
     idummy = idummy + 1
     j = j + 1
   end if
@@ -1096,21 +1127,24 @@ begin
     y = rests@trYMaxF-0.2-0.3*j
     resp@gsLineOpacityF = 0.2
     resp@gsFillColor :=  get_color(el_cmip5)
-    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), (/-23., -18., -18., -23./), \
+    dummy(idummy) = gsn_add_polygon(wks, ENSOPlots(0), \
+                                    (/-23., -18., -18., -23./), \
                                     (/y+0.1, y+0.1, y-0.1, y-0.1/), resp)
     idummy = idummy + 1
     lres@gsLineColor = get_color(el_cmip5)
     lres@gsLineDashPattern =  get_lineindex(el_cmip5)
     lres@gsLineThicknessF = 3.
     lres@gsLineOpacityF = 1.
-    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), (/-23., -18./), (/y, y/), lres)
+    dummy(idummy) = gsn_add_polyline(wks, ENSOPlots(0), \
+                                     (/-23., -18./), (/y, y/), lres)
     idummy = idummy + 1
     txres@txFontColor := get_color(el_cmip5)
-    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), "CMIP5", -17., y, txres)
+    dummy(idummy) = gsn_add_text(wks, ENSOPlots(0), \
+                                 "CMIP5", -17., y, txres)
     idummy = idummy + 1
     j = j + 1
   end if
-  
+
   pres = True
   pres@gsnFrame = False
   pres@gsnMaximize = False
@@ -1127,11 +1161,11 @@ begin
   pres@amParallelPosF = 0.
   gsn_panel(wks, ENSOPlots, (/1, 2/), pres)
 
-; ===================================== Individual Models =======================================
+; =========================== Individual Models =============================
 
   plots = new((/2, 2/), "graphic")
-  w = 0.3 ; width of bars for MME
-  
+  w = 0.3  ; width of bars for MME
+
   do ii = 0, ListCount(el)-1
     if (isvar("centers")) then
       tmp = centers
@@ -1184,18 +1218,18 @@ begin
   res@tmXTOn = False
   res@tmXMajorGrid = True
   res@tmYMajorGrid = True
-  res@tmXMajorGridLineDashPattern = 0 ;11
-  res@tmYMajorGridLineDashPattern = 0 ;11
+  res@tmXMajorGridLineDashPattern = 0  ; 11
+  res@tmYMajorGridLineDashPattern = 0  ; 11
   res@tmXMajorGridLineColor = "grey"
-  res@tmYMajorGridLineColor = "transparent" ;"grey"
+  res@tmYMajorGridLineColor = "transparent"  ; "grey"
   res@tmXMajorGridThicknessF = 0.005
-  res@tmYMajorGridThicknessF = 0. ;0.005
+  res@tmYMajorGridThicknessF = 0.  ; 0.005
 
   res@tmXBMode = "Explicit"
   res@tmXBLabelFontHeightF = 0.015
   res@tmXBValues = col
   res@tmXBLabels = names
-  res@tmXBLabelAngleF = 60. ;45.
+  res@tmXBLabelAngleF = 60.  ; 45.
   res@tmXBLabelJust = "CenterRight"
 
   mkres = True
@@ -1203,9 +1237,9 @@ begin
   mkres@gsMarkerSizeF    = 0.01
   lnres = True
   lnres@gsLineThicknessF = 2.
-  
-  res@trYMaxF = 28. ;38.
-  res@trYMinF = 8. ;10.
+
+  res@trYMaxF = 28.  ; 38.
+  res@trYMinF = 8.  ; 10.
   res@tmYLMode = "Manual"
   res@tmYLTickStartF = 0.
   res@tmYLTickEndF = 132.
@@ -1236,10 +1270,11 @@ begin
       end if
     else
       y = duration_composite(el_obs[ii], multiyear_as_single, \
-      duration_threshold, duration_threshold_unit)
+                             duration_threshold, duration_threshold_unit)
     end if
     if (ii.eq.0) then
-      plots(0, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+      plots(0, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), \
+                               (/y, y/), res)
     else
       plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
       overlay(plots(0, 0), plot)
@@ -1262,13 +1297,14 @@ begin
                              duration_threshold, duration_threshold_unit)
     end if
     if (ii.eq.0) then
-      plots(0, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+      plots(0, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), \
+                               (/y, y/), res)
     else
       plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
       overlay(plots(0, 1), plot)
     end if
   end do
-  
+
   nmodel_cmip5 = 0
   nmodel_cmip6 = 0
   do ii = 0, ListCount(el)-1
@@ -1335,18 +1371,23 @@ begin
     polyres = True
     polyres@gsFillColor = get_color(median)
     polyres@gsFillOpacityF = 1.
-    dummy(idummy) = gsn_add_polygon(wks, plots(0, 0), \
-                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
+    dummy(idummy) \
+      = gsn_add_polygon(wks, plots(0, 0), \
+                        (/icolcmip6-w, icolcmip6-w, \
+                          icolcmip6+w, icolcmip6+w/), \
+                        (/percentile25, percentile75, \
+                          percentile75, percentile25/), \
+                        polyres)
     idummy = idummy + 1
     lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6, icolcmip6/), \
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), \
+                                     (/icolcmip6, icolcmip6/), \
                                      (/percentile5, percentile95/), lnres)
-;                                    (/xmin, xmax/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip6-w, icolcmip6+w/), \
-                                                       (/median, median/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), \
+                                     (/icolcmip6-w, icolcmip6+w/), \
+                                     (/median, median/), lnres)
     idummy = idummy + 1
     delete(el_cmip6_composited)
   end if
@@ -1361,24 +1402,26 @@ begin
     percentile25 = el_cmip5_composited(x25)
     percentile75 = el_cmip5_composited(x75)
     percentile95 = el_cmip5_composited(x95)
-;    xmax = max(el_cmip5_composited)
-;    xmin = min(el_cmip5_composited)
     median@project = "CMIP5"
     polyres = True
     polyres@gsFillColor      = get_color(median)
     polyres@gsFillOpacityF = 1.
-    dummy(idummy) = gsn_add_polygon(wks, plots(0, 0), \
-                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
+    dummy(idummy) \
+      = gsn_add_polygon(wks, plots(0, 0), \
+                        (/icolcmip5-w, icolcmip5-w, \
+                          icolcmip5+w, icolcmip5+w/), \
+                        (/percentile25, percentile75, \
+                          percentile75, percentile25/), polyres)
     idummy = idummy + 1
     lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5, icolcmip5/), \
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), \
+                                     (/icolcmip5, icolcmip5/), \
                                      (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), (/icolcmip5-w, icolcmip5+w/), \
-                                                       (/median, median/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 0), \
+                                     (/icolcmip5-w, icolcmip5+w/), \
+                                     (/median, median/), lnres)
     idummy = idummy + 1
     delete(el_cmip5_composited)
   end if
@@ -1443,23 +1486,25 @@ begin
     percentile25 = la_cmip6_composited(x25)
     percentile75 = la_cmip6_composited(x75)
     percentile95 = la_cmip6_composited(x95)
-;    xmax = max(la_cmip6_composited)
-;    xmin = min(la_cmip6_composited)
     median@project = "CMIP6"
     polyres = True
     polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, plots(0, 1), \
-                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
+    dummy(idummy) \
+      = gsn_add_polygon(wks, plots(0, 1), \
+                        (/icolcmip6-w, icolcmip6-w, \
+                          icolcmip6+w, icolcmip6+w/), \
+                        (/percentile25, percentile75, \
+                          percentile75, percentile25/), polyres)
     idummy = idummy + 1
     lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6, icolcmip6/), \
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), \
+                                     (/icolcmip6, icolcmip6/), \
                                      (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip6-w, icolcmip6+w/), \
-                                                       (/median, median/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), \
+                                     (/icolcmip6-w, icolcmip6+w/), \
+                                     (/median, median/), lnres)
     idummy = idummy + 1
     delete(la_cmip6_composited)
   end if
@@ -1478,278 +1523,260 @@ begin
     xmin = min(la_cmip5_composited)
     median@project = "CMIP5"
     polyres = True
-    polyres@gsFillColor      = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, plots(0, 1), \
-                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
+    polyres@gsFillColor = get_color(median)
+    dummy(idummy) \
+      = gsn_add_polygon(wks, plots(0, 1), \
+                        (/icolcmip5-w, icolcmip5-w, \
+                          icolcmip5+w, icolcmip5+w/), \
+                        (/percentile25, percentile75, \
+                          percentile75, percentile25/), polyres)
     idummy = idummy + 1
     lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5, icolcmip5/), \
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), \
+                                     (/icolcmip5, icolcmip5/), \
                                      (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), (/icolcmip5-w, icolcmip5+w/), \
-                                                       (/median, median/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, plots(0, 1), \
+                                     (/icolcmip5-w, icolcmip5+w/), \
+                                     (/median, median/), lnres)
     idummy = idummy + 1
     delete(la_cmip5_composited)
   end if
-  
+
 ; -----------------------------------------------------------
-  
-  res@trYMaxF = 126.
-  res@trYMinF = 18.
-  do ii = 0, ListCount(el_obs)-1
-    res@xyLineColor = get_color(el_obs[ii])
-    res@xyLineThicknessF = 2.
-    res@xyDashPattern = 1
-    if (ii.eq.0) then
-      res@tiMainString = "(e) El Nino-to-El Nino interval (months)"
-    else
-      res@tiMainString = ""
-    end if
-    y = el_obs[ii]@interval_to_subsequent_same
-    plots(1, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
-    if (ii.eq.0) then
-      res@tiMainString = "(f) La Nina-to-La Nina interval (months)"
-    else
-      res@tiMainString = ""
-    end if
-    y = la_obs[ii]@interval_to_subsequent_same
-    plots(1, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
-  end do
-  
-  nmodel_cmip5 = 0
-  nmodel_cmip6 = 0
-  do ii = 0, ListCount(el)-1
-    center = get_modelling_center(el[ii]@dataset)
-    i = ind(center(0).eq.centers)
-    mkres@gsMarkerColor    = get_color(el[ii])
-    mkres@gsMarkerIndex    = get_markerindex(el[ii])
-    y = el[ii]@interval_to_subsequent_same
-    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 0), i, y, mkres)
-    idummy = idummy + 1
-    delete(center)
-    if (y.gt.0.) then
-      if (el[ii]@project.eq."CMIP6") then
-        nmodel_cmip6 = nmodel_cmip6 + 1
-        if (isvar("el_cmip6_composited")) then
-          tmp = el_cmip6_composited
-          delete(el_cmip6_composited)
-          el_cmip6_composited = new(nmodel_cmip6, typeof(y))
-          el_cmip6_composited = array_append_record(tmp, y, 0)
-          delete(tmp)
-        else
-          el_cmip6_composited = y
-        end if
-      elseif (el[ii]@project.eq."CMIP5") then
-        nmodel_cmip5 = nmodel_cmip5 + 1
-        if (isvar("el_cmip5_composited")) then
-          tmp = el_cmip5_composited
-          delete(el_cmip5_composited)
-          el_cmip5_composited = new(nmodel_cmip5, typeof(y))
-          el_cmip5_composited = array_append_record(tmp, y, 0)
-          delete(tmp)
-        else
-          el_cmip5_composited = y
-        end if
-      end if
-    end if
-  end do
-  if (nmodel_cmip6.gt.2) then
-    median = dim_median(el_cmip6_composited)
-    qsort(el_cmip6_composited)
-    x5   = round(0.05*dimsizes(el_cmip6_composited), 3) - 1
-    x25  = round(0.25*dimsizes(el_cmip6_composited), 3) - 1
-    x75  = round(0.75*dimsizes(el_cmip6_composited), 3) - 1
-    x95  = round(0.95*dimsizes(el_cmip6_composited), 3) - 1
-    percentile5  = el_cmip6_composited(x5)
-    percentile25 = el_cmip6_composited(x25)
-    percentile75 = el_cmip6_composited(x75)
-    percentile95 = el_cmip6_composited(x95)
-    xmax = max(el_cmip6_composited)
-    xmin = min(el_cmip6_composited)
-    median@project = "CMIP6"
-    polyres = True
-    polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, plots(1, 0), \
-                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
-    idummy = idummy + 1
-    lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6, icolcmip6/), \
-                                     (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
-    idummy = idummy + 1
-    lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip6-w, icolcmip6+w/), \
-                                                       (/median, median/), lnres)
-    idummy = idummy + 1
-    delete(el_cmip6_composited)
-  end if
-  if (nmodel_cmip5.gt.2) then
-    median = dim_median(el_cmip5_composited)
-    qsort(el_cmip5_composited)
-    x5   = round(0.05*dimsizes(el_cmip5_composited), 3) - 1
-    x25  = round(0.25*dimsizes(el_cmip5_composited), 3) - 1
-    x75  = round(0.75*dimsizes(el_cmip5_composited), 3) - 1
-    x95  = round(0.95*dimsizes(el_cmip5_composited), 3) - 1
-    percentile5  = el_cmip5_composited(x5)
-    percentile25 = el_cmip5_composited(x25)
-    percentile75 = el_cmip5_composited(x75)
-    percentile95 = el_cmip5_composited(x95)
-;    xmax = max(el_cmip5_composited)
-;    xmin = min(el_cmip5_composited)
-    median@project = "CMIP5"
-    polyres = True
-    polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, plots(1, 0), \
-                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
-    idummy = idummy + 1
-    lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5, icolcmip5/), \
-                                     (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
-    idummy = idummy + 1
-    lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), (/icolcmip5-w, icolcmip5+w/), \
-                                                       (/median, median/), lnres)
-    idummy = idummy + 1
-    delete(el_cmip5_composited)
-  end if
 
-  nmodel_cmip5 = 0
-  nmodel_cmip6 = 0
-  do ii = 0, ListCount(la)-1
-    center = get_modelling_center(la[ii]@dataset)
-    i = ind(center(0).eq.centers)
-    mkres@gsMarkerColor    = get_color(la[ii])
-    mkres@gsMarkerIndex    = get_markerindex(la[ii])
-    y = la[ii]@interval_to_subsequent_same
-    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 1), i, y, mkres)
-    idummy = idummy + 1
-    delete(center)
-    if (y.gt.0) then
-      if (la[ii]@project.eq."CMIP6") then
-        nmodel_cmip6 = nmodel_cmip6 + 1
-        if (isvar("la_cmip6_composited")) then
-          tmp = la_cmip6_composited
-          delete(la_cmip6_composited)
-          la_cmip6_composited = new(nmodel_cmip6, typeof(y))
-          la_cmip6_composited = array_append_record(tmp, y, 0)
-          delete(tmp)
-        else
-          la_cmip6_composited = y
-        end if
-      elseif (la[ii]@project.eq."CMIP5") then
-        nmodel_cmip5 = nmodel_cmip5 + 1
-        if (isvar("la_cmip5_composited")) then
-          tmp = la_cmip5_composited
-          delete(la_cmip5_composited)
-          la_cmip5_composited = new(nmodel_cmip5, typeof(y))
-          la_cmip5_composited = array_append_record(tmp, y, 0)
-          delete(tmp)
-        else
-          la_cmip5_composited = y
-        end if
-      end if
-    end if
-  end do
-  if (nmodel_cmip6.gt.2) then
-    median = dim_median(la_cmip6_composited)
-    qsort(la_cmip6_composited)
-    x5   = round(0.05*dimsizes(la_cmip6_composited), 3) - 1
-    x25  = round(0.25*dimsizes(la_cmip6_composited), 3) - 1
-    x75  = round(0.75*dimsizes(la_cmip6_composited), 3) - 1
-    x95  = round(0.95*dimsizes(la_cmip6_composited), 3) - 1
-    percentile5  = la_cmip6_composited(x5)
-    percentile25 = la_cmip6_composited(x25)
-    percentile75 = la_cmip6_composited(x75)
-    percentile95 = la_cmip6_composited(x95)
-;    xmax = max(la_cmip6_composited)
-;    xmin = min(la_cmip6_composited)
-    median@project = "CMIP6"
-    polyres = True
-    polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, plots(1, 1), \
-                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
-    idummy = idummy + 1
-    lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6, icolcmip6/), \
-                                     (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
-    idummy = idummy + 1
-    lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip6-w, icolcmip6+w/), \
-                                                       (/median, median/), lnres)
-    idummy = idummy + 1
-    delete(la_cmip6_composited)
-  end if
-  if (nmodel_cmip5.gt.2) then
-    median = dim_median(la_cmip5_composited)
-    qsort(la_cmip5_composited)
-    x5   = round(0.05*dimsizes(la_cmip5_composited), 3) - 1
-    x25  = round(0.25*dimsizes(la_cmip5_composited), 3) - 1
-    x75  = round(0.75*dimsizes(la_cmip5_composited), 3) - 1
-    x95  = round(0.95*dimsizes(la_cmip5_composited), 3) - 1
-    percentile5  = la_cmip5_composited(x5)
-    percentile25 = la_cmip5_composited(x25)
-    percentile75 = la_cmip5_composited(x75)
-    percentile95 = la_cmip5_composited(x95)
-;    xmax = max(la_cmip5_composited)
-;    xmin = min(la_cmip5_composited)
-    median@project = "CMIP5"
-    polyres = True
-    polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, plots(1, 1), \
-                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
-    idummy = idummy + 1
-    lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5, icolcmip5/), \
-                                     (/percentile5, percentile95/), lnres)
-;                                     (/xmin, xmax/), lnres)
-    idummy = idummy + 1
-    lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), (/icolcmip5-w, icolcmip5+w/), \
-                                                       (/median, median/), lnres)
-    idummy = idummy + 1
-    delete(la_cmip5_composited)
-  end if
+;  res@trYMaxF = 126.
+;  res@trYMinF = 18.
+;  do ii = 0, ListCount(el_obs)-1
+;    res@xyLineColor = get_color(el_obs[ii])
+;    res@xyLineThicknessF = 2.
+;    res@xyDashPattern = 1
+;    if (ii.eq.0) then
+;      res@tiMainString = "(e) El Nino-to-El Nino interval (months)"
+;    else
+;      res@tiMainString = ""
+;    end if
+;    y = el_obs[ii]@interval_to_subsequent_same
+;    plots(1, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+;    if (ii.eq.0) then
+;      res@tiMainString = "(f) La Nina-to-La Nina interval (months)"
+;    else
+;      res@tiMainString = ""
+;    end if
+;    y = la_obs[ii]@interval_to_subsequent_same
+;    plots(1, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/y, y/), res)
+;  end do
 
-
-  
-;  res@trYMaxF = 48.
-;  res@trYMinF = 6.
-;  res@xyLineColor = get_color(el_ref)
-;  res@xyLineThicknessF = 2.
-;  res@xyDashPattern = 1
-;  res@tiMainString = "EN-to-LN interval (mon)"
-;  plots(1, 0) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/el_ref@interval_to_subsequent_opposite, el_ref@interval_to_subsequent_opposite/), res)
-;  res@tiMainString = "LN-to-EN interval (mon)"
-;  plots(1, 1) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/la_ref@interval_to_subsequent_opposite, la_ref@interval_to_subsequent_opposite/), res)
-  
+;  nmodel_cmip5 = 0
+;  nmodel_cmip6 = 0
 ;  do ii = 0, ListCount(el)-1
 ;    center = get_modelling_center(el[ii]@dataset)
 ;    i = ind(center(0).eq.centers)
 ;    mkres@gsMarkerColor    = get_color(el[ii])
 ;    mkres@gsMarkerIndex    = get_markerindex(el[ii])
-;    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 0), i, el[ii]@interval_to_subsequent_opposite, mkres)
+;    y = el[ii]@interval_to_subsequent_same
+;    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 0), i, y, mkres)
 ;    idummy = idummy + 1
 ;    delete(center)
+;    if (y.gt.0.) then
+;      if (el[ii]@project.eq."CMIP6") then
+;        nmodel_cmip6 = nmodel_cmip6 + 1
+;        if (isvar("el_cmip6_composited")) then
+;          tmp = el_cmip6_composited
+;          delete(el_cmip6_composited)
+;          el_cmip6_composited = new(nmodel_cmip6, typeof(y))
+;          el_cmip6_composited = array_append_record(tmp, y, 0)
+;          delete(tmp)
+;        else
+;          el_cmip6_composited = y
+;        end if
+;      elseif (el[ii]@project.eq."CMIP5") then
+;        nmodel_cmip5 = nmodel_cmip5 + 1
+;        if (isvar("el_cmip5_composited")) then
+;          tmp = el_cmip5_composited
+;          delete(el_cmip5_composited)
+;          el_cmip5_composited = new(nmodel_cmip5, typeof(y))
+;          el_cmip5_composited = array_append_record(tmp, y, 0)
+;          delete(tmp)
+;        else
+;          el_cmip5_composited = y
+;        end if
+;      end if
+;    end if
 ;  end do
+;  if (nmodel_cmip6.gt.2) then
+;    median = dim_median(el_cmip6_composited)
+;    qsort(el_cmip6_composited)
+;    x5   = round(0.05*dimsizes(el_cmip6_composited), 3) - 1
+;    x25  = round(0.25*dimsizes(el_cmip6_composited), 3) - 1
+;    x75  = round(0.75*dimsizes(el_cmip6_composited), 3) - 1
+;    x95  = round(0.95*dimsizes(el_cmip6_composited), 3) - 1
+;    percentile5  = el_cmip6_composited(x5)
+;    percentile25 = el_cmip6_composited(x25)
+;    percentile75 = el_cmip6_composited(x75)
+;    percentile95 = el_cmip6_composited(x95)
+;    xmax = max(el_cmip6_composited)
+;    xmin = min(el_cmip6_composited)
+;    median@project = "CMIP6"
+;    polyres = True
+;    polyres@gsFillColor = get_color(median)
+;    dummy(idummy) \
+;      = gsn_add_polygon(wks, plots(1, 0), \
+;                        (/icolcmip6-w, icolcmip6-w, \
+;                          icolcmip6+w, icolcmip6+w/), \
+;                        (/percentile25, percentile75, \
+;                          percentile75, percentile25/), polyres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := get_color(median)
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), \
+;                                     (/icolcmip6, icolcmip6/), \
+;                                     (/percentile5, percentile95/), lnres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := "white"
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), \
+;                                     (/icolcmip6-w, icolcmip6+w/), \
+;                                     (/median, median/), lnres)
+;    idummy = idummy + 1
+;    delete(el_cmip6_composited)
+;  end if
+;  if (nmodel_cmip5.gt.2) then
+;    median = dim_median(el_cmip5_composited)
+;    qsort(el_cmip5_composited)
+;    x5   = round(0.05*dimsizes(el_cmip5_composited), 3) - 1
+;    x25  = round(0.25*dimsizes(el_cmip5_composited), 3) - 1
+;    x75  = round(0.75*dimsizes(el_cmip5_composited), 3) - 1
+;    x95  = round(0.95*dimsizes(el_cmip5_composited), 3) - 1
+;    percentile5  = el_cmip5_composited(x5)
+;    percentile25 = el_cmip5_composited(x25)
+;    percentile75 = el_cmip5_composited(x75)
+;    percentile95 = el_cmip5_composited(x95)
+;    median@project = "CMIP5"
+;    polyres = True
+;    polyres@gsFillColor = get_color(median)
+;    dummy(idummy) \
+;      = gsn_add_polygon(wks, plots(1, 0), \
+;                        (/icolcmip5-w, icolcmip5-w, \
+;                          icolcmip5+w, icolcmip5+w/), \
+;                        (/percentile25, percentile75, \
+;                          percentile75, percentile25/), polyres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := get_color(median)
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), \
+;                                     (/icolcmip5, icolcmip5/), \
+;                                     (/percentile5, percentile95/), lnres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := "white"
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 0), \
+;                                     (/icolcmip5-w, icolcmip5+w/), \
+;                                     (/median, median/), lnres)
+;    idummy = idummy + 1
+;    delete(el_cmip5_composited)
+;  end if
+
+;  nmodel_cmip5 = 0
+;  nmodel_cmip6 = 0
 ;  do ii = 0, ListCount(la)-1
 ;    center = get_modelling_center(la[ii]@dataset)
 ;    i = ind(center(0).eq.centers)
 ;    mkres@gsMarkerColor    = get_color(la[ii])
 ;    mkres@gsMarkerIndex    = get_markerindex(la[ii])
-;    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 1), i, la[ii]@interval_to_subsequent_opposite, mkres)
+;    y = la[ii]@interval_to_subsequent_same
+;    dummy(idummy) = gsn_add_polymarker(wks, plots(1, 1), i, y, mkres)
 ;    idummy = idummy + 1
 ;    delete(center)
+;    if (y.gt.0) then
+;      if (la[ii]@project.eq."CMIP6") then
+;        nmodel_cmip6 = nmodel_cmip6 + 1
+;        if (isvar("la_cmip6_composited")) then
+;          tmp = la_cmip6_composited
+;          delete(la_cmip6_composited)
+;          la_cmip6_composited = new(nmodel_cmip6, typeof(y))
+;          la_cmip6_composited = array_append_record(tmp, y, 0)
+;          delete(tmp)
+;        else
+;          la_cmip6_composited = y
+;        end if
+;      elseif (la[ii]@project.eq."CMIP5") then
+;        nmodel_cmip5 = nmodel_cmip5 + 1
+;        if (isvar("la_cmip5_composited")) then
+;          tmp = la_cmip5_composited
+;          delete(la_cmip5_composited)
+;          la_cmip5_composited = new(nmodel_cmip5, typeof(y))
+;          la_cmip5_composited = array_append_record(tmp, y, 0)
+;          delete(tmp)
+;        else
+;          la_cmip5_composited = y
+;        end if
+;      end if
+;    end if
 ;  end do
-
+;  if (nmodel_cmip6.gt.2) then
+;    median = dim_median(la_cmip6_composited)
+;    qsort(la_cmip6_composited)
+;    x5   = round(0.05*dimsizes(la_cmip6_composited), 3) - 1
+;    x25  = round(0.25*dimsizes(la_cmip6_composited), 3) - 1
+;    x75  = round(0.75*dimsizes(la_cmip6_composited), 3) - 1
+;    x95  = round(0.95*dimsizes(la_cmip6_composited), 3) - 1
+;    percentile5  = la_cmip6_composited(x5)
+;    percentile25 = la_cmip6_composited(x25)
+;    percentile75 = la_cmip6_composited(x75)
+;    percentile95 = la_cmip6_composited(x95)
+;    median@project = "CMIP6"
+;    polyres = True
+;    polyres@gsFillColor = get_color(median)
+;    dummy(idummy) \
+;      = gsn_add_polygon(wks, plots(1, 1), \
+;                        (/icolcmip6-w, icolcmip6-w, \
+;                          icolcmip6+w, icolcmip6+w/), \
+;                        (/percentile25, percentile75, \
+;                          percentile75, percentile25/), polyres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := get_color(median)
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), \
+;                                     (/icolcmip6, icolcmip6/), \
+;                                     (/percentile5, percentile95/), lnres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := "white"
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), \
+;                                     (/icolcmip6-w, icolcmip6+w/), \
+;                                     (/median, median/), lnres)
+;    idummy = idummy + 1
+;    delete(la_cmip6_composited)
+;  end if
+;  if (nmodel_cmip5.gt.2) then
+;    median = dim_median(la_cmip5_composited)
+;    qsort(la_cmip5_composited)
+;    x5   = round(0.05*dimsizes(la_cmip5_composited), 3) - 1
+;    x25  = round(0.25*dimsizes(la_cmip5_composited), 3) - 1
+;    x75  = round(0.75*dimsizes(la_cmip5_composited), 3) - 1
+;    x95  = round(0.95*dimsizes(la_cmip5_composited), 3) - 1
+;    percentile5  = la_cmip5_composited(x5)
+;    percentile25 = la_cmip5_composited(x25)
+;    percentile75 = la_cmip5_composited(x75)
+;    percentile95 = la_cmip5_composited(x95)
+;    median@project = "CMIP5"
+;    polyres = True
+;    polyres@gsFillColor = get_color(median)
+;    dummy(idummy) \
+;      = gsn_add_polygon(wks, plots(1, 1), \
+;                        (/icolcmip5-w, icolcmip5-w, \
+;                          icolcmip5+w, icolcmip5+w/), \
+;                        (/percentile25, percentile75, \
+;                          percentile75, percentile25/), polyres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := get_color(median)
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), \
+;                                     (/icolcmip5, icolcmip5/), \
+;                                     (/percentile5, percentile95/), lnres)
+;    idummy = idummy + 1
+;    lnres@gsLineColor := "white"
+;    dummy(idummy) = gsn_add_polyline(wks, plots(1, 1), \
+;                                     (/icolcmip5-w, icolcmip5+w/), \
+;                                     (/median, median/), lnres)
+;    idummy = idummy + 1
+;    delete(la_cmip5_composited)
+;  end if
 
   pres := True
   pres@gsnMaximize = False
@@ -1758,7 +1785,6 @@ begin
   pres@gsnPanelLeft = 0.
   pres@gsnPanelRight = 1.
   pres@gsnPanelTop = 0.63
-;  pres@gsnPanelFigureStrings = (/ "(a) El Nino", "(b) La Nina" /)
   pres@gsnPanelFigureStringsFontHeightF = 0.012
   pres@gsnPanelFigureStringsPerimOn = False
   pres@amJust   = "TopCenter"

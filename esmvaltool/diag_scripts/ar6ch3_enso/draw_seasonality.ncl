@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200511 kosaka_yu: cleaned to meet the code style.
 ;    20200105 kosaka_yu: show shading instead of lines
 ;    20191024 kosaka_yu: written.
 ;
@@ -46,13 +47,13 @@ begin
   end if
   return(y)
 end
-  
+
 begin
 
   enter_msg(DIAG_SCRIPT, "")
 
   obs_projects = (/"OBS", "OBS6", "obs4mips", "ana4mips"/)
-  
+
 ;  disabled the shading
 ;  add_shading = False
 
@@ -75,8 +76,8 @@ begin
   ; Get file list
   input_dir = diag_script_info@input_files
   paths = systemfunc("ls "+input_dir+"/ENSOindex_*.nc")
-  
- ; ========================================================================
+
+  ; ========================================================================
 
   ; Get a list of models and obs
   nobs = 0
@@ -116,7 +117,7 @@ begin
   projects = ""
   obs = get_unique_values(obs_all)
   nobs = dimsizes(obs)
-  
+
   ; Read data
   mean = new((/nmodels, 12/), "float")
   var  = new((/nmodels, 12/), "float")
@@ -157,7 +158,6 @@ begin
   do ii = 0, dimsizes(paths) - 1
     f = addfile(paths(ii), "r")
     ts = f->ENSOindex
-;    time = cd_calendar(ts&time, -1)
     ts&time := toint(ts&time)
     syear_data = ts&time(0)/100
     smonth_data = ts&time(0)-syear_data*100
@@ -172,7 +172,7 @@ begin
     mam = ts({t0:t1:12})
     do yr = max((/syear, syear_data/)), min((/eyear, eyear_data/))-1
       ndj({yr*100+12}) = avg(ts({yr*100+11:yr*100+101}))
-      mam({yr*100+4} ) = avg(ts({yr*100+3:yr*100+5}))
+      mam({yr*100+4}) = avg(ts({yr*100+3:yr*100+5}))
     end do
 
     x  = new(12, typeof(ts))
@@ -208,10 +208,10 @@ begin
       var_obs(i, :)  = var_obs(i, :) + tofloat(xx)
       nyrs_obs(i, :) = nyrs_obs(i, :) + nx
       ndj_mean_obs(i) = ndj_mean_obs(i) + tofloat(sum(ndj))
-      ndj_var_obs(i)  = ndj_var_obs(i)  + tofloat(sum(ndj^2))
+      ndj_var_obs(i)  = ndj_var_obs(i)  + tofloat(sum(ndj ^ 2))
       nyrs_ndj_obs(i) = nyrs_ndj_obs(i) + num(.not.ismissing(ndj))
       mam_mean_obs(i) = mam_mean_obs(i) + tofloat(sum(mam))
-      mam_var_obs(i)  = mam_var_obs(i)  + tofloat(sum(mam^2))
+      mam_var_obs(i)  = mam_var_obs(i)  + tofloat(sum(mam ^ 2))
       nyrs_mam_obs(i) = nyrs_mam_obs(i) + num(.not.ismissing(mam))
     else
       i = ind(ts@dataset.eq.models)
@@ -220,11 +220,11 @@ begin
       var(i, :)   = var(i, :)  + tofloat(xx)
       nyrs(i, :) = nyrs(i, :) + nx
       ndj_mean(i) = ndj_mean(i) + tofloat(sum(ndj))
-      ndj_var(i)  = ndj_var(i)  + tofloat(sum(ndj^2))
+      ndj_var(i)  = ndj_var(i)  + tofloat(sum(ndj ^ 2))
       nyrs_ndj(i) = nyrs_ndj(i) + num(.not.ismissing(ndj))
       mam_mean(i) = mam_mean(i) + tofloat(sum(mam))
-      mam_var(i)  = mam_var(i)  + tofloat(sum(mam^2))
-      nyrs_mam(i) = nyrs_mam(i)  + num(.not.ismissing(mam))
+      mam_var(i)  = mam_var(i)  + tofloat(sum(mam ^ 2))
+      nyrs_mam(i) = nyrs_mam(i) + num(.not.ismissing(mam))
     end if
     delete(x)
     delete(xx)
@@ -234,22 +234,27 @@ begin
     delete(ts)
   end do
   mean_obs = mean_obs / tofloat(nyrs_obs)
-  var_obs  = var_obs / tofloat(nyrs_obs - 1) - mean_obs^2*tofloat(nyrs_obs)/tofloat(nyrs_obs-1)
+  var_obs  = var_obs / tofloat(nyrs_obs - 1) \
+    - mean_obs ^ 2*tofloat(nyrs_obs)/tofloat(nyrs_obs-1)
   stdv_obs = sqrt(var_obs)
 
   ndj_mean_obs = ndj_mean_obs / tofloat(nyrs_ndj_obs)
-  ndj_var_obs  = ndj_var_obs / tofloat(nyrs_ndj_obs - 1) - ndj_mean_obs^2*tofloat(nyrs_ndj_obs)/tofloat(nyrs_ndj_obs-1)
+  ndj_var_obs  = ndj_var_obs / tofloat(nyrs_ndj_obs - 1) \
+    - ndj_mean_obs ^ 2*tofloat(nyrs_ndj_obs)/tofloat(nyrs_ndj_obs-1)
   mam_mean_obs = mam_mean_obs / tofloat(nyrs_mam_obs)
-  mam_var_obs  = mam_var_obs / tofloat(nyrs_mam_obs - 1) - mam_mean_obs^2*tofloat(nyrs_mam_obs)/tofloat(nyrs_mam_obs-1)
+  mam_var_obs  = mam_var_obs / tofloat(nyrs_mam_obs - 1) \
+    - mam_mean_obs ^ 2*tofloat(nyrs_mam_obs)/tofloat(nyrs_mam_obs-1)
   seasonality_obs = sqrt(ndj_var_obs/mam_var_obs)
-  
+
   mean = mean / tofloat(nyrs)
-  var  = var / tofloat(nyrs - 1) - mean^2*tofloat(nyrs)/tofloat(nyrs-1) 
+  var  = var / tofloat(nyrs - 1) - mean ^ 2*tofloat(nyrs)/tofloat(nyrs-1)
   stdv = sqrt(var)
   ndj_mean = ndj_mean / tofloat(nyrs_ndj)
-  ndj_var  = ndj_var / tofloat(nyrs_ndj - 1) - ndj_mean^2*tofloat(nyrs_ndj)/tofloat(nyrs_ndj - 1)
+  ndj_var  = ndj_var / tofloat(nyrs_ndj - 1) \
+    - ndj_mean ^ 2*tofloat(nyrs_ndj)/tofloat(nyrs_ndj - 1)
   mam_mean = mam_mean / tofloat(nyrs_mam)
-  mam_var  = mam_var / tofloat(nyrs_mam - 1) - mam_mean^2*tofloat(nyrs_mam)/tofloat(nyrs_mam - 1)
+  mam_var  = mam_var / tofloat(nyrs_mam - 1) \
+    - mam_mean ^ 2*tofloat(nyrs_mam)/tofloat(nyrs_mam - 1)
   seasonality = sqrt(ndj_var/mam_var)
 
   stdv_cmip5mean = new(12, "float")
@@ -295,44 +300,43 @@ begin
   end do
   stdv_cmip5mean = stdv_cmip5mean / nmodels_cmip5
   stdv_cmip6mean = stdv_cmip6mean / nmodels_cmip6
-  
+
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                 "enso_seasonality")
 
-; ===================================== CMIP5, CMIP6 and obs =======================================
+; =========================== CMIP5, CMIP6 and obs ============================
 
   dummy   = new(500, "graphic")
   idummy = 0
 
   month = (/ 0.5, 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 12.5/)
   monthpoly = array_append_record(month, month(::-1), 0)
-  
+
   rests := True
-  rests@gsnDraw           = False
-  rests@gsnFrame          = False
+  rests@gsnDraw = False
+  rests@gsnFrame = False
   rests@vpWidthF = 0.5
   rests@vpHeightF = 0.3
-  rests@xyDashPattern     = 0
-  rests@xyMonoLineColor   = False
-  rests@gsnYRefLine       = 0.
+  rests@xyDashPattern = 0
+  rests@xyMonoLineColor = False
+  rests@gsnYRefLine = 0.
   rests@trXMinF = month(0)
   rests@trXMaxF = month(dimsizes(month)-1)
   rests@trYMinF = 0.2
   rests@trYMaxF = 2.0
   rests@tmXTOn = False
-;  rests@tmYROn = False
-  rests@tmYLMode          = "Explicit"
-  rests@tmXBMode          = "Explicit"
+  rests@tmYLMode = "Explicit"
+  rests@tmXBMode = "Explicit"
   rests@tmXBLabelFontHeightF = 0.014
   rests@tmXBMajorThicknessF = 0.
   rests@tmYLLabelFontHeightF = 0.014
-  rests@tmYLValues        = (/0., 0.2, 0.4, 0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2./)
-  rests@tmYLLabels        = rests@tmYLValues
-  rests@tmXBValues        = (/1, 3, 5, 7, 9, 11/) 
-  rests@tmXBLabels        = (/"Jan", "Mar", "May", "Jul", "Sep", "Nov"/)
-  rests@tmXBMinorValues   = ispan(1, 12, 1)
+  rests@tmYLValues = (/0., 0.2, 0.4, 0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2./)
+  rests@tmYLLabels = rests@tmYLValues
+  rests@tmXBValues = (/1, 3, 5, 7, 9, 11/)
+  rests@tmXBLabels = (/"Jan", "Mar", "May", "Jul", "Sep", "Nov"/)
+  rests@tmXBMinorValues = ispan(1, 12, 1)
   rests@tmLabelAutoStride = False
-  
+
   resp = True
   resp@gsFillOpacityF = 0.1
   resp@gsLineThicknessF = 0.4
@@ -347,38 +351,25 @@ begin
   rests@tiMainOffsetYF = -0.01
   rests@xyLineThicknessF = 0.01
   rests@tiMainString = "(a) ENSO seasonality"
-  seasonality_plot = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/0., 0./), rests)
-    
+  seasonality_plot = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), \
+                                (/0., 0./), rests)
+
   rests@xyDashPattern = 0
   rests@xyLineThicknessF = 0.25
-;  if (add_shading) then
-    res_cmip = True
-    res_cmip@dataset = "CMIP5"
-    res_cmip@project = "CMIP5"
-    resp@gsFillColor = get_color(res_cmip)
-    resp@gsFillOpacityF = 0.2
-    dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, \
-                                    monthpoly, make_poly(expand_season(stdv_cmip5)), resp)
-    idummy = idummy + 1
-    res_cmip@dataset = "CMIP6"
-    res_cmip@project = "CMIP6"
-    resp@gsFillColor = get_color(res_cmip)
-    dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, \
-                                    monthpoly, make_poly(expand_season(stdv_cmip6)), resp)
-    idummy = idummy + 1
-; end if
-
-;  res_cmip = True
-;  do i = 0, nmodels-1
-;    res_cmip@dataset = models(i)
-;    res_cmip@project = projects(i)
-;    rests@xyLineColor = get_color(res_cmip)
-;    rests@xyDashPattern =  get_lineindex(res_cmip)
-;    rests@xyLineThicknessF = 0.5
-;    rests@xyLineOpacityF = 0.5
-;    plot = gsn_csm_xy(wks, month, expand_season(stdv(i, :)), rests)
-;    overlay(seasonality_plot, plot)
-;  end do
+  res_cmip = True
+  res_cmip@dataset = "CMIP5"
+  res_cmip@project = "CMIP5"
+  resp@gsFillColor = get_color(res_cmip)
+  resp@gsFillOpacityF = 0.2
+  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, monthpoly, \
+                                  make_poly(expand_season(stdv_cmip5)), resp)
+  idummy = idummy + 1
+  res_cmip@dataset = "CMIP6"
+  res_cmip@project = "CMIP6"
+  resp@gsFillColor = get_color(res_cmip)
+  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, monthpoly, \
+                                  make_poly(expand_season(stdv_cmip6)), resp)
+  idummy = idummy + 1
 
   res_cmip@project = "CMIP6"
   rests@xyLineColor = get_color(res_cmip)
@@ -408,45 +399,60 @@ begin
     lres@gsLineColor = rests@xyLineColor
     lres@gsLineDashPattern = rests@xyDashPattern
     lres@gsLineThicknessF = rests@xyLineThicknessF
-    dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/1.+i*3., 1+i*3.+0.8/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
-    idummy = idummy + 1    
+    dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, \
+                                     (/1.+i*3., 1+i*3.+0.8/), \
+                                     (/rests@trYMaxF, rests@trYMaxF/)-0.1, \
+                                     lres)
+    idummy = idummy + 1
     txres@txFontColor = get_color(res_obs)
-    dummy(idummy) = gsn_add_text(wks, seasonality_plot, obs(i), 1.+i*3.+0.9, rests@trYMaxF-0.1, txres)
-    idummy = idummy + 1    
+    dummy(idummy) = gsn_add_text(wks, seasonality_plot, obs(i), \
+                                 1.+i*3.+0.9, rests@trYMaxF-0.1, txres)
+    idummy = idummy + 1
   end do
-  
+
   res_cmip@project = "CMIP6"
   x = 4.2+3.*(nobs-1)
   resp@gsLineOpacityF = 0.2
   resp@gsFillColor := get_color(res_cmip)
-  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, (/x, x, x+0.9, x+0.9/), \
-                                  (/rests@trYMaxF-0.03, rests@trYMaxF-0.17, rests@trYMaxF-0.17, rests@trYMaxF-0.03/), resp)
+  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, \
+                                  (/x, x, x+0.9, x+0.9/), \
+                                  (/rests@trYMaxF-0.03, rests@trYMaxF-0.17, \
+                                    rests@trYMaxF-0.17, rests@trYMaxF-0.03/), \
+                                  resp)
   idummy = idummy + 1
   lres@gsLineColor = get_color(res_cmip)
   lres@gsLineDashPattern = get_lineindex(res_cmip)
   lres@gsLineThicknessF = 3.
-  dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/x, x+0.9/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
+  dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/x, x+0.9/), \
+                                   (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
   idummy = idummy + 1
 
   txres@txFontColor = get_color(res_cmip)
-  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP6", x+1., rests@trYMaxF-0.1, txres)
+  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP6", x+1., \
+                               rests@trYMaxF-0.1, txres)
+
   idummy = idummy + 1
   res_cmip@project = "CMIP5"
   x = 7.+3.*(nobs-1)
   resp@gsLineOpacityF = 0.2
   resp@gsFillColor := get_color(res_cmip)
-  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, (/x, x, x+0.9, x+0.9/), \
-                                  (/rests@trYMaxF-0.03, rests@trYMaxF-0.17, rests@trYMaxF-0.17, rests@trYMaxF-0.03/), resp)
+  dummy(idummy) = gsn_add_polygon(wks, seasonality_plot, \
+                                  (/x, x, x+0.9, x+0.9/), \
+                                  (/rests@trYMaxF-0.03, rests@trYMaxF-0.17, \
+                                    rests@trYMaxF-0.17, rests@trYMaxF-0.03/), \
+                                  resp)
   idummy = idummy + 1
   lres@gsLineColor = get_color(res_cmip)
   lres@gsLineDashPattern = get_lineindex(res_cmip)
   lres@gsLineThicknessF = 3.
-  dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/x, x+0.9/), (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
+  dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, (/x, x+0.9/), \
+                                   (/rests@trYMaxF, rests@trYMaxF/)-0.1, lres)
   idummy = idummy + 1
   txres@txFontColor = get_color(res_cmip)
-  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP5", x+1., rests@trYMaxF-0.1, txres)
+  dummy(idummy) = gsn_add_text(wks, seasonality_plot, "CMIP5", \
+                               x+1., rests@trYMaxF-0.1, txres)
   idummy = idummy + 1
-  
+
   pres = True
   pres@gsnFrame = False
   pres@gsnMaximize = False
@@ -456,7 +462,7 @@ begin
   pres@gsnPanelRight = 0.75
   gsn_panel(wks, seasonality_plot, (/1, 1/), pres)
 
-; ===================================== Individual Models =======================================
+; ============================ Individual Models =============================
 
   do ii = 0, nmodels-1
     if (isvar("centers")) then
@@ -505,22 +511,22 @@ begin
   res@gsnFrame = False
   res@trXMinF = col(0) - 0.5
   res@trXMaxF = col(ncols-1) + 0.5
-  res@vpWidthF = 0.5; 0.4
-  res@vpHeightF = 0.2 ;0.15
+  res@vpWidthF = 0.5
+  res@vpHeightF = 0.2
   res@tmXTOn = False
   res@tmXMajorGrid = True
   res@tmYMajorGrid = True
-  res@tmXMajorGridLineDashPattern = 0 ;11
-  res@tmYMajorGridLineDashPattern = 0 ;11
+  res@tmXMajorGridLineDashPattern = 0
+  res@tmYMajorGridLineDashPattern = 0
   res@tmXMajorGridLineColor = "grey"
   res@tmYMajorGridLineColor = "grey"
   res@tmXMajorGridThicknessF = 0.005
-  res@tmYMajorGridThicknessF = 0. ;0.005
+  res@tmYMajorGridThicknessF = 0.
 
   res@tmXBMode = "Explicit"
   res@tmXBValues = col
   res@tmXBLabels = names
-  res@tmXBLabelAngleF = 60. ;45.
+  res@tmXBLabelAngleF = 60.  ; 45.
   res@tmXBLabelJust = "CenterRight"
   res@tmXBLabelFontHeightF = 0.01
 
@@ -529,7 +535,7 @@ begin
   mkres@gsMarkerSizeF    = 0.01
   lnres = True
   lnres@gsLineThicknessF = 2.
-  
+
   res@trYMaxF = 2.5
   res@trYMinF = 0.5
   res@tmYLMode          = "Explicit"
@@ -543,17 +549,19 @@ begin
   res@xyDashPattern = get_lineindex(res_obs)
   res@xyLineThicknessF = 2.
   res@tiMainString = "(b) Seasonality metric"
-  mme_plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/seasonality_obs(0), seasonality_obs(0)/), res)
+  mme_plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), \
+                        (/seasonality_obs(0), seasonality_obs(0)/), res)
   do j = 1, nobs-1
     res_obs@project = "OBS"
     res_obs@dataset = obs(j)
     res@xyLineColor = get_color(res_obs)
     res@xyDashPattern =  get_lineindex(res_obs)
-    plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/seasonality_obs(j), seasonality_obs(j)/), res)
+    plot = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), \
+                      (/seasonality_obs(j), seasonality_obs(j)/), res)
     overlay(mme_plot, plot)
   end do
-  
-  w = 0.3 ; width of bars for MME
+
+  w = 0.3  ; width of bars for MME
   nmodel_cmip5 = 0
   nmodel_cmip6 = 0
   do ii = 0, nmodels-1
@@ -563,7 +571,8 @@ begin
     res_cmip@project = projects(ii)
     mkres@gsMarkerColor    = get_color(res_cmip)
     mkres@gsMarkerIndex    = get_markerindex(res_cmip)
-    dummy(idummy) = gsn_add_polymarker(wks, mme_plot, i, seasonality(ii), mkres)
+    dummy(idummy) = gsn_add_polymarker(wks, mme_plot, i, \
+                                       seasonality(ii), mkres)
     idummy = idummy + 1
     delete(center)
     if (projects(ii).eq."CMIP6") then
@@ -603,17 +612,22 @@ begin
     median@project = "CMIP6"
     polyres = True
     polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, mme_plot, \
-                    (/icolcmip6-w, icolcmip6-w, icolcmip6+w, icolcmip6+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
+    dummy(idummy) \
+      = gsn_add_polygon(wks, mme_plot, \
+                        (/icolcmip6-w, icolcmip6-w, \
+                          icolcmip6+w, icolcmip6+w/), \
+                        (/percentile25, percentile75, \
+                          percentile75, percentile25/), polyres)
     idummy = idummy + 1
     lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6, icolcmip6/), \
-                                                    (/xmin, xmax/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, \
+                                     (/icolcmip6, icolcmip6/), \
+                                     (/xmin, xmax/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip6-w, icolcmip6+w/), \
-                                                    (/median, median/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, \
+                                     (/icolcmip6-w, icolcmip6+w/), \
+                                     (/median, median/), lnres)
     idummy = idummy + 1
     delete(seasonality_cmip6)
   end if
@@ -629,17 +643,22 @@ begin
     median@project = "CMIP5"
     polyres = True
     polyres@gsFillColor = get_color(median)
-    dummy(idummy) = gsn_add_polygon(wks, mme_plot, \
-                    (/icolcmip5-w, icolcmip5-w, icolcmip5+w, icolcmip5+w/), \
-                    (/percentile25, percentile75, percentile75, percentile25/), polyres)
+    dummy(idummy) \
+      = gsn_add_polygon(wks, mme_plot, \
+                        (/icolcmip5-w, icolcmip5-w, \
+                          icolcmip5+w, icolcmip5+w/), \
+                        (/percentile25, percentile75, \
+                          percentile75, percentile25/), polyres)
     idummy = idummy + 1
     lnres@gsLineColor := get_color(median)
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5, icolcmip5/), \
-                                                    (/xmin, xmax/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, \
+                                     (/icolcmip5, icolcmip5/), \
+                                     (/xmin, xmax/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/icolcmip5-w, icolcmip5+w/), \
-                                                    (/median, median/), lnres)
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, \
+                                     (/icolcmip5-w, icolcmip5+w/), \
+                                     (/median, median/), lnres)
     idummy = idummy + 1
     delete(seasonality_cmip5)
   end if

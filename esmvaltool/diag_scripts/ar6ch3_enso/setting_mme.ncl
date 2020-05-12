@@ -21,10 +21,11 @@ function get_color(x)
 local color
 begin
   if (x@project.eq."CMIP6") then
-    color = (/204., 35., 35./)/255. ; "deeppink4"
+    color = (/204., 35., 35./)/255.  ; "deeppink4"
   elseif (x@project.eq."CMIP5") then
-    color = (/37., 81., 204./)/255. ; "deepskyblue"
-  elseif (any(x@project.eq.(/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/))) then
+    color = (/37., 81., 204./)/255.  ; "deepskyblue"
+  elseif (any(x@project.eq.(/"OBS", "OBS6", "obs", \
+                             "obs4mips", "ana4mips"/))) then
     color = (/0., 0., 0./)
   end if
   return(color)
@@ -34,8 +35,9 @@ function get_lineindex(x)
 local lidx
 begin
   if (any(x@project.eq.(/"CMIP5", "CMIP6"/))) then
-    lidx = 0 
-  elseif (any(x@project.eq.(/"OBS", "OBS6", "obs", "obs4mips", "ana4mips"/))) then
+    lidx = 0
+  elseif (any(x@project.eq.(/"OBS", "OBS6", "obs", \
+                             "obs4mips", "ana4mips"/))) then
     if (x@dataset.eq."HadISST") then
       lidx = 0
     elseif (x@dataset.eq."ERSSTv5") then
