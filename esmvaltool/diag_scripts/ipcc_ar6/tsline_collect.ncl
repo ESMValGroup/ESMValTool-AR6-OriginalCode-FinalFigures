@@ -16,14 +16,21 @@
 ;    ts_anomaly: calculates anomalies with respect to the defined period
 ;    ref_start: start year of reference period for anomalies
 ;    ref_end: end year of reference period for anomalies
-;    ref_value: if true, right panel with mean values is attached
+;    region: name of domain
 ;    plot_units: variable unit for plotting
+;    y-min: set min of y-axis
+;    y-max: set max of y-axis
 ;    order: order in which experiments should be plotted
+;    run_ave: if not equal 0 than calculate running mean over this number
+;             of years
+;    header: if true, region name as header     
+;    stat_shading: if true: shading of statistic range
+;    ref_shading: if true: shading of reference period
 ;
 ; Caveats
 ;
 ; Modification history
-;    20190204-A_bock_ls: written.
+;    20190204-A_bock_lisa: written.
 ;
 ; #############################################################################
 
@@ -43,12 +50,8 @@ begin
   diag_script_base = basename(DIAG_SCRIPT)
 
   var0 = variable_info[0]@short_name
-;  field_type0 = variable_info[0]@field
   info_items = select_metadata_by_name(input_file_info, var0)
   units0 = info_items[0]@units
-;  datasetnames = metadata_att_as_array(info_items, "dataset")
-;  dim_MOD = ListCount(info_items)
-;  dim_VAR = ListCount(variable_info)
 
   ; Create output plot directory
   plot_dir = config_user_info@plot_dir
@@ -75,12 +78,13 @@ begin
   ; Set default values for non-required diag_script_info attributes
   set_default_att(diag_script_info, "time_avg", "monthly")
   set_default_att(diag_script_info, "ts_anomaly", "noanom")
-  set_default_att(diag_script_info, "ref_value", False)
   set_default_att(diag_script_info, "region", "Global")
+  set_default_att(diag_script_info, "run_ave", 0)
+  set_default_att(diag_script_info, "header", True)
+  set_default_att(diag_script_info, "stat_shading", False)
+  set_default_att(diag_script_info, "ref_shading", False)
 
   ; Determine time range
-;  start_year = min(metadata_att_as_array(info_items, "start_year"))
-;  end_year = max(metadata_att_as_array(info_items, "end_year"))
   start_year = diag_script_info@start_year
   end_year = diag_script_info@end_year
   all_years = ispan(start_year, end_year, 1)
@@ -139,10 +143,13 @@ begin
     anom = "noanom"
   end if
 
-  if (isatt(diag_script_info, "ts_detrend")) then
-    detr = diag_script_info@ts_detrend
+  ; Running Mean
+  if (isatt(diag_script_info, "run_ave")) then
+    if(diag_script_info@run_ave .gt. 0) then
+      run_ave = "running_mean"
+    end if
   else
-    detr = "nodetr"
+    run_ave = ""
   end if
 
   ; -----------------------------------------------
@@ -153,12 +160,8 @@ begin
     "tsline_mm_" + var0 + "_stat.nc"
   input_files := tostring(input_files)
 
-print("input_files: " + input_files)
-
   ; Filter out non-existing files
   input_files := input_files(ind(isfilepresent(input_files)))
-
-print("input_files: " + input_files)
 
   nfiles = dimsizes(input_files)
 
@@ -181,13 +184,13 @@ print("input_files: " + input_files)
 
     if(isatt(diag_script_info, "order")) then
       ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
-      if (ii_n .gt. dimsizes(data_mean&experiment)-1) then
-        error_msg("f", DIAG_SCRIPT, "", "diag_script_info@order not " \
-                  + "well defined (less experiments available)")
-      elseif (all(ismissing(ii_n))) then
+      if (all(ismissing(ii_n))) then
         error_msg("f", DIAG_SCRIPT, "", "Collected experiment " + \
                   data_temp@experiment + " does not appear in " + \
                   "diag_script_info@order")
+      elseif (ii_n .gt. dimsizes(data_mean&experiment)-1) then
+        error_msg("f", DIAG_SCRIPT, "", "diag_script_info@order not " \
+                  + "well defined (less experiments available)")
       end if
     else
       ii_n = ii
@@ -202,6 +205,19 @@ print("input_files: " + input_files)
     idx1 = ind(date(0).eq.data_mean&time)
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
     delete(date)
+
+    ; Running Mean
+    if(diag_script_info@run_ave .gt. 0) then
+      run_ave = "running_mean"
+      ;tmp = runave_Wrap(data_temp(0,:), 12 * diag_script_info@run_ave, 1)
+      tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
+      ;delete(data_temp)
+      ;data_temp(0,:) = tmp
+      data_temp = tmp
+      delete(tmp)
+    else
+      run_ave = ""
+    end if
 
     data_mean(ii_n, idx1:idx2)  = (/data_temp(0, :)/)
     data_mean&experiment(ii_n) = data_temp@experiment
@@ -219,7 +235,7 @@ print("input_files: " + input_files)
 
   if (isatt(diag_script_info, "ref")) then
     input_files_ref = diag_script_info@input_files + "/" + \
-      "tsline_" + var0 + "_" + anom + "_" + detr + ".nc"
+      "tsline_" + var0 + "_" + anom + ".nc"
     input_files_ref := tostring(input_files_ref)
 
     ; Filter out non-existing files
@@ -244,6 +260,17 @@ print("input_files: " + input_files)
         idx1 = ind(date(0).eq.data_ref&time)
         idx2 = ind(date(dimsizes(date) - 1).eq.data_ref&time)
         delete(date)
+
+        ; Running Mean
+        if(diag_script_info@run_ave .gt. 0) then
+          run_ave = "running_mean"
+          tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
+          ;delete(data_temp)
+          data_temp = tmp
+          delete(tmp)
+        else
+          run_ave = ""
+        end if
 
         data_ref(i, idx1:idx2) = (/data_temp(ind_ref, :)/)
       end if
@@ -280,7 +307,7 @@ print("input_files: " + input_files)
   ; Define workstation
   outfile = config_user_info@plot_dir + data_mean@var + "_" + \
     str_sub_str(diag_script_info@region, " ", "_") + \
-    "_multimodel_" + anom + "_" + detr + "_" + start_year + "-" + end_year
+    "_multimodel_" + anom + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
   ; Set resources
@@ -299,8 +326,8 @@ print("input_files: " + input_files)
     res@tmXBLabels = ispan(xmin, xmax, 5)
     res@tmXBMinorValues =  ispan(xmin, xmax, 1)
   end if
-  res@tmXBLabelAngleF = 45
-  res@tmXBLabelJust     = "CenterRight"
+  ; res@tmXBLabelAngleF = 45
+  ; res@tmXBLabelJust     = "CenterRight"
   if (isatt(diag_script_info, "y_min")) then
     res@trYMinF = diag_script_info@y_min
   end if
@@ -308,20 +335,47 @@ print("input_files: " + input_files)
     res@trYMaxF = diag_script_info@y_max
   end if
 
+  if (xmin .eq. 1850) then
+    res@tmXBMode         = "Manual"
+    res@tmXBTickSpacingF = 50
+  elseif (xmin .eq. 1950) then
+    res@tmXBMode         = "Manual"
+    res@tmXBTickSpacingF = 20
+  end if
+
+  if (diag_script_info@header) then
+    res@tiMainString = diag_script_info@region
+  else
+    res@tiMainString = ""
+  end if
 
   res@tiMainString = diag_script_info@region
 
-  if (isatt(diag_script_info, "ts_anomaly")) then
-    res@tiYAxisString = data_mean@var + " Anomaly" + " [" + data_mean@units + "]"
+  if (isatt(variable_info[0], "long_name")) then
+    if (var0 .eq. "tas") then
+      varname = "Temperature"
+    else
+      varname = variable_info[0]@long_name
+    end if
   else
-    res@tiYAxisString = data_mean@var + " [" + data_mean@units + "]"
+    varname = var0
+  end if
+
+  if (data_mean@units .eq. "degC") then
+    units = "~F34~0~F~ C"
+  else
+    units = data_mean@units
+  end if
+
+  if (anom .eq. "anom") then
+    res@tiYAxisString = varname + " Anomaly" + " (" + units + ")"
+  else
+    res@tiYAxisString = varname + " (" + units + ")"
   end if
 
   res0 = True
   ref_start = diag_script_info@ref_start
   ref_end = diag_script_info@ref_end
-  res0@tiYAxisString = tostring(ref_start) + "-" + tostring(ref_end) \
-    + " " + data_mean@var + " Mean" + " [" + data_mean@units + "]"
 
   if (isatt(diag_script_info, "ref")) then
     xy_line_collect(wks, data_mean, data_ref, data_ref&time, \
@@ -332,6 +386,38 @@ print("input_files: " + input_files)
   end if
 
   log_info(" wrote " + outfile + "." + file_type)
+
+;  ; ***************************************
+;  ; add meta data to plot (for reporting)
+;  ; ***************************************
+;
+;  if (diag_script_info@region .eq. "Global") then
+;    domain = "global"
+;  else
+;    domain = "reg"
+;  end if
+;
+;  if (anom .eq. "anom") then
+;    statistics = "anomaly"
+;  else
+;    statistics = "mean"
+;  end if
+;
+;  caption = "Multi model mean time series of the " + statistics + \
+;             " for variable " + varname + ", similar to IPCC AR5, fig. 10.21."
+;  contrib_authors = (/""bock_lisa"/)
+;
+;  ; Call provenance logger
+;  log_provenance(ncdf_outfile, \
+;                 outfile + "." + file_type, \
+;                 caption, \
+;                 statistics, \
+;                 domain, \
+;                 "times", \
+;                 contrib_authors, \
+;                 (/"flato13ipcc", "jones13jgr"/), \
+;                 metadata_att_as_array(input_file_info, "filename"))
+
 
   leave_msg(DIAG_SCRIPT, "")
 

@@ -1,0 +1,236 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+
+  authors:
+    - bock_lisa
+    - eyring_veronika
+
+#  maintainer:
+    
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_fillvalues:
+      threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_surface:
+    custom_order: true
+    extract_levels:
+      levels:  [0., ]
+      scheme: linear_horizontal_extrapolate_vertical
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_fillvalues:
+      threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+datasets:
+  - {dataset: ACCESS1-0}
+  - {dataset: ACCESS1-3}
+  - {dataset: BNU-ESM}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-BGC}
+  # - {dataset: CESM1-CAM5-1-FV}
+  - {dataset: CESM1-CAM5}
+  - {dataset: CESM1-FASTCHEM}
+  - {dataset: CESM1-WACCM}
+  - {dataset: CMCC-CESM}
+  # - {dataset: CMCC-CM}
+  # - {dataset: CMCC-CMS}
+  # - {dataset: CNRM-CM5-2}
+  - {dataset: CNRM-CM5}
+  - {dataset: CSIRO-Mk3-6-0}
+  # - {dataset: FGOALS-g2}
+  - {dataset: GFDL-CM3}
+  - {dataset: GFDL-ESM2G}
+  - {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H-CC}
+  # - {dataset: GISS-E2-H}
+  - {dataset: GISS-E2-R-CC}
+  - {dataset: GISS-E2-R}
+  # - {dataset: HadGEM2-CC}
+  # - {dataset: HadGEM2-ES}
+  - {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: IPSL-CM5B-LR}
+  - {dataset: MPI-ESM-LR}
+  - {dataset: MPI-ESM-MR}
+  - {dataset: MPI-ESM-P}
+  - {dataset: NorESM1-M}
+  - {dataset: NorESM1-ME}
+
+cmip5_hist_models_tas_era: &cmip5_hist_models_tas_era
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: inmcm4}
+  - {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MRI-CGCM3}
+  #- {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, tier: 3}
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+
+cmip5_hist_models_pr_gpcp: &cmip5_hist_models_pr_gpcp
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: inmcm4}
+  - {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MRI-CGCM3}
+  - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3,
+              tier: 1}
+
+cmip5_hist_models_tos_woa: &cmip5_hist_models_tos_woa
+  - {dataset: WOA, project: OBS, type: clim, version: 2013v2, tier: 2, start_year: 2000, end_year: 2000}
+  #- {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
+
+
+diagnostics:
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Fig. 3.2 (ZOD fig. 3.9)
+  # Sect. 3.3
+  # similar to fig. IPCC AR5, chap. 9, 9.2 a/b/c
+  # Lisa
+  # **********************************************************************
+  # Multi model mean, multi model mean bias, root mean square error and 
+  # mean relative error
+  # (geographical distributions)
+  # **********************************************************************
+
+  fig_3_2:
+    description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim
+        reference_dataset: ERA5 #ERA-Interim
+        mip: Amon
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models_tas_era
+    scripts:
+      fig_3_2: &fig-3-2_and_3-9_settings
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
+        plot_rms_diff: True
+        plot_abs_diff: False
+        plot_rel_diff: False
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Fig. 3.9 (ZOD fig. 3.9)
+  # Sect. 3.3 
+  # similar to fig. IPCC AR5, chap. 9, 9.4
+  # Lisa
+  # **********************************************************************
+  # Multi model mean, multi model mean bias, mean absolute error, and    
+  # mean relative error (geographical ditributions)
+  # **********************************************************************
+
+  fig_3_9:
+    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        project: CMIP5
+        mip: Amon
+        grid: gr
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models_pr_gpcp
+    scripts:
+      fig_3_9:
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
+        plot_rms_diff: True
+        plot_abs_diff: False
+        plot_rel_diff: False
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Fig. 3.19
+  # Sect. 3.3 
+  # Lisa
+  # **********************************************************************
+  # Multi model mean, multi model mean bias, mean absolute error, and    
+  # mean relative error (geographical ditributions)
+  # **********************************************************************
+
+  fig_3_19_tos:
+    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
+    variables:
+      thetao:
+        preprocessor: clim_surface
+        reference_dataset: WOA
+        project: CMIP5
+        mip: Omon
+        grid: gn
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models_tos_woa
+    scripts:
+      fig_3_19:
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
+
+  fig_3_19_sos:
+    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
+    variables:
+      so:
+        preprocessor: clim_surface
+        reference_dataset: WOA
+        project: CMIP5
+        mip: Omon
+        grid: gn
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models_tos_woa
+    scripts:
+      fig_3_19:
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim

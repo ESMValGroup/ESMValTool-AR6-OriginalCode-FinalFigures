@@ -40,9 +40,9 @@ cmip6_hist_models: &cmip6_hist_models_tas
   - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   #- {dataset: E3SM-1-0} no data from 2000-2014
-  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1}
   - {dataset: EC-Earth3-Veg}
-  - {dataset: GFDL-CM4, grid: gr1}
+  #- {dataset: GFDL-CM4, grid: gr1}
   - {dataset: GFDL-ESM4, grid: gr1}
   - {dataset: GISS-E2-1-G, grid: gn}
   #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} no data 1951-2000
