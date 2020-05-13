@@ -1,0 +1,208 @@
+# ESMValTool
+# recipe_seaice.yml
+---
+documentation:
+  description: |
+    Recipe for Arctic and Antarctic sea ice diagnostics.
+
+  authors:
+    - senftleben_daniel
+
+  maintainer:
+    - lauer_axel
+
+  references:
+    - massonnet12tc
+    - stroeve07grl
+
+  projects:
+    - crescendo
+    - esmval
+
+
+
+diagnostics:
+  seaice_tsline_hist:
+    description: Timeseries of September Arctic/Antartic sea ice area and extent
+    themes:
+      - seaIce
+    realms:
+      - seaIce
+    variables:
+      siconc: &var_def
+        mip: SImon
+        project: CMIP6
+        exp: historical
+        reference_dataset: HadISST
+        ensemble: r1i1p1f1
+        start_year: 1950
+        end_year: 2014
+        additional_datasets: &siconc_datasets
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
+          # no areacello - {dataset: E3SM-1-0} 
+          - {dataset: EC-Earth3, grid: gn, ensemble: r22i1p1f1}
+          - {dataset: EC-Earth3-Veg, grid: gn}
+          # no areacello - {dataset: GFDL-CM4, grid: gn}
+          - {dataset: GFDL-ESM4, grid: gn}
+          # no areacello - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+          # no areacello - {dataset: INM-CM4-8, grid: gr1}
+          # no areacello - {dataset: INM-CM5-0, grid: gr1}
+          # - {dataset: IPSL-CM6A-LR, grid: gn, ensemble: r30i1p1f1} cube error
+          - {dataset: MIROC6, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+          - {dataset: MPI-ESM1-2-HR, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, grid: gn}
+          # no areacello - {dataset: NESM3, grid: gn}
+          - {dataset: NorCPM1, grid: gn, ensemble: r24i1p1f1, institute: NCC}
+          - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
+      areacello:
+        mip: Ofx
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        additional_datasets:
+          #<<: *siconc_datasets
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
+          # no areacello - {dataset: E3SM-1-0} 
+          - {dataset: EC-Earth3, grid: gn, ensemble: r22i1p1f1}
+          - {dataset: EC-Earth3-Veg, grid: gn}
+          # no areacello - {dataset: GFDL-CM4, grid: gn}
+          - {dataset: GFDL-ESM4, grid: gn}
+          # no areacello - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+          # no areacello - {dataset: INM-CM4-8, grid: gr1}
+          # no areacello - {dataset: INM-CM5-0, grid: gr1}
+          # - {dataset: IPSL-CM6A-LR, grid: gn, ensemble: r30i1p1f1} cube error
+          - {dataset: MIROC6, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+          - {dataset: MPI-ESM1-2-HR, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, grid: gn}
+          # no areacello - {dataset: NESM3, grid: gn}
+          - {dataset: NorCPM1, grid: gn, ensemble: r24i1p1f1, institute: NCC}
+      #siconca:
+      #  <<: *var_def
+      #  additional_datasets:
+      #    - {dataset: CAMS-CSM1-0, grid: gn}
+      #    - {dataset: CESM2, grid: gn}
+      #    - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+      #    - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
+      #    - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
+      #    - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
+      #    - {dataset: EC-Earth3, grid: gn, ensemble: r22i1p1f1}
+      #    - {dataset: EC-Earth3-Veg, grid: gn}
+      #    - {dataset: GISS-E2-1-G, grid: gr}
+      #    - {dataset: GISS-E2-1-G-CC, grid: gr}
+      #    - {dataset: GISS-E2-1-H, grid: gr}
+      #    - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+      #    - {dataset: MPI-ESM1-2-HR, grid: gn}
+      #    - {dataset: MPI-ESM1-2-LR, grid: gn}
+      #    - {dataset: MRI-ESM2-0, grid: gn}
+      #    - {dataset: SAM0-UNICON, grid: gn}
+      #    - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+      #    - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
+    scripts: &sic_diag
+      sie_nh: &sic_nh_settings
+        script: seaice/seaice_tsline.ncl
+        # "Arctic" or "Antarctic"; entire hemisphere will be evaluated
+        region: "Arctic"
+        # A = annual mean, 3 = March, 9 = September
+        month: "9"
+        # "CMIP5", "DEFAULT"
+        styleset: "CMIP6"
+        # Plot multi-model mean & std dev
+        multi_model_mean: true
+        # Create legend label for each individual ensemble member
+        EMs_in_lg: false
+        # Fill polar hole in data with sic = 1.
+        fill_pole_hole: true
+        # save statistics
+        write_stat: True
+        stat: "MinMax"
+        # calculate anomaly
+        anom: True
+        yr_mean: 5
+      sie_sh: &sic_sh_settings
+        <<: *sic_nh_settings
+        # "Arctic" or "Antarctic"; entire hemisphere will be evaluated
+        region: "Antarctic"
+        # Create legend label for each individual ensemble member
+        EMs_in_lg: false
+        # Fill polar hole in data with sic = 1.
+        fill_pole_hole: false
+
+  seaice_tsline_hist-nat:
+    description: Timeseries of September Arctic/Antartic sea ice area and extent
+    themes:
+      - seaIce
+    realms:
+      - seaIce
+    variables:
+      siconc: 
+        <<: *var_def
+        exp: hist-nat
+        additional_datasets: &siconc_datasets_nat
+          - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
+          #- {dataset: IPSL-CM6A-LR, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
+      areacello:
+        mip: Ofx
+        project: CMIP6
+        exp: hist-nat
+        ensemble: r1i1p1f1
+        additional_datasets:
+          #<<: *siconc_datasets_nat
+          - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
+          #- {dataset: IPSL-CM6A-LR, grid: gn, ensemble: r1i1p1f1}
+    scripts:
+      <<: *sic_diag
+
+  fig_3_40_sie:
+    description: IPCC AR5 Ch. 10, Fig. 10.21
+    variables:
+      siconc:
+        start_year: 1950
+        end_year: 2014
+        mip: SImon
+        reference_dataset: HadISST
+    additional_datasets:
+      - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
+    scripts:
+      collect_nh:
+        <<: *sic_nh_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [siconc, 'seaice_tsline_*/sie_nh']
+        ref: ["HadISST"]
+        order: ["CMIP6_historical", "CMIP6_hist-nat"]
+        time_avg: "yearly"
+        stat_shading: True
+        start_year: 1950
+        end_year: 2014
+        ts_anomaly: "anom"
+        ref_start: 1979
+        ref_end: 1999
+        y_min: -4.5
+        y_max: 4.5
+      collect_sh:
+        <<: *sic_sh_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [siconc, 'seaice_tsline_*/sie_sh']
+        ref: ["HadISST"]
+        order: ["CMIP6_historical", "CMIP6_hist-nat"]
+        time_avg: "yearly"
+        stat_shading: True
+        start_year: 1950
+        end_year: 2014
+        ts_anomaly: "anom"
+        ref_start: 1979
+        ref_end: 1999
+        y_min: -4.5
+        y_max: 4.5
+
+      

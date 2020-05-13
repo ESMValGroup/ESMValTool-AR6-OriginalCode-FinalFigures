@@ -60,14 +60,17 @@ begin
 
   ; Get metadata items
   att = True
-  att@mip = "OImon"
-  info = select_metadata_by_atts(input_file_info, att)  ; variable
-  var0 = info[0]@short_name
-  datasets = metadata_att_as_array(info, "dataset")
-  n_datasets = dimsizes(datasets)
-  att@mip = "fx"
+  att@mip = "Ofx"
   areainfo = select_metadata_by_atts(input_file_info, att)  ; area
   areadatasets = metadata_att_as_array(areainfo, "dataset")
+  att@mip = "SImon"
+  att@short_name = "siconc"
+  info = select_metadata_by_atts(input_file_info, att)  ; variable
+  var0 = info[0]@short_name
+  exp0 = info[0]@exp
+  project0 = info[0]@project
+  datasets = metadata_att_as_array(info, "dataset")
+  n_datasets = dimsizes(datasets)
   delete(att)
 
   ; Check required diag_script_info attributes
@@ -98,12 +101,50 @@ begin
     multi_model_mean = False
   end if
 
+  ; Set index of the reference dataset and read it
+  if (isatt(info[0], "reference_dataset")) then
+    ref_ind = ind(datasets.eq.info[0]@reference_dataset)
+  else
+    ref_ind = -1
+  end if
+
   ; Determine time range
   start_years = metadata_att_as_array(info, "start_year")
   start_year  = min(start_years)
   end_years   = metadata_att_as_array(info, "end_year")
   end_year    = max(end_years)
   all_years   = ispan(start_year, end_year, 1)
+
+  ; Create time coordinate
+  ntime = end_year - start_year + 1
+  time = new(ntime, integer)
+  time = ispan(start_year, end_year, 1)
+  ntime_old = ntime
+
+  ; reference period
+  ref_start = 1979 - start_year
+  ref_end = 1999 - start_year
+
+  ;yr_mean
+  if(isatt(diag_script_info, "yr_mean")) then
+    yr_mean = diag_script_info@yr_mean
+    if(yr_mean.eq.5) then
+      run_ave = "5_yr_mean"
+      av_per = 5
+      time := start_year + 0.1 * ispan(25,10*ntime,50)
+    elseif(yr_mean.eq.2) then
+      run_ave = "2_yr_mean"
+      av_per = 2
+      time := start_year + 0.1 * ispan(10,10*ntime,20)
+    else
+      error_msg("f", diag_script_info, "", yr_mean + "year mean not supported")
+    end if
+    nper = toint(ceil(tofloat(ntime)/av_per))
+    ntime = nper
+  else
+    yr_mean = 0
+    run_ave = ""
+  end if
 
   ; Select attributes
   avgstd = project_style(info, diag_script_info, "avgstd")
@@ -140,19 +181,28 @@ begin
     + sprinti("%0.4i", end_year)
 
   ; Array for collecting sea-ice extent for all datasets
-  val_ext = new((/n_datasets, end_year - start_year + 1/), float)
+  ;val_ext = new((/n_datasets, end_year - start_year + 1/), float)
+  val_ext = new((/n_datasets, ntime/), float)
+  val_ext!0 = "model"
+  val_ext&model = metadata_att_as_array(info, "dataset")
   val_ext!1 = "time"
-  val_ext&time = int2dble(all_years)
+  ;val_ext&time = int2dble(all_years)
+printVarSummary(val_ext)
+  val_ext&time = time
 
   ; Array for collecting sea-ice area for all datasets
-  val_area = new((/n_datasets, end_year - start_year + 1/), float)
+  ;val_area = new((/n_datasets, end_year - start_year + 1/), float)
+  val_area = new((/n_datasets, ntime/), float)
+  val_area!0 = "model"
+  val_area&model = metadata_att_as_array(info, "dataset")
   val_area!1 = "time"
-  val_area&time = int2dble(all_years)
+  ;val_area&time = int2dble(all_years)
+  val_area&time = time
 
   ; Prepare calculation of standard deviation of datasets
   if (multi_model_mean) then
-    val_ext_stddev = new((/4, end_year - start_year + 1/), float)
-    val_area_stddev = new((/4, end_year - start_year + 1/), float)
+    val_ext_stddev = new((/4, ntime/), float)
+    val_area_stddev = new((/4, ntime/), float)
   else  ; initialize anyway: both are needed as parameters for xy_line
     val_ext_stddev = 0
     val_area_stddev = 0
@@ -172,6 +222,20 @@ begin
           dimsizes(dimsizes(sic&lon)).eq.1) then
         l_irreg = False
       end if
+    end if
+
+print("ref_ind = " + ref_ind)
+print("imod = " + imod)
+print("diag_script_info@region = " + diag_script_info@region)
+    if (imod .eq. ref_ind .and. diag_script_info@region .eq. "Antarctic") then
+      printVarSummary(sic)  
+      date = cd_calendar(sic&time, 0)
+      year := date(:, 0)
+print("year = " + year)
+      sel_ind = ind(year .lt. 1979)
+      sic(sel_ind,:,:) = sic@_FillValue
+      ;sic = where(sic&time.ge.1979, sic, sic@_FillValue)
+      delete(date)
     end if
 
     ; Look for area variable
@@ -211,28 +275,64 @@ begin
 
     end if
 
-    ; Calcluate sea ice area
+    ; Calcluate sea ice extent
     sic_sum_ext  = sea_ice_area(sic, area, arealat, l_irreg, \
                                 diag_script_info@region, \
                                 start_years(imod), end_years(imod), \
                                 diag_script_info@month, "extent", \
                                 diag_script_info@fill_pole_hole)
 
-    ; Calculate sea ice extent
+    ; Calculate sea ice area
     sic_sum_area = sea_ice_area(sic, area, arealat, l_irreg, \
                                 diag_script_info@region, \
                                 start_years(imod), end_years(imod), \
                                 diag_script_info@month, "area", \
                                 diag_script_info@fill_pole_hole)
 
-    ; Put into global array
-    ia = toint(start_years(imod)) - start_year
-    ie = toint(end_years(imod)) - start_year
-    val_ext(imod, ia:ie) = tofloat(sic_sum_ext)
-    val_area(imod, ia:ie) = tofloat(sic_sum_area)
+    if (isatt(diag_script_info, "anom")) then
+      if (diag_script_info@anom) then
+        anom = "anom"
+        sic_sum_ext_ref = dim_avg_Wrap(sic_sum_ext(ref_start:ref_end))
+        sic_sum_area_ref = dim_avg_Wrap(sic_sum_area(ref_start:ref_end))
+        sic_sum_ext = sic_sum_ext - sic_sum_ext_ref
+        sic_sum_area = sic_sum_area - sic_sum_area_ref
+      else
+        anom = ""
+      end if
+    end if
+
+    ;fiveyr_mean
+    if (yr_mean.gt.0) then
+      tmp = new(nper, float)
+      tmp!0 = "year"
+      tmp&year = time
+      do i=0, nper-2
+        tmp(i) = dim_avg(sic_sum_ext(i*av_per:(i+1)*av_per))
+      end do
+      ; average over incomplete final averaging period
+      tmp(nper-1) = dim_avg(sic_sum_ext((nper-1)*av_per:(ntime_old-1)))
+      copy_VarAtts(sic_sum_ext, tmp)
+      delete(sic_sum_ext)
+      sic_sum_ext = tmp
+      do i=0, nper-2
+        tmp(i) = dim_avg(sic_sum_area(i*av_per:(i+1)*av_per))
+      end do
+      tmp(nper-1) = dim_avg(sic_sum_area((nper-1)*av_per:(ntime_old-1)))
+      copy_VarAtts(sic_sum_area, tmp)
+      delete(sic_sum_area)
+      sic_sum_area = tmp
+      delete(tmp)
+    end if
+
+    ; Match time coordinate
+    date = sic_sum_ext&year
+    idx1 = ind(date(0).eq.val_ext&time)
+    idx2 = ind(date(dimsizes(date) - 1).eq.val_ext&time)
+    val_ext(imod, idx1:idx2) = tofloat(sic_sum_ext)
+    val_area(imod, idx1:idx2) = tofloat(sic_sum_area)
 
     ; Clean up
-    delete([/sic, area, arealat, sic_sum_ext, sic_sum_area, ia, ie/])
+    delete([/date, sic, area, arealat, sic_sum_ext, sic_sum_area/])
 
   end do  ; imod
 
@@ -260,32 +360,58 @@ begin
       val_area_stddev(3, imonth) = \
         val_area_stddev(0, imonth) + val_area_stddev(1, imonth)
     end do
+
+    ; calculate multi model statistics
+    if (isatt(diag_script_info, "write_stat")) then
+      if (diag_script_info@write_stat) then
+        ;model_arr_stat = new((/4, dimsizes(val_ext&time)/), double)
+        model_arr_stat = new((/4, ntime/), double)
+        model_arr_stat!0 = "stat"
+        model_arr_stat!1 = "time"
+        model_arr_stat&time = val_ext&time
+        model_arr_stat&stat = (/"mean", "min", "max", "ref"/)
+
+printVarSummary(model_arr_stat)
+printVarSummary(val_ext_stddev)
+        model_arr_stat(0, :) = (/val_ext_stddev(0, :)/)
+        if (dimsizes(temp) .gt. 1) then
+          do i = 0, dimsizes(val_ext&time)-1
+            statb = stat_dispersion(val_ext(temp, i), False)
+            if (diag_script_info@stat .eq. "MinMax") then
+              ; min
+              model_arr_stat(1,i) = (/statb(2)/)
+              ; max
+              model_arr_stat(2, i) = (/statb(14)/)
+            elseif (diag_script_info@stat .eq. "5-95") then
+              ; 5% quantile
+              model_arr_stat(1, i) = (/statb(24)/)
+              ; 95% quantile
+              model_arr_stat(2,i) = (/statb(25)/)
+            elseif (diag_script_info@stat .eq. "10-90") then
+              ; 10% quantile
+              model_arr_stat(1, i) = (/statb(3)/)
+              ; 90% quantile
+              model_arr_stat(2, i) = (/statb(13)/)
+            end if
+          end do
+        else
+          model_arr_stat(1,:) = (/model_arr_stat(0, :)/)
+          model_arr_stat(2,:) = (/model_arr_stat(0, :)/)
+        end if
+        if (ref_ind .ge. 0) then
+          model_arr_stat(3, :) = (/val_ext(ref_ind,:)/)
+        end if
+      end if
+    end if
+    
     delete(temp)
   end if
 
   ; Some attributes for extent plot
-  val_ext!0 = "model"
-  val_ext&model = metadata_att_as_array(info, "dataset")
-  val_ext!1 = "time"
-  val_ext&time = int2dble(all_years)
-  if (diag_script_info@month .eq. "A") then   ; weighted annual mean
-    val_ext&time@units = "Annual"
-  else  ; select a month
-    val_ext&time@units = smonths(stringtoint(diag_script_info@month) - 1)
-  end if
   val_ext@units = "10~S~6~N~ km~S~2~N~"
   val_ext@long_name = "Sea Ice Extent"
 
   ; Some attributes for area plot
-  val_area!0 = "model"
-  val_area&model = metadata_att_as_array(info, "dataset")
-  val_area!1 = "time"
-  val_area&time = int2dble(all_years)
-  if (diag_script_info@month .eq. "A") then   ; weighted annual mean
-    val_area&time@units = "Annual"
-  else  ; select a month
-    val_area&time@units = smonths(stringtoint(diag_script_info@month) - 1)
-  end if
   val_area@units = "10~S~6~N~ km~S~2~N~"
   val_area@long_name = "Sea Ice Area"
 
@@ -321,17 +447,13 @@ begin
     ; Resources specific for extent plot
     res_ext = True
     copy_VarMeta(res, res_ext)
-    res_ext@tiMainString = val_ext&time@units + " " + \
+    res_ext@tiMainString = i2month + " " + \
       diag_script_info@region + " " + val_ext@long_name
     res_ext@tiYAxisString = val_ext@units
 
     ; Resources specific for area plot
     res_area = True
     copy_VarMeta(res, res_area)
-    res_area@tiMainString  = val_area&time@units + " " + \
-      diag_script_info@region + " " + val_area@long_name
-    res_area@tiYAxisString = val_area@units
-
     ; Draw the plots (procedure in ./plot_scripts/ncl/xy_line.ncl)
     xy_line(wks_ext, val_ext, val_ext&time, val_ext_stddev, res_ext, info)
     if (isatt(diag_script_info, "legend_outside")) then
@@ -339,6 +461,7 @@ begin
       ; but is same for both area and extent anyway
       if (diag_script_info@legend_outside) then
         val_area@legend_outside = True
+        wks_area@legendfile = config_user_info@plot_dir + out_ext + "_legend"
       end if
     else
       diag_script_info@legend_outside = False
@@ -365,6 +488,19 @@ begin
                    (/"mean", "stddev", "clim"/), domain, "times", \
                    (/"senftleben_daniel", "gottschaldt_klaus-dirk"/), \
                    "stroeve07grl", infiles)
+
+    ; statistics
+    if (isatt(diag_script_info, "write_stat")) then
+      if (diag_script_info@write_stat) then
+        out_file = "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
+        model_arr_stat@experiment = project0 + "_" + exp0
+        model_arr_stat@diag_script = DIAG_SCRIPT
+        model_arr_stat@var = var0
+        model_arr_stat@units = val_ext@units
+        nc_ext_stat = \
+          ncdf_write(model_arr_stat, config_user_info@work_dir + out_file)
+      end if
+    end if
 
     val_area@var = var0
     val_area@diag_script = DIAG_SCRIPT

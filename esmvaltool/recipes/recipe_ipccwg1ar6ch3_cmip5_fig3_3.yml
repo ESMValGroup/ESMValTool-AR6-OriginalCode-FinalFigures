@@ -108,8 +108,7 @@ diagnostics:
       #- {dataset: MRI-ESM1, start_year: 1851}
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
-      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-         start_year: 1850, end_year: 2017, tier: 2}
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
     scripts:
       tsline_anom:
         script: ipcc_ar5/tsline.ncl
