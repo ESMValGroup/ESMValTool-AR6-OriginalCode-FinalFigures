@@ -5,9 +5,10 @@
 ; ############################################################################
 ; Description
 ;
-;    Outputs: 
+;    Outputs:
 ;
 ; History
+;    20200513 kosaka_yu: cleaned up.
 ;    20191030 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -34,15 +35,15 @@ begin
   end if
   scale_precip_ann = True
   if (isatt(diag_script_info, "scale_precip_ann")) then
-    scale_precip_ann= diag_script_info@scale_precip_ann
+    scale_precip_ann = diag_script_info@scale_precip_ann
   end if
-  
+
   input_dir = diag_script_info@input_files + "/"
-  
+
   colors_satellite = (/ "red", "orange", "brown" /)
   colors_insitu = (/ "green", "blue", "darkorchid4", "deepping4" /)
   colors_reanal = (/ "blue3", "darkgreen", "darkslategray", "darkseagreen" /)
-  
+
   domainFiles = systemfunc("ls "+input_dir+"domain_monsoon_*.nc")
   if (scale_precip_ann) then
     prFiles = systemfunc("ls "+input_dir+"monsoon_precip_index_*.nc")
@@ -52,7 +53,7 @@ begin
   uFiles = systemfunc("ls "+input_dir+"u_monsoon_*.nc")
   vFiles = systemfunc("ls "+input_dir+"v_monsoon_*.nc")
 
-;if domainFiles and prFiles exist...
+; if domainFiles and prFiles exist...
   refnamePr = "GPCP-SG"
   if (isatt(diag_script_info, "dataset_obs_pr")) then
     refnamePr = diag_script_info@dataset_obs_pr
@@ -132,10 +133,6 @@ begin
     vMME@long_name = ""
     vMME@units = ""
 
-; ============== ERROR CORRECTION ==============
-;    uMME = where(abs(uMME).gt.1.e+10, uMME@_FillValue, uMME)
-;    vMME = where(abs(vMME).gt.1.e+10, vMME@_FillValue, vMME)
-; ==============================================
   end if
 
   if (isdefined("wks")) then
@@ -145,18 +142,20 @@ begin
   if (drawUV) then
     if (moving_ave.gt.0) then
       wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                    "global_monsoon_"+refnamePr+"+"+refnameUV+"_movingave"+moving_ave+"yrs")
+                    "global_monsoon_" + refnamePr + "+" \
+                    + refnameUV + "_movingave" + moving_ave + "yrs")
     else
       wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                    "global_monsoon_"+refnamePr+"+"+refnameUV)
+                    "global_monsoon_" + refnamePr + "+" + refnameUV)
     end if
   else
     if (moving_ave.gt.0) then
       wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                    "global_monsoon_"+refnamePr+"_movingave"+moving_ave+"yrs")
+                    "global_monsoon_" + refnamePr + \
+                    "_movingave" + moving_ave + "yrs")
     else
       wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                    "global_monsoon_"+refnamePr)
+                    "global_monsoon_" + refnamePr)
     end if
   end if
 
@@ -195,15 +194,15 @@ begin
   resPr@res_tmYLMajorThicknessF =  resPr@res_tmBorderThicknessF
   resPr@res_tmXBMinorThicknessF =  resPr@res_tmBorderThicknessF/2.
   resPr@res_tmYLMinorThicknessF =  resPr@res_tmBorderThicknessF/2.
-  
-;  resPr@res_cnLevels = (/ -12., -9., -6., -3., 0., 3., 6., 9., 12. /)
-;  resPr@res_cnLevels = (/ -2.5, -2., -1.5, -1., -0.5, 0., 0.5, 1., 1.5, 2., 2.5 /)
+
   if (scale_precip_ann) then
-    resPr@res_cnLevels = (/ -2.5, -2., -1.5, -1., -0.5, 0.5, 1., 1.5, 2., 2.5 /)
+    resPr@res_cnLevels = (/-2.5, -2., -1.5, -1., -0.5, \
+                          0.5, 1., 1.5, 2., 2.5/)
   else
-    resPr@res_cnLevels = (/ -1000, -800, -600, -400, -200, 200, 400, 600, 800, 1000 /)
+    resPr@res_cnLevels = (/-1000, -800, -600, -400, -200, \
+                          200, 400, 600, 800, 1000/)
   end if
-  resPr@res_cnFillPalette = "AR6_Precip_11" ;"MPL_BrBG"
+  resPr@res_cnFillPalette = "AR6_Precip_11"
 
   if (drawUV) then
     resUV := True
@@ -227,7 +226,7 @@ begin
     resUV@vcRefAnnoString2 = ""
     resUV@vcRefMagnitudeF = 10.
     resUV@vcMinMagnitudeF = 2.
-    resUV@vcRefAnnoString1 =resUV@vcRefMagnitudeF+" "+uunits
+    resUV@vcRefAnnoString1 = resUV@vcRefMagnitudeF + " " + uunits
   end if
 
   resDomain = True
@@ -248,16 +247,12 @@ begin
   resDomain@res_cnMonoFillScale = True
   resDomain@res_cnFillColor = resDomain@res_cnLineColor
   resDomain@res_cnFillScaleF = 0.6
-  resDomain@res_cnFillPatterns = (/-1, 3/) ;(/ 3, -1 /)
+  resDomain@res_cnFillPatterns = (/-1, 3/)
   resDomain@res_lbLabelBarOn = False
   resDomain@res_gsnLeftString = ""
   resDomain@res_gsnRightString = ""
 
-;  resLine = True
-;  resLine@gsLineColor = "black"
-;  resLine@gsLineThicknessF = 0.5
-
-  plots := new( (/ 2, 2 /), "graphic" )
+  plots := new((/ 2, 2 /), "graphic")
 
   copy_VarAtts(resPr, prRef)
   if (drawUV) then
@@ -268,49 +263,49 @@ begin
   prRef@res_mpMinLatF = 0.
   prRef@res_mpMaxLatF = 60.
   prRef@res_tmXBOn = False
-  plots( 0, 0 ) = contour_map( wks, prRef, "pr" )
+  plots(0, 0) = contour_map(wks, prRef, "pr")
   copy_VarAtts(resDomain, domainRef)
-  plot = contourplot( wks, domainRef, "domain" )
-  overlay( plots( 0, 0 ), plot )
+  plot = contourplot(wks, domainRef, "domain")
+  overlay(plots(0, 0), plot)
 
   copy_VarAtts(resPr, prMME)
   prMME@res_tiMainString = "MME mean"
   prMME@res_mpMinLatF = 0.
   prMME@res_mpMaxLatF = 60.
   prMME@res_tmXBOn = False
-  plots( 0, 1 ) = contour_map( wks, prMME, "pr" )
+  plots(0, 1) = contour_map(wks, prMME, "pr")
   copy_VarAtts(resDomain, domainMME)
-  plot = contourplot( wks, domainMME, "domain" )
-  overlay( plots( 0, 1 ), plot )
+  plot = contourplot(wks, domainMME, "domain")
+  overlay(plots(0, 1), plot)
 
   prRef@res_tiMainString = ""
   prRef@res_mpMinLatF = -60.
   prRef@res_mpMaxLatF = 0.
   prRef@res_tmXBOn = True
-  plots( 1, 0 ) = contour_map( wks, prRef, "pr" )
-  plot = contourplot( wks, domainRef, "domain" )
-  overlay( plots( 1, 0 ), plot )
+  plots(1, 0) = contour_map(wks, prRef, "pr")
+  plot = contourplot(wks, domainRef, "domain")
+  overlay(plots(1, 0), plot)
 
   prMME@res_tiMainString = ""
   prMME@res_mpMinLatF = -60.
   prMME@res_mpMaxLatF = 0.
   prMME@res_tmXBOn = True
-  plots( 1, 1 ) = contour_map( wks, prMME, "pr" )
-  plot = contourplot( wks, domainMME, "domain" )
-  overlay( plots( 1, 1 ), plot )
+  plots(1, 1) = contour_map(wks, prMME, "pr")
+  plot = contourplot(wks, domainMME, "domain")
+  overlay(plots(1, 1), plot)
 
   if (isdefined("uRef").and.isdefined("vRef").and. \
       isdefined("uMME").and.isdefined("vMME")) then
     resUV@vcRefAnnoOn = False
-    plot = gsn_csm_vector( wks, uRef, vRef, resUV )
-    overlay( plots( 0, 0 ), plot )
-    plot = gsn_csm_vector( wks, uMME, vMME, resUV )
-    overlay( plots( 0, 1 ), plot )
-    plot = gsn_csm_vector( wks, uRef, vRef, resUV )
-    overlay( plots( 1, 0 ), plot )
+    plot = gsn_csm_vector(wks, uRef, vRef, resUV)
+    overlay(plots(0, 0), plot)
+    plot = gsn_csm_vector(wks, uMME, vMME, resUV)
+    overlay(plots(0, 1), plot)
+    plot = gsn_csm_vector(wks, uRef, vRef, resUV)
+    overlay(plots(1, 0), plot)
     resUV@vcRefAnnoOn = True
-    plot = gsn_csm_vector( wks, uMME, vMME, resUV )
-    overlay( plots( 1, 1 ), plot )
+    plot = gsn_csm_vector(wks, uMME, vMME, resUV)
+    overlay(plots(1, 1), plot)
   end if
 
   pres                   = True
@@ -327,7 +322,7 @@ begin
   gsn_panel(wks, ndtooned(plots), (/2, 2/), pres)
 
 end
-; ============================================================  
+; ============================================================
 
 begin
 
@@ -353,23 +348,22 @@ begin
       tmp = wgt_runave_n(tmp, wgt, 0, 0)
     end if
 
-;    NHMfile = str_get_field(GMfiles(ii), str_fields_count(GMfiles(ii), "/"), "/")
-;    NHMfile = input_dirs(iGMprDir)+"NH"+NHMfile
     NHMfile = str_sub_str(GMfiles(ii), "GMpr", "NHMpr")
     f = addfile(NHMfile, "r")
     tmpNH = f->NHMpr
     if (moving_ave.gt.0) then
       tmpNH = wgt_runave_n(tmpNH, wgt, 0, 0)
     end if
-    
-    if (any(tmp@project.eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
+
+    if (any(tmp@project \
+            .eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
       if (.not.isdefined("gObs")) then
         gObs = NewList("fifo")
       end if
       ListAppend(gObs, new(dimsizes(tmp), typeof(tmp)))
       i = ListCount(gObs)-1
       gObs[i] = tmp
-      
+
       if (.not.isdefined("nObs")) then
         nObs = NewList("fifo")
       end if
@@ -405,13 +399,13 @@ begin
   GMprObs = new((/ nobs, eyear-syear+1 /), "float")
   GMprObs!0 = "dataset"
   GMprObs!1 = "time"
-  GMprObs&dataset = ispan( 1, nobs, 1 )
-  GMprObs&time = ispan( syear, eyear, 1 )
+  GMprObs&dataset = ispan(1, nobs, 1)
+  GMprObs&time = ispan(syear, eyear, 1)
   NHMprObs = new((/ nobs, eyear-syear+1 /), "float")
   NHMprObs!0 = "dataset"
   NHMprObs!1 = "time"
-  NHMprObs&dataset = ispan( 1, nobs, 1 )
-  NHMprObs&time = ispan( syear, eyear, 1 )
+  NHMprObs&dataset = ispan(1, nobs, 1)
+  NHMprObs&time = ispan(syear, eyear, 1)
   icolor_satellite = 0
   icolor_insitu = 0
   colors   = new(nobs, "string")
@@ -425,7 +419,9 @@ begin
     eyr = nObs[ii]&time(dimsizes(nObs[ii]&time)-1)
     NHMprObs(ii, {syr:eyr}) = (/ nObs[ii] /)
 
-    if (any((/isStrSubset(gObs[ii]@dataset, "GPCP"),isStrSubset(gObs[ii]@dataset, "CMAP"),isStrSubset(gObs[ii]@dataset, "TRMM")/))) then
+    if (any((/isStrSubset(gObs[ii]@dataset, "GPCP"), \
+            isStrSubset(gObs[ii]@dataset, "CMAP"), \
+            isStrSubset(gObs[ii]@dataset, "TRMM")/))) then
       colors(ii) = colors_satellite(icolor_satellite)
       icolor_satellite = icolor_satellite+1
     else
@@ -436,7 +432,8 @@ begin
     if (ii.eq.0) then
       GMprObs@dataset := (/ gObs[ii]@dataset /)
     else
-      GMprObs@dataset := array_append_record(GMprObs@dataset, gObs[ii]@dataset, 0)
+      GMprObs@dataset := array_append_record(GMprObs@dataset, \
+                                             gObs[ii]@dataset, 0)
     end if
   end do
   delete(gObs)
@@ -452,20 +449,20 @@ begin
   GMprModels = new((/ nmodels, eyear-syear+1 /), "float")
   GMprModels!0 = "model"
   GMprModels!1 = "time"
-  GMprModels&model = ispan( 1, nmodels, 1 )
-  GMprModels&time = ispan( syear, eyear, 1 )
+  GMprModels&model = ispan(1, nmodels, 1)
+  GMprModels&time = ispan(syear, eyear, 1)
   do ii = 0, nmodels-1
     syr = gCMIP[ii]&time(0)
     eyr = gCMIP[ii]&time(dimsizes(gCMIP[ii]&time)-1)
     GMprModels(ii, {syr:eyr}) = (/ gCMIP[ii] /)
   end do
   GMprModels@units = gCMIP[0]@units
-  
+
   NHMprModels = new((/ nmodels, eyear-syear+1 /), "float")
   NHMprModels!0 = "model"
   NHMprModels!1 = "time"
-  NHMprModels&model = ispan( 1, nmodels, 1 )
-  NHMprModels&time = ispan( syear, eyear, 1 )
+  NHMprModels&model = ispan(1, nmodels, 1)
+  NHMprModels&time = ispan(syear, eyear, 1)
   do ii = 0, nmodels-1
     syr = nCMIP[ii]&time(0)
     eyr = nCMIP[ii]&time(dimsizes(nCMIP[ii]&time)-1)
@@ -476,9 +473,11 @@ begin
   delete(nCMIP)
 
   GMprMME = dim_avg_n_Wrap(GMprModels, 0)
-  GMprMME = where(dim_num_n(ismissing(GMprModels), 0).le.nmodels/2, GMprMME, GMprMME@_FillValue)
+  GMprMME = where(dim_num_n(ismissing(GMprModels), 0).le.nmodels/2, \
+                  GMprMME, GMprMME@_FillValue)
   NHMprMME = dim_avg_n_Wrap(NHMprModels, 0)
-  NHMprMME = where(dim_num_n(ismissing(NHMprModels), 0).le.nmodels/2, NHMprMME, NHMprMME@_FillValue)  
+  NHMprMME = where(dim_num_n(ismissing(NHMprModels), 0).le.nmodels/2, \
+                   NHMprMME, NHMprMME@_FillValue)
 
   NHMufiles = systemfunc("ls "+input_dir+"NHMcirculation_summer_*.nc")
 
@@ -490,7 +489,8 @@ begin
         tmp = wgt_runave_n(tmp, wgt, 0, 0)
       end if
 
-      if (any(tmp@project.eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
+      if (any(tmp@project \
+              .eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
         if (.not.isdefined("uObs")) then
           uObs = NewList("fifo")
         end if
@@ -518,8 +518,8 @@ begin
     NHMuObs = new((/ nobsu, eyear-syear+1 /), "float")
     NHMuObs!0 = "dataset"
     NHMuObs!1 = "time"
-    NHMuObs&dataset = ispan( 1, nobsu, 1 )
-    NHMuObs&time = ispan( syear, eyear, 1 )
+    NHMuObs&dataset = ispan(1, nobsu, 1)
+    NHMuObs&time = ispan(syear, eyear, 1)
 
     icolor_reanal = 0
     colorsu   = new(nobsu, "string")
@@ -535,11 +535,12 @@ begin
       if (ii.eq.0) then
         NHMuObs@dataset := (/ uObs[ii]@dataset /)
       else
-        NHMuObs@dataset := array_append_record(NHMuObs@dataset, uObs[ii]@dataset, 0)
+        NHMuObs@dataset \
+          := array_append_record(NHMuObs@dataset, uObs[ii]@dataset, 0)
       end if
     end do
     delete(uObs)
-  
+
     syear = 999999
     eyear = -999999
     nmodels = ListCount(uCMIP)
@@ -550,8 +551,8 @@ begin
     NHMuModels = new((/ nmodels, eyear-syear+1 /), "float")
     NHMuModels!0 = "model"
     NHMuModels!1 = "time"
-    NHMuModels&model = ispan( 1, nmodels, 1 )
-    NHMuModels&time = ispan( syear, eyear, 1 )
+    NHMuModels&model = ispan(1, nmodels, 1)
+    NHMuModels&time = ispan(syear, eyear, 1)
     do ii = 0, nmodels-1
       syr = uCMIP[ii]&time(0)
       eyr = uCMIP[ii]&time(dimsizes(uCMIP[ii]&time)-1)
@@ -560,7 +561,8 @@ begin
     delete(uCMIP)
 
     NHMuMME = dim_avg_n_Wrap(NHMuModels, 0)
-    NHMuMME = where(dim_num_n(ismissing(NHMuModels), 0).le.nmodels/2, NHMuMME, NHMuMME@_FillValue)  
+    NHMuMME = where(dim_num_n(ismissing(NHMuModels), 0).le.nmodels/2, \
+                    NHMuMME, NHMuMME@_FillValue)
   end if
 
   plotts = new(4, "graphic")
@@ -574,8 +576,7 @@ begin
   rests@gsnFrame          = False
 
   range = max((/max(abs(GMprObs)), max(abs(GMprMME)), \
-                max(abs(GMprModels))/))
-
+              max(abs(GMprModels))/))
 
   if (range.gt.80.) then
     rests@trYMaxF = 100.
@@ -591,12 +592,12 @@ begin
 
   rests@trYMinF = -rests@trYMaxF
   minyear = min((/min(GMprObs&time), min(GMprMME&time), \
-                  min(GMprModels&time)/))
+                min(GMprModels&time)/))
   minyear = toint(minyear/5)*5
   maxyear = max((/max(GMprObs&time), max(GMprMME&time), \
-                  max(GMprModels&time)/))
-  if (.not.mod(maxyear,5).eq.0) then    
-    maxyear = (toint(maxyear/5)+1)*5
+                max(GMprModels&time)/))
+  if (.not.mod(maxyear, 5).eq.0) then
+    maxyear = (toint(maxyear/5) + 1)*5
   end if
   rests@trXMinF = 1880  ; minyear
   rests@trXMaxF = maxyear
@@ -615,22 +616,27 @@ begin
   lres := True
   yLegend = 0.28
 
-
   rests@xyLineThicknessF = 0.5
   rests@xyLineColor      = (/37, 81., 204./)/255.
   rests@xyLineOpacityF   = 0.5
   if (moving_ave.gt.0) then
-    rests@tiMainString = "Global summer monsoon precipitation ("+GMprModels@units+", "+moving_ave+"-yr moving ave)"
+    rests@tiMainString = "Global summer monsoon precipitation (" \
+                         + GMprModels@units + ", " + moving_ave \
+                         + "-yr moving ave)"
   else
-    rests@tiMainString = "Global summer monsoon precipitation ("+GMprModels@units+")"
+    rests@tiMainString = "Global summer monsoon precipitation (" \
+                         + GMprModels@units + ")"
   end if
   GMprModels@long_names = ""
   plotts(0) = gsn_csm_xy(wks, GMprModels&time, GMprModels, rests)
 
   if (moving_ave.gt.0) then
-    rests@tiMainString = "NH summer monsoon precipitation ("+NHMprModels@units+", "+moving_ave+"-yr moving ave)"
+    rests@tiMainString = "NH summer monsoon precipitation (" \
+                         + NHMprModels@units + ", " \
+                         + moving_ave + "-yr moving ave)"
   else
-    rests@tiMainString = "NH summer monsoon precipitation ("+NHMprModels@units+")"
+    rests@tiMainString = "NH summer monsoon precipitation (" \
+                         + NHMprModels@units + ")"
   end if
   NHMprModels@long_names = ""
   plotts(1) = gsn_csm_xy(wks, NHMprModels&time, NHMprModels, rests)
@@ -638,7 +644,7 @@ begin
   if (isvar("NHMuModels")) then
     restsu = rests
     range = max((/max(abs(NHMuObs)), max(abs(NHMuMME)), \
-                  max(abs(NHMuModels))/))
+                max(abs(NHMuModels))/))
     if (range.gt.3.) then
       restsu@trYMaxF = 3.5
     elseif (range.gt.2.8) then
@@ -661,7 +667,8 @@ begin
 ;    restsu@trYMaxF = 3.
     restsu@trYMinF = -restsu@trYMaxF
     if (moving_ave.gt.0) then
-      restsu@tiMainString = "NH summer monsoon circulation (m/s, "+moving_ave+"-yr moving ave)"
+      restsu@tiMainString = "NH summer monsoon circulation (m/s, " \
+                            + moving_ave + "-yr moving ave)"
     else
       restsu@tiMainString = "NH summer monsoon circulationn (m/s)"
     end if
@@ -730,8 +737,9 @@ begin
     lres@gsLineThicknessF  := rests@xyLineThicknessF
     lres@gsLineColor       := rests@xyLineColors(ii)
     lres@gsLineDashPattern := rests@xyDashPatterns(ii)
-    xLegend = 0.51 + 0.13*ii ; 0.26 + 0.13*ii
-    gsn_polyline_ndc(wks, (/xLegend, xLegend+0.03/), (/yLegend, yLegend/), lres)
+    xLegend = 0.51 + 0.13*ii  ; 0.26 + 0.13*ii
+    gsn_polyline_ndc(wks, (/xLegend, xLegend+0.03/), (/yLegend, yLegend/), \
+                     lres)
     gsn_text_ndc(wks, GMprObs@dataset(ii), xLegend+0.04, yLegend, txres)
   end do
 
@@ -741,8 +749,9 @@ begin
       lres@gsLineThicknessF := restsu@xyLineThicknessF
       lres@gsLineColor      := restsu@xyLineColors(ii)
       lres@gsLineDashPattern := restsu@xyDashPatterns(ii)
-      xLegend = 0.51 + 0.13*ii ; 0.26 + 0.13*dimsizes(colors) + 0.13*ii
-      gsn_polyline_ndc(wks, (/xLegend, xLegend+0.03/), (/yLegend, yLegend/), lres)
+      xLegend = 0.51 + 0.13*ii  ; 0.26 + 0.13*dimsizes(colors) + 0.13*ii
+      gsn_polyline_ndc(wks, (/xLegend, xLegend+0.03/), (/yLegend, yLegend/), \
+                       lres)
       gsn_text_ndc(wks, NHMuObs@dataset(ii), xLegend+0.04, yLegend, txres)
     end do
   end if

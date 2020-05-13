@@ -5,11 +5,12 @@
 ; ############################################################################
 ; Description
 ;
-;    Outputs: 
+;    Outputs:
 ;
 ; History
-;    20191030 kosaka_yu: written.
+;    20200513 kosaka_yu: cleaned up.
 ;    20191130 kosaka_yu: bug fix for monsoon circulation index.
+;    20191030 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;    none
@@ -53,23 +54,23 @@ begin
   if (isatt(diag_script_info, "eyear_clim")) then
     eyear_clim = diag_script_info@eyear_clim
   end if
-  
+
   smonth_NHsummer = 5
   emonth_NHsummer = 9
   smonth_SHsummer = 11
   emonth_SHsummer = 3
   if (isatt(diag_script_info, "smonth_NHsummer")) then
     smonth_NHsummer = diag_script_info@smonth_NHsummer
-  end if 
+  end if
   if (isatt(diag_script_info, "emonth_NHsummer")) then
     emonth_NHsummer = diag_script_info@emonth_NHsummer
-  end if 
+  end if
   if (isatt(diag_script_info, "smonth_SHsummer")) then
     smonth_SHsummer = diag_script_info@smonth_SHsummer
-  end if 
+  end if
   if (isatt(diag_script_info, "emonth_SHsummer")) then
     emonth_SHsummer = diag_script_info@emonth_SHsummer
-  end if 
+  end if
 
   smonth_monsoonyr = smonth_NHsummer
   emonth_monsoonyr = smonth_monsoonyr-1
@@ -80,7 +81,7 @@ begin
   varying_domain = False
   if (isatt(diag_script_info, "varying_domain")) then
     varying_domain = diag_script_info@varying_domain
-  end if 
+  end if
 
   optDomain = True
   optDomain@threshold_mpi = 0.5
@@ -89,14 +90,15 @@ begin
     optDomain@threshold_mpi = diag_script_info@threshold_mpi
   end if
   if (isatt(diag_script_info, "threshold_summer_minus_winter")) then
-    optDomain@threshold_summer_minus_winter = diag_script_info@threshold_summer_minus_winter
+    optDomain@threshold_summer_minus_winter \
+      = diag_script_info@threshold_summer_minus_winter
   end if
-  
+
   ; Get var list
-  
+
   varList = metadata_att_as_array(input_file_info, "short_name")
   varList := get_unique_values(varList)
-  
+
   if (all(varList.ne."pr")) then
     error_msg("f", DIAG_SCRIPT, "", "variable pr is missing.")
   end if
@@ -115,17 +117,14 @@ begin
   else
     vvar = ""
   end if
-  
-;  var = "pr"
-;  varList := metadata_att_as_array(variable_info, "short_name")
-;  iVarPr = ind(varList.eq.var)
 
   var = "pr"
   infoPr = select_metadata_by_name(input_file_info, var)
   dataset_names = metadata_att_as_array(infoPr, "dataset")
   iPrMME     = ind(dataset_names .eq. "MultiModelMean")
   do i = 0, ListCount(infoPr)-1
-    if (any(infoPr[i]@project.eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
+    if (any(infoPr[i]@project.eq.\
+            (/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
       dataset = infoPr[i]@dataset
       if (isvar("iPrObs")) then
         tmp = array_append_record(iPrObs, (/i/), 0)
@@ -145,7 +144,8 @@ begin
     iUMME    = ind(dataset_names .eq. "MultiModelMean")
 
     do i = 0, ListCount(infoU)-1
-      if (any(infoU[i]@project.eq.(/"obs", "OBS", "obs4mips", "ana4mips"/))) then
+      if (any(infoU[i]@project.eq.\
+              (/"obs", "OBS", "obs4mips", "ana4mips"/))) then
         if (isvar("iUObs")) then
           tmp = array_append_record(iUObs, (/i/), 0)
           delete(iUObs)
@@ -156,14 +156,15 @@ begin
         end if
       end if
     end do
-    
+
     infoV = select_metadata_by_name(input_file_info, vvar)
     delete(dataset_names)
     dataset_names = metadata_att_as_array(infoV, "dataset")
     iVMME    = ind(dataset_names .eq. "MultiModelMean")
 
     do i = 0, ListCount(infoV)-1
-      if (any(infoV[i]@project.eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
+      if (any(infoV[i]@project.eq. \
+              (/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
         if (isvar("iVObs")) then
           tmp = array_append_record(iVObs, (/i/), 0)
           delete(iVObs)
@@ -187,38 +188,29 @@ begin
 
   optAccum = opt
   optAccum@accumulate = True
-  
-;  do ii = 0, dimsizes(iPrObs)
+
   do ii = 0, ListCount(infoPr)-1
 
     dataset = infoPr[ii]@dataset
-    
-;    if (ii.eq.dimsizes(iPrObs)) then
-;      iPr = (/iPrMME/)
-;      dataset = "MultiModelMean"
-;    else
-;      iPr = iPrObs(ii)
-;
-;    end if
     pr = read_data(infoPr[ii])
-;    print(dataset+"")
-    
+
     if (any(pr@units.eq.(/"mm/s", "kg/m^2/s", "mm s-1", "kg m-2 s-1" /))) then
       pr = pr*86400.
       pr@units = "mm/day"
     end if
 
-    prClim = get_clim(pr, syear_clim, eyear_clim, smonth_monsoonyr, emonth_monsoonyr)
+    prClim = get_clim(pr, syear_clim, eyear_clim, \
+                      smonth_monsoonyr, emonth_monsoonyr)
     delete(pr)
-    
-    prRange = summer_minus_winter(prClim, opt) ; mm/day
+
+    prRange = summer_minus_winter(prClim, opt)  ; mm/day
     prClimANN = dim_avg_n(prClim, 0)
     MPI = prRange
     MPI = prRange / where(prClimANN.gt.0., prClimANN, prClimANN@_FillValue)
     MPI@long_name = "Monsoon precipitation index"
     MPI@units = ""
 
-    prRange = summer_minus_winter(prClim, optAccum) ; mm
+    prRange = summer_minus_winter(prClim, optAccum)  ; mm
     prRange@var = "pr"
     prRange@units = "mm"
     prRange@diag_script = DIAG_SCRIPT
@@ -238,7 +230,6 @@ begin
     MPI@dataset = dataset
     nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
     nc_outfile = ncdf_write(MPI, nc_filename)
-    
 
     delete(prClim)
     delete(prClimANN)
@@ -250,9 +241,8 @@ begin
   if (uvar.ne."" .and. vvar.ne."") then
     do ii = 0, ListCount(infoU)-1
       dataset = infoU[ii]@dataset
-      
+
       u = read_data(infoU[ii])
-print(""+dataset)
       if (dimsizes(dimsizes(u)).gt.3) then
         utmp = u(:, {85000.}, :, :)
         delete(u)
@@ -260,13 +250,10 @@ print(""+dataset)
         delete(utmp)
       end if
       u = correct_FillValue_uv(u)
-printVarSummary(u)
-print("u: "+max(u)+" "+min(u))
-      uClim = get_clim(u, syear_clim, eyear_clim, smonth_monsoonyr, emonth_monsoonyr)
-print("uClim: "+max(uClim)+" "+min(uClim))
+      uClim = get_clim(u, syear_clim, eyear_clim, \
+                       smonth_monsoonyr, emonth_monsoonyr)
       uMonsoon = summer_minus_winter(uClim, opt)
-print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
-      
+
       uMonsoon@var = "u"
       uMonsoon@diag_script = DIAG_SCRIPT
       uMonsoon@dataset = dataset
@@ -280,7 +267,7 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
 
     do ii = 0, ListCount(infoV)-1
       dataset = infoV[ii]@dataset
-      
+
       v = read_data(infoV[ii])
       if (dimsizes(dimsizes(v)).gt.3) then
         vtmp = v(:, {85000.}, :, :)
@@ -289,13 +276,15 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
         delete(vtmp)
       end if
       v = correct_FillValue_uv(v)
-      vClim = get_clim(v, syear_clim, eyear_clim, smonth_monsoonyr, emonth_monsoonyr)
+      vClim = get_clim(v, syear_clim, eyear_clim, \
+                       smonth_monsoonyr, emonth_monsoonyr)
       vMonsoon = summer_minus_winter(vClim, opt)
-    
+
       vMonsoon@var = "v"
       vMonsoon@diag_script = DIAG_SCRIPT
       vMonsoon@dataset = dataset
-      vMonsoon@long_name = "Climatological summer - winter meridional wind velocity"
+      vMonsoon@long_name \
+        = "Climatological summer - winter meridional wind velocity"
       nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(vMonsoon, nc_filename)
       delete(v)
@@ -303,11 +292,9 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
       delete(vMonsoon)
     end do
   end if
-;  delete(opt)
-;  delete(optAccum)
-  
-; ========================= monsoon precipitation index ===========================
-  
+
+; ====================== monsoon precipitation index ========================
+
   input_dir = config_user_info@work_dir + "/"
 
   do ii = 0, ListCount(infoPr) - 1
@@ -333,7 +320,7 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
       opt@smonth_SHsummer = smonth_SHsummer
       opt@emonth_SHsummer = emonth_SHsummer
 
-      prRange = summer_minus_winter(pr, opt) ; mm/day
+      prRange = summer_minus_winter(pr, opt)  ; mm/day
       prANN   = prRange
       do t = 0, dimsizes(prRange&time)-1
         yr = prRange&time(t)
@@ -343,7 +330,7 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
       MPI = prRange / where(prANN.gt.0., prANN, prANN@_FillValue)
 
       opt@accumulate = True
-      prRange = summer_minus_winter(pr, opt) ; mm
+      prRange = summer_minus_winter(pr, opt)  ; mm
       domain := monsoon_domain(MPI, prRange, optDomain)
       delete(prRange)
       delete(prANN)
@@ -358,7 +345,8 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
 
       syear_out = syear
       eyear_out = eyear
-      if (smonth_NHsummer.gt.emonth_NHsummer .or. smonth_SHsummer.gt.emonth_SHsummer) then
+      if (smonth_NHsummer.gt.emonth_NHsummer .or. \
+          smonth_SHsummer.gt.emonth_SHsummer) then
         syear_out = syear_out + 1
       elseif (smonth.gt.min((/smonth_NHsummer, smonth_SHsummer/))) then
         syear_out = syear_out + 1
@@ -375,17 +363,18 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
     if (varying_domain) then
       prSummer = where(domain.lt.0.5, prSummer@_FillValue, prSummer)
     else
-      prSummer = where(conform(prSummer, domain,  (/1, 2/)).lt.0.5, prSummer@_FillValue, prSummer)
+      prSummer = where(conform(prSummer, domain,  (/1, 2/)).lt.0.5, \
+                       prSummer@_FillValue, prSummer)
     end if
     delete(domain)
     delete(pr)
-    
+
     wgty = latRegWgt(prSummer&lat, typeof(prSummer), 0)
     wgty!0 = "lat"
     wgty&lat = prSummer&lat
     GMpr = prSummer(:, 0, 0)
     GMpr = wgt_areaave(prSummer, wgty, 1., 0)
-    
+
     delete(GMpr@lon)
     delete(GMpr@lat)
     GMpr = GMpr - avg(GMpr({syear_clim:eyear_clim}))
@@ -399,13 +388,14 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
     GMpr@dataset = infoPr[ii]@dataset
 
     work_dir = config_user_info@work_dir + "/"
-    system("mkdir -p " + work_dir)    
+    system("mkdir -p " + work_dir)
     if (isatt(infoPr[ii], "ensemble")) then
-      nc_filename = work_dir + "GMprecip_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
+      nc_filename = work_dir + "GMprecip_summer_"\
+                     + infoPr[ii]@dataset + "_" + infoPr[ii]@ensemble + ".nc"
     else
-      nc_filename = work_dir + "GMprecip_summer_"+infoPr[ii]@dataset+".nc"
+      nc_filename = work_dir + "GMprecip_summer_" + infoPr[ii]@dataset + ".nc"
     end if
-    
+
     if (nc_filename.ne."") then
       nc_outfile = ncdf_write(GMpr, nc_filename)
     end if
@@ -426,9 +416,10 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
     NHMpr@dataset = infoPr[ii]@dataset
 
     if (isatt(infoPr[ii], "ensemble")) then
-      nc_filename = work_dir + "NHMprecip_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
+      nc_filename = work_dir + "NHMprecip_summer_" + infoPr[ii]@dataset \
+                     + "_" + infoPr[ii]@ensemble + ".nc"
     else
-      nc_filename = work_dir + "NHMprecip_summer_"+infoPr[ii]@dataset+".nc"
+      nc_filename = work_dir + "NHMprecip_summer_" + infoPr[ii]@dataset + ".nc"
     end if
     if (nc_filename.ne."") then
       nc_outfile = ncdf_write(NHMpr, nc_filename)
@@ -450,14 +441,15 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
     SHMpr@dataset = infoPr[ii]@dataset
 
     if (isatt(infoPr[ii], "ensemble")) then
-      nc_filename = work_dir + "SHMprecip_summer_"+infoPr[ii]@dataset+"_"+infoPr[ii]@ensemble+".nc"
+      nc_filename = work_dir + "SHMprecip_summer_" + infoPr[ii]@dataset \
+                     + "_"+infoPr[ii]@ensemble + ".nc"
     else
-      nc_filename = work_dir + "SHMprecip_summer_"+infoPr[ii]@dataset+".nc"
+      nc_filename = work_dir + "SHMprecip_summer_" + infoPr[ii]@dataset + ".nc"
     end if
     if (nc_filename.ne."") then
       nc_outfile = ncdf_write(SHMpr, nc_filename)
     end if
-    
+
     delete(time)
     delete(wgty)
     delete(prSummer)
@@ -466,7 +458,7 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
     delete(SHMpr)
   end do
 
-; ========================= monsoon circulation index ===========================
+; ======================= monsoon circulation index =========================
 
   if (uvar.ne."") then
     u = read_data(infoU[0])
@@ -490,35 +482,21 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
         delete(u)
         delete(time)
 
-;        syear_out = syear
-;        eyear_out = eyear
-;        if (smonth_NHsummer.gt.emonth_NHsummer .or. smonth_SHsummer.gt.emonth_SHsummer) then
-;          syear_out = syear_out + 1
-;        elseif (smonth.gt.min((/smonth_NHsummer, smonth_SHsummer/))) then
-;          syear_out = syear_out + 1
-;        end if
-;        if (emonth.lt.max((/emonth_NHsummer, emonth_SHsummer/))) then
-;          eyear_out = eyear_out - 1
-;        end if
-;      
-;        udSummer = ud({syear_out*100+1:eyear_out*100+12:12}, :, :)
-;        udSummer&time = ispan(syear_out, eyear_out, 1)
-;        udSummer = (/summer(ud, opt)/)
         udSummer = summer(ud, opt)
         delete(ud)
 
         udSummer = lonFlip(udSummer)
-        
+
         udNHSM = udSummer(:, {0.:20.}, {-120.:120.})
         delete(udSummer)
-      
+
         wgty = latRegWgt(udNHSM&lat, typeof(udNHSM), 0)
         wgty!0 = "lat"
         wgty&lat = udNHSM&lat
         NHMu = udNHSM(:, 0, 0)
         NHMu = wgt_areaave(udNHSM, wgty, 1., 0)
         delete(wgty)
-      
+
         NHMu = NHMu - avg(NHMu({syear_clim:eyear_clim}))
 
         NHMu@eyear_ref = eyear_clim
@@ -530,23 +508,25 @@ print("uMonsoon: "+max(uMonsoon)+" "+min(uMonsoon))
         NHMu@dataset = infoU[ii]@dataset
 
         work_dir = config_user_info@work_dir + "/"
-        system("mkdir -p " + work_dir)    
+        system("mkdir -p " + work_dir)
         if (isatt(infoU[ii], "ensemble")) then
-          nc_filename = work_dir + "NHMcirculation_summer_"+infoU[ii]@dataset+"_"+infoU[ii]@ensemble+".nc"
+          nc_filename = work_dir + "NHMcirculation_summer_" \
+                         + infoU[ii]@dataset + "_" + infoU[ii]@ensemble + ".nc"
         else
-          nc_filename = work_dir + "NHMcirculation_summer_"+infoU[ii]@dataset+".nc"
+          nc_filename = work_dir + "NHMcirculation_summer_" \
+                         + infoU[ii]@dataset + ".nc"
         end if
-    
+
         if (nc_filename.ne."") then
           nc_outfile = ncdf_write(NHMu, nc_filename)
         end if
-    
+
         delete(udNHSM)
         delete(NHMu)
       end do
     end if
   end if
-  
+
   leave_msg(DIAG_SCRIPT, "")
 
 end

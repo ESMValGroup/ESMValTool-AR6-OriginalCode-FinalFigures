@@ -5,9 +5,10 @@
 ; ############################################################################
 ; Description
 ;
-;    Outputs: 
+;    Outputs:
 ;
 ; History
+;    20200513 kosaka_yu: cleand up.
 ;    20191030 kosa_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -21,13 +22,13 @@ function set_yyyymm(x)
 local x, y, time
 begin
   y = x
-  if (min(mod(x&time,100)).lt.1.or.max(mod(x&time,100)).gt.12) then
+  if (min(mod(x&time, 100)).lt.1.or.max(mod(x&time, 100)).gt.12) then
     time = cd_calendar(x&time, -1)
     delete(y&time)
     y!0 = "time"
     y&time = time
   end if
-  if (isatt(x&time,"calendar")) then
+  if (isatt(x&time, "calendar")) then
     if (y&time@calendar .eq. "proleptic_gregorian") then
       y&time@calendar = "gregorian"
     else
@@ -38,15 +39,16 @@ begin
   y&time@standard_name = "time"
   y&time@axid = "T"
   return(y)
-end  
+end
 
-function get_clim(x, syear, eyear, smonth, emonth );, accumulate)
+function get_clim(x, syear, eyear, smonth, emonth)
 local x, y, clim, time, month
 begin
   if (.not.(smonth.eq.emonth+1 .or. all((/smonth, emonth/).eq.(/1, 12/)))) then
-    error_msg("f", DIAG_SCRIPT, "", "monsoon year doesn't cover 12 calendar months.")
+    error_msg("f", DIAG_SCRIPT, "", \
+              "monsoon year doesn't cover 12 calendar months.")
   end if
-  
+
   time = cd_calendar(x&time, -1)
   y = x
   y&time = time
@@ -56,9 +58,11 @@ begin
   clim&month = ispan(1, 12, 1)
   do month = 1, 12
     if (month.lt.smonth) then
-      clim({month}, :, :) = dim_avg_n(y({(syear+1)*100+month:(eyear+1)*100+month:12}, :, :), 0)
+      clim({month}, :, :) \
+        = dim_avg_n(y({(syear+1)*100+month:(eyear+1)*100+month:12}, :, :), 0)
     else
-      clim({month}, :, :) = dim_avg_n(y({syear*100+month:eyear*100+month:12}, :, :), 0)
+      clim({month}, :, :) \
+        = dim_avg_n(y({syear*100+month:eyear*100+month:12}, :, :), 0)
     end if
   end do
 
@@ -73,7 +77,8 @@ begin
 end
 
 function summer(x, opt)
-local x, y, z, smonthNH, emonthNH, smonthSH, emonthSH, weight, len, yr, mon, accumulate
+local x, y, z, smonthNH, emonthNH, smonthSH, emonthSH, weight, \
+      len, yr, mon, accumulate
 begin
   smonthNH = opt@smonth_NHsummer
   emonthNH = opt@emonth_NHsummer
@@ -84,14 +89,14 @@ begin
   else
     accumulate = False
   end if
-  
+
   weight = new(12, "float")
   do mon = 1, 12
     weight(mon-1) = tofloat(days_in_month(2001, mon))
   end do
 
   if (x!0.eq."month".and.all(toint(x&month).eq.ispan(1, 12, 1))) then
-  
+
     y := x(0, :, :)
     y = 0.
     len = 0.
@@ -154,10 +159,9 @@ begin
     y = 0.
     if (smonthNH.lt.emonthNH) then
       do yr = syear, eyear
-;print(""+yr)
         len = 0.
         do mon = smonthNH, emonthNH
-          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -168,11 +172,12 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthNH, 12
-          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         do mon = 1, emonthNH
-          y({yr}, :, :) = y({yr}, :, :) + X({(yr+1)*100+mon}, :, :) *weight(mon-1)
+          y({yr}, :, :) \
+            = y({yr}, :, :) + X({(yr+1)*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -188,7 +193,7 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthSH, emonthSH
-          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -199,11 +204,12 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthSH, 12
-          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         do mon = 1, emonthSH
-          z({yr}, :, :) = z({yr}, :, :) + X({(yr+1)*100+mon}, :, :) *weight(mon-1)
+          z({yr}, :, :) \
+            = z({yr}, :, :) + X({(yr+1)*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -221,11 +227,12 @@ begin
     y = where(conform(y, lat, 1).lt.0., z,  y)
     y = where(conform(y, lat, 1).eq.0., 0., y)
   end if
-  return( y )
+  return(y)
 end
 
 function summer_minus_winter(x, opt)
-local x, y, z, smonthNH, emonthNH, smonthSH, emonthSH, weight, len, yr, mon, accumulate
+local x, y, z, smonthNH, emonthNH, smonthSH, emonthSH, weight, \
+      len, yr, mon, accumulate
 begin
   smonthNH = opt@smonth_NHsummer
   emonthNH = opt@emonth_NHsummer
@@ -236,14 +243,14 @@ begin
   else
     accumulate = False
   end if
-  
+
   weight = new(12, "float")
   do mon = 1, 12
     weight(mon-1) = tofloat(days_in_month(2001, mon))
   end do
 
   if (x!0.eq."month".and.all(toint(x&month).eq.ispan(1, 12, 1))) then
-  
+
     y := x(0, :, :)
     y = 0.
     len = 0.
@@ -308,7 +315,7 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthNH, emonthNH
-          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -319,11 +326,12 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthNH, 12
-          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          y({yr}, :, :) = y({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         do mon = 1, emonthNH
-          y({yr}, :, :) = y({yr}, :, :) + X({(yr+1)*100+mon}, :, :) *weight(mon-1)
+          y({yr}, :, :) \
+            = y({yr}, :, :) + X({(yr+1)*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -339,7 +347,7 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthSH, emonthSH
-          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -350,11 +358,12 @@ begin
       do yr = syear, eyear
         len = 0.
         do mon = smonthSH, 12
-          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) *weight(mon-1)
+          z({yr}, :, :) = z({yr}, :, :) + X({yr*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         do mon = 1, emonthSH
-          z({yr}, :, :) = z({yr}, :, :) + X({(yr+1)*100+mon}, :, :) *weight(mon-1)
+          z({yr}, :, :) \
+            = z({yr}, :, :) + X({(yr+1)*100+mon}, :, :) * weight(mon-1)
           len = len + weight(mon-1)
         end do
         if (.not.accumulate) then
@@ -373,7 +382,7 @@ begin
     y = where(conform(y, lat, 1).lt.0., -y, y)
     y = where(conform(y, lat, 1).eq.0., 0., y)
   end if
-  return( y )
+  return(y)
 end
 
 function monsoon_domain(MPI, summer_minus_winter, opt)
@@ -396,4 +405,3 @@ begin
   domain@units = ""
   return(domain)
 end
-  
