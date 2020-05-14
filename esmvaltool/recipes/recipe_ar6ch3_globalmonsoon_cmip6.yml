@@ -290,8 +290,8 @@ diagnostics:
         additional_datasets:
           - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, 
              start_year: 1979, end_year: 2017, tier: 2}
-          - {dataset: CMAP, project: OBS, type: satellite, version: V1902, 
-             start_year: 1979, end_year: 2018, tier: 2}
+          - {dataset: CMAP, project: OBS, type: satellite, version: V2005, 
+             start_year: 1979, end_year: 2019, tier: 2}
 
  #     uas:
  #       preprocessor: ppsfc
@@ -353,33 +353,37 @@ diagnostics:
   draw_global_monsoon_cmip6:
     description: Wrapper to collect and plot figures
     scripts:
-      plot_global_monsoon:
-        script: ar6ch3_monsoon/draw_global_monsoon.ncl
-        moving_ave: 0
-        scale_precip_ann: True
-        dataset_obs_pr: GPCP-SG
-        dataset_obs_uv: ERA5
-        ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
-      plot_global_monsoon_runmean11yr:
-        script: ar6ch3_monsoon/draw_global_monsoon.ncl
-        moving_ave: 11
-        scale_precip_ann: True
-        dataset_obs_pr: GPCP-SG
-        dataset_obs_uv: ERA5
-        ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
-      plot_global_monsoon_runmean15yr:
-        script: ar6ch3_monsoon/draw_global_monsoon.ncl
-        moving_ave: 15
-        scale_precip_ann: True
-        dataset_obs_pr: GPCP-SG
-        dataset_obs_uv: ERA5
-        ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
+#      plot_global_monsoon:
+#        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+##        moving_ave: 0
+#        scale_precip_ann: True
+#        dataset_obs_pr: GPCP-SG
+#        dataset_obs_uv: ERA5
+#        ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
+#      plot_global_monsoon_runmean11yr:
+#        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+#        moving_ave: 11
+#        scale_precip_ann: True
+#        dataset_obs_pr: GPCP-SG
+#        dataset_obs_uv: ERA5
+#        ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
+#      plot_global_monsoon_runmean15yr:
+#        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+#        moving_ave: 15
+#        scale_precip_ann: True
+#        dataset_obs_pr: GPCP-SG
+#        dataset_obs_uv: ERA5
+#        ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
       plot_global_monsoon_runmean20yr:
         script: ar6ch3_monsoon/draw_global_monsoon.ncl
         moving_ave: 20
         scale_precip_ann: True
         dataset_obs_pr: GPCP-SG
         dataset_obs_uv: ERA5
+        plot_map: True
+        plot_globalprecipitation: False
+        plot_NHprecipitation: False
+        plot_NHcirculation: True
         ancestors: ['global_monsoon_cmip6/monsoon_domain_intensity']
 
         
@@ -399,8 +403,8 @@ diagnostics:
         additional_datasets:
           - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, 
              start_year: 1979, end_year: 2017, tier: 2}
-          - {dataset: CMAP, project: OBS, type: satellite, version: V1902, 
-             start_year: 1979, end_year: 2018, tier: 2}
+          - {dataset: CMAP, project: OBS, type: satellite, version: V2005, 
+             start_year: 1979, end_year: 2019, tier: 2}
           - {dataset: GPCC, project: OBS, type: insitu, version: v2018, 
              start_year: 1891, end_year: 2016, tier: 2}
           - {dataset: CRU-TS, project: OBS, type: insitu, version: 4.02, 
@@ -421,27 +425,30 @@ diagnostics:
   draw_global_landmonsoon_cmip6:
     description: Wrapper to collect and plot figures
     scripts:
-      plot_global_monsoon:
-        script: ar6ch3_monsoon/draw_global_monsoon.ncl
-        moving_ave: 0
-        scale_precip_ann: True
-        dataset_obs_pr: GPCC
-        ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
-      plot_global_monsoon_runmean11yr:
-        script: ar6ch3_monsoon/draw_global_monsoon.ncl
-        moving_ave: 11
-        scale_precip_ann: True
-        dataset_obs_pr: GPCC
-        ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
-      plot_global_monsoon_runmean15yr:
-        script: ar6ch3_monsoon/draw_global_monsoon.ncl
-        moving_ave: 15
-        scale_precip_ann: True
-        dataset_obs_pr: GPCC
-        ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
+#      plot_global_monsoon:
+#        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+#        moving_ave: 0
+#        scale_precip_ann: True
+#        dataset_obs_pr: GPCC
+#        ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
+#      plot_global_monsoon_runmean11yr:
+#        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+#        moving_ave: 11
+#        scale_precip_ann: True
+#        dataset_obs_pr: GPCC
+#        ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
+#      plot_global_monsoon_runmean15yr:
+#        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+#        moving_ave: 15
+#        scale_precip_ann: True
+#        dataset_obs_pr: GPCC
+#        ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
       plot_global_monsoon_runmean20yr:
         script: ar6ch3_monsoon/draw_global_monsoon.ncl
         moving_ave: 20
         scale_precip_ann: True
         dataset_obs_pr: GPCC
+        plot_map: False
+        plot_globalprecipitation: True
+        plot_NHprecipitation: False
         ancestors: ['global_landmonsoon_cmip6/monsoon_domain_intensity']
