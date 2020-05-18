@@ -28,27 +28,30 @@ preprocessors:
       scheme: linear
 
 datasets:
-  # - {dataset: BCC-CSM2-MR, grid: gn} no siconc data
-  # - {dataset: BCC-ESM1, grid: gn} no ScenarioMIP data on DKRZ
-  # - {dataset: CAMS-CSM1-0, grid: gn} no fx data
+  # - {dataset: AWI-CM-1-1-MR, grid: gn, start_year: 1851} #no siconc data
+  # - {dataset: BCC-CSM2-MR, grid: gn} #no siconc data
+  # - {dataset: BCC-ESM1, grid: gn} #no siconc data
+  # - {dataset: CAMS-CSM1-0, grid: gn} #no fx data
   - {dataset: CanESM5, grid: gn}
-  # - {dataset: CESM2, grid: gn} concatinate error for tas
-  # - {dataset: CESM2-WACCM, grid: gn, institute: NCAR} concatinate error
-  # - {dataset: E3SM-1-0} no data from 2000-2014
-  # - {dataset: EC-Earth3, ensemble: r22i1p1f1} no complete dataset for both experiments
-  # - {dataset: GISS-E2-1-G, grid: gn} no ScenarioMIP data yet
-  # - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} no data 1951-2000
-  # - {dataset: GISS-E2-1-H, grid: gn} no ScenarioMIP data yet
-  # - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn} no fx data
-  # - {dataset: MCM-UA-1-0, grid: gn} no data on DKRZ
+  # - {dataset: CESM2, grid: gn} #fix for siconc failed
+  # - {dataset: CESM2-WACCM, grid: gn, institute: NCAR} #fix for siconc failed
+  # - {dataset: EC-Earth3, ensemble: r22i1p1f1} #no complete dataset for both experiments
+  # - {dataset: GISS-E2-1-G, grid: gn} #no sftlf data
+  # - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #no sftlf data
+  # - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn} #no sftlf data
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1}
+  # - {dataset: MCM-UA-1-0, grid: gn} #no siconc data
   - {dataset: MIROC6, grid: gn}
   - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-  # - {dataset: MPI-ESM1-2-HR, grid: gn} no sftlf data
+  # - {dataset: MPI-ESM1-2-HR, grid: gn} #no sftlf data
+  - {dataset: MPI-ESM1-2-LR, grid: gn} #no ScenarioMIP data yet
   - {dataset: MRI-ESM2-0, grid: gn}
-  # - {dataset: NESM3, grid: gn} no data on DKRZ
-  # - {dataset: NorCPM1, grid: gn} no data on DKRZ
-  # - {dataset: SAM0-UNICON, grid: gn} no ScenarioMIP data yet
-  # - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn} no sftlf data
+  # - {dataset: NESM3, grid: gn} #no sftlf data
+  - {dataset: NorCPM1, ensemble: r24i1p1f1, grid: gn, institute: NCC} #concatinate erros for tas
+  # - {dataset: NorESM2-LM, grid: gn, institute: NCC} #no siconc data (but on ESGF)
+  - {dataset: SAM0-UNICON, grid: gn} #no ScenarioMIP data yet
+  # - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn} #no sftlf data
 
 
 diagnostics:
@@ -67,18 +70,21 @@ diagnostics:
         reference_dataset: HadCRUT4
         mip: Amon
         project: CMIP6
-        exp: [historical, ssp245]
+        exp: historical
         grid: gr
         ensemble: r1i1p1f1
         start_year: 1850
-        end_year: 2018
+        end_year: 2014
         additional_datasets: &damip_simulations
           - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+          # - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2} #no tos data
           - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2}
+          - {dataset: E3SM-1-0} #no ScenarioMIP data on DKRZ
           # - {dataset: EC-Earth3-Veg} concatinate error for siconc
-          # - {dataset: GFDL-CM4, grid: gr1} fix for tas failed
-          # - {dataset: GFDL-ESM4, grid: gr1} no Scenario MIP tos data
-          # - {dataset: IPSL-CM6A-LR} concatinate error for tas
+          # - {dataset: GFDL-CM4, grid: gr1} #fix for siconc failed
+          # - {dataset: GFDL-ESM4, grid: gr1} #no siconc data
+          # - {dataset: GISS-E2-1-H, grid: gn} #no sftlf data
+          # - {dataset: IPSL-CM6A-LR} concatinate error for tos
           - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
              tier: 2}
 
@@ -87,18 +93,21 @@ diagnostics:
         preprocessor: regrid_5_5
         mip: Omon
         project: CMIP6
-        exp: [historical, ssp245]
+        exp: historical
         grid: gn
         ensemble: r1i1p1f1
         start_year: 1850
-        end_year: 2018
+        end_year: 2014
         additional_datasets:
           - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+          # - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2} #no tos data
           - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2}
+          - {dataset: E3SM-1-0, grid: gr} #no ScenarioMIP data on DKRZ
           # - {dataset: EC-Earth3-Veg} concatinate error for siconc
-          # - {dataset: GFDL-CM4, grid: gr} fix for tas failed
-          # - {dataset: GFDL-ESM4, grid: gr} no Scenario MIP tos data
-          # - {dataset: IPSL-CM6A-LR} concatinate error for tas
+          # - {dataset: GFDL-CM4, grid: gr} #fix for siconc failed
+          # - {dataset: GFDL-ESM4, grid: gr} #no siconc data
+          # - {dataset: GISS-E2-1-H, grid: gn} #no sftlf data
+          # - {dataset: IPSL-CM6A-LR} concatinate error for tos
 
       siconc:
         <<: *tos_settings
@@ -106,10 +115,13 @@ diagnostics:
         grid: gr
         additional_datasets:
           - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
+          # - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2} #no tos data
           - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: E3SM-1-0} #no ScenarioMIP data on DKRZ
           # - {dataset: EC-Earth3-Veg, grid: gn} concatinate error for siconc
-          # - {dataset: GFDL-CM4, grid: gr} fix for tas failed
-          # - {dataset: GFDL-ESM4, grid: gr} no Scenario MIP tos data
+          # - {dataset: GFDL-CM4, grid: gr} #fix for siconc failed
+          # - {dataset: GFDL-ESM4, grid: gr} #no siconc data
+          # - {dataset: GISS-E2-1-H, grid: gr} #no sftlf data
           # - {dataset: IPSL-CM6A-LR, grid: gn} concatinate error for tas
 
       sftlf:
@@ -119,10 +131,13 @@ diagnostics:
         grid: gr
         additional_datasets:
           - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+          # - {dataset: CNRM-CM6-1-HR, ensemble: r2i1p1f2} #no tos data
           - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2}
+          - {dataset: E3SM-1-0} #no ScenarioMIP data on DKRZ
           # - {dataset: EC-Earth3-Veg, grid: gn} concatinate error for siconc
-          # - {dataset: GFDL-CM4, grid: gr1} fix for tas failed
-          # - {dataset: GFDL-ESM4, grid: gr} no Scenario MIP tos data
+          # - {dataset: GFDL-CM4, grid: gr1} #fix for siconc failed
+          # - {dataset: GFDL-ESM4, grid: gr} #no siconc data
+          # - {dataset: GISS-E2-1-H, grid: gn} #no sftlf data
           # - {dataset: IPSL-CM6A-LR} concatinate error for tas
 
     scripts:
