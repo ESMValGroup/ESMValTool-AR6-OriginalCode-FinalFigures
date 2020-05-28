@@ -146,91 +146,91 @@ diagnostics:
         projection: Robinson
         timemean: annualclim
         plot_rms_diff: True
-        plot_abs_diff: False
+        plot_abs_diff: True
         plot_rel_diff: False
 
-
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Fig. 3.9 (ZOD fig. 3.9)
-  # Sect. 3.3 
-  # similar to fig. IPCC AR5, chap. 9, 9.4
-  # Lisa
-  # **********************************************************************
-  # Multi model mean, multi model mean bias, mean absolute error, and    
-  # mean relative error (geographical ditributions)
-  # **********************************************************************
-
-  fig_3_9:
-    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
-    variables:
-      pr:
-        preprocessor: clim
-        reference_dataset: GPCP-SG
-        project: CMIP5
-        mip: Amon
-        grid: gr
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
-    additional_datasets: *cmip5_hist_models_pr_gpcp
-    scripts:
-      fig_3_9:
-        script: ipcc_ar6/model_bias.ncl
-        projection: Robinson
-        timemean: annualclim
-        plot_rms_diff: True
-        plot_abs_diff: False
-        plot_rel_diff: False
-
-
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Fig. 3.19
-  # Sect. 3.3 
-  # Lisa
-  # **********************************************************************
-  # Multi model mean, multi model mean bias, mean absolute error, and    
-  # mean relative error (geographical ditributions)
-  # **********************************************************************
-
-  fig_3_19_tos:
-    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
-    variables:
-      thetao:
-        preprocessor: clim_surface
-        reference_dataset: WOA
-        project: CMIP5
-        mip: Omon
-        grid: gn
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
-    additional_datasets: *cmip5_hist_models_tos_woa
-    scripts:
-      fig_3_19:
-        script: ipcc_ar6/model_bias.ncl
-        projection: Robinson
-        timemean: annualclim
-
-  fig_3_19_sos:
-    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
-    variables:
-      so:
-        preprocessor: clim_surface
-        reference_dataset: WOA
-        project: CMIP5
-        mip: Omon
-        grid: gn
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
-    additional_datasets: *cmip5_hist_models_tos_woa
-    scripts:
-      fig_3_19:
-        script: ipcc_ar6/model_bias.ncl
-        projection: Robinson
-        timemean: annualclim
+#
+#  # **********************************************************************
+#  # IPCC WGI AR6, chap. 3
+#  # Fig. 3.9 (ZOD fig. 3.9)
+#  # Sect. 3.3 
+#  # similar to fig. IPCC AR5, chap. 9, 9.4
+#  # Lisa
+#  # **********************************************************************
+#  # Multi model mean, multi model mean bias, mean absolute error, and    
+#  # mean relative error (geographical ditributions)
+#  # **********************************************************************
+#
+#  fig_3_9:
+#    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
+#    variables:
+#      pr:
+#        preprocessor: clim
+#        reference_dataset: GPCP-SG
+#        project: CMIP5
+#        mip: Amon
+#        grid: gr
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#    additional_datasets: *cmip5_hist_models_pr_gpcp
+#    scripts:
+#      fig_3_9:
+#        script: ipcc_ar6/model_bias.ncl
+#        projection: Robinson
+#        timemean: annualclim
+#        plot_rms_diff: True
+#        plot_abs_diff: False
+#        plot_rel_diff: True
+#
+#
+#  # **********************************************************************
+#  # IPCC WGI AR6, chap. 3
+#  # Fig. 3.19
+#  # Sect. 3.3 
+#  # Lisa
+#  # **********************************************************************
+#  # Multi model mean, multi model mean bias, mean absolute error, and    
+#  # mean relative error (geographical ditributions)
+#  # **********************************************************************
+#
+#  fig_3_19_tos:
+#    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
+#    variables:
+#      thetao:
+#        preprocessor: clim_surface
+#        reference_dataset: WOA
+#        project: CMIP5
+#        mip: Omon
+#        grid: gn
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#    additional_datasets: *cmip5_hist_models_tos_woa
+#    scripts:
+#      fig_3_19:
+#        script: ipcc_ar6/model_bias.ncl
+#        projection: Robinson
+#        timemean: annualclim
+#
+#  fig_3_19_sos:
+#    description: IPCC AR5 Ch. 9, Fig. 9.4 (precipitation)
+#    variables:
+#      so:
+#        preprocessor: clim_surface
+#        reference_dataset: WOA
+#        project: CMIP5
+#        mip: Omon
+#        grid: gn
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#    additional_datasets: *cmip5_hist_models_tos_woa
+#    scripts:
+#      fig_3_19:
+#        script: ipcc_ar6/model_bias.ncl
+#        projection: Robinson
+#        timemean: annualclim
