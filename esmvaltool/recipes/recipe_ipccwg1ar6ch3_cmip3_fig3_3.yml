@@ -26,7 +26,7 @@ preprocessors:
       target_grid: reference_dataset
       scheme: linear
     multi_model_statistics:
-      span: overlap
+      span: full #overlap
       statistics: [mean]
       exclude: [reference_dataset]
 
@@ -35,28 +35,26 @@ datasets:
   #- &cmip3 {dataset: cccma_cgcm3_1,  institute: CCCMA, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
   - {<<: *cmip3, dataset: cccma_cgcm3_1}
   - {<<: *cmip3, dataset: cccma_cgcm3_1_t63}
-  - {<<: *cmip3, dataset: csiro_mk3_0}
+  - {<<: *cmip3, dataset: csiro_mk3_0, start_year: 1871}
   #- {<<: *cmip3, dataset: gfdl_cm2_0}
   #- {<<: *cmip3, dataset: gfdl_cm2_1}
   - {<<: *cmip3, dataset: giss_aom}
-  - {<<: *cmip3, dataset: giss_model_e_h}
-  - {<<: *cmip3, dataset: giss_model_e_r}
+  - {<<: *cmip3, dataset: giss_model_e_h, start_year: 1880}
+  - {<<: *cmip3, dataset: giss_model_e_r, start_year: 1880}
   - {<<: *cmip3, dataset: iap_fgoals1_0_g}
-  - {<<: *cmip3, dataset: ingv_echam4}
-  - {<<: *cmip3, dataset: inmcm3_0}
-  - {<<: *cmip3, dataset: ipsl_cm4}
-  - {<<: *cmip3, dataset: miroc3_2_hires}
+  - {<<: *cmip3, dataset: ingv_echam4, start_year: 1870}
+  - {<<: *cmip3, dataset: inmcm3_0, start_year: 1871}
+  - {<<: *cmip3, dataset: ipsl_cm4, start_year: 1860}
+#  - {<<: *cmip3, dataset: miroc3_2_hires, start_year: 1900}
   - {<<: *cmip3, dataset: miroc3_2_medres}
   #- {<<: *cmip3, dataset: miub_echo_g}
-  - {<<: *cmip3, dataset: mpi_echam5}
+  - {<<: *cmip3, dataset: mpi_echam5, start_year: 1860}
   #- {<<: *cmip3, dataset: mri_cgcm2_3_2a}
-  - {<<: *cmip3, dataset: ncar_ccsm3_0}
-  - {<<: *cmip3, dataset: ncar_pcm1}
-  - {<<: *cmip3, dataset: ukmo_hadcm3}
-  - {<<: *cmip3, dataset: ukmo_hadgem1}
-  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
-     start_year: 1950, end_year: 2017, tier: 2}
-
+  - {<<: *cmip3, dataset: ncar_ccsm3_0, start_year: 1870}
+  - {<<: *cmip3, dataset: ncar_pcm1, start_year: 1890}
+  - {<<: *cmip3, dataset: ukmo_hadcm3, start_year: 1860}
+  - {<<: *cmip3, dataset: ukmo_hadgem1, start_year: 1860}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2 }
 
 
 diagnostics:
@@ -80,7 +78,7 @@ diagnostics:
         mip: Amon
         project: CMIP3
         exp: historical
-        start_year: 1950
+        start_year: 1850
         end_year: 1999
     scripts:
       tsline_anom:

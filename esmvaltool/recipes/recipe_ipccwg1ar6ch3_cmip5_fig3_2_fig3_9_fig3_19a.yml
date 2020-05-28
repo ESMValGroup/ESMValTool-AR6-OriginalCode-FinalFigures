@@ -146,7 +146,7 @@ diagnostics:
         projection: Robinson
         timemean: annualclim
         plot_rms_diff: True
-        plot_abs_diff: False
+        plot_abs_diff: True
         plot_rel_diff: False
 
 

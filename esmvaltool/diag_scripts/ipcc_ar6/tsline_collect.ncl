@@ -89,35 +89,6 @@ begin
   end_year = diag_script_info@end_year
   all_years = ispan(start_year, end_year, 1)
 
-  ; Create time coordinate
-  if (time_avg.eq."monthly") then
-    ntime = 12 * (end_year - start_year + 1)
-    time = new(ntime, integer)
-    do yy = start_year, end_year
-        do mm = 1, 12
-            time(12 * (yy - start_year) + mm - 1) = 100 * yy + mm
-        end do
-    end do
-  else if (time_avg.eq."yearly") then
-    ntime = end_year - start_year + 1
-    time = new(ntime, integer)
-    time = ispan(start_year, end_year, 1)
-  end if
-  end if
-
-  ; Create array for collecting two additional datasets
-  dim_data = (/2*3, ntime/)
-  data_all = new(dim_data, double)
-
-  if (isatt(diag_script_info, "ref")) then
-    dim_ref = (/dimsizes(diag_script_info@ref), ntime/)
-    data_ref = new(dim_ref, double)
-    data_ref!0 = "dataset"
-    data_ref&dataset= new(dimsizes(diag_script_info@ref), string, "")
-    data_ref!1 = "time"
-    data_ref&time = time
-  end if
-
   ; Anomaly
   if (isatt(diag_script_info, "ts_anomaly")) then
     anom = diag_script_info@ts_anomaly
@@ -143,37 +114,21 @@ begin
     anom = "noanom"
   end if
 
-  ; Running Mean
-  if (isatt(diag_script_info, "run_ave")) then
-    if(diag_script_info@run_ave .gt. 0) then
-      run_ave = "running_mean"
-    end if
-  else
-    run_ave = ""
-  end if
-
   ; -----------------------------------------------
   ; Read pre-calculated multi model statistics
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-    "tsline_mm_" + var0 + "_stat.nc"
+    "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
+    ;"extent_" + var0 + "_Antarctic_September_1950-2014.nc"
   input_files := tostring(input_files)
+
+print(input_files)
 
   ; Filter out non-existing files
   input_files := input_files(ind(isfilepresent(input_files)))
 
   nfiles = dimsizes(input_files)
-
-  dim_data   = (/nfiles, ntime/)
-  data_mean  = new(dim_data, double)
-  data_mean!0 = "experiment"
-  data_mean!1 = "time"
-  data_mean&experiment = new(nfiles, string, "exp")
-  data_mean&time = time
-  data_mean@var = var0
-  data_mean@units = diag_script_info@plot_units
-  data_stat = new((/2, nfiles, ntime/), double)
 
   ; Loop over files in the list, read and append data
   do ii = 0, nfiles - 1
@@ -182,18 +137,57 @@ begin
 
     data_temp = ncdf_read(input_files(ii), var0)
 
+printVarSummary(data_temp)
+
     if(isatt(diag_script_info, "order")) then
+print(diag_script_info@order)
+print(data_temp@experiment)
       ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
+print("ii_n = " + ii_n)
       if (all(ismissing(ii_n))) then
         error_msg("f", DIAG_SCRIPT, "", "Collected experiment " + \
                   data_temp@experiment + " does not appear in " + \
                   "diag_script_info@order")
-      elseif (ii_n .gt. dimsizes(data_mean&experiment)-1) then
+      elseif (ii_n .gt. nfiles-1)
         error_msg("f", DIAG_SCRIPT, "", "diag_script_info@order not " \
                   + "well defined (less experiments available)")
       end if
     else
       ii_n = ii
+    end if
+
+    if( ii .eq. 0) then
+      ; Create time coordinate
+      ; if (time_avg.eq."monthly") then
+      ;   ntime = 12 * (end_year - start_year + 1)
+      ;   time = new(ntime, integer)
+      ;   do yy = start_year, end_year
+      ;       do mm = 1, 12
+      ;           time(12 * (yy - start_year) + mm - 1) = 100 * yy + mm
+      ;       end do
+      ;   end do
+      ; elseif (time_avg.eq."yearly")
+      ;   ntime = end_year - start_year + 1
+      ;   time = new(ntime, integer)
+      ;   time = ispan(start_year, end_year, 1)
+      ; end if
+      time = data_temp&time
+      ntime = dimsizes(time)
+
+      dim_data   = (/nfiles, ntime/)
+      data_mean  = new(dim_data, double)
+      data_mean!0 = "experiment"
+      data_mean!1 = "time"
+      data_mean&experiment = new(nfiles, string, "exp")
+      data_mean&time = time
+      data_mean@var = var0
+      if (isatt(diag_script_info, "ref")) then
+        data_ref = new((/1, ntime/), double)
+        data_ref!0 = "dataset"
+        data_ref!1 = "time"
+        data_ref&time = time
+      end if
+      data_stat = new((/2, nfiles, ntime/), double)
     end if
 
     ; Match time coordinate
@@ -206,21 +200,21 @@ begin
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
     delete(date)
 
-    ; Running Mean
-    if(diag_script_info@run_ave .gt. 0) then
-      run_ave = "running_mean"
-      ;tmp = runave_Wrap(data_temp(0,:), 12 * diag_script_info@run_ave, 1)
-      tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
-      ;delete(data_temp)
-      ;data_temp(0,:) = tmp
-      data_temp = tmp
-      delete(tmp)
-    else
-      run_ave = ""
-    end if
-
     data_mean(ii_n, idx1:idx2)  = (/data_temp(0, :)/)
     data_mean&experiment(ii_n) = data_temp@experiment
+
+    if (ii .eq. 0) then
+      ;if (isatt(diag_script_info, "plot_units")) then
+      ;  data_mean@units = diag_script_info@plot_units
+      ;else
+      ;  data_mean@units = ""
+      ;end if
+      data_mean@units = data_temp@units
+      if (isatt(diag_script_info, "ref")) then
+        data_ref(0, idx1:idx2)  = (/data_temp(3, :)/)
+        data_ref&dataset(0) = diag_script_info@ref
+      end if
+    end if
 
     data_stat(0, ii_n, idx1:idx2) = data_temp(1, :)
     data_stat(1, ii_n, idx1:idx2) = data_temp(2, :)
@@ -229,56 +223,56 @@ begin
 
   end do
 
-  ; -------------------------------------------
-  ; Read observational data
-  ; -------------------------------------------
+  ;; -------------------------------------------
+  ;; Read observational data
+  ;; -------------------------------------------
 
-  if (isatt(diag_script_info, "ref")) then
-    input_files_ref = diag_script_info@input_files + "/" + \
-      "tsline_" + var0 + "_" + anom + ".nc"
-    input_files_ref := tostring(input_files_ref)
+  ;if (isatt(diag_script_info, "ref")) then
+  ;  input_files_ref = diag_script_info@input_files + "/" + \
+  ;    "tsline_" + var0 + "_" + anom + ".nc"
+  ;  input_files_ref := tostring(input_files_ref)
 
-    ; Filter out non-existing files
-    input_files_ref := input_files_ref(ind(isfilepresent(input_files_ref)))
+  ;  ; Filter out non-existing files
+  ;  input_files_ref := input_files_ref(ind(isfilepresent(input_files_ref)))
 
-    data_temp = ncdf_read(input_files_ref(0), var0)
+  ;  data_temp = ncdf_read(input_files_ref(0), var0)
 
-    log_info("Read in " + input_files_ref(0))
+  ;  log_info("Read in " + input_files_ref(0))
 
-    do i = 0, dimsizes(diag_script_info@ref)-1
+  ;  do i = 0, dimsizes(diag_script_info@ref)-1
 
-      ind_ref = ind(data_temp&model .eq. diag_script_info@ref(i))
-      if (all(ismissing(ind_ref))) then
-        error_msg("f", DIAG_SCRIPT, "", "observational data set not available")
-      else
-        ; Match time coordinate
-        if (time_avg.eq."monthly") then
-          date = cd_calendar(data_temp&time, -1)
-        elseif (time_avg.eq."yearly") then
-          date = data_temp&time
-        end if
-        idx1 = ind(date(0).eq.data_ref&time)
-        idx2 = ind(date(dimsizes(date) - 1).eq.data_ref&time)
-        delete(date)
+  ;    ind_ref = ind(data_temp&model .eq. diag_script_info@ref(i))
+  ;    if (all(ismissing(ind_ref))) then
+  ;      error_msg("f", DIAG_SCRIPT, "", "observational data set not available")
+  ;    else
+  ;      ; Match time coordinate
+  ;      if (time_avg.eq."monthly") then
+  ;        date = cd_calendar(data_temp&time, -1)
+  ;      elseif (time_avg.eq."yearly") then
+  ;        date = data_temp&time
+  ;      end if
+  ;      idx1 = ind(date(0).eq.data_ref&time)
+  ;      idx2 = ind(date(dimsizes(date) - 1).eq.data_ref&time)
+  ;      delete(date)
 
-        ; Running Mean
-        if(diag_script_info@run_ave .gt. 0) then
-          run_ave = "running_mean"
-          tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
-          ;delete(data_temp)
-          data_temp = tmp
-          delete(tmp)
-        else
-          run_ave = ""
-        end if
+  ;      ; Running Mean
+  ;      if(diag_script_info@run_ave .gt. 0) then
+  ;        run_ave = "running_mean"
+  ;        tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
+  ;        ;delete(data_temp)
+  ;        data_temp = tmp
+  ;        delete(tmp)
+  ;      else
+  ;        run_ave = ""
+  ;      end if
 
-        data_ref(i, idx1:idx2) = (/data_temp(ind_ref, :)/)
-      end if
+  ;      data_ref(i, idx1:idx2) = (/data_temp(ind_ref, :)/)
+  ;    end if
 
-    end do
+  ;  end do
 
-    delete(data_temp)
-  end if
+  ;  delete(data_temp)
+  ;end if
 
   ; -------------------------------------------
   ; NetCDF Output
@@ -354,6 +348,8 @@ begin
   if (isatt(variable_info[0], "long_name")) then
     if (var0 .eq. "tas") then
       varname = "Temperature"
+    elseif (var0 .eq. "siconc")
+      varname = "Sea Ice"
     else
       varname = variable_info[0]@long_name
     end if

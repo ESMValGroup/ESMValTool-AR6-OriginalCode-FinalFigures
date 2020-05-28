@@ -138,6 +138,36 @@ begin
     time = new(ntime, integer)
     time = ispan(start_year, end_year, 1)
   end if
+  ntime_old = ntime
+
+  ;yr_mean
+  if(isatt(diag_script_info, "yr_mean")) then
+    yr_mean = diag_script_info@yr_mean
+    if(yr_mean.eq.5) then
+      run_ave = "5_yr_mean"
+      if (time_avg.eq."monthly") then
+        av_per = 60
+      elseif (time_avg.eq."yearly") then
+        av_per = 5
+      end if
+      time := start_year + 0.1 * ispan(25,10*ntime,50)
+    elseif(yr_mean.eq.2) then
+      run_ave = "2_yr_mean"
+      if (time_avg.eq."monthly") then
+        av_per = 24
+      elseif (time_avg.eq."yearly") then
+        av_per = 2
+      end if
+      time := start_year + 0.1 * ispan(10,10*ntime,20)
+    else
+      error_msg("f", diag_script_info, "", yr_mean + "year mean not supported")
+    end if
+    nper = toint(ceil(tofloat(ntime)/av_per))
+    ntime = nper
+  else
+    yr_mean = 0
+    run_ave = ""
+  end if
 
   ; get multi-model mean index
   mmm_ind = ind(datasetnames .eq. "MultiModelMean")
@@ -189,7 +219,7 @@ begin
   model_arr&time = time
   model_arr@_FillValue = 1e+20
   model_arr = model_arr@_FillValue
-  delete(time)
+  ;delete(time)
 
   ; Loop over models
   do imod = 0, dim_MOD - 1
@@ -325,8 +355,22 @@ begin
       delete(procmod)
       procmod = tmp
       delete(tmp)
-    else
-      run_ave = ""
+    end if
+
+    ;fiveyr_mean
+    if (yr_mean.gt.0) then
+      tmp = new(nper, float)
+      tmp!0 = "year"
+      tmp&year = time
+      do i=0, nper-2
+        tmp(i) = dim_avg(procmod(i*av_per:(i+1)*av_per))
+      end do
+      ; average over incomplete final averaging period
+      tmp(nper-1) = dim_avg(procmod((nper-1)*av_per:(ntime_old-1)))
+      copy_VarAtts(procmod, tmp)
+      delete(procmod)
+      procmod = tmp
+      delete(tmp)
     end if
 
     ; Match time coordinate
@@ -367,11 +411,11 @@ begin
       ind_mod = ind(datasetnames.ne."MultiModelMean")
     end if
 
-    model_arr_stat = new((/3, ntime/), double)
+    model_arr_stat = new((/4, ntime/), double)
     model_arr_stat!0 = "stat"
     model_arr_stat!1 = "time"
     model_arr_stat&time = model_arr&time
-    model_arr_stat&stat = (/"mean", "min", "max"/)
+    model_arr_stat&stat = (/"mean", "min", "max", "ref"/)
 
     model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
     do i = 0, ntime-1
@@ -393,13 +437,16 @@ begin
         model_arr_stat(2, i) = (/statb(13)/)
       end if
     end do
+    if (isatt(variable_info[0], "reference_dataset")) then
+      model_arr_stat(3, :) = (/model_arr(ref_ind, :)/)
+    end if
   end if
 
   ; Convert time coordinate to years (required by the plot routine)
   if (time_avg.eq."monthly") then
     year = model_arr&time / 100
-    xmin = min(year)
-    xmax = max(year)
+    xmin = toint(floor(min(year)))
+    xmax = toint(ceil(max(year)))
     month = model_arr&time - 100 * year
     time = todouble(year + month/12.)
     delete(model_arr&time)
@@ -408,8 +455,8 @@ begin
     delete(year)
     delete(month)
   elseif (time_avg.eq."yearly") then
-    xmin = min(model_arr&time)
-    xmax = max(model_arr&time)
+    xmin = toint(floor(min(model_arr&time)))
+    xmax = toint(ceil(max(model_arr&time)))
     tmp = todouble(model_arr&time)
     delete(model_arr&time)
     model_arr&time = tmp
@@ -429,11 +476,12 @@ begin
   ncdf_outfile = ncdf_write(model_arr, out_path1)
   ; statistics
   if (diag_script_info@write_stat) then
-    out_path2 = out_path + "tsline_mm_" + var0 + "_stat.nc"
+    out_path2 = out_path + "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
     model_arr_stat@ncdf = out_path
     model_arr_stat@experiment = project0 + "_" + exp0
     model_arr_stat@diag_script = DIAG_SCRIPT
     model_arr_stat@var = var0
+    model_arr_stat@units = model_arr@units
     ncdf_outfile = ncdf_write(model_arr_stat, out_path2)
   end if
 
