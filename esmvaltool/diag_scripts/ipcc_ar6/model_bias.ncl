@@ -394,13 +394,13 @@ begin
                                 + "ipcc-ar6_temperature_div.rgb")
     end if
   elseif (var0.eq."pr") then
-    mmdata@res_tiMainString = "Precipitation ~C~Multi Model Mean"
+    ;mmdata@res_tiMainString = "Precipitation ~C~Multi Model Mean"
     mmdata@res_cnLevels = ispan(1, 10, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_precipitation_seq.rgb")
     mmdata@res_cnFillPalette = pal
-    diff@res_tiMainString = "Precipitation ~C~Multi Model Mean Bias"
+    ;diff@res_tiMainString = "Precipitation ~C~Multi Model Mean Bias"
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_precipitation_div.rgb")
     diff@res_cnFillPalette = pal2

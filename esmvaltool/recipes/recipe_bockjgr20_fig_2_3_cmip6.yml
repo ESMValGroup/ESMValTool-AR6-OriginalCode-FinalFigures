@@ -1,0 +1,135 @@
+# ESMValTool
+# recipe_bockjgr20.yml
+---
+documentation:
+
+  description: |
+    Producing figures from Bock et al., 2020, JGR
+
+  authors:
+    - bock_lisa
+    - lauer_axel
+
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    #mask_fillvalues:
+    #  threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+datasets:
+  - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
+  - {dataset: AWI-ESM-1-1-LR, grid: gn}
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: BCC-ESM1, grid: gn}
+  - {dataset: CAMS-CSM1-0, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
+  - {dataset: CIESM}
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: E3SM-1-0}
+  - {dataset: E3SM-1-1, institute: E3SM-Project}
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  - {dataset: EC-Earth3-Veg}
+  - {dataset: FGOALS-f3-L}
+  - {dataset: FGOALS-g3, grid: gn}
+  - {dataset: FIO-ESM-2-0, grid: gn}
+  - {dataset: GFDL-CM4, grid: gr1}
+  - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
+  - {dataset: GISS-E2-1-H, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1}
+  - {dataset: IPSL-CM6A-LR}
+  - {dataset: KACE-1-0-G}
+  - {dataset: MCM-UA-1-0, grid: gn}
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: NESM3, grid: gn}
+  - {dataset: NorCPM1, grid: gn, institute: NCC}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC}
+  - {dataset: NorESM2-MM, grid: gn, institute: NCC}
+  - {dataset: SAM0-UNICON, grid: gn}
+  - {dataset: TaiESM1, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+
+cmip6_hist_models_tas_era: &cmip6_hist_models_tas_era
+  - {dataset: AWI-CM-1-1-MR, grid: gn}
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+
+cmip6_hist_models_pr_gpcp: &cmip6_hist_models_pr_gpcp
+  - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3,
+              tier: 1}
+
+
+diagnostics:
+
+  fig_2:
+    description: CMIP6 multi-model mean and bias of near-surface temperature
+    variables:
+      tas:
+        preprocessor: clim
+        reference_dataset: ERA5
+        mip: Amon
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1995
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models_tas_era
+    scripts:
+      model_bias: &fig-2_and_3_settings
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
+
+
+  fig_3:
+    description: CMIP6 multi-model mean and bias of percipitation
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        project: CMIP6
+        mip: Amon
+        grid: gr
+        exp: historical
+        ensemble: r1i1p1f1
+        start_year: 1995
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models_pr_gpcp
+    scripts:
+      model_bias:
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
