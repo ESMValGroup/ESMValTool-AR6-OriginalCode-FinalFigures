@@ -73,8 +73,8 @@ begin
 
   ; Global attributes
   SOURCE = "https://crudata.uea.ac.uk/cru/data/temperature/"
-  REF1 =  "Morice et al., J. Geophys. Res., doi:10.1029/2011JD017187, 2012"
-  REF2 =  "Morice et al., J. Geophys. Res., doi:10.1029/2011JD017187, 2012"
+  REF1 =  "morice12jgr"
+  REF2 =  "morice12jgr
   COMMENT1 = "Temperature time-series calculated from the anomaly " + \
     "time-series by adding the temperature climatology for 1961-1990"
   COMMENT2 = "Temperature anomaly with respect to the period 1961-1990"
