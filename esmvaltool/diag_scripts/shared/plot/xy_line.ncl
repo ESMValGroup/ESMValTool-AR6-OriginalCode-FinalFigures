@@ -1889,11 +1889,27 @@ begin
 
   copy_VarMeta(res_in, res)  ; copy passed resources
 
-  ; ***************************************
-  ; panel first two plots
-  ; ***************************************
-
   plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
+
+  ; ---------------------------------------------------------------------
+  ; Add multi model statistics (5% and 95% quantile)
+  ; ---------------------------------------------------------------------
+  ;if (isatt(diag_script_info, "stat_shading")) then
+  ;  if (diag_script_info@stat_shading .ne. False) then
+  ;    res_stat = True
+  ;    res_stat@gsnXYFillColors = "LightGrey"
+  ;    ;res_stat@gsnXYFillOpacities = 0.2
+  ;    copy_VarMeta(res, res_stat)
+  ;    delete(res_stat@xyLineColors)
+  ;    ; We don't want the line, so make it transparent.
+  ;    res_stat@xyLineColor = -1
+  ;    shading_plot = gsn_csm_xy(wks, source_x, source_stddev(0:1, :), \
+  ;                              res_stat)
+  ;    overlay(plot(0), shading_plot)
+  ;  end if
+  ;end if
+
+  ; ---------------------------------------------------------------------
 
   if (diag_script_info@ts_anomaly .eq. "anom") then
 
@@ -2145,7 +2161,6 @@ print("source = " + source)
   nexp     = tmp(0)
   delete(tmp)
 
-  ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
   cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
   res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
@@ -2171,15 +2186,12 @@ print("source = " + source)
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
       res_stat@gsnXYFillOpacities = 0.2
-      ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
       cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
       copy_VarMeta(res, res_stat)
       res_stat@gsnXYFillColors = cmap(0,:)
       delete(res_stat@xyLineColors)
       ; We don't want the line, so make it transparent.
       res_stat@xyLineColor = -1
-print("source_x = " + source_x)
-print("source_stat(0:1, 0, :) = " + source_stat(0:1, 0, :))
       shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                 res_stat)
       overlay(plot(0), shading_plot)

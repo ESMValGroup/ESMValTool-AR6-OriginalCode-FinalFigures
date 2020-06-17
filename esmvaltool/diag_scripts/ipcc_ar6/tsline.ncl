@@ -31,7 +31,6 @@
 ;             of years
 ;    header: if true, region name as header
 ;    write_stat: if true, write multi model statistics in nc-file
-;    stat: statistics for multi model nc-file (MinMax,5-95,10-90)
 ;
 ; Caveats
 ;
@@ -208,9 +207,6 @@ begin
     anom = "noanom"
   end if
 
-  ; TODO
-  model_arr_stddev = 0
-
   ; Create model array
   model_arr = new((/dim_MOD, ntime/), double)
   model_arr!0 = "model"
@@ -242,10 +238,32 @@ begin
         ; Determine start/end year
         start_year = info_items[imod]@start_year
         end_year = info_items[imod]@end_year
+        if (start_year .gt. diag_script_info@ref_start) then
+          ref_start = start_year
+        else
+          ref_start = diag_script_info@ref_start
+        end if
+        ; TODO
+        ; wrong time period saved in MultiModel file
+        if(info_items[imod]@project.eq."CMIP3" .and. datasetnames(imod) .eq. "MultiModelMean") then
+          ref_start = 1890
+          start_year = 1890
+        end if
+        if(info_items[imod]@project.eq."CMIP5" .and. datasetnames(imod) .eq. "MultiModelMean") then
+          ref_start = 1861
+          start_year = 1861
+        end if
+print("start_year: " + start_year)
+print("end_year: " + end_year)
+print("ref_start: " + ref_start)
+print("ref_end: " + ref_end)
         A_ref_mask = time_operations(A_ref, start_year, \
                                      end_year, "extract", "", 0)
         A0_nomask_ref = time_operations(A0, ref_start, \
                                         ref_end, "extract", "", 0)
+printVarSummary(A0)
+;print(cd_calendar(A0&time, 0))
+printVarSummary(A_ref_mask)
         A0 = where(A_ref_mask.eq.A_ref_mask@_FillValue, \
                    A_ref_mask@_FillValue, A0)
         delete(A_ref_mask)
@@ -286,6 +304,7 @@ begin
         delete(year)
         delete(month)
         delete(date)
+        delete(weights)
         delete(A0_monavg_ref)
 
         ; calculate global mean of reference period
@@ -411,35 +430,48 @@ begin
       ind_mod = ind(datasetnames.ne."MultiModelMean")
     end if
 
-    model_arr_stat = new((/4, ntime/), double)
+    model_arr_stat = new((/10, ntime/), double)
     model_arr_stat!0 = "stat"
     model_arr_stat!1 = "time"
     model_arr_stat&time = model_arr&time
-    model_arr_stat&stat = (/"mean", "min", "max", "ref"/)
+    model_arr_stat&stat = (/"mean", "stddev", "spread", "min", "5%", "10%", "90%", \
+                            "95%", "max", "ref"/)
 
     model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
     do i = 0, ntime-1
       statb = stat_dispersion(model_arr(ind_mod, i), False)
-      if (diag_script_info@stat .eq. "MinMax") then
-        ; min
-        model_arr_stat(1,i) = (/statb(2)/)
-        ; max
-        model_arr_stat(2, i) = (/statb(14)/)
-      elseif (diag_script_info@stat .eq. "5-95") then
-        ; 5% quantile
-        model_arr_stat(0, i) = (/statb(24)/)
-        ; 95% quantile
-        model_arr_stat(0,i) = (/statb(25)/)
-      elseif (diag_script_info@stat .eq. "10-90") then
-        ; 10% quantile
-        model_arr_stat(1, i) = (/statb(3)/)
-        ; 90% quantile
-        model_arr_stat(2, i) = (/statb(13)/)
-      end if
+      ; standard deviation
+      model_arr_stat(1, i) = (/statb(1)/)
+      ; spread
+      model_arr_stat(2, i) = (/statb(14)-statb(2)/)
+      ; min
+      model_arr_stat(3, i) = (/statb(2)/)
+      ; max
+      model_arr_stat(8, i) = (/statb(14)/)
+      ; 5% quantile
+      model_arr_stat(4, i) = (/statb(24)/)
+      ; 95% quantile
+      model_arr_stat(7,i) = (/statb(25)/)
+      ; 10% quantile
+      model_arr_stat(5, i) = (/statb(3)/)
+      ; 90% quantile
+      model_arr_stat(6, i) = (/statb(13)/)
     end do
     if (isatt(variable_info[0], "reference_dataset")) then
-      model_arr_stat(3, :) = (/model_arr(ref_ind, :)/)
+      model_arr_stat(9, :) = (/model_arr(ref_ind, :)/)
     end if
+
+;    ; add stddev to plot
+;    model_arr_stddev = new((/4, ntime/), double)
+;    model_arr_stddev(0, :) = model_arr_stat(0, :)
+;    model_arr_stddev(1, :) = model_arr_stat(1, :)
+;    model_arr_stddev(2, :) = model_arr_stat(0, :) - model_arr_stat(1, :)
+;    model_arr_stddev(3, :) = model_arr_stat(0, :) + model_arr_stat(1, :)
+;
+;  else
+;  
+;    model_arr_stddev = 0
+
   end if
 
   ; Convert time coordinate to years (required by the plot routine)
@@ -555,10 +587,20 @@ begin
 
   if (anom .eq. "anom") then
     xy_line_anom(wks, anom_ref, model_arr, model_arr&time, \
-                 model_arr_stddev, ref_start, ref_end, res, res0, info_items)
+                 0, ref_start, ref_end, res, res0, info_items)
+                 ;model_arr_stddev, ref_start, ref_end, res, res0, info_items)
   else
     xy_line(wks, model_arr, model_arr&time, model_arr_stddev, res, info_items)
   end if
+
+  ;outfile_stat = config_user_info@plot_dir + var0 + "_" \
+  ;  + str_sub_str(diag_script_info@region, " ", "_") \
+  ;  + "_" + project0 + "_" + exp0 + "_" + anom + "_" + run_ave + "_" \
+  ;  + start_year + "-" + end_year + "_stat"
+  ;wks = gsn_open_wks(file_type, outfile_stat)
+  ;xy_line_collect(wks, model_arr(mmm_ind, :), model_arr(ref_ind, :), model_arr&time, \
+  ;               model_arr_stddev(2:3, :), ref_start, ref_end, res, res0, info_items)
+
 
   log_info(" wrote " + outfile + "." + file_type)
 

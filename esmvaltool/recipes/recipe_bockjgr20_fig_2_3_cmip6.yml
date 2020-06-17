@@ -83,7 +83,7 @@ datasets:
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
 
 cmip6_hist_models_tas_era: &cmip6_hist_models_tas_era
-  - {dataset: AWI-CM-1-1-MR, grid: gn}
+  #- {dataset: AWI-CM-1-1-MR, grid: gn} #how to set version?
   - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 
 cmip6_hist_models_pr_gpcp: &cmip6_hist_models_pr_gpcp

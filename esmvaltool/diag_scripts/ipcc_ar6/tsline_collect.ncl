@@ -211,13 +211,13 @@ print("ii_n = " + ii_n)
       ;end if
       data_mean@units = data_temp@units
       if (isatt(diag_script_info, "ref")) then
-        data_ref(0, idx1:idx2)  = (/data_temp(3, :)/)
+        data_ref(0, idx1:idx2)  = (/data_temp(9, :)/)
         data_ref&dataset(0) = diag_script_info@ref
       end if
     end if
 
-    data_stat(0, ii_n, idx1:idx2) = data_temp(1, :)
-    data_stat(1, ii_n, idx1:idx2) = data_temp(2, :)
+    data_stat(0, ii_n, idx1:idx2) = data_temp(3, :) ;- data_temp(1, :)
+    data_stat(1, ii_n, idx1:idx2) = data_temp(8, :) ;+ data_temp(1, :)
 
     delete(data_temp)
 
