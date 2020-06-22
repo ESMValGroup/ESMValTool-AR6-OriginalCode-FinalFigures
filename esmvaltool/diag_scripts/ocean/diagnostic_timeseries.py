@@ -207,9 +207,10 @@ def calc_anomaly(cube, anomaly_period):
     constraint = iris.Constraint(
         time=lambda t: (t_1 < time_units.date2num(t.point) < t_2))
     cube_slice = cube.extract(constraint)
-    print(cube_slice)
-    cube_slice = climate_statistics(cube_slice,
-                                    operator='mean', period='full')
+    print(cube_slice, cube_slice.coord('time').bounds)
+
+    cube_slice = cube_slice.collapsed('time', iris.analysis.MEAN)
+
     cube.data = cube.data - cube_slice.data
     return cube
 
@@ -334,6 +335,14 @@ def multi_model_time_series(
     for filename in sorted(metadata):
         if metadata[filename]['frequency'] != 'fx':
             cube = iris.load_cube(filename)
+            try: 
+                bnds = cube.coord('time').bounds
+                if bnds == None: 
+                    print (" no bounds!")
+#                    continue
+            except: 
+                print("Failed to load bnds")
+#                continue
             cube = diagtools.bgc_units(cube, metadata[filename]['short_name'])
 
             cubes = diagtools.make_cube_layer_dict(cube)
@@ -374,13 +383,13 @@ def multi_model_time_series(
             if 'MultiModel' in metadata[filename]['dataset']:
                 timeplot(
                     cube,
-                    c=color,
+                    c='k',
                     # label=metadata[filename]['dataset'],
                     ls=':',
                     lw=2.,
                 )
                 plot_details[filename] = {
-                    'c': color,
+                    'c': 'k',
                     'ls': ':',
                     'lw': 2.,
                     'label': metadata[filename]['dataset']
@@ -437,7 +446,7 @@ def multi_model_time_series(
             )
 
         # Resize and add legend outside thew axes.
-        plt.gcf().set_size_inches(9., 6.)
+        plt.gcf().set_size_inches(12., 6.)
         diagtools.add_legend_outside_right(
             plot_details, plt.gca(), column_width=0.15)
 
@@ -488,6 +497,7 @@ def main(cfg):
             )
 
         for filename in sorted(metadatas):
+            continue
             if metadatas[filename]['frequency'] != 'fx':
                 logger.info('-----------------')
                 logger.info(
