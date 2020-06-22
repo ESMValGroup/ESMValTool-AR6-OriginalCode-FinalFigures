@@ -139,5 +139,5 @@ diagnostics:
         - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000,  end_year: 2000,  tier: 2}
     scripts:
       Regional_Ocean_DepthLayers_regrid_transect:
-        script: ocean/diagnostic_fig_3_17.py
+        script: ocean/diagnostic_basin_profile_bias.py
         observational_dataset: {dataset: WOA, project: OBS,}
