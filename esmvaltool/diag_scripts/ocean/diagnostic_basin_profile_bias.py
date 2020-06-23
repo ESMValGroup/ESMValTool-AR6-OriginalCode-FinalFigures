@@ -290,7 +290,8 @@ def standardize_depth_coord(cube):
 
 def make_multimodelmean_transects(
         cfg,
-        short_name = 'thetao'
+        short_name = 'thetao',
+        key = 'multimodel_mean'
 ):
     """
     Make a simple plot of the transect for an indivudual model.
@@ -321,7 +322,8 @@ def make_multimodelmean_transects(
             continue
         metadata = metadatas[filename]
         if metadata['short_name'] != short_name: continue
-        #if metadata['dataset'] == 'MRI-ESM1': continue
+        # if metadata['dataset'] == 'MRI-ESM1': 
+        #    continue
         cube = iris.load_cube(filename)
         cube = diagtools.bgc_units(cube, metadata['short_name'])
         cubes[metadata['dataset']] = cube
@@ -331,7 +333,19 @@ def make_multimodelmean_transects(
         return
     short_name = metadatas[filename]['short_name']
     # Take the multimodel mean.
+#    if key == 'multimodel_mean':
+#        cube = make_mean_of_cube_list(cubes, metadata['long_name'])
+    if key == 'CMIP5': 
+        assert 0
+    elif key == 'CMIP6':
+        assert 0
+    elif key in cubes.keys():
+        cubes = {key: cubes[key]}
+    if len(cubes) == 1:
+        print('length:', len(cubes), key, metadata['long_name'])
+
     cube = make_mean_of_cube_list(cubes, metadata['long_name'])
+
     print('model cube mean:' , cube.data.mean(), cube.units)
 
     cube = make_depth_safe(cube)
@@ -368,7 +382,7 @@ def make_multimodelmean_transects(
     title = titlify(title)
 
     # Saving cubes:
-    output_cube = diagtools.folder(cfg['work_dir']) + 'multi_model_mean_'+short_name+'.nc'
+    output_cube = diagtools.folder(cfg['work_dir']) + key + '_'+short_name+'.nc'
     logger.info('Saving cubes to %s', output_cube)
     iris.save(cube, output_cube)
 
@@ -414,16 +428,11 @@ def make_multimodelmean_transects(
 
     fig.subplots_adjust(hspace=0.01)
 
-    # Saving cubes:
-    output_cube = diagtools.folder(cfg['work_dir']) + 'multi_model_mean_'+short_name+'_diff.nc'
-    logger.info('Saving cubes to %s', output_cube)
-    iris.save(cube, output_cube)
-
     # Load image format extention
     image_extention = diagtools.get_image_format(cfg)
 
     # Determine image filename:
-    path = diagtools.folder(cfg['plot_dir'])+'fig_3_17_'+short_name +image_extention
+    path = diagtools.folder(cfg['plot_dir'])+'fig_basin_profile_bias_'+short_name +'_'+key+image_extention
 
     # Saving files:
     if cfg['write_plots']:
@@ -585,8 +594,17 @@ def main(cfg):
 
     """
     #####
-    make_multimodelmean_transects(cfg, short_name = 'thetao')
-    make_multimodelmean_transects(cfg, short_name = 'so')
+    metadatas = diagtools.get_input_files(cfg,)
+    model_names = {}
+    for filename in sorted(metadatas):
+        metadata = metadatas[filename]
+        model_names[metadata['dataset']] = True
+
+    for short_name in ['thetao', 'so']:
+       make_multimodelmean_transects(cfg, short_name = short_name)
+       for model_name in model_names:
+           make_multimodelmean_transects(cfg, short_name = short_name, key = model_name)
+
 
     # for index, metadata_filename in enumerate(cfg['input_files']):
     #     logger.info(
