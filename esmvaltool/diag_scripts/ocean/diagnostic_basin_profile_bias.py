@@ -227,7 +227,6 @@ def make_mean_of_cube_list(cube_list, long_name):
     #        units_str = '1.'
     #print('\n\ntaking mean:\n',cube_mean.metadata[4]['source_id'], cube_mean.coord(axis='Z'))
 
-    #print ('make_mean_of_cube_list: cube -1', cube_mean.data.mean())
     length = 1
     models_includes = {'pass' : [], 'fail':[]}
     for i, cube_name in enumerate(cube_names[1:]):
@@ -265,7 +264,7 @@ def make_mean_of_cube_list(cube_list, long_name):
     
     cube_mean = cube_mean/ float(length)
     #cube_mean.units = units_str
-    #print ('make_mean_of_cube_list: cube_mean', cube_mean.data.mean())
+    print('make_mean_of_cube_list: cube_mean', cube_mean.data.mean())
     # assert 0
     return cube_mean
 
@@ -309,16 +308,20 @@ def make_multimodelmean_transects(
     metadatas = diagtools.get_input_files(cfg,)
     obs_key = 'observational_dataset'
     obs_filename = ''
+    obs_dataset = ''
     obs_metadata = {}
     obs_filename = diagtools.match_model_to_key(obs_key,
                                       cfg[obs_key],
                                       metadatas,)
+
     print('obs_filename', obs_filename)
 
     # Load cube and set up units
     cubes = {}
+    projects ={'CMIP5':[], 'CMIP6':[]}
     for filename in sorted(metadatas):
         if filename == obs_filename:
+            obs_dataset = metadata['dataset']
             continue
         metadata = metadatas[filename]
         if metadata['short_name'] != short_name: continue
@@ -327,20 +330,28 @@ def make_multimodelmean_transects(
         cube = iris.load_cube(filename)
         cube = diagtools.bgc_units(cube, metadata['short_name'])
         cubes[metadata['dataset']] = cube
+        projects[metadata['project']].append(metadata['dataset'])
         print('loading:', metadata['dataset'], cube.data.mean(), cube.units )
     
-    if len(cubes) == 0:
-        return
     short_name = metadatas[filename]['short_name']
-    # Take the multimodel mean.
-#    if key == 'multimodel_mean':
-#        cube = make_mean_of_cube_list(cubes, metadata['long_name'])
+    obs_cube = iris.load_cube(obs_filename)
+    obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
+    obs_cube = standardize_depth_coord(obs_cube)
+    print('pre: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
+
+
     if key == 'CMIP5': 
-        assert 0
+        cubes = {key: cube for key, cube in cubes.items() if key in projects['CMIP5']}
     elif key == 'CMIP6':
-        assert 0
+        cubes = {key: cube for key, cube in cubes.items() if key in projects['CMIP6']}
+    elif key == obs_dataset:
+        cubes = {key: obs_cube}
     elif key in cubes.keys():
         cubes = {key: cubes[key]}
+
+    if len(cubes) == 0:
+       return
+
     if len(cubes) == 1:
         print('length:', len(cubes), key, metadata['long_name'])
 
@@ -350,11 +361,6 @@ def make_multimodelmean_transects(
 
     cube = make_depth_safe(cube)
     #cubes = make_cube_region_dict(cube)
-
-    obs_cube = iris.load_cube(obs_filename)
-    obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
-    obs_cube = standardize_depth_coord(obs_cube)
-    print('pre: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
 
     if metadata['long_name'] == 'Sea Water Potential Temperature':
         contours = [0, 5, 10, 15, 20, 25, 30, 35]
@@ -390,7 +396,8 @@ def make_multimodelmean_transects(
     logger.info('Saving cubes to %s', output_cube)
     iris.save(obs_cube, output_cube)
 
-
+    if cube == obs_cube:
+        assert 0
     cube = cube - obs_cube
     cmap = 'seismic'
     colour_range = diagtools.get_cube_range_diff([cube,])
@@ -595,7 +602,7 @@ def main(cfg):
     """
     #####
     metadatas = diagtools.get_input_files(cfg,)
-    model_names = {}
+    model_names = {'CMIP5':True, 'CMIP6':True}
     for filename in sorted(metadatas):
         metadata = metadatas[filename]
         model_names[metadata['dataset']] = True
