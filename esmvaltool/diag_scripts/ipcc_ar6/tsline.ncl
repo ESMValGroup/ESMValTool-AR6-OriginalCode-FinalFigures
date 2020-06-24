@@ -243,27 +243,10 @@ begin
         else
           ref_start = diag_script_info@ref_start
         end if
-        ; TODO
-        ; wrong time period saved in MultiModel file
-        if(info_items[imod]@project.eq."CMIP3" .and. datasetnames(imod) .eq. "MultiModelMean") then
-          ref_start = 1890
-          start_year = 1890
-        end if
-        if(info_items[imod]@project.eq."CMIP5" .and. datasetnames(imod) .eq. "MultiModelMean") then
-          ref_start = 1861
-          start_year = 1861
-        end if
-print("start_year: " + start_year)
-print("end_year: " + end_year)
-print("ref_start: " + ref_start)
-print("ref_end: " + ref_end)
         A_ref_mask = time_operations(A_ref, start_year, \
                                      end_year, "extract", "", 0)
         A0_nomask_ref = time_operations(A0, ref_start, \
                                         ref_end, "extract", "", 0)
-printVarSummary(A0)
-;print(cd_calendar(A0&time, 0))
-printVarSummary(A_ref_mask)
         A0 = where(A_ref_mask.eq.A_ref_mask@_FillValue, \
                    A_ref_mask@_FillValue, A0)
         delete(A_ref_mask)
@@ -409,6 +392,27 @@ printVarSummary(A_ref_mask)
 
   end do
 
+  ; Convert time coordinate to years (required by the plot routine)
+  if (time_avg.eq."monthly") then
+    year = model_arr&time / 100
+    xmin = toint(floor(min(year)))
+    xmax = toint(ceil(max(year)))
+    month = model_arr&time - 100 * year
+    time = todouble(year + month/12.)
+    delete(model_arr&time)
+    model_arr&time = time
+    delete(time)
+    delete(year)
+    delete(month)
+  elseif (time_avg.eq."yearly") then
+    xmin = toint(floor(min(model_arr&time)))
+    xmax = toint(ceil(max(model_arr&time)))
+    tmp = todouble(model_arr&time)
+    delete(model_arr&time)
+    model_arr&time = tmp
+    delete(tmp)
+  end if
+
   ; individual case for HadCRUT4 observations
   ; mean value comes from climatology file (absolute.nc).
   ; There are no missing values as in the anomaly data.
@@ -430,69 +434,37 @@ printVarSummary(A_ref_mask)
       ind_mod = ind(datasetnames.ne."MultiModelMean")
     end if
 
-    model_arr_stat = new((/10, ntime/), double)
-    model_arr_stat!0 = "stat"
-    model_arr_stat!1 = "time"
+    model_arr_stat = new((/ntime, 10/), double)
+    model_arr_stat!1 = "stat"
+    model_arr_stat!0 = "time"
     model_arr_stat&time = model_arr&time
     model_arr_stat&stat = (/"mean", "stddev", "spread", "min", "5%", "10%", "90%", \
                             "95%", "max", "ref"/)
 
-    model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
+    model_arr_stat(:, 0) = (/model_arr(mmm_ind, :)/)
     do i = 0, ntime-1
       statb = stat_dispersion(model_arr(ind_mod, i), False)
       ; standard deviation
-      model_arr_stat(1, i) = (/statb(1)/)
+      model_arr_stat(i, 1) = (/statb(1)/)
       ; spread
-      model_arr_stat(2, i) = (/statb(14)-statb(2)/)
+      model_arr_stat(i, 2) = (/statb(14)-statb(2)/)
       ; min
-      model_arr_stat(3, i) = (/statb(2)/)
+      model_arr_stat(i, 3) = (/statb(2)/)
       ; max
-      model_arr_stat(8, i) = (/statb(14)/)
+      model_arr_stat(i, 8) = (/statb(14)/)
       ; 5% quantile
-      model_arr_stat(4, i) = (/statb(24)/)
+      model_arr_stat(i, 4) = (/statb(24)/)
       ; 95% quantile
-      model_arr_stat(7,i) = (/statb(25)/)
+      model_arr_stat(i, 7) = (/statb(25)/)
       ; 10% quantile
-      model_arr_stat(5, i) = (/statb(3)/)
+      model_arr_stat(i, 5) = (/statb(3)/)
       ; 90% quantile
-      model_arr_stat(6, i) = (/statb(13)/)
+      model_arr_stat(i, 6) = (/statb(13)/)
     end do
     if (isatt(variable_info[0], "reference_dataset")) then
-      model_arr_stat(9, :) = (/model_arr(ref_ind, :)/)
+      model_arr_stat(:, 9) = (/model_arr(ref_ind, :)/)
     end if
 
-;    ; add stddev to plot
-;    model_arr_stddev = new((/4, ntime/), double)
-;    model_arr_stddev(0, :) = model_arr_stat(0, :)
-;    model_arr_stddev(1, :) = model_arr_stat(1, :)
-;    model_arr_stddev(2, :) = model_arr_stat(0, :) - model_arr_stat(1, :)
-;    model_arr_stddev(3, :) = model_arr_stat(0, :) + model_arr_stat(1, :)
-;
-;  else
-;  
-;    model_arr_stddev = 0
-
-  end if
-
-  ; Convert time coordinate to years (required by the plot routine)
-  if (time_avg.eq."monthly") then
-    year = model_arr&time / 100
-    xmin = toint(floor(min(year)))
-    xmax = toint(ceil(max(year)))
-    month = model_arr&time - 100 * year
-    time = todouble(year + month/12.)
-    delete(model_arr&time)
-    model_arr&time = time
-    delete(time)
-    delete(year)
-    delete(month)
-  elseif (time_avg.eq."yearly") then
-    xmin = toint(floor(min(model_arr&time)))
-    xmax = toint(ceil(max(model_arr&time)))
-    tmp = todouble(model_arr&time)
-    delete(model_arr&time)
-    model_arr&time = tmp
-    delete(tmp)
   end if
 
   ; *************************************

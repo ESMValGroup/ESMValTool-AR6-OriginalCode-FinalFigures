@@ -200,7 +200,7 @@ print("ii_n = " + ii_n)
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
     delete(date)
 
-    data_mean(ii_n, idx1:idx2)  = (/data_temp(0, :)/)
+    data_mean(ii_n, idx1:idx2)  = (/data_temp(:, 0)/)
     data_mean&experiment(ii_n) = data_temp@experiment
 
     if (ii .eq. 0) then
@@ -211,13 +211,36 @@ print("ii_n = " + ii_n)
       ;end if
       data_mean@units = data_temp@units
       if (isatt(diag_script_info, "ref")) then
-        data_ref(0, idx1:idx2)  = (/data_temp(9, :)/)
+        data_ref(0, idx1:idx2)  = (/data_temp(:, 9)/)
         data_ref&dataset(0) = diag_script_info@ref
       end if
     end if
 
-    data_stat(0, ii_n, idx1:idx2) = data_temp(3, :) ;- data_temp(1, :)
-    data_stat(1, ii_n, idx1:idx2) = data_temp(8, :) ;+ data_temp(1, :)
+print("mean")
+print(data_temp(:, 0))
+print("stddev")
+print(data_temp(:, 1))
+print("spread")
+print(data_temp(:, 2))
+print("min")
+print(data_temp(:, 3))
+print("max")
+print(data_temp(:, 8))
+print("obs")
+print(data_temp(:, 9))
+
+
+    ;dev from obs
+    ;data_stat(0, ii_n, idx1:idx2) = where( data_temp(:, 9) .gt. data_temp(:, 3), data_temp(:, 9) - data_temp(:, 3), data_temp(:, 3) - data_temp(:, 9))
+    ;data_stat(1, ii_n, idx1:idx2) = where( data_temp(:, 9) .gt. data_temp(:, 8), data_temp(:, 9) - data_temp(:, 8), data_temp(:, 8) - data_temp(:, 9))
+    ;; not working: rmsd of mmm to obs
+    ;; data_stat(0, ii_n, idx1:idx2) = sqrt(dim_avg_n_Wrap((data_temp(:, 0) - data_temp(:, 9)) ^ 2, 0))
+    ;stddev
+    data_stat(0, ii_n, idx1:idx2) = data_temp(:, 0) - data_temp(:, 1)
+    data_stat(1, ii_n, idx1:idx2) = data_temp(:, 0) + data_temp(:, 1)
+    ;minmax
+    ;data_stat(0, ii_n, idx1:idx2) = data_temp(:, 3) 
+    ;data_stat(1, ii_n, idx1:idx2) = data_temp(:, 8) 
 
     delete(data_temp)
 
