@@ -212,6 +212,8 @@ print("convert var_diff")
       plot_var@res_lbLabelBarOn = False
       plot_var@res_gsnLeftString = ""
       delete(plot_var@long_name)
+      plot_var@res_cnConstFLabelOn = False
+      plot_var@res_cnConstFEnableFill = True
       plot2 = zonalmean_profile(wks, plot_var, var0)
       overlay(plot, plot2)
       draw(plot)
