@@ -7,9 +7,12 @@
 ;
 ; Source
 ;    https://crudata.uea.ac.uk/cru/data/temperature/
+;    https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html
 ;
 ; Last access
-;    20190208
+;    20200625
+;    Attention: Files will be permanently updated with newer time periods,
+;               but file names will not be changed.
 ;
 ; Download and processing instructions
 ;    Download the dataset "HadCRUT4" (median temperature anomalies) and
@@ -78,8 +81,9 @@ begin
   TYPE = "ground"
 
   ; Global attributes
-  SOURCE = "https://crudata.uea.ac.uk/cru/data/temperature/"
-  REF =  "morice12jgr"
+  SOURCE = "https://crudata.uea.ac.uk/cru/data/temperature/, " + \
+    "https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html"
+  REF =  "Morice et al., J. Geophys. Res., doi:10.1029/2011JD017187, 2012"
   COMMENT1 = "Temperature time-series calculated from the anomaly " + \
     "time-series by adding the temperature climatology for 1961-1990"
   COMMENT2 = "Temperature anomaly with respect to the period 1961-1990"
