@@ -166,11 +166,7 @@ begin
         data_all(0, :, :) = data_temp
         data_all!1 = "models"
         data_all&models = data_temp&models
-print("data_temp&models")
-print(data_temp&models)
         projectnames = str_split(data_temp@projects, " ")
-print("projectnames")
-print(projectnames)
       end if
 
       ; Make sure model coordinate is consistent
@@ -186,8 +182,6 @@ print(projectnames)
         data_all(ii, :, :) = (/data_temp/)
         copy_VarCoords(data_temp, data_all(ii:ii, :, :))
       else
-print("data_temp&models")
-print(data_temp&models)
         projects = str_split(data_temp@projects, " ")
         do imod2 = 0, dimsizes(data_temp&models) - 1
           if (.not.any(data_temp&models(imod2).eq.data_all&models)) then
@@ -199,12 +193,7 @@ print(data_temp&models)
               (/data_temp&models(imod2)/)
             data_all := data_new
             delete(data_new)
-print("imod2 = " + imod2)
-print("data_temp&models")
-print(data_temp&models)
             projectnames := array_append_record(projectnames, projects(imod2), 0)
-print("projectnames")
-print(projectnames)
           else
             ; Loop over datasets of data
             do imod = 0, dimsizes(data_all&models) - 1
@@ -353,7 +342,7 @@ print(projectnames)
       end if
       if (n_proj .gt. 1) then
         id2 = ind(projectnames.eq.diag_script_info@project_order(1)) 
-        pid2 = sort_alphabetically(data_all&models(id2), -1, "begin")
+        pid2 = sort_alphabetically(data_temp&models(id2), -1, "begin")
         n2 = dimsizes(id2)
         if (dimsizes(dimsizes(data_all)).eq.3) then
           data_all(:, n1:(n1+n2-1), :) = data_temp(:, id2(pid2), :) 
@@ -362,7 +351,7 @@ print(projectnames)
         end if
         if (n_proj .gt. 2) then
           id3 = ind(projectnames.eq.diag_script_info@project_order(2)) 
-          pid3 = sort_alphabetically(data_all&models(id3), -1, "begin")
+          pid3 = sort_alphabetically(data_temp&models(id3), -1, "begin")
           n3 = dimsizes(id3)
           if (dimsizes(dimsizes(data_all)).eq.3) then
             data_all(:, (n1+n2):(n1+n2+n3-1), :) = data_temp(:, id3(pid3), :) 
