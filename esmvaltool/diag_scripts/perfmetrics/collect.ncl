@@ -370,7 +370,7 @@ print(projectnames)
             data_all(:, (n1+n2):(n1+n2+n3-1)) = data_temp(:, id3(pid3)) 
           end if
           if (n_proj .gt. 3) then
-            error_msg("w", DIAG_SCRIPT, "", "number of projects greater" +
+            error_msg("w", DIAG_SCRIPT, "", "number of projects greater" + \
                       "than 3, not implemented")
           end if
         end if

@@ -525,7 +525,7 @@ begin
   end do
 
   ; Draw a labelbar
-  resTxt@txFontHeightF = 0.015 * scale_font
+  resTxt@txFontHeightF = 0.012 * scale_font
   resTxt@txAngleF = 0.
   resTxt@txJust = "CenterLeft"
   height = res@vpHeightF / npos

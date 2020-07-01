@@ -189,17 +189,17 @@ datasets:
   - {<<: *cmip3, dataset: ncar_ccsm3_0, institute: NCAR}
   - {<<: *cmip3, dataset: ncar_pcm1, institute: NCAR}
   - {<<: *cmip3, dataset: ukmo_hadcm3, institute: UKMO}
-  #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO} #zg_missing years
+  #- {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO} #zg, ua, hus: missing years
   #CMIP6
   #- {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #tas: newest version only 1850
   - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   - {dataset: ACCESS-ESM1-5, institute: CSIRO, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   - {dataset: AWI-ESM-1-1-LR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  #- {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #rlut time not monotonic
   - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-  - {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, project: CMIP6}
+  #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}# different ensembles
   - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CESM2-FV2, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CESM2-WACCM, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
@@ -306,6 +306,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
@@ -430,6 +432,8 @@ diagnostics:
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
 
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
@@ -518,6 +522,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
@@ -603,6 +609,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
@@ -686,6 +694,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
@@ -766,6 +776,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
@@ -841,6 +853,7 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   
@@ -920,6 +933,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
@@ -1001,6 +1016,7 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
@@ -1076,12 +1092,13 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: AIRS, project: obs4mips, level: L3,
          version: RetStd-v5, tier: 1, start_year: 2003, end_year: 2010}
@@ -1151,6 +1168,8 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   
@@ -1234,12 +1253,13 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
@@ -1318,12 +1338,13 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
@@ -1403,12 +1424,13 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
@@ -1487,12 +1509,13 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
@@ -1501,103 +1524,6 @@ diagnostics:
       grading:
         <<: *grading_settings
 
-
-  ### ta: AIR TEMPERATURE (5 hPa) #############################################
-  ta5:
-    description: Air temperature at 5 hPa global.
-    themes:
-      - phys
-    realms:
-      - atmos
-    variables:
-      ta:
-        preprocessor: pp5
-        reference_dataset: ERA-Interim
-        alternative_dataset: NCEP
-        mip: Amon
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 1980
-        end_year: 1999
-    additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
-
-      - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
-      - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
-      - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-      - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
-  
-      - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
-
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      cycle: &cycle_settings
-        script: perfmetrics/main.ncl
-        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-        plot_type: cycle
-        # Time average ('opt' argument of time_operations.ncl)
-        time_avg: monthlyclim
-        # Region ('global', 'trop', 'nhext', 'shext')
-        region: global
-        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
-        plot_stddev: ref_model
-        # Plot legend in a separate file
-        legend_outside: true
-        # Plot style
-        styleset: CMIP5
 
 
   ### ta: AIR TEMPERATURE (850 hPa) ###########################################
@@ -1671,111 +1597,24 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
-      cycle:
-        <<: *cycle_settings
       grading:
         <<: *grading_settings
         # Metric ('RMSD', 'BIAS', taylor')
         metric: [RMSD, taylor]
         # Normalization ('mean', 'median', 'centered_median', 'none')
         normalization: [centered_median, none]
-
-
-  ### ta: AIR TEMPERATURE (30 hPa) ############################################
-  ta30:
-    description: Air temperature at 30 hPa global.
-    themes:
-      - phys
-    realms:
-      - atmos
-    variables:
-      ta:
-        preprocessor: pp30
-        reference_dataset: ERA-Interim
-        alternative_dataset: NCEP
-        mip: Amon
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 1980
-        end_year: 1999
-    additional_datasets:
-      - {dataset: ACCESS1-0}
-      - {dataset: ACCESS1-3}
-      - {dataset: bcc-csm1-1}
-      - {dataset: bcc-csm1-1-m}
-      - {dataset: BNU-ESM}
-      - {dataset: CanCM4}
-      - {dataset: CanESM2}
-      - {dataset: CCSM4}
-      - {dataset: CESM1-BGC}
-      - {dataset: CESM1-CAM5}
-      - {dataset: CESM1-CAM5-1-FV2}
-      - {dataset: CESM1-FASTCHEM}
-      - {dataset: CESM1-WACCM}
-      - {dataset: CMCC-CESM}
-      - {dataset: CMCC-CM}
-      - {dataset: CMCC-CMS}
-      - {dataset: CNRM-CM5}
-      - {dataset: CNRM-CM5-2}
-      - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
-      - {dataset: FGOALS-g2}
-      - {dataset: FGOALS-s2}
-      - {dataset: FIO-ESM}
-      - {dataset: GFDL-CM2p1}
-      - {dataset: GFDL-CM3}
-      - {dataset: GFDL-ESM2G}
-      - {dataset: GFDL-ESM2M}
-      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-      - {dataset: GISS-E2-H-CC}
-      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-      - {dataset: GISS-E2-R-CC}
-      - {dataset: HadCM3}
-      - {dataset: HadGEM2-AO}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
-      - {dataset: inmcm4}
-      - {dataset: IPSL-CM5A-LR}
-      - {dataset: IPSL-CM5A-MR}
-      - {dataset: IPSL-CM5B-LR}
-      - {dataset: MIROC4h}
-      - {dataset: MIROC5}
-      - {dataset: MIROC-ESM}
-      - {dataset: MIROC-ESM-CHEM}
-      - {dataset: MPI-ESM-LR}
-      - {dataset: MPI-ESM-MR}
-      - {dataset: MPI-ESM-P}
-      - {dataset: MRI-CGCM3}
-      - {dataset: MRI-ESM1}
-      - {dataset: NorESM1-M}
-      - {dataset: NorESM1-ME}
-
-      - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
-      - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
-      - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-      - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
-  
-      - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
-
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
-    scripts:
-      cycle:
-        <<: *cycle_settings
 
 
   ### ta: AIR TEMPERATURE (200 hPa) ###########################################
@@ -1849,19 +1688,18 @@ diagnostics:
       - {dataset: NorESM1-ME}
 
       - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+      - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
-      cycle:
-        <<: *cycle_settings
       grading:
         <<: *grading_settings
 
