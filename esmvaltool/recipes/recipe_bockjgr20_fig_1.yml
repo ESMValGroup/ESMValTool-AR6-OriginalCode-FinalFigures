@@ -30,6 +30,12 @@ preprocessors:
       statistics: [mean]
       exclude: [reference_dataset]
 
+  clim_global:
+    area_statistics:
+      operator: mean
+    annual_statistics:
+      operator: mean
+
 
 CMIP6_tas: &cmip6_tas
   - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
@@ -60,7 +66,7 @@ CMIP6_tas: &cmip6_tas
   - {dataset: GFDL-CM4, grid: gr1}
   - {dataset: GFDL-ESM4, grid: gr1}
   - {dataset: GISS-E2-1-G, grid: gn}
-  - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
+  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #permission denied
   - {dataset: GISS-E2-1-H, grid: gn}
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
   - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
@@ -80,7 +86,7 @@ CMIP6_tas: &cmip6_tas
   - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: NorESM2-MM, grid: gn, institute: NCC}
   - {dataset: SAM0-UNICON, grid: gn}
-  - {dataset: TaiESM1, grid: gn}
+  #- {dataset: TaiESM1, grid: gn} #permission denied
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2,
      end_year: 2017}
@@ -236,6 +242,9 @@ diagnostics:
     variables:
       tas: 
         <<: *var_tas
+      tasStderr:
+        <<: *var_tas
+        preprocessor: clim_global
     additional_datasets:
       - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
          start_year: 1850, end_year: 2017, tier: 2}
@@ -243,13 +252,14 @@ diagnostics:
       collect: 
         <<: *tsline_settings
         script: ipcc_ar6/tsline_collect.ncl
-        ancestors: [tas, 'fig_1_*/tsline_anom*']
+        ancestors: [tas, tasStderr, 'fig_1_*/tsline_anom*']
         start_year: 1850
         end_year: 2017
         ref: ["HadCRUT4"]
-        #order: ["CMIP6_historical", "CMIP5_historical", "CMIP3_20c3m"]
+        order: ["CMIP6_historical", "CMIP5_historical", "CMIP3_20c3m"]
         stat_shading: True
         ref_shading: False
+        ref_stderr: True
         #run_ave: 5
     
 
