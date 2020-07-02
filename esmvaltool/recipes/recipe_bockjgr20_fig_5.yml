@@ -719,7 +719,8 @@ diagnostics:
     variables:
       psl:
         preprocessor: ppNOLEV1
-        reference_dataset: ERA-Interim
+        reference_dataset: JRA-55
+        alternative_dataset: ERA-Interim
         mip: Amon
         project: CMIP5
         exp: historical
@@ -785,6 +786,7 @@ diagnostics:
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
+      - {dataset: JRA-55, project: ana4mips, type: reanalysis, tier: 1}
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
     scripts:
