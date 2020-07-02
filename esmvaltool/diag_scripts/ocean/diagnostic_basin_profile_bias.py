@@ -72,6 +72,61 @@ def titlify(title):
     return title
 
 
+def match_model_to_key(
+        model_type,
+        cfg_dict,
+        input_files_dict,
+        variable_group, 
+):
+    """
+    Match up model or observations dataset dictionairies from config file.
+
+    This function checks that the control_model, exper_model and
+    observational_dataset dictionairies from the recipe are matched with the
+    input file dictionairy in the cfg metadata.
+
+    Arguments
+    ---------
+    model_type: str
+        The string model_type to match (only used in debugging).
+    cfg_dict: dict
+        the config dictionairy item for this model type, parsed directly from
+        the diagnostics/ scripts, part of the recipe.
+    input_files_dict: dict
+        The input file dictionairy, loaded directly from the get_input_files()
+         function, in diagnostics_tools.py.
+
+    Returns
+    ---------
+    dict
+        A dictionairy of the input files and their linked details.
+    """
+    matched_keys = {}
+    print('variable_group', variable_group)
+    for input_file, intput_dict in input_files_dict.items():
+        print(input_file)
+        intersect_keys = intput_dict.keys() & cfg_dict.keys()
+        if input_file.find(variable_group) == -1: 
+            continue
+        print('maybe:',input_file)
+        match = True
+
+        for key in intersect_keys:
+            if intput_dict[key] == cfg_dict[key]:
+                matched_keys[key] = [intput_dict[key], cfg_dict[key]]
+                continue
+            match = False
+        if match:
+            print("Found obs file:", input_file, intput_dict, '\n',matched_keys)
+            return input_file
+    logger.warning("Unable to match model: %s", model_type)
+    assert 0
+    return ''
+
+
+
+
+
 def determine_transect_str(cube, region=''):
     """
     Determine the Transect String.
@@ -239,7 +294,6 @@ def make_mean_of_cube_list(cube_list, long_name):
             models_includes['fail'].append(cube_name)
             continue
 
-
         if long_name == 'Sea Water Potential Temperature':
             if mean < -200.:
                 cube.data += 273.15
@@ -290,7 +344,8 @@ def standardize_depth_coord(cube):
 def make_multimodelmean_transects(
         cfg,
         short_name = 'thetao',
-        key = 'multimodel_mean'
+        key = 'all', 
+        variable_group='global_thetao'
 ):
     """
     Make a simple plot of the transect for an indivudual model.
@@ -298,6 +353,10 @@ def make_multimodelmean_transects(
     This tool loads the cube from the file, checks that the units are
     sensible BGC units, checks for layers, adjusts the titles accordingly,
     determines the ultimate file name and format, then saves the image.
+
+    key can be a model name, a project name, 'all' or 'all-ensembles'.
+    when key is all, it first takes the model ensemble mean. ie each model gets one vote.
+    when key  all-ensembles, each ensemble member gets one vote.
 
     Parameters
     ----------
@@ -310,67 +369,104 @@ def make_multimodelmean_transects(
     obs_filename = ''
     obs_dataset = ''
     obs_metadata = {}
-    obs_filename = diagtools.match_model_to_key(obs_key,
+    print('=======\nStarting', short_name, variable_group, key)
+    obs_filename = match_model_to_key(obs_key,
                                       cfg[obs_key],
-                                      metadatas,)
+                                      metadatas,
+                                      variable_group,
+                                      )
 
-    print('obs_filename', obs_filename)
+    print('obs_filename', short_name,variable_group, key, obs_filename)
 
     # Load cube and set up units
     cubes = {}
-    projects ={'CMIP5':[], 'CMIP6':[]}
+    long_name = ''
     for filename in sorted(metadatas):
+        print('---------\n',filename)
+        metadata = metadatas[filename]
+        print(metadata['project'], metadata['short_name'], metadata['variable_group'])
+        print('looking for', short_name, variable_group, key )
         if filename == obs_filename:
             obs_dataset = metadata['dataset']
             continue
-        metadata = metadatas[filename]
-        if metadata['short_name'] != short_name: continue
-        # if metadata['dataset'] == 'MRI-ESM1': 
-        #    continue
+        if  metadata['project'] == 'OBS':
+            continue
+        if metadata['short_name'] != short_name: 
+            continue
+        if metadata['variable_group'] != variable_group: 
+            continue
+
+        project = metadata['project']
+        dataset = metadata['dataset']
+        ensemble = metadata['ensemble']
+        experiment = metadata['exp']
+
+        long_name =  metadata['long_name']
+
         cube = iris.load_cube(filename)
-        cube = diagtools.bgc_units(cube, metadata['short_name'])
-        cubes[metadata['dataset']] = cube
-        projects[metadata['project']].append(metadata['dataset'])
-        print('loading:', metadata['dataset'], cube.data.mean(), cube.units )
-    
-    short_name = metadatas[filename]['short_name']
+        cube = diagtools.bgc_units(cube, short_name)
+
+        index_tuple = (dataset, project, ensemble, experiment)
+        print('loading', index_tuple)
+        cubes[index_tuple] = cube.copy()
+        if filename.find(dataset) == -1: assert 0
+
+    print('all cubes found:', len(cubes), 'cubes')
+
+    if obs_filename.find(variable_group)==-1: 
+        assert 0
+
     obs_cube = iris.load_cube(obs_filename)
-    obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
+    obs_cube = diagtools.bgc_units(obs_cube, short_name)
     obs_cube = standardize_depth_coord(obs_cube)
-    print('pre: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
+    #rint('pre: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
+    print(key, cubes.keys())
 
-
-    if key == 'CMIP5': 
-        cubes = {key: cube for key, cube in cubes.items() if key in projects['CMIP5']}
-    elif key == 'CMIP6':
-        cubes = {key: cube for key, cube in cubes.items() if key in projects['CMIP6']}
-    elif key == obs_dataset:
+    if key == obs_dataset:
         cubes = {key: obs_cube}
-    elif key in cubes.keys():
-        cubes = {key: cubes[key]}
+    elif key in 'all':
+        datasets = {index[0]:True for index in cubes.keys()}
+        new_cubes = {}
+        for dataset in datasets.keys():
+            new_list = {index:cube for index:cube in cubes.items() if dataset in index}
+            new_cubes[dataset] = make_mean_of_cube_list(new_list, long_name)
+        cubes = new_cubes.copy()
+
+    elif key in ['', 'all-ensembles']:
+        pass
+    else:
+        cubes = {index: cube for index, cube in cubes.items() if key in index}
 
     if len(cubes) == 0:
        return
 
-    if len(cubes) == 1:
-        print('length:', len(cubes), key, metadata['long_name'])
+    print('key:', key, 'found:', len(cubes), 'cubes')
 
-    cube = make_mean_of_cube_list(cubes, metadata['long_name'])
+    if key in cubes.keys() and len(cubes) != 1:
+        print('WTF?', key, len(cubes), cubes)
+        assert 0
 
-    print('model cube mean:' , cube.data.mean(), cube.units)
+    print_cubes = True
+    if print_cubes:
+        print('key:',key)
+        print('cubes.keys():',cubes.keys())
+        print('\n\n\nThe following cubes ', len(cubes),'should all be ',key, ':\n', cubes)
+        for index, cube in cubes.items(): print (index,':\n', cube)
+
+    cube = make_mean_of_cube_list(cubes, long_name)
 
     cube = make_depth_safe(cube)
-    #cubes = make_cube_region_dict(cube)
 
-    if metadata['long_name'] == 'Sea Water Potential Temperature':
+    if long_name == 'Sea Water Potential Temperature':
         contours = [0, 5, 10, 15, 20, 25, 30, 35]
         diff_contours = [-3., -2, -1, 1, 2, 3]
         fmt = '%1.0f'
         diff_fmt = '%1.0f'
+        diff_clip = [-3.01, 3.01]
         cube.units = 'celsius'
         obs_cube.units = 'celsius'
 
-    if metadata['long_name'] == 'Sea Water Salinity':
+    if long_name == 'Sea Water Salinity':
         contours = [32, 32.5, 33, 33.5, 34, 34.5, 35, 35.5, 36 ]
         diff_contours = [ -1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1 ]
         fmt = '%1.1f'
@@ -380,11 +476,13 @@ def make_multimodelmean_transects(
         obs_cube.data = obs_cube.data * 1000.
     print('post: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
 
-
     # Add title to plot
+    ocean = ' '.join([variable_group.replace('so_', '').replace('thetao_', '').title(),
+                      'Ocean', ])
     title = ' '.join(
-        [metadata['long_name'], ])
-
+        [key, 
+         ocean, 
+         long_name, ])
     title = titlify(title)
 
     # Saving cubes:
@@ -399,26 +497,27 @@ def make_multimodelmean_transects(
     if cube == obs_cube:
         assert 0
     cube = cube - obs_cube
+    cube.data = np.ma.clip(cube.data, diff_clip[0], diff_clip[1])
     cmap = 'seismic'
     colour_range = diagtools.get_cube_range_diff([cube,])
 
     fig = plt.figure()
     ax1 = fig.add_subplot(211)
-    iris.plot.contourf(cube, 15, cmap=cmap, )#vmin=colour_range[0], vmax=colour_range[1] )
+    iris.plot.contourf(cube, 15, cmap=cmap,  vmin=diff_clip[0], vmax=diff_clip[1], extend='both')
     plt.ylim(1000, 0)
     plt.clim(colour_range)
     plt.title(title)
     plt.setp(ax1.get_xticklabels(), visible=False)
     plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
 
-    CS = iris.plot.contour(obs_cube, contours, colors='k' )
+    CS = iris.plot.contour(obs_cube, contours, colors='k')
     ax1.clabel(CS, CS.levels, inline=True, fontsize=10, fmt = fmt)
 
     CS_diff = iris.plot.contour(cube, diff_contours, colors='white' )
     ax1.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
 
     ax2 = fig.add_subplot(212)
-    iris.plot.contourf(cube, 14, cmap=cmap, )
+    iris.plot.contourf(cube, 14, cmap=cmap,  vmin=diff_clip[0], vmax=diff_clip[1], extend='both' )
     plt.ylim(5000, 1000)
     plt.clim(colour_range)
 
@@ -432,6 +531,10 @@ def make_multimodelmean_transects(
 
     CS_diff = iris.plot.contour(cube, diff_contours, colors='white')
     ax2.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
+    plt.text(0.9, 0.1, ocean,fontsize=10,
+        horizontalalignment='center',
+        verticalalignment='center',
+        transform = ax2.transAxes)
 
     fig.subplots_adjust(hspace=0.01)
 
@@ -439,7 +542,7 @@ def make_multimodelmean_transects(
     image_extention = diagtools.get_image_format(cfg)
 
     # Determine image filename:
-    path = diagtools.folder(cfg['plot_dir'])+'fig_basin_profile_bias_'+short_name +'_'+key+image_extention
+    path = diagtools.folder(cfg['plot_dir'])+'fig_basin_profile_bias_'+variable_group +'_'+key+image_extention
 
     # Saving files:
     if cfg['write_plots']:
@@ -455,119 +558,6 @@ def make_multimodelmean_transects(
 
 
 
-
-
-
-
-
-def make_transects_plots(
-        cfg,
-        metadata,
-        filename,
-        obs_filename,
-):
-    """
-    Make a simple plot of the transect for an indivudual model.
-
-    This tool loads the cube from the file, checks that the units are
-    sensible BGC units, checks for layers, adjusts the titles accordingly,
-    determines the ultimate file name and format, then saves the image.
-
-    Parameters
-    ----------
-    cfg: dict
-        the opened global config dictionairy, passed by ESMValTool.
-    metadata: dict
-        The metadata dictionairy for a specific model.
-    filename: str
-        The preprocessed model file.
-    obs_filename: str
-        Observartional filename
-
-    """
-    # Load cube and set up units
-    cube = iris.load_cube(filename)
-    cube = diagtools.bgc_units(cube, metadata['short_name'])
-
-    cube = make_depth_safe(cube)
-    cubes = make_cube_region_dict(cube)
-
-    print(obs_filename)
-    obs_cube = iris.load_cube(obs_filename)
-    obs_cube = diagtools.bgc_units(obs_cube, metadata['short_name'])
-    obs_cube = standardize_depth_coord(obs_cube)
- 
-    if metadata['long_name'] == 'Sea Water Potential Temperature':
-        contours = [0,5,  10, 15, 20, 25,30,35]
-        diff_contours = [-3., -2, -1, 1, 2, 3]
-    if metadata['long_name'] == 'Sea Water Salinity':
-        contours = [30, 31, 32, 33, 34, 35, 36 ]
-        diff_contours = [ -1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1 ]
-        obs_cube.data = obs_cube.data * 1000.
-    for region, cube in cubes.items():
-        # Add title to plot
-        title = ' '.join(
-            [metadata['dataset'], metadata['long_name']])
-
-        title = titlify(title)
-
-        cube = cube - obs_cube
-
-        cmap = 'seismic'
-        colour_range = diagtools.get_cube_range_diff([cube,])
-
-        #f, (ax1, ax2,) = plt.subplots(2, sharex=True, sharey=False)
-        fig = plt.figure()
-        ax1 = fig.add_subplot(211)
-        iris.plot.contourf(cube, 15, cmap=cmap, )#vmin=colour_range[0], vmax=colour_range[1] )
-        plt.ylim(1000, 0)
-        plt.clim(colour_range)
-        plt.title(title)
-        plt.setp(ax1.get_xticklabels(), visible=False)
-        plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
-
-        CS = iris.plot.contour(obs_cube, contours, colors='k' )
-        ax1.clabel(CS, CS.levels, inline=True, fontsize=10)
-
-        CS_diff = iris.plot.contour(cube, diff_contours, colors='white' )
-        ax1.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10)
-
-        ax2 = fig.add_subplot(212)
-        iris.plot.contourf(cube, 14, cmap=cmap, )#vmin=colour_range[0], vmax=colour_range[1] )
-        plt.ylim(5000, 1000)
-        plt.clim(colour_range)
-
-        locs, labels = plt.yticks()
-        ax2.set_yticks([2000, 3000, 4000, 5000,])
-        plt.colorbar(orientation='horizontal')
-        plt.clim(colour_range)
-
-        CS = iris.plot.contour(obs_cube, contours, colors='k' )
-        ax2.clabel(CS, CS.levels, inline=True, fontsize=10)
-
-        CS_diff = iris.plot.contour(cube, diff_contours, colors='white' )
-        ax2.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10)
-
-        fig.subplots_adjust(hspace=0.01)
-
-        #plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
-
-        # Load image format extention
-        image_extention = diagtools.get_image_format(cfg)
-
-        # Determine image filename:
-        path = diagtools.get_image_path(
-            cfg,
-            metadata,
-            suffix=region + 'transect' + image_extention,
-        )
-
-        # Saving files:
-        if cfg['write_plots']:
-            logger.info('Saving plots to %s', path)
-            plt.savefig(path)
-
-        plt.close()
 
 
 def add_sea_floor(cube):
@@ -602,15 +592,20 @@ def main(cfg):
     """
     #####
     metadatas = diagtools.get_input_files(cfg,)
-    model_names = {'CMIP5':True, 'CMIP6':True}
+    model_names = {'CMIP5':True, 'CMIP6':True, 'all': True, 'all_ensembles':True}
+    short_names = {}
     for filename in sorted(metadatas):
         metadata = metadatas[filename]
         model_names[metadata['dataset']] = True
+        short_names[metadata['short_name']] = True
 
-    for short_name in ['thetao', 'so']:
-       make_multimodelmean_transects(cfg, short_name = short_name)
-       for model_name in model_names:
-           make_multimodelmean_transects(cfg, short_name = short_name, key = model_name)
+    variable_group_suffixes = ['_global', '_indian', '_pacific', '_atlantic']
+    for short_name in short_names.keys():
+        for var_group in variable_group_suffixes:
+            variable_group = short_name+var_group
+
+            for model_name in model_names:
+                make_multimodelmean_transects(cfg, short_name = short_name, key = model_name, variable_group=variable_group)
 
 
     # for index, metadata_filename in enumerate(cfg['input_files']):

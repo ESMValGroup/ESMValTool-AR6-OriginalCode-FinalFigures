@@ -49,12 +49,14 @@ diagnostics:
     variables:
       thetao: # Temperature ocean 3D
         preprocessor: prep_transect
-        #field: TO3M
         mip: Omon
         exp: historical
         start_year: 1975
         end_year: 2000
-    additional_datasets:
+        additional_datasets: &dataset_anchor
+            # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
+            - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000, end_year: 2000,  tier: 2}
+        #
         # ALL CMIP5 - 22/8/2019
         # find /badc/cmip5/data/cmip5/output1/*/*/historical/mon/ocean/Omon/r1i1p1/latest/thetao -type d
         # - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical,  }
@@ -81,8 +83,8 @@ diagnostics:
 #        # - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
-        - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
-        - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+            - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: MPI-ESM-P, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
@@ -105,7 +107,6 @@ diagnostics:
 #        - {dataset: CESM1-CAM5, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: CESM1-FASTCHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: CESM1-WACCM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
-
         # All CMIP6 - 22/8/2019
         # find /badc/cmip6/data/CMIP6/CMIP/*/*/historical/r1i1p1f?/Omon/thetao -type d -maxdepth 0
         # - {dataset: AWI-CM-1-1-MR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # missing coordinate
@@ -118,14 +119,19 @@ diagnostics:
 #        - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data.
 #        # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
-#        - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
+            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
 #        - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, }
 #        - {dataset: CESM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: GFDL-CM4, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: SAM0-UNICON, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # problem with longitude
-        # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
-        - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000, end_year: 2000,  tier: 2}
+      so: # Salinty ocean 3D
+        preprocessor: prep_transect
+          mip: Omon
+          exp: historical
+          start_year: 1975
+          end_year: 2000
+          additional_datasets: *dataset_anchor
     scripts:
       Regional_Ocean_DepthLayers_regrid_transect:
         script: ocean/diagnostic_basin_profile_bias.py
