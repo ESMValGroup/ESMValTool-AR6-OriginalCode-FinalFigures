@@ -46,8 +46,8 @@ datasets:
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   - {dataset: E3SM-1-0}
-  - {dataset: E3SM-1-1, institute: E3SM-Project}
-  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
+  #- {dataset: E3SM-1-1, institute: E3SM-Project} # strange values in ta e.g. 925hPa
+  #- {dataset: E3SM-1-1-ECA, institute: E3SM-Project} # strange values in ta e.g. 925hPa
   #- {dataset: EC-Earth3, ensemble: r22i1p1f1}
   #- {dataset: EC-Earth3-Veg} #no hus data after 1995
   - {dataset: FGOALS-f3-L} 
@@ -55,9 +55,9 @@ datasets:
   #- {dataset: FIO-ESM-2-0, grid: gn} #lat is not monotonic
   - {dataset: GFDL-CM4, grid: gr1}
   - {dataset: GFDL-ESM4, grid: gr1}
-  - {dataset: GISS-E2-1-G, grid: gn}
-  - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
-  - {dataset: GISS-E2-1-H, grid: gn}
+  #- {dataset: GISS-E2-1-G, grid: gn} # strange values in hus e.g. 925hPa
+  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} # permission denied
+  #- {dataset: GISS-E2-1-H, grid: gn} # strange values in hus e.g. 925hPa
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
   - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
   - {dataset: INM-CM4-8, grid: gr1}
@@ -76,7 +76,7 @@ datasets:
   - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: NorESM2-MM, grid: gn, institute: NCC}
   - {dataset: SAM0-UNICON, grid: gn}
-  - {dataset: TaiESM1, grid: gn}
+  #- {dataset: TaiESM1, grid: gn} # permission denied
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
   #- {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
