@@ -1,5 +1,5 @@
 """
-Figure 3.21
+Figure surface_salinity_trends (3.26 - previously 3.21)
 ======================================
 
 This tool is part of the ocean diagnostic tools package in the ESMValTool,
@@ -381,7 +381,7 @@ def main(cfg):
 
     #############################################
     # Determine image filename:
-    path = diagtools.folder(cfg['plot_dir']) + 'fig_3_21' + image_extention
+    path = diagtools.folder(cfg['plot_dir']) + 'surface_salinity_trends' + image_extention
 
     # Saving files:
     if cfg['write_plots']:
