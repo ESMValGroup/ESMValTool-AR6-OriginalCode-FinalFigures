@@ -236,9 +236,9 @@ diagnostics:
 #        - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } #lat/lon
 #        - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
-#        - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data.
+            - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data.
 #        # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
-            - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
+#            - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
             - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
             - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r2i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
 
@@ -295,44 +295,44 @@ diagnostics:
   # --------------------------------------------------
   # Surface diagnostics
   # --------------------------------------------------
-  diag_surface_thetao:
-    variables:
-      thetao_global_surface: # Temperature ocean 3D
-        short_name: thetao
-        preprocessor: prep_map_global
-        mip: Omon
-        exp: historical
-        start_year: 1995
-        end_year: 1999
-        additional_datasets: *dataset_anchor
-      thetao_global_atlantic: # Temperature ocean 3D
-        short_name: thetao
-        preprocessor: prep_map_atlantic
-        mip: Omon
-        exp: historical
-        start_year: 1995
-        end_year: 1999
-        additional_datasets: *dataset_anchor
-      thetao_global_indian: # Temperature ocean 3D
-        short_name: thetao
-        preprocessor: prep_map_indian
-        mip: Omon
-        exp: historical
-        start_year: 1995
-        end_year: 1999
-        additional_datasets: *dataset_anchor
-      thetao_global_pacific: # Temperature ocean 3D
-        short_name: thetao
-        preprocessor: prep_map_pacific
-        mip: Omon
-        exp: historical
-        start_year: 1995
-        end_year: 1999
-        additional_datasets: *dataset_anchor
-
-    scripts:
-      surface_map:
-        script: ocean/diagnostic_maps.py
-        observational_dataset: {dataset: WOA, project: OBS,}
+#  diag_surface_thetao:
+#    variables:
+#      thetao_global_surface: # Temperature ocean 3D
+#        short_name: thetao
+#        preprocessor: prep_map_global
+#        mip: Omon
+#        exp: historical
+#        start_year: 1995
+#        end_year: 1999
+#        additional_datasets: *dataset_anchor
+#      thetao_global_atlantic: # Temperature ocean 3D
+#        short_name: thetao
+#        preprocessor: prep_map_atlantic
+#        mip: Omon
+#        exp: historical
+#        start_year: 1995
+#        end_year: 1999
+#        additional_datasets: *dataset_anchor
+#      thetao_global_indian: # Temperature ocean 3D
+#        short_name: thetao
+#        preprocessor: prep_map_indian
+#        mip: Omon
+#        exp: historical
+#        start_year: 1995
+#        end_year: 1999
+#        additional_datasets: *dataset_anchor
+#      thetao_global_pacific: # Temperature ocean 3D
+#        short_name: thetao
+#        preprocessor: prep_map_pacific
+#        mip: Omon
+#        exp: historical
+#        start_year: 1995
+#        end_year: 1999
+#        additional_datasets: *dataset_anchor
+#
+#    scripts:
+#      surface_map:
+#        script: ocean/diagnostic_maps.py
+#        observational_dataset: {dataset: WOA, project: OBS,}
 
 

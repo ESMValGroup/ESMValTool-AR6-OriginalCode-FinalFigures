@@ -21,12 +21,13 @@ documentation:
 # TODO: Figure out the observational data. CORA is not gridded.
 
 preprocessors:
-  prep_3_21:
+  prep_sal_surf:
     custom_order: true
     # extract_levels:
     #   levels:  [0., ]
     #   scheme: linear_horizontal_extrapolate_vertical
-    time_average:
+    time_statistics:
+        operation: mean
     regrid:
       target_grid: 1x1
       scheme: linear
@@ -43,8 +44,7 @@ diagnostics:
   diag_3_21:
     variables:
       sos: # Salinity ocean surface 2D
-        preprocessor: prep_3_21
-        field: TOsM
+        preprocessor: prep_sal_surf
         project: CMIP5
         mip: Omon
         ensemble: r1i1p1
@@ -79,7 +79,7 @@ diagnostics:
         - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2050, end_year: 2099}
 
     #   sos: # Salinity ocean surface 2D
-    #     preprocessor: prep_3_21
+    #     preprocessor: prep_sal_surf
     #     field: TOsM
     #     additional_datasets:
     #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1950}
