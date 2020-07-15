@@ -3,10 +3,10 @@
 ---
 documentation:
   description: |
-    Recipe to produce figure 3.21 for IPCC WG1
+    Recipe to produce surface salinity trends figure 3.26 (previously 3.21) for IPCC WG1
 
   authors:
-    - demo_le
+    - demora_lee
 
   references:
     - demora2018gmd
@@ -26,8 +26,8 @@ preprocessors:
     # extract_levels:
     #   levels:  [0., ]
     #   scheme: linear_horizontal_extrapolate_vertical
-    time_statistics:
-        operation: mean
+    climate_statistics:
+      operator: mean
     regrid:
       target_grid: 1x1
       scheme: linear
@@ -50,33 +50,33 @@ diagnostics:
         ensemble: r1i1p1
         additional_datasets:
         # CanESM2, HadGEM2-ES, GFDL-ESM2M, MPI-ESM-MR
-        # - {dataset: HadGEM2-ES, exp: historical, start_year: 1950, end_year: 1950}
-        # - {dataset: HadGEM2-ES, exp: historical, start_year: 2000, end_year: 2000}
-        # - {dataset: HadGEM2-ES, exp: historical, start_year: 1950, end_year: 2000}
-        # - {dataset: HadGEM2-ES, exp: rcp85,      start_year: 2050, end_year: 2050}
-        # - {dataset: HadGEM2-ES, exp: rcp85,      start_year: 2099, end_year: 2099}
-        # - {dataset: HadGEM2-ES, exp: rcp85,      start_year: 2050, end_year: 2099}
+         - {dataset: HadGEM2-ES, exp: historical, start_year: 1950, end_year: 1950}
+         - {dataset: HadGEM2-ES, exp: historical, start_year: 2000, end_year: 2000}
+         - {dataset: HadGEM2-ES, exp: historical, start_year: 1950, end_year: 2000}
+         - {dataset: HadGEM2-ES, exp: rcp85,      start_year: 2050, end_year: 2050}
+         - {dataset: HadGEM2-ES, exp: rcp85,      start_year: 2099, end_year: 2099}
+         - {dataset: HadGEM2-ES, exp: rcp85,      start_year: 2050, end_year: 2099}
 
-        - {dataset: CanESM2, exp: historical, start_year: 1950, end_year: 1950}
-        - {dataset: CanESM2, exp: historical, start_year: 2000, end_year: 2000}
-        - {dataset: CanESM2, exp: historical, start_year: 1950, end_year: 2000}
-        - {dataset: CanESM2, exp: rcp85,      start_year: 2050, end_year: 2050}
-        - {dataset: CanESM2, exp: rcp85,      start_year: 2099, end_year: 2099}
-        - {dataset: CanESM2, exp: rcp85,      start_year: 2050, end_year: 2099}
-
-        - {dataset: GFDL-ESM2M, exp: historical, start_year: 1950, end_year: 1950}
-        - {dataset: GFDL-ESM2M, exp: historical, start_year: 2000, end_year: 2000}
-        - {dataset: GFDL-ESM2M, exp: historical, start_year: 1950, end_year: 2000}
-        - {dataset: GFDL-ESM2M, exp: rcp85,      start_year: 2050, end_year: 2050}
-        - {dataset: GFDL-ESM2M, exp: rcp85,      start_year: 2099, end_year: 2099}
-        - {dataset: GFDL-ESM2M, exp: rcp85,      start_year: 2050, end_year: 2099}
-
-        - {dataset: MPI-ESM-MR, exp: historical, start_year: 1950, end_year: 1950}
-        - {dataset: MPI-ESM-MR, exp: historical, start_year: 2000, end_year: 2000}
-        - {dataset: MPI-ESM-MR, exp: historical, start_year: 1950, end_year: 2000}
-        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2050, end_year: 2050}
-        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2099, end_year: 2099}
-        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2050, end_year: 2099}
+#        - {dataset: CanESM2, exp: historical, start_year: 1950, end_year: 1950}
+#        - {dataset: CanESM2, exp: historical, start_year: 2000, end_year: 2000}
+#        - {dataset: CanESM2, exp: historical, start_year: 1950, end_year: 2000}
+#        - {dataset: CanESM2, exp: rcp85,      start_year: 2050, end_year: 2050}
+#        - {dataset: CanESM2, exp: rcp85,      start_year: 2099, end_year: 2099}
+#        - {dataset: CanESM2, exp: rcp85,      start_year: 2050, end_year: 2099}
+#
+#        - {dataset: GFDL-ESM2M, exp: historical, start_year: 1950, end_year: 1950}
+#        - {dataset: GFDL-ESM2M, exp: historical, start_year: 2000, end_year: 2000}
+#        - {dataset: GFDL-ESM2M, exp: historical, start_year: 1950, end_year: 2000}
+#        - {dataset: GFDL-ESM2M, exp: rcp85,      start_year: 2050, end_year: 2050}
+#        - {dataset: GFDL-ESM2M, exp: rcp85,      start_year: 2099, end_year: 2099}
+#        - {dataset: GFDL-ESM2M, exp: rcp85,      start_year: 2050, end_year: 2099}
+#
+#        - {dataset: MPI-ESM-MR, exp: historical, start_year: 1950, end_year: 1950}
+#        - {dataset: MPI-ESM-MR, exp: historical, start_year: 2000, end_year: 2000}
+#        - {dataset: MPI-ESM-MR, exp: historical, start_year: 1950, end_year: 2000}
+#        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2050, end_year: 2050}
+#        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2099, end_year: 2099}
+#        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2050, end_year: 2099}
 
     #   sos: # Salinity ocean surface 2D
     #     preprocessor: prep_sal_surf
