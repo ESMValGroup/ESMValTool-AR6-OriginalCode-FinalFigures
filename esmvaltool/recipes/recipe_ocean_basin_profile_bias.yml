@@ -201,9 +201,9 @@ diagnostics:
 #        # - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
-            - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#            - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
             - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
-            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r2i1p1, mip: Omon, exp: historical, }
+              #            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r2i1p1, mip: Omon, exp: historical, }
 
 #        - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
@@ -241,6 +241,8 @@ diagnostics:
 #            - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
             - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
             - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r2i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
+#            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
+#            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r2i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
 
 #        - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, }
@@ -272,20 +274,44 @@ diagnostics:
         end_year: 1999
         additional_datasets: *dataset_anchor
 
-#      so: # Salinty ocean 3D
-#        preprocessor: prep_global
-#        mip: Omon
-#        exp: historical
-#        start_year: 1995
-#        end_year: 1999
-#        additional_datasets: *dataset_anchor
-#      so: # Salinty ocean 3D
-#        preprocessor: prep_atlantic
-#        mip: Omon
-#        exp: historical
-#        start_year: 1995
-#        end_year: 1999
-#        additional_datasets: *dataset_anchor
+      so_global: # Salinty ocean 3D
+        short_name: so
+        preprocessor: prep_global
+        mip: Omon
+        exp: historical
+        start_year: 1995
+        end_year: 1999
+        additional_datasets: &dataset_anchor_so
+            # https://data.nodc.noaa.gov/woa/WOA13/DATAv2/
+            - {dataset: WOA,  project: OBS,  type: clim,  version: 2013v2,  start_year: 2000, end_year: 2000,  tier: 2}
+            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+
+      so_atlantic:
+        short_name: so
+        preprocessor: prep_atlantic
+        mip: Omon
+        exp: historical
+        start_year: 1995
+        end_year: 1999
+        additional_datasets: *dataset_anchor_so
+      so_indian:
+        short_name: so
+        preprocessor: prep_indian
+        mip: Omon
+        exp: historical
+        start_year: 1995
+        end_year: 1999
+        additional_datasets: *dataset_anchor_so
+      so_pacific:
+        short_name: so
+        preprocessor: prep_pacific
+        mip: Omon
+        exp: historical
+        start_year: 1995
+        end_year: 1999
+        additional_datasets: *dataset_anchor_so
+
+        
     scripts:
       Ocean_basin_profile_bias:
         script: ocean/diagnostic_basin_profile_bias.py
@@ -334,5 +360,4 @@ diagnostics:
 #      surface_map:
 #        script: ocean/diagnostic_maps.py
 #        observational_dataset: {dataset: WOA, project: OBS,}
-
 
