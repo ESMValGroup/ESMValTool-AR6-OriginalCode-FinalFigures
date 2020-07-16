@@ -52,7 +52,8 @@ diagnostics:
         preprocessor: prep_annual
         additional_datasets: *dataset_anchor
 
-    diagnostic_3_20:
-      script: ocean/diagnostic_chap3_ocean_heat_content.py
+    scripts:
+      diagnostic:
+        script: ocean/diagnostic_chap3_ocean_heat_content.py
 
 
