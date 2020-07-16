@@ -45,7 +45,6 @@ diagnostics:
     variables:
       sos: # Salinity ocean surface 2D
         preprocessor: prep_sal_trends
-        field: TOsM
         project: CMIP5
         mip: Omon
         ensemble: r1i1p1
@@ -81,7 +80,6 @@ diagnostics:
 
     #   sos: # Salinity ocean surface 2D
     #     preprocessor: prep_sal_trends
-    #     field: TOsM
     #     additional_datasets:
     #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1950}
     #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 2000, end_year: 2000}

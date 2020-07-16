@@ -236,9 +236,11 @@ diagnostics:
 #        - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } #lat/lon
 #        - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
 #        - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, }
-#        - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data.
+            - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, } # extra field in data.
 #        # - {dataset: MIROC6, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, }
 #            - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, } # time
+            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
+            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r2i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
 #            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
 #            - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r2i1p1f2, grid: gn, mip: Omon, exp: historical, } # time
 
@@ -310,13 +312,6 @@ diagnostics:
         additional_datasets: *dataset_anchor_so
 
         
-#      so: # Salinty ocean 3D
-#        preprocessor: prep_atlantic
-#        mip: Omon
-#        exp: historical
-#        start_year: 1995
-#        end_year: 1999
-#        additional_datasets: *dataset_anchor
     scripts:
       Ocean_basin_profile_bias:
         script: ocean/diagnostic_basin_profile_bias.py
@@ -365,5 +360,4 @@ diagnostics:
 #      surface_map:
 #        script: ocean/diagnostic_maps.py
 #        observational_dataset: {dataset: WOA, project: OBS,}
-#
 
