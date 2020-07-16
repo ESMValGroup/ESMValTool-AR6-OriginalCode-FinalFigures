@@ -428,7 +428,7 @@ def make_multimodelmean_transects(
         datasets = {index[0]:True for index in cubes.keys()}
         new_cubes = {}
         for dataset in datasets.keys():
-            new_list = {index:cube for index:cube in cubes.items() if dataset in index}
+            new_list = {index:cube for index, cube in cubes.items() if dataset in index}
             new_cubes[dataset] = make_mean_of_cube_list(new_list, long_name)
         cubes = new_cubes.copy()
 

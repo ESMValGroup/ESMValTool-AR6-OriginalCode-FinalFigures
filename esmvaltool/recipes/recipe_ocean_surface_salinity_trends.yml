@@ -21,7 +21,7 @@ documentation:
 # TODO: Figure out the observational data. CORA is not gridded.
 
 preprocessors:
-  prep_3_21:
+  prep_sal_trends:
     custom_order: true
     # extract_levels:
     #   levels:  [0., ]
@@ -41,10 +41,10 @@ preprocessors:
     #   statistics: [mean ]
 
 diagnostics:
-  diag_3_21:
+  diag_sal_trends:
     variables:
       sos: # Salinity ocean surface 2D
-        preprocessor: prep_3_21
+        preprocessor: prep_sal_trends
         field: TOsM
         project: CMIP5
         mip: Omon
@@ -80,7 +80,7 @@ diagnostics:
 #        - {dataset: MPI-ESM-MR, exp: rcp85,      start_year: 2050, end_year: 2099}
 
     #   sos: # Salinity ocean surface 2D
-    #     preprocessor: prep_3_21
+    #     preprocessor: prep_sal_trends
     #     field: TOsM
     #     additional_datasets:
     #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: historical, ensemble: r1i1p1, start_year: 1950, end_year: 1950}
@@ -90,5 +90,5 @@ diagnostics:
     #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2099, end_year: 2099}
     #     - {dataset: HadGEM2-ES, project: CMIP5, mip: Omon, exp: rcp85,      ensemble: r1i1p1, start_year: 2050, end_year: 2099}
     scripts:
-      diagnostic_3_21:
-        script: ocean/diagnostic_fig_3_21.py
+      diagnostic_sal_trends:
+        script: ocean/diagnostic_surface_salinity_trends.py
