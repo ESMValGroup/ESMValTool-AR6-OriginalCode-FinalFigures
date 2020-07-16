@@ -43,11 +43,11 @@ diagnostics:
         preprocessor: prep_annual
         additional_datasets: &dataset_anchor
           - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-aer, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-GHG, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
-          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-nat, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+#          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-aer, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+#          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-GHG, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+#          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-nat, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
           - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329}
-      thetao:
+      volcello:
         short_name: volcello
         preprocessor: prep_annual
         additional_datasets: *dataset_anchor

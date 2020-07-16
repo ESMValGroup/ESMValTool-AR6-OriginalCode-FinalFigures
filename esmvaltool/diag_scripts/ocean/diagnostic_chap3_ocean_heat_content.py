@@ -788,10 +788,11 @@ def maenumerate(marr):
 
 
 
-def calc_pi_trend(cfg, filename, method='linear regression', overwite=False):
+def calc_pi_trend(cfg, filename, method='linear regression', overwite=True ):
     """
     Calculate the trend in the 
     """
+    assert 0
     exp = metadatas[filename]['exp']
     short_name = metadatas[filename]['short_name']
     dataset = metadatas[filename]['dataset']
@@ -818,6 +819,7 @@ def calc_pi_trend(cfg, filename, method='linear regression', overwite=False):
     intercepts = {}
     shape = cube.shape[1:]
     for index, arr in maenumerate(cube.data[0,:,:,:]):
+        print(index)
         linreg = linregress(decimal_time, cube.data[:, index[0], index[1], index[2]])
         # linreg = linregress( np.arange(len(decimal_time)), pi_cube.data)
 
@@ -836,7 +838,7 @@ def calc_pi_trend(cfg, filename, method='linear regression', overwite=False):
         pyplot.title('Intercepts')
 
         path = diagtools.folder([cfg['plot_dir'], 'pi_trend'])
-        path += path'_'.join([project, dataset, exp, ensemble, short_name, 'pitrend'])+'.png'
+        path += '_'.join([project, dataset, exp, ensemble, short_name, 'pitrend'])+'.png'
         pyplot.savefig(path)
         pyplot.close()
     return output_fn
@@ -862,21 +864,27 @@ def main(cfg):
     short_names = {}
     file_dict = {}
 
+    print('\n\n\ncreation loop')
     for filename in sorted(metadatas):
+        print('creation loop', filename,':', metadatas[filename])
         exp = metadatas[filename]['exp'] 
         variable_group = metadatas[filename]['variable_group']
         short_name = metadatas[filename]['short_name']
         dataset = metadatas[filename]['dataset']
         ensemble = metadatas[filename]['ensemble']
         project = metadatas[filename]['project']
-
-        file_dict[(project, dataset, exp, ensemble, short_namp)] = filename
-    
+        print((project, dataset, exp, ensemble, short_name))
+        file_dict[(project, dataset, exp, ensemble, short_name)] = filename
+   
     #doing stuff:
+    print('\n\n\ndoing stuff loop')
+
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
+        print('iterating', project, dataset, exp, ensemble, short_name, filename)
         if exp != 'piControl': continue
-        if short_name ==@ 'volcello': continue
+        if short_name == 'volcello': continue
         trend_file[filename] = calc_pi_trend(cfg, filename)
+    assert 0
 
     # 
     # Here's the plan:
