@@ -773,6 +773,75 @@ def make_fig_3_20(
     plt.close()
 
 
+#####
+# Above here is old code.
+def maenumerate(marr):
+    """
+    masked array version of ndenumerate.
+    """
+    mask = ~marr.mask.ravel()
+    for i, m in itertools.izip(np.ndenumerate(marr), mask):
+        if m: yield i
+
+
+
+
+
+
+def calc_pi_trend(cfg, filename, method='linear regression', overwite=False):
+    """
+    Calculate the trend in the 
+    """
+    exp = metadatas[filename]['exp']
+    short_name = metadatas[filename]['short_name']
+    dataset = metadatas[filename]['dataset']
+    ensemble = metadatas[filename]['ensemble']
+    project = metadatas[filename]['project']
+
+    work_dir = diagtools.folder([cfg['work_dir'], 'pi_trend'])
+    output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, short_name, 'pitrend'])+'.nc'
+
+    # Check if overwriting the file
+    if overwrite and os.path.exists(output_fn):
+        os.remove(output_fn)
+
+    # Check if it already exists:
+    if os.path.exists(output_fn):
+        return output_fn
+
+    cube = iris.load_cube(filename)
+    decimal_time = diagtools.cube_time_to_float(cube)
+   
+    if method != 'linear regression': assert 0
+
+    slopes = {} 
+    intercepts = {}
+    shape = cube.shape[1:]
+    for index, arr in maenumerate(cube.data[0,:,:,:]):
+        linreg = linregress(decimal_time, cube.data[:, index[0], index[1], index[2]])
+        # linreg = linregress( np.arange(len(decimal_time)), pi_cube.data)
+
+        slopes[index] = linreg.slope
+        intercepts[index] = linreg.intercept
+
+    plot_histo = True
+    if plot_histo:	 
+        fig = pyplot.figure()
+        fig.add_subplot(211)
+        pyplot.hist(slopes.values(), c='red')
+        pyplot.title('Slopes')
+
+        fig.add_subplot(212)
+        pyplot.hist(intercepts.values(), c='blues')
+        pyplot.title('Intercepts')
+
+        path = diagtools.folder([cfg['plot_dir'], 'pi_trend'])
+        path += path'_'.join([project, dataset, exp, ensemble, short_name, 'pitrend'])+'.png'
+        pyplot.savefig(path)
+        pyplot.close()
+    return output_fn
+
+
 def main(cfg):
     """
     Load the config file and some metadata, then pass them the plot making
@@ -785,14 +854,39 @@ def main(cfg):
 
     """
     metadatas = diagtools.get_input_files(cfg)
-    for variable_group in ['ohc2000','ohc7002000','ohc700', 'ohcgt', ]:
-        for plot_projects in ['CMIP6', 'all', 'CMIP5',  'obs']:
-            logger.info('main %s, %s', variable_group, plot_projects)
-            make_fig_3_20(
-                    cfg,
-                    variable_group,
-                    plot_projects = plot_projects,
-                )
+    projects = {}
+    datasets = {}
+    ensembles = {}
+    experiments = {}
+    variable_group = {}
+    short_names = {}
+    file_dict = {}
+
+    for filename in sorted(metadatas):
+        exp = metadatas[filename]['exp'] 
+        variable_group = metadatas[filename]['variable_group']
+        short_name = metadatas[filename]['short_name']
+        dataset = metadatas[filename]['dataset']
+        ensemble = metadatas[filename]['ensemble']
+        project = metadatas[filename]['project']
+
+        file_dict[(project, dataset, exp, ensemble, short_namp)] = filename
+    
+    #doing stuff:
+    for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
+        if exp != 'piControl': continue
+        if short_name ==@ 'volcello': continue
+        trend_file[filename] = calc_pi_trend(cfg, filename)
+
+    # 
+    # Here's the plan:
+    # load the control run
+    #    for each point in the control run, apply a linear regression.
+    #    save the intersect and slope as netcdf
+    # For the relevant historical, 
+    #    load the historical data, apply the de-trending and save the netcdf in the working dir.
+    #
+    #
     logger.info('Success')
 
 
