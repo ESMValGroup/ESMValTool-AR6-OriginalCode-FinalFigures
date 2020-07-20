@@ -16,8 +16,6 @@
 ;   plot_rel_diff: additionally also plot relative differences (True, False)
 ;   plot_rms_diff: additionally also plot root mean square differences (True, False)
 ;   projection:    map projection, e.g., Mollweide, Mercator
-;   timemean:      time averaging, i.e. "seasonalclim" (DJF, MAM, JJA, SON),
-;                  "annualclim" (annual mean)
 ;
 ; Required variable_info attributes (variable specific)
 ;   reference_dataset: name of reference datatset
@@ -66,38 +64,19 @@ begin
   log_info(DIAG_SCRIPT + " (var: " + var0 + ")")
   log_info("++++++++++++++++++++++++++++++++++++++++++")
 
-  ; time averaging: at the moment, only "annualclim" and "seasonalclim"
-  ; are supported
-
   ; Set default values for non-required diag_script_info attributes
   set_default_att(diag_script_info, "plot_abs_diff", False)
   set_default_att(diag_script_info, "plot_rms_diff", False)
   set_default_att(diag_script_info, "plot_rel_diff", False)
   set_default_att(diag_script_info, "projection", "CylindricalEquidistant")
-  set_default_att(diag_script_info, "timemean", "annualclim")
-
-  timemean = diag_script_info@timemean
-
-  if (timemean.eq."seasonalclim") then
-    numseas = 4
-    season = (/"DJF", "MAM", "JJA", "SON"/)
-  else
-    numseas = 1  ; default
-    season = (/"annual"/)
-  end if
-
-  ; create string for caption (netcdf provenance)
-
-  allseas = season(0)
-  do is = 1, numseas - 1
-    allseas = allseas + "/" + season(i)
-  end do
 
   ; make sure path for (mandatory) netcdf output exists
 
   work_dir = config_user_info@work_dir + "/"
   ; Create work dir
   system("mkdir -p " + work_dir)
+
+  input_dir = diag_script_info@input_files(1)
 
   if (config_user_info@write_plots.eq."True") then
     write_plots = True
@@ -143,7 +122,7 @@ begin
   diag_script_base = basename(DIAG_SCRIPT)
 
   ; ========================================================================
-  ; =========================== calculations ===============================
+  ; =========================== Read data ==================================
   ; ========================================================================
 
   ; note: 1) masking is handled by the backend
@@ -152,7 +131,7 @@ begin
   ; read data
 
   A0 = read_data(info0[mm_ind])
-  mmdata = time_operations(A0, -1, -1, "average", timemean, True)
+  mmdata = time_operations(A0, -1, -1, "average", "annualclim", True)
   if (dimsizes(A0&time).gt.12) then
     mm_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
   else
@@ -161,7 +140,7 @@ begin
   delete(A0)
 
   A0 = read_data(info0[ref_ind])
-  refdata = time_operations(A0, -1, -1, "average", timemean, True)
+  refdata = time_operations(A0, -1, -1, "average", "annualclim", True)
   if (dimsizes(A0&time).gt.12) then
     ref_mon = time_operations(A0, -1, -1, "average", "monthlyclim", True)
   else
@@ -190,7 +169,7 @@ begin
 
       A0 = read_data(info0[imod])
 
-      data(ii,:,:) = time_operations(A0, -1, -1, "average", timemean, True)
+      data(ii,:,:) = time_operations(A0, -1, -1, "average", "annualclim", True)
       data_mon(ii,:,:,:) = time_operations(A0, -1, -1, "average", "monthlyclim", True)
 
       ii = ii + 1
@@ -200,6 +179,21 @@ begin
     end if
 
   end do
+
+  ; -----------------------------------------------------------
+  ; read precalculated natural variability for multi-model-mean
+  ; -----------------------------------------------------------
+
+  log_info("Read precalculated natural variability for multi-model")
+  natvar_file = addfile(input_dir + "/" + "IAV_mmm_piControl_" + \
+                        var0 + "_annualclim.nc", "r")
+  natvar_mmm = natvar_file->iav
+  tmp = natvar_mmm
+  delete(natvar_mmm)
+  natvar_mmm = rm_single_dims(tmp)
+
+
+  ; -----------------------------------------------------------
 
   ; convert units for plotting
   if (var0.eq."pr") then
@@ -225,6 +219,11 @@ begin
   elseif (var0.eq."so") then
     refdata = refdata * 1000.
   end if
+
+
+  ; ========================================================================
+  ; =========================== Calculations ===============================
+  ; ========================================================================
 
   ; differences between multi-model mean and reference data set
   ; (multi-model bias)
@@ -292,7 +291,36 @@ begin
   reldiff = dim_avg_n_Wrap(reldiff_i, 0)
   copy_VarMeta(diff, reldiff) 
 
-  ;delete(refdata)
+
+  ; ----------------------------------------------
+  ; Determine sigma and sign for significance
+  ; ----------------------------------------------
+  var_pos_signif = dim_num_n(where(diff_i .gt. 0., 1., \
+                                   diff@_FillValue) .eq. 1., 0)
+  var_neg_signif = dim_num_n(where(diff_i .lt. 0., 1., \
+                                   diff@_FillValue) .eq. 1., 0)
+  var_pos_signif_tmp = \
+    var_pos_signif / where((var_pos_signif + var_neg_signif) \
+                           .ne. 0., var_pos_signif + \
+                           var_neg_signif, diff@_FillValue)
+  var_neg_signif_tmp = \
+    var_neg_signif / where((var_pos_signif + var_neg_signif) \
+                           .ne. 0., var_pos_signif + \
+                           var_neg_signif, diff@_FillValue)
+  signif_and_sign = where(var_pos_signif_tmp .ge. 0.9 .or. \
+                          var_neg_signif_tmp .ge. 0.9, 1., 0.)
+  signif_and_sign = where(ismissing(signif_and_sign), 0.,\
+                          signif_and_sign)
+  sigma_and_sign = where(abs(diff( :, :)) .gt. \
+                         abs(2. * natvar_mmm), 1., 0.)
+  to_plot_not_signif = where(abs(diff( :, :)) .lt. \
+                                      abs(natvar_mmm),\
+                                      1., 0.)
+  to_plot_signif = where(signif_and_sign .eq. 1, \
+                                  sigma_and_sign, 0.)
+
+  copy_VarMeta(diff, to_plot_signif)
+  copy_VarMeta(diff, to_plot_not_signif)
 
   ; ========================================================================
   ; ============================= plotting =================================
@@ -335,7 +363,7 @@ begin
   end if
   diff@var_units  = diff@units
 
-  plots = new((/5, numseas/), graphic)
+  plots = new((/5/), graphic)
 
   ; --------------------------------------------------------------------
   ; plot contour map
@@ -553,67 +581,118 @@ begin
   pres@gsnPanelFigureStringsJust = "TopLeft"
   pres@gsnPanelFigureStringsFontHeightF = 0.016
 
-  plotfile = new(numseas, string)
-  plotfile(:) = ""
-
   if (write_plots) then
-    do is = 0, numseas - 1
-      ; --------------------------------------------------------------------
-      ; create workspace
+    ; --------------------------------------------------------------------
+    ; create workspace
 
-      if (isvar("wks")) then
-        delete(wks)
+    if (isvar("wks")) then
+      delete(wks)
+    end if
+
+    wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_" + var0 \
+                  + "_annualclim" )
+
+    plotfile = wks@fullname
+
+    plots(0) = contour_map(wks, mmdata, var0)
+    plots(1) = contour_map(wks, diff, var0)
+    if (plot_abs_diff) then
+      plots(2) = contour_map(wks, absdiff, var0)
+    end if
+    if (plot_rms_diff) then
+      plots(3) = contour_map(wks, rmsdiff, var0)
+    end if
+    if (plot_rel_diff) then
+      plots(4) = contour_map(wks, reldiff, var0)
+    end if
+
+    ; add significance
+;    if (isatt(diag_script_info, "sig") .and. \
+;        diag_script_info@sig .eq. True) then
+      ; resources dots
+      ress = True
+      ress@gsnDraw = False
+      ress@gsnFrame = False
+      ress@gsnAddCyclic = True
+      ress@cnLinesOn = False
+      ress@cnLineLabelsOn = False
+      ress@cnLevelSelectionMode = "ExplicitLevels"
+      ress@cnLevels = (/.3, 1.3/)
+      ress@cnInfoLabelOn = False
+      ress@tiMainOn = False
+      ress@cnFillOn = True
+      ress@cnFillMode = "AreaFill"
+      ress@cnMonoFillPattern = False
+      ress@cnFillPatterns = (/-1, 17, 17/)
+      ress@cnMonoFillColor = True
+      ress@lbLabelBarOn = False
+      ress@gsnLeftString = ""
+      ress@gsnRightString = ""
+      ress@cnFillDotSizeF       = 0.001
+      ress@cnFillScaleF        = .6        ; add extra density
+
+      ; plot dots
+      if all(to_plot_signif(:, :) .eq. 1) then
+        to_plot_signif(0, 0) = 0
       end if
-
-      wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_" + var0 \
-                    + "_" + season(is))
-
-      plotfile(is) = wks@fullname
-
-      if (numseas.gt.1) then
-        pres@txString = season(is)
-        plots(0, is) = contour_map(wks, mmdata(is, :, :), var0)
-        plots(1, is) = contour_map(wks, diff(is, :, :), var0)
-        if (plot_abs_diff) then
-          plots(2, is) = contour_map(wks, absdiff(is, :, :), var0)
-        end if
-        if (plot_rms_diff) then
-          plots(3, is) = contour_map(wks, rmsdiff(is, :, :), var0)
-        end if
-        if (plot_rel_diff) then
-          plots(4, is) = contour_map(wks, reldiff(is, :, :), var0)
-        end if
-        gsn_panel(wks, plots(plotind, is), plotsperline, pres)
-      else
-        plots(0, 0) = contour_map(wks, mmdata, var0)
-        plots(1, 0) = contour_map(wks, diff, var0)
-        if (plot_abs_diff) then
-          plots(2, 0) = contour_map(wks, absdiff, var0)
-        end if
-        if (plot_rms_diff) then
-          plots(3, 0) = contour_map(wks, rmsdiff, var0)
-        end if
-        if (plot_rel_diff) then
-          plots(4, 0) = contour_map(wks, reldiff, var0)
-        end if
-        gsn_panel(wks, plots(plotind, 0), plotsperline, pres)
+      if (max(to_plot_signif(:, :)) .gt. \
+          min(to_plot_signif(:, :))) then
+        plot1 = gsn_csm_contour(wks, to_plot_signif(:, :), ress)
+        overlay(plots(1), plot1)
       end if
+;    end if
 
-      ; add meta data to plot (for reporting)
+;    if (isatt(diag_script_info, "not_sig") .and. \
+;        diag_script_info@not_sig .eq. True) then
+      ; resources hatch
+      resb = True
+      resb@gsnDraw = False
+      resb@gsnFrame = False
+      resb@gsnAddCyclic = True
+      resb@cnLinesOn = False
+      resb@cnLineLabelsOn = False
+      resb@cnLevelSelectionMode = "ExplicitLevels"
+      resb@cnLevels = (/.3, 1.3/)
+      resb@cnInfoLabelOn = False
+      resb@tiMainOn = False
+      resb@cnFillOn = True
+      resb@cnFillMode = "AreaFill"
+      resb@cnRasterSmoothingOn = False
+      resb@cnMonoFillPattern = False
+      resb@cnFillPatterns = (/-1, 10, 10/)
+      resb@cnMonoFillColor = True
+      resb@lbLabelBarOn = False
+      resb@gsnLeftString = ""
+      resb@gsnRightString = ""
+      resb@cnFillScaleF = 0.25
 
-      caption = "Multi model values, from top left to bottom right: " \
-                + "mean, bias"
-      if (plot_abs_diff) then
-        caption = caption + ", absolute error"
+      ; plot hatch
+      if all(to_plot_not_signif(:, :) .eq. 1) then
+        to_plot_not_signif(0, 0) = 0
       end if
-      if (plot_rms_diff) then
-        caption = caption + ", root mean square error"
+      if (max(to_plot_not_signif(:, :)) .gt. \
+          min(to_plot_not_signif(:, :))) then
+        plot2 = gsn_csm_contour(wks, to_plot_not_signif(:, :), resb)
+        overlay(plots(1), plot2)
       end if
-      if (plot_rel_diff) then
-        caption = caption + ", relative error"
-      end if
+;    end if
 
-    end do  ; is-loop (seasons)
+    gsn_panel(wks, plots(plotind), plotsperline, pres)
+
+    ; add meta data to plot (for reporting)
+
+    caption = "Multi model values, from top left to bottom right: " \
+              + "mean, bias"
+    if (plot_abs_diff) then
+      caption = caption + ", absolute error"
+    end if
+    if (plot_rms_diff) then
+      caption = caption + ", root mean square error"
+    end if
+    if (plot_rel_diff) then
+      caption = caption + ", relative error"
+    end if
+
   end if  ; if write_plots
 
   ; ###########################################
@@ -621,11 +700,13 @@ begin
   ; ###########################################
 
   nc_filename = work_dir + "model_bias_" + var0 + ".nc"
-  nc_filename@existing = "append"
+  nc_filename@existing = "overwrite"
 
   mmdata@var = var0 + "_mean"
   mmdata@long_name = var0 + " (multi-model mean)"
   nc_outfile = ncdf_write(mmdata, nc_filename)
+
+  nc_filename@existing = "append"
 
   refdata@var = var0 + "_ref"
   refdata@long_name = var0 + " (reference data)"
@@ -654,6 +735,22 @@ begin
     nc_outfile = ncdf_write(reldiff, nc_filename)
   end if
 
+  to_plot_signif@diag_script = (/DIAG_SCRIPT/)
+  to_plot_signif@var = "signif"
+  to_plot_signif@var_long_name = "significance: mean change larger than " \
+                                 + "2*natvar and 90% of models have the " \
+                                 + "same sign" 
+  to_plot_signif@units     = 1
+  ncdf_outfile = ncdf_write(to_plot_signif, nc_filename) 
+
+  to_plot_not_signif@diag_script = (/DIAG_SCRIPT/)
+  to_plot_not_signif@var = "not_signif"
+  to_plot_not_signif@var_long_name = "not significant: mean change " \
+                                     + "smaller than 1*natvar"
+  to_plot_not_signif@units     = 1
+  ncdf_outfile = ncdf_write(to_plot_not_signif, nc_filename)
+
+
   ; ------------------------------------------------------------------------
   ; write provenance to netcdf output and plot file(s) (mean)
   ; ------------------------------------------------------------------------
@@ -662,12 +759,10 @@ begin
   domain = ("global")
   plottype = ("geo")
   prov_caption = caption + " for variable " + var0 \
-    + " (" + allseas + "), reference = " + names(ref_ind) + "."
+    + ", reference = " + names(ref_ind) + "."
 
-  do is = 0, numseas - 1
-    log_provenance(nc_outfile, plotfile(is), prov_caption, statistics, \
-                   domain, plottype, "", "", climofiles)
-  end do
+  log_provenance(nc_outfile, plotfile, prov_caption, statistics, \
+                 domain, plottype, "", "", climofiles)
 
   leave_msg(DIAG_SCRIPT, "")
 
