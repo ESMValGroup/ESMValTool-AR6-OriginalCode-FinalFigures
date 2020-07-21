@@ -322,6 +322,13 @@ begin
   copy_VarMeta(diff, to_plot_signif)
   copy_VarMeta(diff, to_plot_not_signif)
 
+  if (plot_rms_diff) then
+    to_plot_not_signif_rmsd = where(rmsdiff( :, :) .lt. \
+                                      abs(natvar_mmm),\
+                                      1., 0.)
+    copy_VarMeta(diff, to_plot_not_signif_rmsd)
+  end if
+
   ; ========================================================================
   ; ============================= plotting =================================
   ; ========================================================================
@@ -640,6 +647,7 @@ begin
         plot1 = gsn_csm_contour(wks, to_plot_signif(:, :), ress)
         overlay(plots(1), plot1)
       end if
+
 ;    end if
 
 ;    if (isatt(diag_script_info, "not_sig") .and. \
@@ -675,6 +683,19 @@ begin
         plot2 = gsn_csm_contour(wks, to_plot_not_signif(:, :), resb)
         overlay(plots(1), plot2)
       end if
+
+      if (plot_rms_diff) then
+        ; plot hatch
+        if all(to_plot_not_signif_rmsd(:, :) .eq. 1) then
+          to_plot_not_signif_rmsd(0, 0) = 0
+        end if
+        if (max(to_plot_not_signif_rmsd(:, :)) .gt. \
+            min(to_plot_not_signif_rmsd(:, :))) then
+          plot3 = gsn_csm_contour(wks, to_plot_not_signif_rmsd(:, :), resb)
+          overlay(plots(3), plot3)
+        end if
+      end if
+
 ;    end if
 
     gsn_panel(wks, plots(plotind), plotsperline, pres)
@@ -726,6 +747,13 @@ begin
     rmsdiff@var = var0 + "_rms_bias"
     rmsdiff@long_name = var0 + " (multi-model root mean square difference)"
     nc_outfile = ncdf_write(rmsdiff, nc_filename)
+
+    to_plot_not_signif_rmsd@diag_script = (/DIAG_SCRIPT/)
+    to_plot_not_signif_rmsd@var = "not_signif_rmsd"
+    to_plot_not_signif_rmsd@var_long_name = "not significant: rmsd " \
+                                       + "smaller than 1*natvar"
+    to_plot_not_signif@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_not_signif_rmsd, nc_filename)
   end if
 
   if (isvar("reldiff")) then
