@@ -390,7 +390,7 @@ diagnostics:
       - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, project: CMIP6}
 
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}      
 
   swcre:
     <<: *corr_diag
@@ -467,7 +467,7 @@ diagnostics:
       - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, project: CMIP6}
 
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}      
 
   ### COLLECT CORRELATIONS AND PLOT ###########################################
   fig_3_41_cor_collect:
