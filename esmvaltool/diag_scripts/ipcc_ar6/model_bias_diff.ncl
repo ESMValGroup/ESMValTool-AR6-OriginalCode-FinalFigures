@@ -407,9 +407,10 @@ begin
   ; ============================= plotting =================================
   ; ========================================================================
 
-  climofiles = new(2, string)
+  ;climofiles = new(2, string)
   ;climofiles(0) = infiles(mm_ind)
-  climofiles(1) = infiles(ref_ind)
+  ;climofiles(1) = infiles(ref_ind)
+  climofiles = infiles
 
   diff1@res_gsnMaximize  = True  ; use full page for the plot
   diff1@res_cnFillOn  = True  ; color plot desired
