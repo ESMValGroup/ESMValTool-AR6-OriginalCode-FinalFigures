@@ -68,7 +68,8 @@ begin
   set_default_att(diag_script_info, "plot_abs_diff", False)
   set_default_att(diag_script_info, "plot_rms_diff", False)
   set_default_att(diag_script_info, "plot_rel_diff", False)
-  set_default_att(diag_script_info, "projection", "CylindricalEquidistant")
+  set_default_att(diag_script_info, "stippandhatch", False)
+  set_default_att(diag_script_info, "projection", "Robinson")
 
   ; make sure path for (mandatory) netcdf output exists
 
@@ -100,6 +101,8 @@ begin
   plot_abs_diff = diag_script_info@plot_abs_diff
   plot_rel_diff = diag_script_info@plot_rel_diff
   plot_rms_diff = diag_script_info@plot_rms_diff
+
+  stippandhatch = diag_script_info@stippandhatch
 
   ; get reference dataset
 
@@ -184,14 +187,16 @@ begin
   ; read precalculated natural variability for multi-model-mean
   ; -----------------------------------------------------------
 
-  log_info("Read precalculated natural variability for multi-model")
-  natvar_file = addfile(input_dir + "/" + "IAV_mmm_piControl_" + \
-                        var0 + "_annualclim.nc", "r")
-  natvar_mmm = natvar_file->iav
-  tmp = natvar_mmm
-  delete(natvar_mmm)
-  natvar_mmm = rm_single_dims(tmp)
-
+  if (stippandhatch) then
+    log_info("Read precalculated natural variability for multi-model")
+    natvar_file = addfile(input_dir + "/" + "IAV_mmm_piControl_" + \
+                          var0 + "_annualclim.nc", "r")
+    natvar_mmm = natvar_file->iav
+    tmp = natvar_mmm
+    delete(natvar_mmm)
+    natvar_mmm = rm_single_dims(tmp)
+    delete(tmp)
+  end if
 
   ; -----------------------------------------------------------
 
@@ -248,7 +253,7 @@ begin
   rmsdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   reldiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
 
-  if (plot_rms_diff .or. plot_abs_diff .or. plot_rel_diff) then
+  if (stippandhatch .or. plot_rms_diff .or. plot_abs_diff .or. plot_rel_diff) then
 
     ii = 0
 
@@ -293,43 +298,47 @@ begin
 
   rmsd = calculate_metric(refdata, mmdata, "RMSD")
   bias = area_operations(diff, -90., 90., 0., 360., "average", True)
+  mean = area_operations(mmdata, -90., 90., 0., 360., "average", True)
 
   ; ----------------------------------------------
   ; Determine sigma and sign for significance
   ; ----------------------------------------------
-  var_pos_signif = dim_num_n(where(diff_i .gt. 0., 1., \
-                                   diff@_FillValue) .eq. 1., 0)
-  var_neg_signif = dim_num_n(where(diff_i .lt. 0., 1., \
-                                   diff@_FillValue) .eq. 1., 0)
-  var_pos_signif_tmp = \
-    var_pos_signif / where((var_pos_signif + var_neg_signif) \
-                           .ne. 0., var_pos_signif + \
-                           var_neg_signif, diff@_FillValue)
-  var_neg_signif_tmp = \
-    var_neg_signif / where((var_pos_signif + var_neg_signif) \
-                           .ne. 0., var_pos_signif + \
-                           var_neg_signif, diff@_FillValue)
-  signif_and_sign = where(var_pos_signif_tmp .ge. 0.9 .or. \
-                          var_neg_signif_tmp .ge. 0.9, 1., 0.)
-  signif_and_sign = where(ismissing(signif_and_sign), 0.,\
-                          signif_and_sign)
-  sigma_and_sign = where(abs(diff( :, :)) .gt. \
-                         abs(2. * natvar_mmm), 1., 0.)
-  to_plot_not_signif = where(abs(diff( :, :)) .lt. \
-                                      abs(natvar_mmm),\
-                                      1., 0.)
-  to_plot_signif = where(signif_and_sign .eq. 1, \
-                                  sigma_and_sign, 0.)
+  if (stippandhatch) then
+    var_pos_signif = dim_num_n(where(diff_i .gt. 0., 1., \
+                                     diff@_FillValue) .eq. 1., 0)
+    var_neg_signif = dim_num_n(where(diff_i .lt. 0., 1., \
+                                     diff@_FillValue) .eq. 1., 0)
+    var_pos_signif_tmp = \
+      var_pos_signif / where((var_pos_signif + var_neg_signif) \
+                             .ne. 0., var_pos_signif + \
+                             var_neg_signif, diff@_FillValue)
+    var_neg_signif_tmp = \
+      var_neg_signif / where((var_pos_signif + var_neg_signif) \
+                             .ne. 0., var_pos_signif + \
+                             var_neg_signif, diff@_FillValue)
+    signif_and_sign = where(var_pos_signif_tmp .ge. 0.9 .or. \
+                            var_neg_signif_tmp .ge. 0.9, 1., 0.)
+    signif_and_sign = where(ismissing(signif_and_sign), 0.,\
+                            signif_and_sign)
+    sigma_and_sign = where(abs(diff( :, :)) .gt. \
+                           abs(2. * natvar_mmm), 1., 0.)
+    to_plot_not_signif = where(abs(diff( :, :)) .lt. \
+                                        abs(natvar_mmm),\
+                                        1., 0.)
+    to_plot_signif = where(signif_and_sign .eq. 1, \
+                                    sigma_and_sign, 0.)
 
-  copy_VarMeta(diff, to_plot_signif)
-  copy_VarMeta(diff, to_plot_not_signif)
+    copy_VarMeta(diff, to_plot_signif)
+    copy_VarMeta(diff, to_plot_not_signif)
 
-  if (plot_rms_diff) then
-    to_plot_not_signif_rmsd = where(rmsdiff( :, :) .lt. \
-                                      abs(natvar_mmm),\
-                                      1., 0.)
-    copy_VarMeta(diff, to_plot_not_signif_rmsd)
+    if (plot_rms_diff) then
+      to_plot_not_signif_rmsd = where(rmsdiff( :, :) .lt. \
+                                        abs(natvar_mmm),\
+                                        1., 0.)
+      copy_VarMeta(diff, to_plot_not_signif_rmsd)
+    end if
   end if
+
 
   ; ========================================================================
   ; ============================= plotting =================================
@@ -383,6 +392,12 @@ begin
   diff@res_gsnFrame  = False  ; Don't advance frame.
   diff@res_mpPerimOn  = False
 
+  diff@res_mpGeophysicalLineColor = "gray42"
+  diff@res_mpPerimOn    = False
+  diff@res_mpGridLineColor   = "transparent"
+  diff@res_mpGridAndLimbOn   = True
+  diff@res_mpOutlineOn = True
+
   diff@res_lbTitleString  = "(" + diff@units + ")"
   diff@res_lbTitlePosition  = "Bottom"
 
@@ -390,20 +405,32 @@ begin
   diff@res_lbTopMarginF  = 0.1
   diff@res_lbTitleFontHeightF  = 0.014
 
+  diff@res_lbBoxEndCapStyle = "TriangleBothEnds"
+  diff@res_lbBoxLineColor = "gray70"
+
   diff@res_tiMainFontHeightF  = 0.016
 
-  diff@res_tiMainString = "Multi-Model Mean Bias"
+  diff@res_gsnRightStringParallelPosF = 0.8
+
+  if(isatt(diag_script_info, "bias_caption")) then
+    diff@res_tiMainString = diag_script_info@bias_caption
+  else
+    diff@res_tiMainString = "Multi-Model Mean Bias"
+  end if
 
   copy_VarMeta(diff, mmdata)
   delete(mmdata@res_cnLevels)
 
-  mmdata@res_tiMainString = "Multi-Model Mean"
+  if(isatt(diag_script_info, "mean_caption")) then
+    mmdata@res_tiMainString = diag_script_info@mean_caption
+  else
+    mmdata@res_tiMainString = "Multi-Model Mean"
+  end if
 
   mmdata@res_gsnLeftStringFontHeightF = 0.015
   mmdata@res_gsnRightStringFontHeightF = 0.015
   mmdata@res_gsnRightString  = " "
   mmdata@res_gsnLeftString   = " "
-
 
 
   if (var0.eq."tas") then
@@ -425,14 +452,14 @@ begin
     end if
     if (plot_rms_diff) then
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                                + "ipcc-ar6_temperature_div.rgb")
+                                + "ipcc-ar6_temperature_seq.rgb")
     end if
   elseif (var0.eq."pr") then
     ;mmdata@res_tiMainString = "Precipitation ~C~Multi Model Mean"
     mmdata@res_cnLevels = ispan(1, 10, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_precipitation_seq.rgb")
+                             + "ipcc-ar6_precipitation_div.rgb")
     mmdata@res_cnFillPalette = pal
     ;diff@res_tiMainString = "Precipitation ~C~Multi Model Mean Bias"
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
@@ -469,7 +496,7 @@ begin
     end if
     if (plot_rms_diff) then
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                                + "ipcc-ar6_temperature_10.rgb")
+                                + "ipcc-ar6_temperature_seq.rgb")
     end if
   elseif (var0.eq."so") then
     mmdata@res_tiMainString = "Sea Surface Salinity ~C~Multi Model Mean"
@@ -525,8 +552,11 @@ begin
 
   if (plot_rms_diff) then
     copy_VarMeta(diff, rmsdiff)
-;    if (isvar("pal5")) then
-;      delete(rmsdiff@res_cnFillColors)
+    if (isvar("pal5")) then
+      rmsdiff@res_cnFillPalette = pal5
+      delete(rmsdiff@res_cnLevels)
+      rmsdiff@res_cnLevels = ispan(1,12,1) * 0.5
+      rmsdiff@res_lbBoxEndCapStyle = "TriangleHighEnd"
 ;      if (var0 .eq. "tas") then
 ;        rmsdiff@res_cnFillColors = pal5(4:0,:)
 ;        nt = dimsizes(pal5(4:0,:))
@@ -540,7 +570,7 @@ begin
 ;      n = nt(0)
 ;    else
 ;      n = dimsizes(diff@res_cnLevels)
-;    end if
+    end if
 ;    mx = max(diff@res_cnLevels)
 ;    delete(rmsdiff@res_cnLevels)
 ;
@@ -554,7 +584,11 @@ begin
 ;      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
 ;    end if
 
-    rmsdiff@res_tiMainString = "Multi Model Mean of Root Mean Square Error"
+    if(isatt(diag_script_info, "rmsd_caption")) then
+       rmsdiff@res_tiMainString = diag_script_info@rmsd_caption
+    else
+      rmsdiff@res_tiMainString = "Multi Model Mean of Root Mean Square Error"
+    end if
 
     iadd = 3
     itmp = array_append_record(plotind, iadd, 0)
@@ -586,9 +620,10 @@ begin
     plotsperline(1) = plotsperline(1) + 1
   end if
 
-  ; add global bias and rmsd value
-  diff@res_gsnRightString = "rmsd = " + sprintf("%6.3f", rmsd)
-  diff@res_gsnLeftString  = "bias = " + sprintf("%6.3f", bias)
+  ;; add global mean, bias and rmsd value
+  ;mmdata@res_gsnRightString = "mean = " + sprintf("%6.3f", mean)
+  ;diff@res_gsnRightString = "mean = " + sprintf("%6.3f", bias)
+  ;rmsdiff@res_gsnRightString = "mean = " + sprintf("%6.3f", rmsd)
  
 
   ; panelling resources
@@ -598,10 +633,19 @@ begin
   pres@gsnPanelRowSpec = True  ; tell panel what order to plot
   pres@gsnPanelYWhiteSpacePercent = 5
   pres@gsnPanelXWhiteSpacePercent = 5
-  pres@gsnPanelFigureStrings = (/"a)","b)","c)","d)"/)
+  if (isatt(diag_script_info, "panel_num")) then
+    pres@gsnPanelFigureStrings = diag_script_info@panel_num
+  else
+    pres@gsnPanelFigureStrings = (/"a)","b)","c)","d)"/)
+  end if
   pres@gsnPanelFigureStringsPerimOn = False
+  pres@gsnPanelFigureStringsBackgroundFillColor ="transparent"
   pres@gsnPanelFigureStringsJust = "TopLeft"
   pres@gsnPanelFigureStringsFontHeightF = 0.016
+
+  if (isatt(diag_script_info, "panel_title")) then
+    pres@gsnPanelMainString = diag_script_info@panel_title
+  end if
 
   if (write_plots) then
     ; --------------------------------------------------------------------
@@ -629,8 +673,7 @@ begin
     end if
 
     ; add significance
-;    if (isatt(diag_script_info, "sig") .and. \
-;        diag_script_info@sig .eq. True) then
+    if (stippandhatch) then
       ; resources dots
       ress = True
       ress@gsnDraw = False
@@ -663,10 +706,6 @@ begin
         overlay(plots(1), plot1)
       end if
 
-;    end if
-
-;    if (isatt(diag_script_info, "not_sig") .and. \
-;        diag_script_info@not_sig .eq. True) then
       ; resources hatch
       resb = True
       resb@gsnDraw = False
@@ -711,7 +750,7 @@ begin
         end if
       end if
 
-;    end if
+    end if
 
     gsn_panel(wks, plots(plotind), plotsperline, pres)
 
@@ -763,12 +802,14 @@ begin
     rmsdiff@long_name = var0 + " (multi-model root mean square difference)"
     nc_outfile = ncdf_write(rmsdiff, nc_filename)
 
-    to_plot_not_signif_rmsd@diag_script = (/DIAG_SCRIPT/)
-    to_plot_not_signif_rmsd@var = "not_signif_rmsd"
-    to_plot_not_signif_rmsd@var_long_name = "not significant: rmsd " \
-                                       + "smaller than 1*natvar"
-    to_plot_not_signif@units     = 1
-    ncdf_outfile = ncdf_write(to_plot_not_signif_rmsd, nc_filename)
+    if (plot_rms_diff .and. stippandhatch) then
+      to_plot_not_signif_rmsd@diag_script = (/DIAG_SCRIPT/)
+      to_plot_not_signif_rmsd@var = "not_signif_rmsd"
+      to_plot_not_signif_rmsd@var_long_name = "not significant: rmsd " \
+                                         + "smaller than 1*natvar"
+      to_plot_not_signif@units     = 1
+      ncdf_outfile = ncdf_write(to_plot_not_signif_rmsd, nc_filename)
+    end if
   end if
 
   if (isvar("reldiff")) then
@@ -778,20 +819,23 @@ begin
     nc_outfile = ncdf_write(reldiff, nc_filename)
   end if
 
-  to_plot_signif@diag_script = (/DIAG_SCRIPT/)
-  to_plot_signif@var = "signif"
-  to_plot_signif@var_long_name = "significance: mean change larger than " \
-                                 + "2*natvar and 90% of models have the " \
-                                 + "same sign" 
-  to_plot_signif@units     = 1
-  ncdf_outfile = ncdf_write(to_plot_signif, nc_filename) 
+  if (stippandhatch) then
+    to_plot_signif@diag_script = (/DIAG_SCRIPT/)
+    to_plot_signif@var = "signif"
+    to_plot_signif@var_long_name = "significance: mean change larger than " \
+                                   + "2*natvar and 90% of models have the " \
+                                   + "same sign" 
+    to_plot_signif@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_signif, nc_filename) 
 
-  to_plot_not_signif@diag_script = (/DIAG_SCRIPT/)
-  to_plot_not_signif@var = "not_signif"
-  to_plot_not_signif@var_long_name = "not significant: mean change " \
-                                     + "smaller than 1*natvar"
-  to_plot_not_signif@units     = 1
-  ncdf_outfile = ncdf_write(to_plot_not_signif, nc_filename)
+    to_plot_not_signif@diag_script = (/DIAG_SCRIPT/)
+    to_plot_not_signif@var = "not_signif"
+    to_plot_not_signif@var_long_name = "not significant: mean change " \
+                                       + "smaller than 1*natvar"
+    to_plot_not_signif@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_not_signif, nc_filename)
+
+  end if
 
 
   ; ------------------------------------------------------------------------
