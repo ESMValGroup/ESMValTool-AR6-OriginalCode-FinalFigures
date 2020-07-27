@@ -1,6 +1,6 @@
 # ESMValTool
 # recipe_ocean_amoc.yml
-
+---
 documentation:
   description: |
     Recipe to produce time series figures of the derived variable, the
@@ -95,7 +95,6 @@ diagnostics:
       - {dataset: CESM2-WACCM,    project: CMIP6,    exp: [historical, ssp585],  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2100}
       - {dataset: SAM0-UNICON,    project: CMIP6,    exp: [historical, ssp585],  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2100}
 
-
     scripts:
       AMOC_timeseries_cmip6:
         script: ocean/diagnostic_timeseries.py
@@ -160,7 +159,6 @@ diagnostics:
         script: ocean/diagnostic_timeseries.py
         moving_average: 6 years
         anomaly: [1860, 1900]
-
 
 
   # diag_timeseries_drake:
