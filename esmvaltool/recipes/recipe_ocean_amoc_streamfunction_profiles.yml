@@ -121,6 +121,7 @@ diagnostics:
   diag_timeseries_amoc_hist:
     variables:
       amoc:
+        short_name: amoc
         mip: Omon
         derive: true
         force_derivation: false
