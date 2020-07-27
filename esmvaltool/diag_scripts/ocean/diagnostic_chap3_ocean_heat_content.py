@@ -26,12 +26,16 @@ import os
 import iris
 import matplotlib.pyplot as plt
 import numpy as np
+import itertools
 import cf_units
 import datetime
 from scipy.stats import linregress
 from scipy.io import loadmat
+import netCDF4 
 
+from glob import glob
 from dask import array as da
+from shelve import open as shopen
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
@@ -784,15 +788,10 @@ def maenumerate(marr):
         if m: yield i
 
 
-
-
-
-
-def calc_pi_trend(cfg, filename, method='linear regression', overwite=True ):
+def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=True ):
     """
     Calculate the trend in the 
     """
-    assert 0
     exp = metadatas[filename]['exp']
     short_name = metadatas[filename]['short_name']
     dataset = metadatas[filename]['dataset']
@@ -801,6 +800,7 @@ def calc_pi_trend(cfg, filename, method='linear regression', overwite=True ):
 
     work_dir = diagtools.folder([cfg['work_dir'], 'pi_trend'])
     output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, short_name, 'pitrend'])+'.nc'
+    output_shelve = output_fn.replace('.nc', '.shelve')
 
     # Check if overwriting the file
     if overwrite and os.path.exists(output_fn):
@@ -815,32 +815,65 @@ def calc_pi_trend(cfg, filename, method='linear regression', overwite=True ):
    
     if method != 'linear regression': assert 0
 
-    slopes = {} 
-    intercepts = {}
-    shape = cube.shape[1:]
-    for index, arr in maenumerate(cube.data[0,:,:,:]):
-        print(index)
+    if glob(output_shelve+'*'):
+        print ('loading from', output_shelve)
+        sh = shopen(output_shelve)
+        slopes = sh.get('slopes', {})
+        intercepts = sh.get('intercepts', {})
+        count = sh.get('count', 0)
+        sh.close()
+    else:
+        print('Starting fresh')
+        slopes = {} 
+        intercepts = {}
+        count = 0
+
+    dummy = cube.data[0]
+    print('Calculating linear regression for:', [project, dataset, exp, ensemble, short_name, ])
+    for index, arr in np.ndenumerate(dummy): #[~cube.data[0].mask]):
+        if np.ma.is_masked(arr): continue
+        if slopes.get(index, False): continue
+        #print(index)
         linreg = linregress(decimal_time, cube.data[:, index[0], index[1], index[2]])
         # linreg = linregress( np.arange(len(decimal_time)), pi_cube.data)
 
         slopes[index] = linreg.slope
         intercepts[index] = linreg.intercept
+        count+=1
+        if count%250000 == 0:
+            print('Saving shelve: ', count, index, linreg.slope, linreg.intercept)
+            sh = shopen(output_shelve)
+            sh['slopes'] = slopes
+            sh['intercepts'] = intercepts
+            sh['count'] = count
+            sh.close()
+
+    print('Saving final shelve: ', count, index, linreg.slope, linreg.intercept)
+    sh = shopen(output_shelve)
+    sh['slopes'] = slopes
+    sh['intercepts'] = intercepts
+    sh['count'] = count
+    sh.close()
 
     plot_histo = True
     if plot_histo:	 
-        fig = pyplot.figure()
+        fig = plt.figure()
         fig.add_subplot(211)
-        pyplot.hist(slopes.values(), c='red')
-        pyplot.title('Slopes')
+        plt.hist(slopes.values(), c='red')
+        plt.title('Slopes')
 
         fig.add_subplot(212)
-        pyplot.hist(intercepts.values(), c='blues')
-        pyplot.title('Intercepts')
+        plt.hist(intercepts.values(), c='blues')
+        plt.title('Intercepts')
 
         path = diagtools.folder([cfg['plot_dir'], 'pi_trend'])
         path += '_'.join([project, dataset, exp, ensemble, short_name, 'pitrend'])+'.png'
-        pyplot.savefig(path)
-        pyplot.close()
+        print('Saving figure:', path)
+        plt.savefig(path)
+        plt.close()
+
+   #  nc = netCDF4.Dataset(output_fn, mode='w')
+    
     return output_fn
 
 
@@ -883,8 +916,7 @@ def main(cfg):
         print('iterating', project, dataset, exp, ensemble, short_name, filename)
         if exp != 'piControl': continue
         if short_name == 'volcello': continue
-        trend_file[filename] = calc_pi_trend(cfg, filename)
-    assert 0
+        trend_file[filename] = calc_pi_trend(cfg, metadatas, filename)
 
     # 
     # Here's the plan:

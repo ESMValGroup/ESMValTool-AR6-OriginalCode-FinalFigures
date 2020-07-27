@@ -162,7 +162,6 @@ diagnostics:
       msftmyz:
         short_name: msftmyz
         preprocessor: prep_transect
-        field: TO2M
         mip: Omon
         exp: historical
         # start_year: 2000
