@@ -228,16 +228,6 @@ def add_aux_times(cube):
     return cube
 
 
-def zero_around(cube, year_initial=1971., year_final=1971.):
-    """
-    Zero around the time range provided.
-
-    """
-    new_cube = extract_time(cube, year_initial, 1, 1, year_final, 12, 31)
-    mean = new_cube.data.mean()
-    cube.data = cube.data - mean
-    return cube
-
 
 def zero_around_dat(times, data, year=1971.):
     """
@@ -779,6 +769,223 @@ def make_fig_3_20(
 
 #####
 # Above here is old code.
+def zero_around(cube, year_initial=1971., year_final=1971.):
+    """
+    Zero around the time range provided.
+
+    """
+    new_cube = extract_time(cube, year_initial, 1, 1, year_final, 12, 31)
+    mean = new_cube.data.mean()
+    cube.data = cube.data - mean
+    return cube
+
+def zero_around_dat(times, data, year=1971.):
+    """
+    Zero around the time range provided.
+    """
+    index = np.argmin(np.abs(np.array(times) - year))
+    return data - np.ma.mean(data[index-1:index+2])
+
+
+
+def add_map_subplot(subplot, cube, nspace, title='',
+                    cmap='viridis', extend='neither', log=False):
+    """
+    Add a map subplot to the current pyplot figure.
+    Parameters
+    ----------
+    subplot: int
+        The matplotlib.pyplot subplot number. (ie 221)
+    cube: iris.cube.Cube
+        the iris cube to be plotted.
+    nspace: numpy.array
+        An array of the ticks of the colour part.
+    title: str
+        A string to set as the subplot title.
+    cmap: str
+        A string to describe the matplotlib colour map.
+    extend: str
+        Contourf-coloring of values outside the levels range
+    log: bool
+        Flag to plot the colour scale linearly (False) or
+        logarithmically (True)
+    """
+    plt.subplot(subplot)
+    logger.info('add_map_subplot: %s', subplot)
+    if log:
+        qplot = qplt.contourf(
+            cube,
+            nspace,
+            linewidth=0,
+            cmap=plt.cm.get_cmap(cmap),
+            norm=LogNorm(),
+            zmin=nspace.min(),
+            zmax=nspace.max())
+        qplot.colorbar.set_ticks([0.1, 1., 10.])
+    else:
+        qplot = iris.plot.contourf(
+            cube,
+            nspace,
+            linewidth=0,
+            cmap=plt.cm.get_cmap(cmap),
+            extend=extend,
+            zmin=nspace.min(),
+            zmax=nspace.max())
+        cbar = plt.colorbar(orientation='horizontal')
+        cbar.set_ticks(
+            [nspace.min(), (nspace.max() + nspace.min()) / 2.,
+             nspace.max()])
+
+    plt.gca().coastlines()
+    plt.title(title)
+
+
+def single_pane_map_plot(
+        cfg,
+        metadata,
+        cube,
+        key='',
+        ):
+    """
+    Make a single pane map figure.
+    """
+    short_name = metadata['short_name']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+    exp = metadata['exp']
+
+    times = cube.coord('time').units.num2date(cube.coord('time').points)
+    year = str(times[0].year)
+
+    unique_id = [dataset, exp, ensemble, short_name, year, key]
+
+    # Determine image filename
+
+    path = diagtools.folder(cfg['plot_dir']) + '_'.join(unique_id)
+    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+
+    if os.path.exists(path): 
+        return
+
+    nspace = np.linspace(
+        cube.data.min(), cube.data.max(), 20, endpoint=True)
+    title = ' '.join(unique_id)
+    print('single_pane_map_plot:', unique_id, nspace, [cube.data.min(), cube.data.max()])
+    add_map_subplot(111, cube, nspace, title=title,
+                    )
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path, dpi=200)
+    plt.close()
+
+
+
+def make_difference_plots(
+        cfg,
+        metadata,
+        detrended_cube,
+        hist_cube):
+    """
+    Make a figure showing four maps and the other shows a scatter plot.
+    The four pane image is a latitude vs longitude figures showing:
+    * Top left: model
+    * Top right: observations
+    * Bottom left: model minus observations
+    * Bottom right: model over observations
+    Parameters
+    ----------
+    cfg: dict
+        the opened global config dictionairy, passed by ESMValTool.
+    metadata: dict
+        the input files dictionairy
+    """
+
+    short_name = metadata['short_name']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+
+
+    long_name = ''.join([ short_name, dataset, ]) 
+    units = str(hist_cube.units)
+
+    # Load image format extention
+    image_extention = diagtools.get_image_format(cfg)
+
+    fig = plt.figure()
+    fig.set_size_inches(9, 6)
+
+    # Create the cubes
+    cube221 = detrended_cube[-1,0]
+    cube222 = hist_cube[-1, 0]
+    cube223 = cube221 - cube222
+    cube224 =  cube221/cube222
+
+    # create the z axis for plots 2, 3, 4.
+    extend = 'neither'
+    zrange12 = diagtools.get_cube_range([cube221, cube222])
+    #if 'maps_range' in metadata[input_file]:
+    #    zrange12 = metadata[input_file]['maps_range']
+    #    extend = 'both'
+    zrange3 = diagtools.get_cube_range_diff([cube223])
+    #if 'diff_range' in metadata[input_file]:
+    #    zrange3 = metadata[input_file]['diff_range']
+    #    extend = 'both'
+
+    cube224.data = np.ma.clip(cube224.data, 0.1, 10.)
+
+    print('plotting:', long_name, 'zrange12:',zrange12)
+    n_points = 12
+    linspace12 = np.linspace(
+        zrange12[0], zrange12[1], n_points, endpoint=True)
+    linspace3 = np.linspace(
+        zrange3[0], zrange3[1], n_points, endpoint=True)
+    logspace4 = np.logspace(-1., 1., 12, endpoint=True)
+
+    # Add the sub plots to the figure.
+    add_map_subplot(
+        221, cube221, linspace12, cmap='viridis', title='Detrended',
+        extend=extend)
+    add_map_subplot(
+        222, cube222, linspace12, cmap='viridis',
+        title='Historical',
+        extend=extend)
+    add_map_subplot(
+        223,
+        cube223,
+        linspace3,
+        cmap='bwr',
+        title='Difference',
+        extend=extend)
+    if np.min(zrange12) > 0.:
+        add_map_subplot(
+            224,
+            cube224,
+            logspace4,
+            cmap='bwr',
+            title='Quotient',
+            log=True)
+
+    # Add overall title
+    fig.suptitle(long_name + ' [' + units + ']', fontsize=14)
+
+    # Determine image filename    
+    fn_list = ['Detrended', project, dataset, ensemble, short_name, 'quad_maps']
+    path = diagtools.folder(cfg['plot_dir']) + '_'.join(fn_list)
+    path = path.replace(' ', '') + image_extention
+
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path, dpi=200)
+
+    plt.close()
+
+
+
+
 def maenumerate(marr):
     """
     masked array version of ndenumerate.
@@ -786,6 +993,93 @@ def maenumerate(marr):
     mask = ~marr.mask.ravel()
     for i, m in itertools.izip(np.ndenumerate(marr), mask):
         if m: yield i
+
+
+def detrend_hist(cfg, metadatas, filename, trend_shelve):
+    """
+    Use the shelve calculoated in calc_pi_trend to detrend 
+    the historical data.
+    """
+    exp = metadatas[filename]['exp']
+    short_name = metadatas[filename]['short_name']
+    dataset = metadatas[filename]['dataset']
+    ensemble = metadatas[filename]['ensemble']
+    project = metadatas[filename]['project']
+
+    work_dir = diagtools.folder([cfg['work_dir'], 'detrended'])
+    output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, short_name, 'detrended'])+'.nc'
+
+    if os.path.exists(output_fn):
+        print('Detrended already exists:', output_fn)
+        cube = iris.load_cube(filename)
+        detrended = iris.load_cube(output_fn) 
+        make_difference_plots(
+            cfg,
+            metadatas[filename],
+            detrended,
+            cube,
+            )
+        
+        return output_fn
+    print ('loading from', trend_shelve)
+
+    if not glob(trend_shelve+'*'):
+        print('Trend shelve doesn\'t exist', trend_shelve)
+        assert 0
+    sh = shopen(trend_shelve)
+    slopes = sh['slopes']
+    intercepts = sh['intercepts']
+    sh.close()
+
+    cube = iris.load_cube(filename)
+    for t in [0, -1]:
+        single_pane_map_plot(
+            cfg,
+            metadatas[filename],
+            cube[t,0],
+            key='hist'
+            )
+
+    decimal_time = diagtools.cube_time_to_float(cube)
+
+    dummy = cube.data.copy()
+    dummy = np.ma.masked_where(dummy>10E10, dummy)
+    count = 0
+    for index, arr in np.ndenumerate(dummy[0]): 
+        if np.ma.is_masked(arr): continue
+        data = cube.data[:, index[0], index[1], index[2]]
+        if np.ma.is_masked(data.max()): continue
+
+        if not count%10000 : 
+            print(index, arr, [len(slopes)], dummy.shape, len(decimal_time))
+            print(slopes[index], intercepts[index])
+        slope = slopes[index]
+        intercept = intercepts[index] 
+
+        line = [ (t * slope) + intercept for t in np.arange(len(decimal_time))]
+        dummy[:,index[0], index[1],index[2]] = np.array(line)
+        count+=1
+    detrended = cube.copy()
+    detrended.data = detrended.data - np.ma.array(dummy)
+    iris.save(detrended, output_fn)
+
+    for t in [0, -1]:
+        single_pane_map_plot(
+                cfg,
+                metadatas[filename],
+                detrended[t,0],
+                key='detrended'
+                )
+
+    make_difference_plots(
+        cfg,
+        metadatas[filename],
+        detrended,
+        cube,
+        )
+
+    return output_fn
+
 
 
 def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=True ):
@@ -823,20 +1117,45 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
         count = sh.get('count', 0)
         sh.close()
     else:
-        print('Starting fresh')
+        print('Starting picontrol calculation from fresh')
         slopes = {} 
         intercepts = {}
         count = 0
 
+    for t in [0, -1]:
+        single_pane_map_plot(
+            cfg, 
+            metadatas[filename], 
+            cube[t, 0], 
+            key ='piControl')
+
     dummy = cube.data[0]
+    dummy = np.ma.masked_where(dummy>10E10, dummy)
+    times = cube.coord('time')
+    pi_year = times.units.num2date(times.points)[0].year + 11. # (1971 equivalent)
+
     print('Calculating linear regression for:', [project, dataset, exp, ensemble, short_name, ])
     for index, arr in np.ndenumerate(dummy): #[~cube.data[0].mask]):
         if np.ma.is_masked(arr): continue
         if slopes.get(index, False): continue
-        #print(index)
-        linreg = linregress(decimal_time, cube.data[:, index[0], index[1], index[2]])
-        # linreg = linregress( np.arange(len(decimal_time)), pi_cube.data)
 
+        # Load time series for individual point
+        data = cube.data[:, index[0], index[1], index[2]]
+        if np.ma.is_masked(data.max()): continue
+
+        # Zero PI control around year 11 (1971 in hist)
+        data = zero_around_dat(decimal_time, data, year=pi_year)
+
+        # Calculate Linear Regression
+        linreg = linregress( np.arange(len(decimal_time)), data)
+        if linreg.slope > 1E10 or linreg.intercept>1E10:
+              print('linear regression failed:', linreg)
+              print('slope:', linreg.slope,'intercept', linreg.intercept)
+              print('from time:', np.arange(len(decimal_time)))
+              print('from data:', cube.data[:, index[0], index[1], index[2]])
+              assert 0
+
+        # Store results of Linear Regression
         slopes[index] = linreg.slope
         intercepts[index] = linreg.intercept
         count+=1
@@ -848,7 +1167,10 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
             sh['count'] = count
             sh.close()
 
-    print('Saving final shelve: ', count, index, linreg.slope, linreg.intercept)
+    if count == 0: 
+        print('linear regression failed', count)
+        assert 0
+    print('Saving final shelve: ', count, index )#linreg.slope, linreg.intercept)
     sh = shopen(output_shelve)
     sh['slopes'] = slopes
     sh['intercepts'] = intercepts
@@ -859,11 +1181,11 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
     if plot_histo:	 
         fig = plt.figure()
         fig.add_subplot(211)
-        plt.hist(slopes.values(), c='red')
+        plt.hist(list(slopes.values()), bins=21, color='red', )
         plt.title('Slopes')
 
         fig.add_subplot(212)
-        plt.hist(intercepts.values(), c='blues')
+        plt.hist(list(intercepts.values()), bins=21, color='blue')
         plt.title('Intercepts')
 
         path = diagtools.folder([cfg['plot_dir'], 'pi_trend'])
@@ -872,9 +1194,27 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
         plt.savefig(path)
         plt.close()
 
-   #  nc = netCDF4.Dataset(output_fn, mode='w')
-    
-    return output_fn
+#    nc = netCDF4.Dataset(output_fn, mode='w')
+#    coord_sys = iris.coord_systems.GeogCS(
+#            iris.fileformats.pp.EARTH_RADIUS)
+#        lons = iris.coords.DimCoord(
+#            [i + .5 for i in range(5)],
+#            standard_name='longitude',
+#            bounds=[[i, i + 1.] for i in range(5)],  # [0,1] to [4,5]
+#            units='degrees_east',
+#            coord_system=self.coord_sys)
+#        lats = iris.coords.DimCoord(
+#            [i + .5 for i in range(5)],
+#            standard_name='latitude',
+#            bounds=[[i, i + 1.] for i in range(5)],
+#            units='degrees_north',
+#            coord_system=self.coord_sys,
+#        )
+#        coords_spec = [(lats, 0), (lons, 1)]
+#        self.grid = iris.cube.Cube(data, dim_coords_and_dims=coords_spec)
+#
+    return output_shelve 
+#   return output_fn
 
 
 def main(cfg):
@@ -897,6 +1237,8 @@ def main(cfg):
     short_names = {}
     file_dict = {}
 
+    trend_shelves = {}
+    detrended_hist = {}
     print('\n\n\ncreation loop')
     for filename in sorted(metadatas):
         print('creation loop', filename,':', metadatas[filename])
@@ -911,12 +1253,28 @@ def main(cfg):
    
     #doing stuff:
     print('\n\n\ndoing stuff loop')
-
+    # Calculated trend.
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
         print('iterating', project, dataset, exp, ensemble, short_name, filename)
-        if exp != 'piControl': continue
-        if short_name == 'volcello': continue
-        trend_file[filename] = calc_pi_trend(cfg, metadatas, filename)
+        if exp != 'piControl': 
+            continue
+        if short_name == 'volcello': 
+            continue
+        trend_shelves[(project, dataset, exp, ensemble, short_name)] = calc_pi_trend(cfg, metadatas, filename)
+
+    # Detrend the historical.
+    for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
+        print('iterating', project, dataset, exp, ensemble, short_name, filename)
+        if exp == 'piControl':
+              continue
+        if short_name == 'volcello':
+              continue
+        trend_shelve = trend_shelves[(project, dataset, 'piControl', 'r1i1p1f2', short_name)]
+
+        detrended_hist[(project, dataset, exp, ensemble, short_name)] = detrend_hist(cfg, metadatas, filename, trend_shelve)
+
+    
+
 
     # 
     # Here's the plan:
