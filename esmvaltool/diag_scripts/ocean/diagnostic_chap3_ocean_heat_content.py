@@ -788,6 +788,46 @@ def zero_around_dat(times, data, year=1971.):
     return data - np.ma.mean(data[index-1:index+2])
 
 
+def detrending_fig(cfg, 
+        metadatas, 
+        detrended_hist, 
+        trend_intact_hist, 
+        detrended_piC, 
+        trend_intact_piC,
+        depth_range):
+    """
+    Make figure showing detrending process as a time series.
+    """
+    short_name = metadata['short_name']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+
+    cube_d_h = iris.load_cube(detrended_hist)
+    cube_i_h = iris.load_cube(trend_intact_hist)
+    cube_d_p = iris.load_cube(detrended_piChist)
+    cube_i_p = iris.load_cube(trend_intact_piC)
+
+    times = diagtools.cube_time_to_float(cube_d_i)
+   
+    Plt.plot(times, cube_d_h.data, color = 'red', label = 'Detrended Historical')
+    plt.plot(times, cube_i_h.data, color = 'blue', label = 'Historical')
+    plt.plot(times, cube_d_p.data, color = 'orange', label = 'Detrended PI Control')
+    plt.plot(times, cube_i_p.data, color = 'green', label = 'PI Control')
+
+    plt.axhline(0., c = 'k', ls=':' )
+    title = ' '.join([dataset, ensemble])
+    plt.title(title)
+
+    fig_dir = diagtools.folder([cfg['plot_dir'], 'ohc_detrending_ts'])
+    image_extention = diagtools.get_image_format(cfg)
+    fig_fn = fig_dir + '_'.join([project, dataset, ensemble, 'ohc_detrending_ts',
+                                   depth_range])+image_extention
+
+    plt.savefig(fig_fn)
+    plt.close()
+
+
 
 def add_map_subplot(subplot, cube, nspace, title='',
                     cmap='viridis', extend='neither', log=False):
@@ -1475,7 +1515,33 @@ def main(cfg):
             ohc_ts_fn = calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend)
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, short_name, trend)] = ohc_ts_fn
             metadatas[ohc_ts_fn] = metadatas[ohc_fn]
-    plot_multimodel_depth_ranges(             
+
+    print('plotting detrending figure. ')
+
+    # for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_hist.items():
+        # time series needs:
+        #    detrended hist - tick
+        #    trend intact hist
+        #    PI control - detrended
+        #    PI control trend intact
+        #    Linear regression?
+    datasets = {index[1]:True for index in ocean_heat_content_timeseries.keys()}
+    ensembles = {index[3]:True for index in ocean_heat_content_timeseries.keys()}
+    projects = {index[3]:True for index in ocean_heat_content_timeseries.keys()}
+
+    ensemble = 'r2i1p1f2'
+    project = 'CMIP6'
+    for dataset, depth_range  in itertools.product(datasets.keys(), depth_ranges):    
+        detrended_hist = ocean_heat_content_timeseries[(project, dataset, 'historical', ensemble, 'ohc', 'detrended')]
+        trend_intact_hist = ocean_heat_content_timeseries[(project, dataset, 'historical', ensemble, 'ohc', 'intact')]
+        detrended_piC = ocean_heat_content_timeseries[(project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'detrended')]
+        trend_intact_piC = ocean_heat_content_timeseries[(project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'intact')]
+
+        detrending_fig(cfg, metadatas, detrended_hist, trend_intact_hist, detrended_piC, trend_intact_piC, depth_range)
+
+
+
+#    plot_multimodel_depth_ranges(            ) 
     logger.info('Success')
 
 
