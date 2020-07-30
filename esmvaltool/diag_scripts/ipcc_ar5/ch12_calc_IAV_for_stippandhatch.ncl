@@ -184,8 +184,9 @@ begin
     if ((end_yr(0, 0) - start_yr(0, 0) + 1) .lt. 500) then
       log_info("warning: Control run is less than 500 years.")
     end if
-    if (isatt(diag_script_info, "not_cut_100_years") .and. \
-        diag_script_info@not_cut_100_years .eq. True) then
+    if ((isatt(diag_script_info, "not_cut_100_years") .and. \
+        diag_script_info@not_cut_100_years .eq. True) .or. \
+        (end_yr(0, 0) - start_yr(0, 0) + 1) .lt. 500) then
       new_start_yr = toint(start_yr(0, 0))
     else
       new_start_yr = toint((start_yr(0, 0) + 100))
@@ -369,8 +370,6 @@ begin
           rm_single_dims(dim_avg_n(tmp_zon(:, s, :, :), 0) * sqrt(2.))
       end if
     end do
-
-print(IAV_mmm)
 
     if (ndim .eq. 3) then
       IAV_mmm!0 = "season"

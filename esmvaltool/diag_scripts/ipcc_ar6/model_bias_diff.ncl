@@ -410,7 +410,6 @@ begin
   ;climofiles = new(2, string)
   ;climofiles(0) = infiles(mm_ind)
   ;climofiles(1) = infiles(ref_ind)
-  climofiles = infiles
 
   diff1@res_gsnMaximize  = True  ; use full page for the plot
   diff1@res_cnFillOn  = True  ; color plot desired
@@ -667,8 +666,8 @@ begin
       delete(wks)
     end if
 
-    wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_" + var0 \
-                  + "_annualclim" )
+    wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_diff_" + var0 \
+                  + "_annualclim_" + input_file_info[0]@project )
 
     plotfile = wks@fullname
 
@@ -749,23 +748,23 @@ begin
       resb@gsnRightString = ""
       resb@cnFillScaleF = 0.25
 
-      ; plot hatch
-      if all(to_plot_not_signif1(:, :) .eq. 1) then
-        to_plot_not_signif1(0, 0) = 0
-      end if
-      if (max(to_plot_not_signif1(:, :)) .gt. \
-          min(to_plot_not_signif1(:, :))) then
-        plot3 = gsn_csm_contour(wks, to_plot_not_signif1(:, :), resb)
-        overlay(plots(0), plot3)
-      end if
-      if all(to_plot_not_signif2(:, :) .eq. 1) then
-        to_plot_not_signif2(0, 0) = 0
-      end if
-      if (max(to_plot_not_signif2(:, :)) .gt. \
-          min(to_plot_not_signif2(:, :))) then
-        plot4 = gsn_csm_contour(wks, to_plot_not_signif2(:, :), resb)
-        overlay(plots(1), plot4)
-      end if
+      ;; plot hatch
+      ;if all(to_plot_not_signif1(:, :) .eq. 1) then
+      ;  to_plot_not_signif1(0, 0) = 0
+      ;end if
+      ;if (max(to_plot_not_signif1(:, :)) .gt. \
+      ;    min(to_plot_not_signif1(:, :))) then
+      ;  plot3 = gsn_csm_contour(wks, to_plot_not_signif1(:, :), resb)
+      ;  overlay(plots(0), plot3)
+      ;end if
+      ;if all(to_plot_not_signif2(:, :) .eq. 1) then
+      ;  to_plot_not_signif2(0, 0) = 0
+      ;end if
+      ;if (max(to_plot_not_signif2(:, :)) .gt. \
+      ;    min(to_plot_not_signif2(:, :))) then
+      ;  plot4 = gsn_csm_contour(wks, to_plot_not_signif2(:, :), resb)
+      ;  overlay(plots(1), plot4)
+      ;end if
 
       ; mark improvements in panel 0
       ress@cnFillPatterns = (/-1, 6, 6/)
@@ -816,7 +815,8 @@ begin
   ; # output to netCDF                        #
   ; ###########################################
 
-  nc_filename = work_dir + "model_bias_diff_" + var0 + ".nc"
+  nc_filename = work_dir + "model_bias_diff_" + var0 + "_annualclim_" \
+                + input_file_info[0]@project + ".nc"
   nc_filename@existing = "overwrite"
 
   ;mmdata@var = var0 + "_mean"
@@ -890,14 +890,17 @@ begin
   ; write provenance to netcdf output and plot file(s) (mean)
   ; ------------------------------------------------------------------------
 
+  authors = (/"bock_lisa"/)
   statistics = (/"clim", "diff"/)
   domain = ("global")
   plottype = ("geo")
+  references = (/"flato13ipcc"/)
   prov_caption = caption + " for variable " + var0 \
     + ", reference = " + names(ref_ind) + "."
+  infiles = metadata_att_as_array(info0, "filename")
 
-  log_provenance(nc_outfile, plotfile, prov_caption, statistics, \
-                 domain, plottype, "", "", climofiles)
+  ;log_provenance(nc_filename, plotfile, prov_caption, statistics, \
+  ;               domain, plottype, authors, references, infiles)
 
   leave_msg(DIAG_SCRIPT, "")
 

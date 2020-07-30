@@ -344,9 +344,9 @@ begin
   ; ============================= plotting =================================
   ; ========================================================================
 
-  climofiles = new(2, string)
-  climofiles(0) = infiles(mm_ind)
-  climofiles(1) = infiles(ref_ind)
+  ;climofiles = new(2, string)
+  ;climofiles(0) = infiles(mm_ind)
+  ;climofiles(1) = infiles(ref_ind)
 
   diff@res_gsnMaximize  = True  ; use full page for the plot
   diff@res_cnFillOn  = True  ; color plot desired
@@ -434,13 +434,11 @@ begin
 
 
   if (var0.eq."tas") then
-    ;mmdata@res_tiMainString = "Near-Surface Temperature ~C~   Multi-Model Mean"
     mmdata@res_cnLevels = ispan(-35, 35, 5)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_temperature_div.rgb")
     mmdata@res_cnFillPalette = pal
-    ;diff@res_tiMainString = "Near-Surface Temperature ~C~  Multi-Model Mean Bias"
     diff@res_cnFillPalette = pal
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
@@ -455,13 +453,12 @@ begin
                                 + "ipcc-ar6_temperature_seq.rgb")
     end if
   elseif (var0.eq."pr") then
-    ;mmdata@res_tiMainString = "Precipitation ~C~Multi Model Mean"
     mmdata@res_cnLevels = ispan(1, 10, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                             + "ipcc-ar6_precipitation_div.rgb")
+                             + "ipcc-ar6_precipitation_seq.rgb")
     mmdata@res_cnFillPalette = pal
-    ;diff@res_tiMainString = "Precipitation ~C~Multi Model Mean Bias"
+    mmdata@res_lbBoxEndCapStyle = "TriangleHighEnd"
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_precipitation_div.rgb")
     diff@res_cnFillPalette = pal2
@@ -475,16 +472,14 @@ begin
     end if
     if (plot_rms_diff) then
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                                + "ipcc-ar6_precipitation_div.rgb")
+                                + "ipcc-ar6_precipitation_seq.rgb")
     end if
   elseif (var0.eq."tos" .or. var0.eq."thetao") then
-    mmdata@res_tiMainString = "Sea Surface Temperature ~C~Multi Model Mean"
     mmdata@res_cnLevels = ispan(-30, 30, 5)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_temperature_div.rgb")
     mmdata@res_cnFillPalette = pal
-    diff@res_tiMainString = "Sea Surface Temperature ~C~Multi Model Mean Bias"
     diff@res_cnFillPalette = pal
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
@@ -499,14 +494,12 @@ begin
                                 + "ipcc-ar6_temperature_seq.rgb")
     end if
   elseif (var0.eq."so") then
-    mmdata@res_tiMainString = "Sea Surface Salinity ~C~Multi Model Mean"
     mmdata@res_cnLevels = ispan(310, 370, 5) * 0.1
     ;mmdata@res_cnLevels = ispan(26, 37, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_misc_seq_1.rgb")
     mmdata@res_cnFillPalette = pal
-    diff@res_tiMainString = "Sea Surface Salinity ~C~Multi Model Mean Bias"
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_misc_div.rgb")
     diff@res_cnFillPalette = pal2
@@ -554,35 +547,15 @@ begin
     copy_VarMeta(diff, rmsdiff)
     if (isvar("pal5")) then
       rmsdiff@res_cnFillPalette = pal5
+      rmsdiff@res_lbBoxEndCapStyle = "TriangleHighEnd"
+    end if
+    if (var0 .eq. "tas") then
       delete(rmsdiff@res_cnLevels)
       rmsdiff@res_cnLevels = ispan(1,12,1) * 0.5
-      rmsdiff@res_lbBoxEndCapStyle = "TriangleHighEnd"
-;      if (var0 .eq. "tas") then
-;        rmsdiff@res_cnFillColors = pal5(4:0,:)
-;        nt = dimsizes(pal5(4:0,:))
-;      elseif (var0 .eq. "pr") then
-;        rmsdiff@res_cnFillColors = pal5(5:10,:)
-;        nt = dimsizes(pal5(5:10,:))
-;      elseif (var0 .eq. "tos") then
-;        rmsdiff@res_cnFillColors = pal5(4:0,:)
-;        nt = dimsizes(pal5(4:0,:))
-;      end if
-;      n = nt(0)
-;    else
-;      n = dimsizes(diff@res_cnLevels)
+    elseif (var0 .eq. "pr")
+      delete(rmsdiff@res_cnLevels)
+      rmsdiff@res_cnLevels = ispan(1,8,1) * 0.5
     end if
-;    mx = max(diff@res_cnLevels)
-;    delete(rmsdiff@res_cnLevels)
-;
-;    tmp = fspan(0.0, mx, n)
-;
-;    rmsdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
-;    delete(tmp)
-;
-;    if (var0 .eq. "pr") then
-;      delete(rmsdiff@res_cnLevels)
-;      rmsdiff@res_cnLevels = (/0.5,1.,1.5,2.,2.5/)
-;    end if
 
     if(isatt(diag_script_info, "rmsd_caption")) then
        rmsdiff@res_tiMainString = diag_script_info@rmsd_caption
@@ -656,7 +629,7 @@ begin
     end if
 
     wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_" + var0 \
-                  + "_annualclim" )
+                  + "_annualclim_" + input_file_info[0]@project)
 
     plotfile = wks@fullname
 
@@ -728,27 +701,27 @@ begin
       resb@gsnRightString = ""
       resb@cnFillScaleF = 0.25
 
-      ; plot hatch
-      if all(to_plot_not_signif(:, :) .eq. 1) then
-        to_plot_not_signif(0, 0) = 0
-      end if
-      if (max(to_plot_not_signif(:, :)) .gt. \
-          min(to_plot_not_signif(:, :))) then
-        plot2 = gsn_csm_contour(wks, to_plot_not_signif(:, :), resb)
-        overlay(plots(1), plot2)
-      end if
+      ;; plot hatch
+      ;if all(to_plot_not_signif(:, :) .eq. 1) then
+      ;  to_plot_not_signif(0, 0) = 0
+      ;end if
+      ;if (max(to_plot_not_signif(:, :)) .gt. \
+      ;    min(to_plot_not_signif(:, :))) then
+      ;  plot2 = gsn_csm_contour(wks, to_plot_not_signif(:, :), resb)
+      ;  overlay(plots(1), plot2)
+      ;end if
 
-      if (plot_rms_diff) then
-        ; plot hatch
-        if all(to_plot_not_signif_rmsd(:, :) .eq. 1) then
-          to_plot_not_signif_rmsd(0, 0) = 0
-        end if
-        if (max(to_plot_not_signif_rmsd(:, :)) .gt. \
-            min(to_plot_not_signif_rmsd(:, :))) then
-          plot3 = gsn_csm_contour(wks, to_plot_not_signif_rmsd(:, :), resb)
-          overlay(plots(3), plot3)
-        end if
-      end if
+      ;if (plot_rms_diff) then
+      ;  ; plot hatch
+      ;  if all(to_plot_not_signif_rmsd(:, :) .eq. 1) then
+      ;    to_plot_not_signif_rmsd(0, 0) = 0
+      ;  end if
+      ;  if (max(to_plot_not_signif_rmsd(:, :)) .gt. \
+      ;      min(to_plot_not_signif_rmsd(:, :))) then
+      ;    plot3 = gsn_csm_contour(wks, to_plot_not_signif_rmsd(:, :), resb)
+      ;    overlay(plots(3), plot3)
+      ;  end if
+      ;end if
 
     end if
 
@@ -774,7 +747,9 @@ begin
   ; # output to netCDF                        #
   ; ###########################################
 
-  nc_filename = work_dir + "model_bias_" + var0 + ".nc"
+  nc_filename = work_dir + "model_bias_" + var0 + "_annualclim_" \
+                + input_file_info[0]@project + ".nc"
+
   nc_filename@existing = "overwrite"
 
   mmdata@var = var0 + "_mean"
@@ -842,14 +817,17 @@ begin
   ; write provenance to netcdf output and plot file(s) (mean)
   ; ------------------------------------------------------------------------
 
+  authors = (/"bock_lisa"/)
   statistics = (/"clim", "diff"/)
   domain = ("global")
   plottype = ("geo")
+  references = (/"flato13ipcc"/)
   prov_caption = caption + " for variable " + var0 \
     + ", reference = " + names(ref_ind) + "."
+  infiles = metadata_att_as_array(info0, "filename")
 
-  log_provenance(nc_outfile, plotfile, prov_caption, statistics, \
-                 domain, plottype, "", "", climofiles)
+  log_provenance(nc_filename, plotfile, prov_caption, statistics, \
+                 domain, plottype, authors, references, infiles)
 
   leave_msg(DIAG_SCRIPT, "")
 
