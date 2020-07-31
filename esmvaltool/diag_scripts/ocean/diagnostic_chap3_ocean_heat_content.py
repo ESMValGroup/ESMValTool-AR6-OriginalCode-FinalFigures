@@ -41,6 +41,11 @@ from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
 
 from esmvalcore.preprocessor._time import extract_time
+try:
+    import gsw
+except: 
+    print('Unable to load gsw.\n You need to install it in your conda environmetn with:\npip install gsw')
+
 
 
 # This part sends debug statements to stdout
@@ -1131,43 +1136,118 @@ def derive_ohc(cube, volume):
     return cube
 
 
-def calc_ohc(cfg, metadatas, detrended_fn, volcello_fn, trend=''):
+
+
+def calc_ohc_basic(cfg, metadatas, thetao_fn, volcello_fn, trend=''):
     """
-    Calculate OHC form files.
+    Calculate OHC form files using basic fudge factor..
     """
-    cube = iris.load_cube(detrended_fn)
-    vol_cube = iris.load_cube(volcello_fn)
-
-    exp = metadatas[detrended_fn]['exp']
-
-
-    dataset = metadatas[detrended_fn]['dataset']
-    ensemble = metadatas[detrended_fn]['ensemble']
-    project = metadatas[detrended_fn]['project']
+    exp = metadatas[thetao_fn]['exp']
+    dataset = metadatas[thetao_fn]['dataset']
+    ensemble = metadatas[thetao_fn]['ensemble']
+    project = metadatas[thetao_fn]['project']
 
     work_dir = diagtools.folder([cfg['work_dir'], 'OHC'])
-    
     output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'ocean_heat', trend])+'.nc'
 
     if os.path.exists(output_fn):
         return output_fn
 
-    cube = iris.load_cube(detrended_fn)
-    vol_cube = iris.load_cube(volcello_fn)
+    times = diagtools.cube_time_to_float(cube)
+    const = 4.09169e+6
 
+    if volume.ndim == 3:
+        print('calculating volume sum (3D):')
+        for t, time in enumerate(times):
+            cube.data[t] = cube.data[t] * volume.data * const
+    elif volume.ndim == 4:
+        for t, time in enumerate(times):
+            cube.data[t] = cube.data[t] * volume[t].data * const
+    else:
+        print('Volume and temperature do not match')
+
+    cube = iris.load_cube(thetao_fn)
+    vol_cube = iris.load_cube(volcello_fn)
     ohc_cube = derive_ohc(cube, vol_cube)
+    iris.save(ohc_cube, output_fn)
+
+    for t in [0, -1]:
+        single_pane_map_plot(
+                cfg,
+                metadatas[thetao_fn],
+                ohc_cube[t, 0],
+                key='OHC'
+                )
+
+
+def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact'):
+    """
+    Calculate OHC form files using full method..
+    """
+    exp = metadatas[thetao_fn]['exp']
+    dataset = metadatas[thetao_fn]['dataset']
+    ensemble = metadatas[thetao_fn]['ensemble']
+    project = metadatas[thetao_fn]['project']
+
+    work_dir = diagtools.folder([cfg['work_dir'], 'OHC'])
+    output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'ocean_heat', trend])+'.nc'
+
+    if os.path.exists(output_fn):
+        return output_fn
+
+    thetao_cube = iris.load_cube(thetao_fn)
+    so_cube = iris.load_cube(so_fn)
+    #vol_cube = iris.load_cube(volcello_fn)
+    #cube = thetao_cube.copy()
+
+    depths = -1.*np.abs(thetao_cube.coord('depth').points)
+    lats = thetao_cube.coord('latitude').points
+
+    cube.data = 
+    pressure = gsw.conversions.p_from_z(
+        depth,
+        lat,
+        )
+    #if pressure.ndim == 4
+
+    # all cubes will be 4d.
+    # but: z may be 1D, 3D or 4D
+    # 
+    times = diagtools.cube_time_to_float(cube)
+    for t, time in enumerate(times):
+
+        pressure.
+
+
+    if volume.ndim == 3:
+        print('calculating volume sum (3D):')
+        for t, time in enumerate(times):
+            cube.data[t] = cube.data[t] * volume.data * const
+    elif volume.ndim == 4:
+        for t, time in enumerate(times):
+            cube.data[t] = cube.data[t] * volume[t].data * const
+
+
+    ohc_arr = gsw.energy.internal_energy(so_cube.data, thetao_cube.data, )
+
+#    cube = derive_ohc(cube, vol_cube)
+    cube.units = cf_units.Unit('J')
+    cube.name = 'Ocean heat Content'
+    cube.short_name = 'ohc'
+    cube.var_name = 'ohc'
 
     iris.save(ohc_cube, output_fn)
 
     for t in [0, -1]:
         single_pane_map_plot(
                 cfg,
-                metadatas[detrended_fn],
+                metadatas[thetao_fn],
                 ohc_cube[t, 0],
                 key='OHC'
                 )
-
     return output_fn
+    
+
 
 def detrend_hist(cfg, metadatas, filename, trend_shelve):
     """
@@ -1499,7 +1579,13 @@ def main(cfg):
         else:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
-        ohc_fn = calc_ohc(cfg, metadatas, fn, volcello_fn, trend='intact')
+
+        if detrending_method == 'Basic':
+            ohc_fn = calc_ohc_basic(cfg, metadatas, fn, volcello_fn, trend='intact')
+        elif detrending_method == 'Full':
+            so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
+            ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
+
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc','intact')] = ohc_fn
         metadatas[ohc_fn] = metadatas[fn].copy()
 
@@ -1511,7 +1597,13 @@ def main(cfg):
         else:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0 
-        ohc_fn = calc_ohc(cfg, metadatas, detrended_fn, volcello_fn,trend='detrended')
+
+        if detrending_method == 'Basic':
+            ohc_fn = calc_ohc_basic(cfg, metadatas, detrended_fn, volcello_fn,trend='detrended')
+        elif detrending_method == 'Full':
+            so_fn = detrended_hist[(project, dataset, exp, ensemble, 'so')]
+            ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
+
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc', 'detrended')] = ohc_fn 
         metadatas[ohc_fn] = metadatas[detrended_fn].copy()
 
