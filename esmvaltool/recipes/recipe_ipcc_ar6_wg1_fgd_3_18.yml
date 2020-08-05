@@ -72,5 +72,5 @@ diagnostics:
         concatinate_cmip5: true
         seaiceextent: true # if sea ice extent is false, sea ice area is used instead
         cmip5_exps_concatinate: ['historical', 'rcp45'] # the order the cmip5 data should be concatenated
-        month_latitude_NH: [2, 50.] # month and latitude for NH panel
-        month_latitude_SH: [9, -50.] # month and latitude for SH panel
+        month_latitude_NH: [9, 50.] # month and latitude for NH panel
+        month_latitude_SH: [2, -50.] # month and latitude for SH panel

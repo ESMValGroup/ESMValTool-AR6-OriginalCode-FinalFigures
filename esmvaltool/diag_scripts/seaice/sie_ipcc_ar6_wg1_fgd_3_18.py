@@ -18,13 +18,17 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 # #here will be the functions I need
 
-def create_attr_dict(project, month, start_lat, end_lat, concatinated=False, concat_list=None):
+def create_attr_dict(project, month, start_lat, end_lat, concatinated=False, concat_list=None, siext=True):
 
     attr_dict={}
     attr_dict['project'] = project
     attr_dict['month'] = month
     attr_dict['start_lat'] = start_lat
     attr_dict['end_lat'] = end_lat
+    if siext:
+        attr_dict['variable']='SIE'
+    else:
+        attr_dict['variable']='SIA'
     if concatinated:
         attr_dict['concatinated_from']: concat_list
 
@@ -193,11 +197,26 @@ def update_dict(list_dict):
             data_dict[key]['mean']=np.concatenate((data_dict[key]['mean'],[entry['mean']]))
             data_dict[key]['lin_trend_slope']= np.average([data_dict[key]['lin_trend_slope'],entry['lin_trend_slope']])
         else:
-            data_dict[key]={'mean': [entry['mean']], 'lin_trend_slope': [entry['lin_trend_slope']]}
+            if upd_dic['project']=='CMIP5':
+                data_dict[key]={'mean': [entry['mean']], 'lin_trend_slope': [entry['lin_trend_slope']], 'institute' : entry['institute_id']}
+            else:
+                data_dict[key] = {'mean': [entry['mean']], 'lin_trend_slope': [entry['lin_trend_slope']],
+                                  'institute': entry['institution_id']}
 
     for data_key in data_dict.keys():
         data_dict[data_key]['mean'] = np.average(data_dict[data_key]['mean'])
         data_dict[data_key]['lin_trend_slope'] = np.average(data_dict[data_key]['lin_trend_slope']) * 10 # was done in the original code
+
+    verb_month_dict={1:'JAN', 2:'FEB', 3:'MAR', 4:'APR', 5: 'MAY', 6:'JUN',
+                     7:'JUL', 8:'AUG', 9: 'SEP', 10:'OCT', 11:'NOV', 12:'DEC'}
+
+    upd_dic['verb_month'] = verb_month_dict[upd_dic['month']]
+
+
+    if upd_dic['start_lat'] > 0:
+        upd_dic['hemisphere'] = 'NH'
+    else:
+        upd_dic['hemisphere'] = 'SH'
 
     upd_dic.update({'data': data_dict})
 
@@ -229,35 +248,64 @@ def model_stats(inp_dict):
 
 def make_panel(data_dict,nrow,ncol,idx):
 
-    if data_dict['start_lat'] > 0:
-        # put this above
-        # also add in data dict var and verbous month
-        data_dict['hemisphere'] = 'NH'
-    else:
-        data_dict['hemisphere'] = 'SH'
+    tmp_cbar=plt.cm.jet
 
     ax = plt.subplot(nrow,ncol,idx)
-    #redo
-    title = data_dict['hemisphere'] + '_'+str(data_dict['month']) +'_' +data_dict['project']
+    title = data_dict['hemisphere'] + ' ' + data_dict['variable'] + ' ' +data_dict['verb_month'] + ' ' + 'Clim & Trend' + ' (' +data_dict['project']+')'
     ax.set_title(title)
+    cmap_step=int(256/len(data_dict['data'].keys()))
+    xs=[]
+    for n, mod in enumerate(list(data_dict['data'].keys())):
+        ax.scatter(data_dict['data'][mod]['mean'],data_dict['data'][mod]['lin_trend_slope'],label=mod,c=tmp_cbar(n*cmap_step),marker='s')
+        xs.append(data_dict['data'][mod]['mean'])
+    xs=np.asarray(xs)
+    ax.scatter(data_dict['mme_mean'],data_dict['mme_slope'],s=60,marker='o',c='r',label='MME')
+    if data_dict['p_val']>0.5:
+        ax.plot(xs,xs*data_dict['slope_models']+data_dict['intercept'],c='k')
+    ax.set_ylabel('Trend(10^6km^2/decade)')
+    ax.set_xlabel('Clim.(10^6km^2)')
+    if idx%2==0:
+        ax.legend(loc=6, bbox_to_anchor=(1.0,0.5), fontsize=8, frameon=False, ncol=2)
 
     return
 
 def make_plot(data_dict):
-    # somewhere here the make_panel will be called
 
     n_panels=len(data_dict.keys())
-    # determine those
-    nrow=2
-    ncol=2
+
+    projects = [data_dict[key]['project'] for key in data_dict.keys()]
+
+    nrow = len(set(projects))
+    ncol = n_panels/2
 
     fig = plt.figure()
+    fig.set_size_inches(10., 9.)
 
     for n, key in enumerate(data_dict.keys()):
         make_panel(data_dict[key],nrow,ncol,n+1)
 
+    fig.subplots_adjust(left=0.085, right=0.75, top=0.96, bottom=0.06, wspace=0.28, hspace= 0.2)
+
     return
 
+def figure_handling(cfg):
+
+    if cfg['write_plots']:
+
+        img_ext = diagtools.get_image_format(cfg)
+
+        path=os.path.join(cfg['plot_dir'], 'fig_3_18_scatter' + img_ext)
+
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path)
+
+    else:
+
+        plt.show()
+
+    plt.close()
+
+    return
 
 def main(cfg):
 
@@ -281,7 +329,9 @@ def main(cfg):
 
     make_plot(cmip_data_dict)
 
-    # check why cmip5 is curced
+    figure_handling(cfg)
+
+    # check why cmip5 is crocked
 
     logger.info('Success')
 
