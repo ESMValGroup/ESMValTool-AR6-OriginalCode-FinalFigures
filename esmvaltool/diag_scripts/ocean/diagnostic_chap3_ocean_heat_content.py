@@ -37,6 +37,8 @@ from glob import glob
 from dask import array as da
 from shelve import open as shopen
 
+from matplotlib.colors import LogNorm
+
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
 
@@ -790,6 +792,7 @@ def zero_around_dat(times, data, year=1971.):
     Zero around the time range provided.
     """
     index = np.argmin(np.abs(np.array(times) - year))
+    #print('zero_around_dat', times, year, index, np.ma.mean(data[index-1:index+2]))
     return data - np.ma.mean(data[index-1:index+2])
 
 
@@ -803,6 +806,11 @@ def detrending_fig(cfg,
     """
     Make figure showing detrending process as a time series.
     """
+    print('detrending_fig: detrended_hist',detrended_hist)
+    print('detrending_fig: trend_intact_hist', trend_intact_hist)
+    print('detrending_fig: detrended_piC',detrended_piC)
+    print('detrending_fig: trend_intact_piC', trend_intact_piC)
+
     short_name = metadatas[detrended_hist]['short_name']
     dataset = metadatas[detrended_hist]['dataset']
     ensemble = metadatas[detrended_hist]['ensemble']
@@ -812,18 +820,24 @@ def detrending_fig(cfg,
 
     cube_d_h = iris.load_cube(detrended_hist)
     cube_i_h = iris.load_cube(trend_intact_hist)
-    #cube_d_p = iris.load_cube(detrended_piC)
+    cube_d_p = iris.load_cube(detrended_piC)
     cube_i_p = iris.load_cube(trend_intact_piC)
 
     times = diagtools.cube_time_to_float(cube_d_h)
 
+    print('detrending_fig:', cube_d_h.data.max(), cube_i_h.data.max(), cube_i_p.data.max())
+    print('detrending_fig: times', times)
     d_h_data = zero_around_dat(times, cube_d_h.data, year=1971.)
     i_h_data = zero_around_dat(times, cube_i_h.data, year=1971.)
+    d_p_data = zero_around_dat(times, cube_d_p.data, year=1971.)
     i_p_data = zero_around_dat(times, cube_i_p.data, year=1971.)
+
+    print('detrending_fig:', d_h_data.max(), i_h_data.max(), i_p_data.max())
+
 
     plt.plot(times, d_h_data, color = 'red', label = 'Detrended Historical')
     plt.plot(times, i_h_data, color = 'blue', label = 'Historical')
-    #plt.plot(times, cube_d_p.data, color = 'orange', label = 'Detrended PI Control')
+    plt.plot(times, d_p_data, color = 'orange', label = 'Detrended PI Control')
     plt.plot(times, i_p_data, color = 'green', label = 'PI Control')
 
     plt.axhline(0., c = 'k', ls=':' )
@@ -837,6 +851,7 @@ def detrending_fig(cfg,
                                    depth_range])+image_extention
 
     plt.savefig(fig_fn)
+    print('detrending_fig: saving',fig_fn)
     plt.close()
 
 
@@ -866,7 +881,7 @@ def add_map_subplot(subplot, cube, nspace, title='',
     plt.subplot(subplot)
     logger.info('add_map_subplot: %s', subplot)
     if log:
-        qplot = qplt.contourf(
+        qplot = iris.quickplot.contourf(
             cube,
             nspace,
             linewidth=0,
@@ -1045,8 +1060,6 @@ def maenumerate(marr):
         if m: yield i
 
 
-
-
 def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
     """
     Calculate Ocean Heat Content time series.
@@ -1068,7 +1081,9 @@ def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
     if os.path.exists(output_fn):
         return output_fn
 
-    # depth_ranges = ['total', '0-700m', '700-2000m', '2000m_plus']
+    print('calc_ohc_ts: calculating:', depth_range, trend, dataset, exp, ensemble)
+
+    # depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     cube = iris.load_cube(ohc_fn)
     times = diagtools.cube_time_to_float(cube)
     print('calc_ohc_ts', exp, dataset, ensemble, project, depth_range, trend)
@@ -1080,6 +1095,9 @@ def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
         elif depth_range ==  '700-2000m':
             zmax = 2000.
             zmin = 700.
+        elif depth_range ==  '0-2000m':
+            zmax = 2000.
+            zmin = 0.
         elif depth_range ==  '2000m_plus':
             zmax = 10000.
             zmin = 2000.
@@ -1097,13 +1115,12 @@ def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
 
     iris.save(cube, output_fn)
 
-    if not os.path.exists(fig_fn):
-        title = ' '.join([dataset, exp, ensemble, trend, 'OHC', depth_range])
-        fig = plt.figure()
-        timeplot(cube)
-        plt.title(title)
-        plt.savefig(fig_fn)
-        plt.close()
+    title = ' '.join([dataset, exp, ensemble, trend, 'OHC', depth_range])
+    fig = plt.figure()
+    timeplot(cube)
+    plt.title(title)
+    plt.savefig(fig_fn)
+    plt.close()
 
     return output_fn
 
@@ -1189,67 +1206,125 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     ensemble = metadatas[thetao_fn]['ensemble']
     project = metadatas[thetao_fn]['project']
 
+
     work_dir = diagtools.folder([cfg['work_dir'], 'OHC'])
     output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'ocean_heat', trend])+'.nc'
+
+    print('\n-------\ncalc_ohc_full', (exp, dataset, ensemble, project, trend), thetao_fn)
+    print('output_fn:', output_fn)
 
     if os.path.exists(output_fn):
         return output_fn
 
     thetao_cube = iris.load_cube(thetao_fn)
     so_cube = iris.load_cube(so_fn)
-    #vol_cube = iris.load_cube(volcello_fn)
-    #cube = thetao_cube.copy()
+    vol_cube = iris.load_cube(volcello_fn)
 
-    depths = -1.*np.abs(thetao_cube.coord('depth').points)
+    for fn in [thetao_fn, so_fn, volcello_fn, output_fn]:
+        if fn.find(exp) == -1: 
+            print('ERROR:', exp, 'not in', fn)
+            assert 0
+
     lats = thetao_cube.coord('latitude').points
+    lons = thetao_cube.coord('longitude').points
+    depths = -1.*np.abs(thetao_cube.coord('depth').points) # depth is negative here.
+    times = diagtools.cube_time_to_float(thetao_cube) # decidmal time.
+    ohc_data = thetao_cube.data.copy()
 
-    cube.data = 
-    pressure = gsw.conversions.p_from_z(
-        depth,
-        lat,
-        )
-    #if pressure.ndim == 4
+    count = 0
+    for (t,z,y,x), temp in np.ndenumerate(thetao_cube.data):
+        if np.ma.is_masked(temp): 
+            continue
+        if temp > 1000.: 
+            continue
+        # Load individual data values. 
+        if depths.ndim == 1: 
+            depth = depths[z]
+        elif depths.ndim == 3:
+            depth = depths[z,y,x]
+        elif depths.ndim == 4:
+            depth = depths[t,z,y,x]
+        
+        if lats.ndim == 1:
+            lat = lats[y]
+        elif lats.ndim ==2:
+            lat = lats[y,x]
 
-    # all cubes will be 4d.
-    # but: z may be 1D, 3D or 4D
-    # 
-    times = diagtools.cube_time_to_float(cube)
-    for t, time in enumerate(times):
+        if lons.ndim == 1:
+            lon = lons[x]
+        elif lons.ndim ==2:
+            lon = lons[y,x]
 
-        pressure.
+        if vol_cube.ndim == 3:
+            vol = vol_cube.data[z,y,x]
+        elif vol_cube.ndim == 4:
+            vol = vol_cube.data[t, z,y,x]
 
+        psal = so_cube.data[t,z,y,x]
+        time = times[t]
 
-    if volume.ndim == 3:
-        print('calculating volume sum (3D):')
-        for t, time in enumerate(times):
-            cube.data[t] = cube.data[t] * volume.data * const
-    elif volume.ndim == 4:
-        for t, time in enumerate(times):
-            cube.data[t] = cube.data[t] * volume[t].data * const
+        # start making calculations.
+        pressure = gsw.conversions.p_from_z(depth, lat) # dbar
+        ctemp = gsw.conversions.CT_from_t(psal, temp, pressure)
+        asal = gsw.conversions.SA_from_SP(psal, pressure, lon, lat)
+        rho = gsw.density.rho(asal, ctemp, pressure) #  kg/ m3
+        energy = gsw.energy.internal_energy(asal, ctemp, pressure) # J/kg
+        enthalpy = gsw.energy.enthalpy(asal, ctemp, pressure) # J/kg
+        
+        cell_energy = energy * rho * vol
+        ohc_data[t,z,y,x] = cell_energy
+        if count%100000==0:
+            print('cal OHC:', [t,z,y,x], [time, depth, lat, lon], 'p:', pressure)
+            print('sal: practical:', psal, '\tabsolute:', asal, '\tdiff:', psal - asal)
+            print('temp: in situ:', temp, '\tconservative:', ctemp, '\tdiff:', temp - ctemp)
+            print('rho:', rho, '\tvol:',vol)
+            print('energy: internal', energy, '\tenethalpy:', enthalpy, '\tdiff:', energy - enthalpy)
+            print('energy: cell total', cell_energy)
+        count+=1
 
+    cube = thetao_cube.copy()
+#   Paul:
+#   So to calculate H (heat content, J m-2), you need rho (density, kg m^3)
+#   and cp (specific heat capacity of seawater, J) in addition to vanilla CMIPx output.
+#
+#   So the ingredients to a good OHC are:
+#   -   Salinity (so)
+#   -   Temperature (thetao)
+#   -   Pressure (depth, from axis)
+#   -   Specific heat capacity of cell (TEOS-10 library: S, T, P inputs)
+#   -   Density of cell (TEOS-10 library; S, T, P inputs
+#   H = rho x cp x grid cell temperature. 
 
-    ohc_arr = gsw.energy.internal_energy(so_cube.data, thetao_cube.data, )
+#   In practice:
+#   conserv_temp = gsw.conversions.CT_from_t(so_cube.data, thetao_cube.data, pressure.data) 
+#   pressure = pressure = gsw.conversions.p_from_z(depth, latitude) # dbar
+#   abs_sal = gsw.conversions.SA_from_SP(so, p, lon, lat)
+#   rho = gsw.density.rho(so_cube.data, conserv_temp.data, pressure.data) #  kg/ m
+#   energy = gsw.energy.internal_energy(so_cube.data, conserv_temp.data, pressure.data)
+#   or?
+#   energy =  gsw.energy.enthalpy(so_cube.data, conserv_temp.data, pressure.data) J/kg
+#   total energy per cubic meter = density * energy (internal or enthalpy) J/cell
+#   then intergrate it over several axes.
 
-#    cube = derive_ohc(cube, vol_cube)
+    cube = thetao_cube.copy()
+    cube.data = ohc_data 
     cube.units = cf_units.Unit('J')
-    cube.name = 'Ocean heat Content'
+    cube.name = 'Ocean heat Content ' + trend
     cube.short_name = 'ohc'
     cube.var_name = 'ohc'
-
-    iris.save(ohc_cube, output_fn)
+    iris.save(cube, output_fn)
 
     for t in [0, -1]:
         single_pane_map_plot(
                 cfg,
                 metadatas[thetao_fn],
-                ohc_cube[t, 0],
-                key='OHC'
+                cube[t, 0],
+                key='OHC_full'
                 )
     return output_fn
     
 
-
-def detrend_hist(cfg, metadatas, filename, trend_shelve):
+def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     """
     Use the shelve calculoated in calc_pi_trend to detrend 
     the historical data.
@@ -1273,13 +1348,13 @@ def detrend_hist(cfg, metadatas, filename, trend_shelve):
             detrended,
             cube,
             )
-        
         return output_fn
     print ('loading from', trend_shelve)
 
     if not glob(trend_shelve+'*'):
         print('Trend shelve doesn\'t exist', trend_shelve)
         assert 0
+
     sh = shopen(trend_shelve)
     slopes = sh['slopes']
     intercepts = sh['intercepts']
@@ -1291,11 +1366,10 @@ def detrend_hist(cfg, metadatas, filename, trend_shelve):
             cfg,
             metadatas[filename],
             cube[t,0],
-            key='hist'
+            key='trend_intact'
             )
 
     decimal_time = diagtools.cube_time_to_float(cube)
-
     dummy = cube.data.copy()
     dummy = np.ma.masked_where(dummy>10E10, dummy)
     count = 0
@@ -1310,9 +1384,10 @@ def detrend_hist(cfg, metadatas, filename, trend_shelve):
         slope = slopes[index]
         intercept = intercepts[index] 
 
-        line = [ (t * slope) + intercept for t in np.arange(len(decimal_time))]
-        dummy[:,index[0], index[1],index[2]] = np.array(line)
+        line = [(t * slope) + intercept for t in np.arange(len(decimal_time))]
+        dummy[:, index[0], index[1], index[2]] = np.array(line)
         count+=1
+
     detrended = cube.copy()
     detrended.data = detrended.data - np.ma.array(dummy)
     iris.save(detrended, output_fn)
@@ -1360,7 +1435,8 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
     cube = iris.load_cube(filename)
     decimal_time = diagtools.cube_time_to_float(cube)
    
-    if method != 'linear regression': assert 0
+    if method != 'linear regression':
+        assert 0
 
     if glob(output_shelve+'*'):
         print ('loading from', output_shelve)
@@ -1448,23 +1524,26 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
         plt.close()
 
     # Create NetCDF for slopes
+    print('Creating netcdf for slopes:', output_fn)
     nc = netCDF4.Dataset(output_fn, mode='w')
     nc.dataset = dataset
     nc.exp = exp
     nc.ensemble = ensemble
     nc.project = project
 
-    toexclude = ['thetao', 'volcello', ]
+    toexclude = ['thetao', 'volcello', 'so', 'areacello']
     src = netCDF4.Dataset(filename, 'r')
     # copy global attributes all at once via dictionary
     # dst.setncatts(src.__dict__)
     # copy dimensions
     for name, dimension in src.dimensions.items():
+        print('copying dimension', name)
         nc.createDimension(
             name, (len(dimension) if not dimension.isunlimited() else None))
 
     for name, variable in src.variables.items():
         if name not in toexclude:
+            print('copying variables', name)
             x = nc.createVariable(name, variable.datatype, variable.dimensions)
             nc[name][:] = src[name][:]
             # copy variable attributes all at once via dictionary
@@ -1518,6 +1597,7 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
+    detrending_method = 'Full'
     metadatas = diagtools.get_input_files(cfg)
     projects = {}
     datasets = {}
@@ -1528,7 +1608,7 @@ def main(cfg):
     file_dict = {}
 
     trend_shelves = {}
-    detrended_hist = {}
+    detrended_ncs = {}
     ocean_heat_content = {}
     ocean_heat_content_timeseries = {}
 
@@ -1550,21 +1630,18 @@ def main(cfg):
         print('iterating', project, dataset, exp, ensemble, short_name, filename)
         if exp != 'piControl': 
             continue
-        if short_name == 'volcello': 
+        if short_name in ['volcello', 'areacello']: 
             continue
         trend_shelves[(project, dataset, exp, ensemble, short_name)] = calc_pi_trend(cfg, metadatas, filename)
 
-    print('\nDetrend the historical.')
+    print('\nDetrend from PI.')
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
-        print('iterating', project, dataset, exp, ensemble, short_name, filename)
-        if exp == 'piControl':
-              continue
-        if short_name == 'volcello':
+        print('detrending:', project, dataset, exp, ensemble, short_name, filename)
+        if short_name in ['volcello', 'areacello']:
               continue
         trend_shelve = trend_shelves[(project, dataset, 'piControl', 'r1i1p1f2', short_name)]
-
-        detrended_fn = detrend_hist(cfg, metadatas, filename, trend_shelve)
-        detrended_hist[(project, dataset, exp, ensemble, short_name)] = detrended_fn
+        detrended_fn = detrend_from_PI(cfg, metadatas, filename, trend_shelve)
+        detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
 
     print('\nCalculate ocean heat content - trend intact')
@@ -1580,17 +1657,34 @@ def main(cfg):
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
 
+        for index in file_dict.keys():
+            if project not in index: continue
+            if dataset not in index: continue
+            if exp not in index: continue
+            if ensemble not in index: continue
+            print('trend intact calculation:', dataset, ':', index)
+
         if detrending_method == 'Basic':
             ohc_fn = calc_ohc_basic(cfg, metadatas, fn, volcello_fn, trend='intact')
         elif detrending_method == 'Full':
             so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
             ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
 
+        if ohc_fn.find(exp) == -1:
+            print('ERROR - ohc_fn',(project, dataset, exp, ensemble, short_name), ohc_fn )
+            assert 0
+
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc','intact')] = ohc_fn
         metadatas[ohc_fn] = metadatas[fn].copy()
 
-    print('\nCalculate ocean heat content - detrended hist')
-    for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_hist.items():
+
+
+
+    print('\nCalculate ocean heat content - detrended')
+    for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_ncs.items():
+        if short_name != 'thetao':
+            continue
+
         # volcello is in same ensemble, same exp.
         if (project, dataset, exp, ensemble, 'volcello') in file_dict:
             volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
@@ -1598,38 +1692,59 @@ def main(cfg):
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0 
 
-        if detrending_method == 'Basic':
-            ohc_fn = calc_ohc_basic(cfg, metadatas, detrended_fn, volcello_fn,trend='detrended')
-        elif detrending_method == 'Full':
-            so_fn = detrended_hist[(project, dataset, exp, ensemble, 'so')]
-            ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
+        for index in detrended_ncs.keys():
+            if dataset not in index: continue
+            if exp not in index: continue
+            if ensemble not in index: continue
+            print(dataset, ':', index)
 
+        if detrending_method == 'Basic':
+            ohc_fn = calc_ohc_basic(cfg, metadatas, detrended_fn, volcello_fn, trend='detrended')
+        elif detrending_method == 'Full':
+            print('detrending_method:', detrending_method, project, dataset, exp, ensemble)
+            so_fn = detrended_ncs[(project, dataset, exp, ensemble, 'so')]
+            print('detrending_method:', detrending_method, so_fn)
+            ohc_fn = calc_ohc_full(cfg, metadatas, detrended_fn, so_fn, volcello_fn, trend='detrended')
+        else: 
+            assert 0
+
+        if ohc_fn.find(exp) == -1:
+            print('\n\nERROR - ohc_fn',(project, dataset, exp, ensemble, short_name), ohc_fn )
+            print('detrended_fn', detrended_fn)
+            print('so_fn', so_fn)
+            print('volcello_fn', volcello_fn)
+            print('metadatas:',metadatas[detrended_fn],'\n\n')
+            assert 0
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc', 'detrended')] = ohc_fn 
         metadatas[ohc_fn] = metadatas[detrended_fn].copy()
 
     print('Calculate OHC time series')
-    depth_ranges = ['total', '0-700m', '700-2000m', '2000m_plus']
+    depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     for depth_range in depth_ranges:
         for (project, dataset, exp, ensemble, short_name, trend), ohc_fn in ocean_heat_content.items():
             ohc_ts_fn = calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend)
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, short_name, trend, depth_range)] = ohc_ts_fn
+            if ohc_fn.find(exp) == -1:
+                print('ERROR - ohc_fn',project, dataset, exp, ensemble, short_name, trend, ':', ohc_fn)
+                assert 0
+            if ohc_ts_fn.find(exp) == -1: 
+                print('ERROR - ohc_ts_fn',project, dataset, exp, ensemble, short_name, trend, ':', ohc_ts_fn)
+                assert 0
             metadatas[ohc_ts_fn] = metadatas[ohc_fn]
 
-    print('plotting detrending figure. ')
-
-    # for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_hist.items():
-        # time series needs:
-        #    detrended hist - tick
-        #    trend intact hist
-        #    PI control - detrended
-        #    PI control trend intact
-        #    Linear regression?
     datasets = {index[1]:True for index in ocean_heat_content_timeseries.keys()}
     ensembles = {index[3]:True for index in ocean_heat_content_timeseries.keys()}
-    projects = {index[3]:True for index in ocean_heat_content_timeseries.keys()}
+    projects = {index[0]:True for index in ocean_heat_content_timeseries.keys()}
 
+    # Warning: this is specific for UKESM1 and will need to be generalised.
+    print('plotting detrending figure. ')
     ensemble = 'r2i1p1f2'
     project = 'CMIP6'
+    def print_dict(dic,name=''):
+        print('\n---------------\nprinting', name)
+        for key in sorted(dic.keys()): 
+            print(name, key, dic[key])
+
     for dataset, depth_range  in itertools.product(datasets.keys(), depth_ranges):   
         for index in ocean_heat_content_timeseries.keys():
             if dataset not in index: continue
@@ -1637,14 +1752,23 @@ def main(cfg):
             print(dataset, depth_range, ':', index)
         detrended_hist = ocean_heat_content_timeseries[(project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_range)]
         trend_intact_hist = ocean_heat_content_timeseries[(project, dataset, 'historical', ensemble, 'ohc', 'intact', depth_range)]
-        detrended_piC = '' #ocean_heat_content_timeseries[(project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'detrended', depth_range)]
+        detrended_piC = ocean_heat_content_timeseries[(project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'detrended', depth_range)]
         trend_intact_piC = ocean_heat_content_timeseries[(project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'intact', depth_range)]
+        if detrended_hist.find('hist')==-1:
+            print('Wrong: detrended_hist', detrended_hist)
+            print_dict(ocean_heat_content_timeseries, 'ocean_heat_content_timeseries')
+            assert 0 
+        if trend_intact_hist.find('hist')==-1:
+            assert 0
+        if detrended_piC.find('piControl')==-1:
+            assert 0
+        if trend_intact_piC.find('piControl')==-1:
+            assert 0
 
         detrending_fig(cfg, metadatas, detrended_hist, trend_intact_hist, detrended_piC, trend_intact_piC, depth_range)
 
+    # Multi model time series plotx for each time series
 
-
-#    plot_multimodel_depth_ranges(            ) 
     logger.info('Success')
 
 
