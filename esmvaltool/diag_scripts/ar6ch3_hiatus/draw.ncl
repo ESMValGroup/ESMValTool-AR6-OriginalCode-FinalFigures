@@ -8,7 +8,7 @@
 ;    Outputs:
 ;
 ; History
-;    20191103 kosaka_yu: written.
+;    20200531 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
 ;    none
@@ -211,18 +211,54 @@ begin
 
 ; ======================================================================
 ;
-;                           1. Read GMST trends
+;              1. Read GMST trends and composite trend patterns
 ;
 ; ======================================================================
-  
-  files = systemfunc("ls "+input_dir+"trendGMST_*.nc")
+
+  do ii = 0, dimsizes(input_dir)-1
+    tmp = systemfunc("ls "+input_dir(ii))
+    tmp = input_dir(ii) + tmp
+    if (isvar("files")) then
+      files := array_append_record(files, tmp, 0)
+    else
+      files = tmp
+    end if
+    delete(tmp)
+  end do
+    
+  do ii = 0, dimsizes(files)-1
+    if (isStrSubset(files(ii), "HiatusTrendPattern_composite.nc")) then
+      f = addfile(files(ii), "r")
+      TstrendCMIPhiatus = f->trend
+      TstrendCMIPhiatus = TstrendCMIPhiatus * scale      
+    elseif (isStrSubset(files(ii), "PostTrendPattern_composite.nc")) then
+      f = addfile(files(ii), "r")
+      TstrendCMIPpost = f->trend
+      TstrendCMIPpost = TstrendCMIPpost * scale      
+    end if
+  end do
+
+  if (TstrendCMIPhiatus@blend_GST.eq.1) then
+    GST = "GMST"
+  else
+    GST = "GSAT"
+  end if
+  if (TstrendCMIPhiatus@mask_GST.eq.1) then
+    masking = "masked"
+  else
+    masking = "unmasked"
+  end if
+  composite_threshold = TstrendCMIPhiatus@composite_threshold
+  composite_threshold_GSTtrend_composite = TstrendCMIPhiatus@threshold_trendGSThiatus * scale
+
+  exit
   
   do ii = 0, dimsizes(files)-1
     f = addfile(files(ii), "r")
-    if (isStrSubset(files(ii), "trendGMST_hiatus_cmip6.nc")) then
-      GMSTtrendCMIP6Hiatus = f->trend
-      GMSTtrendCMIP6Hiatus = GMSTtrendCMIP6Hiatus * scale
-      thresGMSTtrendCMIP6 = GMSTtrendCMIP6Hiatus@composite_threshold * scale
+    if (isStrSubset(files(ii), "trend"+GST+"_"+masking+"_CMIP6.txt")) then
+      GSTtrendCMIP6hiatus = f->trend
+      GSTtrendCMIP6hiatus = GSTtrendCMIP6hiatus * scale
+      thresGSTtrendCMIP6 = GSTtrendCMIP6hiatus@composite_threshold * scale
       syear_hiatus = GMSTtrendCMIP6Hiatus@syear_trend
       eyear_hiatus = GMSTtrendCMIP6Hiatus@eyear_trend
     elseif (isStrSubset(files(ii), "trendGMST_post_cmip6.nc")) then

@@ -24,7 +24,7 @@ load "$diag_scripts/../interface_scripts/interface.ncl"
 ;load "$diag_scripts/shared/plot/contour_maps.ncl"
 ;load "$diag_scripts/shared/plot/contourplot.ncl"
 
-load "$diag_scripts/ar6ch3_hiatus/percentiles.ncl"
+load "$diag_scripts/ar6ch3_hiatus/functions.ncl"
 
 begin
 
