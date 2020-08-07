@@ -22,6 +22,7 @@ load "$diag_scripts/../interface_scripts/interface.ncl"
 load "$diag_scripts/shared/statistics.ncl"
 load "$diag_scripts/shared/plot/style.ncl"
 load "$diag_scripts/shared/plot/contour_maps.ncl"
+load "$diag_scripts/ar6ch3_sam_millennium/set_color.ncl"
 
 begin
 
@@ -74,7 +75,7 @@ begin
   models = metadata_att_as_array(info, "dataset")
   project = metadata_att_as_array(info, "project")
   ensemble = metadata_att_as_array(info, "ensemble")
-  modelens = models + "_"+ ensemble
+  modelens = project + "_" + models + "_"+ ensemble
   integrations = get_unique_values(modelens)
   nintegrations = dimsizes(integrations)
   
@@ -82,13 +83,10 @@ begin
   sam = new((/nintegrations, eyear_data-syear_data+1/), "float")
   sam!1 = "time"
   sam&time = ispan(syear_data, eyear_data, 1)
-  if (all(project.eq."CMIP5")) then
-    sam@source = "CMIP5"
-  elseif (all(project.eq."CMIP6")) then
-    sam@source = "CMIP6"
-  end if
   north = sam
   south = sam
+  cmip_phase = new((/nintegrations/), "string")
+  model_name = new((/nintegrations/), "string")
   
   do ii = 0, ListCount(info) - 1
     ; Read data
@@ -108,11 +106,13 @@ begin
     yr0 = max((/syr, syear_data/))
     yr1 = min((/eyr, eyear_data/))
 
-    int = ind(info[ii]@dataset+"_"+info[ii]@ensemble.eq.integrations)
+    int = ind(info[ii]@project+"_"+info[ii]@dataset+"_"+info[ii]@ensemble.eq.integrations)
     
     north(int, {yr0:yr1}) = (/slp({yr0:yr1}, {-40.})/)
     south(int, {yr0:yr1}) = (/slp({yr0:yr1}, {-65.})/)
     delete(slp)
+    cmip_phase(int) = info[ii]@project
+    model_name(int) = info[ii]@dataset
   end do
   
   north = (north - conform(north, dim_avg_n(north(:, {syear_ref:eyear_ref}), 1), 0)) \
@@ -129,7 +129,7 @@ begin
     sam = sam - conform(sam, dim_avg_n(sam(:, {syear_ref:eyear_ref}), 1), 0)
     sam = sam / conform(sam, dim_stddev_n(sam(:, {syear_ref:eyear_ref}), 1), 0)
   end if
-  
+
 ; ======================== READ RECONSTRUCTIONS ========================
 
   script = get_script_name()
@@ -281,7 +281,20 @@ begin
   sam_datwyler_ann_lowpass = wgt_runave_n_Wrap(sam_datwyler_ann, wgt, 0, 0)
   sam_datwyler_djf_lowpass = wgt_runave_n_Wrap(sam_datwyler_djf, wgt, 0, 0)
   delete(wgt)
-  
+
+  if (num(cmip_phase.eq."CMIP5").gt.1) then
+    sam_lowpass_cmip5mean = sam_lowpass(0, :)
+    sam_lowpass_cmip5mean = \
+      where(dim_num_n(ismissing(sam_lowpass(ind(cmip_phase.eq."CMIP5"), :)), 0).gt.0, \
+            sam_lowpass@_FillValue, dim_avg_n(sam_lowpass(ind(cmip_phase.eq."CMIP5"), :), 0))
+  end if
+  if (num(cmip_phase.eq."CMIP6").gt.1) then
+    sam_lowpass_cmip6mean = sam_lowpass(0, :)
+    sam_lowpass_cmip6mean = \
+      where(dim_num_n(ismissing(sam_lowpass(ind(cmip_phase.eq."CMIP6"), :)), 0).gt.0, \
+            sam_lowpass@_FillValue, dim_avg_n(sam_lowpass(ind(cmip_phase.eq."CMIP6"), :), 0))
+  end if
+
 ; =============================== Draw ===============================
 
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
@@ -318,7 +331,7 @@ begin
   restsL@trYMaxF           = 3.5 ;2.
   restsL@trYMinF           = -13.
   restsL@xyLineColor       = sam_abram@color
-  restsL@tiMainString = "SAM index"
+  restsL@tiMainString = "SAM indices in the last millenium"
   restsR = rests
   restsR@trYMaxF           = 7.5 ;6.
   restsR@trYMinF           = -9.
@@ -326,12 +339,23 @@ begin
   restsR2 = rests
   restsR2@trYMaxF           = 13.5 ;12.
   restsR2@trYMinF           = -3.
-  restsR2@xyLineColor       = "grey"
+  colors = new((/nintegrations, 3/), "float")
+  color_cmip5 = (/0.3, 0.3, 0.3/)
+  do ii = 0, nintegrations-1
+    if (cmip_phase(ii).eq."CMIP5") then
+      colors(ii, :) = color_cmip5
+    elseif (cmip_phase(ii).eq."CMIP6") then
+      colors(ii, :) = get_color(model_name(ii))
+    end if
+  end do
+  ;restsR2@xyLineColor       = "grey"
+  restsR2@xyLineColors      = colors
+  restsR2@xyLineOpacityF    = 0.4
   restsR2@tmYRTickEndF      = 4.
-  
+
   plot = gsn_csm_xy3(wks, sam_abram_runmean&time, sam_abram_runmean, sam_villalba_runmean, sam_runmean, restsL, restsR, restsR2)
 
-  dummy = new(nintegrations+15, "graphic")
+  dummy = new(nintegrations+18, "graphic")
   polyres = True
   polyres@gsLineThicknessF = 0.5
   polyres@gsLineColor       = "grey30"
@@ -377,19 +401,39 @@ begin
   dummy(12) = gsn_add_text(wks, plot@xy2, sam_datwyler_djf@source, 1550., 0.4, txres)
 
   
-  polyres@gsLineColor     := "black"
   polyres@gsLineThicknessF = 0.75
   do n = 0, nintegrations-1
+    if (cmip_phase(n).eq."CMIP5") then
+      polyres@gsLineColor := color_cmip5
+    elseif (cmip_phase(n).eq."CMIP6") then
+      polyres@gsLineColor := get_color(model_name(n))
+    end if
     dummy(12+n) = gsn_add_polyline(wks, plot@xy3, sam_lowpass&time, sam_lowpass(n, :), polyres)
   end do
-  polyres@gsLineThicknessF = 4.
-  polyres@gsLineColor     := "white"
-  dummy(12+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass&time, where(dim_num_n(ismissing(sam_lowpass), 0).gt.0, sam_lowpass@_FillValue, dim_avg_n(sam_lowpass, 0)), polyres)
-  polyres@gsLineThicknessF = 2.5
-  polyres@gsLineColor     := "black"
-  dummy(13+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass&time, where(dim_num_n(ismissing(sam_lowpass), 0).gt.0, sam_lowpass@_FillValue, dim_avg_n(sam_lowpass, 0)), polyres)
-  txres@txFontColor := polyres@gsLineColor
-  dummy(14+nintegrations) = gsn_add_text(wks, plot@xy3, sam_lowpass@source, 1900., -2.0, txres)
+  if (isvar("sam_lowpass_cmip5mean")) then
+    polyres@gsLineThicknessF = 4.
+    polyres@gsLineColor     := "white"
+    dummy(12+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip5mean&time, \
+                                               sam_lowpass_cmip5mean, polyres)
+    polyres@gsLineThicknessF = 2.5
+    polyres@gsLineColor     := color_cmip5
+    dummy(13+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip5mean&time, \
+                                               sam_lowpass_cmip5mean, polyres)
+    txres@txFontColor := polyres@gsLineColor
+    dummy(14+nintegrations) = gsn_add_text(wks, plot@xy3, "CMIP5", 1900., -2.0, txres)
+  end if
+  if (isvar("sam_lowpass_cmip6mean")) then
+    polyres@gsLineThicknessF = 4.
+    polyres@gsLineColor     := "white"
+    dummy(15+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip6mean&time, \
+                                               sam_lowpass_cmip6mean, polyres)
+    polyres@gsLineThicknessF = 2.5
+    polyres@gsLineColor     := get_color("CMIP6")
+    dummy(16+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip6mean&time, \
+                                               sam_lowpass_cmip6mean, polyres)
+    txres@txFontColor := polyres@gsLineColor
+    dummy(17+nintegrations) = gsn_add_text(wks, plot@xy3, "CMIP6", 1900., -2.6, txres)
+  end if
   
   draw(plot)
   frame(wks)

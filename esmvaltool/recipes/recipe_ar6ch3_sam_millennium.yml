@@ -66,15 +66,21 @@ datasets:
 #  - {project: CMIP5, dataset: CCSM4, ensemble: r1i1p1, exp: [past1000, historical]}
 #  - {project: CMIP5, dataset: GISS-E2-R, ensemble: r1i1p121, exp: [past1000, historical]}
 
+  - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: past1000, end_year: 1849, grid: gn}
+  - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: historical, start_year: 1850, end_year: 2014, grid: gn}
+  - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: ssp245, start_year: 2015, grid: gn}
+  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: past1000, end_year: 1849, grid: gn}
+  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: historical, start_year: 1850, end_year: 2014, grid: gn}
+  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: ssp245, start_year: 2015, grid: gn}
+  
 preprocessors:
 
   pp_5deg:
     regrid:
       target_grid: 5x5
       scheme: linear
-    zonal_means:
-      coordinate: longitude
-      mean_type: mean
+    zonal_statistics:
+      operator: mean
     annual_statistics:
       operator: mean
 
