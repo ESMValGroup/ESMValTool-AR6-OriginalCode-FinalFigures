@@ -38,7 +38,6 @@ begin
   enter_msg(DIAG_SCRIPT, "")
 
   var0 = variable_info[0]@short_name
-  field_type0 = variable_info[0]@field
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
@@ -130,8 +129,15 @@ begin
   ; Set resources
   res = True
 
+  res@tiMainString = "Zonal standard deviation ~C~ ~Z75~" + variable_info[0]@long_name
   res@tiXAxisString = "Latitude"
-  res@tiYAxisString = "Zonal st. dev." + " [" + model_arr@units + "]"
+
+  if (model_arr@units .eq. "degC") then
+    units = "~F34~0~F~ C"
+  else
+    units = model_arr@units
+  end if
+  res@tiYAxisString = "(" + units + ")"
 
   xy_line(wks, model_arr, model_arr&lat, 0, res, info_items)
 

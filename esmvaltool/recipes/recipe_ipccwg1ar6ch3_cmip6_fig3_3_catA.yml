@@ -1,0 +1,104 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+
+  authors:
+    - bock_lisa
+    - eyring_veronika
+
+#  maintainer:
+    
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim_ref:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+cmip6_hist_models: &cmip6_hist_models_tas
+#  - {dataset: BCC-CSM2-MR, grid: gn}
+#  - {dataset: BCC-ESM1, grid: gn}
+#  - {dataset: CAMS-CSM1-0, grid: gn}
+#  - {dataset: CanESM5, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+#  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+#  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  #- {dataset: E3SM-1-0} no data from 2000-2014
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1}
+#  - {dataset: EC-Earth3-Veg}
+  #- {dataset: GFDL-CM4, grid: gr1}
+#  - {dataset: GFDL-ESM4, grid: gr1}
+#  - {dataset: GISS-E2-1-G, grid: gn}
+  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} no data 1951-2000
+#  - {dataset: GISS-E2-1-H, grid: gn}
+#  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+#  - {dataset: IPSL-CM6A-LR}
+  #- {dataset: MCM-UA-1-0, grid: gn} no data on DKRZ
+  - {dataset: MIROC6, grid: gn}
+#  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  #- {dataset: NESM3, grid: gn} no data on DKRZ
+  #- {dataset: NorCPM1, grid: gn} no data on DKRZ
+  - {dataset: SAM0-UNICON, grid: gn}
+#  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+     start_year: 1850, end_year: 2017, tier: 2}
+
+
+diagnostics:
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig 3.3 (ZOD fig. 3.10)
+  # similar to fig. IPCC AR5, chap. 9, 9.8
+  # Lisa
+  # **********************************************************************
+  # Time series of anomalies of annual and global surface temperature
+  # **********************************************************************
+
+  fig_3_3:
+    description: IPCC AR6 Ch. 3, Fig. 3.x (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models_tas
+    scripts:
+      tsline_anom:
+        script: ipcc_ar5/tsline.ncl
+        time_avg: "yearly"
+        ts_anomaly: "anom"   
+        ref_start: 1850
+        ref_end: 1900
+        ref_mask: True
+        plot_units: "degC"
+        y_min: -0.5
+        y_max: 1.6
+        volcanoes: True
+        styleset: CMIP6
