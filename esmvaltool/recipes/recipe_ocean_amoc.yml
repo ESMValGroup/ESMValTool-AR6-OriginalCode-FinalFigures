@@ -52,7 +52,6 @@ diagnostics:
         derive: true
         force_derivation: false
     additional_datasets:
-<<<<<<< HEAD
     #  - {dataset: CanESM2,          project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
     #  - {dataset: CCSM4,            project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
     #  - {dataset: CESM1-BGC,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
@@ -95,7 +94,6 @@ diagnostics:
       - {dataset: CESM2,          project: CMIP6,    exp: [historical, ssp585],  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2100}
       - {dataset: CESM2-WACCM,    project: CMIP6,    exp: [historical, ssp585],  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2100}
       - {dataset: SAM0-UNICON,    project: CMIP6,    exp: [historical, ssp585],  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2100}
-
 
     scripts:
       AMOC_timeseries_cmip6:
