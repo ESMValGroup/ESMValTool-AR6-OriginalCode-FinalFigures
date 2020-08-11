@@ -22,6 +22,61 @@ preprocessors:
     area_statistics:
       operator: mean
 
+  nbp_mean96:
+    extract_region:
+      start_latitude: -90
+      end_latitude: -60
+      start_longitude: 0
+      end_longitude: 360
+    area_statistics:
+      operator: mean
+
+  nbp_mean63:
+    extract_region:
+      start_latitude: -60
+      end_latitude: -30
+      start_longitude: 0
+      end_longitude: 360
+    area_statistics:
+      operator: mean
+
+  nbp_mean30:
+    extract_region:
+      start_latitude: -30
+      end_latitude: 0
+      start_longitude: 0
+      end_longitude: 360
+    area_statistics:
+      operator: mean
+
+  nbp_mean03:
+    extract_region:
+      start_latitude: 0
+      end_latitude: 30
+      start_longitude: 0
+      end_longitude: 360
+    area_statistics:
+      operator: mean
+
+  nbp_mean36:
+    extract_region:
+      start_latitude: 30
+      end_latitude: 60
+      start_longitude: 0
+      end_longitude: 360
+    area_statistics:
+      operator: mean
+
+  nbp_mean69:
+    extract_region:
+      start_latitude: 60
+      end_latitude: 90
+      start_longitude: 0
+      end_longitude: 360
+    area_statistics:
+      operator: mean
+
+
 
 diagnostics:
   # **********************************************************************
@@ -33,7 +88,7 @@ diagnostics:
   # status:
   # **********************************************************************
 
-  fig_3_38_co2:
+  fig_3_38_co2_global:
     description: attribute increase of nbp sca to climate, co2, landuse
     variables:
       nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
@@ -48,12 +103,186 @@ diagnostics:
         additional_datasets:
           - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
           - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
 
           - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
           - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
 
           - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
           - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
+    scripts:
+      fig_nbp_sca_att:
+        script: ipcc_ar6/nbp_sca_att.py
+
+  fig_3_38_co2_global96:
+    description: attribute increase of nbp sca to climate, co2, landuse
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean96
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        #derive: true
+        additional_datasets:
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
+    scripts:
+      fig_nbp_sca_att:
+        script: ipcc_ar6/nbp_sca_att.py
+
+  fig_3_38_co2_global63:
+    description: attribute increase of nbp sca to climate, co2, landuse
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean63
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        #derive: true
+        additional_datasets:
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
+    scripts:
+      fig_nbp_sca_att:
+        script: ipcc_ar6/nbp_sca_att.py
+
+  fig_3_38_co2_global30:
+    description: attribute increase of nbp sca to climate, co2, landuse
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean30
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        #derive: true
+        additional_datasets:
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
+    scripts:
+      fig_nbp_sca_att:
+        script: ipcc_ar6/nbp_sca_att.py
+
+
+  fig_3_38_co2_global03:
+    description: attribute increase of nbp sca to climate, co2, landuse
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean03
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        #derive: true
+        additional_datasets:
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
+    scripts:
+      fig_nbp_sca_att:
+        script: ipcc_ar6/nbp_sca_att.py
+
+
+  fig_3_38_co2_global36:
+    description: attribute increase of nbp sca to climate, co2, landuse
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean36
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        #derive: true
+        additional_datasets:
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
+    scripts:
+      fig_nbp_sca_att:
+        script: ipcc_ar6/nbp_sca_att.py
+
+
+  fig_3_38_co2_global69:
+    description: attribute increase of nbp sca to climate, co2, landuse
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean69
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014 #2010
+        #derive: true
+        additional_datasets:
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: historical}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: historical}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-bgc}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-bgc}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, exp: hist-bgc}
+
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r4i1p1f2, exp: hist-noLu}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, exp: hist-noLu}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p1f1, exp: hist-noLu}
     scripts:
       fig_nbp_sca_att:
         script: ipcc_ar6/nbp_sca_att.py

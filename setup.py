@@ -25,22 +25,29 @@ REQUIREMENTS = {
         'cartopy',
         'cdo',
         'cf-units',
+        'cmocean',
         'cython',
-        'jinja2',
+        'ecmwf-api-client',
         'eofs',
-        'esmvalcore>=2.0.0b2,<2.1',
+        'esmvalcore>=2.0.0b6,<2.1',
         'fiona',
+        'jinja2',
         'matplotlib<3',
         'nc-time-axis',  # needed by iris.plot
         'netCDF4',
         'numpy',
         'pandas',
+        'pyproj>=2.1'
         'pyyaml',
         'scitools-iris>=2.2',
         'scikit-learn',
+        'seawater',
+        'seaborn',
         'shapely',
         'stratify',
         'xarray>=0.12',
+        'xesmf',
+        'xlrd',
         'xlsxwriter',
     ],
     # Test dependencies
@@ -138,6 +145,7 @@ class RunTests(CustomCommand):
             '--cov-report=xml:{}/coverage.xml'.format(report_dir),
             '--junit-xml={}/report.xml'.format(report_dir),
             '--html={}/report.html'.format(report_dir),
+            '--disable-warnings'
         ]
         if self.installation:
             args.append('--installation')

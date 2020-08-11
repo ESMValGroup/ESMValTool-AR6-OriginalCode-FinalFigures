@@ -9,10 +9,10 @@
 ;    and plots them. Like IPCC ch. 9 fig 9.6
 ;
 ; Required diag_script_info attributes (diagnostics specific)
-;     diag_script_info@collect: Set to True for last variable for collecting
-;                               all variables and plotting
 ;
 ; Optional diag_script_info attributes (diagnostic specific)
+;     diag_script_info@diag_order: give order of plotting variables on the
+;                                  x-axis
 ;
 ; Required variable_info attributes (variable specific)
 ;     none
@@ -21,14 +21,15 @@
 ;     none
 ;
 ; Required variable attributes (defined in namelist)
-;    ref_model: name of reference data set (observations)
+;    reference_dataset: name of reference data set (observations)
 ;
 ; Caveats
 ;     Effect of different regridding methods not yet determined
 ;
 ; Modification history
-;    20190205-A_gier_be: Adapted to new ncl structures
-;    20181101-A_gier_be: moved collect from main script
+;    20191011-A_bock_lisa: Add customizable order of variables
+;    20190205-A_gier_bettina: Adapted to new ncl structures
+;    20181101-A_gier_bettina: moved collect from main script
 ;
 ; #############################################################################
 load "$diag_scripts/../interface_scripts/interface.ncl"
@@ -57,20 +58,25 @@ begin
 
   ; Set up auxiliary variables
   var_collect = new(dimsizes(file_list), string)
+  var_diag = new(dimsizes(file_list), string)
   alt_obs = new(dimsizes(file_list), string)
 
   ; Loop over files in list, read and append data
   do ii = 0, dimsizes(file_list) - 1
     data_temp = ncdf_read(file_list(ii), "cor")
     var_collect(ii) = data_temp@corvar
+    var_diag(ii) = data_temp@diagnostics
     alt_obs(ii) = data_temp@alt_obs
 
     ; Make 2D array to store all data
     if (.not.isdefined("data_all")) then
       data_all = new((/dimsizes(data_temp), dimsizes(file_list)/), float)
-      data_all(:, 0) = data_temp
+      data_all(:, ii) = data_temp
       data_all!0 = "models"
       data_all&models = data_temp&models
+
+      ; Input file list for provenance
+      prov_files = str_split(data_temp@input, ",")
     else
       ; If model coordinates are identical
       if (dimsizes(data_temp&models).eq.dimsizes(data_all&models)) \
@@ -102,6 +108,9 @@ begin
           end if
         end do
       end if
+      ; Append input file list for provenance
+      prov_files := array_append_record(prov_files, \
+                                        str_split(data_temp@input, ","), 0)
     end if
     delete(data_temp)
   end do
@@ -126,6 +135,32 @@ begin
   data_all&models@project = projects
   delete(projects)
 
+  ; Sort diagnostics in the order specified in the settings
+    if (isatt(diag_script_info, "diag_order")) then
+      l_ok = True
+      if (dimsizes(data_all&vars).ne. \
+          dimsizes(diag_script_info@diag_order)) then
+        error_msg("w", DIAG_SCRIPT, "", "specified order of diagnostics " + \
+                  "cannot be applied, number of diagnostics does not match")
+        l_ok = False
+      end if
+      pid = new(dimsizes(diag_script_info@diag_order), integer)
+      do ii = 0, dimsizes(diag_script_info@diag_order) - 1
+        tmp = ind(var_diag.eq.diag_script_info@diag_order(ii))
+        if (any(ismissing(tmp)) .or. dimsizes(tmp).gt.1) then
+          error_msg("w", DIAG_SCRIPT, "", "specified order of diagnostics " + \
+                    "cannot be applied, invalid entry in diag_order")
+          break
+        end if
+        pid(ii) = tmp
+        delete(tmp)
+      end do
+      if (l_ok) then
+        data_all := data_all(:, pid)
+        alt_obs  := alt_obs(pid)
+      end if
+    end if
+
 ; -------------------------------------------------------------------------
 ; ----------------- Interim Functions -------------------------------------
 ; -------------------------------------------------------------------------
@@ -139,7 +174,7 @@ begin
   ; Return value: 1D array of unique entries in array
   ;
   ; Modification history:
-  ;    20170406-A_gier_be: written.
+  ;    20170406-A_gier_bettina: written.
   local dummy_array, unique_new, new_array, nodupes
   begin
   dummy_array = array
@@ -166,7 +201,6 @@ begin
   end do
   return(unique)
   end
-
 ; -----------------------------------------------------------------------------
 ; ---------------------------- Plotting ---------------------------------------
 ; -----------------------------------------------------------------------------
@@ -352,7 +386,7 @@ begin
     end if
   end do
 
-  y_min_label = res@trYMinF + 0.2*yspan
+  y_min_label = res@trYMinF + 0.1*yspan
   lb_stride = yspan/res@vpHeightF * font_height * 1.2   ; font_height*3
   plabel = projects
   ; Draw Legend
@@ -372,6 +406,25 @@ begin
 
   draw(plot)
   frame(wks)
+  ; Write output
+  if config_user_info@write_netcdf then
+    system("mkdir -p " + config_user_info@work_dir)
+    workpath = config_user_info@work_dir + "pattern_cor.nc"
+    ncdf_outfile = ncdf_write(data_all, workpath)
+  else
+    ncdf_outfile = workpath
+  end if
 
+  ; collect meta-data and call ESMValMD function
+  caption = "Centered pattern correlations between models and observations" \
+            + " for the annual mean climatologies " \
+            + "(similar to IPCC ch. 9 fig. 9.6)."
+  statistics = (/"corr", "clim"/)
+  domains = (/"global"/)
+  plottype = "other"
+  authors = (/"gier_bettina", "bock_lisa"/)
+  references = (/"flato13ipcc"/)
+  log_provenance(ncdf_outfile, outfile, caption, statistics, domains, \
+                 plottype, authors, references, prov_files)
   leave_msg(DIAG_SCRIPT, "")
 end
