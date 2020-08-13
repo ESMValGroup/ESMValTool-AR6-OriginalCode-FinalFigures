@@ -35,9 +35,17 @@ documentation:
     - other
 
 datasets:
-#  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn, exp: historical}
-#  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r2i1p1f1, grid: gn, exp: historical}
-#  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r3i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: ACCESS-CM2, ensemble: r2i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: ACCESS-ESM1-5, ensemble: r2i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: ACCESS-ESM1-5, ensemble: r3i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn, exp: historical} # ?
+  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r2i1p1f1, grid: gn, exp: historical} # ?
+  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r3i1p1f1, grid: gn, exp: historical} # ?
+  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r4i1p1f1, grid: gn, exp: historical} # ?
+  - {project: CMIP6, dataset: AWI-CM-1-1-MR, ensemble: r5i1p1f1, grid: gn, exp: historical} # ?
+  - {project: CMIP6, dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: BCC-CSM2-MR, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: BCC-CSM2-MR, ensemble: r3i1p1f1, grid: gn, exp: historical}
@@ -45,6 +53,11 @@ datasets:
   - {project: CMIP6, dataset: BCC-ESM1, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: BCC-ESM1, ensemble: r3i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CAS-ESM2-0, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CAS-ESM2-0, ensemble: r2i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CAS-ESM2-0, ensemble: r3i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CAS-ESM2-0, ensemble: r4i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: historical}
@@ -55,11 +68,20 @@ datasets:
   - {project: CMIP6, dataset: CESM2, ensemble: r8i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2, ensemble: r10i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CESM2, ensemble: r11i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CESM2-FV2, ensemble: r2i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CESM2-FV2, ensemble: r3i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2-WACCM, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2-WACCM, ensemble: r3i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CESM2-WACCM-FV2, ensemble: r2i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CESM2-WACCM-FV2, ensemble: r3i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CIESM, ensemble: r1i1p1f1, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CIESM, ensemble: r2i1p1f1, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CIESM, ensemble: r3i1p1f1, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r3i1p1f2, grid: gr, exp: historical}
@@ -70,12 +92,30 @@ datasets:
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r8i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r10i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r11i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r12i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r13i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r14i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r15i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r16i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r17i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r18i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r19i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r20i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r21i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r22i1p1f2, grid: gr, exp: historical}
+#  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r23i1p1f2, grid: gr, exp: historical} #missing
+  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r24i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r2i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r3i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r4i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r7i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r8i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r9i1p1f2, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r10i1p1f2, grid: gr, exp: historical}
   - {project: CMIP6, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CanESM5, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: CanESM5, ensemble: r3i1p1f1, grid: gn, exp: historical}
@@ -126,12 +166,16 @@ datasets:
 #  - {project: CMIP6, dataset: CanESM5, ensemble: r23i1p2f1, grid: gn, exp: historical}
 #  - {project: CMIP6, dataset: CanESM5, ensemble: r24i1p2f1, grid: gn, exp: historical}
 #  - {project: CMIP6, dataset: CanESM5, ensemble: r25i1p2f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: CanESM5-CanOE, ensemble: r3i1p2f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r3i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r4i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: E3SM-1-0, ensemble: r5i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: E3SM-1-1-ECA, ensemble: r1i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r2i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: EC-Earth3, ensemble: r3i1p1f1, grid: gr, exp: historical}
@@ -156,14 +200,20 @@ datasets:
   - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r2i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r3i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r4i1p1f1, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: FGOALS-f3-L, ensemble: r2i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn, exp: historical} #concatenation failure
   - {project: CMIP6, dataset: FGOALS-g3, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: FGOALS-g3, ensemble: r3i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: FGOALS-g3, ensemble: r4i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: FGOALS-g3, ensemble: r5i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: FGOALS-g3, ensemble: r6i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, exp: historical}
   - {project: CMIP6, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: historical}
+  - {project: CMIP6, dataset: GFDL-ESM4, ensemble: r2i1p1f1, grid: gr1, exp: historical}
+  - {project: CMIP6, dataset: GFDL-ESM4, ensemble: r3i1p1f1, grid: gr1, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn, exp: historical}
@@ -174,6 +224,8 @@ datasets:
   - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r8i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r10i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r101i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: GISS-E2-1-G, ensemble: r102i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: GISS-E2-1-H, ensemble: r2i1p1f1, grid: gn, exp: historical}
@@ -190,8 +242,13 @@ datasets:
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: historical}
   - {project: CMIP6, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: historical}
   - {project: CMIP6, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: HadGEM3-GC31-MM, ensemble: r2i1p1f3, grid: gn, exp: historical}
+#  - {project: CMIP6, dataset: IITM-ESM, ensemble: r1i1p1f1, grid: gn, exp: historical} # missing some time segments
   - {project: CMIP6, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1, exp: historical}
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1, exp: historical}
   - {project: CMIP6, dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1, exp: historical}
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r3i1p1f1, grid: gr1, exp: historical}
+  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r4i1p1f1, grid: gr1, exp: historical}
   - {project: CMIP6, dataset: INM-CM5-0, ensemble: r5i1p1f1, grid: gr1, exp: historical}
   - {project: CMIP6, dataset: INM-CM5-0, ensemble: r6i1p1f1, grid: gr1, exp: historical}
   - {project: CMIP6, dataset: INM-CM5-0, ensemble: r7i1p1f1, grid: gr1, exp: historical}
@@ -231,8 +288,12 @@ datasets:
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r31i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r32i1p1f1, grid: gr, exp: historical}
   - {project: CMIP6, dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr, exp: historical}
-#  - {project: CMIP6, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn, exp: historical} #fix_metadata failure
+  - {project: CMIP6, dataset: KACE-1-0-G, ensemble: r2i1p1f1, grid: gr, exp: historical}
+  - {project: CMIP6, dataset: KACE-1-0-G, ensemble: r3i1p1f1, grid: gr, exp: historical}
+#  - {project: CMIP6, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn, exp: historical} #preprocess failure
   - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r2i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: historical}
@@ -244,6 +305,7 @@ datasets:
   - {project: CMIP6, dataset: MIROC6, ensemble: r9i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MIROC6, ensemble: r10i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: MPI-ESM-1-2-HAM, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r3i1p1f1, grid: gn, exp: historical}
@@ -309,6 +371,7 @@ datasets:
   - {project: CMIP6, dataset: NorESM2-LM, ensemble: r3i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r2i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r3i1p1f2, grid: gn, exp: historical}
@@ -318,6 +381,11 @@ datasets:
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r7i1p1f3, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r9i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r10i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r11i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r12i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn, exp: historical}
+  - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r16i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r17i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r18i1p1f2, grid: gn, exp: historical}
   - {project: CMIP6, dataset: UKESM1-0-LL, ensemble: r19i1p1f2, grid: gn, exp: historical}
