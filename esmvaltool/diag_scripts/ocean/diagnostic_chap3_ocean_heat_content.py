@@ -787,14 +787,151 @@ def zero_around(cube, year_initial=1971., year_final=1971.):
     cube.data = cube.data - mean
     return cube
 
-def zero_around_dat(times, data, year=1971.):
-    """
-    Zero around the time range provided.
-    """
-    index = np.argmin(np.abs(np.array(times) - year))
-    #print('zero_around_dat', times, year, index, np.ma.mean(data[index-1:index+2]))
-    return data - np.ma.mean(data[index-1:index+2])
+#def zero_around_dat(times, data, year=1971.):
+#    """
+#    Zero around the time range provided.
+#    """
+#    index = np.argmin(np.abs(np.array(times) - year))
+#    #print('zero_around_dat', times, year, index, np.ma.mean(data[index-1:index+2]))
 
+
+def top_left_text(ax, text):
+    """
+    Adds text to the top left of ax.
+    """
+    plt.text(0.05, 0.9, text,
+             horizontalalignment='left',
+             verticalalignment='center',
+             transform=ax.transAxes)
+
+
+def load_convert(fn):
+     cube = iris.load_cube(fn)
+     cube.convert_units('ZJ')
+     times = diagtools.cube_time_to_float(cube)
+     data = zero_around_dat(times, cube.data, year=1971.)
+     return times, data
+
+
+def single_pane(fig, ax, fn, color='red', xlim=False, no_ticks=False):
+    times, data = load_convert(fn)
+    ax.plot(times, data, c=color)
+    if xlim:
+        ax.set_xlim(xlim)
+    if no_ticks:
+        ax.set_xticklabels([])
+    return fig, ax  
+
+
+def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
+    """
+    Multimodel version of the 2.25 plot.
+    """
+
+    depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
+    RHS_xlim = [1995, 2017]
+
+    projects = list({index[0]:True for index in ocean_heat_content_timeseries.keys()}.keys())
+    datasets = list({index[1]:True for index in ocean_heat_content_timeseries.keys()}.keys())
+    ensembles = list({index[3]:True for index in ocean_heat_content_timeseries.keys()}.keys())
+
+    datasets = sorted(datasets)
+    color_dict = {da:c for da, c in zip(datasets, ['r' ,'b'])}
+
+    # ocean_heat_content_timeseries keys:
+    # (project, dataset, 'piControl', pi_ensemble, 'ohc', 'intact', depth_range)
+
+    depth_dict = { 321: 'total', 
+                   322: '0-2000m', 
+                   323: '0-700m',
+                   324: '0-700m', 
+                   326:  '700-2000m',
+                   (6, 2, 9):  '700-2000m', 
+                   (6, 2, 11): '2000m_plus'}
+    xlims_dict = { 321: False,
+                   322: RHS_xlim,
+                   323: False,
+                   324: RHS_xlim,
+                   326: RHS_xlim,
+                   (6, 2, 9):  False,
+                   (6, 2, 11): False}
+    no_ticks= {321: True,
+               322: True,
+               323: True,
+               324: True,
+               326: False,
+               (6, 2, 9):  True,
+               (6, 2, 11): False}
+
+
+    plot_details={}
+    fig = plt.figure()
+    fig.set_size_inches(10, 7)
+    axes= {}
+    for subplot in depth_dict.keys():
+        if isinstance(subplot, int):
+            axes[subplot] =  plt.subplot(subplot)
+        else:
+            axes[subplot] =  plt.subplot(subplot[0], subplot[1], subplot[2]) 
+        if subplot== 323:
+            
+            plt.ylabel('OHC (ZJ)', fontsize=16)
+
+    for project, dataset, ensemble in itertools.product(projects, datasets, ensembles): 
+
+        total_key = (project, dataset, 'historical', ensemble, 'ohc', 'detrended', 'total')
+        fn = ocean_heat_content_timeseries.get(total_key, False)
+        if not fn: 
+            continue
+
+        for subplot, ax in axes.items():
+            key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
+            fn = ocean_heat_content_timeseries[key]
+            fig, ax = single_pane(fig, ax, fn,  
+                                  color=color_dict[dataset], 
+                                  xlim=xlims_dict[subplot],
+                                  no_ticks=no_ticks[subplot])
+
+    for subplot, ax in axes.items():
+        ax.axhline(0., c='k', ls=':')
+
+    top_left_text(axes[321], 'Full-depth')
+    top_left_text(axes[322], '0-2000m')
+    top_left_text(axes[323], '0-700m')
+    top_left_text(axes[324], '0-700m')
+    top_left_text(axes[326], '700m - 2000m')
+    top_left_text(axes[(6, 2, 9)], '700m - 2000m')
+    top_left_text(axes[(6, 2, 11)], '> 2000m')
+
+    plt.suptitle('Global Ocean Heat Content')
+
+    if len(datasets) <=5:
+         axleg = plt.axes([0.0, 0.00, 0.9, 0.10]) 
+    else:
+         axleg = plt.axes([0.0, 0.00, 0.9, 0.15])
+     axleg.axis('off')
+
+    # Add emply plots to dummy axis.
+    for dataset in datasets:
+        axleg.plot([], [], c=color_dict[dataset], lw=2, ls='-', label=dataset)
+
+    legd = axleg.legend(
+            loc='upper center',
+            ncol=5,
+            prop={'size': 10},
+            bbox_to_anchor=(0.5, 0.5,),
+            fontsize=12)
+    legd.draw_frame(False)
+    legd.get_frame().set_alpha(0.)
+
+    fig_dir = diagtools.folder([cfg['plot_dir'], 'multimodel_ohc'])
+    image_extention = diagtools.get_image_format(cfg)
+    fig_fn = fig_dir + '_'.join(['multimodel_ohc',
+                                 ])+image_extention
+
+    plt.savefig(fig_fn)
+    print('multimodel_ohc: saving',fig_fn)
+    plt.close()
 
 
 def fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp):
@@ -819,12 +956,6 @@ def fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemb
             for dr, cube in cubes.items():
                 times = diagtools.cube_time_to_float(cube)
                 cube.data = zero_around_dat(times, cube.data, year=1971.)
-
-    def top_left_text(ax, text):
-         plt.text(0.05, 0.9, text, 
-                 horizontalalignment='left',
-                 verticalalignment='center', 
-                 transform=ax.transAxes)
 
     fig = plt.figure()
     fig.set_size_inches(10, 7)
@@ -876,7 +1007,6 @@ def fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemb
         for ax in [ax1, ax2, ax3, ax4, ax6, ax9, ax11]:
             ax.axhline(0., c='k', ls=':')
 
-
     fig_dir = diagtools.folder([cfg['plot_dir'], 'ohc_summary'])
     image_extention = diagtools.get_image_format(cfg)
     fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, 'ohc_summary',
@@ -895,7 +1025,8 @@ def detrending_fig(cfg,
         trend_intact_hist, 
         detrended_piC, 
         trend_intact_piC,
-        depth_range):
+        depth_range,
+        key):
     """
     Make figure showing detrending process as a time series.
     """
@@ -922,15 +1053,19 @@ def detrending_fig(cfg,
 
     times = diagtools.cube_time_to_float(cube_d_h)
 
-    print('detrending_fig:', cube_d_h.data.max(), cube_i_h.data.max(), )
-    print('detrending_fig: times', times)
+    print('detrending_fig:', key, cube_d_h.data.max(), cube_i_h.data.max())
+    print('detrending_fig: times', key, times)
     d_h_data = zero_around_dat(times, cube_d_h.data, year=1971.)
     i_h_data = zero_around_dat(times, cube_i_h.data, year=1971.)
     d_p_data = zero_around_dat(times, cube_d_p.data, year=1971.)
     if not  skip_intact_piC:
         i_p_data = zero_around_dat(times, cube_i_p.data, year=1971.)
 
-    print('detrending_fig:', d_h_data.max(), i_h_data.max(), i_p_data.max())
+    #print('detrending_fig:', key, d_h_data.max(), i_h_data.max(), i_p_data.max())
+    print('detrending_fig: d h:', key, d_h_data.max())
+    print('detrending_fig: i h:', key, i_h_data.max())
+    print('detrending_fig: d p:', key, d_p_data.max())
+    print('detrending_fig: i p:', key, i_p_data.max())
 
 
     plt.plot(times, d_h_data, color = 'red', label = 'Detrended Historical')
@@ -940,13 +1075,13 @@ def detrending_fig(cfg,
         plt.plot(times, i_p_data, color = 'green', label = 'PI Control')
 
     plt.axhline(0., c = 'k', ls=':' )
-    title = ' '.join([dataset, exp, ensemble, depth_range])
+    title = ' '.join([key, dataset, exp, ensemble, depth_range])
     plt.title(title)
     plt.legend()
 
-    fig_dir = diagtools.folder([cfg['plot_dir'], 'ohc_detrending_ts'])
+    fig_dir = diagtools.folder([cfg['plot_dir'], 'detrending_ts'])
     image_extention = diagtools.get_image_format(cfg)
-    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, 'ohc_detrending_ts',
+    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, key, 'detrending_ts',
                                    depth_range])+image_extention
 
     plt.savefig(fig_fn)
@@ -1592,6 +1727,19 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
 
     return output_fn
 
+def guess_PI_ensemble(dicts, keys, ens_pos = None):
+    """
+    Take a punt as the pi ensemble member.
+    """
+    keys.append('piControl')
+    for index, value in dicts.items():
+        intersection = set(index) & set(keys)
+        
+        if len(intersection) == len(keys):
+            print("guess_PI_ensemble: full match", index, keys, index[ens_pos] )
+            return index[ens_pos]
+    print('Did Not find pi control ensemble:', keys, ens_pos)
+    assert 0
 
 def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=False):
     """
@@ -1613,7 +1761,7 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
 
     # Check if it already exists:
     if os.path.exists(output_fn):
-        return output_fn
+        return output_shelve
 
     cube = iris.load_cube(filename)
     decimal_time = diagtools.cube_time_to_float(cube)
@@ -1829,7 +1977,8 @@ def main(cfg):
         print('detrending:', project, dataset, exp, ensemble, short_name, filename)
         if short_name in ['volcello', 'areacello']:
               continue
-        trend_shelve = trend_shelves[(project, dataset, 'piControl', 'r1i1p1f2', short_name)]
+        pi_ensemble = guess_PI_ensemble(trend_shelves, [project, dataset, short_name], ens_pos = 3)
+        trend_shelve = trend_shelves[(project, dataset, 'piControl', pi_ensemble, short_name)]
         detrended_fn = detrend_from_PI(cfg, metadatas, filename, trend_shelve)
         detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
@@ -1908,6 +2057,7 @@ def main(cfg):
             print('volcello_fn', volcello_fn)
             print('metadatas:',metadatas[detrended_fn],'\n\n')
             assert 0
+
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc', 'detrended')] = ohc_fn 
         specvol_anomalies[(project, dataset, exp, ensemble, 'specvol_anom','detrended')] = specvol_fn
 
@@ -1915,12 +2065,13 @@ def main(cfg):
         metadatas[specvol_fn] = metadatas[detrended_fn].copy()
 
 
-    print('Calculate OHC time series')
+    print('\n---------------------\nCalculate OHC time series')
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     for depth_range in depth_ranges:
         for (project, dataset, exp, ensemble, short_name, trend), ohc_fn in ocean_heat_content.items():
             ohc_ts_fn = calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend)
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, short_name, trend, depth_range)] = ohc_ts_fn
+            print('OHC:', (project, dataset, exp, ensemble, short_name, trend, depth_range))
             if ohc_fn.find(exp) == -1:
                 print('ERROR - ohc_fn',project, dataset, exp, ensemble, short_name, trend, ':', ohc_fn)
                 assert 0
@@ -1934,24 +2085,30 @@ def main(cfg):
     exps = {index[2]:True for index in ocean_heat_content_timeseries.keys()}
     ensembles = {index[3]:True for index in ocean_heat_content_timeseries.keys()}
 
-    # Warning: this is specific for UKESM1 and will need to be generalised.
-    print('plotting detrending figure. ')
-    ensemble = 'r2i1p1f2'
-    project = 'CMIP6'
     def print_dict(dic,name=''):
         print('\n---------------\nprinting', name)
         for key in sorted(dic.keys()): 
             print(name, key, dic[key])
 
-    for dataset, depth_range  in itertools.product(datasets.keys(), depth_ranges):   
+    # OHC detrending TS:
+    print('\n----------------------\nplotting detrending figure. ')
+    for dataset, ensemble, project, depth_range  in itertools.product(datasets.keys(), ensembles.keys(), projects.keys(), depth_ranges):   
         for index in ocean_heat_content_timeseries.keys():
             if dataset not in index: continue
             if depth_range not in index: continue
-            print(dataset, depth_range, ':', index)
-        detrended_hist = ocean_heat_content_timeseries[(project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_range)]
+            #if ensemble not in index: continue
+            if project not in index: continue
+            print('detrending diagrma:', dataset, depth_range, ':', index)
+        
+        detrended_hist = ocean_heat_content_timeseries.get((project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_range), False)
+        if detrended_hist == False:
+            continue
+
+        pi_ensemble = guess_PI_ensemble(ocean_heat_content_timeseries, [project, dataset, 'ohc', 'detrended'], ens_pos = 3)
+
         trend_intact_hist = ocean_heat_content_timeseries[(project, dataset, 'historical', ensemble, 'ohc', 'intact', depth_range)]
-        detrended_piC = ocean_heat_content_timeseries[(project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'detrended', depth_range)]
-        trend_intact_piC = ocean_heat_content_timeseries.get((project, dataset, 'piControl', 'r1i1p1f2', 'ohc', 'intact', depth_range), '')
+        detrended_piC = ocean_heat_content_timeseries[(project, dataset, 'piControl', pi_ensemble, 'ohc', 'detrended', depth_range)]
+        trend_intact_piC = ocean_heat_content_timeseries.get((project, dataset, 'piControl', pi_ensemble, 'ohc', 'intact', depth_range), '')
         if detrended_hist.find('hist')==-1:
             print('Wrong: detrended_hist', detrended_hist)
             print_dict(ocean_heat_content_timeseries, 'ocean_heat_content_timeseries')
@@ -1960,9 +2117,7 @@ def main(cfg):
             assert 0
         if detrended_piC.find('piControl')==-1:
             assert 0
-#        if trend_intact_piC.find('piControl')==-1:
-#            assert 0
-        detrending_fig(cfg, metadatas, detrended_hist, trend_intact_hist, detrended_piC, trend_intact_piC, depth_range)
+        detrending_fig(cfg, metadatas, detrended_hist, trend_intact_hist, detrended_piC, trend_intact_piC, depth_range, 'OHC')
 
     # Multi model time series plotx for each time series
     # Figure based on 2.25.
@@ -1972,7 +2127,8 @@ def main(cfg):
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, 'ohc', 'detrended', 'total')]
         except: continue
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
-
+    
+    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries)
 
     logger.info('Success')
 

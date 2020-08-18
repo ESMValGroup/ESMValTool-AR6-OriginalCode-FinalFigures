@@ -50,6 +50,10 @@ diagnostics:
 #          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-GHG, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
 #          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-nat, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
           - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329}
+
+          - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1960, end_year: 2014}
+          - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1960, end_year: 2014}
+
       so:
         short_name: so
         preprocessor: prep_annual
