@@ -33,6 +33,8 @@ from scipy.stats import linregress
 from scipy.io import loadmat
 import netCDF4 
 
+from concurrent.futures import ProcessPoolExecutor
+
 from glob import glob
 from dask import array as da
 from shelve import open as shopen
@@ -236,15 +238,6 @@ def add_aux_times(cube):
     return cube
 
 
-
-def zero_around_dat(times, data, year=1971.):
-    """
-    Zero around the time range provided.
-    """
-    index = np.argmin(np.abs(np.array(times) - year))
-    return data - np.ma.mean(data[index-1:index+2])
-
-
 def detrend(cfg, metadata, cube, pi_cube, method = 'linear regression'):
     """
     Detrend the historical cube using the pi_control cube.
@@ -278,6 +271,7 @@ def detrend(cfg, metadata, cube, pi_cube, method = 'linear regression'):
     plt.savefig(path)
     plt.close()
     return cube
+
 
 def make_new_time_array(times, new_datetime):
     """
@@ -679,7 +673,6 @@ def make_fig_3_20(
     else:
         add_all_obs = False
 
-
     if add_all_obs:
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
@@ -787,12 +780,12 @@ def zero_around(cube, year_initial=1971., year_final=1971.):
     cube.data = cube.data - mean
     return cube
 
-#def zero_around_dat(times, data, year=1971.):
-#    """
-#    Zero around the time range provided.
-#    """
-#    index = np.argmin(np.abs(np.array(times) - year))
-#    #print('zero_around_dat', times, year, index, np.ma.mean(data[index-1:index+2]))
+def zero_around_dat(times, data, year=1971.):
+    """
+    Zero around the time range provided.
+    """
+    index = np.argmin(np.abs(np.array(times) - year))
+    return data - np.ma.mean(data[index-1:index+2])
 
 
 def top_left_text(ax, text):
@@ -837,7 +830,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
 
     datasets = sorted(datasets)
     color_dict = {da:c for da, c in zip(datasets, ['r' ,'b'])}
-
+    color_dict['Observations'] = 'black'
     # ocean_heat_content_timeseries keys:
     # (project, dataset, 'piControl', pi_ensemble, 'ohc', 'intact', depth_range)
 
@@ -862,7 +855,6 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
                326: False,
                (6, 2, 9):  True,
                (6, 2, 11): False}
-
 
     plot_details={}
     fig = plt.figure()
@@ -905,11 +897,57 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
 
     plt.suptitle('Global Ocean Heat Content')
 
+    add_all_obs = True
+    if add_all_obs:
+        matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
+        matdata = loadmat(matfile)
+        depths = ['0-300 m', '0-700 m','700-2000 m','>2000 m','Full-depth']
+        obs_years = matdata['time_yr'][0] + 0.5
+        obs_years = np.ma.masked_where(obs_years < 1960., obs_years)
+        hc_data = matdata['hc_global']
+        datasets.append('Observations')
+
+        def strip_name(array): return str(array[0][0]).strip(' ')
+        def zetta_to_joules(dat): return dat * 1.E21
+
+        hc_global = {}
+        for z, depth in enumerate(depths):
+            hc_global[depth] = {}
+            for ii, array in enumerate(matdata['hc_yr_fname']):
+                name = strip_name(array)
+                series = hc_data[ii,z,:]
+                series = np.ma.masked_invalid(series)
+                series = zero_around_dat(obs_years, series)
+                series = zetta_to_joules(series)
+                series = np.ma.masked_where(obs_years.mask, series)
+                hc_global[depth][name] = series
+
+        for subplot, depth_key in depth_dict.items():
+            if depth_key == 'total':
+                obs_series = hc_global['Full-depth'] 
+            elif depth_key == '0-700m':
+                obs_series = hc_global['0-700 m']
+            elif depth_key == '700-2000m':
+                obs_series = hc_global['700-2000 m']
+            elif depth_key == '2000m_plus':
+                obs_series = hc_global['>2000 m']
+            else:
+                obs_series = {}
+
+            for i, name in enumerate(sorted(obs_series.keys())):
+                if np.isnan(obs_series[name].max()): continue
+                if len(obs_series[name].compressed()) == 0: continue
+                axes[subplot].plot(obs_years,
+                           obs_series[name]*1E-21,
+                           c = 'black',
+                           lw = 0.5,
+                           )
+
     if len(datasets) <=5:
-         axleg = plt.axes([0.0, 0.00, 0.9, 0.10]) 
+        axleg = plt.axes([0.0, 0.00, 0.9, 0.10]) 
     else:
-         axleg = plt.axes([0.0, 0.00, 0.9, 0.15])
-     axleg.axis('off')
+        axleg = plt.axes([0.0, 0.00, 0.9, 0.15])
+    axleg.axis('off')
 
     # Add emply plots to dummy axis.
     for dataset in datasets:
@@ -1484,65 +1522,8 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     times = diagtools.cube_time_to_float(thetao_cube) # decidmal time.
     ohc_data = thetao_cube.data.copy()
     specvol_data = thetao_cube.data.copy()
-
+    
     count = 0
-    """
-    for (t,z,y,x), temp in np.ndenumerate(thetao_cube.data):
-        if np.ma.is_masked(temp): 
-            continue
-        if temp > 1000.: 
-            continue
-        # Load individual data values. 
-        if depths.ndim == 1: 
-            depth = depths[z]
-        elif depths.ndim == 3:
-            depth = depths[z,y,x]
-        elif depths.ndim == 4:
-            depth = depths[t,z,y,x]
-        
-        if lats.ndim == 1:
-            lat = lats[y]
-        elif lats.ndim ==2:
-            lat = lats[y,x]
-
-        if lons.ndim == 1:
-            lon = lons[x]
-        elif lons.ndim ==2:
-            lon = lons[y,x]
-
-        if vol_cube.ndim == 3:
-            vol = vol_cube.data[z,y,x]
-        elif vol_cube.ndim == 4:
-            vol = vol_cube.data[t, z,y,x]
-
-        psal = so_cube.data[t,z,y,x]
-        time = times[t]
-
-        # start making calculations.
-        pressure = gsw.conversions.p_from_z(depth, lat) # dbar
-        ctemp = gsw.conversions.CT_from_t(psal, temp, pressure)
-        asal = gsw.conversions.SA_from_SP(psal, pressure, lon, lat)
-        rho = gsw.density.rho(asal, ctemp, pressure) #  kg/ m3
-        energy = gsw.energy.internal_energy(asal, ctemp, pressure) # J/kg
-        #enthalpy = gsw.energy.enthalpy(asal, ctemp, pressure) # J/kg
-        specvol = gsw.specvol_anom_standard(asal, ctemp, pressure)
-
-        cell_energy = energy * rho * vol
-        ohc_data[t,z,y,x] = cell_energy
-        specvol_data[t,z,y,x] = specvol
-
-        if count%100000==0:
-            print('cal OHC:', project, dataset, exp, ensemble, trend)
-            print('position:',[t,z,y,x], [time, depth, lat, lon], 'p:', pressure)
-            print('sal: practical:', psal, '\tabsolute:', asal, '\tdiff:', psal - asal)
-            print('temp: in situ:', temp, '\tconservative:', ctemp, '\tdiff:', temp - ctemp)
-            print('rho:', rho, '\tvol:',vol)
-            #print('energy: internal', energy, '\tenethalpy:', enthalpy, '\tdiff:', energy - enthalpy)
-            print('energy: internal', energy)
-
-            print('energy: cell total', cell_energy)
-        count+=1
-    """
     # layer by layer calculation.
     if lats.ndim == 1:
         #lat, lon = np.meshgrid(lats,lons)
@@ -1577,7 +1558,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
             rho = gsw.density.rho(asal, ctemp, pressure) #  kg/ m3
             energy = gsw.energy.internal_energy(asal, ctemp, pressure) # J/kg
             #enthalpy = gsw.energy.enthalpy(asal, ctemp, pressure) # J/kg
-            specvol = gsw.specvol_anom_standard(asal, ctemp, pressure)
+            specvol = gsw.specvol_anom_standard(asal, ctemp, pressure) # m^3 kg^-1 Pa
 
             cell_energy = energy * rho * vol
             ohc_data[t,z] = cell_energy
@@ -1618,7 +1599,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
 
     cube2 = thetao_cube.copy()
     cube2.data = specvol_data
-    cube2.units = cf_units.Unit('m^3/kg')
+    cube2.units = cf_units.Unit('m^3/kg Pa')
     cube2.name = 'specific volume anomaly ' + trend
     cube2.short_name = 'specvol_anom'
     cube2.var_name = 'specvol_anom'
@@ -1741,6 +1722,19 @@ def guess_PI_ensemble(dicts, keys, ens_pos = None):
     print('Did Not find pi control ensemble:', keys, ens_pos)
     assert 0
 
+def ampi_fit(cubedata, iter_pack, dummy, y_dat):
+    """
+    Multp processing linear regression fit.
+    Valeriu wrote this and I don't fully understand how the parallelisation works.
+    """
+    index, _ = iter_pack
+    data = cubedata[:, index[0], index[1], index[2]]
+    if np.ma.is_masked(data.max()):
+        return [], index
+    linreg = linregress(y_dat, data)
+    return linreg, index
+
+
 def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=False):
     """
     Calculate the trend in the 
@@ -1796,42 +1790,82 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
     times = cube.coord('time')
     pi_year = times.units.num2date(times.points)[0].year + 11. # (1971 equivalent)
 
-    print('Calculating linear regression for:', [project, dataset, exp, ensemble, short_name, ])
-    for index, arr in np.ndenumerate(dummy): #[~cube.data[0].mask]):
-        if np.ma.is_masked(arr): continue
-        if slopes.get(index, False): continue
+    parrallel_calc = True
+    if not parrallel_calc:
+        decimal_aranged = np.arange(len(decimal_time))
 
-        # Load time series for individual point
-        data = cube.data[:, index[0], index[1], index[2]]
-        if np.ma.is_masked(data.max()): continue
+        print('Calculating linear regression for:', [project, dataset, exp, ensemble, short_name, ])
+        for index, arr in np.ndenumerate(dummy): #[~cube.data[0].mask]):
+            if np.ma.is_masked(arr): continue
+            if slopes.get(index, False): continue
 
-        # Zero PI control around year 11 (1971 in hist)
-        data = zero_around_dat(decimal_time, data, year=pi_year)
+            # Load time series for individual point
+            data = cube.data[:, index[0], index[1], index[2]]
+            if np.ma.is_masked(data.max()): continue
 
-        # Calculate Linear Regression
-        linreg = linregress( np.arange(len(decimal_time)), data)
-        if linreg.slope > 1E10 or linreg.intercept>1E10:
-              print('linear regression failed:', linreg)
-              print('slope:', linreg.slope,'intercept', linreg.intercept)
-              print('from time:', np.arange(len(decimal_time)))
-              print('from data:', cube.data[:, index[0], index[1], index[2]])
-              assert 0
+            # Zero PI control around year 11 (1971 in hist)
+            data = zero_around_dat(decimal_time, data, year=pi_year)
 
-        # Store results of Linear Regression
-        slopes[index] = linreg.slope
-        intercepts[index] = linreg.intercept
-        count+=1
-        if count%250000 == 0:
-            print('Saving shelve: ', count, index, linreg.slope, linreg.intercept)
-            sh = shopen(output_shelve)
-            sh['slopes'] = slopes
-            sh['intercepts'] = intercepts
-            sh['count'] = count
-            sh.close()
+            # Calculate Linear Regression
+            linreg = linregress( decimal_aranged, data)
+            if linreg.slope > 1E10 or linreg.intercept>1E10:
+                print('linear regression failed:', linreg)
+                print('slope:', linreg.slope,'intercept', linreg.intercept)
+                print('from time:', np.arange(len(decimal_time)))
+                print('from data:', cube.data[:, index[0], index[1], index[2]])
+                assert 0
 
-    if count == 0: 
-        print('linear regression failed', count)
-        assert 0
+            # Store results of Linear Regression
+            slopes[index] = linreg.slope
+            intercepts[index] = linreg.intercept
+            count+=1
+            if count%250000 == 0:
+                print('Saving shelve: ', count, index, linreg.slope, linreg.intercept)
+                sh = shopen(output_shelve)
+                sh['slopes'] = slopes
+                sh['intercepts'] = intercepts
+                sh['count'] = count
+                sh.close()
+
+        if count == 0: 
+            print('linear regression failed', count)
+            assert 0
+    else:
+        print('Performing parrallel calculation:')
+        y_dat = np.arange(len(times.points))
+        iter_pack = np.ndenumerate(dummy)
+
+        def mpi_fit(iter_pack, dummy, y_dat):
+            """
+            Multp processing linear regression fit.
+            Valeriu wrote this and I don't fully understand how the parallelisation works.
+            """
+            index, _ = iter_pack
+            data = cube.data[:, index[0], index[1], index[2]]
+            if np.ma.is_masked(data.max()):
+                return [], index
+            linreg = linregress(y_dat, data)
+            print(linreg)
+            assert 0
+            return linreg, index
+
+        print('ProcessPoolExecutor: starting') 
+        with ProcessPoolExecutor(max_workers=8) as executor:
+            print('ProcessPoolExecutor: executing')
+            for linreg, index in executor.map(mpi_fit,
+                                              iter_pack,
+                                              itertools.repeat(dummy),
+                                              itertools.repeat(y_dat),
+                                              chunksize=10000):
+                print(linreg, index)
+                if linreg:
+                    if count%5000 == 0:
+                        print(count, 'linreg:', linreg[0],linreg[1])
+                    slopes[index] = linreg[0]
+                    intercepts[index] = linreg[1]
+                    count+=1
+
+
     print('Saving final shelve: ', count, index )#linreg.slope, linreg.intercept)
     sh = shopen(output_shelve)
     sh['slopes'] = slopes
