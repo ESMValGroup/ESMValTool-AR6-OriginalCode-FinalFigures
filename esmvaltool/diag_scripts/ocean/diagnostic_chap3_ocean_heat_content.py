@@ -33,7 +33,8 @@ from scipy.stats import linregress
 from scipy.io import loadmat
 import netCDF4 
 
-from concurrent.futures import ProcessPoolExecutor
+#from concurrent.futures import ProcessPoolExecutor
+import concurrent.futures
 
 from glob import glob
 from dask import array as da
@@ -1722,18 +1723,6 @@ def guess_PI_ensemble(dicts, keys, ens_pos = None):
     print('Did Not find pi control ensemble:', keys, ens_pos)
     assert 0
 
-def ampi_fit(cubedata, iter_pack, dummy, y_dat):
-    """
-    Multp processing linear regression fit.
-    Valeriu wrote this and I don't fully understand how the parallelisation works.
-    """
-    index, _ = iter_pack
-    data = cubedata[:, index[0], index[1], index[2]]
-    if np.ma.is_masked(data.max()):
-        return [], index
-    linreg = linregress(y_dat, data)
-    return linreg, index
-
 
 def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=False):
     """
@@ -1783,8 +1772,8 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
             cube[t, 0], 
             key ='piControl')
 
-    dummy = cube.data[0]
-    dummy = np.ma.masked_where(dummy>10E10, dummy)
+    dummy = cube[0].data
+    #dummy = np.ma.masked_where(dummy>10E10, dummy)
     if count == len(dummy.compressed()):
         return output_shelve
     times = cube.coord('time')
@@ -1832,39 +1821,36 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
             assert 0
     else:
         print('Performing parrallel calculation:')
-        y_dat = np.arange(len(times.points))
-        iter_pack = np.ndenumerate(dummy)
+        time_arange = np.arange(len(times.points))
+        ndenum = np.ndenumerate(dummy)
 
-        def mpi_fit(iter_pack, dummy, y_dat):
-            """
-            Multp processing linear regression fit.
-            Valeriu wrote this and I don't fully understand how the parallelisation works.
-            """
+        def mpi_fit(iter_pack, cubedata, time_itr): #, mpi_data):
+            print('mpi_fit',iter_pack)
             index, _ = iter_pack
-            data = cube.data[:, index[0], index[1], index[2]]
+            data = cubedata[:, index[0], index[1], index[2]]
             if np.ma.is_masked(data.max()):
                 return [], index
-            linreg = linregress(y_dat, data)
-            print(linreg)
-            assert 0
+            linreg = linregress(time_itr, data)
             return linreg, index
 
-        print('ProcessPoolExecutor: starting') 
-        with ProcessPoolExecutor(max_workers=8) as executor:
+        print('ProcessPoolExecutor: starting')
+#        executor = ProcessPoolExecutor(max_workers=1)
+        with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
             print('ProcessPoolExecutor: executing')
             for linreg, index in executor.map(mpi_fit,
-                                              iter_pack,
-                                              itertools.repeat(dummy),
-                                              itertools.repeat(y_dat),
-                                              chunksize=10000):
-                print(linreg, index)
+                                              ndenum,
+                                              itertools.repeat(cube.data),
+                                              itertools.repeat(time_arange),
+                                              chunksize=100000):
+#                                              itertools.repeat(y_dat)):
+#                                             chunksize=10000):
+                print(linreg, index, count)
                 if linreg:
                     if count%5000 == 0:
                         print(count, 'linreg:', linreg[0],linreg[1])
                     slopes[index] = linreg[0]
                     intercepts[index] = linreg[1]
                     count+=1
-
 
     print('Saving final shelve: ', count, index )#linreg.slope, linreg.intercept)
     sh = shopen(output_shelve)
