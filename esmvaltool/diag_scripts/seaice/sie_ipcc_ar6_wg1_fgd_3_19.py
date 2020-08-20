@@ -330,7 +330,7 @@ def main(cfg):
 
     make_plot(cmip_data_dict)
 
-    ipcc_sea_ice_diag.figure_handling(cfg)
+    ipcc_sea_ice_diag.figure_handling(cfg, name = 'fig_3_19_timeseries')
     # check why cmip5 is crocked
 
     logger.info('Success')

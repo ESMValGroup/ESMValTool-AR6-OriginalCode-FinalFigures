@@ -161,13 +161,13 @@ def calculate_siparam(cubelist, siext=True):
 
     return (cubelist)
 
-def figure_handling(cfg):
+def figure_handling(cfg, name = 'plot'):
 
     if cfg['write_plots']:
 
         img_ext = diagtools.get_image_format(cfg)
 
-        path=os.path.join(cfg['plot_dir'], 'fig_3_18_scatter' + img_ext)
+        path=os.path.join(cfg['plot_dir'], name + img_ext)
 
         logger.info('Saving plots to %s', path)
         plt.savefig(path)
