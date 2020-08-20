@@ -87,13 +87,13 @@ datasets:
  - {dataset: ACCESS1-3, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 250, end_year: 724}
  - {dataset: bcc-csm1-1, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
  - {dataset: bcc-csm1-1-m, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 380}
- - {dataset: CanESM2, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year:	2015, end_year: 2964}
+ - {dataset: CanESM2, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2015, end_year: 2964}
  - {dataset: CCSM4, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 800, end_year: 1274}
  - {dataset: CCSM4, exp: piControl, project: CMIP5, ensemble: r2i1p1, start_year: 953, end_year: 1047}
  - {dataset: CESM1-BGC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 101, end_year: 575}
  - {dataset: CESM1-CAM5, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 285}
  - {dataset: CESM1-FASTCHEM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 70, end_year: 259}
- - {dataset: CESM1-WACCM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year:	96, end_year: 285}
+ - {dataset: CESM1-WACCM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 96, end_year: 285}
  - {dataset: CNRM-CM5, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1850, end_year: 2609}
  - {dataset: CNRM-CM5-2, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1850, end_year: 2134}
  - {dataset: CNRM-CM5-2, exp: piControl, project: CMIP5, ensemble: "r1i1p(2:3)", start_year: 1850, end_year: 1944}
@@ -103,18 +103,18 @@ datasets:
  - {dataset: GFDL-ESM2G, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
  - {dataset: GFDL-ESM2M, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
  - {dataset: GISS-E2-H, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1180, end_year: 1844}
- - {dataset: GISS-E2-H, exp: piControl, project: CMIP5, ensemble: "r1i1p(2:3)", start_year:	2490, end_year: 2964}
+ - {dataset: GISS-E2-H, exp: piControl, project: CMIP5, ensemble: "r1i1p(2:3)", start_year: 2490, end_year: 2964}
  - {dataset: GISS-E2-H-CC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2081, end_year: 2270}
  - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 3331, end_year: 4090}
  - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p2, start_year: 3590, end_year: 4064}
  - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p3, start_year: 3560, end_year: 4034}
- - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p141, start_year:	850, end_year: 1989}
- - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p142, start_year:	2790, end_year: 2884}
+ - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p141, start_year: 850, end_year: 1989}
+ - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p142, start_year: 2790, end_year: 2884}
  - {dataset: GISS-E2-R-CC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2050, end_year: 2239}
  - {dataset: HadGEM2-CC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1860, end_year: 2049}
  - {dataset: HadGEM2-ES, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1860, end_year: 2429}
  - {dataset: inmcm4, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1851, end_year: 2325}
- - {dataset: MIROC4h, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year:	51, end_year: 145}
+ - {dataset: MIROC4h, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 51, end_year: 145}
  - {dataset: MIROC5, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2000, end_year: 2664}
  - {dataset: MIROC-ESM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1800, end_year: 2369}
  - {dataset: MIROC-ESM-CHEM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1846, end_year: 2035}
@@ -128,7 +128,7 @@ datasets:
  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, exp: historical, grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: ACCESS-ESM1-5, exp: historical, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: BCC-CSM2-MR, exp: historical, grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
- - {dataset: CanESM5, exp: historical, grid: gn, project: CMIP6, ensemble: ["r(1:25)i1p1f1",	"r(1:25)i1p2f1"], start_year: 1923, end_year: 2017}
+ - {dataset: CanESM5, exp: historical, grid: gn, project: CMIP6, ensemble: ["r(1:25)i1p1f1", "r(1:25)i1p2f1"], start_year: 1923, end_year: 2017}
  - {dataset: CanESM5-CanOE, exp: historical, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p2f1", start_year: 1923, end_year: 2017}
  - {dataset: CESM2-WACCM, exp: historical, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: CNRM-CM6-1, exp: historical, grid: gr, project: CMIP6, ensemble: "r(1:10)i1p1f2", start_year: 1923, end_year: 2017}
@@ -136,7 +136,7 @@ datasets:
  - {dataset: CNRM-ESM2-1, exp: historical, grid: gr, project: CMIP6, ensemble: "r(1:5)i1p1f2", start_year: 1923, end_year: 2017}
  - {dataset: GFDL-CM4, exp: historical, grid: gr1, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: GFDL-ESM4, exp: historical, grid: gr1, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
- - {dataset: GISS-E2-1-G, exp: historical, grid: gn, project: CMIP6, ensemble: ["r(1:10)i1p1f2",	"r(1:5)i1p3f1"], start_year: 1923, end_year: 2017}
+ - {dataset: GISS-E2-1-G, exp: historical, grid: gn, project: CMIP6, ensemble: ["r(1:10)i1p1f2", "r(1:5)i1p3f1"], start_year: 1923, end_year: 2017}
  - {dataset: HadGEM3-GC31-LL, exp: historical, grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f3", start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: historical, grid: gr, project: CMIP6, ensemble: ["r(1:6)i1p1f1", "r(10:11)i1p1f1", r14i1p1f1, r22i1p1f1, r25i1p1f1], start_year: 1923, end_year: 2017}
  - {dataset: MIROC-ES2L, exp: historical, grid: gn, project: CMIP6, ensemble: r1i1p1f2, start_year: 1923, end_year: 2017}
@@ -209,4 +209,4 @@ diagnostics:
         mip: LImon
     scripts:
       ipcc_ar6_wg1_fgd_3_20:
-#        script: /home/acrnemr/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_19.py
+        script: liza_trials/ls_path.py 

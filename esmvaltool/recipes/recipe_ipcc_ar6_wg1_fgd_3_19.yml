@@ -1,10 +1,10 @@
 # ESMValTool
-# recipe_ipcc_ar6_wg1_fgd_3_18.yml
+# recipe_ipcc_ar6_wg1_fgd_3_19.yml
 ---
 documentation:
 
   description: |
-    plots scatter plot 3_18 for IPCC AR6 WGI Ch 3
+    plots scatter plot 3_19 for IPCC AR6 WGI Ch 3
 
   authors:
     - malinina_elizaveta
@@ -24,18 +24,72 @@ models_cmip5_list: &models_cmip5_list
 # CMIP5_ALL
  - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1}
  - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1}
- - {dataset: CanESM2, project: CMIP5, ensemble: "r(1:2)i1p1"}
- - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1 }
- - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1}
+# - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1}
+# - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1} couldn't regrid
+ - {dataset: CanESM2, project: CMIP5, ensemble: "r(1:5)i1p1"}
+ - {dataset: CCSM4, project: CMIP5, ensemble: "r(1:6)i1p1"}
+ - {dataset: CESM1-BGC, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: CESM1-CAM5, project: CMIP5, ensemble: "r(1:3)i1p1"}
+ - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: CMCC-CMS, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: CNRM-CM5, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: CSIRO-Mk3-6-0, project: CMIP5, ensemble: "r(1:10)i1p1"}
+ - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: GFDL-CM2p1, project: CMIP5, ensemble: "r(1:10)i1p1"}
+# - {dataset: GFDL-CM3, project: CMIP5, ensemble: [r1i1p1,r3i1p1,r5i1p1]} 0307 problem with iris cube
+ - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1}
+# - {dataset: GISS-E2-H, project: CMIP5, ensemble: "r(1:5)i1p(1:3)" }
+ - {dataset: GISS-E2-H-CC, project: CMIP5, ensemble: r1i1p1}
+# - {dataset: GISS-E2-R, project: CMIP5, ensemble: [r1i1p1, r1i1p2, r1i1p3, r2i1p1, r2i1p2, r2i1p3, r3i1p1, r3i1p2, r3i1p3, r4i1p1, r4i1p2, r4i1p3, r5i1p1, r5i1p2, r5i1p3, r6i1p1, r6i1p3]}
+ - {dataset: GISS-E2-R-CC, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: HadCM3, project: CMIP5, ensemble: "r(1:10)i1p1"}
+ - {dataset: HadGEM2-AO, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: HadGEM2-ES, project: CMIP5, ensemble: "r(1:4)i1p1"}
+ - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: "r(1:4)i1p1"}
+ - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: MIROC5, project: CMIP5, ensemble: "r(1:3)i1p1" }
+ - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: "r(1:3)i1p1"}
+ - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: "r(1:3)i1p1"}
+ - {dataset: MRI-CGCM3, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: NorESM1-ME, project: CMIP5, ensemble: r1i1p1}
 
 models_cmip6_list: &models_cmip6_list
 # CMIP6_ALL
  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
  - {dataset: ACCESS-ESM1-5, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
- - {dataset: CanESM5, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:2)i1p1f1"}
+# non-existent, report to Lisa - {dataset: BCC-CSM2-MR, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+ - {dataset: CAMS-CSM1-0, grid: gn, project: CMIP6, exp: historical, ensemble: [r1i1p1f1, r2i1p1f1]}
+ - {dataset: CanESM5, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:25)i1p1f1"}
+# - {dataset: CanESM5-CanOE, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:3)i1p2f1"}
+# - {dataset: CESM2, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:3)i1p1f1"}
+# - {dataset: CESM2-WACCM, grid: gn, project: CMIP6, exp: historical, ensemble: [r1i1p1f1,r3i1p1f1]}
+ - {dataset: CNRM-CM6-1, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:6)i1p1f2"}
+ - {dataset: CNRM-CM6-1-HR, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f2}
+ - {dataset: CNRM-ESM2-1, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f2}
+# - {dataset: FGOALS-g3, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:4)i1p1f1"}
+# - {dataset: FIO-ESM-2-0, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:3)i1p1f1"}
+# - {dataset: GFDL-CM4, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+# - {dataset: GFDL-ESM4, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+# - {dataset: HadGEM3-GC31-LL, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:4)i1p1f3"}
+ - {dataset: HadGEM3-GC31-LL, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f3}
  - {dataset: INM-CM4-8, grid: gr1, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
  - {dataset: INM-CM5-0, grid: gr1, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
- - {dataset: MPI-ESM1-2-LR, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+# - {dataset: IPSL-CM6A-LR, grid: gn, project: CMIP6, exp: historical, ensemble: ["r(1:6)i1p1f1",r10i1p1f1,r11i1p1f1,r14i1p1f1]}
+# - {dataset: MIROC6, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:3)i1p1f1"}
+# this particular scenario not there - {dataset: MIROC-ES2L, grid:gn, project: CMIP6, exp: historical, ensemble: r1i1p1f2}
+ - {dataset: MPI-ESM1-2-HR,grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+ - {dataset: MPI-ESM1-2-LR, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:10)i1p1f1"}
+ - {dataset: MRI-ESM2-0, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:5)i1p1f1"}
+ - {dataset: NESM3, grid: gn, project: CMIP6, exp: historical, ensemble: [r1i1p1f1, r2i1p1f1]}
+# - {dataset: NorESM2-LM, grid: gn,  project: CMIP6, exp: historical, ensemble: "r(1:3)i1p1f1"}
+# - {dataset: UKESM1-0-LL, grid: gn,  project: CMIP6, exp: historical, ensemble: [r1i1p1f2, r2i1p1f2, r3i1p1f2, r4i1p1f2, r8i1p1f2]}
 
 diagnostics:
   ipcc_ar6_wg1_fgd_3_19:
@@ -76,7 +130,7 @@ diagnostics:
 
     scripts:
       ipcc_ar6_wg1_fgd_3_19:
-        script: /home/acrnemr/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_19.py
+        script: /pf/b/b381183/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_19.py 
         concatinate_cmip5: true
         concatinate_cmip6: false
         seaiceextent: true # if sea ice extent is false, sea ice area is used instead
