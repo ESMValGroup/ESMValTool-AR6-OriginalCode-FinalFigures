@@ -1472,6 +1472,186 @@ def calc_ohc_basic(cfg, metadatas, thetao_fn, volcello_fn, trend=''):
                 )
 
 
+def calc_slr_full(cfg, metadatas,
+        hist_thetao_fn, hist_so_fn,
+        pi_thetao_fn, pi_so_fn,
+        trend='intact'
+        ):
+    """
+    First we calculate the climatological average (mean along the time dimension) of the Pre-industrial control thetao (temperature) and so (salinity) datasets. These will be called thetao_bar and so_bar. Also, we apply the gsw.conversions to them to conservative temperature (ctemp_bar) and absolute salinity (asal_bar).
+
+    Then, using the Gibbs Seawater library, we iterate of the 4D dataset.
+
+    for each point in time and space in a 4D dataset:
+        pressure = gsw.conversions.p_from_z(depth, lat) # dbar
+
+        # note that so and thetao have already been detrended here.
+        ctemp = gsw.conversions.CT_from_t(so, thetao, pressure)
+        asal = gsw.conversions.SA_from_SP(so, pressure, lon, lat)
+
+        # Calculate specific volumes:     
+        svan_clim = gsw.specvol_anom_standard(asal_bar, ctemp_bar, pressure)
+        svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure) - svan_clim
+        svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure) - svan_clim
+        svan_halosteric = svan_total - svan_thermosteric
+    """
+
+    # PI control:
+    exp = metadatas[hist_thetao_fn]['exp']
+    dataset = metadatas[hist_thetao_fn]['dataset']
+    ensemble = metadatas[hist_thetao_fn]['ensemble']
+    project = metadatas[hist_thetao_fn]['project']
+
+    work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
+    output_fns = {}
+    output_fns['total'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_SLR', trend])+'.nc'
+    output_fns['thermo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_SLR', trend])+'.nc'
+    output_fns['halo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_SLR', trend])+'.nc'
+
+    if False not in [os.path.exists(fn) for fn in output_fns.values()]:
+        for key, fn in output_fns.items():
+          cube1 = iris.load_cube(fn)
+          for t in [0, -1]:
+              single_pane_map_plot(
+                      cfg,
+                      metadatas[hist_thetao_fn],
+                      cube1[t, 0],
+                      key='SLR_'+key+'_'+trend
+                      )
+        return output_fns['total'], output_fns['thermo'], output_fns['halo'] 
+
+    # load hist netcdfs
+    print('load hist netcdfs')
+    so_cube = iris.load_cube(hist_so_fn)
+    thetao_cube = iris.load_cube(hist_thetao_fn)
+
+    # load dimensions
+    lats = thetao_cube.coord('latitude').points
+    lons = thetao_cube.coord('longitude').points
+    if lats.ndim == 1:
+        lon, lat = np.meshgrid(lons,lats)
+    elif lats.ndim == 2:
+        lat = lats
+        lon = lons
+
+    depths = -1.*np.abs(thetao_cube.coord('depth').points) # depth is negative here.
+    times = diagtools.cube_time_to_float(thetao_cube) # decidmal time.
+
+    # Calculate climatology   
+    print('Calculate clim')
+    psal_bar = iris.load_cube(pi_so_fn)
+    psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
+    print('clim: so:', psal_bar.shape)
+    temp_bar = iris.load_cube(pi_thetao_fn)
+    temp_bar = temp_bar.collapsed('time', iris.analysis.MEAN)
+    print('clim: thetao:', temp_bar.shape)
+
+    depths_bar = -1.*np.abs(temp_bar.coord('depth').points)
+
+    #output
+    print('copying output cube')
+    slr_total = thetao_cube.data.copy()
+    slr_thermo = thetao_cube.data.copy()
+
+    # Calculate SLR in 2D 
+    for z in np.arange(thetao_cube.data.shape[1]):
+        print('Calculate SLR in 2D:', z) 
+        if depths.ndim == 1:
+            depth = np.zeros_like(lat) + depths[z]
+        elif depths.ndim == 3:
+            depth = depths[z]
+
+        if depths.ndim != 4:
+            pressure = gsw.conversions.p_from_z(depth, lat) # dbar
+
+        # clim:
+        if depths_bar.ndim == 1:
+            depth_bar = np.zeros_like(lat) + depths_bar[z]
+        elif depths_bar.ndim == 3:
+            depth_bar = depths_bar[z]
+        else: assert 0
+        print('starting clim calc')
+        pressure_bar = gsw.conversions.p_from_z(depth_bar, lat) # dbar
+        print('pressure_bar', pressure_bar.shape, lat.shape, depth_bar.shape)
+        psal_z_bar = psal_bar.data[z]
+        print('psal_z_bar', psal_z_bar.shape)
+        ctemp_bar = gsw.conversions.CT_from_t(psal_z_bar, temp_bar.data[z], pressure_bar)    
+        print('ctemp_bar:',ctemp_bar.shape, psal_z_bar.shape)
+        asal_bar = gsw.conversions.SA_from_SP(psal_z_bar, pressure_bar, lon, lat)
+        print('asal_bar', asal_bar.shape)
+        svan_clim = gsw.specvol_anom_standard(asal_bar, ctemp_bar, pressure_bar)
+        print('svan_clim:', svan_clim.shape)
+
+        # not sure about this part
+        svan_clim = svan_clim * pressure_bar
+        print(z,'svan_clim max:', svan_clim.max())
+        for t, time in enumerate(times):
+            print(t, z, 'performing 2D SLR')
+            if depths.ndim == 4:
+                depth = depths[t, z]
+                pressure = gsw.conversions.p_from_z(depth, lat)# dbar
+
+            psal = so_cube[t, z].data
+            temp = thetao_cube[t, z].data
+            ctemp = gsw.conversions.CT_from_t(psal, temp, pressure)
+            asal = gsw.conversions.SA_from_SP(psal, pressure, lon, lat)
+
+            # Calculate specific volumes: m3 kg-1
+            svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure)*pressure - svan_clim
+            svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure)*pressure - svan_clim
+            #svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure) - svan_clim
+            #svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure) - svan_clim
+            """
+            pressure is in dbar (1 decibar is 10000 Pa is 10000 kg m-1 s-2), 
+            so these calculations produce units of m^3 kg^-1 *dbar = 1e5 m^2 s-2.
+
+From there, we divide the dynamic heights by 9.81m s_2 (acceleration due to gravity) then multiply by 1000 to convert to mm.  ( I guess this is where Paul’s factor of 100 comes from?)
+            """
+            
+#           svan_halosteric = svan_total - svan_thermosteric
+            slr_total[t, z] = svan_total * 10000. # dynamic heights (m2 s-2)
+            slr_thermo[t, z] = svan_thermosteric * 10000. # dynamic heights (m2 s-2)
+
+    slr_total = slr_total.sum(axis=1) * 1000 / 9.81 # units: mm
+    slr_thermo = slr_thermo.sum(axis=1)* 1000 / 9.81 # units: mm
+    slr_halo = slr_total - slr_thermo     
+
+    cube0 = thetao_cube[:,0,:,:].copy()
+    cube0.data = slr_total
+    cube0.units = cf_units.Unit('mm')
+    cube0.name = 'Total Sea Level Rise'
+    cube0.short_name = 'slr_total'
+    cube0.var_name = 'slr_total'
+    iris.save(cube0, output_fns['total'])
+
+    cube1 = thetao_cube[:,0,:,:].copy()
+    cube1.data = slr_thermo
+    cube1.units = cf_units.Unit('mm')
+    cube1.name = 'Halosteric Sea Level Rise'
+    cube1.short_name = 'slr_thermo'
+    cube1.var_name = 'slr_thermo'
+    iris.save(cube1, output_fns['thermo'])
+
+    cube2 = thetao_cube[:,0,:,:].copy()
+    cube2.data = slr_halo
+    cube2.units = cf_units.Unit('mm')
+    cube2.name = 'Halosteric Sea Level Rise'
+    cube2.short_name = 'slr_halo'
+    cube2.var_name = 'slr_halo'
+    iris.save(cube2, output_fns['halo'])
+
+    for t in [0, -1]:
+        for key, cube in zip(('total', 'thermo', 'halo'),
+                             (cube0, cube1, cube2)):
+            single_pane_map_plot(
+                cfg,
+                metadatas[hist_thetao_fn],
+                cube[t],
+                key='SLR_'+key+'_'+trend
+                )
+    return output_fns['total'], output_fns['thermo'], output_fns['halo']
+
+
 def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact'):
     """
     Calculate OHC form files using full method..
@@ -1484,14 +1664,12 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
 
     work_dir = diagtools.folder([cfg['work_dir'], 'OHC'])
     output_ohc_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'ocean_heat', trend])+'.nc'
-    output_specvol_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'specvol_anom', trend])+'.nc'
 
     print('\n-------\ncalc_ohc_full', (exp, dataset, ensemble, project, trend), thetao_fn)
     print('output_ohc_fn:', output_ohc_fn)
 
-    if os.path.exists(output_ohc_fn) and os.path.exists(output_specvol_fn):
+    if os.path.exists(output_ohc_fn):
         cube1 = iris.load_cube(output_ohc_fn)
-        cube2 = iris.load_cube(output_specvol_fn)
         for t in [0, -1]:
             single_pane_map_plot(
                     cfg,
@@ -1499,14 +1677,8 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
                     cube1[t, 0],
                     key='OHC_full_'+trend
                     )
-            single_pane_map_plot(
-                    cfg,
-                    metadatas[thetao_fn],
-                    cube2[t, 0],
-                    key='specvol_anom_'+trend
-                    )
 
-        return output_ohc_fn, output_specvol_fn
+        return output_ohc_fn 
 
     thetao_cube = iris.load_cube(thetao_fn)
     so_cube = iris.load_cube(so_fn)
@@ -1522,7 +1694,6 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     depths = -1.*np.abs(thetao_cube.coord('depth').points) # depth is negative here.
     times = diagtools.cube_time_to_float(thetao_cube) # decidmal time.
     ohc_data = thetao_cube.data.copy()
-    specvol_data = thetao_cube.data.copy()
     
     count = 0
     # layer by layer calculation.
@@ -1559,11 +1730,9 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
             rho = gsw.density.rho(asal, ctemp, pressure) #  kg/ m3
             energy = gsw.energy.internal_energy(asal, ctemp, pressure) # J/kg
             #enthalpy = gsw.energy.enthalpy(asal, ctemp, pressure) # J/kg
-            specvol = gsw.specvol_anom_standard(asal, ctemp, pressure) # m^3 kg^-1 Pa
 
             cell_energy = energy * rho * vol
             ohc_data[t,z] = cell_energy
-            specvol_data[t,z] = specvol
 
     cube = thetao_cube.copy()
 
@@ -1598,15 +1767,6 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     cube.var_name = 'ohc'
     iris.save(cube, output_ohc_fn)
 
-    cube2 = thetao_cube.copy()
-    cube2.data = specvol_data
-    cube2.units = cf_units.Unit('m^3/kg Pa')
-    cube2.name = 'specific volume anomaly ' + trend
-    cube2.short_name = 'specvol_anom'
-    cube2.var_name = 'specvol_anom'
-    iris.save(cube2, output_specvol_fn)
-
-
     for t in [0, -1]:
         single_pane_map_plot(
                 cfg,
@@ -1614,15 +1774,17 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
                 cube[t, 0],
                 key='OHC_full_'+trend
                 )
-        single_pane_map_plot(
-                cfg,
-                metadatas[thetao_fn],
-                cube2[t, 0],
-                key='specvol_anom_'+trend
-                )
+    return output_ohc_fn 
 
-    return output_ohc_fn, output_specvol_fn
-    
+def mpi_detrend(iter_pack, cubedata, decimal_time, slopes, intercepts):
+    index, _ = iter_pack
+    data = cubedata[:, index[0], index[1], index[2]]
+    if np.ma.is_masked(data.max()):
+        return [], index
+
+    line = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
+    return index, np.array(line)
+
 
 def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     """
@@ -1673,20 +1835,41 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     dummy = cube.data.copy()
     dummy = np.ma.masked_where(dummy>10E10, dummy)
     count = 0
-    for index, arr in np.ndenumerate(dummy[0]): 
-        if np.ma.is_masked(arr): continue
-        data = cube.data[:, index[0], index[1], index[2]]
-        if np.ma.is_masked(data.max()): continue
 
-        if not count%10000 : 
-            print(index, arr, [len(slopes)], dummy.shape, len(decimal_time))
-            print(slopes[index], intercepts[index])
-        slope = slopes[index]
-        intercept = intercepts[index] 
 
-        line = [(t * slope) + intercept for t in np.arange(len(decimal_time))]
-        dummy[:, index[0], index[1], index[2]] = np.array(line)
-        count+=1
+    parrallel = True
+    if not parrallel:    
+        for index, arr in np.ndenumerate(dummy[0]): 
+            if np.ma.is_masked(arr): continue
+            data = cube.data[:, index[0], index[1], index[2]]
+            if np.ma.is_masked(data.max()): continue
+
+            if not count%250000:
+                print(count, index, 'detrending')
+
+            line = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
+            dummy[:, index[0], index[1], index[2]] = np.array(line)
+            count+=1
+    else:
+        # parrlel:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+            print('ProcessPoolExecutor: executing detrending mpi')
+            # iter_pack, cubedata, decimal_time, slopes, intercepts
+            ndenum = np.ndenumerate(dummy)
+
+            for dtline, index in executor.map(mpi_detrend, 
+                                              ndenum,
+                                              itertools.repeat(cube.data),
+                                              itertools.repeat(decimal_time),
+                                              itertools.repeat(slopes),
+                                              itertools.repeat(intercepts),
+                                              chunksize=100000):
+                if dtline:
+                    if count%250000 == 0:
+                        print(count, 'detrend')
+                    dummy[:, index[0], index[1], index[2]] = dtline
+                    count+=1
+
 
     detrended = cube.copy()
     detrended.data = detrended.data - np.ma.array(dummy)
@@ -1722,6 +1905,17 @@ def guess_PI_ensemble(dicts, keys, ens_pos = None):
             return index[ens_pos]
     print('Did Not find pi control ensemble:', keys, ens_pos)
     assert 0
+
+
+def mpi_fit(iter_pack, cubedata, time_itr, tmin): #, mpi_data):
+            index, _ = iter_pack
+            data = cubedata[:, index[0], index[1], index[2]]
+            if np.ma.is_masked(data.max()):
+                return [], index
+            data = data - np.ma.mean(data[tmin-1:tmin+2])
+            linreg = linregress(time_itr, data)
+            return linreg, index
+
 
 
 def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=False):
@@ -1824,15 +2018,7 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
         time_arange = np.arange(len(times.points))
         ndenum = np.ndenumerate(dummy)
 
-        def mpi_fit(iter_pack, cubedata, time_itr): #, mpi_data):
-            print('mpi_fit',iter_pack)
-            index, _ = iter_pack
-            data = cubedata[:, index[0], index[1], index[2]]
-            if np.ma.is_masked(data.max()):
-                return [], index
-            linreg = linregress(time_itr, data)
-            return linreg, index
-
+        tmin = np.argmin(np.abs(np.array(decimal_time) - pi_year))
         print('ProcessPoolExecutor: starting')
 #        executor = ProcessPoolExecutor(max_workers=1)
         with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
@@ -1841,15 +2027,16 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
                                               ndenum,
                                               itertools.repeat(cube.data),
                                               itertools.repeat(time_arange),
+                                              itertools.repeat(tmin), 
                                               chunksize=100000):
 #                                              itertools.repeat(y_dat)):
 #                                             chunksize=10000):
-                print(linreg, index, count)
+#               print(linreg, index, count)
                 if linreg:
-                    if count%5000 == 0:
+                    if count%250000 == 0:
                         print(count, 'linreg:', linreg[0],linreg[1])
-                    slopes[index] = linreg[0]
-                    intercepts[index] = linreg[1]
+                    slopes[index] = linreg.slope
+                    intercepts[index] = linreg.intercept
                     count+=1
 
     print('Saving final shelve: ', count, index )#linreg.slope, linreg.intercept)
@@ -2003,6 +2190,31 @@ def main(cfg):
         detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
 
+
+    print('\n-------------\nCalculate Sea Level Rise')
+
+    for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_ncs.items():
+        if short_name != 'thetao':
+            continue
+        if exp ==  'piControl': # no need to calculate this.
+            continue
+        hist_thetao_fn = detrended_fn
+        hist_so_fn =  detrended_ncs[(project, dataset, exp, ensemble, 'so')]
+        pi_ensemble = guess_PI_ensemble(detrended_ncs, [project, dataset, 'thetao',], ens_pos = 3)
+        pi_thetao_fn =  detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'thetao')]
+        pi_so_fn = detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'so')]
+
+        slr_total_fn, slr_thermo_fn, slr_halo_fn = calc_slr_full(cfg,
+            metadatas,
+            hist_thetao_fn,
+            hist_so_fn,
+            pi_thetao_fn, 
+            pi_so_fn,
+            trend='detrended'
+            )
+        print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
+    assert 0
+          
     print('\nCalculate ocean heat content - trend intact')
     for (project, dataset, exp, ensemble, short_name), fn in file_dict.items():
         if short_name != 'thetao': 
@@ -2025,20 +2237,20 @@ def main(cfg):
 
         if detrending_method == 'Basic':
             ohc_fn = calc_ohc_basic(cfg, metadatas, fn, volcello_fn, trend='intact')
-            specvol_fn = ''
+#            specvol_fn = ''
         elif detrending_method == 'Full':
             so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
-            ohc_fn, specvol_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
+            ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
 
         if ohc_fn.find(exp) == -1:
             print('ERROR - ohc_fn',(project, dataset, exp, ensemble, short_name), ohc_fn )
             assert 0
 
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc','intact')] = ohc_fn
-        specvol_anomalies[(project, dataset, exp, ensemble, 'specvol_anom','intact')] = specvol_fn
+#        specvol_anomalies[(project, dataset, exp, ensemble, 'specvol_anom','intact')] = specvol_fn
 
         metadatas[ohc_fn] = metadatas[fn].copy()
-        metadatas[specvol_fn] = metadatas[fn].copy()
+#        metadatas[specvol_fn] = metadatas[fn].copy()
 
     print('\nCalculate ocean heat content - detrended')
     for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_ncs.items():
@@ -2066,7 +2278,7 @@ def main(cfg):
             print('detrending_method:', detrending_method, project, dataset, exp, ensemble)
             so_fn = detrended_ncs[(project, dataset, exp, ensemble, 'so')]
             print('detrending_method:', detrending_method, so_fn)
-            ohc_fn, specvol_fn = calc_ohc_full(cfg, metadatas, detrended_fn, so_fn, volcello_fn, trend='detrended')
+            ohc_fn = calc_ohc_full(cfg, metadatas, detrended_fn, so_fn, volcello_fn, trend='detrended')
         else: 
             assert 0
 
@@ -2079,10 +2291,10 @@ def main(cfg):
             assert 0
 
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc', 'detrended')] = ohc_fn 
-        specvol_anomalies[(project, dataset, exp, ensemble, 'specvol_anom','detrended')] = specvol_fn
+#        specvol_anomalies[(project, dataset, exp, ensemble, 'specvol_anom','detrended')] = specvol_fn
 
         metadatas[ohc_fn] = metadatas[detrended_fn].copy()
-        metadatas[specvol_fn] = metadatas[detrended_fn].copy()
+#        metadatas[specvol_fn] = metadatas[detrended_fn].copy()
 
 
     print('\n---------------------\nCalculate OHC time series')
