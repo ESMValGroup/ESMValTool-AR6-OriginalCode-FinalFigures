@@ -8,6 +8,8 @@
 ;    Outputs:
 ;
 ; History
+;    20200814 kosaka_yu: revised to follow the ENSO metric package at
+;                        https://github.com/CLIVAR-PRP/ENSO_metrics/wiki/EnsoDuration
 ;    20200511 kosaka_yu: cleaned to meet the code style.
 ;    20191024 kosaka_yu: written.
 ;
@@ -58,9 +60,6 @@ begin
     error_msg("f", DIAG_SCRIPT, "", "variable "+var+" is missing.")
   end if
   iVarTs = ind(varList.eq.var)
-;  if (isatt(variable_info[iVarTs], "reference_dataset")) then
-;    refname = variable_info[iVarTs]@reference_dataset
-;  end if
 
   ; ========================================================================
 
@@ -233,24 +232,15 @@ begin
 
     ; Detrend
     if (detrend) then
-      do mon = 1, 12
-        trend = dtrend_n(ts({syear*100+mon:eyear*100+mon:12}, :, :), True, 0)
-        syr = syear
-        eyr = eyear
-        if (smonth_data.gt.mon) then
-          syr = syr + 1
-        end if
-        if (emonth_data.lt.mon) then
-          eyr = eyr - 1
-        end if
-        ts({syr*100+mon:eyr*100+mon:12}, :, :) \
-          = ts({syr*100+mon:eyr*100+mon:12}, :, :) \
-          - conform(ts({syr*100+mon:eyr*100+mon:12}, :, :), \
-                    reshape(trend@slope, dimsizes(ts(0, :, :))), (/1, 2/)) \
-          * conform(ts({syr*100+mon:eyr*100+mon:12}, :, :), \
-                    tofloat(ispan(syr, eyr, 1)) - (syear+eyear)/2., 0)
-        delete(trend)
-      end do
+      idx = ispan(1, dimsizes(ts&time), 1)
+      idx!0 = "time"
+      idx&time = ts&time
+      trend = dtrend_n(ts({syear*100+1:eyear*100+12}, :, :), True, 0)
+      ts = ts \
+           - conform(ts, reshape(trend@slope, dimsizes(ts(0, :, :))), (/1, 2/)) \
+             * conform(ts, tofloat(idx) - avg(tofloat(idx({syear*100+1:eyear*100+12}))), 0)
+      delete(trend)
+      delete(idx)
     end if
 
     ; Time smoothing
@@ -261,10 +251,10 @@ begin
     j1 = ind(lat_bnds(:, 0).lt.N .and. N.le.lat_bnds(:, 1))
     i0 = ind(lon_bnds(:, 0).le.W .and. W.lt.lon_bnds(:, 1))
     if (dimsizes(i0).gt.1) then
-      print("i0="+i0)
-      print("W="+W)
-      print("lon_bnds(0)="+lon_bnds(i0(0), :))
-      print("lon_bnds(1)="+lon_bnds(i0(1), :))
+;      print("i0="+i0)
+;      print("W="+W)
+;      print("lon_bnds(0)="+lon_bnds(i0(0), :))
+;      print("lon_bnds(1)="+lon_bnds(i0(1), :))
       i0 := i0(0)
     end if
     i1 = ind(lon_bnds(:, 0).lt.E .and. E.le.lon_bnds(:, 1))
@@ -276,9 +266,8 @@ begin
     j = j0
     dy(j) = (lat_bnds(j, 1) - S) * (cos(lat_bnds(j, 1)*d2r) + cos(S*d2r)) / 2.
     do j = j0+1, j1-1
-      dy(j) = (lat_bnds(j, 1) \
-               - lat_bnds(j, 0)) * (cos(lat_bnds(j, 1)*d2r) \
-                                    + cos(lat_bnds(j, 0)*d2r)) / 2.
+      dy(j) = (lat_bnds(j, 1) - lat_bnds(j, 0)) \
+              * (cos(lat_bnds(j, 1)*d2r) + cos(lat_bnds(j, 0)*d2r)) / 2.
     end do
     j = j1
     dy(j) = (N - lat_bnds(j, 0)) * (cos(N*d2r) + cos(lat_bnds(j, 0)*d2r)) / 2.
@@ -307,7 +296,6 @@ begin
     Nino@project = infoTs[ii]@project
     Nino@dataset = infoTs[ii]@dataset
     Nino@esize = esize
-;    Nino@reference_dataset = infoTs[ii]@reference_dataset
     Nino@long_name = "ENSO index time series"
 
     if (any(infoTs[ii]@project.eq.\

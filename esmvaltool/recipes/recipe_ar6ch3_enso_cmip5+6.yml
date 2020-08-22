@@ -561,37 +561,6 @@ preprocessors:
       end_longitude: 280.
       start_latitude: -30.
       end_latitude: 30.
-#    anomalies:
-#      period: monthly
-#    area_statistics: 
-#      operator: mean
-
-#  pp_index_seasonal:
-#    extract_region:
-#      start_longitude: 190.
-#      end_longitude: 240.
-#      start_latitude: -5.
-#      end_latitude: 5.
-#    anomalies:
-#      period: monthly
-#    extract_season:
-#      season: DJF
-##    seasonal_statistics:
-##      operator: mean
-#    seasonal_mean:
-#    detrend:
-#    area_statistics: 
-#      operator: mean
-#
-#  pp_map:
-#    extract_season:
-#      season: DJF
-#    anomalies:
-#      period: monthly
-##    seasonal_statistics:
-##      operator: mean
-#    seasonal_mean:
-#    detrend:
       
 diagnostics:
 
@@ -600,86 +569,77 @@ diagnostics:
     variables:
       ts:
         preprocessor: pp_index
-#        reference_dataset: HadISST
         mip: Amon
         frequency: mon
-        start_year: 1946
+        start_year: 1948
         end_year: 2014
         additional_datasets:
           - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
           - {dataset: ERSSTv5, project: OBS, type: reanaly, version: 1, tier: 2}
 
     scripts:
-      define_ensoindex: 
+      define_ensoindex_1951-2010: 
         script: ar6ch3_enso/define_ensoindex.ncl
-        syear: 1950
+        syear: 1951
         eyear: 2010
         index: Nino3.4  # Nino3, Nino3.4, Nino4, Nino1+2, Nino3.3_LatExt, TP, EP, EP_LatExt, EEP, WEP
         detrend: True
-      enso_events: 
-        script: ar6ch3_enso/find_ensoevents.ncl
-        syear: 1950
+      draw_enso_lifecycle_1951-2010:
+        script: ar6ch3_enso/draw_lifecycle.ncl
+        syear: 1951
         eyear: 2010
         detect_month: 12  # Based on December value
-        detect_threshold: 0.5
-        unit_threshold: stdv
-        ancestors: ['define_ensoindex']
-      draw_enso_lifecycle:
-        script: ar6ch3_enso/draw_lifecycle.ncl
-        duration_threshold: 0.25
+        detect_threshold: 0.75
+        unit_detect_threshold: stdv
+        duration_threshold: 0.5
         unit_duration_threshold: stdv
-        duration_individual: True
-        multiyear_as_single: always
-        ancestors: ['enso_events']
-      draw_enso_seasonality:
+        ancestors: ['define_ensoindex_1951-2010']
+      draw_enso_seasonality_1951-2010:
         script: ar6ch3_enso/draw_seasonality.ncl
-        syear: 1950
+        syear: 1951
         eyear: 2010
-        ancestors: ['define_ensoindex']
+        ancestors: ['define_ensoindex_1951-2010']
 
-#  enso_teleconnection:
-#    description: draw remote influence of ENSO
-#    variables:
-#      ts:
-#        preprocessor: pp_index_seasonal
-#        datasets:
-#          - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
-#        mip: Amon
-#        frequency: mon
-#        field: T2Ms
-#        exp: historical
-#        start_year: 1958
-#        end_year: 2014
-#      tas:
-#        preprocessor: pp_map
-#        reference_dataset: JRA-55
-#        mip: Amon
-#        frequency: mon
-#        field: T2Ms
-#        exp: historical
-#        start_year: 1958
-#        end_year: 2014
-#        additional_datasets:
-#          - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1, tier: 2}
-#      pr:
-#        preprocessor: pp_map
-#        reference_dataset: GPCP-SG
-#        datasets:
-#          - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 2}
-#        mip: Amon
-#        frequency: mon
-#        field: T2Ms
-#        exp: historical
-#        start_year: 1979
-#        end_year: 2014
-#        additional_datasets:
-#          - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 2}
-#
-#    scripts:  
-#      draw_enso_teleconnection:
-#        script: ar6ch3_enso/draw_teleconnection.ncl
-#        syear_tas: 1959
-#        eyear_tas: 2014
-#        syear_pr: 1980
-#        eyear_pr: 2014
-#        detrend: True
+      define_ensoindex_1971-2010: 
+        script: ar6ch3_enso/define_ensoindex.ncl
+        syear: 1971
+        eyear: 2010
+        index: Nino3.4  # Nino3, Nino3.4, Nino4, Nino1+2, Nino3.3_LatExt, TP, EP, EP_LatExt, EEP, WEP
+        detrend: True
+      draw_enso_lifecycle_1971-2010:
+        script: ar6ch3_enso/draw_lifecycle.ncl
+        syear: 1971
+        eyear: 2010
+        detect_month: 12  # Based on December value
+        detect_threshold: 0.75
+        unit_detect_threshold: stdv
+        duration_threshold: 0.5
+        unit_duration_threshold: stdv
+        ancestors: ['define_ensoindex_1971-2010']
+      draw_enso_seasonality_1971-2010:
+        script: ar6ch3_enso/draw_seasonality.ncl
+        syear: 1971
+        eyear: 2010
+        ancestors: ['define_ensoindex_1971-2010']
+
+      define_ensoindex_1979-2010: 
+        script: ar6ch3_enso/define_ensoindex.ncl
+        syear: 1979
+        eyear: 2010
+        index: Nino3.4  # Nino3, Nino3.4, Nino4, Nino1+2, Nino3.3_LatExt, TP, EP, EP_LatExt, EEP, WEP
+        detrend: True
+      draw_enso_lifecycle_1979-2010:
+        script: ar6ch3_enso/draw_lifecycle.ncl
+        syear: 1979
+        eyear: 2010
+        detect_month: 12  # Based on December value
+        detect_threshold: 0.75
+        unit_detect_threshold: stdv
+        duration_threshold: 0.5
+        unit_duration_threshold: stdv
+        ancestors: ['define_ensoindex_1979-2010']
+      draw_enso_seasonality_1979-2010:
+        script: ar6ch3_enso/draw_seasonality.ncl
+        syear: 1979
+        eyear: 2010
+        ancestors: ['define_ensoindex_1979-2010']
