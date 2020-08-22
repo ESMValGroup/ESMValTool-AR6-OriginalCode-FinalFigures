@@ -99,6 +99,9 @@ def prepare_cmip_for_3_18(data_dict, project, month, start_lat, end_lat, concati
     # add here a warning message about start lat being smaller than end lat
     attr_dict= create_attr_dict(project, month, start_lat, end_lat, concatinated=concatinate, exp_list=exp_list)
 
+    if (project == 'CMIP5') & ('hist-nat' in exp_list):
+        exp_list = ['historicalNat']
+
     cmip_dict = filter_datasets(data_dict, project, exp_list)
     if concatinate==True:
         for i in range(0,len(cmip_dict.keys())-1):
