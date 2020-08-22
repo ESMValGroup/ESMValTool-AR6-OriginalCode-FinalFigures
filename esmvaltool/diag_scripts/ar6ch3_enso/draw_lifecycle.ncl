@@ -317,8 +317,8 @@ begin
       end do
       if (any(Nino@project.eq.obs_projects)) then
         duration_el_obs(iobs) = avg(durations)
-print("El Nino: "+years_el+" "+durations+" months")
-print("Mean El Nino duration = "+duration_el_obs(iobs)+" months")
+;print("El Nino: "+years_el+" "+durations+" months")
+;print("Mean El Nino duration = "+duration_el_obs(iobs)+" months")
       elseif (Nino@project.eq."CMIP5") then
         duration_el_cmip5(irun_cmip5) = avg(durations)
       elseif (Nino@project.eq."CMIP6") then
@@ -342,9 +342,9 @@ print("Mean El Nino duration = "+duration_el_obs(iobs)+" months")
         j0 = ind(time_duration.eq.target_month)
         do j = j0, 0, 1
           if (.not.ismissing(ts(j)).and.ts(j).lt.-threshold) then
-if (any(Nino@project.eq.obs_projects)) then
-print(years_la(ii)*100+time_duration(j)+" "+ts(j)+" vs "+(-threshold))
-end if
+;if (any(Nino@project.eq.obs_projects)) then
+;print(years_la(ii)*100+time_duration(j)+" "+ts(j)+" vs "+(-threshold))
+;end if
             durations(ii) = durations(ii) + 1.
           else
             break
@@ -352,9 +352,9 @@ end if
         end do
         do j = j0+1, dimsizes(ts)-1
           if (.not.ismissing(ts(j)).and.ts(j).lt.-threshold) then
-if (any(Nino@project.eq.obs_projects)) then
-print(years_la(ii)*100+time_duration(j)+" "+ts(j)+" vs "+(-threshold))
-end if
+;if (any(Nino@project.eq.obs_projects)) then
+;print(years_la(ii)*100+time_duration(j)+" "+ts(j)+" vs "+(-threshold))
+;end if
             durations(ii) = durations(ii) + 1.
           else
             break
@@ -363,8 +363,8 @@ end if
       end do
       if (any(Nino@project.eq.obs_projects)) then
         duration_la_obs(iobs) = avg(durations)
-print("La Nina: "+years_la+" "+durations+" months")
-print("Mean La Nina duration = "+duration_la_obs(iobs)+" months")
+;print("La Nina: "+years_la+" "+durations+" months")
+;print("Mean La Nina duration = "+duration_la_obs(iobs)+" months")
       elseif (Nino@project.eq."CMIP5") then
         duration_la_cmip5(irun_cmip5) = avg(durations)
       elseif (Nino@project.eq."CMIP6") then
