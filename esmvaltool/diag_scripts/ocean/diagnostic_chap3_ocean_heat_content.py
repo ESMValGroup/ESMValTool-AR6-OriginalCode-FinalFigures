@@ -1474,7 +1474,7 @@ def calc_ohc_basic(cfg, metadatas, thetao_fn, volcello_fn, trend=''):
 
 def calc_slr_full(cfg, metadatas,
         hist_thetao_fn, hist_so_fn,
-        pi_thetao_fn, pi_so_fn,
+        #pi_thetao_fn, pi_so_fn,
         trend='intact'
         ):
     """
@@ -1495,7 +1495,6 @@ def calc_slr_full(cfg, metadatas,
         svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure) - svan_clim
         svan_halosteric = svan_total - svan_thermosteric
     """
-
     # PI control:
     exp = metadatas[hist_thetao_fn]['exp']
     dataset = metadatas[hist_thetao_fn]['dataset']
@@ -1539,10 +1538,17 @@ def calc_slr_full(cfg, metadatas,
 
     # Calculate climatology   
     print('Calculate clim')
-    psal_bar = iris.load_cube(pi_so_fn)
+    if np.array(times).min()<1880:
+        psal_bar = extract_time(so_cube.copy(), 1850, 1,1, 1880, 12, 31)
+        temp_bar = extract_time(thetao_cube.copy(), 1850, 1,1, 1880, 12, 31)
+    else:
+        psal_bar = extract_time(so_cube.copy(), 1950, 1,1, 1980, 12, 31)
+        temp_bar = extract_time(thetao_cube.copy(), 1950, 1,1, 1980, 12, 31)
+
+#    psal_bar = iris.load_cube(pi_so_fn)
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: so:', psal_bar.shape)
-    temp_bar = iris.load_cube(pi_thetao_fn)
+#    temp_bar = iris.load_cube(pi_thetao_fn)
     temp_bar = temp_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: thetao:', temp_bar.shape)
 
@@ -1579,12 +1585,16 @@ def calc_slr_full(cfg, metadatas,
         print('ctemp_bar:',ctemp_bar.shape, psal_z_bar.shape)
         asal_bar = gsw.conversions.SA_from_SP(psal_z_bar, pressure_bar, lon, lat)
         print('asal_bar', asal_bar.shape)
-        svan_clim = gsw.specvol_anom_standard(asal_bar, ctemp_bar, pressure_bar)
-        print('svan_clim:', svan_clim.shape)
+        gsdh_clim = gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar)
+        #svan_clim = gsw.specvol_anom_standard(asal_bar, ctemp_bar, pressure_bar)
+         #gsw.geo_strf_dyn_height(SA,CT,p,delta_p,interp_style)
+
+        #assert 0
+        print('gsdh_clim:', gsdh_clim.shape)
 
         # not sure about this part
-        svan_clim = svan_clim * pressure_bar
-        print(z,'svan_clim max:', svan_clim.max())
+#        svan_clim = svan_clim * pressure_bar
+#        print(z,'svan_clim max:', svan_clim.max())
         for t, time in enumerate(times):
             print(t, z, 'performing 2D SLR')
             if depths.ndim == 4:
@@ -1597,8 +1607,11 @@ def calc_slr_full(cfg, metadatas,
             asal = gsw.conversions.SA_from_SP(psal, pressure, lon, lat)
 
             # Calculate specific volumes: m3 kg-1
-            svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure)*pressure - svan_clim
-            svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure)*pressure - svan_clim
+            gsdh_total = gsw.geo_strf_dyn_height(asal, ctemp, pressure) - gsdh_clim
+            gsdh_thermo = gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure) - gsdh_clim
+
+#            svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure)*pressure - svan_clim
+#            svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure)*pressure - svan_clim
             #svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure) - svan_clim
             #svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure) - svan_clim
             """
@@ -1609,11 +1622,13 @@ From there, we divide the dynamic heights by 9.81m s_2 (acceleration due to grav
             """
             
 #           svan_halosteric = svan_total - svan_thermosteric
-            slr_total[t, z] = svan_total * 10000. # dynamic heights (m2 s-2)
-            slr_thermo[t, z] = svan_thermosteric * 10000. # dynamic heights (m2 s-2)
+#           slr_total[t, z] = svan_total * 10000. # dynamic heights (m2 s-2)
+#           slr_thermo[t, z] = svan_thermosteric * 10000. # dynamic heights (m2 s-2)
+            slr_total[t, z] = gsdh_total * 1000 / 9.81 # units mm
+            slr_thermo[t, z] = gsdh_thermo * 1000 / 9.81 # units mm
 
-    slr_total = slr_total.sum(axis=1) * 1000 / 9.81 # units: mm
-    slr_thermo = slr_thermo.sum(axis=1)* 1000 / 9.81 # units: mm
+    slr_total = slr_total.sum(axis=1)
+    slr_thermo = slr_thermo.sum(axis=1)
     slr_halo = slr_total - slr_thermo     
 
     cube0 = thetao_cube[:,0,:,:].copy()
@@ -2200,16 +2215,16 @@ def main(cfg):
             continue
         hist_thetao_fn = detrended_fn
         hist_so_fn =  detrended_ncs[(project, dataset, exp, ensemble, 'so')]
-        pi_ensemble = guess_PI_ensemble(detrended_ncs, [project, dataset, 'thetao',], ens_pos = 3)
-        pi_thetao_fn =  detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'thetao')]
-        pi_so_fn = detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'so')]
+#        pi_ensemble = guess_PI_ensemble(detrended_ncs, [project, dataset, 'thetao',], ens_pos = 3)
+#        pi_thetao_fn =  detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'thetao')]
+#        pi_so_fn = detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'so')]
 
         slr_total_fn, slr_thermo_fn, slr_halo_fn = calc_slr_full(cfg,
             metadatas,
             hist_thetao_fn,
             hist_so_fn,
-            pi_thetao_fn, 
-            pi_so_fn,
+            #pi_thetao_fn, 
+            #pi_so_fn,
             trend='detrended'
             )
         print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
