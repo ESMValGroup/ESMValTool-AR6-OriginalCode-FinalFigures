@@ -261,10 +261,11 @@ def make_panel(data_dict, fig, inner, title):
         else:
             ax.set_xticks(tks_dates)
             ax.set_xticklabels([str(yr) for yr in yrs])
-        ax.set_ylabel(proj+ ' ['+str(data_dict[proj]['n_models'])+']', rotation=90)
+        ax.set_ylabel(proj+ ' ['+str(data_dict[proj]['n_models'])+']')#, rotation=0, labelpad=5)
+        # ax.yaxis.label.set_rotation(90)
         fig.add_subplot(ax)
 
-    return (pmesh)
+    return (ax, pmesh)
 
 def make_plot(data_dict):
 
@@ -287,14 +288,13 @@ def make_plot(data_dict):
                     title = 'Antarctic SIE'
             else:
                 title = ''
-            pmesh = make_panel(data_dict[hemisph][exp], fig, inner, title= title)
+            ax , pmesh = make_panel(data_dict[hemisph][exp], fig, inner, title= title)
 
     cax = fig.add_axes([0.3,0.05,0.4,0.01])
     cbar = fig.colorbar(pmesh, cax=cax, orientation='horizontal')
     cbar.ax.set_xlabel('10^6 km^2')
     fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)#, wspace=0.28, hspace=0.2)
     # make a joint colorbar
-
 
     return
 
@@ -306,6 +306,7 @@ def main(cfg):
 
     for hemisph in cmip_data_dict.keys():
         cmip_data_dict[hemisph]['historical'] = {'CMIP5':{}, 'CMIP6':{}}
+        cmip_data_dict[hemisph]['hist-nat'] = {'CMIP5':{}, 'CMIP6':{}}
         mon_lat_str = 'month_latitude_' + hemisph
         if np.abs(cfg[mon_lat_str][1]) == cfg[mon_lat_str][1]:
             start_lat = cfg[mon_lat_str][1]
@@ -317,9 +318,13 @@ def main(cfg):
         for experiment in cmip_data_dict[hemisph].keys():
             for entry in cmip_data_dict[hemisph][experiment].keys():
                 for month in cfg[mon_lat_str][0]:
-                    cmip_data_dict[hemisph][experiment][entry][month] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, entry,
-                                                                             month, start_lat, end_lat, cfg['concatinate_' + entry.lower()],
-                                                                             exp_list=cfg[entry.lower() +'_exps_concatinate'])
+                    if experiment == 'historical':
+                        cmip_data_dict[hemisph][experiment][entry][month] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(
+                            metadatas, entry, month, start_lat, end_lat, cfg['concatinate_' + entry.lower()],
+                            exp_list=cfg[entry.lower() +'_exps_concatinate'])
+                    elif experiment == 'hist-nat':
+                        cmip_data_dict[hemisph][experiment][entry][month] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(
+                            metadatas, entry, month, start_lat, end_lat, False, exp_list=[experiment])
                     cmip_data_dict[hemisph][experiment][entry][month][0] = ipcc_sea_ice_diag.calculate_siparam(cmip_data_dict[hemisph][experiment][entry][month][0],
                                                                                cfg['seaiceextent'])
                     cmip_data_dict[hemisph][experiment][entry][month][0] = substract_ref_period(cmip_data_dict[hemisph][experiment][entry][month][0], cfg['ref_period'])
