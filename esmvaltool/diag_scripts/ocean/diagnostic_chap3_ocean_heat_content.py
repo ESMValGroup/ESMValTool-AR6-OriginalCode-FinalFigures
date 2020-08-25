@@ -1506,6 +1506,23 @@ def calc_slr_full(cfg, metadatas,
     output_fns['total'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_SLR', trend])+'.nc'
     output_fns['thermo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_SLR', trend])+'.nc'
     output_fns['halo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_SLR', trend])+'.nc'
+    output_fns['clim'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend])+'.nc'
+
+    for key, fn in output_fns.items():
+        if not os.path.exists(fn): continue
+        cube1 = iris.load_cube(fn)
+        for t in [0, -1]:
+            if key == 'clim':
+                dat = cube1
+                if t == -1: continue
+            else:
+                dat = cube1[t]
+            single_pane_map_plot(
+                cfg,
+                metadatas[hist_thetao_fn],
+                dat,
+                key='SLR_'+key+'_'+trend
+                )
 
     if False not in [os.path.exists(fn) for fn in output_fns.values()]:
         for key, fn in output_fns.items():
@@ -1514,7 +1531,7 @@ def calc_slr_full(cfg, metadatas,
               single_pane_map_plot(
                       cfg,
                       metadatas[hist_thetao_fn],
-                      cube1[t, 0],
+                      cube1[t],
                       key='SLR_'+key+'_'+trend
                       )
         return output_fns['total'], output_fns['thermo'], output_fns['halo'] 
@@ -1545,20 +1562,114 @@ def calc_slr_full(cfg, metadatas,
         psal_bar = extract_time(so_cube.copy(), 1950, 1,1, 1980, 12, 31)
         temp_bar = extract_time(thetao_cube.copy(), 1950, 1,1, 1980, 12, 31)
 
-#    psal_bar = iris.load_cube(pi_so_fn)
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: so:', psal_bar.shape)
-#    temp_bar = iris.load_cube(pi_thetao_fn)
     temp_bar = temp_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: thetao:', temp_bar.shape)
-
     depths_bar = -1.*np.abs(temp_bar.coord('depth').points)
 
     #output
     print('copying output cube')
-    slr_total = thetao_cube.data.copy()
-    slr_thermo = thetao_cube.data.copy()
+    slr_total = thetao_cube.data.copy()[:,1] #2d + time
+    slr_thermo = slr_total.copy()
+    count = 0
 
+    if os.path.exists(output_fns['clim']):
+        print ('loading from', output_fns['clim'])
+        clim_cube = iris.load_cube(output_fns['clim'])
+        slr_clim = clim_cube.data
+    else:
+        print('Starting clim SLR calculation from fresh')
+        slr_clim = slr_total[0].copy() # 2D
+
+        # Iterate over each water column:
+        for (y,x), la in np.ndenumerate(lat):
+            psal_yx_bar = psal_bar.data[:, y, x]
+            if np.ma.is_masked(psal_yx_bar.max()):
+                 continue
+
+            lo = lon[y,x]
+            print('Calculate SLR in 1D:', (y,x), 'latitude:', la, lo)
+
+            # clim:
+            if depths_bar.ndim == 1:
+                depth_bar = depths_bar
+            elif depths_bar.ndim == 3:
+                depth_bar = depths_bar[:, y, x]
+            else: assert 0
+
+            pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
+            ctemp_bar = gsw.conversions.CT_from_t(psal_yx_bar, temp_bar.data[:, y, x], pressure_bar)
+            asal_bar = gsw.conversions.SA_from_SP(psal_yx_bar, pressure_bar, lo, la)
+            gsdh_clim = gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar, max_dp=1000.)
+            slr_clim[y, x] = gsdh_clim.sum() * 1000 / 9.81
+
+        cube0 = thetao_cube[0, 0,:,:].copy()
+        cube0.data = slr_clim
+        cube0.units = cf_units.Unit('mm')
+        cube0.name = 'Climatological Sea Level Rise'
+        cube0.long_name = 'Climatological Sea Level Rise'
+        cube0.short_name = 'slr_clim'
+        cube0.var_name = 'slr_clim'
+        cube0.standard_name = 'steric_change_in_mean_sea_level'
+        iris.save(cube0, output_fns['clim'])
+
+    # Iterate over each water column:
+    for (y, x), la in np.ndenumerate(lat):
+        psal_yx_bar = psal_bar.data[:, y, x]
+        if np.ma.is_masked(psal_yx_bar.max()):
+             continue
+
+        lo = lon[y, x]
+        print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
+
+        if depths.ndim == 1:
+            depth = depths
+        elif depths.ndim == 3:
+            depth = depths[:, y, x]
+       
+        if depths.ndim != 4:
+            pressure = gsw.conversions.p_from_z(depth, la) # dbar
+
+        # clim:
+        if depths_bar.ndim == 1:
+            depth_bar = depths_bar
+        elif depths_bar.ndim == 3:
+            depth_bar = depths_bar[:, y, x]
+        else: assert 0
+        pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
+        asal_bar = gsw.conversions.SA_from_SP(psal_yx_bar, pressure_bar, lo, la)
+
+        for t, time in enumerate(times):
+            #print(t, y, x, 'performing 2D SLR')
+            if depths.ndim == 4:
+                depth = depths[t, :, y, x]
+                pressure = gsw.conversions.p_from_z(depth, la)# dbar
+
+            psal = so_cube[t, :, y, x].data
+            temp = thetao_cube[t, :, y, x].data
+
+            ctemp = gsw.conversions.CT_from_t(psal, temp, pressure)
+            asal = gsw.conversions.SA_from_SP(psal, pressure, lo, la)
+
+            # Calculate specific volumes: m3 kg-1
+            gsdh_total = gsw.geo_strf_dyn_height(asal, ctemp, pressure, max_dp=1000.).sum()
+            gsdh_thermo = gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure, max_dp=1000.).sum()
+
+            # Convert to mm and calculate anomaly
+            gsdh_total = gsdh_total * 1000 / 9.81 - slr_clim[y, x]
+            gsdh_thermo = gsdh_thermo * 1000 / 9.81 - slr_clim[y, x]
+
+            # Put in the output array:
+            slr_total[t, y, x] = gsdh_total 
+            slr_thermo[t, y, x] = gsdh_thermo
+            count+=1
+            if count %1000 == 0:
+                print(count, (t, y, x), 'performing 2D SLR:', 
+                    gsdh_total, 
+                    gsdh_thermo)
+
+    """
     # Calculate SLR in 2D 
     for z in np.arange(thetao_cube.data.shape[1]):
         print('Calculate SLR in 2D:', z) 
@@ -1614,13 +1725,7 @@ def calc_slr_full(cfg, metadatas,
 #            svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure)*pressure - svan_clim
             #svan_total = gsw.specvol_anom_standard(asal, ctemp, pressure) - svan_clim
             #svan_thermosteric = gsw.specvol_anom_standard(asal_bar, ctemp, pressure) - svan_clim
-            """
-            pressure is in dbar (1 decibar is 10000 Pa is 10000 kg m-1 s-2), 
-            so these calculations produce units of m^3 kg^-1 *dbar = 1e5 m^2 s-2.
 
-From there, we divide the dynamic heights by 9.81m s_2 (acceleration due to gravity) then multiply by 1000 to convert to mm.  ( I guess this is where Paul’s factor of 100 comes from?)
-            """
-            
 #           svan_halosteric = svan_total - svan_thermosteric
 #           slr_total[t, z] = svan_total * 10000. # dynamic heights (m2 s-2)
 #           slr_thermo[t, z] = svan_thermosteric * 10000. # dynamic heights (m2 s-2)
@@ -1630,29 +1735,36 @@ From there, we divide the dynamic heights by 9.81m s_2 (acceleration due to grav
     slr_total = slr_total.sum(axis=1)
     slr_thermo = slr_thermo.sum(axis=1)
     slr_halo = slr_total - slr_thermo     
+    """
 
     cube0 = thetao_cube[:,0,:,:].copy()
     cube0.data = slr_total
     cube0.units = cf_units.Unit('mm')
     cube0.name = 'Total Sea Level Rise'
+    cube0.long_name = 'Total Sea Level Rise'
     cube0.short_name = 'slr_total'
     cube0.var_name = 'slr_total'
+    cube0.standard_name = 'steric_change_in_mean_sea_level' 
     iris.save(cube0, output_fns['total'])
 
     cube1 = thetao_cube[:,0,:,:].copy()
     cube1.data = slr_thermo
     cube1.units = cf_units.Unit('mm')
-    cube1.name = 'Halosteric Sea Level Rise'
+    cube1.name = 'Thermosteric Sea Level Rise'
+    cube1.long_name = 'Thermosteric Sea Level Rise'
     cube1.short_name = 'slr_thermo'
     cube1.var_name = 'slr_thermo'
+    cube1.standard_name = 'thermosteric_change_in_mean_sea_level'
     iris.save(cube1, output_fns['thermo'])
 
     cube2 = thetao_cube[:,0,:,:].copy()
     cube2.data = slr_halo
     cube2.units = cf_units.Unit('mm')
     cube2.name = 'Halosteric Sea Level Rise'
+    cube2.long_name = 'Halosteric Sea Level Rise'
     cube2.short_name = 'slr_halo'
     cube2.var_name = 'slr_halo'
+    cube1.standard_name = 'thermosteric_change_in_mean_sea_level'
     iris.save(cube2, output_fns['halo'])
 
     for t in [0, -1]:
