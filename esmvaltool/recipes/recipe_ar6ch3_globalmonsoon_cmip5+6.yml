@@ -1,0 +1,613 @@
+# ESMValTool
+# recipe_ar6ch3_global_monsoon_cmip5+6.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+
+  authors:
+    - kosaka_yu
+
+#  maintainer:
+    
+  references:
+   - acknow_project
+
+  projects:
+    - ipcc_ar6
+
+  realms:
+    - atmos
+
+  themes:
+    - monsoon
+
+  domains:
+    - trop
+    - midlat
+
+  plot_types:
+    - geo
+    - times
+
+  statistics:
+    - clim
+    - anomaly
+
+cmip6: &cmip6
+  #- {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn} #no pr
+  #- {dataset: AWI-CM-1-1-MR, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: AWI-CM-1-1-MR, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: BCC-CSM2-MR, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: BCC-CSM2-MR, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: BCC-ESM1, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: BCC-ESM1, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn}
+  - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r4i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r5i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r6i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r7i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r8i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r9i1p1f1, grid: gn}
+  #- {dataset: CESM2, ensemble: r11i1p1f1, grid: gn}
+  - {dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: CESM2-WACCM, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: CESM2-WACCM, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, grid: gr}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+  #- {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2, grid: gr}
+  #- {dataset: CNRM-ESM2-1, ensemble: r3i1p1f2, grid: gr}
+  #- {dataset: CNRM-ESM2-1, ensemble: r4i1p1f2, grid: gr}
+  #- {dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr}
+  - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr}
+  #- {dataset: E3SM-1-0, ensemble: r3i1p1f1, grid: gr}
+  #- {dataset: E3SM-1-0, ensemble: r4i1p1f1, grid: gr}
+  #- {dataset: E3SM-1-0, ensemble: r5i1p1f1, grid: gr}
+  - {dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr}
+  - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r2i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r3i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r4i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r6i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r9i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r11i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r13i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r14i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r15i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r17i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r21i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gr}
+  - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3-Veg, ensemble: r3i1p1f1, grid: gr}
+  #- {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1, grid: gr}
+  - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: FGOALS-f3-L, ensemble: r2i1p1f1, grid: gr}
+  #- {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gr}
+  - {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: FGOALS-g3, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: FGOALS-g3, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn} #preprocessor failure
+  #- {dataset: FIO-ESM-2-0, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: FIO-ESM-2-0, ensemble: r3i1p1f1, grid: gn} #preprocessor failure
+  - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p1f2, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r4i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r5i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r6i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r7i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r8i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-G, ensemble: r10i1p1f1, grid: gn}
+  - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r5i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r6i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r7i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r8i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r9i1p1f1, grid: gn}
+  #- {dataset: GISS-E2-1-H, ensemble: r10i1p1f1, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  #- {dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
+  #- {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
+  #- {dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  #- {dataset: HadGEM3-GC31-MM, ensemble: r2i1p1f3, grid: gn}
+  - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  #- {dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1}
+  #- {dataset: INM-CM5-0, ensemble: r3i1p1f1, grid: gr1}
+  - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r11i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r12i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r13i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r14i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r15i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r16i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r17i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r18i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r20i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r21i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r22i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r23i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r24i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r25i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r26i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r27i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r28i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r30i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r31i1p1f1, grid: gr}
+  #- {dataset: IPSL-CM6A-LR, ensemble: r32i1p1f1, grid: gr}
+  - {dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: KACE-1-0-G, ensemble: r2i1p1f1, grid: gr}
+  #- {dataset: KACE-1-0-G, ensemble: r3i1p1f1, grid: gr}
+  #- {dataset: MCM-UA-1-0, ensemble: r1i1p1f2, grid: gn} #preprocessor failure
+  #- {dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r4i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r5i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r6i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r7i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r8i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r9i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r10i1p1f1, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: MPI-ESM-1-2-HAM, ensemble: r2i1p1f1, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: MPI-ESM1-2-HR, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: MPI-ESM1-2-LR, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: MRI-ESM2-0, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: MRI-ESM2-0, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: MRI-ESM2-0, ensemble: r4i1p1f1, grid: gn}
+  #- {dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn}
+  - {dataset: NESM3, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: NESM3, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: NESM3, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: NorCPM1, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: NorCPM1, ensemble: r3i1p1f1, grid: gn}
+  #- {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn}
+  #- {dataset: NorESM2-LM, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r2i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r3i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r4i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r5i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r6i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r7i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
+  #- {dataset: UKESM1-0-LL, ensemble: r9i1p1f2, grid: gn}
+
+cmip5: &cmip5
+  - {dataset: ACCESS1-0, ensemble: r1i1p1}
+  #- {dataset: ACCESS1-3, ensemble: r1i1p1} #No RCP4.5 ua
+  #- {dataset: BNU-ESM, ensemble: r1i1p1} #No RCP4.5 ua
+  #- {dataset: CanCM4, ensemble: r1i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r2i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r3i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r4i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r5i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r6i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r7i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r8i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r9i1p1} #since 1961
+  #- {dataset: CanCM4, ensemble: r10i1p1} #since 1961
+  - {dataset: CanESM2, ensemble: r1i1p1}
+  #- {dataset: CanESM2, ensemble: r2i1p1}
+  #- {dataset: CanESM2, ensemble: r3i1p1}
+  #- {dataset: CanESM2, ensemble: r4i1p1}
+  #- {dataset: CanESM2, ensemble: r5i1p1}
+  - {dataset: CCSM4, ensemble: r1i1p1}
+  #- {dataset: CCSM4, ensemble: r2i1p1}
+  #- {dataset: CCSM4, ensemble: r3i1p1}
+  #- {dataset: CCSM4, ensemble: r4i1p1}
+  #- {dataset: CCSM4, ensemble: r5i1p1}
+  #- {dataset: CCSM4, ensemble: r6i1p1}
+  #- {dataset: CESM1-BGC, ensemble: r1i1p1} no RCP4.5 ua
+  #- {dataset: CESM1-CAM5-1-FV2, ensemble: r1i1p1} # preprocessor failure
+  #- {dataset: CESM1-CAM5, ensemble: r1i1p1} # no RCP4.5 ua
+  - {dataset: CESM1-CAM5, ensemble: r2i1p1}
+  #- {dataset: CESM1-CAM5, ensemble: r3i1p1}
+  #- {dataset: CESM1-FASTCHEM, ensemble: r1i1p1} # No RCP4.5
+  #- {dataset: CESM1-WACCM, ensemble: r1i1p1}  # No RCP4.5
+  #- {dataset: CESM1-WACCM, ensemble: r2i1p1} #since 1955
+  #- {dataset: CESM1-WACCM, ensemble: r3i1p1} #since 1955
+  #- {dataset: CESM1-WACCM, ensemble: r4i1p1} #since 1955
+  #- {dataset: CMCC-CESM, ensemble: r1i1p1}  # No RCP4.5
+  #- {dataset: CMCC-CM, ensemble: r1i1p1} # No RCP4.5 ua
+  #- {dataset: CMCC-CMS, ensemble: r1i1p1} # No RCP4.5 ua
+  #- {dataset: CNRM-CM5-2, ensemble: r1i1p1} # No RCP4.5
+  - {dataset: CNRM-CM5, ensemble: r1i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r1i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r2i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r3i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r4i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r5i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r6i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r7i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r8i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r9i1p1}
+  #- {dataset: CSIRO-Mk3-6-0, ensemble: r10i1p1}
+  - {dataset: CSIRO-Mk3L-1-2, ensemble: r1i2p1}
+  #- {dataset: EC-EARTH, ensemble: r1i1p1} # no ua
+  #- {dataset: EC-EARTH, ensemble: r2i1p1} # no ua
+  #- {dataset: EC-EARTH, ensemble: r3i1p1} # no file
+  #- {dataset: EC-EARTH, ensemble: r6i1p1} # ua 1933-1949 missing
+  #- {dataset: EC-EARTH, ensemble: r7i1p1} # no ua
+  #- {dataset: EC-EARTH, ensemble: r8i1p1} #overlap
+  #- {dataset: EC-EARTH, ensemble: r9i1p1} # no RCP4.5 ua
+  #- {dataset: EC-EARTH, ensemble: r11i1p1} # no ua
+  #- {dataset: EC-EARTH, ensemble: r12i1p1} # no historical ua
+  #- {dataset: EC-EARTH, ensemble: r13i1p1} # no ua
+  #- {dataset: EC-EARTH, ensemble: r14i1p1} # no ua
+  #- {dataset: FGOALS-g2, ensemble: r1i1p1, start_year: 1900} # ua since 1900 only
+  - {dataset: FGOALS-s2, ensemble: r1i1p1}
+  #- {dataset: FGOALS-s2, ensemble: r2i1p1}
+  #- {dataset: FGOALS-s2, ensemble: r3i1p1}
+  #- {dataset: FIO-ESM, ensemble: r1i1p1} ua No RCP4.5
+  - {dataset: FIO-ESM, ensemble: r2i1p1}
+  #- {dataset: FIO-ESM, ensemble: r3i1p1}
+  - {dataset: GFDL-CM2p1, ensemble: r1i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r2i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r3i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r4i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r5i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r6i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r7i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r8i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r9i1p1}
+  #- {dataset: GFDL-CM2p1, ensemble: r10i1p1}
+  - {dataset: GFDL-CM3, ensemble: r1i1p1}
+  - {dataset: GFDL-ESM2G, ensemble: r1i1p1}
+  - {dataset: GFDL-ESM2M, ensemble: r1i1p1}
+  #- {dataset: GISS-E2-H-CC, ensemble: r1i1p1} # no RCP4.5 ua
+  #- {dataset: GISS-E2-H, ensemble: r1i1p1} No RCP4.5 ua
+  #- {dataset: GISS-E2-H, ensemble: r1i1p2}
+  #- {dataset: GISS-E2-H, ensemble: r1i1p3}
+  - {dataset: GISS-E2-H, ensemble: r2i1p1}
+  #- {dataset: GISS-E2-H, ensemble: r2i1p2}
+  #- {dataset: GISS-E2-H, ensemble: r2i1p3}
+  #- {dataset: GISS-E2-H, ensemble: r3i1p1}
+  #- {dataset: GISS-E2-H, ensemble: r3i1p2}
+  #- {dataset: GISS-E2-H, ensemble: r3i1p3}
+  #- {dataset: GISS-E2-H, ensemble: r4i1p1}
+  #- {dataset: GISS-E2-H, ensemble: r4i1p2}
+  #- {dataset: GISS-E2-H, ensemble: r4i1p3}
+  #- {dataset: GISS-E2-H, ensemble: r5i1p1}
+  #- {dataset: GISS-E2-H, ensemble: r5i1p2}
+  #- {dataset: GISS-E2-H, ensemble: r5i1p3}
+  #- {dataset: GISS-E2-H, ensemble: r6i1p3} 
+  #- {dataset: GISS-E2-R-CC, ensemble: r1i1p1} # no RCP4.5 ua
+  - {dataset: GISS-E2-R, ensemble: r1i1p1}
+  #- {dataset: GISS-E2-R, ensemble: r1i1p2}
+  #- {dataset: GISS-E2-R, ensemble: r1i1p3}
+  #- {dataset: GISS-E2-R, ensemble: r2i1p1}
+  #- {dataset: GISS-E2-R, ensemble: r2i1p2}
+  #- {dataset: GISS-E2-R, ensemble: r2i1p3}
+  #- {dataset: GISS-E2-R, ensemble: r3i1p1}
+  #- {dataset: GISS-E2-R, ensemble: r3i1p2}
+  #- {dataset: GISS-E2-R, ensemble: r3i1p3}
+  #- {dataset: GISS-E2-R, ensemble: r4i1p1}
+  #- {dataset: GISS-E2-R, ensemble: r4i1p2}
+  #- {dataset: GISS-E2-R, ensemble: r4i1p3}
+  #- {dataset: GISS-E2-R, ensemble: r5i1p1}
+  #- {dataset: GISS-E2-R, ensemble: r5i1p2}
+  #- {dataset: GISS-E2-R, ensemble: r5i1p3}
+  #- {dataset: GISS-E2-R, ensemble: r6i1p1}
+  #- {dataset: GISS-E2-R, ensemble: r6i1p3}
+  - {dataset: HadCM3, ensemble: r1i1p1}
+  #- {dataset: HadCM3, ensemble: r2i1p1}
+  #- {dataset: HadCM3, ensemble: r3i1p1}
+  #- {dataset: HadCM3, ensemble: r4i1p1}
+  #- {dataset: HadCM3, ensemble: r5i1p1}
+  #- {dataset: HadCM3, ensemble: r6i1p1}
+  #- {dataset: HadCM3, ensemble: r7i1p1}
+  #- {dataset: HadCM3, ensemble: r8i1p1}
+  #- {dataset: HadCM3, ensemble: r9i1p1}
+  #- {dataset: HadCM3, ensemble: r10i1p1}
+  #- {dataset: HadGEM2-AO, ensemble: r1i1p1} # no RCP4.5 ua
+  - {dataset: HadGEM2-CC, ensemble: r1i1p1}
+  - {dataset: HadGEM2-ES, ensemble: r1i1p1}
+  #- {dataset: HadGEM2-ES, ensemble: r2i1p1} #overlap
+  #- {dataset: HadGEM2-ES, ensemble: r3i1p1} #overlap
+  #- {dataset: HadGEM2-ES, ensemble: r4i1p1}
+  - {dataset: IPSL-CM5A-LR, ensemble: r1i1p1}
+  #- {dataset: IPSL-CM5A-LR, ensemble: r2i1p1}
+  #- {dataset: IPSL-CM5A-LR, ensemble: r3i1p1}
+  #- {dataset: IPSL-CM5A-LR, ensemble: r4i1p1}
+  - {dataset: IPSL-CM5A-MR, ensemble: r1i1p1}
+  #- {dataset: IPSL-CM5B-LR, ensemble: r1i1p1}
+  #- {dataset: MIROC4h, ensemble: r1i1p1} #since 1950
+  #- {dataset: MIROC4h, ensemble: r2i1p1} #since 1950
+  #- {dataset: MIROC4h, ensemble: r3i1p1} #since 1950
+  #- {dataset: MIROC5, ensemble: r1i1p1} #overlap
+  #- {dataset: MIROC5, ensemble: r2i1p1} #overlap
+  #- {dataset: MIROC5, ensemble: r3i1p1} #overlap
+  #- {dataset: MIROC5, ensemble: r4i1p1} #overlap
+  #- {dataset: MIROC5, ensemble: r5i1p1} #overlap
+  - {dataset: MIROC-ESM, ensemble: r1i1p1}
+  - {dataset: MIROC-ESM-CHEM, ensemble: r1i1p1}
+  - {dataset: MPI-ESM-LR, ensemble: r1i1p1}
+  #- {dataset: MPI-ESM-LR, ensemble: r2i1p1}
+  #- {dataset: MPI-ESM-LR, ensemble: r3i1p1}
+  #- {dataset: MPI-ESM-MR, ensemble: r1i1p1} # no RCP4.5 ua
+  - {dataset: MPI-ESM-MR, ensemble: r2i1p1}
+  #- {dataset: MPI-ESM-MR, ensemble: r3i1p1}
+  #- {dataset: MPI-ESM-P, ensemble: r1i1p1} # No RCP4.5
+  #- {dataset: MPI-ESM-P, ensemble: r2i1p1} # No RCP4.5
+  - {dataset: MRI-CGCM3, ensemble: r1i1p1}
+  #- {dataset: MRI-CGCM3, ensemble: r2i1p1} # no RCP4.5
+  #- {dataset: MRI-CGCM3, ensemble: r3i1p1} # no RCP4.5
+  #- {dataset: MRI-CGCM3, ensemble: r4i1p1} # no RCP4.5
+  #- {dataset: MRI-CGCM3, ensemble: r5i1p1} # no RCP4.5
+  - {dataset: NorESM1-M, ensemble: r1i1p1}
+  - {dataset: NorESM1-ME, ensemble: r1i1p1}
+  - {dataset: bcc-csm1-1, ensemble: r1i1p1}
+  #- {dataset: bcc-csm1-1-m, ensemble: r1i1p1} # no RCP4.5 ua
+  - {dataset: inmcm4, ensemble: r1i1p1}
+
+preprocessors:
+
+  pp:
+    regrid:
+      target_grid: 2.5x2.5
+      scheme: linear
+
+  pp_land:
+    regrid:
+      target_grid: 0.5x0.5
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+      
+  ppsfc:
+    regrid:
+      target_grid: 2.5x2.5
+      scheme: linear
+
+  pp850+200:
+    extract_levels:
+      levels: [85000, 20000]
+      scheme: linear
+    regrid:
+      target_grid: 2.5x2.5
+      scheme: linear
+
+diagnostics:
+
+  global_monsoon_obs:
+    description: define monsoon domain and calculate intensity index
+    variables:
+      pr:
+        preprocessor: pp
+        mip: Amon
+        frequency: mon
+        start_year: 1870
+        end_year: 2014
+        additional_datasets:
+          - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, 
+             start_year: 1979, end_year: 2017, tier: 2}
+          - {dataset: CMAP, project: OBS, type: satellite, version: V2005, 
+             start_year: 1979, end_year: 2019, tier: 2}
+      ua:
+        preprocessor: pp850+200
+        mip: Amon
+        frequency: mon
+        start_year: 1870
+        end_year: 2014
+        additional_datasets:
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3,
+             start_year: 1979, end_year: 2018}
+          - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1, tier: 3,
+             start_year: 1958, end_year: 2013}
+          - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1, tier: 3,
+             start_year: 1980, end_year: 2014}
+      va:
+        preprocessor: pp850+200
+        mip: Amon
+        frequency: mon
+        start_year: 1870
+        end_year: 2014
+        additional_datasets:
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3,
+             start_year: 1979, end_year: 2018}
+    scripts:
+      monsoon_domain_intensity: &monsoon_domain_intensity
+        script: ar6ch3_monsoon/monsoon_domain_intensity.ncl
+        syear_clim: 1979
+        eyear_clim: 2014
+        smonth_NHsummer: 5
+        emonth_NHsummer: 9
+        smonth_SHsummer: 11
+        emonth_SHsummer: 3
+#        threshold_summer_minus_witner: 300.
+#        threshold_mpi: 0.5
+
+  global_monsoon_cmip5:
+    description: define monsoon domain and calculate intensity index
+    variables:
+      pr:
+        preprocessor: pp
+        project: CMIP5
+        mip: Amon
+        frequency: mon
+        exp: [historical, rcp45]
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip5
+      ua:
+        preprocessor: pp850+200
+        project: CMIP5
+        mip: Amon
+        frequency: mon
+        exp: [historical, rcp45]
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip5
+    scripts:
+      monsoon_domain_intensity:
+        <<: *monsoon_domain_intensity
+
+  global_monsoon_cmip6:
+    description: define monsoon domain and calculate intensity index
+    variables:
+      pr:
+        preprocessor: pp
+        project: CMIP6
+        mip: Amon
+        frequency: mon
+        exp: historical
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip6
+      ua:
+        preprocessor: pp850+200
+        project: CMIP6
+        mip: Amon
+        frequency: mon
+        exp: historical
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip6
+      va:
+        preprocessor: pp850+200
+        project: CMIP6
+        mip: Amon
+        frequency: mon
+        exp: historical
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip6
+    scripts:
+      monsoon_domain_intensity:
+        <<: *monsoon_domain_intensity
+        
+  global_landmonsoon_obs:
+    description: define monsoon domain and calculate intensity index
+    variables:
+      pr:
+        preprocessor: pp_land
+        mip: Amon
+        frequency: mon
+        start_year: 1870
+        end_year: 2014
+        additional_datasets:
+          - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, 
+             start_year: 1979, end_year: 2017, tier: 2}
+          - {dataset: CMAP, project: OBS, type: satellite, version: V2005, 
+             start_year: 1979, end_year: 2019, tier: 2}
+          - {dataset: GPCC, project: OBS, type: insitu, version: v2018, 
+             start_year: 1891, end_year: 2016, tier: 2}
+          - {dataset: CRU-TS, project: OBS, type: insitu, version: 4.02, 
+             start_year: 1901, end_year: 2016, tier: 3}
+    scripts:
+      monsoon_domain_intensity: 
+        <<: *monsoon_domain_intensity
+
+  global_landmonsoon_cmip5:
+    description: define monsoon domain and calculate intensity index
+    variables:
+      pr:
+        preprocessor: pp_land
+        project: CMIP5
+        mip: Amon
+        frequency: mon
+#        field: T2Ms
+        exp: [historical, rcp45]
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip5
+    scripts:
+      monsoon_domain_intensity: 
+        <<: *monsoon_domain_intensity
+
+  global_landmonsoon_cmip6:
+    description: define monsoon domain and calculate intensity index
+    variables:
+      pr:
+        preprocessor: pp_land
+        project: CMIP6
+        mip: Amon
+        frequency: mon
+#        field: T2Ms
+        exp: historical
+        start_year: 1870
+        end_year: 2014
+        additional_datasets: *cmip6
+    scripts:
+      monsoon_domain_intensity: 
+        <<: *monsoon_domain_intensity
+        
+  draw_global_monsoon_cmip5+6:
+    description: Wrapper to collect and plot figures
+    scripts:
+      plot_global_monsoon_runmean20yr:
+        script: ar6ch3_monsoon/draw_global_monsoon.ncl
+        diagnostic_map: [global_monsoon_obs/monsoon_domain_intensity,
+                         global_monsoon_cmip6/monsoon_domain_intensity]
+        scale_precip_ann: True
+        dataset_obs_pr_map: GPCP-SG
+        dataset_obs_uv_map: ERA5
+        project_map: CMIP6
+        moving_ave: 20
+        diagnostic_precip: [global_landmonsoon_obs/monsoon_domain_intensity,
+                            global_landmonsoon_cmip5/monsoon_domain_intensity,
+                            global_landmonsoon_cmip6/monsoon_domain_intensity]
+        diagnostic_circulation: [global_monsoon_obs/monsoon_domain_intensity,
+                                 global_monsoon_cmip5/monsoon_domain_intensity,
+                                 global_monsoon_cmip6/monsoon_domain_intensity]
+        ancestors: ['global_monsoon_obs/monsoon_domain_intensity',
+                    'global_monsoon_cmip5/monsoon_domain_intensity',
+                    'global_monsoon_cmip6/monsoon_domain_intensity',
+                    'global_landmonsoon_obs/monsoon_domain_intensity',
+                    'global_landmonsoon_cmip5/monsoon_domain_intensity',
+                    'global_landmonsoon_cmip6/monsoon_domain_intensity']

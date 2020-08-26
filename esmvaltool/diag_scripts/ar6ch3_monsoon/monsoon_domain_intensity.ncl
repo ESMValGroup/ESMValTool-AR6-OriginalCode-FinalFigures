@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200825 kosaka_yu: calculate multimodel means individually for CMIP5 and CMIP6.
 ;    20200513 kosaka_yu: cleaned up.
 ;    20191130 kosaka_yu: bug fix for monsoon circulation index.
 ;    20191030 kosaka_yu: written.
@@ -94,6 +95,8 @@ begin
       = diag_script_info@threshold_summer_minus_winter
   end if
 
+  obs_projects = (/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/)
+  
   ; Get var list
 
   varList = metadata_att_as_array(input_file_info, "short_name")
@@ -120,12 +123,13 @@ begin
 
   var = "pr"
   infoPr = select_metadata_by_name(input_file_info, var)
-  dataset_names = metadata_att_as_array(infoPr, "dataset")
-  iPrMME     = ind(dataset_names .eq. "MultiModelMean")
+;  dataset_names = metadata_att_as_array(infoPr, "dataset")
+;  iPrMME     = ind(dataset_names .eq. "MultiModelMean")
   do i = 0, ListCount(infoPr)-1
-    if (any(infoPr[i]@project.eq.\
-            (/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
-      dataset = infoPr[i]@dataset
+    if (ismissing(infoPr[i]@project)) then
+      continue
+    end if
+    if (any(infoPr[i]@project.eq.obs_projects)) then
       if (isvar("iPrObs")) then
         tmp = array_append_record(iPrObs, (/i/), 0)
         delete(iPrObs)
@@ -134,18 +138,39 @@ begin
       else
         iPrObs = (/i/)
       end if
+    elseif (infoPr[i]@project.eq."CMIP5") then
+      if (isvar("iPrCMIP5")) then
+        tmp = array_append_record(iPrCMIP5, (/i/), 0)
+        delete(iPrCMIP5)
+        iPrCMIP5 = tmp
+        delete(tmp)
+      else
+        iPrCMIP5 = (/i/)
+      end if
+    elseif (infoPr[i]@project.eq."CMIP6") then
+      if (isvar("iPrCMIP6")) then
+        tmp = array_append_record(iPrCMIP6, (/i/), 0)
+        delete(iPrCMIP6)
+        iPrCMIP6 = tmp
+        delete(tmp)
+      else
+        iPrCMIP6 = (/i/)
+      end if
     end if
   end do
 
-  if (uvar.ne."" .and. vvar.ne."") then
+;  if (uvar.ne."" .and. vvar.ne."") then
+  if (uvar.ne."") then
     infoU = select_metadata_by_name(input_file_info, uvar)
-    delete(dataset_names)
-    dataset_names = metadata_att_as_array(infoU, "dataset")
-    iUMME    = ind(dataset_names .eq. "MultiModelMean")
+;    delete(dataset_names)
+;    dataset_names = metadata_att_as_array(infoU, "dataset")
+;    iUMME    = ind(dataset_names .eq. "MultiModelMean")
 
     do i = 0, ListCount(infoU)-1
-      if (any(infoU[i]@project.eq.\
-              (/"obs", "OBS", "obs4mips", "ana4mips"/))) then
+      if (ismissing(infoU[i]@project)) then
+        continue
+      end if
+      if (any(infoU[i]@project.eq.obs_projects)) then
         if (isvar("iUObs")) then
           tmp = array_append_record(iUObs, (/i/), 0)
           delete(iUObs)
@@ -154,17 +179,39 @@ begin
         else
           iUObs = (/i/)
         end if
+      elseif (infoU[i]@project.eq."CMIP5") then
+        if (isvar("iUCMIP5")) then
+          tmp = array_append_record(iUCMIP5, (/i/), 0)
+          delete(iUCMIP5)
+          iUCMIP5 = tmp
+          delete(tmp)
+        else
+          iUCMIP5 = (/i/)
+        end if
+      elseif (infoU[i]@project.eq."CMIP6") then
+        if (isvar("iUCMIP6")) then
+          tmp = array_append_record(iUCMIP6, (/i/), 0)
+          delete(iUCMIP6)
+          iUCMIP6 = tmp
+          delete(tmp)
+        else
+          iUCMIP6 = (/i/)
+        end if
       end if
     end do
+  end if
 
+  if (vvar.ne."") then
     infoV = select_metadata_by_name(input_file_info, vvar)
-    delete(dataset_names)
-    dataset_names = metadata_att_as_array(infoV, "dataset")
-    iVMME    = ind(dataset_names .eq. "MultiModelMean")
+;    delete(dataset_names)
+;    dataset_names = metadata_att_as_array(infoV, "dataset")
+;    iVMME    = ind(dataset_names .eq. "MultiModelMean")
 
     do i = 0, ListCount(infoV)-1
-      if (any(infoV[i]@project.eq. \
-              (/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
+      if (ismissing(infoV[i]@project)) then
+        continue
+      end if
+      if (any(infoV[i]@project.eq.obs_projects)) then
         if (isvar("iVObs")) then
           tmp = array_append_record(iVObs, (/i/), 0)
           delete(iVObs)
@@ -172,6 +219,24 @@ begin
           delete(tmp)
         else
           iVObs = (/i/)
+        end if
+      elseif (infoV[i]@project.eq."CMIP5") then
+        if (isvar("iVCMIP5")) then
+          tmp = array_append_record(iVCMIP5, (/i/), 0)
+          delete(iVCMIP5)
+          iVCMIP5 = tmp
+          delete(tmp)
+        else
+          iVCMIP5 = (/i/)
+        end if
+      elseif (infoV[i]@project.eq."CMIP6") then
+        if (isvar("iVCMIP6")) then
+          tmp = array_append_record(iVCMIP6, (/i/), 0)
+          delete(iVCMIP6)
+          iVCMIP6 = tmp
+          delete(tmp)
+        else
+          iVCMIP6 = (/i/)
         end if
       end if
     end do
@@ -215,6 +280,12 @@ begin
     prRange@units = "mm"
     prRange@diag_script = DIAG_SCRIPT
     prRange@dataset = dataset
+    prRange@syear_clim = syear_clim
+    prRange@eyear_clim = eyear_clim
+    prRange@smonth_NHsummer = smonth_NHsummer
+    prRange@emonth_NHsummer = emonth_NHsummer
+    prRange@smonth_SHsummer = smonth_SHsummer
+    prRange@emonth_SHsummer = emonth_SHsummer
     nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
     nc_outfile = ncdf_write(prRange, nc_filename)
 
@@ -222,15 +293,54 @@ begin
     domain@var = "monsoon_domain"
     domain@diag_script = DIAG_SCRIPT
     domain@dataset = dataset
+    domain@syear_clim = syear_clim
+    domain@eyear_clim = eyear_clim
+    domain@smonth_NHsummer = smonth_NHsummer
+    domain@emonth_NHsummer = emonth_NHsummer
+    domain@smonth_SHsummer = smonth_SHsummer
+    domain@emonth_SHsummer = emonth_SHsummer
     nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
     nc_outfile = ncdf_write(domain, nc_filename)
 
     MPI@var = "MPI"
     MPI@diag_script = DIAG_SCRIPT
     MPI@dataset = dataset
+    MPI@syear_clim = syear_clim
+    MPI@eyear_clim = eyear_clim
+    MPI@smonth_NHsummer = smonth_NHsummer
+    MPI@emonth_NHsummer = emonth_NHsummer
+    MPI@smonth_SHsummer = smonth_SHsummer
+    MPI@emonth_SHsummer = emonth_SHsummer
     nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
     nc_outfile = ncdf_write(MPI, nc_filename)
 
+    if (isvar("iPrCMIP5")) then
+      if (any(ii.eq.iPrCMIP5)) then
+        w = 1./tofloat(num(metadata_att_as_array(infoPr, "dataset").eq.infoPr[ii]@dataset))
+        if (isvar("prClimCMIP5")) then
+          prClimCMIP5 = prClimCMIP5 + prClim * w
+          nprClimCMIP5 = nprClimCMIP5 + w
+        else
+          prClimCMIP5 = prClim
+          prClimCMIP5 = prClim * w
+          nprClimCMIP5 = w
+        end if
+      end if
+    end if
+    if (isvar("iPrCMIP6")) then
+      if (any(ii.eq.iPrCMIP6)) then
+        w = 1./tofloat(num(metadata_att_as_array(infoPr, "dataset").eq.infoPr[ii]@dataset))
+        if (isvar("prClimCMIP6")) then
+          prClimCMIP6 = prClimCMIP6 + prClim * w
+          nprClimCMIP6 = nprClimCMIP6 + w
+        else
+          prClimCMIP6 = prClim
+          prClimCMIP6 = prClim * w
+          nprClimCMIP6 = w
+        end if
+      end if
+    end if
+    
     delete(prClim)
     delete(prClimANN)
     delete(prRange)
@@ -238,6 +348,122 @@ begin
     delete(domain)
   end do
 
+  if (isvar("prClimCMIP5")) then
+    prClimCMIP5 = prClimCMIP5 / nprClimCMIP5
+
+    dataset = "MultiModelMeanCMIP5"
+
+    prRange = summer_minus_winter(prClimCMIP5, opt)  ; mm/day
+    prClimANN = dim_avg_n(prClimCMIP5, 0)
+    MPI = prRange
+    MPI = prRange / where(prClimANN.gt.0., prClimANN, prClimANN@_FillValue)
+    MPI@long_name = "Monsoon precipitation index"
+    MPI@units = ""
+
+    prRange = summer_minus_winter(prClimCMIP5, optAccum)  ; mm
+    prRange@var = "pr"
+    prRange@units = "mm"
+    prRange@diag_script = DIAG_SCRIPT
+    prRange@dataset = dataset
+    prRange@syear_clim = syear_clim
+    prRange@eyear_clim = eyear_clim
+    prRange@smonth_NHsummer = smonth_NHsummer
+    prRange@emonth_NHsummer = emonth_NHsummer
+    prRange@smonth_SHsummer = smonth_SHsummer
+    prRange@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(prRange, nc_filename)
+
+    domain := monsoon_domain(MPI, prRange, optDomain)
+    domain@var = "monsoon_domain"
+    domain@diag_script = DIAG_SCRIPT
+    domain@dataset = dataset
+    domain@syear_clim = syear_clim
+    domain@eyear_clim = eyear_clim
+    domain@smonth_NHsummer = smonth_NHsummer
+    domain@emonth_NHsummer = emonth_NHsummer
+    domain@smonth_SHsummer = smonth_SHsummer
+    domain@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(domain, nc_filename)
+
+    MPI@var = "MPI"
+    MPI@diag_script = DIAG_SCRIPT
+    MPI@dataset = dataset
+    MPI@syear_clim = syear_clim
+    MPI@eyear_clim = eyear_clim
+    MPI@smonth_NHsummer = smonth_NHsummer
+    MPI@emonth_NHsummer = emonth_NHsummer
+    MPI@smonth_SHsummer = smonth_SHsummer
+    MPI@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
+    nc_outfile = ncdf_write(MPI, nc_filename)
+    delete(prClimCMIP5)
+    delete(nprClimCMIP5)
+    delete(prClimANN)
+    delete(prRange)
+    delete(MPI)
+    delete(domain)
+  end if
+
+  if (isvar("prClimCMIP6")) then
+    prClimCMIP6 = prClimCMIP6 / nprClimCMIP6
+
+    dataset = "MultiModelMeanCMIP6"
+
+    prRange = summer_minus_winter(prClimCMIP6, opt)  ; mm/day
+    prClimANN = dim_avg_n(prClimCMIP6, 0)
+    MPI = prRange
+    MPI = prRange / where(prClimANN.gt.0., prClimANN, prClimANN@_FillValue)
+    MPI@long_name = "Monsoon precipitation index"
+    MPI@units = ""
+
+    prRange = summer_minus_winter(prClimCMIP6, optAccum)  ; mm
+    prRange@var = "pr"
+    prRange@units = "mm"
+    prRange@diag_script = DIAG_SCRIPT
+    prRange@dataset = dataset
+    prRange@syear_clim = syear_clim
+    prRange@eyear_clim = eyear_clim
+    prRange@smonth_NHsummer = smonth_NHsummer
+    prRange@emonth_NHsummer = emonth_NHsummer
+    prRange@smonth_SHsummer = smonth_SHsummer
+    prRange@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(prRange, nc_filename)
+
+    domain := monsoon_domain(MPI, prRange, optDomain)
+    domain@var = "monsoon_domain"
+    domain@diag_script = DIAG_SCRIPT
+    domain@dataset = dataset
+    domain@syear_clim = syear_clim
+    domain@eyear_clim = eyear_clim
+    domain@smonth_NHsummer = smonth_NHsummer
+    domain@emonth_NHsummer = emonth_NHsummer
+    domain@smonth_SHsummer = smonth_SHsummer
+    domain@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(domain, nc_filename)
+
+    MPI@var = "MPI"
+    MPI@diag_script = DIAG_SCRIPT
+    MPI@dataset = dataset
+    MPI@syear_clim = syear_clim
+    MPI@eyear_clim = eyear_clim
+    MPI@smonth_NHsummer = smonth_NHsummer
+    MPI@emonth_NHsummer = emonth_NHsummer
+    MPI@smonth_SHsummer = smonth_SHsummer
+    MPI@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
+    nc_outfile = ncdf_write(MPI, nc_filename)
+    delete(prClimCMIP6)
+    delete(nprClimCMIP6)
+    delete(prClimANN)
+    delete(prRange)
+    delete(MPI)
+    delete(domain)
+  end if
+  
   if (uvar.ne."" .and. vvar.ne."") then
     do ii = 0, ListCount(infoU)-1
       dataset = infoU[ii]@dataset
@@ -258,8 +484,42 @@ begin
       uMonsoon@diag_script = DIAG_SCRIPT
       uMonsoon@dataset = dataset
       uMonsoon@long_name = "Climatological summer - winter zonal wind velocity"
+      uMonsoon@syear_clim = syear_clim
+      uMonsoon@eyear_clim = eyear_clim
+      uMonsoon@smonth_NHsummer = smonth_NHsummer
+      uMonsoon@emonth_NHsummer = emonth_NHsummer
+      uMonsoon@smonth_SHsummer = smonth_SHsummer
+      uMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(uMonsoon, nc_filename)
+
+      if (isvar("iUCMIP5")) then
+        if (any(ii.eq.iUCMIP5)) then
+          w = 1./tofloat(num(metadata_att_as_array(infoU, "dataset").eq.infoU[ii]@dataset))
+          if (isvar("uClimCMIP5")) then
+            uClimCMIP5 = uClimCMIP5 + uClim * w
+            nuClimCMIP5 = nuClimCMIP5 + w
+          else
+            uClimCMIP5 = uClim
+            uClimCMIP5 = uClim * w
+            nuClimCMIP5 = w
+          end if
+        end if
+      end if
+      if (isvar("iUCMIP6")) then
+        if (any(ii.eq.iUCMIP6)) then
+          w = 1./tofloat(num(metadata_att_as_array(infoU, "dataset").eq.infoU[ii]@dataset))
+          if (isvar("uClimCMIP6")) then
+            uClimCMIP6 = uClimCMIP6 + uClim * w
+            nuClimCMIP6 = nuClimCMIP6 + w
+          else
+            uClimCMIP6 = uClim
+            uClimCMIP6 = uClim * w
+            nuClimCMIP6 = w
+          end if
+        end if
+      end if
+      
       delete(u)
       delete(uClim)
       delete(uMonsoon)
@@ -285,14 +545,144 @@ begin
       vMonsoon@dataset = dataset
       vMonsoon@long_name \
         = "Climatological summer - winter meridional wind velocity"
+      vMonsoon@syear_clim = syear_clim
+      vMonsoon@eyear_clim = eyear_clim
+      vMonsoon@smonth_NHsummer = smonth_NHsummer
+      vMonsoon@emonth_NHsummer = emonth_NHsummer
+      vMonsoon@smonth_SHsummer = smonth_SHsummer
+      vMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(vMonsoon, nc_filename)
+
+      if (isvar("iVMIP5")) then
+        if (any(ii.eq.iVCMIP5)) then
+          w = 1./tofloat(num(metadata_att_as_array(infoV, "dataset").eq.infoV[ii]@dataset))
+          if (isvar("vClimCMIP5")) then
+            vClimCMIP5 = vClimCMIP5 + vClim * w
+            nvClimCMIP5 = nvClimCMIP5 + w
+          else
+            vClimCMIP5 = vClim
+            vClimCMIP5 = vClim * w
+            nvClimCMIP5 = w
+          end if
+        end if
+      end if
+      if (isvar("iVCMIP6")) then
+        if (any(ii.eq.iVCMIP6)) then
+          w = 1./tofloat(num(metadata_att_as_array(infoV, "dataset").eq.infoV[ii]@dataset))
+          if (isvar("vClimCMIP6")) then
+            vClimCMIP6 = vClimCMIP6 + vClim * w
+            nvClimCMIP6 = nvClimCMIP6 + w
+          else
+            vClimCMIP6 = vClim
+            vClimCMIP6 = vClim * w
+            nvClimCMIP6 = w
+          end if
+        end if
+      end if
+
       delete(v)
       delete(vClim)
       delete(vMonsoon)
     end do
   end if
 
+  if (isvar("uClimCMIP5")) then
+    uClimCMIP5 = uClimCMIP5 / nuClimCMIP5
+    dataset = "MultiModelMeanCMIP5"
+
+    uMonsoon = summer_minus_winter(uClimCMIP5, opt)
+
+    uMonsoon@var = "u"
+    uMonsoon@diag_script = DIAG_SCRIPT
+    uMonsoon@dataset = dataset
+    uMonsoon@syear_clim = syear_clim
+    uMonsoon@eyear_clim = eyear_clim
+    uMonsoon@smonth_NHsummer = smonth_NHsummer
+    uMonsoon@emonth_NHsummer = emonth_NHsummer
+    uMonsoon@smonth_SHsummer = smonth_SHsummer
+    uMonsoon@emonth_SHsummer = emonth_SHsummer
+    uMonsoon@long_name = "Climatological summer - winter zonal wind velocity"
+    nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(uMonsoon, nc_filename)
+
+    delete(uClimCMIP5)
+    delete(nuClimCMIP5)
+    delete(uMonsoon)
+  end if
+  if (isvar("vClimCMIP5")) then
+    vClimCMIP5 = vClimCMIP5 / nvClimCMIP5
+    dataset = "MultiModelMeanCMIP5"
+
+    vMonsoon = summer_minus_winter(vClimCMIP5, opt)
+
+    vMonsoon@var = "v"
+    vMonsoon@diag_script = DIAG_SCRIPT
+    vMonsoon@dataset = dataset
+    vMonsoon@long_name \
+        = "Climatological summer - winter meridional wind velocity"
+    vMonsoon@syear_clim = syear_clim
+    vMonsoon@eyear_clim = eyear_clim
+    vMonsoon@smonth_NHsummer = smonth_NHsummer
+    vMonsoon@emonth_NHsummer = emonth_NHsummer
+    vMonsoon@smonth_SHsummer = smonth_SHsummer
+    vMonsoon@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(vMonsoon, nc_filename)
+
+    delete(vClimCMIP5)
+    delete(nvClimCMIP5)
+    delete(vMonsoon)
+  end if
+
+  if (isvar("uClimCMIP6")) then
+    uClimCMIP6 = uClimCMIP6 / nuClimCMIP6
+    dataset = "MultiModelMeanCMIP6"
+
+    uMonsoon = summer_minus_winter(uClimCMIP6, opt)
+
+    uMonsoon@var = "u"
+    uMonsoon@diag_script = DIAG_SCRIPT
+    uMonsoon@dataset = dataset
+    uMonsoon@long_name = "Climatological summer - winter zonal wind velocity"
+    uMonsoon@syear_clim = syear_clim
+    uMonsoon@eyear_clim = eyear_clim
+    uMonsoon@smonth_NHsummer = smonth_NHsummer
+    uMonsoon@emonth_NHsummer = emonth_NHsummer
+    uMonsoon@smonth_SHsummer = smonth_SHsummer
+    uMonsoon@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(uMonsoon, nc_filename)
+
+    delete(uClimCMIP6)
+    delete(nuClimCMIP6)
+    delete(uMonsoon)
+  end if
+  if (isvar("vClimCMIP6")) then
+    vClimCMIP6 = vClimCMIP6 / nvClimCMIP6
+    dataset = "MultiModelMeanCMIP6"
+
+    vMonsoon = summer_minus_winter(vClimCMIP6, opt)
+
+    vMonsoon@var = "v"
+    vMonsoon@diag_script = DIAG_SCRIPT
+    vMonsoon@dataset = dataset
+    vMonsoon@long_name \
+        = "Climatological summer - winter meridional wind velocity"
+    vMonsoon@syear_clim = syear_clim
+    vMonsoon@eyear_clim = eyear_clim
+    vMonsoon@smonth_NHsummer = smonth_NHsummer
+    vMonsoon@emonth_NHsummer = emonth_NHsummer
+    vMonsoon@smonth_SHsummer = smonth_SHsummer
+    vMonsoon@emonth_SHsummer = emonth_SHsummer
+    nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
+    nc_outfile = ncdf_write(vMonsoon, nc_filename)
+
+    delete(vClimCMIP6)
+    delete(nvClimCMIP6)
+    delete(vMonsoon)
+  end if
+  
 ; ====================== monsoon precipitation index ========================
 
   input_dir = config_user_info@work_dir + "/"
