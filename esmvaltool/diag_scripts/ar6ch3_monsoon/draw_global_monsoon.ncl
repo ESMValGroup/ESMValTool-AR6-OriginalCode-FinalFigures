@@ -56,14 +56,18 @@ begin
   colors_reanal = (/"black", "black", "black", "black"/)
   patterns_reanal = (/0, 1, 14, 7/)
   seglens_reanal = (/0.15, 0.1, 0.05, 0.15 /)
+
+  color_CMIP6 = (/204., 35., 35./)/255.
+  color_CMIP5 = (/37., 81., 204./)/255.
+  color_AMIP  = (/236., 156., 46./)/255.  ; (/236., 209., 81./)/255.
   
   moving_ave = 0
   if (isatt(diag_script_info, "moving_ave")) then
     moving_ave = diag_script_info@moving_ave
   end if
-  scale_precip_ann = True
-  if (isatt(diag_script_info, "scale_precip_ann")) then
-    scale_precip_ann = diag_script_info@scale_precip_ann
+  scale_precip_map_ann = True
+  if (isatt(diag_script_info, "scale_precip_map_ann")) then
+    scale_precip_map_ann = diag_script_info@scale_precip_map_ann
   end if
 
   if (isatt(diag_script_info, "diagnostic_map")) then
@@ -95,7 +99,7 @@ begin
   else
     diagnostic_circulation = ""
   end if
-
+  
 ; =======================================================
   
   if (all(diagnostic_map .eq. "")) then
@@ -189,7 +193,7 @@ begin
   if (.not.all(input_dir_map .eq. "")) then
     if (dimsizes(input_dir_map).eq.1) then
         domainFileRef  = input_dir_map+"domain_monsoon_"+refPr_map+".nc"
-        if (scale_precip_ann) then
+        if (scale_precip_map_ann) then
           prFileRef    = input_dir_map+"monsoon_precip_index_"+refPr_map+".nc"
         else
           prFileRef    = input_dir_map+"precip_monsoon_"+refPr_map+".nc"
@@ -198,7 +202,7 @@ begin
         vFileRef       = input_dir_map+"v_monsoon_"+refUV_map+".nc"
 
         domainFileMME  = input_dir_map+"domain_monsoon_MultiModelMean"+project_map+".nc"
-        if (scale_precip_ann) then
+        if (scale_precip_map_ann) then
           prFileMME    = input_dir_map+"monsoon_precip_index_MultiModelMean"+project_map+".nc"
         else
           prFileMME    = input_dir_map+"precip_monsoon_MultiModelMean"+project_map+".nc"
@@ -214,7 +218,7 @@ begin
           end if
         end if
         if (.not.isvar("prFileRef")) then
-          if (scale_precip_ann) then
+          if (scale_precip_map_ann) then
             tmppath = input_dir_map(n)+"monsoon_precip_index_"+refPr_map+".nc"
           else
             tmppath = input_dir_map(n)+"precip_monsoon_"+refPr_map+".nc"
@@ -243,7 +247,7 @@ begin
           end if
         end if
         if (.not.isvar("prFileMME")) then
-          if (scale_precip_ann) then
+          if (scale_precip_map_ann) then
             tmppath = input_dir_map(n)+"monsoon_precip_index_MultiModelMean"+project_map+".nc"
           else
             tmppath = input_dir_map(n)+"precip_monsoon_MultiModelMean"+project_map+".nc"
@@ -281,7 +285,7 @@ begin
 ;    if (fileexists(prFileRef).and.fileexists(prFileMME)) then
 ;      drawPr = True
       f = addfile(prFileRef, "r")
-      if (scale_precip_ann) then
+      if (scale_precip_map_ann) then
         prRef = f->MPI
       else
         prRef = f->pr
@@ -290,7 +294,7 @@ begin
       prRef@units = ""
       refnamePr = prRef@dataset
       f = addfile(prFileMME, "r")
-      if (scale_precip_ann) then
+      if (scale_precip_map_ann) then
         prMME = f->MPI
       else
         prMME = f->pr
@@ -330,7 +334,7 @@ begin
     end if
 
     if (drawUV) then
-      if (moving_ave.gt.0) then
+      if (moving_ave.gt.1) then
         wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                       "global_monsoon_" + refnamePr + "+" \
                       + refnameUV + "_movingave" + moving_ave + "yrs")
@@ -339,7 +343,7 @@ begin
                       "global_monsoon_" + refnamePr + "+" + refnameUV)
       end if
     else
-      if (moving_ave.gt.0) then
+      if (moving_ave.gt.1) then
         wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                       "global_monsoon_" + refnamePr + \
                       "_movingave" + moving_ave + "yrs")
@@ -385,7 +389,7 @@ begin
     resPr@res_tmXBMinorThicknessF =  resPr@res_tmBorderThicknessF/2.
     resPr@res_tmYLMinorThicknessF =  resPr@res_tmBorderThicknessF/2.
 
-    if (scale_precip_ann) then
+    if (scale_precip_map_ann) then
       resPr@res_cnLevels = (/-2.5, -2., -1.5, -1., -0.5, \
                             0.5, 1., 1.5, 2., 2.5/)
     else
@@ -563,7 +567,7 @@ begin
     pres@lbTitlePosition   = "Bottom"
     pres@lbTitleOffsetF    = 0.25
     pres@lbTitleFontHeightF = 0.012
-    if (scale_precip_ann) then
+    if (scale_precip_map_ann) then
       pres@lbTitleString   = "(Summer minus Winter) / (Annual mean) ratio of precipitation rate" 
     else
       pres@lbTitleString   = "Summer minus winter precipitation rate (mm day~S~-1~N~)" 
@@ -608,7 +612,7 @@ end
 
 begin
 
-  if (moving_ave.gt.0) then
+  if (moving_ave.gt.1) then
     if (mod(moving_ave, 2).eq.0) then
       wgt = new(moving_ave+1, "float")
       wgt = 1.
@@ -646,10 +650,14 @@ begin
     do ii = 0, dimsizes(Prfiles)-1
       f = addfile(Prfiles(ii), "r")
       tmp = f->GMpr
-      if (moving_ave.gt.0) then
+      if (moving_ave.gt.1) then
         tmp = wgt_runave_n(tmp, wgt, 0, 0)
       end if
-
+;      if (isatt(tmp, "experiment_id")) then
+;        print(tmp@dataset+" "+tmp@experiment_id)
+;      else
+;        print(tmp@dataset)
+;      end if
       if (any(tmp@project \
               .eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
         if (.not.isdefined("gObs")) then
@@ -658,20 +666,27 @@ begin
         ListAppend(gObs, new(dimsizes(tmp), typeof(tmp)))
         i = ListCount(gObs)-1
         gObs[i] = tmp
-      elseif (tmp@project.eq."CMIP6") then
+      elseif (tmp@project.eq."CMIP6".and.isStrSubset(tmp@experiment_id, "historical")) then
         if (.not.isdefined("gCMIP6")) then
           gCMIP6 = NewList("fifo")
         end if
         ListAppend(gCMIP6, new(dimsizes(tmp), typeof(tmp)))
         i = ListCount(gCMIP6)-1
         gCMIP6[i] = tmp
-      elseif (tmp@project.eq."CMIP5") then
+      elseif (tmp@project.eq."CMIP5".and.isStrSubset(tmp@experiment_id, "historical")) then
         if (.not.isdefined("gCMIP5")) then
           gCMIP5 = NewList("fifo")
         end if
         ListAppend(gCMIP5, new(dimsizes(tmp), typeof(tmp)))
         i = ListCount(gCMIP5)-1
         gCMIP5[i] = tmp
+      elseif (tmp@experiment_id.eq."amip-hist") then
+        if (.not.isdefined("gAMIP")) then
+          gAMIP = NewList("fifo")
+        end if
+        ListAppend(gAMIP, new(dimsizes(tmp), typeof(tmp)))
+        i = ListCount(gAMIP)-1
+        gAMIP[i] = tmp
       end if
       delete(tmp)
     end do
@@ -697,6 +712,12 @@ begin
       syr = gObs[ii]&time(0)
       eyr = gObs[ii]&time(dimsizes(gObs[ii]&time)-1)
       GMprObs(ii, {syr:eyr}) = (/ gObs[ii] /)
+      if (gObs[ii]@units.eq."") then
+        GMprObs(ii, :) = GMprObs(ii, :) * 100.
+        GMprObs@units = "%"
+      else
+        GMprObs@units = gObs[ii]@units
+      end if
 
       if (any((/isStrSubset(gObs[ii]@dataset, "GPCP"), \
               isStrSubset(gObs[ii]@dataset, "CMAP"), \
@@ -742,8 +763,13 @@ begin
         GMprCMIP6(ii, {syr:eyr}) = (/ gCMIP6[ii] /)
         esizeGMprCMIP6 = num(metadata_att_as_array(gCMIP6, "dataset").eq.gCMIP6[ii]@dataset)
       end do
-      GMprCMIP6@units = gCMIP6[0]@units
-
+      if (gCMIP6[0]@units.eq."") then
+        GMprCMIP6 = GMprCMIP6 * 100.
+        GMprCMIP6@units = "%"
+      else
+        GMprCMIP6@units = gCMIP6[0]@units
+      end if
+      
       GMprCMIP6mean  = GMprCMIP6(0, :)
       GMprCMIP6_5th  = GMprCMIP6mean
       GMprCMIP6_95th = GMprCMIP6mean
@@ -779,8 +805,13 @@ begin
         GMprCMIP5(ii, {syr:eyr}) = (/ gCMIP5[ii] /)
         esizeGMprCMIP5 = num(metadata_att_as_array(gCMIP5, "dataset").eq.gCMIP5[ii]@dataset)
       end do
-      GMprCMIP5@units = gCMIP5[0]@units
-
+      if (gCMIP5[0]@units.eq."") then
+        GMprCMIP5 = GMprCMIP5 * 100.
+        GMprCMIP5@units = "%"
+      else
+        GMprCMIP5@units = gCMIP5[0]@units
+      end if
+      
       GMprCMIP5mean  = GMprCMIP5(0, :)
       GMprCMIP5_5th  = GMprCMIP5mean
       GMprCMIP5_95th = GMprCMIP5mean
@@ -792,6 +823,49 @@ begin
       nmodels_CMIP5_pr = count_unique_values(metadata_att_as_array(gCMIP5, "dataset"))
       delete(gCMIP5)
       delete(esizeGMprCMIP5)
+    end if
+
+    syear = 999999
+    eyear = -999999
+    nruns = ListCount(gAMIP)
+    if (nruns.gt.0) then
+      do ii = 0, nruns-1
+        syear = min((/toint(gAMIP[ii]&time(0)), syear/))
+        eyear = max((/toint(gAMIP[ii]&time(dimsizes(gAMIP[ii]&time)-1)), eyear/))
+      end do
+      GMprAMIP = new((/ nruns, eyear-syear+1 /), "float")
+      GMprAMIP!0 = "ensemble"
+      GMprAMIP!1 = "time"
+      GMprAMIP&ensemble = ispan(1, nruns, 1)
+      GMprAMIP&time = ispan(syear, eyear, 1)
+      esizeGMprAMIP = new(nruns, "integer")
+      esizeGMprAMIP!0 = "ensemble"
+      esizeGMprAMIP&ensemble = GMprAMIP&ensemble
+      do ii = 0, nruns-1
+        syr = gAMIP[ii]&time(0)
+        eyr = gAMIP[ii]&time(dimsizes(gAMIP[ii]&time)-1)
+        GMprAMIP(ii, {syr:eyr}) = (/ gAMIP[ii] /)
+        esizeGMprAMIP = num(metadata_att_as_array(gAMIP, "dataset").eq.gAMIP[ii]@dataset)
+      end do
+      GMprAMIP@units = gAMIP[0]@units
+      if (gAMIP[0]@units.eq."") then
+        GMprAMIP = GMprAMIP * 100.
+        GMprAMIP@units = "%"
+      else
+        GMprAMIP@units = gAMIP[0]@units
+      end if
+      
+      GMprAMIPmean  = GMprAMIP(0, :)
+      GMprAMIP_5th  = GMprAMIPmean
+      GMprAMIP_95th = GMprAMIPmean
+      GMprAMIPmean  = (/weighted_mean(GMprAMIP, 1./tofloat(esizeGMprAMIP))/)
+      GMprAMIP_5th  = (/weighted_percentile(GMprAMIP, 1./tofloat(esizeGMprAMIP), 0.05)/)
+      GMprAMIP_95th = (/weighted_percentile(GMprAMIP, 1./tofloat(esizeGMprAMIP), 0.95)/)
+
+      nruns_AMIP_pr = nruns
+      nmodels_AMIP_pr = count_unique_values(metadata_att_as_array(gAMIP, "dataset"))
+      delete(gAMIP)
+      delete(esizeGMprAMIP)
     end if
   end if
 
@@ -812,7 +886,7 @@ begin
       do ii = 0, dimsizes(NHMufiles)-1
         f = addfile(NHMufiles(ii), "r")
         tmp = f->NHMu
-        if (moving_ave.gt.0) then
+        if (moving_ave.gt.1) then
           tmp = wgt_runave_n(tmp, wgt, 0, 0)
         end if
 
@@ -824,20 +898,27 @@ begin
           ListAppend(uObs, new(dimsizes(tmp), typeof(tmp)))
           i = ListCount(uObs)-1
           uObs[i] = tmp
-        elseif (tmp@project.eq."CMIP6") then
+        elseif (tmp@project.eq."CMIP6".and.isStrSubset(tmp@experiment_id, "historical")) then
           if (.not.isdefined("uCMIP6")) then
             uCMIP6 = NewList("fifo")
           end if
           ListAppend(uCMIP6, new(dimsizes(tmp), typeof(tmp)))
           i = ListCount(uCMIP6)-1
           uCMIP6[i] = tmp
-        elseif (tmp@project.eq."CMIP5") then
+        elseif (tmp@project.eq."CMIP5".and.isStrSubset(tmp@experiment_id, "historical")) then
           if (.not.isdefined("uCMIP5")) then
             uCMIP5 = NewList("fifo")
           end if
           ListAppend(uCMIP5, new(dimsizes(tmp), typeof(tmp)))
           i = ListCount(uCMIP5)-1
           uCMIP5[i] = tmp
+        elseif (tmp@experiment_id.eq."amip-hist") then
+          if (.not.isdefined("uAMIP")) then
+            uAMIP = NewList("fifo")
+          end if
+          ListAppend(uAMIP, new(dimsizes(tmp), typeof(tmp)))
+          i = ListCount(uAMIP)-1
+          uAMIP[i] = tmp
         end if
         delete(tmp)
       end do
@@ -950,6 +1031,43 @@ begin
         delete(uCMIP5)
         delete(esizeNHMuCMIP5)
       end if
+
+      syear = 999999
+      eyear = -999999
+      nruns = ListCount(uAMIP)
+      if (nruns.gt.0) then
+        do ii = 0, nruns-1
+          syear = min((/toint(uAMIP[ii]&time(0)), syear/))
+          eyear = max((/toint(uAMIP[ii]&time(dimsizes(uAMIP[ii]&time)-1)), \
+                      eyear/))
+        end do
+        NHMuAMIP = new((/ nruns, eyear-syear+1 /), "float")
+        NHMuAMIP!0 = "ensemble"
+        NHMuAMIP!1 = "time"
+        NHMuAMIP&ensemble = ispan(1, nruns, 1)
+        NHMuAMIP&time = ispan(syear, eyear, 1)
+        esizeNHMuAMIP = new(nruns, "integer")
+        esizeNHMuAMIP!0 = "ensemble"
+        esizeNHMuAMIP&ensemble = NHMuAMIP&ensemble
+        do ii = 0, nruns-1
+          syr = uAMIP[ii]&time(0)
+          eyr = uAMIP[ii]&time(dimsizes(uAMIP[ii]&time)-1)
+          NHMuAMIP(ii, {syr:eyr}) = (/ uAMIP[ii] /)
+          esizeNHMuAMIP = num(metadata_att_as_array(uAMIP, "dataset").eq.uAMIP[ii]@dataset)
+        end do
+
+        NHMuAMIPmean  = NHMuAMIP(0, :)
+        NHMuAMIP_5th  = NHMuAMIPmean
+        NHMuAMIP_95th = NHMuAMIPmean
+        NHMuAMIPmean  = (/weighted_mean(NHMuAMIP, 1./tofloat(esizeNHMuAMIP))/)
+        NHMuAMIP_5th  = (/weighted_percentile(NHMuAMIP, 1./tofloat(esizeNHMuAMIP), 0.05)/)
+        NHMuAMIP_95th = (/weighted_percentile(NHMuAMIP, 1./tofloat(esizeNHMuAMIP), 0.95)/)
+
+        nruns_AMIP_u = nruns
+        nmodels_AMIP_u = count_unique_values(metadata_att_as_array(uAMIP, "dataset"))
+        delete(uAMIP)
+        delete(esizeNHMuAMIP)
+      end if
     end if
   end if
 
@@ -991,38 +1109,37 @@ begin
   resl := True
 ;  resl@tfPolyDrawOrder = "Draw"
 
-  x2 = 0.51
-  x3 = 0.55
+  x2 = 0.57
+  x3 = 0.61
   xc = (x2 + x3)/2.
   wLegend = 0.065
-  iLegend = 0.03
+  iLegend = 0.02
   yLegend1 = 0.23
   yLegend2 = 0.26
   yLegendC = (yLegend1 + yLegend2)/2.
   yLegend  = yLegendC - 0.004
+  done_CMIP5legend = False
   done_CMIP6legend = False
-  done_CMIP6legend = False
+  done_AMIPlegend = False
   if (drawPr) then
     range = max(abs(GMprObs))
     if (isvar("GMprCMIP6mean")) then
       range = max((/range, max(abs(GMprCMIP6_5th))/))
       range = max((/range, max(abs(GMprCMIP6_95th))/))
+      pr_units = GMprCMIP6mean@units
     end if
     if (isvar("GMprCMIP5mean")) then
       range = max((/range, max(abs(GMprCMIP5_5th))/))
       range = max((/range, max(abs(GMprCMIP5_95th))/))
+      pr_units = GMprCMIP5mean@units
     end if
-    if (range.gt.80.) then
-      rests@trYMaxF = 100.
-    elseif (range.gt.70.) then
-      rests@trYMaxF = 80.
-    elseif (range.gt.60.) then
-      rests@trYMaxF = 70.
-    elseif (range.gt.50.) then
-      rests@trYMaxF = 60.
-    else
-      rests@trYMaxF = 50.
+    if (isvar("GMprAMIPmean")) then
+      range = max((/range, max(abs(GMprAMIP_5th))/))
+      range = max((/range, max(abs(GMprAMIP_95th))/))
+      pr_units = GMprAMIPmean@units
     end if
+    ranges := (/2., 3., 4., 5., 6., 7., 8., 10., 12., 15., 20., 30., 40., 50., 60., 70., 80., 100./)
+    rests@trYMaxF = min(where(ranges.lt.range, 9999., ranges))
     rests@trYMinF = -rests@trYMaxF
     rests@gsnCenterString = "Global summer monsoon precipitation"
     if (dimsizes(input_dir_precip).eq.1) then
@@ -1037,9 +1154,19 @@ begin
         end if
       end do
     end if
+    if (rests@trYMaxF.eq.tofloat(toint(rests@trYMaxF))) then
+      rests@gsnCenterStringOrthogonalPosF = 0.02
+    else
+      rests@gsnCenterStringOrthogonalPosF = 0.06
+    end if
+    rests@gsnLeftStringOrthogonalPosF = rests@gsnCenterStringOrthogonalPosF  ; - 0.02
     rests@gsnLeftString = "(c)"
-    rests@tiYAxisString = "(mm day~S~-1~N~)"
-
+    if (pr_units.eq."%") then
+      rests@tiYAxisString = "(%)"
+    else
+      rests@tiYAxisString = "(mm day~S~-1~N~)"
+    end if
+    
     plotts(0) = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), \
                            (/GMprCMIP6mean@_FillValue, GMprCMIP6mean@_FillValue/), rests)
     if (isvar("syear_clim").and.isvar("eyear_clim")) then
@@ -1053,7 +1180,7 @@ begin
     if (isvar("GMprCMIP5mean")) then
       x := array_append_record(GMprCMIP5_5th&time, GMprCMIP5_95th&time(::-1), 0)
       y := array_append_record(GMprCMIP5_5th, GMprCMIP5_95th(::-1), 0)
-      resp@gsFillColor := (/37., 81., 204./)/255.
+      resp@gsFillColor := color_CMIP5
       dummy(idummy) = gsn_add_polygon(wks, plotts(0), x, y, resp)
       idummy = idummy + 1
 
@@ -1081,7 +1208,7 @@ begin
     if (isvar("GMprCMIP6mean")) then
       x := array_append_record(GMprCMIP6_5th&time, GMprCMIP6_95th&time(::-1), 0)
       y := array_append_record(GMprCMIP6_5th, GMprCMIP6_95th(::-1), 0)
-      resp@gsFillColor := (/204., 35., 35./)/255.
+      resp@gsFillColor := color_CMIP6
       dummy(idummy) = gsn_add_polygon(wks, plotts(0), x, y, resp)
       idummy = idummy + 1
 
@@ -1098,7 +1225,7 @@ begin
       txres@txFontColor := resp@gsFillColor
       txres@txFontHeightF = 0.012
       gsn_text_ndc(wks, "CMIP6", (x1+x2)/2., yLegend1-0.004, txres)
-      if (all((/nruns_CMIP5_pr, nmodels_CMIP5_pr/).eq.(/nruns_CMIP5_u, nmodels_CMIP5_u/))) then
+      if (all((/nruns_CMIP6_pr, nmodels_CMIP6_pr/).eq.(/nruns_CMIP6_u, nmodels_CMIP6_u/))) then
         txres@txFontHeightF = 0.008
         gsn_text_ndc(wks, nmodels_CMIP6_pr+"models, "+nruns_CMIP6_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
       end if
@@ -1113,6 +1240,49 @@ begin
       gsn_text_ndc(wks, "mean", xc, yLegendC, txres)
       gsn_text_ndc(wks, "5th",  xc, yLegend1, txres)
       done_CMIP6legend = True
+      x2 = x1 - iLegend
+    end if
+
+    if (isvar("GMprAMIPmean")) then
+      x := array_append_record(GMprAMIP_5th&time, GMprAMIP_95th&time(::-1), 0)
+      y := array_append_record(GMprAMIP_5th, GMprAMIP_95th(::-1), 0)
+      resp@gsFillColor := color_AMIP
+      dummy(idummy) = gsn_add_polygon(wks, plotts(0), x, y, resp)
+      idummy = idummy + 1
+
+      resl@gsLineColor := resp@gsFillColor
+      resl@gsLineThicknessF = 2.5
+      resl@gsLineDashPattern = 0
+      dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprAMIPmean&time, GMprAMIPmean, resl)
+      idummy = idummy + 1
+
+;      x4 = x3 + wLegend
+;      gsn_polygon_ndc(wks, (/x3,x3,x4,x4/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
+;      gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
+;      txres@txJust = "TopCenter"
+;      txres@txFontColor := resp@gsFillColor
+;      txres@txFontHeightF = 0.012
+;      gsn_text_ndc(wks, "AMIP", (x3+x4)/2., yLegend1-0.004, txres)
+;      if (all((/nruns_AMIP_pr, nmodels_AMIP_pr/).eq.(/nruns_AMIP_u, nmodels_AMIP_u/))) then
+;        txres@txFontHeightF = 0.008
+;        gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs", (x3+x4)/2., yLegend1-0.02, txres)
+;      end if
+;      done_AMIPlegend = True
+;      x3 = x4 + iLegend
+
+      x1 = x2 - wLegend - 0.01
+      x2 = x2 - 0.01
+      gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
+      gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
+      txres@txJust = "TopCenter"
+      txres@txFontColor := resp@gsFillColor
+      txres@txFontHeightF = 0.012
+      gsn_text_ndc(wks, "AMIP", (x1+x2)/2., yLegend1-0.004, txres)
+      if (all((/nruns_AMIP_pr, nmodels_AMIP_pr/).eq.(/nruns_AMIP_u, nmodels_AMIP_u/))) then
+        txres@txFontHeightF = 0.008
+        gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
+      end if
+      done_AMIPlegend = True
       x2 = x1 - iLegend
     end if
 
@@ -1143,9 +1313,8 @@ begin
 
   if (drawCirc) then
     restsu = rests
-    restsu@tmYLPrecision = 1
-    restsu@tmYLLabelJust = "CenterCenter"
-    restsu@tmYLLabelDeltaF = -0.1
+;    restsu@tmYLPrecision = 1
+;    restsu@tmYLLabelJust = "CenterCenter"
     range = max(abs(NHMuObs))
     if (isvar("NHMuCMIP6mean")) then
       range = max((/range, max(abs(NHMuCMIP6_5th))/))
@@ -1155,29 +1324,22 @@ begin
       range = max((/range, max(abs(NHMuCMIP5_5th))/))
       range = max((/range, max(abs(NHMuCMIP5_95th))/))
     end if
-    if (range.gt.3.) then
-      restsu@trYMaxF = 3.5
-    elseif (range.gt.2.8) then
-      restsu@trYMaxF = 3.
-    elseif (range.gt.2.6) then
-      restsu@trYMaxF = 2.8
-    elseif (range.gt.2.4) then
-      restsu@trYMaxF = 2.6
-    elseif (range.gt.2.2) then
-      restsu@trYMaxF = 2.4
-    elseif (range.gt.2.) then
-      restsu@trYMaxF = 2.2
-    elseif (range.gt.1.8) then
-      restsu@trYMaxF = 2.
-    elseif (range.gt.1.6) then
-      restsu@trYMaxF = 1.8
-    else
-      restsu@trYMaxF = 1.6
+    if (isvar("NHMuAMIPmean")) then
+      range = max((/range, max(abs(NHMuAMIP_5th))/))
+      range = max((/range, max(abs(NHMuAMIP_95th))/))
     end if
+    
+    ranges := (/1.5, 1.8, 2., 2.2, 2.4, 2.6, 2.8, 3., 3.5, 4., 6., 8., 10., 15., 20./)
+    restsu@trYMaxF = min(where(ranges.lt.range, 9999., ranges))
     restsu@trYMinF = -restsu@trYMaxF
     restsu@gsnCenterString = "NH summer monsoon circulation"
-    restsu@gsnCenterStringOrthogonalPosF = 0.02
+    if (restsu@trYMaxF.eq.tofloat(toint(restsu@trYMaxF))) then
+      restsu@gsnCenterStringOrthogonalPosF = 0.02
+    else
+      restsu@gsnCenterStringOrthogonalPosF = 0.06
+    end if
     restsu@gsnLeftString = "(d)"
+    restsu@gsnLeftStringOrthogonalPosF = restsu@gsnCenterStringOrthogonalPosF - 0.02
     restsu@tiYAxisString = "(m s~S~-1~N~)"
     plotts(1) = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/NHMuCMIP6mean@_FillValue, NHMuCMIP6mean@_FillValue/), restsu)
 
@@ -1192,7 +1354,7 @@ begin
     if (isvar("NHMuCMIP5mean")) then
       x := array_append_record(NHMuCMIP5_5th&time, NHMuCMIP5_95th&time(::-1), 0)
       y := array_append_record(NHMuCMIP5_5th, NHMuCMIP5_95th(::-1), 0)
-      resp@gsFillColor := (/37., 81., 204./)/255.
+      resp@gsFillColor := color_CMIP5
       dummy(idummy) = gsn_add_polygon(wks, plotts(1), x, y, resp)
       idummy = idummy + 1
     
@@ -1217,7 +1379,7 @@ begin
     if (isvar("NHMuCMIP6mean")) then
       x := array_append_record(NHMuCMIP6_5th&time, NHMuCMIP6_95th&time(::-1), 0)
       y := array_append_record(NHMuCMIP6_5th, NHMuCMIP6_95th(::-1), 0)
-      resp@gsFillColor := (/204., 35., 35./)/255.
+      resp@gsFillColor := color_CMIP6 
       dummy(idummy) = gsn_add_polygon(wks, plotts(1), x, y, resp)
       idummy = idummy + 1
     
@@ -1247,6 +1409,33 @@ begin
         gsn_text_ndc(wks, "5th",  xc, yLegend1, txres)
         done_CMIP6legend = True
         x2 = x1 - iLegend
+      end if
+    end if
+    if (isvar("NHMuAMIPmean")) then
+      x := array_append_record(NHMuAMIP_5th&time, NHMuAMIP_95th&time(::-1), 0)
+      y := array_append_record(NHMuAMIP_5th, NHMuAMIP_95th(::-1), 0)
+      resp@gsFillColor := color_AMIP
+      dummy(idummy) = gsn_add_polygon(wks, plotts(1), x, y, resp)
+      idummy = idummy + 1
+    
+      resl@gsLineColor := resp@gsFillColor
+      resl@gsLineThicknessF = 2.5
+      resl@gsLineDashPattern = 0
+      dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuAMIPmean&time, NHMuAMIPmean, resl)
+      idummy = idummy + 1
+      
+      if (.not.done_AMIPlegend) then
+        x4 = x3 + wLegend
+        gsn_polygon_ndc(wks, (/x3,x3,x4,x4/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
+        gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
+        txres@txJust = "TopCenter"
+        txres@txFontColor := resp@gsFillColor
+        txres@txFontHeightF = 0.012
+        gsn_text_ndc(wks, "AMIP", (x3+x4)/2., yLegend1-0.004, txres)
+        txres@txFontHeightF = 0.008
+        gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
+        done_AMIPlegend = True
+        x3 = x4 + iLegend
       end if
     end if
     if (isvar("NHMuObs")) then
