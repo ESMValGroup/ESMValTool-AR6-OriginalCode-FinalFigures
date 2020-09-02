@@ -1641,7 +1641,7 @@ def calc_slr_full(cfg,
         # Load depth dataset
         if depths.ndim == 1:
             depth = depths
-        elif depths.ndim == 3:1
+        elif depths.ndim == 3:
             depth = depths[:, y, x]
        
         if depths.ndim != 4:
@@ -1663,10 +1663,14 @@ def calc_slr_full(cfg,
                 depth = depths[t, :, y, x]
                 pressure = gsw.conversions.p_from_z(depth, la)# dbar
 
+            # load salinity and temperature data
             psal = so_cube.data[t, :, y, x]
             temp = thetao_cube.data[t, :, y, x]
 
+            # Convert temperature to conservative temperature
             ctemp = gsw.conversions.CT_from_t(psal, temp, pressure)
+
+            # Convert salinity to absolute salininty
             asal = gsw.conversions.SA_from_SP(psal, pressure, lo, la)
 
             # Calculate Dynamic height anomaly   
@@ -1681,7 +1685,6 @@ def calc_slr_full(cfg,
             slr_total[t, y, x] = gsdh_total 
             slr_thermo[t, y, x] = gsdh_thermo
             count+=1
-#            if count %1 == 0:
             print(count, (t, y, x), 'performing 2D SLR:',
                   gsdh_total,
                   gsdh_thermo)
@@ -1746,14 +1749,14 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
                     key='OHC_full_'+trend
                     )
 
-        return output_ohc_fn 
+        return output_ohc_fn
 
     thetao_cube = iris.load_cube(thetao_fn)
     so_cube = iris.load_cube(so_fn)
     vol_cube = iris.load_cube(volcello_fn)
 
     for fn in [thetao_fn, so_fn, volcello_fn, output_ohc_fn]:
-        if fn.find(exp) == -1: 
+        if fn.find(exp) == -1:
             print('ERROR:', exp, 'not in', fn)
             assert 0
 
