@@ -42,6 +42,10 @@ begin
     ; Read data
     var = read_data(info_items[imod])
 
+    if (var0 .eq. "tos" .and. var@units .eq. "K") then
+      var = convert_units(var, "degC")
+    end if
+
     ; Convert data to floats if necessary
     if (typeof(var) .eq. "double") then
       var := dble2flt(var)

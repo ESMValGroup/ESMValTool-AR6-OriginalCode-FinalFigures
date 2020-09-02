@@ -1889,11 +1889,27 @@ begin
 
   copy_VarMeta(res_in, res)  ; copy passed resources
 
-  ; ***************************************
-  ; panel first two plots
-  ; ***************************************
-
   plot(0) = gsn_csm_xy(wks, source_x, source, res)  ; create plot
+
+  ; ---------------------------------------------------------------------
+  ; Add multi model statistics (5% and 95% quantile)
+  ; ---------------------------------------------------------------------
+  ;if (isatt(diag_script_info, "stat_shading")) then
+  ;  if (diag_script_info@stat_shading .ne. False) then
+  ;    res_stat = True
+  ;    res_stat@gsnXYFillColors = "LightGrey"
+  ;    ;res_stat@gsnXYFillOpacities = 0.2
+  ;    copy_VarMeta(res, res_stat)
+  ;    delete(res_stat@xyLineColors)
+  ;    ; We don't want the line, so make it transparent.
+  ;    res_stat@xyLineColor = -1
+  ;    shading_plot = gsn_csm_xy(wks, source_x, source_stddev(0:1, :), \
+  ;                              res_stat)
+  ;    overlay(plot(0), shading_plot)
+  ;  end if
+  ;end if
+
+  ; ---------------------------------------------------------------------
 
   if (diag_script_info@ts_anomaly .eq. "anom") then
 
@@ -2035,6 +2051,7 @@ undef("xy_line_collect")
 procedure xy_line_collect(wks[1],
                           source_mean,
                           source,
+                          source_stderr,
                           source_x,
                           source_stat,
                           ref_start,
@@ -2047,6 +2064,7 @@ procedure xy_line_collect(wks[1],
 ;    wks:  workstation, must be passed - no default used yet!
 ;    source_mean:   source_mean
 ;    source:        data to be plotted (no netCDF input possible yet)
+;    source_stderr: standard error of reference
 ;    source_x:      x-axis of array to be plotted (e.g. source&time, ... )
 ;    source_stat:   statistics of multi_model_mean, e.g. 5 and 95% quantile
 ;                   or stddev
@@ -2118,12 +2136,9 @@ begin
   res@tmXBMinorLengthF = 0.003
   res@tmYLMinorLengthF = 0.003
 
-printVarSummary(source)
-print("source = " + source)
-
   if (isatt(diag_script_info, "ref")) then
-    min_tmp = (/min(source_mean), min(source), min(source_stat)/)
-    max_tmp = (/max(source_mean), max(source), max(source_stat)/)
+    min_tmp = (/min(source_mean), min(source), min(source_stderr), min(source_stat)/)
+    max_tmp = (/max(source_mean), max(source), max(source_stderr), max(source_stat)/)
   else
     min_tmp = (/min(source_mean), min(source_stat)/)
     max_tmp = (/max(source_mean), max(source_stat)/)
@@ -2146,21 +2161,20 @@ print("source = " + source)
   delete(tmp)
 
   ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
-  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
+  ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
   cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_cmip_line.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
   res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
-  res@xyLineColors = cmap(0:3,:)
+  res@xyLineColors = cmap(:,:)
 
   if (nexp .gt. 6) then
     error_msg("w", scriptname, funcname, "Color palette not defined for " \
               + "more than " + nexp + " experiments")
   end if
 
-  ; res@pmLegendDisplayMode = "Always"
-  ; res@xyExplicitLegendLabels = source_mean&experiment
-  ; res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
-  ; res@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  res@pmLegendDisplayMode = "Always"
+  res@xyExplicitLegendLabels = source_mean&experiment
+  res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
 
   plot(0) = gsn_csm_xy(wks, source_x, source_mean(:,0,:), res)  ; create plot
 
@@ -2173,8 +2187,8 @@ print("source = " + source)
     if (diag_script_info@stat_shading .ne. False) then
       res_stat = True
       res_stat@gsnXYFillOpacities = 0.2
-      ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_shading.rgb")
-      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
+      ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/cmip_shading.rgb")
       copy_VarMeta(res, res_stat)
       res_stat@gsnXYFillColors = cmap(0,:)
       delete(res_stat@xyLineColors)
@@ -2183,31 +2197,31 @@ print("source = " + source)
       res_stat@xyLineColor = cmap(0,:)
       delete(res_stat@xyLineThicknesses)
       res_stat@xyLineThicknesses = (/1, 1/)
-      ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
-      shading_plot = gsn_csm_xy(wks, source_x, source_mean(0, 1:2, :), \
+      ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(0, 1:2, :), \
+      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                 res_stat)
       overlay(plot(0), shading_plot)
       if(nexp .ge. 2) then
         res_stat@gsnXYFillColors = cmap(1,:)
         res_stat@xyLineColor = cmap(1,:)
-        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
-        shading_plot = gsn_csm_xy(wks, source_x, source_mean(1, 1:2, :), \
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(1, 1:2, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 3) then
         res_stat@gsnXYFillColors = cmap(2,:)
         res_stat@xyLineColor = cmap(2,:)
-        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
-        shading_plot = gsn_csm_xy(wks, source_x, source_mean(2, 1:2, :), \
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(2, 1:2, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 4) then
         res_stat@gsnXYFillColors = cmap(3,:)
         res_stat@xyLineColor = cmap(3,:)
-        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
-        shading_plot = gsn_csm_xy(wks, source_x, source_mean(3, 1:2, :), \
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(3, 1:2, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if

@@ -1,7 +1,7 @@
-; CLOUDS_BIAS
+; MODEL_BIAS
 ; ############################################################################
-; Author: Axel Lauer (DLR, Germany)
-; PROJECT-NAME EMBRACE
+; Author: Axel Lauer (DLR, Germany), Lisa Bock (DLR, Germany)
+; PROJECT-NAME IPCC-AR6
 ; ############################################################################
 ; Description
 ;   Calculates the multi-model mean bias, absolute difference, relative 
@@ -292,6 +292,9 @@ begin
   reldiff = dim_avg_n_Wrap(reldiff_i, 0)
   copy_VarMeta(diff, reldiff) 
 
+  rmsd = calculate_metric(refdata, mmdata, "RMSD")
+  bias = area_operations(diff, -90., 90., 0., 360., "average", True)
+
   ;delete(refdata)
 
   ; ========================================================================
@@ -308,6 +311,7 @@ begin
   diff@res_cnLinesOn  = False
   diff@res_tiMainOn  = True
   diff@res_gsnLeftStringFontHeightF = 0.015
+  diff@res_gsnRightStringFontHeightF = 0.015
   diff@res_cnLevelSelectionMode  = "ExplicitLevels"
   diff@res_mpOutlineOn  = True
   if (.not.isatt(diff, "res_cnLevels")) then
@@ -316,6 +320,7 @@ begin
   diff@res_mpFillOn  = False
   diff@res_lbLabelBarOn  = True
   diff@res_gsnRightString  = ""
+  diff@res_gsnLeftString   = ""
   diff@res_mpFillDrawOrder  = "PostDraw"  ; draw map fill last
   diff@res_cnMissingValFillColor  = "Gray"
   diff@res_tmYLLabelsOn  = False
@@ -353,22 +358,28 @@ begin
 
   diff@res_tiMainFontHeightF  = 0.016
 
-  diff@res_tiMainString = "Multi Model Mean Bias"
+  diff@res_tiMainString = "Multi-Model Mean Bias"
 
   copy_VarMeta(diff, mmdata)
   delete(mmdata@res_cnLevels)
 
-  mmdata@res_tiMainString = "Multi Model Mean"
+  mmdata@res_tiMainString = "Multi-Model Mean"
+
+  mmdata@res_gsnLeftStringFontHeightF = 0.015
+  mmdata@res_gsnRightStringFontHeightF = 0.015
+  mmdata@res_gsnRightString  = " "
+  mmdata@res_gsnLeftString   = " "
+
 
 
   if (var0.eq."tas") then
-    mmdata@res_tiMainString = "Surface Temperature ~C~Multi Model Mean"
+    ;mmdata@res_tiMainString = "Near-Surface Temperature ~C~   Multi-Model Mean"
     mmdata@res_cnLevels = ispan(-35, 35, 5)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_temperature_div.rgb")
     mmdata@res_cnFillPalette = pal
-    diff@res_tiMainString = "Surface Temperature ~C~Multi Model Mean Bias"
+    ;diff@res_tiMainString = "Near-Surface Temperature ~C~  Multi-Model Mean Bias"
     diff@res_cnFillPalette = pal
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
@@ -383,13 +394,13 @@ begin
                                 + "ipcc-ar6_temperature_div.rgb")
     end if
   elseif (var0.eq."pr") then
-    mmdata@res_tiMainString = "Precipitation ~C~Multi Model Mean"
+    ;mmdata@res_tiMainString = "Precipitation ~C~Multi Model Mean"
     mmdata@res_cnLevels = ispan(1, 10, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_precipitation_seq.rgb")
     mmdata@res_cnFillPalette = pal
-    diff@res_tiMainString = "Precipitation ~C~Multi Model Mean Bias"
+    ;diff@res_tiMainString = "Precipitation ~C~Multi Model Mean Bias"
     pal2 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                               + "ipcc-ar6_precipitation_div.rgb")
     diff@res_cnFillPalette = pal2
@@ -525,7 +536,7 @@ begin
     copy_VarMeta(diff, reldiff)
     delete(reldiff@res_cnLevels)
     reldiff@res_cnLevels = fspan(-80.0, 80.0, 9)
-    reldiff@res_tiMainString = "Multi Model Mean of Relative Error"
+    reldiff@res_tiMainString = "Multi-Model Mean of Relative Error"
     reldiff@units = "%"
     reldiff@res_lbTitleString = "(" + reldiff@units + ")"
     if (isvar("pal4")) then
@@ -540,6 +551,11 @@ begin
     delete(itmp)
     plotsperline(1) = plotsperline(1) + 1
   end if
+
+  ; add global bias and rmsd value
+  diff@res_gsnRightString = "rmsd = " + sprintf("%6.3f", rmsd)
+  diff@res_gsnLeftString  = "bias = " + sprintf("%6.3f", bias)
+ 
 
   ; panelling resources
 
@@ -601,7 +617,7 @@ begin
 
       ; add meta data to plot (for reporting)
 
-      caption = "Multi model values, from top left to bottom right: " \
+      caption = "Multi-model values, from top left to bottom right: " \
                 + "mean, bias"
       if (plot_abs_diff) then
         caption = caption + ", absolute error"
@@ -621,12 +637,13 @@ begin
   ; ###########################################
 
   nc_filename = work_dir + "model_bias_" + var0 + ".nc"
-  nc_filename@existing = "append"
+  nc_filename@existing = "overwrite"
 
   mmdata@var = var0 + "_mean"
   mmdata@long_name = var0 + " (multi-model mean)"
   nc_outfile = ncdf_write(mmdata, nc_filename)
 
+  nc_filename@existing = "append"
   refdata@var = var0 + "_ref"
   refdata@long_name = var0 + " (reference data)"
   nc_outfile = ncdf_write(refdata, nc_filename)

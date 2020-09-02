@@ -84,7 +84,14 @@ begin
     ; Calculate difference
     if (l_diff) then
       var_diff = var_all(:, :, 0)
-      var_diff = var_all(:, :, 0) - var_ref(:, :, 0)
+      if (isatt(diag_script_info, "diff_rel")) then
+        if (diag_script_info@diff_rel) then
+          var_tmp = where(abs(var_all).lt.1e-6, var_all@_FillValue, var_all)
+          var_diff = (var_all(:, :, 0) - var_ref(:, :, 0))/var_tmp(:, :, 0)
+        end if
+      else
+        var_diff = var_all(:, :, 0) - var_ref(:, :, 0)
+      end if
     end if
 
     ; Write output
@@ -106,7 +113,10 @@ begin
     if (isatt(diag_script_info, "plot_units")) then
       var_all = convert_units(var_all, diag_script_info@plot_units)
       if (l_diff)
-        var_diff = convert_units(var_diff, diag_script_info@plot_units)
+        if (.not. any(var0 .eq. (/"ta", "hus"/))) then
+print("convert var_diff")
+          var_diff = convert_units(var_diff, diag_script_info@plot_units)
+        end if
       end if
     end if
 
@@ -115,6 +125,11 @@ begin
     plot_var@res_tiMainString = annots(imod)
     plot_var@res_cnLevelSelectionMode = "ExplicitLevels"
     plot_var@res_cnLevels = diag_script_info@abs_levs
+    if (isatt(diag_script_info, "abs_col")) then
+      pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                               + diag_script_info@abs_col)
+      plot_var@res_cnFillPalette = pal
+    end if
     plot_var@res_trYMinF = diag_script_info@zonal_ymin
     plot_var@res_gsnLeftString = \
       plot_var@long_name + " [" + format_units(plot_var@units) + "]"
@@ -154,6 +169,12 @@ begin
     plot_var@res_gsnSpreadColorEnd = -2
     wks = gsn_open_wks(file_type, plotpath_diff)
     gsn_merge_colormaps(wks, "temp_19lev", "gray70")
+    if (isatt(diag_script_info, "diff_col")) then
+      pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                               + diag_script_info@diff_col)
+      plot_var@res_cnFillPalette = pal
+      delete(plot_var@res_gsnSpreadColorEnd)
+    end if
     plot = zonalmean_profile(wks, plot_var, var0)
     delete(plot_var@res_cnLevels)
 
@@ -191,6 +212,8 @@ begin
       plot_var@res_lbLabelBarOn = False
       plot_var@res_gsnLeftString = ""
       delete(plot_var@long_name)
+      plot_var@res_cnConstFLabelOn = False
+      plot_var@res_cnConstFEnableFill = True
       plot2 = zonalmean_profile(wks, plot_var, var0)
       overlay(plot, plot2)
       draw(plot)
