@@ -1898,7 +1898,7 @@ begin
   if (diag_script_info@ts_anomaly .eq. "anom") then
 
     ; ---------------------------------------------------------------------
-    ; yellow shading of reference period
+    ; grey shading of reference period
     ; ---------------------------------------------------------------------
     gsres                = True
     gsres@gsFillColor    = "Grey70" ;"yellow"
@@ -2147,6 +2147,7 @@ print("source = " + source)
 
   ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_line_06.rgb")
   cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_cmip_line.rgb")
   res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
   res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
   res@xyLineColors = cmap(0:3,:)
@@ -2159,8 +2160,9 @@ print("source = " + source)
   ; res@pmLegendDisplayMode = "Always"
   ; res@xyExplicitLegendLabels = source_mean&experiment
   ; res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
+  ; res@lgLabelFontHeightF = .05       ; set the legend label font thickness
 
-  plot(0) = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
+  plot(0) = gsn_csm_xy(wks, source_x, source_mean(:,0,:), res)  ; create plot
 
   res@pmLegendDisplayMode = "Never"
 
@@ -2177,27 +2179,35 @@ print("source = " + source)
       res_stat@gsnXYFillColors = cmap(0,:)
       delete(res_stat@xyLineColors)
       ; We don't want the line, so make it transparent.
-      res_stat@xyLineColor = -1
-print("source_x = " + source_x)
-print("source_stat(0:1, 0, :) = " + source_stat(0:1, 0, :))
-      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
+      ;res_stat@xyLineColor = -1
+      res_stat@xyLineColor = cmap(0,:)
+      delete(res_stat@xyLineThicknesses)
+      res_stat@xyLineThicknesses = (/1, 1/)
+      ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
+      shading_plot = gsn_csm_xy(wks, source_x, source_mean(0, 1:2, :), \
                                 res_stat)
       overlay(plot(0), shading_plot)
       if(nexp .ge. 2) then
         res_stat@gsnXYFillColors = cmap(1,:)
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
+        res_stat@xyLineColor = cmap(1,:)
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_mean(1, 1:2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 3) then
         res_stat@gsnXYFillColors = cmap(2,:)
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
+        res_stat@xyLineColor = cmap(2,:)
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_mean(2, 1:2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 4) then
         res_stat@gsnXYFillColors = cmap(3,:)
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
+        res_stat@xyLineColor = cmap(3,:)
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_mean(3, 1:2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
@@ -2216,12 +2226,33 @@ print("source_stat(0:1, 0, :) = " + source_stat(0:1, 0, :))
     delete(res@xyLineThicknesses)
     delete(res@xyLineColors)
     res@xyDashPatterns    = dashes
-    res@xyLineThicknesses = (/5/) ; thicks  ; make 2nd lines thicker
+    ;res@xyLineThicknesses = thicks
+    res@xyLineThicknesses = (/3, 3, 3, 3, 3/)   ; make lines thicker
     res@xyLineColors      = colors  ; change line color
 
     ref_p = gsn_csm_xy(wks, source_x, source, res)  ; create plot
     overlay(plot(0), ref_p)
   end if
+
+  ; ---------------------------------------------------------------------
+  ; add standard error of reference datasets
+  ; ---------------------------------------------------------------------
+  ;if (isatt(diag_script_info, "ref_stderr")) then
+  ;  if (diag_script_info@ref_stderr .ne. False) then
+  ;    res_stderr = True
+  ;    res_stderr@gsnXYFillOpacities = 0.2
+  ;    copy_VarMeta(res, res_stderr)
+  ;    res_stderr@gsnXYFillColors = "grey"
+  ;    delete(res_stderr@xyLineColors)
+  ;    delete(res_stderr@xyLineThicknesses)
+  ;    ; We don't want the line, so make it transparent.
+  ;    res_stderr@xyLineColor = "grey"
+  ;    res_stderr@xyLineThicknesses = (/1, 1/)
+  ;    shading_plot = gsn_csm_xy(wks, source_x, source_stderr(0:1, :), \
+  ;                              res_stderr)
+  ;    overlay(plot(0), shading_plot)
+  ;  end if
+  ;end if
 
   if (diag_script_info@ts_anomaly .eq. "anom" .and. \
       diag_script_info@ref_shading) then
@@ -2261,10 +2292,58 @@ print("source_stat(0:1, 0, :) = " + source_stat(0:1, 0, :))
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
 
+  ; ***********************************************
+  ; legend resources
+  ; ***********************************************
+
+  lgres                    = True
+  lgres@lgItemType         = "Lines"   ; show lines only (default)
+  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+  lgres@vpHeightF          = 0.15      ; height of legend (NDC)
+  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+  ;lgres@lgBoxBackground    = "white"
+  lgres@lgPerimFill        = 0
+  lgres@lgPerimFillColor   = "white"
+
+  delete(cmap)
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/cmip_line.rgb")
+  tmp = tostring(cmap)
+  tmp1 = (/"(/" + tmp(0,0) + "," + tmp(0,1) + "," + tmp(0,2) + "/)" , \
+           "(/" + tmp(1,0) + "," + tmp(1,1) + "," + tmp(1,2) + "/)" , \
+           "(/" + tmp(2,0) + "," + tmp(2,1) + "," + tmp(2,2) + "/)"/)
+  lgres@lgLineColors      = array_append_record(colors, tmp1, 0)
+  lgres@lgDashIndexes     = array_append_record(dashes, (/0,0,0/), 0)
+  ;lgres@lgLineThicknesses = thicks + 3
+  lgres@lgLineThicknessF = 3
+  labels = array_append_record(annots, source_mean&experiment, 0)
+  nitems = dimsizes(labels)
+  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
+
+  ; Create legend
+  lbid = gsn_create_legend(wks, nitems, labels, lgres)
+
+  amres = True
+  amres@amParallelPosF   = -0.38  ;0.81
+  amres@amOrthogonalPosF = -0.3  ;0.0
+  annoid1 = gsn_add_annotation(plot(0), lbid, amres)
+
+
   resP = True
   resP@gsnMaximize = True
   resP@gsnPaperOrientation = "portrait"
   resP@gsnPaperMargin =  0.8
+
+  ;if (isatt(diag_script_info, "panel_num")) then
+  ;  resP@gsnPanelFigureStrings = diag_script_info@panel_num
+  ;else
+  ;  resP@gsnPanelFigureStrings = (/"a)"/)
+  ;end if
+  ;resP@gsnPanelFigureStringsPerimOn = False
+  ;resP@gsnPanelFigureStringsBackgroundFillColor ="transparent"
+  ;resP@gsnPanelFigureStringsJust = "TopLeft"
+  ;resP@gsnPanelFigureStringsFontHeightF = 0.016
 
   gsn_panel(wks, plot, (/1, 1/), resP)
 
