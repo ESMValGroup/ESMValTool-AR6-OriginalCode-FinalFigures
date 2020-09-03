@@ -164,6 +164,48 @@ def calculate_siparam(cubelist, siext=True):
 
     return (cubelist)
 
+def create_coords(cubelist, year_n):
+    # dirty trick, we try to unify time to merge  the cubelist in the end
+
+    cb = cubelist [0]
+
+    n_t = len(cb.coord('time').points)
+    coord = [np.average(cb.coord('time').points[year_n*i:year_n*i + year_n]) for i in range(0, int(n_t / year_n))]
+    bnds = [[cb.coord('time').bounds[year_n*i][0], cb.coord('time').bounds[year_n*i + (year_n - 1)][1]] for i in
+            range(0, int(n_t / year_n))]
+    if n_t%year_n != 0:
+        # raise warning
+        print('The n of years is not divisible by '+str(year_n))
+        # coord.append(np.average(cb.coord('time').points[int(n_t / year_n):-1]))
+        # bnds.append([cb.coord('time').bounds[int(n_t / year_n) * year_n][0], cb.coord('time').bounds[-1][1]])
+
+    dcoord = iris.coords.DimCoord(np.asarray(coord), bounds=np.asarray(bnds),
+                                  standard_name=cb.coord('time').standard_name,
+                                  units=cb.coord('time').units, long_name=cb.coord('time').long_name,
+                                  var_name=cb.coord('time').var_name)
+
+    return (dcoord)
+
+def n_year_mean(cubelist, n):
+
+    # the idea behind it is that we pass the cubelist with the same time coords
+
+    n_aver_cubelist = iris.cube.CubeList()
+
+    dcoord = create_coords(cubelist, n)
+
+    for cube in cubelist:
+        n_t = len(cube.coord('time').points)
+        data = [np.average(cube.data[n*i:n*i + n]) for i in range(0, int(n_t / n))]
+        if n_t%n!=0:
+            # add here a warning that the last is an average of n_t%n==0 years
+            print('The n of years is not divisible by '+str(n)+' last '+str(n_t%n)+' years were not taken into account')
+        n_aver_cube = iris.cube.Cube(np.asarray(data), long_name=cube.long_name+', '+str(n)+'y mean', var_name=cube.var_name, units=cube.units,
+                                     attributes=cube.attributes, dim_coords_and_dims=[(dcoord,0)])
+        n_aver_cubelist.append(n_aver_cube)
+
+    return (n_aver_cubelist)
+
 def figure_handling(cfg, name = 'plot'):
 
     if cfg['write_plots']:
