@@ -3,7 +3,7 @@
 # ytelo modifications
 ---
 documentation:
-  description: For plotting temperature trends in the vertical temperature profile.
+  description: For plotting temperature trends in the vertical temperature profile. IPCC AR6 Chapter 3 Fig. 3.9.
 
   authors:
     - andela_bouwe
@@ -159,6 +159,4 @@ diagnostics:
         end_year: 2014
     scripts:
       fig_3_9:
-        script: /home/users/eunicelo/scripts/esmvaltool_scripts/for_ar6/vertical_temp_trends.py
-    #quickplot:
-      #plot_type: scatter
+        script: vertical_temp_profiles/vertical_temp_trends.py
