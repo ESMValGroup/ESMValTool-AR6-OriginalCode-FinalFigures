@@ -1,0 +1,164 @@
+# ESMValTool
+# recipe_python.yml
+# ytelo modifications
+---
+documentation:
+  description: For plotting temperature trends in the vertical temperature profile.
+
+  authors:
+    - andela_bouwe
+    - righi_mattia
+
+  maintainer:
+    - schlund_manuel
+
+  references:
+    - acknow_project
+
+  projects:
+    - esmval
+    - c3s-magic
+
+datasets:
+  # observations
+  - {dataset: rich17obs, project: RICH_TTL, ensemble: mean, start_year: 1979, end_year: 2014}
+  - {dataset: raobcore17, project: RAOB_TTL, start_year: 1979, end_year: 2014}
+  - {dataset: era5.1, project: ERA_TTL, start_year: 1979, end_year: 2014}
+  
+  # CMIP6 Coupled, JASMIN
+  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: ACCESS-ESM1-5, institute: CSIRO, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: AWI-CM-1-1-MR, institute: AWI, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: AWI-ESM-1-1-LR, institute: AWI, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: BCC-CSM2-MR, institute: BCC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: BCC-ESM1, institute: BCC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CAMS-CSM1-0, institute: CAMS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2, institute: NCAR, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2-FV2, institute: NCAR, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2-WACCM, institute: NCAR, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2-WACCM-FV2, institute: NCAR, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CNRM-CM6-1, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CNRM-CM6-1-HR, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CNRM-ESM2-1, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CanESM5, institute: CCCma, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: E3SM-1-0, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: historical, ensemble: r2i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: E3SM-1-1, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r24i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  # esmvalcore.cmor.check.CMORCheckError: There were errors in variable ta: lat: is not monotonic
+  #{dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: GFDL-CM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-1-G, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: GISS-E2-1-G-CC, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: GISS-E2-1-H, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f3, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, institute: MOHC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f3, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: INM-CM4-8, institute: INM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: INM-CM5-0, institute: INM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: IPSL-CM6A-LR, institute: IPSL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: MCM-UA-1-0, institute: UA, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MIROC-ES2L, institute: MIROC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MIROC6, institute: MIROC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, institute: HAMMOZ-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, institute: MPI-M, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, institute: MPI-M, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0, institute: MRI, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NESM3, institute: NUIST, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NorCPM1, institute: NCC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NorESM2-LM, institute: NCC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NorESM2-MM, institute: NCC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: SAM0-UNICON, institute: SNU, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: TaiESM1, institute: AS-RCEC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gn}
+  # CMIP6 Coupled, ESGF
+  - {dataset: CAS-ESM2-0, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CIESM, institute: THU, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CMCC-CM2-SR5, institute: CMCC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CanESM5-CanOE, institute: CCCma, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p2f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3-Veg, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3-Veg-LR, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: GFDL-ESM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  #- {dataset: IITM-ESM, institute: CCCR-IITM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: KACE-1-0-G, institute: NIMS-KMA, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  
+  # CMIP6 AMIP, JASMIN except GFDL-AM4 (starts in 1980)
+  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: ACCESS-ESM1-5, institute: CSIRO, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: BCC-CSM2-MR, institute: BCC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: BCC-ESM1, institute: BCC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CAMS-CSM1-0, institute: CAMS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2, institute: NCAR, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2-WACCM, institute: NCAR, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CNRM-CM6-1, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CNRM-ESM2-1, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: GFDL-CM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-1-G, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p3f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f3, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, institute: MOHC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f3, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: IPSL-CM6A-LR, institute: IPSL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: MIROC6, institute: MIROC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0, institute: MRI, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: SAM0-UNICON, institute: SNU, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  # fix_metadata; if cube.attributes[parent_units] == bad_value; KeyError: 'parent_time_units'
+  #{dataset: UKESM1-0-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f4, start_year: 1979, end_year: 2014, grid: gn}
+  # CMIP6 AMIP, ESGF
+  - {dataset: CAS-ESM2-0, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2-FV2, institute: NCAR, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CESM2-WACCM-FV2, institute: NCAR, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CIESM, institute: THU, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CMCC-CM2-SR5, institute: CMCC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: CNRM-CM6-1-HR, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: CanESM5, institute: CCCma, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: E3SM-1-0, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3-Veg, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  #  esmvalcore.cmor.check.CMORCheckError: There were errors in variable ta: lat: is not monotonic
+  #- {dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-2-G, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p3f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: INM-CM4-8, institute: INM, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: INM-CM5-0, institute: INM, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  - {dataset: KACE-1-0-G, institute: NIMS-KMA, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: MIROC-ES2L, institute: MIROC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, institute: MPI-M, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NESM3, institute: NUIST, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NorCPM1, institute: NCC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  - {dataset: NorESM2-LM, institute: NCC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+
+
+preprocessors:
+  preproc_extract_regird:
+    extract_levels:
+      levels: [85000.,70000.,50000.,40000.,30000.,20000.,15000.,10000.,7000.,5000.,3000.,2000.,1000.]
+      scheme: linear
+    regrid:
+      target_grid: rich17obs
+      scheme: linear
+    extract_region:
+      start_longitude: 0.
+      end_longitude: 360.
+      start_latitude: -20.
+      end_latitude: 20.
+
+diagnostics:
+  atmos_trends:
+    description: Atmospheric temperature trend diagnostic.
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      ta:
+        preprocessor: preproc_extract_regird 
+        mip: Amon
+        start_year: 1979
+        end_year: 2014
+    scripts:
+      fig_3_9:
+        script: /home/users/eunicelo/scripts/esmvaltool_scripts/for_ar6/vertical_temp_trends.py
+    #quickplot:
+      #plot_type: scatter
