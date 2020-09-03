@@ -28,7 +28,7 @@ datasets:
  - {dataset: CSIRO-Mk3-6-0, exp: historicalNat, project: CMIP5, ensemble: r1i1p1, start_year: 1923, end_year: 2012}
 # models_cmip5_ctl: &models_cmip5_ctl
  - {dataset: ACCESS1-0, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 300, end_year: 774}
- - {dataset: CanESM2, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2015, end_year: 2310}
+ - {dataset: CanESM2, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2015, end_year: 2309}
  - {dataset: CSIRO-Mk3-6-0, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
 # models_cmip6_all: &models_cmip6_all
  - {dataset: ACCESS-ESM1-5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
@@ -51,5 +51,6 @@ diagnostics:
       ipcc_ar6_wg1_fgd_3_20:
         script: /home/acrnemr/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_20.py
         months: [3,4]
+        years_for_average: 5
         ref_period: [1971, 2000]
         main_period: [1923, 2017]
