@@ -97,6 +97,7 @@ doc/sphinx/source/gallery.rst
 *.Rhistory
 *.rdata
 *.pkl
+data_for_recipe/
 
 # ESMF log files
 *.ESMF_LogFile
