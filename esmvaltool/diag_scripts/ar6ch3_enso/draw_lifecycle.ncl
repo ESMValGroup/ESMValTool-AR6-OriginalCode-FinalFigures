@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200905 kosaka_yu: revised for consistency with CLIVAR ENSO metric package
 ;    20200814 kosaka_yu: merge find_ensoevents.ncl
 ;                        follow the ENSO metric package at
 ;                        https://github.com/CLIVAR-PRP/ENSO_metrics/wiki/EnsoDuration
@@ -97,7 +98,8 @@ begin
   lag_range = (/-2, 3/) ; years
 
   ; segment length for evaluating duration
-  duration_range = (/-1, 2/) ; years
+;  duration_range = (/-1, 2/) ; years
+  duration_range = (/-2, 3/) ; according to Yann Planton
 
 ; =============================
   
@@ -284,7 +286,9 @@ begin
     ; Get duration and average across events
     threshold = duration_threshold
     if (duration_threshold_unit.eq."stdv") then
-      threshold = duration_threshold * stddev(Nino({syear*100+1:eyear*100+12}))
+;      threshold = duration_threshold * stddev(Nino({syear*100+1:eyear*100+12}))
+      threshold = duration_threshold \  ; According to Yann Planton
+                    * stddev(Nino({syear*100+target_month:eyear*100+target_month:12}))
     end if
 
     if (nevents_el.gt.0) then
@@ -451,8 +455,8 @@ begin
   rests@gsnYRefLine = 0.
   rests@trXMinF = min(lag)
   rests@trXMaxF = max(lag)
-  rests@trYMinF = -2.4
-  rests@trYMaxF = 2.4
+  rests@trYMinF = -2.6
+  rests@trYMaxF = 2.6
   rests@tmXTOn = False
   rests@tmXBMode          = "Explicit"
   rests@tmXBLabelFontHeightF = 0.012
@@ -483,7 +487,7 @@ begin
 
   txres = True
   txres@txFontHeightF = 0.02
-  txres@txJust = "centerleft"
+  txres@txJust = "CenterLeft"
 
   rests@tiMainFontHeightF = 0.018
   rests@tiMainOffsetYF = -0.015
