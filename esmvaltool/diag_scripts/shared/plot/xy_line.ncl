@@ -2197,31 +2197,31 @@ begin
       res_stat@xyLineColor = cmap(0,:)
       delete(res_stat@xyLineThicknesses)
       res_stat@xyLineThicknesses = (/1, 1/)
-      ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(0, 1:2, :), \
-      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
+      shading_plot = gsn_csm_xy(wks, source_x, source_mean(0, 1:2, :), \
+      ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
                                 res_stat)
       overlay(plot(0), shading_plot)
       if(nexp .ge. 2) then
         res_stat@gsnXYFillColors = cmap(1,:)
         res_stat@xyLineColor = cmap(1,:)
-        ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(1, 1:2, :), \
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_mean(1, 1:2, :), \
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 3) then
         res_stat@gsnXYFillColors = cmap(2,:)
         res_stat@xyLineColor = cmap(2,:)
-        ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(2, 1:2, :), \
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_mean(2, 1:2, :), \
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if
       if(nexp .ge. 4) then
         res_stat@gsnXYFillColors = cmap(3,:)
         res_stat@xyLineColor = cmap(3,:)
-        ;shading_plot = gsn_csm_xy(wks, source_x, source_mean(3, 1:2, :), \
-        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
+        shading_plot = gsn_csm_xy(wks, source_x, source_mean(3, 1:2, :), \
+        ;shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
                                   res_stat)
         overlay(plot(0), shading_plot)
       end if

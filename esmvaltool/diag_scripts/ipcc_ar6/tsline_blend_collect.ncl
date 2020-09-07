@@ -435,10 +435,10 @@ begin
   ref_end = diag_script_info@ref_end
 
   if (isatt(diag_script_info, "ref")) then
-    xy_line_collect(wks, data_mean, data_ref, data_ref&time, \
-                   data_ref_stderr, ref_start, ref_end, res, res0, info_var)
+    xy_line_collect(wks, data_mean, data_ref, data_ref_stderr, data_ref&time, \
+                   0, ref_start, ref_end, res, res0, info_var)
   else
-    xy_line_collect(wks, data_mean, 0, data_mean&time, \
+    xy_line_collect(wks, data_mean, 0, 0, data_mean&time, \
                     0, ref_start, ref_end, res, res0, info_var)
   end if
 
