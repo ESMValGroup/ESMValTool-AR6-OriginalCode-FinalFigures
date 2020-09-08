@@ -600,25 +600,13 @@ diagnostics:
         eyear: 2010
         ancestors: ['define_ensoindex_1951-2010']
 
-      define_ensoindex_1971-2010:
+      define_ensoindex_1961-2010:
         <<: *define_index
-        syear: 1971
-      draw_enso_lifecycle_1971-2010:
+        syear: 1961
+      draw_enso_lifecycle_1961-2010:
         <<: *lifecycle
-        syear: 1971
-      draw_enso_seasonality_1971-2010:
+        syear: 1961
+      draw_enso_seasonality_1961-2010:
         <<: *seasonality
-        syear: 1971
-        ancestors: ['define_ensoindex_1971-2010']
-
-      define_ensoindex_1979-2010: 
-        <<: *define_index
-        syear: 1979
-      draw_enso_lifecycle_1979-2010:
-        <<: *lifecycle
-        syear: 1979
-        ancestors: ['define_ensoindex_1979-2010']
-      draw_enso_seasonality_1979-2010:
-        <<: *seasonality
-        syear: 1979
-        ancestors: ['define_ensoindex_1979-2010']
+        syear: 1961
+        ancestors: ['define_ensoindex_1961-2010']

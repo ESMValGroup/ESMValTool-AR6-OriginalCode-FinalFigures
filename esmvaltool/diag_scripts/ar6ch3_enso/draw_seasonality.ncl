@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200907 kosaka_yu: refined the details of figure
 ;    20200905 kosaka_yu: refined the drawing part
 ;    20200811 kosaka_yu: (b): show individual ensemble members instead of compositing all members
 ;                        and plot them for individual models instead of modelling centers
@@ -516,12 +517,12 @@ begin
   mkres@gsMarkerSizeF    = 0.006
   mkres@tfPolyDrawOrder = "PostDraw"
   lnres := True
-  lnres@gsLineThicknessF = 2.
   lnres@tfPolyDrawOrder = "PostDraw"
   polyres := True
   polyres@tfPolyDrawOrder = "PostDraw"
   txres := True
-  txres@txFontHeightF = 0.012
+  txres@txFontHeightF = 0.008 ; 0.012
+  txres@txJust = "CenterLeft"
   
   res_obs@project = "OBS"
   res_obs@dataset = obs(0)
@@ -531,21 +532,46 @@ begin
   res@tiMainString = "(b) Seasonality metric (NDJ/MAM ratio)"
   mme_plot = gsn_csm_xy(wks, (/seasonality_obs(0), seasonality_obs(0)/), \
                         (/seasonality_obs@_FillValue, seasonality_obs@_FillValue/), res)
+
+  lnres@gsLineColor := "black"
+  lnres@gsLineThicknessF = 0.5
+  polyres@gsFillColor := "white"
+  x2 = res@trXMaxF - 0.05
+  x1 = x2 - (res@trXMaxF - res@trXMinF) * 0.32
+  y1 = 1.5
+  y2 = y1 + (res@trYMaxF - res@trYMinF) * 0.09
+  dummy(idummy) = gsn_add_polygon(wks, mme_plot, (/x1, x1, x2, x2/), \
+                                  (/y1, y2, y2, y1/), polyres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/x1, x1, x2, x2, x1/), \
+                                   (/y1, y2, y2, y1, y1/), lnres)
+  idummy = idummy + 1
+  dy = (y2 - y1)/4.
+  y1 = y1 + dy/2.
+  x1 = x1 + 0.025
+  fmt = "%4.2f" 
+  
+  lnres@gsLineThicknessF = 2.
   do j = 0, nobs-1
     res_obs@project = "OBS"
     res_obs@dataset = obs(j)
-    lnres@gsLineColor = get_color(res_obs)
+    lnres@gsLineColor := get_color(res_obs)
     lnres@gsLineDashPattern =  get_lineindex(res_obs)
     dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/seasonality_obs(j), seasonality_obs(j)/), \
                                      (/res@trYMinF, res@trYMaxF/), lnres)
     idummy = idummy + 1
+
+    txres@txFontColor := lnres@gsLineColor
+    dummy(idummy) = gsn_add_text(wks, mme_plot, obs(j)+": "+sprintf(fmt, seasonality_obs(j)), x1, y1, txres)
+    idummy = idummy + 1
+    y1 = y1 + dy
   end do
   
   w = 0.4  ; half height of MME bars
   dsres := True
   if (any(names.eq."CMIP6")) then
     iraw = ind(names.eq."CMIP6")
-    polyres@gsFillColor = color_cmip6
+    polyres@gsFillColor := color_cmip6
     dummy(idummy) \
       = gsn_add_polygon(wks, mme_plot, \
                         (/seasonality_cmip6_25th, seasonality_cmip6_75th, \
@@ -563,6 +589,11 @@ begin
                                      (/seasonality_cmip6_mean, seasonality_cmip6_mean/), \
                                      (/raw(iraw)-w, raw(iraw)+w/), lnres)
     idummy = idummy + 1
+
+    txres@txFontColor := polyres@gsFillColor
+    dummy(idummy) = gsn_add_text(wks, mme_plot, "CMIP6 MME mean: "+sprintf(fmt, seasonality_cmip6_mean), x1, y1, txres)
+    idummy = idummy + 1
+    y1 = y1 + dy
   end if
   if (any(names.eq."CMIP5")) then
     iraw = ind(names.eq."CMIP5")
@@ -584,6 +615,11 @@ begin
                                      (/seasonality_cmip5_mean, seasonality_cmip5_mean/), \
                                      (/raw(iraw)-w, raw(iraw)+w/), lnres)
     idummy = idummy + 1
+
+    txres@txFontColor := polyres@gsFillColor
+    dummy(idummy) = gsn_add_text(wks, mme_plot, "CMIP5 MME mean: "+sprintf(fmt, seasonality_cmip5_mean), x1, y1, txres)
+    idummy = idummy + 1
+    y1 = y1 + dy
   end if
 
   dsres := True

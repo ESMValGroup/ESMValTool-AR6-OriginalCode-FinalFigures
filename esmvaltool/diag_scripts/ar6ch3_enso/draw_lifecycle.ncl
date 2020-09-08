@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200907 kosaka_yu: refined the details of figure
 ;    20200905 kosaka_yu: revised for consistency with CLIVAR ENSO metric package
 ;    20200814 kosaka_yu: merge find_ensoevents.ncl
 ;                        follow the ENSO metric package at
@@ -289,6 +290,10 @@ begin
 ;      threshold = duration_threshold * stddev(Nino({syear*100+1:eyear*100+12}))
       threshold = duration_threshold \  ; According to Yann Planton
                     * stddev(Nino({syear*100+target_month:eyear*100+target_month:12}))
+;      threshold2 = duration_threshold * stddev(Nino({syear*100+1:eyear*100+12}))
+;if (any(Nino@project.eq.obs_projects)) then
+;  print(Nino@dataset+" "+threshold+"degC "+threshold2+"degC")
+;end if
     end if
 
     if (nevents_el.gt.0) then
@@ -651,40 +656,40 @@ begin
 
 ; =========================== Individual Models =============================
 
-  nraws = 0
+  nrows = 0
   if (isvar("duration_el_cmip6_mean")) then
-    nraws = nraws + 1
+    nrows = nrows + 1
   end if
   if (isvar("duration_el_cmip5_mean")) then
-    nraws = nraws + 1
+    nrows = nrows + 1
   end if
   if (plot_each_cmip6) then
-    nraws = nraws + count_unique_values(models_cmip6)
+    nrows = nrows + count_unique_values(models_cmip6)
   end if
   if (plot_each_cmip5) then
-    nraws = nraws + count_unique_values(models_cmip5)
+    nrows = nrows + count_unique_values(models_cmip5)
   end if
 
-  raw = ispan(0, nraws-1, 1)
-  names := new(nraws, "string")
-  names!0 = "raw"
-  names&raw = raw
-  iraw = 0
+  row = ispan(0, nrows-1, 1)
+  names := new(nrows, "string")
+  names!0 = "row"
+  names&row = row
+  irow = 0
   if (isvar("duration_el_cmip6_mean")) then
-    names(iraw) = "CMIP6"
-    iraw = iraw + 1
+    names(irow) = "CMIP6"
+    irow = irow + 1
   end if
   if (isvar("duration_el_cmip5_mean")) then
-    names(iraw) = "CMIP5"
-    iraw = iraw + 1
+    names(irow) = "CMIP5"
+    irow = irow + 1
   end if
   if (plot_each_cmip6) then
-    names(iraw:iraw+count_unique_values(models_cmip6)-1) = (/get_unique_values(models_cmip6)/)
-    iraw = iraw + count_unique_values(models_cmip6)
+    names(irow:irow+count_unique_values(models_cmip6)-1) = (/get_unique_values(models_cmip6)/)
+    irow = irow + count_unique_values(models_cmip6)
   end if
   if (plot_each_cmip5) then
-    names(iraw:iraw+count_unique_values(models_cmip5)-1) = (/get_unique_values(models_cmip5)/)
-    iraw = iraw + count_unique_values(models_cmip5)
+    names(irow:irow+count_unique_values(models_cmip5)-1) = (/get_unique_values(models_cmip5)/)
+    irow = irow + count_unique_values(models_cmip5)
   end if
   
   mme_plots = new(2, "graphic")
@@ -693,11 +698,11 @@ begin
   res@gsnDraw = False
   res@gsnFrame = False
   res@xyCurveDrawOrder = "PreDraw"
-  res@trYMinF = raw(0) - 0.6
-  res@trYMaxF = raw(nraws-1) + 0.6
+  res@trYMinF = row(0) - 0.6
+  res@trYMaxF = row(nrows-1) + 0.6
   res@trYReverse = True
   res@vpWidthF = panel_width
-  res@vpHeightF = nraws * 0.0115
+  res@vpHeightF = nrows * 0.0115
   res@vpYF = vpY - panel_height - 0.065
 
   res@tmXMajorGrid = True
@@ -712,7 +717,7 @@ begin
   
   res@tmYROn = False
   res@tmYLMode = "Explicit"
-  res@tmYLValues = raw
+  res@tmYLValues = row
   res@tmYLLabels = names
   res@tmYLLabelJust = "CenterRight"
   res@tmYLLabelFontHeightF = 0.01
@@ -768,12 +773,12 @@ begin
   mkres@gsMarkerSizeF    = 0.006
   mkres@tfPolyDrawOrder = "PostDraw"
   lnres := True
-  lnres@gsLineThicknessF = 2.
   lnres@tfPolyDrawOrder = "PostDraw"
   polyres := True
   polyres@tfPolyDrawOrder = "PostDraw"
   txres := True
-  txres@txFontHeightF = 0.012
+  txres@txFontHeightF = 0.008;0.012
+  txres@txJust = "CenterLeft"
   
   res_obs@project = "OBS"
   res_obs@dataset = obs(0)
@@ -791,10 +796,35 @@ begin
   mme_plots(1) = gsn_csm_xy(wks, (/duration_la_obs(0), duration_la_obs(0)/), \
                             (/duration_la_obs@_FillValue, duration_la_obs@_FillValue/), res)
 
+  lnres@gsLineColor := "black"
+  lnres@gsLineThicknessF = 0.5
+  polyres@gsFillColor := "white"
+  x2 = res@trXMaxF - 0.5
+  x1 = x2 - (res@trXMaxF - res@trXMinF) * 0.32
+  y1 = 1.5
+  y2 = y1 + (res@trYMaxF - res@trYMinF) * 0.09
+  dummy(idummy) = gsn_add_polygon(wks, mme_plots(0), (/x1, x1, x2, x2/), \
+                                  (/y1, y2, y2, y1/), polyres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polyline(wks, mme_plots(0), (/x1, x1, x2, x2, x1/), \
+                                   (/y1, y2, y2, y1, y1/), lnres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polygon(wks, mme_plots(1), (/x1, x1, x2, x2/), \
+                                  (/y1, y2, y2, y1/), polyres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polyline(wks, mme_plots(1), (/x1, x1, x2, x2, x1/), \
+                                   (/y1, y2, y2, y1, y1/), lnres)
+  idummy = idummy + 1
+  dy = (y2 - y1)/4.
+  y1 = y1 + dy/2.
+  x1 = x1 + 0.3
+  fmt = "%4.1f" 
+  
+  lnres@gsLineThicknessF = 2.
   do j = 0, nobs-1
     res_obs@project = "OBS"
     res_obs@dataset = obs(j)
-    lnres@gsLineColor = get_color(res_obs)
+    lnres@gsLineColor := get_color(res_obs)
     lnres@gsLineDashPattern =  get_lineindex(res_obs)
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(0), (/duration_el_obs(j), duration_el_obs(j)/), \
                                      (/res@trYMinF, res@trYMaxF/), lnres)
@@ -802,101 +832,122 @@ begin
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(1), (/duration_la_obs(j), duration_la_obs(j)/), \
                                      (/res@trYMinF, res@trYMaxF/), lnres)
     idummy = idummy + 1
+
+    txres@txFontColor := lnres@gsLineColor
+    dummy(idummy) = gsn_add_text(wks, mme_plots(0), obs(j)+": "+sprintf(fmt, duration_el_obs(j)), x1, y1, txres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, mme_plots(1), obs(j)+": "+sprintf(fmt, duration_la_obs(j)), x1, y1, txres)
+    idummy = idummy + 1
+    y1 = y1 + dy
   end do
   
   w = 0.4  ; half height of MME bars
   dsres := True
   if (any(names.eq."CMIP6")) then
-    iraw = ind(names.eq."CMIP6")
+    irow = ind(names.eq."CMIP6")
     dsres@project = "CMIP6"
-    polyres@gsFillColor = get_color(dsres)
+    polyres@gsFillColor := get_color(dsres)
     dummy(idummy) \
       = gsn_add_polygon(wks, mme_plots(0), \
                         (/duration_el_cmip6_25th, duration_el_cmip6_75th, \
                           duration_el_cmip6_75th, duration_el_cmip6_25th/), \
-                        (/raw(iraw)-w, raw(iraw)-w, \
-                          raw(iraw)+w, raw(iraw)+w/), polyres)
+                        (/row(irow)-w, row(irow)-w, \
+                          row(irow)+w, row(irow)+w/), polyres)
     idummy = idummy + 1
     dummy(idummy) \
       = gsn_add_polygon(wks, mme_plots(1), \
                         (/duration_la_cmip6_25th, duration_la_cmip6_75th, \
                           duration_la_cmip6_75th, duration_la_cmip6_25th/), \
-                        (/raw(iraw)-w, raw(iraw)-w, \
-                          raw(iraw)+w, raw(iraw)+w/), polyres)
+                        (/row(irow)-w, row(irow)-w, \
+                          row(irow)+w, row(irow)+w/), polyres)
     idummy = idummy + 1
 
     lnres@gsLineColor := get_color(dsres)
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(0), \
                                      (/duration_el_cmip6_5th, duration_el_cmip6_95th/), \
-                                     (/raw(iraw), raw(iraw)/), lnres)
+                                     (/row(irow), row(irow)/), lnres)
     idummy = idummy + 1
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(1), \
                                      (/duration_la_cmip6_5th, duration_la_cmip6_95th/), \
-                                     (/raw(iraw), raw(iraw)/), lnres)
+                                     (/row(irow), row(irow)/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(0), \
                                      (/duration_el_cmip6_mean, duration_el_cmip6_mean/), \
-                                     (/raw(iraw)-w, raw(iraw)+w/), lnres)
+                                     (/row(irow)-w, row(irow)+w/), lnres)
     idummy = idummy + 1
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(1), \
                                      (/duration_la_cmip6_mean, duration_la_cmip6_mean/), \
-                                     (/raw(iraw)-w, raw(iraw)+w/), lnres)
+                                     (/row(irow)-w, row(irow)+w/), lnres)
     idummy = idummy + 1
+
+    txres@txFontColor := polyres@gsFillColor
+    dummy(idummy) = gsn_add_text(wks, mme_plots(0), "CMIP6 MME mean: "+sprintf(fmt, duration_el_cmip6_mean), x1, y1, txres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, mme_plots(1), "CMIP6 MME mean: "+sprintf(fmt, duration_la_cmip6_mean), x1, y1, txres)
+    idummy = idummy + 1
+    y1 = y1 + dy
   end if
   if (any(names.eq."CMIP5")) then
-    iraw = ind(names.eq."CMIP5")
+    irow = ind(names.eq."CMIP5")
     dsres@project = "CMIP5"
     polyres@gsFillColor = get_color(dsres)
     dummy(idummy) \
       = gsn_add_polygon(wks, mme_plots(0), \
                         (/duration_el_cmip5_25th, duration_el_cmip5_75th, \
                           duration_el_cmip5_75th, duration_el_cmip5_25th/), \
-                        (/raw(iraw)-w, raw(iraw)-w, \
-                          raw(iraw)+w, raw(iraw)+w/), polyres)
+                        (/row(irow)-w, row(irow)-w, \
+                          row(irow)+w, row(irow)+w/), polyres)
     idummy = idummy + 1
     dummy(idummy) \
       = gsn_add_polygon(wks, mme_plots(1), \
                         (/duration_la_cmip5_25th, duration_la_cmip5_75th, \
                           duration_la_cmip5_75th, duration_la_cmip5_25th/), \
-                        (/raw(iraw)-w, raw(iraw)-w, \
-                          raw(iraw)+w, raw(iraw)+w/), polyres)
+                        (/row(irow)-w, row(irow)-w, \
+                          row(irow)+w, row(irow)+w/), polyres)
     idummy = idummy + 1
 
     lnres@gsLineColor := get_color(dsres)
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(0), \
                                      (/duration_el_cmip5_5th, duration_el_cmip5_95th/), \
-                                     (/raw(iraw), raw(iraw)/), lnres)
+                                     (/row(irow), row(irow)/), lnres)
     idummy = idummy + 1
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(1), \
                                      (/duration_la_cmip5_5th, duration_la_cmip5_95th/), \
-                                     (/raw(iraw), raw(iraw)/), lnres)
+                                     (/row(irow), row(irow)/), lnres)
     idummy = idummy + 1
     lnres@gsLineColor := "white"
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(0), \
                                      (/duration_el_cmip5_mean, duration_el_cmip5_mean/), \
-                                     (/raw(iraw)-w, raw(iraw)+w/), lnres)
+                                     (/row(irow)-w, row(irow)+w/), lnres)
     idummy = idummy + 1
     dummy(idummy) = gsn_add_polyline(wks, mme_plots(1), \
                                      (/duration_la_cmip5_mean, duration_la_cmip5_mean/), \
-                                     (/raw(iraw)-w, raw(iraw)+w/), lnres)
+                                     (/row(irow)-w, row(irow)+w/), lnres)
     idummy = idummy + 1
+
+    txres@txFontColor := polyres@gsFillColor
+    dummy(idummy) = gsn_add_text(wks, mme_plots(0), "CMIP5 MME mean: "+sprintf(fmt, duration_el_cmip5_mean), x1, y1, txres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, mme_plots(1), "CMIP5 MME mean: "+sprintf(fmt, duration_la_cmip5_mean), x1, y1, txres)
+    idummy = idummy + 1
+    y1 = y1 + dy
   end if
 
   dsres := True
   if (plot_each_cmip6) then
     do ii = 0, dimsizes(duration_el_cmip6)-1
       if (any(names.eq.models_cmip6(ii))) then
-        iraw = ind(names.eq.models_cmip6(ii))
+        irow = ind(names.eq.models_cmip6(ii))
         dsres@dataset = models_cmip6(ii)
         dsres@project = "CMIP6"
         mkres@gsMarkerColor    = get_color(dsres)
         mkres@gsMarkerIndex    = get_markerindex(dsres)
         dummy(idummy) = gsn_add_polymarker(wks, mme_plots(0), \
-                                           duration_el_cmip6(ii), raw(iraw), mkres)
+                                           duration_el_cmip6(ii), row(irow), mkres)
         idummy = idummy + 1
         dummy(idummy) = gsn_add_polymarker(wks, mme_plots(1), \
-                                           duration_la_cmip6(ii), raw(iraw), mkres)
+                                           duration_la_cmip6(ii), row(irow), mkres)
         idummy = idummy + 1
       end if
     end do
@@ -904,16 +955,16 @@ begin
   if (plot_each_cmip5) then
     do ii = 0, dimsizes(duration_el_cmip5)-1
       if (any(names.eq.models_cmip5(ii))) then
-        iraw = ind(names.eq.models_cmip5(ii))
+        irow = ind(names.eq.models_cmip5(ii))
         dsres@dataset = models_cmip5(ii)
         dsres@project = "CMIP5"
         mkres@gsMarkerColor    = get_color(dsres)
         mkres@gsMarkerIndex    = get_markerindex(dsres)
         dummy(idummy) = gsn_add_polymarker(wks, mme_plots(0), \
-                                           duration_el_cmip5(ii), raw(iraw), mkres)
+                                           duration_el_cmip5(ii), row(irow), mkres)
         idummy = idummy + 1
         dummy(idummy) = gsn_add_polymarker(wks, mme_plots(1), \
-                                           duration_la_cmip5(ii), raw(iraw), mkres)
+                                           duration_la_cmip5(ii), row(irow), mkres)
         idummy = idummy + 1
       end if
     end do
@@ -987,7 +1038,7 @@ begin
   txres@txFontHeightF = 0.02
   txres@txFont = "helvetica-bold"
   txres@txJust = "TopCenter"  
-  gsn_text_ndc(wks, "ENSO time evolution", 0.55, 0.9999, txres)
+  gsn_text_ndc(wks, "ENSO lifecycle", 0.55, 0.9999, txres)
     
   draw(mme_plots(0))
   draw(mme_plots(1))
