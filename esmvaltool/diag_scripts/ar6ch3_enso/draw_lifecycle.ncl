@@ -483,7 +483,7 @@ begin
   rests@tmLabelAutoStride = False
   rests@tiYAxisFontHeightF = rests@tmYLLabelFontHeightF
   rests@tiYAxisOffsetXF = 0.012
-  rests@tiYAxisString = "(~S~o~N~C)"
+  rests@tiYAxisString = "ENSO index (~S~o~N~C)"
   
   resp = True
   resp@gsFillOpacityF = 0.1
@@ -787,12 +787,12 @@ begin
   res@xyLineThicknessF = 2.
 
   res@vpXF = vpX0
-  res@tiMainString = "(c) Mean El Nino duration (month)"
+  res@tiMainString = "(c) Mean El Nino duration"
   mme_plots(0) = gsn_csm_xy(wks, (/duration_el_obs(0), duration_el_obs(0)/), \
                             (/duration_el_obs@_FillValue, duration_el_obs@_FillValue/), res)
   res@vpXF = vpX1
   res@tmYLLabelsOn = False
-  res@tiMainString = "(d) Mean La Nina duration (month)"
+  res@tiMainString = "(d) Mean La Nina duration"
   mme_plots(1) = gsn_csm_xy(wks, (/duration_la_obs(0), duration_la_obs(0)/), \
                             (/duration_la_obs@_FillValue, duration_la_obs@_FillValue/), res)
 
