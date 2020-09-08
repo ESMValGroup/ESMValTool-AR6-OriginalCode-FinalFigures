@@ -55,19 +55,40 @@ diagnostics:
         end_year: 2014 #2010
         #derive: true
         additional_datasets:
-          #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 3, start_year: 1986, end_year: 2008}
+          - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 2, start_year: 1986, end_year: 2008}
           #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 2018, tier: 3, start_year: 1986, end_year: 2014}
+#          - {dataset: CanESM5, grid: gn}
+#          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2}
+#          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2}
+#          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2}
+#          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r6i1p1f1}
+#          - {dataset: GISS-E2-1-G, grid: gn}
+#          - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
+#          - {dataset: GISS-E2-1-H, grid: gn}
+#          - {dataset: CESM2, grid: gn}
+#          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+#          - {dataset: SAM0-UNICON, grid: gn}
+          - {dataset: ACCESS-ESM1-5, grid: gn}
           - {dataset: CanESM5, grid: gn}
-          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2}
-          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2}
-          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2}
-          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r6i1p1f1}
-          - {dataset: GISS-E2-1-G, grid: gn}
-          - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS}
-          - {dataset: GISS-E2-1-H, grid: gn}
+          - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1}
           - {dataset: CESM2, grid: gn}
+          - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
           - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r7i1p1f2}
+          #- {dataset: GISS-E2-1-G, grid: gn, ensemble: r10i1p1f1}
+          - {dataset: INM-CM4-8, grid: gr1}
+          - {dataset: INM-CM5-0, grid: gr1}
+          - {dataset: IPSL-CM6A-LR, grid: gr}
+          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, grid: gn}
+          - {dataset: NorCPM1, grid: gn, institute: NCC}
+          - {dataset: NorESM2-LM, grid: gn}
+          - {dataset: NorESM2-MM, grid: gn}
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r2i1p1f2, project: CMIP6}
           - {dataset: SAM0-UNICON, grid: gn}
+
     scripts:
       fig_3_38_co2:
         script: ipcc_ar6/CO2_SCA_trend.py

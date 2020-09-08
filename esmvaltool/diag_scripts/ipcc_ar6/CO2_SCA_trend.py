@@ -120,6 +120,11 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
 
     """Plot data"""
+    linestyles = {"CO2-MLO": "-",  "CO2-GLOB": "dashed", "JMA-TRANSCOM": "dotted"}
+    colors = {"Multi-Model Mean": (204/255., 35/255., 35/255.), "CO2-MLO": (0, 0, 0),
+              "CO2-GLOB": (0, 0, 0), "JMA-TRANSCOM": (0, 0, 0),
+              #"CO2-GLOB": (36/255., 147/255., 126/255.), "JMA-TRANSCOM": (54/255., 156/255., 232/255.,),
+              "first10": (237/255., 128/255., 55/255.), "last10": (36/255., 147/255., 126/255.)}
     CMIP6_colors = [(0, 0, 0), (112/255., 160/255., 205/255.), (178/255., 178/255., 178/255.), (196/255., 121/255., 0), (0/255., 52/255., 102/255.), (0, 79/255., 0)]
     CMIP6_shading = [(128/255., 128/255., 128/255.), (91/255., 174/255., 178/255.), (191/255., 191/255., 191/255.), (204/255., 174/255., 113/255.), (67/255., 147/255., 195/255.), (223/255., 237/255., 195/255.)]
     fig, ax = plt.subplots()#plt.figure(figsize=(6, 4))
@@ -129,8 +134,8 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
     for dataset in dataset_groups['mmm_datasets']:
         mmm_amps[dataset] = amps[dataset]
     mmm_time, mmm_mean, mmm_std = compute_mmm_std(timeranges, mmm_amps, "yearly")
-    plt.plot(mmm_time, mmm_mean, label = "Multi-Model Mean", color=CMIP6_colors.pop(0), linewidth = 3)
-    plt.fill_between(mmm_time, mmm_mean-mmm_std, mmm_mean + mmm_std, color=CMIP6_shading.pop(0), alpha=.3)
+    plt.plot(mmm_time, mmm_mean, label = "Multi-Model Mean", color=colors["Multi-Model Mean"], linewidth = 3)
+    plt.fill_between(mmm_time, mmm_mean-mmm_std, mmm_mean + mmm_std, color=colors["Multi-Model Mean"], alpha=.2)
 
     # Non-mmm lines
     for dataset in yrs:
@@ -149,13 +154,14 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
                 mean_dataset_10 = 0.
             if dataset in dataset_groups['ref_model']:
                 plt.plot(yrs[dataset], amps[dataset] - mean_dataset_10 + mmm_mean_10, label = dataset,
-                         color = CMIP6_colors.pop(0), linewidth = 3)
+                         color = colors[dataset], linewidth = 3)
                 plt.fill_between(yrs[dataset], amps[dataset] - amps['ref_std'] - mean_dataset_10 + mmm_mean_10, \
                                      amps[dataset] + amps['ref_std'] - mean_dataset_10 + mmm_mean_10, \
-                                     color = CMIP6_shading.pop(0), alpha=.3)
+                                     color = colors[dataset], alpha=.2) #CMIP6_shading.pop(0), alpha=.3)
             else:
-                plt.plot(yrs[dataset], amps[dataset] - mean_dataset_10 + mmm_mean_10, label = dataset, color = CMIP6_colors.pop(0), linewidth = 2)
-                CMIP6_shading.pop(0)
+                plt.plot(yrs[dataset], amps[dataset] - mean_dataset_10 + mmm_mean_10,
+                         label = dataset, color = colors[dataset], linewidth = 2, linestyle=linestyles[dataset])
+                #CMIP6_shading.pop(0)
     # Prettify
     plt.ylabel('Relative change in amplitude')
     plt.legend(fontsize=10, loc = 2)
@@ -164,8 +170,7 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
 
     # INSET
     axins = inset_axes(ax, width='30%', height='30%', loc=4, borderpad=2)
-
-    CMIP6_colors = [(0, 0, 0), (112/255., 160/255., 205/255.), (196/255., 121/255., 0), (178/255., 178/255., 178/255.), (0/255., 52/255., 102/255.), (0, 79/255., 0)]
+    #CMIP6_colors = [(0, 0, 0), (112/255., 160/255., 205/255.), (196/255., 121/255., 0), (178/255., 178/255., 178/255.), (0/255., 52/255., 102/255.), (0, 79/255., 0)]
     CMIP6_shading = [(128/255., 128/255., 128/255.), (91/255., 174/255., 178/255.), (204/255., 174/255., 113/255.), (191/255., 191/255., 191/255.), (67/255., 147/255., 195/255.), (223/255., 237/255., 195/255.)]
     # Initial
     iyrs = [min_year, min_year+9]
@@ -177,14 +182,14 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
             cycle_data[dataset] = compute_avg_sca(t_cycle[dataset][int_ind:fin_ind], \
                                                       avg_cycle[dataset][int_ind:fin_ind])
             if dataset in dataset_groups['plot_sca']:
-                axins.plot(range(1, 13), cycle_data[dataset], linestyle = "--", color = CMIP6_colors.pop(1))
+                axins.plot(range(1, 13), cycle_data[dataset], linestyle = "--", color = colors[dataset])#color = CMIP6_colors.pop(1))
     # Compute MMM cycle
     mmm_cycle_data = {}
     for dataset in dataset_groups['mmm_datasets']:
         mmm_cycle_data[dataset] = cycle_data[dataset]
     _, mmm_meanc, mmm_stdc =  compute_mmm_std(timeranges, mmm_cycle_data, "cycle")
-    axins.plot(range(1, 13), mmm_meanc, "k--", label = "Multi-Model Mean")
-    axins.fill_between(range(1, 13), mmm_meanc-mmm_stdc, mmm_meanc + mmm_stdc, color=(90/255., 90/255., 90/255.),alpha=.3)
+    axins.plot(range(1, 13), mmm_meanc, "k--", label = "Multi-Model Mean", color=colors["first10"])
+    axins.fill_between(range(1, 13), mmm_meanc-mmm_stdc, mmm_meanc + mmm_stdc, color = colors["first10"], alpha=.2)
 
     # Final
     #fyrs = [1999, 2008]
@@ -209,14 +214,14 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
     for dataset in dataset_groups['mmm_datasets']:
         mmm_cycle_data[dataset] = cycle_data[dataset]
     _, mmm_meanf, mmm_stdf =  compute_mmm_std(timeranges, mmm_cycle_data, "cycle")
-    axins.plot(range(1, 13), mmm_meanf, "k", label = "Multi-Model Mean")
-    axins.fill_between(range(1, 13), mmm_meanf-mmm_stdf, mmm_meanf + mmm_stdf, color=(128/255., 128/255., 128/255.),alpha=.3)
+    axins.plot(range(1, 13), mmm_meanf, "k", label = "Multi-Model Mean", color = colors["last10"])
+    axins.fill_between(range(1, 13), mmm_meanf-mmm_stdf, mmm_meanf + mmm_stdf, color = colors["last10"], alpha=.2)#color=(128/255., 128/255., 128/255.),alpha=.3)
 
 
     xlab = range(2, 13, 2)
     xlabels = ['Feb', 'Apr', 'Jun', 'Aug', 'Oct', 'Dec']
     plt.xticks(xlab, xlabels)
-    plt.ylabel(r'nbp PgC yr$^{-1}$')
+    plt.ylabel(r'NBP PgC yr$^{-1}$')
     #plt.ylabel(r'F$_{TA}$ PgC yr$^{-1}$')
     axins.patch.set_alpha(0.0)
 
