@@ -196,15 +196,40 @@ def n_year_mean(cubelist, n):
 
     for cube in cubelist:
         n_t = len(cube.coord('time').points)
-        data = [np.average(cube.data[n*i:n*i + n]) for i in range(0, int(n_t / n))]
         if n_t%n!=0:
             # add here a warning that the last is an average of n_t%n==0 years
             print('The n of years is not divisible by '+str(n)+' last '+str(n_t%n)+' years were not taken into account')
-        n_aver_cube = iris.cube.Cube(np.asarray(data), long_name=cube.long_name+', '+str(n)+'y mean', var_name=cube.var_name, units=cube.units,
-                                     attributes=cube.attributes, dim_coords_and_dims=[(dcoord,0)])
+        if len(cube.data.shape) == 1:
+            data = [np.average(cube.data[n*i:n*i + n]) for i in range(0, int(n_t / n))]
+            n_aver_cube = iris.cube.Cube(np.asarray(data), long_name=cube.long_name + ', ' + str(n) + 'y mean',
+                                         var_name=cube.var_name, units=cube.units,
+                                         attributes=cube.attributes, dim_coords_and_dims=[(dcoord, 0)])
+        elif len(cube.data.shape) == 2:
+            data = np.asarray([np.average(cube.data[:, n * i:n * i + n], axis=1) for i in range(0, int(n_t / n))])
+            n_aver_cube =iris.cube.Cube(data, long_name=cube.long_name + ', ' + str(n) + 'y mean',
+                                                 var_name=cube.var_name, units=cube.units, attributes=cube.attributes,
+                                                 dim_coords_and_dims=[(dcoord,0), (cube.coords()[0],1)])
+
         n_aver_cubelist.append(n_aver_cube)
 
     return (n_aver_cubelist)
+
+
+def substract_ref_period(cubelist, ref_period):
+
+    constr = iris.Constraint(time=lambda cell: ref_period[0] <= cell.point.year <= ref_period[1])
+
+    upd_cubelist = iris.cube.CubeList()
+
+    for cube in cubelist:
+        mean = cube.extract(constr).collapsed('time', iris.analysis.MEAN)
+        upd_cube = cube - mean
+        upd_cube.attributes = cube.attributes
+        upd_cube.long_name = cube.long_name + ' anomaly'
+        upd_cube.var_name = cube.var_name + '_ano'
+        upd_cubelist.append(upd_cube)
+
+    return(upd_cubelist)
 
 def figure_handling(cfg, name = 'plot'):
 

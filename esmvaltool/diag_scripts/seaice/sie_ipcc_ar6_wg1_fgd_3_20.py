@@ -2,11 +2,11 @@ import cf_units
 import datetime
 import iris
 from iris.experimental.equalise_cubes import equalise_attributes
+import iris.plot as iplt
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from scipy import stats, special
 import sys
 
 # import internal esmvaltool modules here
@@ -49,13 +49,16 @@ def calculate_sce(cubelist, threshold = 5):
         tim = sub_cubelist[0].coord('time')
         orig = tim.units.origin
         calendar = tim.units.calendar
+        #  dest orig and calendar are done so in the end we can merge cubes
+        dest_orig = 'days since 1850-1-1 00:00:00'
+        dest_calendar = 'gregorian'
         cf_tim = cf_units.num2date(tim.points, orig, calendar)
         year = np.asarray([pnt.year for pnt in cf_tim])
         pnt_dts = np.asarray([datetime.datetime(yr, 7, 1) for yr in year])
         bds_dts = np.asarray([[datetime.datetime(yr, 1, 1), datetime.datetime(yr, 12, 31)] for yr in year])
-        tim_coor = iris.coords.DimCoord(cf_units.date2num(pnt_dts, orig, calendar), standard_name='time',
-                                        long_name='time', var_name='time', units=tim.units,
-                                        bounds=cf_units.date2num(bds_dts, orig, calendar))
+        tim_coor = iris.coords.DimCoord(cf_units.date2num(pnt_dts, dest_orig, dest_calendar), standard_name='time',
+                                        long_name='time', var_name='time', units=cf_units.Unit(dest_orig, dest_calendar),
+                                        bounds=cf_units.date2num(bds_dts, dest_orig, dest_calendar))
         for cube in sub_cubelist:
 
             area = iris.analysis.cartography.area_weights(cube, normalize=False)
@@ -89,37 +92,137 @@ def shuffle_period(cubelist, period, aver_n):
 
     shuffled_cubelist = iris.cube.CubeList()
 
+    pnts = [datetime.datetime(yr, 7,1) for yr in np.arange(period[0], period[1]+1)]
+    bnds = [[datetime.datetime(yr, 1,1),datetime.datetime(yr, 12, 31)] for yr in np.arange(period[0], period[1]+1)]
+
     nyears = period[1] - period[0] + 1
 
+    dest_orig = 'days since 1850-1-1 00:00:00'
+    dest_calendar = 'gregorian'
+
     for cube in cubelist:
+        time_coord = iris.coords.DimCoord(cf_units.date2num(pnts, dest_orig, dest_calendar), standard_name='time',
+                                          long_name='time', var_name='time', units=cf_units.Unit(dest_orig, calendar=dest_calendar),
+                                          bounds=cf_units.date2num(bnds, dest_orig, dest_calendar))
         ctl_yrs = len(cube.coord('time').points)
         n_rows = ctl_yrs//nyears
         if ctl_yrs%nyears !=0:
             print('The years in the ctl experiment are not divisible by '+str(nyears)+'last '+str(ctl_yrs%nyears)+
                   ' years were not considered')
-        shuffled_cubelist.append()
+        data = cube.data
+        sub_shuf_cblst = iris.cube.CubeList()
+        for row in range(n_rows):
+            sub_shuf_cb = iris.cube.Cube(data[row*nyears:(row*nyears + nyears)], long_name='shuffled snow cover extent', var_name='sce',
+                            units="10^6km2", attributes=cube.attributes, dim_coords_and_dims=[(time_coord, 0)])
+            sub_shuf_cb.add_aux_coord(iris.coords.AuxCoord(row, long_name='n', var_name='n'))
+            sub_shuf_cblst.append(sub_shuf_cb)
+        shuffled_cube = sub_shuf_cblst.merge_cube()
+        shuffled_cubelist.append(shuffled_cube)
 
     return (shuffled_cubelist)
 
+def cubelist_averaging(cubelist):
 
-def subtract_ref_period(cubelist, period):
+    if len(cubelist)>1:
+        for n,cube in enumerate(cubelist):
+            cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
+        equalise_attributes(cubelist)
+        merged_cube = cubelist.merge_cube()
+        averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
+    else:
+        averaged_cube = cubelist[0]
+        averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis'))
 
-    ano_cubelist = iris.cube.CubeList()
+    return(averaged_cube)
 
-    for cube in cubelist:
-        ano_cubelist.append()
+def calc_stats(cubelist, exp):
 
-    return(ano_cubelist)
+    output_dic = {}
 
-# do ensamble average
+    if exp == 'piControl':
+        n_sizes = np.asarray([len(cube.coord('n').points) for cube in cubelist])
+        n_len = n_sizes.max()
+        t_len = len(cubelist[0].coord('time').points)
+        joint_arr = np.ma.zeros((t_len, n_len, len(cubelist)))
+        for n, cube in enumerate(cubelist):
+            n_lim =len(cube.coord('n').points)
+            joint_arr[:,0:n_lim, n] = cube.data
+            if n_lim < n_len:
+                joint_arr[:, 0:n_lim, n] = cube.data
+                joint_arr[:, n_lim:n_len, 1] = np.ma.masked_all((t_len, n_len - n_lim))
+        max_arr = joint_arr.max(axis=(1,2))
+        min_arr = joint_arr.min(axis=(1,2))
+        # to compute percentiles for 3d array only nan percentiles can be used
+        # masked features become nans
+        joint_arr[joint_arr.mask] = np.nan
+        percent= np.nanpercentile(joint_arr.data, [5, 95], axis = (1,2))
+        per_coord= iris.coords.DimCoord([5,95], long_name='percentile', var_name='percentile')
+        output_dic['min'] = iris.cube.Cube(min_arr, long_name='min_sce', var_name='min_sce',
+                            units="10^6km2", dim_coords_and_dims=[(cube.coord('time'), 0)])
+        output_dic['max'] = iris.cube.Cube(max_arr, long_name='min_sce', var_name='min_sce',
+                            units="10^6km2", dim_coords_and_dims=[(cube.coord('time'), 0)])
+        # output_dic['5_95_percentiles'] = iris.cube.Cube(percent.T, long_name='perc_sce', var_name='perc_sce',
+        #                     units="10^6km2", dim_coords_and_dims=[(cube.coord('time'), 0), (per_coord, 1)])
+        output_dic['5_95_percentiles'] = iris.cube.Cube(percent, long_name='perc_sce', var_name='perc_sce',
+                            units="10^6km2", dim_coords_and_dims=[(per_coord, 0), (cube.coord('time'), 1)])
+    else:
+        for n,cube in enumerate(cubelist):
+            cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='coll_axis', var_name='coll_axis'))
+            cube.cell_methods = None
+        equalise_attributes(cubelist)
+        exp_cube = cubelist.merge_cube()
+        output_dic['mean'] = exp_cube.collapsed('coll_axis', iris.analysis.MEAN)
+        output_dic['min'] = exp_cube.collapsed('coll_axis', iris.analysis.MIN)
+        output_dic['max'] = exp_cube.collapsed('coll_axis', iris.analysis.MAX)
+        output_dic['5_95_percentiles'] = exp_cube.collapsed('coll_axis', iris.analysis.PERCENTILE, percent = [5, 95])
 
-# calculate stats, mean, 5% percentile, 95% percentile, min, max
+    return(output_dic)
 
-def make_panel():
+def make_panel(data_dic, proj, nrows, idx):
+
+    ax = plt.subplot(nrows, 1, idx)
+    ax.plot([np.datetime64('1919'), np.datetime64('2021')], [0, 0], c='k', linestyle='solid')
+
+    for n, exp in enumerate(data_dic.keys()):
+        if 'historical-' in exp:
+            label = 'ALL'
+            iplt.plot(data_dic[exp]['mean'], label = label ,c ='r', linestyle = 'solid', axes = ax)
+            iplt.plot(data_dic[exp]['5_95_percentiles'][0], c ='r', linestyle = 'dashed', axes = ax)
+            iplt.plot(data_dic[exp]['5_95_percentiles'][1], c ='r', linestyle = 'dashed', axes = ax)
+        elif 'nat' in exp.lower():
+            label = 'NAT'
+            iplt.plot(data_dic[exp]['mean'], label=label, c='b', linestyle = 'solid', axes=ax)
+            iplt.plot(data_dic[exp]['5_95_percentiles'][0], c ='b', linestyle = 'dashed', axes = ax)
+            iplt.plot(data_dic[exp]['5_95_percentiles'][1], c ='b', linestyle = 'dashed', axes = ax)
+        elif 'piControl' in exp:
+            label = 'CTL'
+            ax.plot([1,1],c = 'g', linestyle = 'solid', label= label)
+            iplt.plot(data_dic[exp]['5_95_percentiles'][0], c ='g', linestyle = 'dashed', axes = ax)
+            iplt.plot(data_dic[exp]['5_95_percentiles'][1], c ='g', linestyle = 'dashed', axes = ax)
+
+    ax.set_ylim(-4,4)
+    ax.set_yticks(np.arange(-4,5,2))
+    ax.set_xlim(np.datetime64('1920'),np.datetime64('2020'))
+    xticks = np.arange(np.datetime64('1920'), np.datetime64('2021'), np.timedelta64(20, 'Y'))
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticks)
+    ax.text(np.datetime64('1922'), 3, proj, fontsize = 'x-large')
+    ax.set_ylabel('SCE anomaly (10^6 km^2)')
+    ax.legend(loc = 3, frameon=False, ncol=1)
 
     return
 
-def make_plot():
+def make_plot(data_dict):
+
+    fig = plt.figure()
+    fig.set_size_inches(10., 9.)
+
+    nrows = len(data_dict.keys())
+
+    for n, key in enumerate(data_dict.keys()):
+        make_panel(data_dict[key], key, nrows, n+1)
+
+    fig.subplots_adjust(left=0.1, right=0.95, top=0.96, bottom=0.06, wspace=0.28, hspace=0.2)
 
     return
 
@@ -130,12 +233,16 @@ def main(cfg):
     projects = ['CMIP5', 'CMIP6']
     # projects might be called through set(keys too)
 
+    plotting_dic = {}
+
     for project in projects:
+        plotting_dic[project] = {}
         proj_dtsts = dtsts.get_dataset_info_list(project=project)
         exps = set([dtst['exp'] for dtst in proj_dtsts])
         for exp in exps:
             exp_dtsts = dtsts.get_dataset_info_list(exp=exp, project=project)
             models = set([dtst['dataset'] for dtst in exp_dtsts])
+            ens_cubelist = iris.cube.CubeList()
             for model in models:
                 model_dtsts = dtsts.get_dataset_info_list(dataset= model, exp= exp, project=project)
                 mod_fnames = [dtst['filename'] for dtst in model_dtsts]
@@ -145,15 +252,14 @@ def main(cfg):
                 mod_sce_cubelist = monthly_av(mod_sce_cubelist)
                 if exp == 'piControl':
                     mod_sce_cubelist = shuffle_period(mod_sce_cubelist, cfg['main_period'], cfg['years_for_average'])
-                else:
-                    mod_sce_cubelist = ipcc_sea_ice_diag.n_year_mean(mod_sce_cubelist,n = cfg ['years_for_average'])
-                    # mod_sce_cubelist = subtract_ref_period(mod_sce_cubelist, cfg['ref_period'])
+                mod_sce_cubelist = ipcc_sea_ice_diag.n_year_mean(mod_sce_cubelist,n = cfg ['years_for_average'])
+                mod_sce_cubelist = ipcc_sea_ice_diag.substract_ref_period(mod_sce_cubelist, cfg['ref_period'])
+                ens_cube = cubelist_averaging(mod_sce_cubelist)
+                ens_cubelist.append(ens_cube)
+            plotting_dic[project][exp] = calc_stats(ens_cubelist, exp)
 
-
-                print('Liza')
-
-
-    # ipcc_sea_ice_diag.figure_handling(cfg, name='fig_3_19_timeseries')
+    make_plot(plotting_dic)
+    ipcc_sea_ice_diag.figure_handling(cfg, name='fig_3_20_timeseries')
 
     logger.info('Success')
 
