@@ -165,6 +165,7 @@ def calc_stats(cubelist, exp):
         #                     units="10^6km2", dim_coords_and_dims=[(cube.coord('time'), 0), (per_coord, 1)])
         output_dic['5_95_percentiles'] = iris.cube.Cube(percent, long_name='perc_sce', var_name='perc_sce',
                             units="10^6km2", dim_coords_and_dims=[(per_coord, 0), (cube.coord('time'), 1)])
+        output_dic['number_models'] = len(cubelist)
     else:
         for n,cube in enumerate(cubelist):
             cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='coll_axis', var_name='coll_axis'))
@@ -175,6 +176,7 @@ def calc_stats(cubelist, exp):
         output_dic['min'] = exp_cube.collapsed('coll_axis', iris.analysis.MIN)
         output_dic['max'] = exp_cube.collapsed('coll_axis', iris.analysis.MAX)
         output_dic['5_95_percentiles'] = exp_cube.collapsed('coll_axis', iris.analysis.PERCENTILE, percent = [5, 95])
+        output_dic['number_models'] = len(cubelist)
 
     return(output_dic)
 
@@ -183,19 +185,19 @@ def make_panel(data_dic, proj, nrows, idx):
     ax = plt.subplot(nrows, 1, idx)
     ax.plot([np.datetime64('1919'), np.datetime64('2021')], [0, 0], c='k', linestyle='solid')
 
-    for n, exp in enumerate(data_dic.keys()):
+    for n, exp in enumerate(sorted(data_dic.keys())):
         if 'historical-' in exp:
-            label = 'ALL'
+            label = 'ALL ['+ str(data_dic[exp]['number_models'])+']'
             iplt.plot(data_dic[exp]['mean'], label = label ,c ='r', linestyle = 'solid', axes = ax)
             iplt.plot(data_dic[exp]['5_95_percentiles'][0], c ='r', linestyle = 'dashed', axes = ax)
             iplt.plot(data_dic[exp]['5_95_percentiles'][1], c ='r', linestyle = 'dashed', axes = ax)
         elif 'nat' in exp.lower():
-            label = 'NAT'
+            label = 'NAT [' + str(data_dic[exp]['number_models'])+']'
             iplt.plot(data_dic[exp]['mean'], label=label, c='b', linestyle = 'solid', axes=ax)
             iplt.plot(data_dic[exp]['5_95_percentiles'][0], c ='b', linestyle = 'dashed', axes = ax)
             iplt.plot(data_dic[exp]['5_95_percentiles'][1], c ='b', linestyle = 'dashed', axes = ax)
         elif 'piControl' in exp:
-            label = 'CTL'
+            label = 'CTL [' + str(data_dic[exp]['number_models'])+']'
             ax.plot([1,1],c = 'g', linestyle = 'solid', label= label)
             iplt.plot(data_dic[exp]['5_95_percentiles'][0], c ='g', linestyle = 'dashed', axes = ax)
             iplt.plot(data_dic[exp]['5_95_percentiles'][1], c ='g', linestyle = 'dashed', axes = ax)
@@ -207,7 +209,7 @@ def make_panel(data_dic, proj, nrows, idx):
     ax.set_xticks(xticks)
     ax.set_xticklabels(xticks)
     ax.text(np.datetime64('1922'), 3, proj, fontsize = 'x-large')
-    ax.set_ylabel('SCE anomaly (10^6 km^2)')
+    ax.set_ylabel(r'SCE anomaly (10$^6$ km$^2$)')
     ax.legend(loc = 3, frameon=False, ncol=1)
 
     return
