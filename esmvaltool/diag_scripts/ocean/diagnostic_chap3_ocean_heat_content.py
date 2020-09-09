@@ -1521,7 +1521,7 @@ def calc_slr_full(cfg,
                       metadatas[hist_thetao_fn],
                       dat,
                       key='SLR_'+key+'_'+trend,
-                      sym_zero = True,
+                      sym_zero=True,
                       )
             print('files exist:', key, fn)
         return output_fns['total'], output_fns['thermo'], output_fns['halo']
@@ -1529,8 +1529,8 @@ def calc_slr_full(cfg,
     else: 
         print('outputs not found:', output_fns)
         for key, fn in output_fns.items():
-            if not os.path.exists(fn): print('file does not exist:', key, fn)
-
+            if not os.path.exists(fn):
+                print('file does not exist:', key, fn)
 
     # Load historical temperature and salinity netcdfs
     print('load hist netcdfs')
@@ -1540,28 +1540,29 @@ def calc_slr_full(cfg,
     # load latitude longitude dimensions
     lats = thetao_cube.coord('latitude').points
     lons = thetao_cube.coord('longitude').points
+
     # Make sure latitude and longitude are 2D
     if lats.ndim == 1:
-        lon, lat = np.meshgrid(lons,lats)
+        lon, lat = np.meshgrid(lons, lats)
     elif lats.ndim == 2:
         lat = lats
         lon = lons
 
     # Load depth data, ensuring depth is negative
-    depths = -1.*np.abs(thetao_cube.coord('depth').points) # depth is negative here.
+    depths = -1.*np.abs(thetao_cube.coord('depth').points)
 
     # Load time array as decidimal time.
-    times = diagtools.cube_time_to_float(thetao_cube) # decidmal time.
+    times = diagtools.cube_time_to_float(thetao_cube)
 
     # Calculate climatologies for historical period Temperature and salinity.   
     # Note that _bar suffix indicates climatology data.
     print('Calculate clim')
-    if np.array(times).min()<1880:
-        psal_bar = extract_time(so_cube.copy(), 1850, 1,1, 1880, 12, 31)
-        temp_bar = extract_time(thetao_cube.copy(), 1850, 1,1, 1880, 12, 31)
+    if np.array(times).min() < 1880:
+        psal_bar = extract_time(so_cube.copy(), 1850, 1, 1, 1880, 12, 31)
+        temp_bar = extract_time(thetao_cube.copy(), 1850, 1, 1, 1880, 12, 31)
     else:
-        psal_bar = extract_time(so_cube.copy(), 1950, 1,1, 1980, 12, 31)
-        temp_bar = extract_time(thetao_cube.copy(), 1950, 1,1, 1980, 12, 31)
+        psal_bar = extract_time(so_cube.copy(), 1950, 1, 1, 1980, 12, 31)
+        temp_bar = extract_time(thetao_cube.copy(), 1950, 1, 1, 1980, 12, 31)
 
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: so:', psal_bar.shape)
@@ -1575,6 +1576,7 @@ def calc_slr_full(cfg,
     slr_thermo = slr_total.copy()
     count = 0
 
+    gravity = 9.7963 # m /s^2
     # Performd SLR calculation for Climatology cube
     # If cube already exists, then just load the clim SLR data.
     if os.path.exists(output_fns['clim']):
@@ -1591,15 +1593,16 @@ def calc_slr_full(cfg,
             if np.ma.is_masked(psal_yx_bar.max()):
                  continue
 
-            lo = lon[y,x]
-            print('Calculate SLR in 1D:', (y,x), 'latitude:', la, lo)
+            lo = lon[y, x]
+            print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
 
             # load clim depth
             if depths_bar.ndim == 1:
                 depth_bar = depths_bar
             elif depths_bar.ndim == 3:
                 depth_bar = depths_bar[:, y, x]
-            else: assert 0
+            else:
+                assert 0
 
             # Calculate climatoligical pressure
             pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
@@ -1613,13 +1616,13 @@ def calc_slr_full(cfg,
             # Calculuate climatological Dynamic height anomaly
             # max_dp is the maximum difference between layers, set to a very high value 
             # to avoid expensive interpolation.
-            gsdh_clim = gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar, max_dp=1000.)
+            gsdh_clim = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar)#[0], max_dp=1000.)
 
             # Convert dynamic height into mm.
-            slr_clim[y, x] = gsdh_clim.sum() * 1000 / 9.81
+            slr_clim[y, x] = gsdh_clim[0] * 1000. / gravity
 
         # Save climatological SLR cube as a netcdf.
-        cube0 = thetao_cube[0, 0,:,:].copy()
+        cube0 = thetao_cube[0, 0, :, :].copy()
         cube0.data = slr_clim
         cube0.units = cf_units.Unit('mm')
         cube0.name = 'Climatological Sea Level Rise'
@@ -1674,17 +1677,18 @@ def calc_slr_full(cfg,
             asal = gsw.conversions.SA_from_SP(psal, pressure, lo, la)
 
             # Calculate Dynamic height anomaly   
-            gsdh_total = gsw.geo_strf_dyn_height(asal, ctemp, pressure, max_dp=1000.).sum()
-            gsdh_thermo = gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure, max_dp=1000.).sum()
+            gsdh_total = -1. * gsw.geo_strf_dyn_height(asal, ctemp, pressure, )[0]
+            #max_dp=1000.).sum()
+            gsdh_thermo = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure)[0] #, max_dp=1000.).sum()
 
             # Convert to mm and calculate anomaly relative to clim data
-            gsdh_total = gsdh_total * 1000 / 9.81 - slr_clim[y, x]
-            gsdh_thermo = gsdh_thermo * 1000 / 9.81 - slr_clim[y, x]
+            gsdh_total = gsdh_total * 1000. / gravity - slr_clim[y, x]
+            gsdh_thermo = gsdh_thermo * 1000. /  gravity - slr_clim[y, x]
 
             # Put in the output array:
-            slr_total[t, y, x] = gsdh_total 
+            slr_total[t, y, x] = gsdh_total
             slr_thermo[t, y, x] = gsdh_thermo
-            count+=1
+            count += 1
             print(count, (t, y, x), 'performing 2D SLR:',
                   gsdh_total,
                   gsdh_thermo)
@@ -1854,6 +1858,8 @@ def mpi_detrend(iter_pack, cubedata, decimal_time, slopes, intercepts):
         return [], index
 
     line = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
+    print(iter_pack,line)
+
     return index, np.array(line)
 
 
@@ -1923,24 +1929,23 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
             count+=1
     else:
         # parrlel:
-        with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
             print('ProcessPoolExecutor: executing detrending mpi')
             # iter_pack, cubedata, decimal_time, slopes, intercepts
             ndenum = np.ndenumerate(dummy)
 
-            for dtline, index in executor.map(mpi_detrend, 
+            for dtline, index in executor.map(mpi_detrend,
                                               ndenum,
                                               itertools.repeat(cube.data),
                                               itertools.repeat(decimal_time),
                                               itertools.repeat(slopes),
                                               itertools.repeat(intercepts),
-                                              chunksize=100000):
+                                              ): #chunksize=1000000):
                 if dtline:
-                    if count%250000 == 0:
+                    if count % 25000 == 0:
                         print(count, 'detrend')
                     dummy[:, index[0], index[1], index[2]] = dtline
-                    count+=1
-
+                    count += 1
 
     detrended = cube.copy()
     detrended.data = detrended.data - np.ma.array(dummy)
@@ -2264,6 +2269,7 @@ def main(cfg):
 
     print('\n-------------\nCalculate Sea Level Rise')
 
+    slr_fns = {}
     for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
         detrended_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
         if short_name != 'thetao':
@@ -2285,6 +2291,13 @@ def main(cfg):
             trend='detrended'
             )
         print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
+        slr_fns[(project, dataset, exp, ensemble, 'slr_total')] = slr_total_fn
+        slr_fns[(project, dataset, exp, ensemble, 'slr_thermo')] = slr_thermo_fn
+        slr_fns[(project, dataset, exp, ensemble, 'slr_halo')] = slr_halo_fn
+
+        # Calculate time series?
+        volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
+
     assert 0
           
     print('\nCalculate ocean heat content - trend intact')
