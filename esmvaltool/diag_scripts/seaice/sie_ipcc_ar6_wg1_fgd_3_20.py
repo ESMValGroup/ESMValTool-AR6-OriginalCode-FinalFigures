@@ -121,14 +121,42 @@ def shuffle_period(cubelist, period, aver_n):
 
     return (shuffled_cubelist)
 
-def cubelist_averaging(cubelist):
+def cubelist_averaging(cubelist, exp):
 
     if len(cubelist)>1:
-        for n,cube in enumerate(cubelist):
-            cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
-        equalise_attributes(cubelist)
-        merged_cube = cubelist.merge_cube()
-        averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
+        if exp == 'piControl':
+            len_arr = []
+            for cube in cubelist:
+                if len(cube.shape) > 1:
+                    len_arr.append(cube.shape[1])
+                else:
+                    len_arr.append(1)
+            if len(set(len_arr)) == 1:
+                for n, cube in enumerate(cubelist):
+                    cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
+                equalise_attributes(cubelist)
+                merged_cube = cubelist.merge_cube()
+                averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
+            else:
+                dim_len= np.array(len_arr).max()
+                arr = np.ma.zeros((len(cube.coord('time').points), dim_len, len(cubelist)))
+                for n, cube in enumerate(cubelist):
+                    if len_arr[n] < dim_len:
+                        arr[:, 0:len_arr[n], n] = cube.data
+                        arr[:, len_arr[n]: dim_len, n] = np.ma.masked_all((len(cube.coord('time').points), dim_len - len_arr[n]))
+                    else:
+                        arr[:,:,n] = cube.data
+                        coord_n = cube.coord('n')
+                av_arr = np.average(arr, axis = 2)
+                averaged_cube = iris.cube.Cube(av_arr, long_name=cube.long_name, var_name= cube.var_name,
+                            units="10^6km2", dim_coords_and_dims=[(coord_n, 0), (cube.coord('time'), 2)])
+                averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis'))
+        else:
+            for n,cube in enumerate(cubelist):
+                cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
+            equalise_attributes(cubelist)
+            merged_cube = cubelist.merge_cube()
+            averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
     else:
         averaged_cube = cubelist[0]
         averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis'))
@@ -256,7 +284,7 @@ def main(cfg):
                     mod_sce_cubelist = shuffle_period(mod_sce_cubelist, cfg['main_period'], cfg['years_for_average'])
                 mod_sce_cubelist = ipcc_sea_ice_diag.n_year_mean(mod_sce_cubelist,n = cfg ['years_for_average'])
                 mod_sce_cubelist = ipcc_sea_ice_diag.substract_ref_period(mod_sce_cubelist, cfg['ref_period'])
-                ens_cube = cubelist_averaging(mod_sce_cubelist)
+                ens_cube = cubelist_averaging(mod_sce_cubelist, exp)
                 ens_cubelist.append(ens_cube)
             plotting_dic[project][exp] = calc_stats(ens_cubelist, exp)
 
