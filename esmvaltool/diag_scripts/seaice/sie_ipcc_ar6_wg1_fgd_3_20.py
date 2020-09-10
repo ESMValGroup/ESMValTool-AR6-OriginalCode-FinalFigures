@@ -142,8 +142,12 @@ def cubelist_averaging(cubelist, exp):
                 arr = np.ma.zeros((len(cube.coord('time').points), dim_len, len(cubelist)))
                 for n, cube in enumerate(cubelist):
                     if len_arr[n] < dim_len:
-                        arr[:, 0:len_arr[n], n] = cube.data
-                        arr[:, len_arr[n]: dim_len, n] = np.ma.masked_all((len(cube.coord('time').points), dim_len - len_arr[n]))
+                        if len_arr[n] > 1:
+                            arr[:, 0:len_arr[n], n] = cube.data
+                        else:
+                            arr[:,0,n] = cube.data
+                        arr[:, len_arr[n]: dim_len, n] = np.ma.masked_all(
+                                (len(cube.coord('time').points), dim_len - len_arr[n]))
                     else:
                         arr[:,:,n] = cube.data
                         coord_n = cube.coord('n')
