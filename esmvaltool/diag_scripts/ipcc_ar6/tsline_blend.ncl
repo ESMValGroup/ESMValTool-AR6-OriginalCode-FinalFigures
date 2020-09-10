@@ -221,7 +221,6 @@ begin
               "no reference dataset defined")
   end if
     
-
   ; TODO
   model_arr_stddev = 0
 
@@ -247,6 +246,9 @@ begin
     model_arr(dim_MOD, :) = (/diag_ref/)
   end if
 
+  model_arr_tas = model_arr
+  ;copy_VarMeta(model_arr, model_arr_tas)
+
   ; Loop over models
   do imod = 0, dim_MOD - 1
 
@@ -258,7 +260,9 @@ begin
     ndim = dimsizes(tas0)
 
     ; Convert units from K to degC
-    tas0 = convert_units(tas0, "degC")
+    if (info_tas[imod]@units .eq. "K") then
+      tas0 = convert_units(tas0, "degC")
+    end if
 
     if (all (imod .ne. (/ref_ind, mmm_ind/))) then
 
@@ -268,7 +272,11 @@ begin
       sftlf0 := read_data(info_sftlf[imod])
       ndim_sftlf = dimsizes(sftlf0)
 
-      ; force missing cellsto open water/land and scale if stored as percentage
+      if (info_tos[imod]@units .eq. "K") then
+        tos0 = convert_units(tos0, "degC")
+      end if
+
+      ; force missing cells to open water/land and scale if stored as percentage
       sic0 = where(sic0.lt.0.0, 0.0, sic0)
       sic0 = where(sic0.gt.100.0, 0.0, sic0)
       if (max(sic0) .gt. 90.0) then
@@ -282,14 +290,17 @@ begin
         sftof0 = 0.01 * sftof0
       end if
 
+
       ; combine land/ice masks
-      do m = 0, ndim(0) - 1
+      ndim_sic = dimsizes(sic0)
+      do m = 0, ndim_sic(0) - 1
         sic0(m,:,:) = (1.0 - sic0(m,:,:)) * sftof0(:,:) 
       end do
 
       ; deal with missing tos through sic
       sic0 = where(tos0 .lt. -500.00, 0.0, sic0)
       sic0 = where(tos0 .gt. 500.00, 0.0, sic0)
+      sic0 = where(tos0 .eq. tos0@_FillValue, 0.0, sic0)
 
       ; prepare missing
       tos0 = where(abs(tos0) .gt. 500.0, tos0@_FillValue, tos0)
@@ -306,10 +317,10 @@ begin
       ref_start = diag_script_info@ref_start
     end if
     
-    base_mon = time_operations(tas0, ref_start, ref_end, "average", \
-                                      "monthlyclim", True)
-    ;base_mon = time_operations(tas0, 1961, 1990, "average", \
+    ;base_mon = time_operations(tas0, ref_start, ref_end, "average", \
     ;                                  "monthlyclim", True)
+    base_mon = time_operations(tas0, 1961, 1990, "average", \
+                                      "monthlyclim", True)
 
     tas0_anom := tas0
     do i = 0, ndim(0) - 1
@@ -319,10 +330,10 @@ begin
     if (all (imod .ne. (/ref_ind, mmm_ind/))) then
 
       ; calculate tos anomaly for each grid point
-      base_mon = time_operations(tos0, ref_start, ref_end, "average", \
-                                        "monthlyclim", True)
-      ;base_mon = time_operations(tos0, 1961, 1990, "average", \
+      ;base_mon = time_operations(tos0, ref_start, ref_end, "average", \
       ;                                  "monthlyclim", True)
+      base_mon = time_operations(tos0, 1961, 1990, "average", \
+                                        "monthlyclim", True)
 
       tos0_anom := tos0
       do i = 0, ndim(0) - 1
@@ -337,43 +348,56 @@ begin
       tos0 = where(tos0.eq.tos0@_FillValue, tas0, tos0)
       tos0_anom = where(tos0_anom.eq.tos0@_FillValue, tas0_anom, tos0_anom)
 
-      ; masking with reference dataset
-      ; Determine start/end year
-      start_year = info_tas[imod]@start_year
-      end_year = info_tas[imod]@end_year
-      tas_ref_mask := time_operations(tas_ref, start_year, \
-                                       end_year, "extract", "", 0)
-      tas0 = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
-                   tas_ref_mask@_FillValue, tos0)
-      tas0_anom = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
-                   tas_ref_mask@_FillValue, tos0_anom)
+;      ; masking with reference dataset
+;      ; Determine start/end year
+;      start_year = info_tas[imod]@start_year
+;      end_year = info_tas[imod]@end_year
+;      tas_ref_mask := time_operations(tas_ref, start_year, \
+;                                       end_year, "extract", "", 0)
+;      tas0 = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
+;                   tas_ref_mask@_FillValue, tas0)
+;      tas0_anom = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
+;                   tas_ref_mask@_FillValue, tas0_anom)
+;      tos0 = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
+;                   tas_ref_mask@_FillValue, tos0)
+;      tos0_anom = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
+;                   tas_ref_mask@_FillValue, tos0_anom)
 
     end if
 
     ; calculate field mean
-    gmst_mon := area_operations(tas0, -90., 90., \
+    gmst_mon := area_operations(tos0, -90., 90., \
                                0., 360., "average", True) 
-    gmst_mon_anom := area_operations(tas0_anom, -90., 90., \
+    gmst_mon_anom := area_operations(tos0_anom, -90., 90., \
+                               0., 360., "average", True) 
+    tas_mon := area_operations(tas0, -90., 90., \
+                               0., 360., "average", True) 
+    tas_mon_anom := area_operations(tas0_anom, -90., 90., \
                                0., 360., "average", True) 
 
     ; yearly average
     if (time_avg .eq. "yearly") then
       diag := time_operations(gmst_mon_anom, -1, -1, "average", \
                              "yearly", True)
+      diag_tas := time_operations(tas_mon_anom, -1, -1, "average", \
+                             "yearly", True)
     else
       diag := gmst_mon_anom
+      diag_tas := tas_mon_anom
     end if
 
-    ref_diag = time_operations(gmst_mon, 1961, 1990, "average", \
-                               "annualclim", True)
+    ;ref_diag = time_operations(gmst_mon, 1961, 1990, "average", \
+    ;                           "annualclim", True)
 
-    ;if (ref_start .ne. 1961 .or. ref_end .ne. 1990) then
-    ;  diag = diag + ref_diag
-    ;  ;ref_diag = time_operations(diag, ref_start, ref_end, "average", \
-    ;  ;                           "annualclim", True)
-    ;  ref_diag = avg(diag(ref_start-start_year:ref_end-start_year))
-    ;  diag = diag - ref_diag
-    ;end if
+    if (ref_start .ne. 1961 .or. ref_end .ne. 1990) then
+      ;diag = diag + ref_diag
+      ;ref_diag = time_operations(diag, ref_start, ref_end, "average", \
+      ;                           "annualclim", True)
+      ref_diag = avg(diag(ref_start-start_year:ref_end-start_year))
+      diag = diag - ref_diag
+      ref_diag_tas = avg(diag_tas(ref_start-start_year:ref_end-start_year))
+      diag_tas = diag_tas - ref_diag_tas
+    end if
 
     ; save mean ref value
     anom_ref(imod) = ref_diag
@@ -393,6 +417,7 @@ begin
 ;    end if
 
     procmod := diag
+    procmod_tas := diag_tas
 
     ; Match time coordinate
     if (time_avg.eq."monthly") then
@@ -403,9 +428,11 @@ begin
     idx1 = ind(date(0).eq.model_arr&time)
     idx2 = ind(date(dimsizes(date) - 1).eq.model_arr&time)
     model_arr(imod, idx1:idx2) = (/procmod/)
-    if (imod.eq.0) then
-      copy_VarAtts(procmod, model_arr)
-    end if
+    model_arr_tas(imod, idx1:idx2) = (/procmod_tas/)
+    ;if (imod.eq.0) then
+    ;  copy_VarAtts(procmod, model_arr)
+    ;  copy_VarAtts(procmod, model_arr_tas)
+    ;end if
     delete(procmod)
     delete(date)
 
@@ -416,15 +443,11 @@ begin
   ; *************************************
 
   ndim := dimsizes(datasetnames)
-printVarSummary(model_arr)
-print("ndim = " + ndim)
   ensemble_assign = new(ndim, integer)
 
   enum = 1
   temp = datasetnames(0)
-print("temp = " + temp)
   do gg = 0, ndim - 1
-print("gg = " + gg)
     if (temp.eq.datasetnames(gg)) then ; does the model name match what's in temp?
       ensemble_assign(gg) = enum ; if so, assign it the same number
     else
@@ -455,9 +478,6 @@ print("gg = " + gg)
       datasetnames_em(gg-1) = datasetnames(wind(0))
     end if
   end do
-
-print("datasetnames = " + datasetnames)
-print("datasetnames_em = " + datasetnames_em)
 
 
   ; *************************************
@@ -508,11 +528,32 @@ print("datasetnames_em = " + datasetnames_em)
   system("mkdir -p " + out_path)
   out_path1 = out_path + "tsline_gmst_" + anom + "_" + project0 + "_" \
               + exp0 + ".nc"
+  out_path1@existing = "overwrite"
   model_arr@ncdf = out_path
   model_arr@experiment = project0 + "_" + exp0
   model_arr@diag_script = DIAG_SCRIPT
   model_arr@var = var0
+  model_arr@long_name = "Global Mean Surface Temperature"
   ncdf_outfile = ncdf_write(model_arr, out_path1)
+
+printVarSummary(model_arr)
+printVarSummary(model_arr_tas)
+
+  copy_VarAtts(model_arr, model_arr_tas)
+
+  out_path1a = out_path + "tsline_tas_" + anom + "_" + project0 + "_" \
+              + exp0 + ".nc"
+  out_path1@existing = "overwrite"
+  model_arr@ncdf = out_path
+  model_arr@experiment = project0 + "_" + exp0
+  model_arr@diag_script = DIAG_SCRIPT
+  model_arr@var = "tas"
+  model_arr@long_name = "Near-Surface Temperature"
+  ncdf_outfile = ncdf_write(model_arr, out_path1a)
+  ;out_path1@existing = "append"
+  ;model_arr_tas@var = "tas"
+  ;model_arr_tas@long_name = "Near-Surface Temperature"
+  ;ncdf_outfile = ncdf_write(model_arr_tas, out_path1)
 
   ; *************************************
   ; optional output with statistics
@@ -676,6 +717,14 @@ print("datasetnames_em = " + datasetnames_em)
   end if
 
   log_info(" wrote " + outfile + "." + file_type)
+
+  outfile = config_user_info@plot_dir + "tas_" \
+    + str_sub_str(diag_script_info@region, " ", "_") \
+    + "_" + project0 + "_" + exp0 + "_" + anom + "_" \
+    + start_year + "-" + end_year
+  wks = gsn_open_wks(file_type, outfile)
+  xy_line_anom(wks, anom_ref, model_arr_tas, model_arr&time, \
+               model_arr_stddev, ref_start, ref_end, res, res0, info_tas)
 
   ; ***************************************
   ; add meta data to plot (for reporting)

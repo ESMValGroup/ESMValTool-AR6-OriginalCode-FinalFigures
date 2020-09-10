@@ -124,7 +124,7 @@ diagnostics:
         ensemble: r1i1p1f1
         start_year: 1850
         end_year: 2014
-        additional_datasets:
+        additional_datasets: &cmip6_Amon
           - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
           - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
           #- {dataset: AWI-CM-1-1-MR, grid: gn} #only 1850 in latestversion
@@ -140,7 +140,7 @@ diagnostics:
           - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
           - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
           #- {dataset: CIESM} # no sftlf
-          #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
+          - {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
           - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
           - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2} #no tos data
           - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2}
@@ -181,13 +181,15 @@ diagnostics:
         <<: *tas_settings_cmip6
         preprocessor: regrid_5_5
         additional_datasets:
+          #- {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+          #   tier: 2}
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
              tier: 2}
       tos:
         <<: *tas_settings_cmip6
         preprocessor: regrid_5_5
         mip: Omon
-        additional_datasets:
+        additional_datasets: &cmip6_Omon
           - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
           - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
           #- {dataset: AWI-CM-1-1-MR, grid: gn} #only 1850 in latestversion
@@ -203,7 +205,7 @@ diagnostics:
           - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
           - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
           #- {dataset: CIESM} # no sftlf
-          #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
+          - {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
           - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
           - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2} #no tos data
           - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r2i1p1f2}
@@ -245,115 +247,13 @@ diagnostics:
         preprocessor: regrid_5_5
         mip: SImon
         additional_datasets:
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
-          #- {dataset: AWI-CM-1-1-MR, grid: gn} #only 1850 in latestversion
-          #- {dataset: AWI-ESM-1-1-LR, grid: gn} #tos: failed to run fix_metadata
-          #- {dataset: BCC-CSM2-MR, grid: gn} #no siconc data
-          #- {dataset: BCC-ESM1, grid: gn} #no sftlf data
-          #- {dataset: CAMS-CSM1-0, grid: gn} #no sftlf data
-          - {dataset: CanESM5, grid: gn}
-          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
-          #- {dataset: CAS-ESM2-0, institute: CAS, grid: gn} #no sftlf data
-          - {dataset: CESM2, grid: gn}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
-          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
-          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
-          #- {dataset: CIESM} # no sftlf
-          #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
-          - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
-          - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2} #no tos data
-          - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r2i1p1f2}
-          - {dataset: E3SM-1-0}
-          - {dataset: E3SM-1-1, institute: E3SM-Project}
-          - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
-          #- {dataset: EC-Earth3, ensemble: r22i1p1f1} #permission denied tas
-          - {dataset: EC-Earth3-Veg, grid: gn} #concatinate error for siconc
-          #- {dataset: FGOALS-f3-L, grid: gn} #siconc: fail to run regrid
-          #- {dataset: FGOALS-g3, grid: gn}  #siconc: failed to run regrid
-          #- {dataset: FIO-ESM-2-0, grid: gn} #no sftlf data
-          #- {dataset: GFDL-CM4, grid: gr1} #permission denied tas
-          #- {dataset: GFDL-ESM4, grid: gr} #permission denied tos
-          #- {dataset: GISS-E2-1-G, grid: gn} #no siconc data
-          #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #permission denied tas
-          #- {dataset: GISS-E2-1-H, grid: gr} #no sftlf data
-          #- {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn} #no sftlf data
-          #- {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn} #no sftlf data
-          - {dataset: INM-CM4-8, grid: gr1}
-          - {dataset: INM-CM5-0, grid: gr1}
-          - {dataset: IPSL-CM6A-LR, grid: gn} #concatinate error for tas
-          #- {dataset: KACE-1-0-G} #no tos data
-          #- {dataset: MCM-UA-1-0, grid: gn} #no siconc data
-          - {dataset: MIROC6, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-          - {dataset: MPI-ESM-1-2-HAM, grid: gn}
-          - {dataset: MPI-ESM1-2-HR, grid: gn}
-          - {dataset: MPI-ESM1-2-LR, grid: gn}
-          - {dataset: MRI-ESM2-0, grid: gn}
-          #- {dataset: NESM3, grid: gn} #no sftlf data 
-          - {dataset: NorCPM1, grid: gn, institute: NCC}
-          #- {dataset: NorESM2-LM, grid: gn, institute: NCC} #siconc: error in lat and lon
-          #- {dataset: NorESM2-MM, grid: gn, institute: NCC} #siconc: Can not concatenate
-          #- {dataset: SAM0-UNICON, grid: gn} #errors in siconc with lon
-          #- {dataset: TaiESM1, grid: gn} #less years available for tos
-          #- {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn} #no sftlf data
+          <<: *cmip6_Omon
       sftlf:
         <<: *tas_settings_cmip6
         preprocessor: regrid_5_5
         mip: fx
         additional_datasets:
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
-          #- {dataset: AWI-CM-1-1-MR, grid: gn} #only 1850 in latestversion
-          #- {dataset: AWI-ESM-1-1-LR, grid: gn} #tos: failed to run fix_metadata
-          #- {dataset: BCC-CSM2-MR, grid: gn} #no siconc data
-          #- {dataset: BCC-ESM1, grid: gn} #no sftlf data
-          #- {dataset: CAMS-CSM1-0, grid: gn} #no sftlf data
-          - {dataset: CanESM5, grid: gn}
-          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
-          #- {dataset: CAS-ESM2-0, institute: CAS, grid: gn} #no sftlf data
-          - {dataset: CESM2, grid: gn}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
-          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
-          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
-          #- {dataset: CIESM} # no sftlf
-          #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
-          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-          - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2} #no tos data
-          - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2}
-          - {dataset: E3SM-1-0}
-          - {dataset: E3SM-1-1, institute: E3SM-Project}
-          - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
-          #- {dataset: EC-Earth3, ensemble: r22i1p1f1} #permission denied tas
-          - {dataset: EC-Earth3-Veg} #concatinate error for siconc
-          #- {dataset: FGOALS-f3-L} #siconc: fail to run regrid
-          #- {dataset: FGOALS-g3, grid: gn}  #siconc: failed to run regrid
-          #- {dataset: FIO-ESM-2-0, grid: gn} #no sftlf data
-          #- {dataset: GFDL-CM4, grid: gr1} #permission denied tas
-          #- {dataset: GFDL-ESM4, grid: gr} #permission denied tos
-          #- {dataset: GISS-E2-1-G, grid: gn} #no siconc data
-          #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #permission denied tas
-          #- {dataset: GISS-E2-1-H, grid: gn} #no sftlf data
-          #- {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn} #no sftlf data
-          #- {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn} #no sftlf data
-          - {dataset: INM-CM4-8, grid: gr1}
-          - {dataset: INM-CM5-0, grid: gr1}
-          - {dataset: IPSL-CM6A-LR} #concatinate error for tas
-          #- {dataset: KACE-1-0-G} #no tos data
-          #- {dataset: MCM-UA-1-0, grid: gn} #no siconc data
-          - {dataset: MIROC6, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-          - {dataset: MPI-ESM-1-2-HAM, grid: gn}
-          - {dataset: MPI-ESM1-2-HR, grid: gn}
-          - {dataset: MPI-ESM1-2-LR, grid: gn}
-          - {dataset: MRI-ESM2-0, grid: gn}
-          #- {dataset: NESM3, grid: gn} #no sftlf data 
-          - {dataset: NorCPM1, grid: gn, institute: NCC}
-          #- {dataset: NorESM2-LM, grid: gn, institute: NCC} #siconc: error in lat and lon
-          #- {dataset: NorESM2-MM, grid: gn, institute: NCC} #siconc: Can not concatenate
-          #- {dataset: SAM0-UNICON, grid: gn} #errors in siconc with lon
-          #- {dataset: TaiESM1, grid: gn} #less years available for tos
-          #- {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn} #no sftlf data
+          <<: *cmip6_Amon
     scripts:
       fig-3-3: &tsline_settings
         script: ipcc_ar6/tsline_blend.ncl
@@ -384,6 +284,8 @@ diagnostics:
         <<: *tas_settings_cmip5
         preprocessor: regrid_5_5
         additional_datasets:
+          #- {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+          #   tier: 2}
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
              tier: 2}
       tos:
@@ -410,9 +312,11 @@ diagnostics:
     variables:
       tasa: 
         <<: *tas_settings_cmip6
+        end_year: 2018
         preprocessor: regrid_5_5
         additional_datasets:
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
+          - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
           - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
           - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2,
              start_year: 1880}
@@ -422,7 +326,7 @@ diagnostics:
         script: ipcc_ar6/tsline_blend_collect.ncl
         ancestors: [tasa, 'fig_3_3_*/fig-3-3']
         start_year: 1850
-        end_year: 2017
+        end_year: 2018
         ref: ["HadCRUT5"]
         order: ["CMIP6_historical", "CMIP5_historical"]
         stat_shading: True

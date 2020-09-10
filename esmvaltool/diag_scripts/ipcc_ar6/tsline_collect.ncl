@@ -50,8 +50,8 @@ begin
   diag_script_base = basename(DIAG_SCRIPT)
 
   var_names = metadata_att_as_array(variable_info, "short_name")
-  ;var0 = variable_info[0]@short_name
-  var0 = "tas"
+  var0 = variable_info[0]@short_name
+  ;var0 = "tas"
   ind_tas = ind(var_names .eq. "tas")
   info_items = select_metadata_by_name(input_file_info, var0)
   units0 = info_items[0]@units
@@ -130,9 +130,11 @@ begin
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-    "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
+    "tsline_mm_tas_" + anom + "_stat.nc"
+    ;"tsline_mm_" + var0 + "_" + anom + "_stat.nc"
     ;"extent_" + var0 + "_Antarctic_September_1950-2014.nc"
   input_files := tostring(input_files)
+print(input_files)
 
   ; Filter out non-existing files
   input_files := input_files(ind(isfilepresent(input_files)))
