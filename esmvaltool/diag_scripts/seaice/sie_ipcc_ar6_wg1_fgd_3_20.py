@@ -88,7 +88,7 @@ def monthly_av(cubelist):
     return (aver_cubelist)
 
 
-def shuffle_period(cubelist, period, aver_n):
+def shuffle_period(cubelist, period):
 
     shuffled_cubelist = iris.cube.CubeList()
 
@@ -110,13 +110,12 @@ def shuffle_period(cubelist, period, aver_n):
             print('The years in the ctl experiment are not divisible by '+str(nyears)+'last '+str(ctl_yrs%nyears)+
                   ' years were not considered')
         data = cube.data
-        sub_shuf_cblst = iris.cube.CubeList()
+        sub_shuf_data = np.ma.zeros((nyears, n_rows))
+        n_coord = iris.coords.DimCoord(np.arange(n_rows), long_name='n', var_name='n')
         for row in range(n_rows):
-            sub_shuf_cb = iris.cube.Cube(data[row*nyears:(row*nyears + nyears)], long_name='shuffled snow cover extent', var_name='sce',
-                            units="10^6km2", attributes=cube.attributes, dim_coords_and_dims=[(time_coord, 0)])
-            sub_shuf_cb.add_aux_coord(iris.coords.AuxCoord(row, long_name='n', var_name='n'))
-            sub_shuf_cblst.append(sub_shuf_cb)
-        shuffled_cube = sub_shuf_cblst.merge_cube()
+            sub_shuf_data[:, row] = data[row*nyears:(row*nyears + nyears)]
+        shuffled_cube =iris.cube.Cube(sub_shuf_data, long_name='shuffled snow cover extent', var_name='sce',
+                            units="10^6km2", attributes=cube.attributes, dim_coords_and_dims=[(time_coord, 0), (n_coord, 1)])
         shuffled_cubelist.append(shuffled_cube)
 
     return (shuffled_cubelist)
@@ -153,7 +152,7 @@ def cubelist_averaging(cubelist, exp):
                         coord_n = cube.coord('n')
                 av_arr = np.average(arr, axis = 2)
                 averaged_cube = iris.cube.Cube(av_arr, long_name=cube.long_name, var_name= cube.var_name,
-                            units="10^6km2", dim_coords_and_dims=[(coord_n, 0), (cube.coord('time'), 2)])
+                            units="10^6km2", dim_coords_and_dims=[(coord_n, 1), (cube.coord('time'), 0)])
                 averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis'))
         else:
             for n,cube in enumerate(cubelist):
@@ -285,7 +284,7 @@ def main(cfg):
                 mod_sce_cubelist = calculate_sce(mod_cubelist)
                 mod_sce_cubelist = monthly_av(mod_sce_cubelist)
                 if exp == 'piControl':
-                    mod_sce_cubelist = shuffle_period(mod_sce_cubelist, cfg['main_period'], cfg['years_for_average'])
+                    mod_sce_cubelist = shuffle_period(mod_sce_cubelist, cfg['main_period'])
                 mod_sce_cubelist = ipcc_sea_ice_diag.n_year_mean(mod_sce_cubelist,n = cfg ['years_for_average'])
                 mod_sce_cubelist = ipcc_sea_ice_diag.substract_ref_period(mod_sce_cubelist, cfg['ref_period'])
                 ens_cube = cubelist_averaging(mod_sce_cubelist, exp)

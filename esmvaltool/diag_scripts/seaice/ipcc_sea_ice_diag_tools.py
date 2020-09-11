@@ -205,10 +205,10 @@ def n_year_mean(cubelist, n):
                                          var_name=cube.var_name, units=cube.units,
                                          attributes=cube.attributes, dim_coords_and_dims=[(dcoord, 0)])
         elif len(cube.data.shape) == 2:
-            data = np.asarray([np.average(cube.data[:, n * i:n * i + n], axis=1) for i in range(0, int(n_t / n))])
+            data = np.asarray([np.average(cube.data[n * i:n * i + n, :], axis=0) for i in range(0, int(n_t / n))])
             n_aver_cube =iris.cube.Cube(data, long_name=cube.long_name + ', ' + str(n) + 'y mean',
                                                  var_name=cube.var_name, units=cube.units, attributes=cube.attributes,
-                                                 dim_coords_and_dims=[(dcoord,0), (cube.coords()[0],1)])
+                                                 dim_coords_and_dims=[(dcoord,0), (cube.coords()[1],1)])
 
         n_aver_cubelist.append(n_aver_cube)
 
