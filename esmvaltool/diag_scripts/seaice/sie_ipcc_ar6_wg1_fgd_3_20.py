@@ -201,8 +201,12 @@ def calc_stats(cubelist, exp):
         for n,cube in enumerate(cubelist):
             cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='coll_axis', var_name='coll_axis'))
             cube.cell_methods = None
-        equalise_attributes(cubelist)
-        exp_cube = cubelist.merge_cube()
+            # I don't know why it works, but... Apparently otherwise it crushes with an error
+            # TypeError: int() argument must be a string, a bytes-like object or a number, not 'NoneType'
+            # Seriously, no idea why!!! Guess some iris bug
+        cblst = cubelist
+        equalise_attributes(cblst)
+        exp_cube = cblst.merge_cube()
         output_dic['mean'] = exp_cube.collapsed('coll_axis', iris.analysis.MEAN)
         output_dic['min'] = exp_cube.collapsed('coll_axis', iris.analysis.MIN)
         output_dic['max'] = exp_cube.collapsed('coll_axis', iris.analysis.MAX)
