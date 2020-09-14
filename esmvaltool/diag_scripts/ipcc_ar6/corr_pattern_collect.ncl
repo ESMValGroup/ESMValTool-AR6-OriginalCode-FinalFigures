@@ -228,6 +228,7 @@ begin
   ; For now just CMIP projects
   c_projects = str_match_ic(data_all&models@project, "CMIP")
   projects = get_unique_entries(c_projects)
+  projects = (/"CMIP3", "CMIP5", "CMIP6"/)
   n_var = dimsizes(data_all&vars)
 
   nr_projects = dimsizes(projects)
@@ -338,7 +339,7 @@ begin
   res_circ = True
   res_circ@gsMarkerIndex = 16
   res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
-  res_circ@gsMarkerSizeF = marker_size
+  res_circ@gsMarkerSizeF = 2 * marker_size
   res_circ@gsMarkerOpacityF = 0.4
 
   ; Resources for white markers below median
