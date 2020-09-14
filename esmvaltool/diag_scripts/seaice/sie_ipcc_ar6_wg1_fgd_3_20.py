@@ -132,7 +132,7 @@ def cubelist_averaging(cubelist, exp):
                     len_arr.append(1)
             if len(set(len_arr)) == 1:
                 for n, cube in enumerate(cubelist):
-                    cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
+                    cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis', bounds = [n-1, n+1]))
                 equalise_attributes(cubelist)
                 merged_cube = cubelist.merge_cube()
                 averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
@@ -141,10 +141,7 @@ def cubelist_averaging(cubelist, exp):
                 arr = np.ma.zeros((len(cube.coord('time').points), dim_len, len(cubelist)))
                 for n, cube in enumerate(cubelist):
                     if len_arr[n] < dim_len:
-                        if len_arr[n] > 1:
-                            arr[:, 0:len_arr[n], n] = cube.data
-                        else:
-                            arr[:,0,n] = cube.data
+                        arr[:, 0:len_arr[n], n] = cube.data
                         arr[:, len_arr[n]: dim_len, n] = np.ma.masked_all(
                                 (len(cube.coord('time').points), dim_len - len_arr[n]))
                     else:
@@ -153,7 +150,7 @@ def cubelist_averaging(cubelist, exp):
                 av_arr = np.average(arr, axis = 2)
                 averaged_cube = iris.cube.Cube(av_arr, long_name=cube.long_name, var_name= cube.var_name,
                             units="10^6km2", dim_coords_and_dims=[(coord_n, 1), (cube.coord('time'), 0)])
-                averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis'))
+                averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis', bounds = [-1, 1]))
         else:
             for n,cube in enumerate(cubelist):
                 cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
@@ -162,7 +159,7 @@ def cubelist_averaging(cubelist, exp):
             averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
     else:
         averaged_cube = cubelist[0]
-        averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis'))
+        averaged_cube.add_aux_coord(iris.coords.AuxCoord(0, long_name='ave_axis', var_name='ave_axis', bounds = [-1, 1]))
 
     return(averaged_cube)
 
@@ -199,14 +196,14 @@ def calc_stats(cubelist, exp):
         output_dic['number_models'] = len(cubelist)
     else:
         for n,cube in enumerate(cubelist):
-            cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='coll_axis', var_name='coll_axis'))
+            cube.remove_coord('ave_axis')
+            cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='coll_axis', var_name='coll_axis', bounds = [n - 1, n+1 ] ))
             cube.cell_methods = None
             # I don't know why it works, but... Apparently otherwise it crushes with an error
             # TypeError: int() argument must be a string, a bytes-like object or a number, not 'NoneType'
             # Seriously, no idea why!!! Guess some iris bug
-        cblst = cubelist
-        equalise_attributes(cblst)
-        exp_cube = cblst.merge_cube()
+        equalise_attributes(cubelist)
+        exp_cube = cubelist.merge_cube()
         output_dic['mean'] = exp_cube.collapsed('coll_axis', iris.analysis.MEAN)
         output_dic['min'] = exp_cube.collapsed('coll_axis', iris.analysis.MIN)
         output_dic['max'] = exp_cube.collapsed('coll_axis', iris.analysis.MAX)
