@@ -3653,8 +3653,11 @@ diagnostics:
       plot_refHadCRUT5_HadCRUT5mean: &plot_settings
         script: ar6ch3_hiatus/draw.ncl
         obs_dataset_pattern: HadCRUT5_mean
-        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5', 'trend_hiatus_posthiatus_5x5/composite_refHadCRUT5_HadCRUT5mean']
+        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5',
+                    'trend_hiatus_posthiatus_5x5/composite_refHadCRUT5_HadCRUT5mean']
 
+# Following part is unrelated to the figure, but to make a table that support the text.
+# Will take very long time.
       trendHiatusPosthiatus_refCowtanWay:
         <<: *trend_settings
         method_GMST: Cowtan2015

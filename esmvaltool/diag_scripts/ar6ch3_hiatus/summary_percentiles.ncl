@@ -21,6 +21,7 @@
 load "$diag_scripts/../interface_scripts/interface.ncl"
 
 load "$diag_scripts/ar6ch3_hiatus/functions.ncl"
+load "$diag_scripts/ar6ch3_hiatus/io_globalmean.ncl"
 
 begin
 
@@ -105,10 +106,13 @@ begin
           elseif (any(ens.eq."median")) then
             trend_obs = trend_obs_array(ind(ens.eq."median"))
           end if
+          delete(trend_obs_array)
+          delete(ens)
         else
           trend_obs = trend_obs_list[0]
         end if
         trend_obs = trend_obs * scale
+        delete(trend_obs_list)
       else
         continue
       end if
@@ -121,7 +125,7 @@ begin
       end if
 
       if (blending.eq."blended") then
-        hlist = "blended: method = "+blend_method+", "
+        hlist = "blended, "
       else
         hlist = "unblended, "
       end if
@@ -195,6 +199,15 @@ begin
       end if
       if (isvar("trend_cmip")) then
         delete(trend_cmip)
+      end if
+      if (isvar("weight_cmip5")) then
+        delete(weight_cmip5)
+      end if
+      if (isvar("weight_cmip6")) then
+        delete(weight_cmip6)
+      end if
+      if (isvar("weight_cmip")) then
+        delete(weight_cmip)
       end if
       if (isvar("path_obs")) then
         delete(path_obs)
