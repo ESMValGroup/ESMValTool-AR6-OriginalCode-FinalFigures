@@ -1258,6 +1258,7 @@ def make_difference_plots(
     short_name = metadata['short_name']
     dataset = metadata['dataset']
     ensemble = metadata['ensemble']
+    exp = metadata['exp']
     project = metadata['project']
 
     long_name = ' '.join([ short_name, dataset, ]) 
@@ -1298,11 +1299,11 @@ def make_difference_plots(
 
     # Add the sub plots to the figure.
     add_map_subplot(
-        221, cube221, linspace12, cmap='viridis', title='Detrended',
+        221, cube221, linspace12, cmap='viridis', title='Detrended '+exp,
         extend=extend)
     add_map_subplot(
         222, cube222, linspace12, cmap='viridis',
-        title='Historical',
+        title=exp + '(trend intact)',
         extend=extend)
     add_map_subplot(
         223,
@@ -1324,8 +1325,8 @@ def make_difference_plots(
     fig.suptitle(long_name + ' [' + units + ']', fontsize=14)
 
     # Determine image filename    
-    fn_list = ['Detrended', project, dataset, ensemble, short_name, 'quad_maps']
-    path = diagtools.folder(cfg['plot_dir']) + '_'.join(fn_list)
+    fn_list = ['Detrended', project, dataset, ensemble, exp, short_name, 'quad_maps']
+    path = diagtools.folder([cfg['plot_dir'], 'detrended_quad']) + '_'.join(fn_list)
     path = path.replace(' ', '') + image_extention
 
     # Saving files:
@@ -1579,6 +1580,8 @@ def calc_slr_full(cfg,
     gravity = 9.7963 # m /s^2
     # Performd SLR calculation for Climatology cube
     # If cube already exists, then just load the clim SLR data.
+    p_ref = 'default' #'2000m' #'default' #'SeaFloor' # 'default'
+
     if os.path.exists(output_fns['clim']):
         print ('loading from', output_fns['clim'])
         clim_cube = iris.load_cube(output_fns['clim'])
@@ -1616,10 +1619,17 @@ def calc_slr_full(cfg,
             # Calculuate climatological Dynamic height anomaly
             # max_dp is the maximum difference between layers, set to a very high value 
             # to avoid expensive interpolation.
-            gsdh_clim = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar)#[0], max_dp=1000.)
+            if  p_ref == 'SeaFloor':
+                seafloorpres = np.ma.masked_where(ctemp_bar.mask, pressure_bar).max()
+                gsdh_clim = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar, p_ref = seafloorpres)[0]
+            elif p_ref == '2000m':
+                ref_pressure = gsw.conversions.p_from_z(-2000., la)
+                gsdh_clim = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar, p_ref = ref_pressure)[0]
+            else:
+                gsdh_clim = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp_bar, pressure_bar)[0] 
 
             # Convert dynamic height into mm.
-            slr_clim[y, x] = gsdh_clim[0] * 1000. / gravity
+            slr_clim[y, x] = gsdh_clim * 1000. / gravity
 
         # Save climatological SLR cube as a netcdf.
         cube0 = thetao_cube[0, 0, :, :].copy()
@@ -1675,11 +1685,19 @@ def calc_slr_full(cfg,
 
             # Convert salinity to absolute salininty
             asal = gsw.conversions.SA_from_SP(psal, pressure, lo, la)
-
+          
             # Calculate Dynamic height anomaly   
-            gsdh_total = -1. * gsw.geo_strf_dyn_height(asal, ctemp, pressure, )[0]
-            #max_dp=1000.).sum()
-            gsdh_thermo = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure)[0] #, max_dp=1000.).sum()
+            if p_ref == 'SeaFloor':
+                seafloorpres = np.ma.masked_where(ctemp.mask, pressure).max()
+                gsdh_total = -1. * gsw.geo_strf_dyn_height(asal, ctemp, pressure, p_ref = seafloorpres)[0]
+                gsdh_thermo = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure, p_ref = seafloorpres)[0]
+            elif p_ref == '2000m':
+                ref_pressure = gsw.conversions.p_from_z(-2000., la) 
+                gsdh_total = -1. * gsw.geo_strf_dyn_height(asal, ctemp, pressure, p_ref = ref_pressure)[0]
+                gsdh_thermo = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure, p_ref = ref_pressure)[0]
+            else:
+                gsdh_total = -1. * gsw.geo_strf_dyn_height(asal, ctemp, pressure, )[0]
+                gsdh_thermo = -1. * gsw.geo_strf_dyn_height(asal_bar, ctemp, pressure)[0]
 
             # Convert to mm and calculate anomaly relative to clim data
             gsdh_total = gsdh_total * 1000. / gravity - slr_clim[y, x]
@@ -1689,9 +1707,10 @@ def calc_slr_full(cfg,
             slr_total[t, y, x] = gsdh_total
             slr_thermo[t, y, x] = gsdh_thermo
             count += 1
-            print(count, (t, y, x), 'performing 2D SLR:',
-                  gsdh_total,
-                  gsdh_thermo)
+            if t == 0:
+                print(count, (t, y, x), 'performing 2D SLR:',
+                    gsdh_total,
+                    gsdh_thermo)
 
     # Save SLR data as a cube and then a netcdf..
     cube0 = thetao_cube[:, 0, :, :].copy()
@@ -1725,6 +1744,45 @@ def calc_slr_full(cfg,
     iris.save(cube2, output_fns['halo'])
 
     return output_fns['total'], output_fns['thermo'], output_fns['halo']
+
+
+def calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type):
+    """
+    Calculate SLR time series.
+    """
+    work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
+    slr_ts_fn = work_dir + '_'.join([project, dataset, exp, ensemble, slr_type, 'timeseries'])+'.nc'
+    if os.path.exists(slr_ts_fn):
+        return slr_ts_fn
+
+    # Load data and calculate average.
+    slr_cube = iris.load_cube(slr_fn)
+    area_cube = iris.load_cube(areacella_fn)
+
+    grid_areas = da.tile(area_cube.core_data(), [slr_cube.shape[0], 1, 1])
+    slr_cube = slr_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=grid_areas)
+    
+    # Save NetCDF
+    iris.save(slr_cube, slr_ts_fn)
+
+    # Make plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    times = diagtools.cube_time_to_float(slr_cube)
+    plt.plot(times, slr_cube.data, color='red', )
+    plt.title(' '.join([project, dataset, exp, ensemble, slr_type, 'timeseries']))
+
+    plt.xlabel('Year')
+    plt.ylabel('Change in Sea Level, mm')
+    plt.axhline(0., c = 'k', ls=':' )
+
+    path = diagtools.folder([cfg['plot_dir'], 'SLR_timeseries'])
+    path += '_'.join([project, dataset, exp, ensemble, slr_type, 'timeseries'])+'.png'
+    print('Saving figure:', path)
+    plt.savefig(path)
+    plt.close()
+
+    return slr_ts_fn
 
 
 def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact'):
@@ -1858,10 +1916,7 @@ def mpi_detrend(iter_pack, cubedata, decimal_time, slopes, intercepts):
         return [], index
 
     line = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
-    print(iter_pack,line)
-
     return index, np.array(line)
-
 
 def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     """
@@ -1914,7 +1969,7 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     count = 0
 
 
-    parrallel = True
+    parrallel = False
     if not parrallel:    
         for index, arr in np.ndenumerate(dummy[0]): 
             if np.ma.is_masked(arr): continue
@@ -1980,6 +2035,19 @@ def guess_PI_ensemble(dicts, keys, ens_pos = None):
             print("guess_PI_ensemble: full match", index, keys, index[ens_pos] )
             return index[ens_pos]
     print('Did Not find pi control ensemble:', keys, ens_pos)
+    assert 0
+
+def guess_areacello_fn(dicts, keys):
+    """
+    Take a punt at the areacello filename.
+    """
+    for index, value in dicts.items():
+        intersection = set(index) & set(keys)
+
+        if len(intersection) == len(keys):
+            print("guess_areacello_fn: full match", index, keys, value)
+            return value
+    print('Did Not find Areacello:', keys)
     assert 0
 
 
@@ -2235,7 +2303,7 @@ def main(cfg):
 
     print('\n\n\ncreation loop')
     for filename in sorted(metadatas):
-        print('creation loop', filename,':', metadatas[filename])
+        #print('creation loop', filename,':', metadatas[filename])
         exp = metadatas[filename]['exp'] 
         variable_group = metadatas[filename]['variable_group']
         short_name = metadatas[filename]['short_name']
@@ -2244,7 +2312,7 @@ def main(cfg):
         project = metadatas[filename]['project']
         print((project, dataset, exp, ensemble, short_name))
         file_dict[(project, dataset, exp, ensemble, short_name)] = filename
-   
+
     print('\nCalculating trend')
     # Calculated trend.
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
@@ -2268,7 +2336,6 @@ def main(cfg):
 
 
     print('\n-------------\nCalculate Sea Level Rise')
-
     slr_fns = {}
     for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
         detrended_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
@@ -2296,9 +2363,13 @@ def main(cfg):
         slr_fns[(project, dataset, exp, ensemble, 'slr_halo')] = slr_halo_fn
 
         # Calculate time series?
-        volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
+        areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
+        for slr_fn, slr_type in zip([slr_total_fn, slr_thermo_fn, slr_halo_fn], ['slr_total', 'slr_thermo', 'slr_halo']):
+            slr_ts_fn = calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type)
+            slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts')] = slr_ts_fn
 
-    assert 0
+
+    #    assert 0
           
     print('\nCalculate ocean heat content - trend intact')
     for (project, dataset, exp, ensemble, short_name), fn in file_dict.items():
