@@ -221,7 +221,7 @@ begin
       refdata = convert_units(refdata, "degC")
       ref_mon = convert_units(ref_mon, "degC")
     end if
-  elseif (var0.eq."so") then
+  elseif (var0.eq."sos") then
     refdata = refdata * 1000.
   end if
 
@@ -242,7 +242,7 @@ begin
     diff@res_cnLevels = ispan(-6, 6, 1)
   elseif (var0 .eq. "pr") then
     diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
-  elseif (var0 .eq. "so") then
+  elseif any(var0 .eq. (/"sos", "so"/)) then
     diff@units = "0.001"
     diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
     ;diff@res_cnLevels = ispan(-8, 8, 1)
@@ -269,7 +269,9 @@ begin
         absdiff_i(ii,:,:) = abs(diff_i(ii,:,:))
 
         ; root mean square error
-        rmsdiff_i(ii,:,:) = calculate_metric(data_mon(ii,:,:,:), ref_mon, "RMSDxy")
+        if (plot_rms_diff) then
+          rmsdiff_i(ii,:,:) = calculate_metric(data_mon(ii,:,:,:), ref_mon, "RMSDxy")
+        end if
 
         ; relative difference
         ; replace "epsilon" values with missing value
@@ -493,9 +495,9 @@ begin
       pal5 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                                 + "ipcc-ar6_temperature_seq.rgb")
     end if
-  elseif (var0.eq."so") then
-    mmdata@res_cnLevels = ispan(310, 370, 5) * 0.1
-    ;mmdata@res_cnLevels = ispan(26, 37, 1)
+  elseif (var0.eq."sos" .or. var0 .eq. "so") then
+    ;mmdata@res_cnLevels = ispan(310, 370, 5) * 0.1
+    mmdata@res_cnLevels = ispan(26, 37, 1)
 
     pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
                              + "ipcc-ar6_misc_seq_1.rgb")
