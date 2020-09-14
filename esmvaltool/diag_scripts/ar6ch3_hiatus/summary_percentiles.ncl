@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200914 kosaka_yu: revised to account for weighting in percentiles.
 ;    20191203 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -19,11 +20,6 @@
 
 load "$diag_scripts/../interface_scripts/interface.ncl"
 
-;load "$diag_scripts/shared/statistics.ncl"
-;load "$diag_scripts/shared/plot/style.ncl"
-;load "$diag_scripts/shared/plot/contour_maps.ncl"
-;load "$diag_scripts/shared/plot/contourplot.ncl"
-
 load "$diag_scripts/ar6ch3_hiatus/functions.ncl"
 
 begin
@@ -34,7 +30,6 @@ begin
 
   input_dirs = diag_script_info@input_files + "/"
   ndirs = dimsizes(input_dirs)
-;print (input_dirs)
   output_dir = config_user_info@plot_dir + "/"
   system("mkdir -p "+output_dir)
   system("rm -f "+output_dir+"percentiles_GMSTtrend_hiatus_*.txt")
@@ -54,60 +49,66 @@ begin
         masking = "unmasked"
         blending = "unblended"
       end if
-    
-      path_cmip5 = input_dirs(n)+"trendGMST_"+blending+"_"+masking+"_hiatus_cmip5.nc"
-      if (fileexists(path_cmip5)) then
-        f = addfile(path_cmip5, "r")
-        trend_cmip5 = f->trend
-        trend_cmip5 = trend_cmip5 * scale
+
+      if (blending.eq."blended") then
+        path_cmip5 = input_dirs(n)+"trendGMST_"+masking+"_CMIP5.txt"
+        path_cmip6 = input_dirs(n)+"trendGMST_"+masking+"_CMIP6.txt"
+      else
+        path_cmip5 = input_dirs(n)+"trendGSAT_"+masking+"_CMIP5.txt"
+        path_cmip6 = input_dirs(n)+"trendGSAT_"+masking+"_CMIP6.txt"
       end if
-      path_cmip6 = input_dirs(n)+"trendGMST_"+blending+"_"+masking+"_hiatus_cmip6.nc"
+      if (fileexists(path_cmip5)) then
+        trend_cmip5_list = read_GMtrend_as_list(path_cmip5)
+        trend_cmip5 = list_to_array(trend_cmip5_list)
+        trend_cmip5 = trend_cmip5 * scale
+        weight_cmip5 = trend_cmip5
+        weight_cmip5 = 0.
+        do ii = 0, ListCount(trend_cmip5_list)-1
+          esize = num(trend_cmip5_list[ii]@dataset.eq.metadata_att_as_array(trend_cmip5_list, "dataset"))
+          weight_cmip5(ii) = 1./tofloat(esize)
+        end do
+        delete(trend_cmip5_list)
+      end if
       if (fileexists(path_cmip6)) then
-        f = addfile(path_cmip6, "r")
-        trend_cmip6 = f->trend
+        trend_cmip6_list = read_GMtrend_as_list(path_cmip6)
+        trend_cmip6 = list_to_array(trend_cmip6_list)
         trend_cmip6 = trend_cmip6 * scale
+        weight_cmip6 = trend_cmip6
+        weight_cmip6 = 0.
+        do ii = 0, ListCount(trend_cmip6_list)-1
+          esize = num(trend_cmip6_list[ii]@dataset.eq.metadata_att_as_array(trend_cmip6_list, "dataset"))
+          weight_cmip6(ii) = 1./tofloat(esize)
+        end do
+        delete(trend_cmip6_list)
       end if
 
-      if (.not.isvar("obs_dataset")) then
-        if (isvar("trend_cmip6")) then
-          if (isatt(trend_cmip6, "mask_reference")) then
-            obs_dataset = trend_cmip6@mask_reference
-          end if
-        elseif (isvar("trend_cmip5")) then
-          if (isatt(trend_cmip5, "mask_reference")) then
-            obs_dataset = trend_cmip5@mask_reference
+      diagnostic = str_get_field(input_dirs(n), str_fields_count(input_dirs(n), "/"), "/")
+      ipos = str_index_of_substr(diagnostic, "mask", -1) + 4
+      if (ismissing(ipos)) then
+        ipos = str_index_of_substr(diagnostic, "ref", -1) + 3
+      end if
+      if (ismissing(ipos)) then
+        ipos = str_index_of_substr(diagnostic, "_", -1) + 1
+      end if
+      obs_dataset = str_get_field(str_insert(diagnostic, " ", ipos), 2, " ")
+      delete(ipos)
+      delete(diagnostic)
+        
+      path_obs = input_dirs(n)+"trendGMST_"+obs_dataset+"_OBS.txt"
+      if (fileexists(path_obs)) then
+        trend_obs_list = read_GMtrend_as_list(path_obs)
+        if (ListCount(trend_obs_list).gt.1) then
+          trend_obs_array = list_to_array(trend_obs_list)
+          ens = metadata_att_as_array(trend_obs_list, "ensemble")
+          if (any(ens.eq."mean")) then
+            trend_obs = trend_obs_array(ind(ens.eq."mean"))
+          elseif (any(ens.eq."median")) then
+            trend_obs = trend_obs_array(ind(ens.eq."median"))
           end if
         else
-          continue
+          trend_obs = trend_obs_list[0]
         end if
-      end if
-
-      blend_method = ""
-      if (blending .eq. "blended") then
-        if (isvar("trend_cmip6")) then
-          if (isatt(trend_cmip6, "blend_method")) then
-            blend_method = trend_cmip6@blend_method
-          end if
-        elseif (isvar("trend_cmip5")) then
-          if (isatt(trend_cmip5, "blend_method")) then
-            blend_method = trend_cmip5@blend_method
-          end if
-        end if
-      end if
-      
-      if (isvar("obs_dataset")) then
-        path_obs = input_dirs(n)+"trendGMST_"+blending+"_"+masking+"_hiatus_"+obs_dataset+".nc"
-        if (fileexists(path_obs)) then
-          f = addfile(path_obs, "r")
-          trend_obs = f->trend
-          trend_obs = trend_obs * scale
-          if (dimsizes(trend_obs).gt.1) then
-            tmp = trend_obs(0)
-            delete(trend_obs)
-            trend_obs = tmp
-            delete(tmp)
-          end if
-        end if
+        trend_obs = trend_obs * scale
       else
         continue
       end if
@@ -136,44 +137,45 @@ begin
         write_table(ofile, "a", [/hlist/], "%s")
         if (isvar("trend_cmip6")) then
           hlist = "cmip6:   "+sprintf(fmt, min(trend_cmip6))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.025))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.0375))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.05))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.1))+" " \
-                             +sprintf(fmt, dim_median(trend_cmip6))+" " \
-                             +sprintf(fmt, avg(trend_cmip6))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.9))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.95))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip6, 0.975))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.025))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.0375))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.05))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.1))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.5))+" " \
+                             +sprintf(fmt, weighted_mean(trend_cmip6, weight_cmip6))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.9))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.95))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip6, weight_cmip6, 0.975))+" " \
                              +sprintf(fmt, max(trend_cmip6))
           write_table(ofile, "a", [/hlist/], "%s")
         end if
         if (isvar("trend_cmip5")) then
           hlist = "cmip5:   "+sprintf(fmt, min(trend_cmip5))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.025))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.0375))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.05))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.1))+" " \
-                             +sprintf(fmt, dim_median(trend_cmip5))+" " \
-                             +sprintf(fmt, avg(trend_cmip5))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.9))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.95))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip5, 0.975))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.025))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.0375))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.05))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.1))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.5))+" " \
+                             +sprintf(fmt, weighted_mean(trend_cmip5, weight_cmip5))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.9))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.95))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip5, weight_cmip5, 0.975))+" " \
                              +sprintf(fmt, max(trend_cmip5))
           write_table(ofile, "a", [/hlist/], "%s")
         end if
         if (isvar("trend_cmip5").and.isvar("trend_cmip6")) then
           trend_cmip = array_append_record(trend_cmip5, trend_cmip6, 0)
+          weight_cmip = array_append_record(weight_cmip5, weight_cmip6, 0)
           hlist = "cmip5+6: "+sprintf(fmt, min(trend_cmip))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.025))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.0375))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.05))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.1))+" " \
-                             +sprintf(fmt, dim_median(trend_cmip))+" " \
-                             +sprintf(fmt, avg(trend_cmip))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.9))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.95))+" " \
-                             +sprintf(fmt, percentile_val(trend_cmip, 0.975))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.025))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.0375))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.05))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.1))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.5))+" " \
+                             +sprintf(fmt, weighted_mean(trend_cmip, weight_cmip))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.9))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.95))+" " \
+                             +sprintf(fmt, weighted_percentile(trend_cmip, weight_cmip, 0.975))+" " \
                              +sprintf(fmt, max(trend_cmip))
           write_table(ofile, "a", [/hlist/], "%s")
         end if
