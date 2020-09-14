@@ -3631,7 +3631,7 @@ diagnostics:
         additional_datasets: *tasaga_datasets
 
     scripts:
-      trendHiatusPosthiatus_blendHadCRUT5_maskHadCRUT5: &trend_settings
+      trendHiatusPosthiatus_refHadCRUT5: &trend_settings
         script: ar6ch3_hiatus/trend.ncl
         method_GMST: HadCRUT5
         mask_ref_dataset_GMST: HadCRUT5
@@ -3641,7 +3641,7 @@ diagnostics:
         syear_post: 2012
         eyear_post: 2026
         method_trend: least_square
-      composite_blendHadCRUT5_maskHadCRUT5_HadCRUT5mean: &composite_settings
+      composite_refHadCRUT5_HadCRUT5mean: &composite_settings
         script: ar6ch3_hiatus/composite.ncl
         blend_globalmean: True
         mask_globalmean: True
@@ -3649,144 +3649,117 @@ diagnostics:
         mask_pattern: True
         composite_threshold: HadCRUT5mean
         composite_dataset: cmip6
-        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendHadCRUT5_maskHadCRUT5']
-      plot_blendHadCRUT5_maskHadCRUT5_HadCRUT5mean: &plot_settings
+        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5']
+      plot_refHadCRUT5_HadCRUT5mean: &plot_settings
         script: ar6ch3_hiatus/draw.ncl
-        obs_dataset_pattern: HadCRUT5mean
-        pdf_individual_cmip: True
-        pdf_style: "histogram"
-        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendHadCRUT5_maskHadCRUT5', 'trend_hiatus_posthiatus_5x5/composite_blendHadCRUT5_maskHadCRUT5_HadCRUT5mean']
+        obs_dataset_pattern: HadCRUT5_mean
+        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5', 'trend_hiatus_posthiatus_5x5/composite_refHadCRUT5_HadCRUT5mean']
 
-#      trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5:
-#        <<: *trend_settings
-#        method_GMST: Cowtan2015
-#      composite_blendCowtan2015_maskHadCRUT5_obsmax:
-#        <<: *composite_settings
-#        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5']
-#      plot_blendCowtan2015_maskHadCRUT5_obsmax:
-#        <<: *plot_settings
-#        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendCowtan2015_maskHadCRUT5_obsmax']
-#      composite_blendCowtan2015_maskHadCRUT5_obsmean:
-#        <<: *composite_settings
-#        composite_threshold: mean
-#        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5']
-#      plot_blendCowtan2015_maskHadCRUT5_obsmean: 
-#        <<: *plot_settings
-#        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendCowtan2015_maskHadCRUT5_obsmean']
-#      composite_blendCowtan2015_maskHadCRUT5_HadCRUT5mean:
-#        <<: *composite_settings
-#        composite_threshold: HadCRUT5mean
-#        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5']
-#      plot_blendCowtan2015_maskHadCRUT5_HadCRUT5mean:
-#        <<: *plot_settings
-#        ancestors: ['trend_hiatus_posthiatus_5x5/composite_blendCowtan2015_maskHadCRUT5_HadCRUT5mean']
-
-#      trendHiatusPosthiatus_blendCowtan2015_maskCowtanWay:
-#        <<: *trend_settings
-#        method_GMST: Cowtan2015
-#        mask_ref_dataset_GMST: CowtanWay
-#        do_post: False
-#        
-#      trendHiatusPosthiatus_blendNOAAGlobalTemp_maskNOAAGlobalTemp:
-#        <<: *trend_settings
-#        method_GMST: NOAAGlobalTemp
-#        mask_ref_dataset_GMST: NOAAGlobalTemp
-#        do_post: False
+      trendHiatusPosthiatus_refCowtanWay:
+        <<: *trend_settings
+        method_GMST: Cowtan2015
+        mask_ref_dataset_GMST: CowtanWay
+        do_post: False
         
-#  trend_hiatus_posthiatus_2x2:
-#    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 2x2 observations
-#    variables: 
-#      sftlf:
-#        <<: *sftlf_setting
+      trendHiatusPosthiatus_refNOAAGlobalTemp:
+        <<: *trend_settings
+        method_GMST: NOAAGlobalTemp
+        mask_ref_dataset_GMST: NOAAGlobalTemp
+        do_post: False
+        
+  trend_hiatus_posthiatus_2x2:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 2x2 observations
+    variables: 
+      sftlf:
+        <<: *sftlf_setting
+        preprocessor: regrid2x2
+#      sftof: &sftof_setting # No file works
+#        <<: *sftof_setting
 #        preprocessor: regrid2x2
-##      sftof: &sftof_setting # No file works
-##        <<: *sftof_setting
-##        preprocessor: regrid2x2
-#      tas:
-#        <<: *tas_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      tos:
-#        <<: *tos_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      sic:
-#        <<: *sic_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      siconc:
-#        <<: *siconc_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      siconca:
-#        <<: *siconca_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      tasa:
-#        <<: *tasa_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      tasaga:
-#        <<: *tasaga_setting
-#        end_year: 2012
-#    scripts:
-#      trendHiatusPosthiatus_blendGISTEMP_maskGISTEMP:
-#        <<: *trend_settings
-#        method_GMST: GISTEMP
-#        mask_ref_dataset_GMST: GISTEMP
-#        do_post: False
-#        
-#  trend_hiatus_posthiatus_1x1:
-#    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
-#    variables: 
-#      sftlf:
-#        <<: *sftlf_setting
+      tas:
+        <<: *tas_setting
+        preprocessor: regrid2x2
+        end_year: 2012
+      tos:
+        <<: *tos_setting
+        preprocessor: regrid2x2
+        end_year: 2012
+      sic:
+        <<: *sic_setting
+        preprocessor: regrid2x2
+        end_year: 2012
+      siconc:
+        <<: *siconc_setting
+        preprocessor: regrid2x2
+        end_year: 2012
+      siconca:
+        <<: *siconca_setting
+        preprocessor: regrid2x2
+        end_year: 2012
+      tasa:
+        <<: *tasa_setting
+        preprocessor: regrid2x2
+        end_year: 2012
+      tasaga:
+        <<: *tasaga_setting
+        end_year: 2012
+    scripts:
+      trendHiatusPosthiatus_refGISTEMP:
+        <<: *trend_settings
+        method_GMST: GISTEMP
+        mask_ref_dataset_GMST: GISTEMP
+        do_post: False
+
+  trend_hiatus_posthiatus_1x1:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables: 
+      sftlf:
+        <<: *sftlf_setting
+        preprocessor: regrid1x1
+#      sftof: &sftof_setting # No file works
+#        <<: *sftof_setting
 #        preprocessor: regrid1x1
-##      sftof: &sftof_setting # No file works
-##        <<: *sftof_setting
-##        preprocessor: regrid1x1
-#      tas:
-#        <<: *tas_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      tos:
-#        <<: *tos_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      sic:
-#        <<: *sic_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      siconc:
-#        <<: *siconc_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      siconca:
-#        <<: *siconca_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      tasa:
-#        <<: *tasa_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      tasaga:
-#        <<: *tasaga_setting
-#        end_year: 2012
-#    scripts:
-#      trendHiatusPosthiatus_blendBerkeleyEarth_maskBerkeleyEarth:
-#        <<: *trend_settings
-#        method_GMST: BerkeleyEarth
-#        mask_ref_dataset_GMST: BerkeleyEarth
-#        do_post: False
-#        
-#  summary_GMSTtrend_hiatus:
-#    description: Compare percentiles of cmip GMST trend for hiatus with obs
-#    scripts:
-#      percentiles:
-#        script: ar6ch3_hiatus/summary_percentiles.ncl
-#        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendHadCRUT5_maskHadCRUT5']
-#                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendCowtan2015_maskHadCRUT5',
-#                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendCowtan2015_maskCowtanWay',
-#                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_blendNOAAGlobalTemp_maskNOAAGlobalTemp',
-#                    'trend_hiatus_posthiatus_2x2/trendHiatusPosthiatus_blendGISTEMP_maskGISTEMP',
-#                    'trend_hiatus_posthiatus_1x1/trendHiatusPosthiatus_blendBerkeleyEarth_maskBerkeleyEarth']
+      tas:
+        <<: *tas_setting
+        preprocessor: regrid1x1
+        end_year: 2012
+      tos:
+        <<: *tos_setting
+        preprocessor: regrid1x1
+        end_year: 2012
+      sic:
+        <<: *sic_setting
+        preprocessor: regrid1x1
+        end_year: 2012
+      siconc:
+        <<: *siconc_setting
+        preprocessor: regrid1x1
+        end_year: 2012
+      siconca:
+        <<: *siconca_setting
+        preprocessor: regrid1x1
+        end_year: 2012
+      tasa:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        end_year: 2012
+      tasaga:
+        <<: *tasaga_setting
+        end_year: 2012
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        do_post: False
+        
+  summary_GMSTtrend_hiatus:
+    description: Compare percentiles of cmip GMST trend for hiatus with obs
+    scripts:
+      percentiles:
+        script: ar6ch3_hiatus/summary_percentiles.ncl
+        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5',
+                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refCowtanWay',
+                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refNOAAGlobalTemp',
+                    'trend_hiatus_posthiatus_2x2/trendHiatusPosthiatus_refGISTEMP',
+                    'trend_hiatus_posthiatus_1x1/trendHiatusPosthiatus_refBerkeleyEarth']
