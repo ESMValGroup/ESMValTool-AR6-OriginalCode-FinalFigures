@@ -78,6 +78,11 @@ begin
   end_year = max(metadata_att_as_array(info_items, "end_year"))
   all_years = ispan(start_year, end_year, 1)
 
+
+  ; ------------------------------------------------------------------
+  ; Calculation of standard deviation
+  ; ------------------------------------------------------------------
+
   ; Create model array
   model_arr = new((/dim_MOD, dimsizes(A_ref&lat)/), float)
   model_arr!0 = "model"
@@ -93,11 +98,25 @@ begin
 
     ; Convert units for plotting (if required)
     if (isatt(diag_script_info, "plot_units")) then
-      A0 = convert_units(A0, diag_script_info@plot_units)
+      if (info_items[imod]@short_name .ne. "tasa" .and. \
+          info_items[imod]@units .ne. diag_script_info@plot_units) then
+        A0 = convert_units(A0, diag_script_info@plot_units)
+      end if
     end if
+
+;    ; detrending all timeseries
+;    ;if(info_items[imod]@project .eq. "OBS") then
+    A0_detrend = dtrend_quadratic_msg_n(A0, False, False, 0)
+    ;A0_detrend@_FillValue = 1.e20
+
+    
+    A0_detrend = where(A0_detrend.gt.1.e36, A0_detrend@_FillValue, A0_detrend)
+
+    A0 = (/A0_detrend/)
 
     procmod = dim_avg_Wrap(A0)
     delete(A0)
+    delete(A0_detrend)
 
     A0_timavg = time_operations(procmod, -1, -1, "average", "yearly", True)
     delete(procmod)
@@ -105,6 +124,9 @@ begin
     ;; calculate zonal standard deviation
     A0_stddev = dim_stddev_n_Wrap(A0_timavg,0)
     delete(A0_timavg)
+    if(any(A0_stddev.eq."-nan")) then
+      A0_stddev = where(A0_stddev.eq."-nan", A0_stddev@_FillValue, A0_stddev)
+    end if
 
     if (dimsizes(A0_stddev&lat).ne.dimsizes(A_ref&lat)) then
       dnames = getVarDimNames(A0_stddev)
@@ -124,8 +146,24 @@ begin
 
   end do
 
+  ; ------------------------------------------------------------------
+  ;Calculate multi model mean and stddev
+  ; ------------------------------------------------------------------
+  
+  model_arr_stddev = new((/4, dimsizes(A_ref&lat)/), float)
+  model_arr_stddev!1 = "lat"
+  model_arr_stddev&lat = A_ref&lat
 
+  model_arr_stddev(0, :) = dim_avg_n_Wrap(model_arr, 0)
+  model_arr_stddev(1, :) = dim_stddev_n_Wrap(model_arr, 0)
+  model_arr_stddev(2, :) = model_arr_stddev(0, :) - model_arr_stddev(1, :)
+  model_arr_stddev(3, :) = model_arr_stddev(0, :) + model_arr_stddev(1, :)
+
+
+  ; ------------------------------------------------------------------
   ; Output to NetCDF
+  ; ------------------------------------------------------------------
+
   out_path = config_user_info@work_dir
   system("mkdir -p " + out_path)
   out_path = out_path + var0 + "_std_dev_zonmean.nc"
@@ -134,6 +172,11 @@ begin
   model_arr@var = var0
   ncdf_outfile = ncdf_write(model_arr, out_path)
 
+
+  ; ------------------------------------------------------------------
+  ; Plotting
+  ; ------------------------------------------------------------------
+
   ; Define workstation
   outfile = config_user_info@plot_dir + var0 + "_std_dev_zonmean.nc" 
   wks = gsn_open_wks(file_type, outfile)
@@ -141,7 +184,8 @@ begin
   ; Set resources
   res = True
 
-  res@tiMainString = "Zonal standard deviation ~C~~Z75~" + variable_info[0]@long_name
+  ;restiMainString = "Zonal standard deviation ~C~~Z75~" + variable_info[0]@long_name
+  res@tiMainString = "Variability of Near-Surface Air Temperature"
   res@tiXAxisString = "Latitude"
 
   if (model_arr@units .eq. "degC") then
@@ -151,7 +195,7 @@ begin
   end if
   res@tiYAxisString = "(" + units + ")"
 
-  xy_line(wks, model_arr, model_arr&lat, 0, res, info_items)
+  xy_line(wks, model_arr, model_arr&lat, model_arr_stddev, res, info_items)
 
   log_info(" wrote " + outfile + "." + file_type)
 
