@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20200916 kosaka_yu: revised.
 ;    20191120 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -299,140 +300,175 @@ begin
 
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                 "sam_millenium")
+  dummy = new(500, "graphic")
+  idummy = 0
   
   rests := True
-;  rests@xyMonoLineColor   = False
-;  rests@gsnYRefLine       = 0.
-  rests@tmYLLabelFontHeightF = 0.01
-  rests@tmXBLabelFontHeightF = 0.01
+  rests@tmYLLabelFontHeightF = 0.015
+  rests@tmYRLabelFontHeightF = rests@tmYLLabelFontHeightF
+  rests@tmXBLabelFontHeightF = 0.015
   rests@gsnDraw           = False
   rests@gsnFrame          = False
-;  rests@gsnMaximize       = True
   rests@trXMinF           = tofloat(syear)
   rests@trXMaxF           = tofloat(eyear)
   rests@tmXTOn            = False
-  rests@tmYLMode          = "Manual"
-  rests@tmYLTickSpacingF  = 2.
-  rests@tmYLTickStartF    = -4.
-  rests@tmYLTickEndF      = 4.
-  rests@tmYRMode          = rests@tmYLMode
-  rests@tmYRTickSpacingF  = rests@tmYLTickSpacingF
-  rests@tmYRTickStartF    = rests@tmYLTickStartF
-  rests@tmYRTickEndF      = rests@tmYLTickEndF
+  rests@tmYLMode          = "Explicit"
+
+  dy1 = -4.
+  dy2 = -10.
+  rests@tmYLValues = (/-12, -10, -8, -6, -4, -2, 0, 2/)
+  rests@tmYLLabels = (/"-2", "0", "2", "4", "-4", "-2", "0", "2"/)
+  rests@tmYLMinorValues = (/-14., -13.5, -13., -12.5, -12., -11.5, -11., -10.5, -10, \
+                            -9.5, -9, -8.5, -8, -7.5, -7., -6.5, \
+                            -4., -3.5, -3., -2.5, -2., -1.5, -1., -0.5, 0., \
+                            0.5, 1., 1.5, 2., 2.5, 3., 3.5, 4. /)
+  rests@tmYRMode           = rests@tmYLMode
+  rests@tmYUseLeft         = False
+  rests@tmYRLabelsOn       = True
+  rests@tmYRValues = (/-8, -6, -4, -2, 0/)
+  rests@tmYRLabels = (/"-4", "-2", "0", "2", "4"/)
+  rests@tmYRMinorValues = (/-8., -7.5, -7., -6.5, -6., -5.5, -5., -4.5, -4., -3.5, -3., \
+                            -2.5, -2., -1.5, -1., -0.5, 0./)
   rests@vpWidthF          = 0.6
   rests@vpHeightF         = 0.7
   rests@tiMainFontHeightF = 0.015
   rests@tiMainOffsetYF = -0.008
 
   rests@xyDashPattern     = 0
-  rests@xyLineThicknessF = 0.5
+  rests@xyLineThicknessF  = 0.5
+  rests@xyLineColor       = "transparent"
 
-  restsL = rests
-  restsL@trYMaxF           = 3.5 ;2.
-  restsL@trYMinF           = -13.
-  restsL@xyLineColor       = sam_abram@color
-  restsL@tiMainString = "SAM indices in the last millenium"
-  restsR = rests
-  restsR@trYMaxF           = 7.5 ;6.
-  restsR@trYMinF           = -9.
-  restsR@xyLineColor       = sam_villalba@color
-  restsR2 = rests
-  restsR2@trYMaxF           = 13.5 ;12.
-  restsR2@trYMinF           = -3.
-  colors = new((/nintegrations, 3/), "float")
-  color_cmip5 = (/0.3, 0.3, 0.3/)
-  do ii = 0, nintegrations-1
-    if (cmip_phase(ii).eq."CMIP5") then
-      colors(ii, :) = color_cmip5
-    elseif (cmip_phase(ii).eq."CMIP6") then
-      colors(ii, :) = get_color(model_name(ii))
-    end if
-  end do
-  ;restsR2@xyLineColor       = "grey"
-  restsR2@xyLineColors      = colors
-  restsR2@xyLineOpacityF    = 0.4
-  restsR2@tmYRTickEndF      = 4.
-
-  plot = gsn_csm_xy3(wks, sam_abram_runmean&time, sam_abram_runmean, sam_villalba_runmean, sam_runmean, restsL, restsR, restsR2)
-
-  dummy = new(nintegrations+18, "graphic")
-  polyres = True
-  polyres@gsLineThicknessF = 0.5
-  polyres@gsLineColor       = "grey30"
-  polyres@gsLineDashPattern = 1
+  rests@tiMainString = "SAM indices in the last millenium"
+  rests@tiMainFontHeightF = 0.02
+  rests@trYMaxF           = 3.5 ;2.
+  rests@trYMinF           = -13.
+  
+  plot = gsn_csm_xy(wks, (/syear, eyear/), (/0, 0/), rests)
 
   txres := True
   txres@txFontHeightF = 0.015
+  txres@txJust = "CenterCenter"
+  txres@txAngleF = 90.
+  gsn_text_ndc(wks, "Annual mean", 0.13, 0.22, txres)
+  gsn_text_ndc(wks, "Annual mean", 0.13, 0.65, txres)
+  txres@txAngleF = -90.
+  gsn_text_ndc(wks, "Austral summer", 0.87, 0.48, txres)
+  txres@txAngleF = 0.
+  
+  lres = True
+  lres@gsLineThicknessF = 0.5
+  lres@gsLineColor       = "grey30"
+  lres@gsLineDashPattern = 1
+  dummy(idummy) = gsn_add_polyline(wks, plot, (/syear, eyear/), (/0, 0/), lres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polyline(wks, plot, (/syear, eyear/), (/dy1, dy1/), lres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polyline(wks, plot, (/syear, eyear/), (/dy2, dy2/), lres)
+  idummy = idummy + 1
+
+  lres@gsLineDashPattern = 0
+  lres@gsLineColor := sam_abram@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_abram_runmean&time, sam_abram_runmean, lres)
+  idummy = idummy + 1
+
+  lres@gsLineColor := sam_villalba@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_villalba_runmean&time, sam_villalba_runmean+dy1, lres)
+  idummy = idummy + 1
+    
+  color_cmip5 = (/0.3, 0.3, 0.3/)
+  do ii = 0, nintegrations-1
+    if (cmip_phase(ii).eq."CMIP5") then
+    lres@gsLineColor    = color_cmip5
+    elseif (cmip_phase(ii).eq."CMIP6") then
+    lres@gsLineColor    = get_color(model_name(ii))
+    end if
+    lres@gsLineOpacityF = 0.4
+    dummy(idummy) = gsn_add_polyline(wks, plot, sam_runmean&time, sam_runmean(ii, :)+dy2, lres)
+    idummy = idummy + 1
+  end do
+  
+  txres@txFontHeightF = 0.015
   txres@txJust = "CenterLeft"
 
-  dummy(0) = gsn_add_polyline(wks, plot, (/syear, eyear/), (/0., 0./), polyres)
-  dummy(1) = gsn_add_polyline(wks, plot@xy2, (/syear, eyear/), (/0., 0./), polyres)
-  dummy(2) = gsn_add_polyline(wks, plot@xy3, (/syear, eyear/), (/0., 0./), polyres)
-
-  polyres@gsLineDashPattern = 0
-  polyres@gsLineThicknessF  = 0.5
-  polyres@gsLineColor      := sam_datwyler_ann@color
-  dummy(3) = gsn_add_polyline(wks, plot, sam_datwyler_ann_runmean&time, sam_datwyler_ann_runmean, polyres)
+  lres@gsLineDashPattern = 0
+  lres@gsLineThicknessF  = 0.5
+  lres@gsLineColor      := sam_datwyler_ann@color
+  lres@gsLineOpacityF = 1.
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_datwyler_ann_runmean&time, sam_datwyler_ann_runmean, lres)
+  idummy = idummy + 1
   
-  polyres@gsLineThicknessF = 2.5
-  polyres@gsLineColor     := sam_abram@color
-  dummy(4) = gsn_add_polyline(wks, plot, sam_abram_lowpass&time, sam_abram_lowpass, polyres)
-  txres@txFontColor := polyres@gsLineColor
-  dummy(5) = gsn_add_text(wks, plot, sam_abram@source, 1420., 0.5, txres)
-
-  polyres@gsLineColor     := sam_datwyler_ann@color
-  dummy(6) = gsn_add_polyline(wks, plot, sam_datwyler_ann_lowpass&time, sam_datwyler_ann_lowpass, polyres)
-;  txres@txFontColor := polyres@gsLineColor
-;  dummy(7) = gsn_add_text(wks, plot, sam_datwyler_ann@source, 1070., -1.3, txres)
-
-  polyres@gsLineThicknessF = 0.5
-  polyres@gsLineColor     := sam_datwyler_djf@color
-  dummy(8) = gsn_add_polyline(wks, plot@xy2, sam_datwyler_djf_runmean&time, sam_datwyler_djf_runmean, polyres)
+  lres@gsLineThicknessF = 2.5
+  lres@gsLineColor     := sam_abram@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_abram_lowpass&time, sam_abram_lowpass, lres)
+  idummy = idummy + 1
+  txres@txFontColor := lres@gsLineColor
+  dummy(idummy) = gsn_add_text(wks, plot, sam_abram@source, 1420., 0.5, txres)
+  idummy = idummy + 1
   
-  polyres@gsLineThicknessF = 2.5
-  polyres@gsLineColor     := sam_villalba@color
-  dummy(9) = gsn_add_polyline(wks, plot@xy2, sam_villalba_lowpass&time, sam_villalba_lowpass, polyres)
-  txres@txFontColor := polyres@gsLineColor
-  dummy(10) = gsn_add_text(wks, plot@xy2, sam_villalba@source, 1100., -3.1, txres)
+  lres@gsLineColor     := sam_datwyler_ann@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_datwyler_ann_lowpass&time, sam_datwyler_ann_lowpass, lres)
+  idummy = idummy + 1
 
-  polyres@gsLineColor     := sam_datwyler_djf@color
-  dummy(11) = gsn_add_polyline(wks, plot@xy2, sam_datwyler_djf_lowpass&time, sam_datwyler_djf_lowpass, polyres)
-  txres@txFontColor := polyres@gsLineColor
-  dummy(12) = gsn_add_text(wks, plot@xy2, sam_datwyler_djf@source, 1550., 0.4, txres)
-
+  lres@gsLineThicknessF = 0.5
+  lres@gsLineColor     := sam_datwyler_djf@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_datwyler_djf_runmean&time, sam_datwyler_djf_runmean+dy1, lres)
+  idummy = idummy + 1
   
-  polyres@gsLineThicknessF = 0.75
+  lres@gsLineThicknessF = 2.5
+  lres@gsLineColor     := sam_villalba@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_villalba_lowpass&time, sam_villalba_lowpass+dy1, lres)
+  idummy = idummy + 1
+  txres@txFontColor := lres@gsLineColor
+  dummy(idummy) = gsn_add_text(wks, plot, sam_villalba@source, 1100., -3.1+dy1, txres)
+  idummy = idummy + 1
+  
+  lres@gsLineColor     := sam_datwyler_djf@color
+  dummy(idummy) = gsn_add_polyline(wks, plot, sam_datwyler_djf_lowpass&time, sam_datwyler_djf_lowpass+dy1, lres)
+  idummy = idummy + 1
+  txres@txFontColor := lres@gsLineColor
+  dummy(idummy) = gsn_add_text(wks, plot, sam_datwyler_djf@source, 1550., 0.4+dy1, txres)
+  idummy = idummy + 1
+  
+  
+  lres@gsLineThicknessF = 0.75
   do n = 0, nintegrations-1
     if (cmip_phase(n).eq."CMIP5") then
-      polyres@gsLineColor := color_cmip5
+      lres@gsLineColor := color_cmip5
     elseif (cmip_phase(n).eq."CMIP6") then
-      polyres@gsLineColor := get_color(model_name(n))
+      lres@gsLineColor := get_color(model_name(n))
     end if
-    dummy(12+n) = gsn_add_polyline(wks, plot@xy3, sam_lowpass&time, sam_lowpass(n, :), polyres)
+    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass&time, sam_lowpass(n, :)+dy2, lres)
+    idummy = idummy + 1
   end do
   if (isvar("sam_lowpass_cmip5mean")) then
-    polyres@gsLineThicknessF = 4.
-    polyres@gsLineColor     := "white"
-    dummy(12+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip5mean&time, \
-                                               sam_lowpass_cmip5mean, polyres)
-    polyres@gsLineThicknessF = 2.5
-    polyres@gsLineColor     := color_cmip5
-    dummy(13+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip5mean&time, \
-                                               sam_lowpass_cmip5mean, polyres)
-    txres@txFontColor := polyres@gsLineColor
-    dummy(14+nintegrations) = gsn_add_text(wks, plot@xy3, "CMIP5", 1900., -2.0, txres)
+    lres@gsLineThicknessF = 4.
+    lres@gsLineColor     := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip5mean&time, \
+                                     sam_lowpass_cmip5mean+dy2, lres)
+    idummy = idummy + 1
+    lres@gsLineThicknessF = 2.5
+    lres@gsLineColor     := color_cmip5
+    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip5mean&time, \
+                                     sam_lowpass_cmip5mean+dy2, lres)
+    idummy = idummy + 1
+    txres@txFontColor := lres@gsLineColor
+    dummy(idummy) = gsn_add_text(wks, plot, "CMIP5", 1900., -2.0+dy2, txres)
+    idummy = idummy + 1
   end if
   if (isvar("sam_lowpass_cmip6mean")) then
-    polyres@gsLineThicknessF = 4.
-    polyres@gsLineColor     := "white"
-    dummy(15+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip6mean&time, \
-                                               sam_lowpass_cmip6mean, polyres)
-    polyres@gsLineThicknessF = 2.5
-    polyres@gsLineColor     := get_color("CMIP6")
-    dummy(16+nintegrations) = gsn_add_polyline(wks, plot@xy3, sam_lowpass_cmip6mean&time, \
-                                               sam_lowpass_cmip6mean, polyres)
-    txres@txFontColor := polyres@gsLineColor
-    dummy(17+nintegrations) = gsn_add_text(wks, plot@xy3, "CMIP6", 1900., -2.6, txres)
+    lres@gsLineThicknessF = 4.
+    lres@gsLineColor     := "white"
+    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip6mean&time, \
+                                     sam_lowpass_cmip6mean+dy2, lres)
+    idummy = idummy + 1
+    lres@gsLineThicknessF = 2.5
+    lres@gsLineColor     := get_color("CMIP6")
+    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip6mean&time, \
+                                     sam_lowpass_cmip6mean+dy2, lres)
+    idummy = idummy + 1
+    txres@txFontColor := lres@gsLineColor
+    dummy(idummy) = gsn_add_text(wks, plot, "CMIP6", 1900., -2.6+dy2, txres)
+    idummy = idummy + 1
   end if
   
   draw(plot)
