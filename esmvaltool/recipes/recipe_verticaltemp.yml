@@ -18,7 +18,7 @@ documentation:
 
 datasets:
   # observations
-  - {dataset: rich17obs, project: RICH_TTL, ensemble: mean, start_year: 1979, end_year: 2014}
+  - {dataset: rich17obs, project: RICH_TTL, ensemble: "rio(00:31)" , start_year: 1979, end_year: 2014}
   - {dataset: raobcore17, project: RAOB_TTL, start_year: 1979, end_year: 2014}
   - {dataset: era5.1, project: ERA_TTL, start_year: 1979, end_year: 2014}
   

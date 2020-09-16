@@ -17,7 +17,7 @@ rootpath:
   default: ~/default_inputpath
   ERA_TTL: /gws/nopw/j04/bris_climdyn/eunicelo/ERA5.1_fixed
   RAOB_TTL: /gws/nopw/j04/bris_climdyn/eunicelo/RAOBCORE15
-  RICH_TTL: /gws/nopw/j04/bris_climdyn/eunicelo/RICH15obs
+  RICH_TTL: /gws/nopw/j04/bris_climdyn/eunicelo/RICH15obs/original
 
 # Directory structure for input data: [default]/BADC/DKRZ/ETHZ/etc
 # See config-developer.yml for definitions.
