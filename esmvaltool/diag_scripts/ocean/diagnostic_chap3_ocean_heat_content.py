@@ -1072,17 +1072,17 @@ def calc_slr_full(cfg,
 
             # load clim depth
             if depths_bar.ndim == 1:
-                depth_bar = np.tile(depths_bar, sal_bar.shape)
-                print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar)
+                depth_bar = np.tile(depths_bar, (len(la), 1)).T
+                print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar.shape)
                 if depth_bar.shape != sal_bar.shape: assert 0
-                assert 0
             elif depths_bar.ndim == 3:
                 depth_bar = depths_bar[:, y, :]
             else:
                 assert 0
 
             # Calculate climatoligical pressure
-            pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(la.shape)]) # dbar
+            # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
+            pressure_bar = gsw.conversions.p_from_z(depth_bar, la[y])
             pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
 
             if dataset in EOS80:
@@ -1095,12 +1095,11 @@ def calc_slr_full(cfg,
             # Calculuate climatological Dynamic height anomaly
             # max_dp is the maximum difference between layers, set to a very high value
             # to avoid expensive interpolation.
-            seafloorpres = pressure_bar.max(axis=0)
-            print('shapes:', sal_bar.shape, temp_bar.shape, pressure_bar.shape, seafloorpres.shape)
-            assert 0
             if  p_ref == 'SeaFloor':
+                seafloorpres = pressure_bar.max(axis=0)
                 gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = seafloorpres)[0]
             elif p_ref == '2000m':
+                seafloorpres = pressure_bar.max(axis=0)
                 ref_pressure = gsw.conversions.p_from_z(-2000., la)
                 ref_pressure = np.min([ref_pressure, seafloorpres])
                 gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = ref_pressure)[0]
@@ -1114,7 +1113,6 @@ def calc_slr_full(cfg,
 
             # Convert dynamic height into mm.
             slr_clim[y, :] = gsdh_clim * 1000. / gravity
-            assert 0
 
         # Save climatological SLR cube as a netcdf.
         cube0 = thetao_cube[0, 0, :, :].copy()
