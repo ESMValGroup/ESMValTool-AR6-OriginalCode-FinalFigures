@@ -1059,6 +1059,69 @@ def calc_slr_full(cfg,
     else:
         print('Starting clim SLR calculation from fresh')
         slr_clim = slr_total[0].copy() # 2D
+        # # print('Starting clim SLR calculation from fresh')
+        # slr_clim = slr_total[0].copy() # 2D
+        #
+        # # Iterate over each water column:
+        # for (y,x), la in np.ndenumerate(lat):
+        #     sal_bar = psal_bar.data[:, y, x]
+        #     temp_bar= ztemp_bar.data[:, y, x]
+        #     if np.ma.is_masked(sal_bar.max()):
+        #          continue
+        #
+        #     lo = lon[y, x]
+        #     print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
+        #
+        #     # load clim depth
+        #     if depths_bar.ndim == 1:
+        #         depth_bar = depths_bar
+        #     elif depths_bar.ndim == 3:
+        #         depth_bar = depths_bar[:, y, x]
+        #     else:
+        #         assert 0
+        #
+        #     # Calculate climatoligical pressure
+        #     pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
+        #     pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
+        #
+        #     if dataset in EOS80:
+        #         # Calculuate climatological conservative temperature
+        #         temp_bar = gsw.conversions.CT_from_t(sal_bar, temp_bar.data[:, y, x], pressure_bar)
+        #
+        #         # Calculuate climatological salinity
+        #         sal_bar = gsw.conversions.SA_from_SP(sal_bar, pressure_bar, lo, la)
+        #
+        #     # Calculuate climatological Dynamic height anomaly
+        #     # max_dp is the maximum difference between layers, set to a very high value
+        #     # to avoid expensive interpolation.
+        #     seafloorpres = pressure_bar.max()
+        #     if  p_ref == 'SeaFloor':
+        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = seafloorpres)[0]
+        #     elif p_ref == '2000m':
+        #         ref_pressure = gsw.conversions.p_from_z(-2000., la)
+        #         ref_pressure = np.min([ref_pressure, seafloorpres])
+        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = ref_pressure)[0]
+        #     else:
+        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar)[0]
+        #
+        # #     print('sal_bar:',sal_bar, '\ntemp_bar:', temp_bar, '\npressure_bar:', pressure_bar)
+        # #     for pref in [0, 10, 2000, pressure_bar.max()]:
+        # #         print('reference pressure:', pref, gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = pref)* 1000. / gravity)
+        # #     assert 0
+        #
+        #     # Convert dynamic height into mm.
+        #     slr_clim[y, x] = gsdh_clim * 1000. / gravity
+        #
+        # # Save climatological SLR cube as a netcdf.
+        # cube0 = thetao_cube[0, 0, :, :].copy()
+        # cube0.data = np.ma.masked_where(slr_clim==0., slr_clim)
+        # cube0.units = cf_units.Unit('mm')
+        # cube0.name = 'Climatological Sea Level Rise'
+        # cube0.long_name = 'Climatological Sea Level Rise'
+        # cube0.short_name = 'slr_clim'
+        # cube0.var_name = 'slr_clim'
+        # cube0.standard_name = 'steric_change_in_mean_sea_level'
+        # iris.save(cube0, output_fns['clim'])
 
         # Iterate over each y line:
         for y in np.arange(len(lat[:,0])):
@@ -1125,111 +1188,52 @@ def calc_slr_full(cfg,
         cube0.standard_name = 'steric_change_in_mean_sea_level'
         iris.save(cube0, output_fns['clim'])
 
-        # # print('Starting clim SLR calculation from fresh')
-        # slr_clim = slr_total[0].copy() # 2D
-        #
-        # # Iterate over each water column:
-        # for (y,x), la in np.ndenumerate(lat):
-        #     sal_bar = psal_bar.data[:, y, x]
-        #     temp_bar= ztemp_bar.data[:, y, x]
-        #     if np.ma.is_masked(sal_bar.max()):
-        #          continue
-        #
-        #     lo = lon[y, x]
-        #     print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
-        #
-        #     # load clim depth
-        #     if depths_bar.ndim == 1:
-        #         depth_bar = depths_bar
-        #     elif depths_bar.ndim == 3:
-        #         depth_bar = depths_bar[:, y, x]
-        #     else:
-        #         assert 0
-        #
-        #     # Calculate climatoligical pressure
-        #     pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
-        #     pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
-        #
-        #     if dataset in EOS80:
-        #         # Calculuate climatological conservative temperature
-        #         temp_bar = gsw.conversions.CT_from_t(sal_bar, temp_bar.data[:, y, x], pressure_bar)
-        #
-        #         # Calculuate climatological salinity
-        #         sal_bar = gsw.conversions.SA_from_SP(sal_bar, pressure_bar, lo, la)
-        #
-        #     # Calculuate climatological Dynamic height anomaly
-        #     # max_dp is the maximum difference between layers, set to a very high value
-        #     # to avoid expensive interpolation.
-        #     seafloorpres = pressure_bar.max()
-        #     if  p_ref == 'SeaFloor':
-        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = seafloorpres)[0]
-        #     elif p_ref == '2000m':
-        #         ref_pressure = gsw.conversions.p_from_z(-2000., la)
-        #         ref_pressure = np.min([ref_pressure, seafloorpres])
-        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = ref_pressure)[0]
-        #     else:
-        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar)[0]
-        #
-        # #     print('sal_bar:',sal_bar, '\ntemp_bar:', temp_bar, '\npressure_bar:', pressure_bar)
-        # #     for pref in [0, 10, 2000, pressure_bar.max()]:
-        # #         print('reference pressure:', pref, gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = pref)* 1000. / gravity)
-        # #     assert 0
-        #
-        #     # Convert dynamic height into mm.
-        #     slr_clim[y, x] = gsdh_clim * 1000. / gravity
-        #
-        # # Save climatological SLR cube as a netcdf.
-        # cube0 = thetao_cube[0, 0, :, :].copy()
-        # cube0.data = np.ma.masked_where(slr_clim==0., slr_clim)
-        # cube0.units = cf_units.Unit('mm')
-        # cube0.name = 'Climatological Sea Level Rise'
-        # cube0.long_name = 'Climatological Sea Level Rise'
-        # cube0.short_name = 'slr_clim'
-        # cube0.var_name = 'slr_clim'
-        # cube0.standard_name = 'steric_change_in_mean_sea_level'
-        # iris.save(cube0, output_fns['clim'])
-
-
-    # Now perform the SLR calculation for each point in time for each water column:
-    for (y, x), la in np.ndenumerate(lat):
-        psal_yx_bar = psal_bar.data[:, y, x]
-        if np.ma.is_masked(psal_yx_bar.max()):
+    # Now perform the SLR calculation for each point in time for each lat line:
+    for y in np.arange(len(lat[:,0])):
+        sal_bar = psal_bar.data[:, y, :]
+        if np.ma.is_masked(sal_bar.max()):
              continue
-
-        lo = lon[y, x]
-        print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
+        la = lat[y, :]
+        lo = lon[y, :]
+        print('Calculate SLR in 1D:', y, 'of', len(la) )
 
         # Load depth dataset
         if depths.ndim == 1:
-            depth = depths
+            #depth = depths
+            depth = np.tile(depths, (len(la), 1)).T
+            print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar.shape)
+            if depth.shape != sal_bar.shape: assert 0
         elif depths.ndim == 3:
-            depth = depths[:, y, x]
+            depth = depths[:, y, :]
 
         if depths.ndim != 4:
             pressure = gsw.conversions.p_from_z(depth, la) # dbar
 
         # Load climatological depth dataset
+        # load clim depth
         if depths_bar.ndim == 1:
-            depth_bar = depths_bar
+            depth_bar = np.tile(depths_bar, (len(la), 1)).T
+            print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar.shape)
+            if depth_bar.shape != sal_bar.shape: assert 0
         elif depths_bar.ndim == 3:
-            depth_bar = depths_bar[:, y, x]
-        else: assert 0
-
-        if dataset in EOS80:
-            pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
-            pressure_bar = np.ma.masked_where(psal_yx_bar.mask, pressure_bar)
-            sal_bar = gsw.conversions.SA_from_SP(psal_yx_bar, pressure_bar, lo, la)
+            depth_bar = depths_bar[:, y, :]
         else:
-            sal_bar = psal_yx_bar
+            assert 0
+
+        pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
+        pressure_bar = np.ma.masked_where(sal_bar.mask, pressure_bar)
+        if dataset in EOS80:
+            sal_bar = gsw.conversions.SA_from_SP(sal_bar, pressure_bar, lo, la)
+
         # Calculate SLR for each point in time in the historical dataset.
         for t, time in enumerate(times):
             if depths.ndim == 4:
-                depth = depths[t, :, y, x]
+                depth = depths[t, :, y, :]
                 pressure = gsw.conversions.p_from_z(depth, la) # dbar
 
             # load salinity and temperature data
-            sal = so_cube.data[t, :, y, x]
-            temp = thetao_cube.data[t, :, y, x]
+            sal = so_cube.data[t, :, y, :]
+            temp = thetao_cube.data[t, :, y, :]
             pressure = np.ma.masked_where(temp.mask, pressure)
 
             if dataset in EOS80:
@@ -1239,13 +1243,15 @@ def calc_slr_full(cfg,
                 sal = gsw.conversions.SA_from_SP(sal, pressure, lo, la)
 
             # Calculate Dynamic height anomaly
-            seafloorpres = pressure.max()
+            seafloorpres = pressure.max(axis=0)
             if p_ref == 'SeaFloor':
                 gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = seafloorpres)[0]
                 gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = seafloorpres)[0]
             elif p_ref == '2000m':
                 ref_pressure = gsw.conversions.p_from_z(-2000., la)
                 ref_pressure = np.min([ref_pressure, seafloorpres])
+                print(seafloorpres.shape, ref_pressure.shape)
+                assert 0
                 gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = ref_pressure)[0]
                 gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = ref_pressure)[0]
             else:
@@ -1253,8 +1259,8 @@ def calc_slr_full(cfg,
                 gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure)[0]
 
             # Convert to mm and calculate anomaly relative to clim data
-            gsdh_total = gsdh_total * 1000. / gravity - slr_clim[y, x]
-            gsdh_thermo = gsdh_thermo * 1000. /  gravity - slr_clim[y, x]
+            gsdh_total = gsdh_total * 1000. / gravity - slr_clim[y, :]
+            gsdh_thermo = gsdh_thermo * 1000. /  gravity - slr_clim[y, :]
 
         #     print('sal:',sal, '\ntemp:', temp, '\npressure:', pressure)
         #     for pref in [0, 10, 2000, seafloorpres]:
@@ -1264,13 +1270,94 @@ def calc_slr_full(cfg,
         #     assert 0
 
             # Put in the output array:
-            slr_total[t, y, x] = gsdh_total
-            slr_thermo[t, y, x] = gsdh_thermo
+            slr_total[t, y, :] = gsdh_total
+            slr_thermo[t, y, :] = gsdh_thermo
             count += 1
             if t == 0:
-                print(count, (t, y, x), 'performing 2D SLR:',
+                print(count, (t, y), 'performing 2D SLR:',
                     gsdh_total,
                     gsdh_thermo)
+    # # Now perform the SLR calculation for each point in time for each water column:
+    # for (y, x), la in np.ndenumerate(lat):
+    #     psal_yx_bar = psal_bar.data[:, y, x]
+    #     if np.ma.is_masked(psal_yx_bar.max()):
+    #          continue
+    #
+    #     lo = lon[y, x]
+    #     print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
+    #
+    #     # Load depth dataset
+    #     if depths.ndim == 1:
+    #         depth = depths
+    #     elif depths.ndim == 3:
+    #         depth = depths[:, y, x]
+    #
+    #     if depths.ndim != 4:
+    #         pressure = gsw.conversions.p_from_z(depth, la) # dbar
+    #
+    #     # Load climatological depth dataset
+    #     if depths_bar.ndim == 1:
+    #         depth_bar = depths_bar
+    #     elif depths_bar.ndim == 3:
+    #         depth_bar = depths_bar[:, y, x]
+    #     else: assert 0
+    #
+    #     if dataset in EOS80:
+    #         pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
+    #         pressure_bar = np.ma.masked_where(psal_yx_bar.mask, pressure_bar)
+    #         sal_bar = gsw.conversions.SA_from_SP(psal_yx_bar, pressure_bar, lo, la)
+    #     else:
+    #         sal_bar = psal_yx_bar
+    #     # Calculate SLR for each point in time in the historical dataset.
+    #     for t, time in enumerate(times):
+    #         if depths.ndim == 4:
+    #             depth = depths[t, :, y, x]
+    #             pressure = gsw.conversions.p_from_z(depth, la) # dbar
+    #
+    #         # load salinity and temperature data
+    #         sal = so_cube.data[t, :, y, x]
+    #         temp = thetao_cube.data[t, :, y, x]
+    #         pressure = np.ma.masked_where(temp.mask, pressure)
+    #
+    #         if dataset in EOS80:
+    #             # Convert temperature to conservative temperature
+    #             temp = gsw.conversions.CT_from_t(sal, temp, pressure)
+    #             # Convert salinity to absolute salininty
+    #             sal = gsw.conversions.SA_from_SP(sal, pressure, lo, la)
+    #
+    #         # Calculate Dynamic height anomaly
+    #         seafloorpres = pressure.max()
+    #         if p_ref == 'SeaFloor':
+    #             gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = seafloorpres)[0]
+    #             gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = seafloorpres)[0]
+    #         elif p_ref == '2000m':
+    #             ref_pressure = gsw.conversions.p_from_z(-2000., la)
+    #             ref_pressure = np.min([ref_pressure, seafloorpres])
+    #             gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = ref_pressure)[0]
+    #             gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = ref_pressure)[0]
+    #         else:
+    #             gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, )[0]
+    #             gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure)[0]
+    #
+    #         # Convert to mm and calculate anomaly relative to clim data
+    #         gsdh_total = gsdh_total * 1000. / gravity - slr_clim[y, x]
+    #         gsdh_thermo = gsdh_thermo * 1000. /  gravity - slr_clim[y, x]
+    #
+    #     #     print('sal:',sal, '\ntemp:', temp, '\npressure:', pressure)
+    #     #     for pref in [0, 10, 2000, seafloorpres]:
+    #     #         print('reference pressure:', pref, gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = pref)* 1000. / gravity)
+    #     #         print('slr_clim[y, x]:',[y,x], pref, slr_clim[y, x],gsdh_total,  gsdh_total, gsdh_thermo)
+    #         #
+    #     #     assert 0
+    #
+    #         # Put in the output array:
+    #         slr_total[t, y, x] = gsdh_total
+    #         slr_thermo[t, y, x] = gsdh_thermo
+    #         count += 1
+    #         if t == 0:
+    #             print(count, (t, y, x), 'performing 2D SLR:',
+    #                 gsdh_total,
+    #                 gsdh_thermo)
 
     # Save SLR data as a cube and then a netcdf..
     cube0 = thetao_cube[:, 0, :, :].copy()
