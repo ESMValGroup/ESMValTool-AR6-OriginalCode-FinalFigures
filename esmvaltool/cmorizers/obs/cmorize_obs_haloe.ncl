@@ -90,12 +90,18 @@ begin
 
     xx = f->$NAME(vv)$
 
-    ; Special case hus: convert mixing ratio to specific humidity
+    ; hus: convert mixing ratio to specific humidity
     if (VAR(vv).eq."hus") then
       xx = xx * 18.015 / 28.97  ; [m3/m3] --> [kg/kg]
       xx = xx / (1. + xx)
     end if
 
+    ; tro3: convert mixing ratio to ppbv
+    if (VAR(vv).eq."tro3") then
+      xx = xx * 1.e9  ; [m3/m3] --> [1.e-9] (i.e., [nmol/mol])
+    end if
+
+    ; Define output array
     tmp = new((/dimsizes(time), dimsizes(xx&press), dimsizes(xx&eqlat)/), \
               float)
     tmp!0 = "time"
@@ -115,7 +121,7 @@ begin
     output!2 = "lat"
     output!3 = "lon"
     output&time = time
-    output&plev = f->press
+    output&plev = 100 * f->press  ; [hPa] --> [Pa]
     output&lat = f->eqlat
     output&lon = lonGlobeF(nlon, "lon", "latitude", "degrees_East")
     do ii = 0, dimsizes(output&lon) - 1

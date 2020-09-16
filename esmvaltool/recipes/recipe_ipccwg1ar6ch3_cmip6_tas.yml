@@ -14,8 +14,8 @@ documentation:
   references:
     - flato13ipcc
 
-  projects:
-    - ipcc_ar6
+#  projects:
+#    - ipcc_ar6
 
 
 preprocessors:
@@ -188,7 +188,7 @@ models_cmip6_historical_tas_era5: &models_cmip6_historical_tas_era5
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   - {dataset: E3SM-1-0}
   - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
-  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1} #permission denied
   - {dataset: EC-Earth3-Veg}
   - {dataset: FGOALS-f3-L}
   - {dataset: FGOALS-g3, grid: gn} 
@@ -237,8 +237,8 @@ models_cmip6_historical_tas_hadcrut4: &models_cmip6_historical_tas_hadcrut4
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   - {dataset: E3SM-1-0}
-  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
-  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  #- {dataset: E3SM-1-1-ECA, institute: E3SM-Project} # strange results
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1} # permission denied
   - {dataset: EC-Earth3-Veg}
   - {dataset: FGOALS-f3-L}
   - {dataset: FGOALS-g3, grid: gn}
