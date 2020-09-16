@@ -1,0 +1,73 @@
+# ESMValTool
+# recipe_ocean_heat_content.yml
+---
+documentation:
+  description: |
+    Recipe to produce several figures for IPCC WG1 chapter 3,
+    including 
+      ohc_timeseries, (figure 3.23)
+      ohu_timeseries, (figure 3.25)
+      halosteric_sea_level, (figure 3.27)
+      thermosteric_sea_level (figure 3.28)
+
+    unfortunately, a lot of the procesing needs to be done in the diagnostic script,
+    so there's only limited preprocessing done here.
+
+  authors:
+    - demora_lee
+
+  references:
+    - demora2018gmd
+
+
+  projects:
+    - ukesm
+
+
+preprocessors:
+
+    prep_annual:
+      annual_statistics:
+        operator: mean
+      regrid_time:
+        frequency: yr
+        #      regrid: 
+        # target_grid: 5x5
+        # scheme: linear
+
+
+
+diagnostics:
+
+  diag_ohc:
+    variables:
+      thetao:
+        short_name: thetao
+        preprocessor: prep_annual
+        additional_datasets: &dataset_anchor
+          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: historical, ensemble: r2i1p1f2, grid: gn, start_year: 1860, end_year: 2014}
+#          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-aer, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+#          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-GHG, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+#          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: hist-nat, ensemble: r2i1p1f2, grid: gn, start_year: 1960, end_year: 2014}
+          - {dataset: UKESM1-0-LL,     project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2175, end_year: 2329}
+          - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: historical, ensemble: r1i1p1f3, grid: gn, start_year: 1860, end_year: 2014}
+          - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Omon, exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014}
+
+      so:
+        short_name: so
+        preprocessor: prep_annual
+        additional_datasets: *dataset_anchor
+      volcello:
+        short_name: volcello
+        preprocessor: prep_annual
+        additional_datasets: *dataset_anchor
+      areacello:
+        short_name: areacello
+        additional_datasets: 
+        #         - {dataset: UKESM1-0-LL,     project: CMIP6, mip: fx  , exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329}
+         - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Ofx  , exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 2275, end_year: 2329}
+    scripts:
+      diagnostic:
+        script: ocean/diagnostic_chap3_ocean_heat_content.py
+
+
