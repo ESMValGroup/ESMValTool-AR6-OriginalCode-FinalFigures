@@ -97,19 +97,74 @@ preprocessors:
 
 models_cmip6_historical_pr_ghcn: &models_cmip6_historical_pr_ghcn
   - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
+  #- {dataset: AWI-CM-1-1-MR, grid: gn} #start 1851
+  - {dataset: AWI-ESM-1-1-LR, grid: gn}
   - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: BCC-ESM1, grid: gn}
   - {dataset: CAMS-CSM1-0, grid: gn}
   - {dataset: CanESM5, grid: gn}
+  - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {dataset: CAS-ESM2-0, institute: CAS, grid: gn}
   - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
+  - {dataset: CIESM}
+  #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: E3SM-1-0}
+  - {dataset: E3SM-1-1, institute: E3SM-Project}
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1} #permission denied
+  - {dataset: EC-Earth3-Veg}
+  - {dataset: FGOALS-f3-L}
+  - {dataset: FGOALS-g3, grid: gn} 
+  - {dataset: FIO-ESM-2-0, grid: gn}
+  #- {dataset: GFDL-CM4, grid: gr1} #permission denied
+  - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #permission denied
+  - {dataset: GISS-E2-1-H, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1}
+  - {dataset: IPSL-CM6A-LR}
+  - {dataset: KACE-1-0-G}
+  - {dataset: MCM-UA-1-0, grid: gn}
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: NESM3, grid: gn} 
+  - {dataset: NorCPM1, grid: gn, institute: NCC}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC}
+  - {dataset: NorESM2-MM, grid: gn, institute: NCC}
+  - {dataset: SAM0-UNICON, grid: gn}
+  - {dataset: TaiESM1, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
 
 
 models_cmip6_hist-nat_pr_ghcn: &models_cmip6_hist-nat_pr_ghcn
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
   - {dataset: BCC-CSM2-MR, grid: gn}
   - {dataset: CanESM5, grid: gn}
   - {dataset: CESM2, grid: gn}
   - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+  - {dataset: FGOALS-g3, grid: gn} 
   - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: IPSL-CM6A-LR}
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
 
 
@@ -154,6 +209,30 @@ diagnostics:
         preprocessor: clim_5x5_land_60N-90N
         exp: hist-nat
         additional_datasets: *models_cmip6_hist-nat_pr_ghcn
+      pr_historical_30N-60N:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_30N-60N
+      pr_hist-nat_30N-60N:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_30N-60N
+        exp: hist-nat
+        additional_datasets: *models_cmip6_hist-nat_pr_ghcn
+      pr_historical_30S-30N:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_30S-30N
+      pr_hist-nat_30S-30N:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_30S-30N
+        exp: hist-nat
+        additional_datasets: *models_cmip6_hist-nat_pr_ghcn
+      pr_historical_30S-60S:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_30S-60S
+      pr_hist-nat_30S-60S:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_30S-60S
+        exp: hist-nat
+        additional_datasets: *models_cmip6_hist-nat_pr_ghcn
     scripts:
       tsline: &tsline_settings_pr
         script: ipcc_ar6/precip_anom.ncl
@@ -164,9 +243,12 @@ diagnostics:
         start_year: 1950
         end_year: 2014
         experiments: ["historical", "hist-nat"]
-        header: ["Global", "60N-90N"]
+        header: ["Global", "60N-90N", "30N-60N", "30S-30N", "60S-30S"]
         panels: [["pr_historical_global", "pr_hist-nat_global"],
-                 ["pr_historical_60N-90N", "pr_hist-nat_60N-90N"]]
+                 ["pr_historical_60N-90N", "pr_hist-nat_60N-90N"],
+                 ["pr_historical_30N-60N", "pr_hist-nat_30N-60N"],
+                 ["pr_historical_30S-30N", "pr_hist-nat_30S-30N"],
+                 ["pr_historical_30S-60S", "pr_hist-nat_30S-60S"]]
         stat: "MinMax"
         plot_units: "mm/day"
         y_min: -0.2
