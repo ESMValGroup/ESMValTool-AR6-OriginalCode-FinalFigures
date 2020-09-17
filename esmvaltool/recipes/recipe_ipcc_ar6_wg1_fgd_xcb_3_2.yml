@@ -5,67 +5,68 @@ documentation:
   description: Recipe for example diagnostic written in R.
 
   authors:
-    - mailinina_elizaveta
+    - malinina_elizaveta
 
 datasets:
 # CMIP5
-  - {dataset: ACCESS1-0, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: bcc-csm1-1, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2012}
-  - {dataset: bcc-csm1-1-m, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2012}
-  - {dataset: BNU-ESM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1950, end_year: 2005}
-  - {dataset: CanESM2, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:5)i1p1", start_year: 1850, end_year: 2005}
-  - {dataset: CCSM4, project: CMIP5, exp: [historical, rcp45], ensemble: ["r(1:2)i1p1", r6i1p1], start_year: 1850, end_year: 2005}
-  - {dataset: CMCC-CM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: CMCC-CMS, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: CNRM-CM5, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:10)i1p1", start_year: 1850, end_year: 2005}
-  - {dataset: FGOALS-g2, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1950, end_year: 2005}
-  - {dataset: FGOALS-s2, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1850, end_year: 2005}
-  - {dataset: GFDL-ESM2G, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1861, end_year: 2005}
-  - {dataset: GFDL-ESM2M, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1861, end_year: 2005}
-  - {dataset: GISS-E2-R, project: CMIP5, exp: [historical, rcp45], ensemble: [r6i1p1, r6i1p3], start_year: 1850, end_year: 2005}
-  - {dataset: HadCM3, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:10)i1p1", start_year: 1859, end_year: 2005}
-  - {dataset: HadGEM2-ES, project: CMIP5, exp: [historical, rcp45], ensemble: "r(2:3)i1p1", start_year: 1859, end_year: 2005}
-  - {dataset: inmcm4, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:4)i1p1", start_year: 1850, end_year: 2005}
-  - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: MIROC4h, project: CMIP5, exp: [historica, rcp45]l, ensemble: "r(1:3)i1p1", start_year: 1950, end_year: 2005}
-  - {dataset: MIROC5, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1850, end_year: 2012}
-  - {dataset: MIROC-ESM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: MIROC-ESM-CHEM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: MPI-ESM-LR, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1850, end_year: 2005}
-  - {dataset: MPI-ESM-MR, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1850, end_year: 2005}
-  - {dataset: MRI-CGCM3, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
-  - {dataset: NorESM1-M, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1850, end_year: 2005}
+  - {dataset: ACCESS1-0, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: bcc-csm1-1, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: bcc-csm1-1-m, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: BNU-ESM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: CanESM2, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:5)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: CCSM4, project: CMIP5, exp: [historical, rcp45], ensemble: ["r(1:2)i1p1", r6i1p1], start_year: 1953, end_year: 2017}
+  - {dataset: CMCC-CM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: CMCC-CMS, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: CNRM-CM5, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:10)i1p1", start_year: 1953, end_year: 2017}
+#  - {dataset: FGOALS-g2, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017} not concatenated
+#  - {dataset: FGOALS-s2, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2017} no day data
+  - {dataset: GFDL-ESM2G, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: GFDL-ESM2M, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: GISS-E2-R, project: CMIP5, exp: [historical, rcp45], ensemble: [r6i1p1, r6i1p3], start_year: 1953, end_year: 2017}
+  - {dataset: HadCM3, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:10)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: HadGEM2-ES, project: CMIP5, exp: [historical, rcp45], ensemble: "r(2:3)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: inmcm4, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:4)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+#  - {dataset: MIROC4h, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2017} problem concat
+  - {dataset: MIROC5, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: MIROC-ESM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: MIROC-ESM-CHEM, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: MPI-ESM-LR, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: MPI-ESM-MR, project: CMIP5, exp: [historical, rcp45], ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2017}
+  - {dataset: MRI-CGCM3, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
+  - {dataset: NorESM1-M, project: CMIP5, exp: [historical, rcp45], ensemble: r1i1p1, start_year: 1953, end_year: 2017}
   # historicalNat
-  - {dataset: bcc-csm1-1, project: CMIP5, exp: historicalNat, ensemble: r1i1p1, start_year: 1850, end_year: 2012}
-  - {dataset: CanESM2, project: CMIP5, exp: historicalNat, ensemble: "r(1:5)i1p1", start_year: 1850, end_year: 2012}
-  - {dataset: CNRM-CM5, project: CMIP5, exp: historicalNat, ensemble: ["r(1:5)i1p1", r8i1p1], start_year: 1850, end_year: 2012}
-  - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: historicalNat, ensemble: "r(1:5)i1p1", start_year: 1850, end_year: 2012}
-  - {dataset: HadGEM2-ES, project: CMIP5, exp: historicalNat, ensemble: "r(1:4)i1p1", start_year: 1859, end_year: 2019}
-  - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historicalNat, ensemble: "r(1:3)i1p1", start_year: 1850, end_year: 2012}
-  - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historicalNat, ensemble: "r(1:3)i1p1", start_year: 1850, end_year: 2012}
-  - {dataset: NorESM1-M, project: CMIP5, exp: historicalNat, ensemble: r1i1p1, start_year: 1850, end_year: 2012}
+  - {dataset: bcc-csm1-1, project: CMIP5, exp: historicalNat, ensemble: r1i1p1, start_year: 1953, end_year: 2012}
+  - {dataset: CanESM2, project: CMIP5, exp: historicalNat, ensemble: "r(1:5)i1p1", start_year: 1953, end_year: 2012}
+  - {dataset: CNRM-CM5, project: CMIP5, exp: historicalNat, ensemble: ["r(1:5)i1p1", r8i1p1], start_year: 1953, end_year: 2012}
+  - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: historicalNat, ensemble: "r(1:5)i1p1", start_year: 1953, end_year: 2012}
+  - {dataset: HadGEM2-ES, project: CMIP5, exp: historicalNat, ensemble: "r(1:4)i1p1", start_year: 1953, end_year: 2019}
+  - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historicalNat, ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2012}
+  - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historicalNat, ensemble: "r(1:3)i1p1", start_year: 1953, end_year: 2012}
+  - {dataset: NorESM1-M, project: CMIP5, exp: historicalNat, ensemble: r1i1p1, start_year: 1953, end_year: 2012} 
 # CMIP6
-  - {dataset: BCC-CSM2-MR, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2014}
-  - {dataset: CanESM5, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:10)i1p1f1", grid: gn, start_year: 1850, end_year: 2014}
-  - {dataset: CNRM-CM6-1, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f2, grid: gr, start_year: 1850, end_year: 2014}
-  - {dataset: CNRM-ESM2-1, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f2, grid: gr, start_year: 1850, end_year: 2014}
-  - { dataset: EC-Earth3, project: CMIP6, exp: [historical, ssp245], ensemble: [ r6i1p1f1, r9i1p1f1 ], grid: gr, start_year: 1850, end_year: 2014 }
-  - { dataset: EC-Earth3-Veg, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 2014 }
-  - { dataset: GFDL-CM4, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gr1, start_year: 1850, end_year: 2014 }
-  - { dataset: IPSL-CM6A-LR, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:2)i1p1f1", grid: gr, start_year: 1850, end_year: 2014 }
-  - {dataset: MRI-ESM2-0, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:5)i1p1f1", grid: gn, start_year: 1850, end_year: 2014}
-  - { dataset: NESM3, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:2)i1p1f1", grid: gn, start_year: 1850, end_year: 2014 }
-  - { dataset: UKESM1-0-LL, project: CMIP6, exp: [historical, ssp245], ensemble: [ "r(1:4)i1p1f2", r8i1p1f2 ], grid: gn, start_year: 1850, end_year: 2014 }
+  - {dataset: BCC-CSM2-MR, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gn, start_year: 1953, end_year: 2017}
+#  - {dataset: CanESM5, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:10)i1p1f1", grid: gn, start_year: 1953, end_year: 2017}
+  - {dataset: CNRM-CM6-1, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f2, grid: gr, start_year: 1953, end_year: 2017}
+  - {dataset: CNRM-ESM2-1, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f2, grid: gr, start_year: 1953, end_year: 2017}
+#  - { dataset: EC-Earth3, project: CMIP6, exp: [historical, ssp245], ensemble: [ r6i1p1f1, r9i1p1f1 ], grid: gr, start_year: 1953, end_year: 2017 }
+#  - { dataset: EC-Earth3-Veg, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gr, start_year: 1953, end_year: 2017 }
+#  - { dataset: GFDL-CM4, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gr1, start_year: 1953, end_year: 2017 }
+  - { dataset: IPSL-CM6A-LR, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:2)i1p1f1", grid: gr, start_year: 1953, end_year: 2017 }
+  - {dataset: MRI-ESM2-0, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:5)i1p1f1", grid: gn, start_year: 1953, end_year: 2017}
+#  - { dataset: NESM3, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:2)i1p1f1", grid: gn, start_year: 1953, end_year: 2017 } no NESM3 2 tasmax
+  - { dataset: UKESM1-0-LL, project: CMIP6, exp: [historical, ssp245], ensemble: [ "r(1:4)i1p1f2", r8i1p1f2 ], grid: gn, start_year: 1953, end_year: 2017 }
   # hist-nat
-  - {dataset: BCC-CSM2-MR, project: CMIP6, exp: hist-nat, ensemble: "r(1:3)i1p1f1", grid: gn, start_year: 1850, end_year: 2020}
-  - {dataset: CanESM5, project: CMIP6, exp: hist-nat, ensemble: "r(1:10)i1p1f1", grid: gn, start_year: 1850, end_year: 2020}
-  - {dataset: CNRM-CM6-1, project: CMIP6, exp: hist-nat, ensemble: "r(1:3)i1p1f2", grid: gr, start_year: 1850, end_year: 2020}
-  - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: hist-nat, ensemble: "r(1:4)i1p1f3", grid: gn, start_year: 1850, end_year: 2020}
-  - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: hist-nat, ensemble: "r(1:7)i1p1f1", grid: gr, start_year: 1850, end_year: 2020}
-  - {dataset: MRI-ESM2-0, project: CMIP6, exp: hist-nat, ensemble: [r1i1p1f1, r3i1p1f1, r5i1p1f1], grid: gn, start_year: 1850, end_year: 2020}
-  - {dataset: NorESM2-LM, project: CMIP6, exp: hist-nat, ensemble: "r(1:3)i1p1f1", grid: gn, start_year: 1950, end_year: 2020}
+  - {dataset: BCC-CSM2-MR, project: CMIP6, exp: hist-nat, ensemble: "r(1:3)i1p1f1", grid: gn, start_year: 1953, end_year: 2020}
+  - {dataset: CanESM5, project: CMIP6, exp: hist-nat, ensemble: "r(1:10)i1p1f1", grid: gn, start_year: 1953, end_year: 2020}
+  - {dataset: CNRM-CM6-1, project: CMIP6, exp: hist-nat, ensemble: "r(1:3)i1p1f2", grid: gr, start_year: 1953, end_year: 2020}
+  - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: hist-nat, ensemble: "r(1:4)i1p1f3", grid: gn, start_year: 1953, end_year: 2020}
+#  - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: hist-nat, ensemble: "r(1:7)i1p1f1", grid: gr, start_year: 1953, end_year: 2020}
+  - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: hist-nat, ensemble: "r(1:2)i1p1f1", grid: gr, start_year: 1953, end_year: 2020}
+  - {dataset: MRI-ESM2-0, project: CMIP6, exp: hist-nat, ensemble: [r1i1p1f1, r3i1p1f1, r5i1p1f1], grid: gn, start_year: 1953, end_year: 2020}
+#  - {dataset: NorESM2-LM, project: CMIP6, exp: hist-nat, ensemble: "r(1:3)i1p1f1", grid: gn, start_year: 1953, end_year: 2020} no tasmax
 
 diagnostics:
   xcbox32:
@@ -75,10 +76,10 @@ diagnostics:
         mip: day
         additional_datasets:
           - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: hist-nat, ensemble: "r(8:10)i1p1f1", grid: gr, start_year: 1850, end_year: 2020}
-          - {dataset: CanESM5, project: CMIP6, exp: [historical, ssp245], ensemble: ["r(11:25)i1p1f1", "r(1:25)i1p2f1"], grid: gn, start_year: 1850, end_year: 2014}
-          - {dataset: CESM2, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:3)i1p1f1", grid: gn, start_year: 1850, end_year: 2014}
+#          - {dataset: CanESM5, project: CMIP6, exp: [historical, ssp245], ensemble: ["r(11:25)i1p1f1", "r(1:25)i1p2f1"], grid: gn, start_year: 1850, end_year: 2014}
+#          - {dataset: CESM2, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:3)i1p1f1", grid: gn, start_year: 1850, end_year: 2014} problems concatenating
           - {dataset: CESM2-WACCM, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2014}
-          - {dataset: EC-Earth3, project: CMIP6, exp: [historical, ssp245], ensemble: r4i1p1f1, grid: gr, start_year: 1850, end_year: 2014}
+#          - {dataset: EC-Earth3, project: CMIP6, exp: [historical, ssp245], ensemble: r4i1p1f1, grid: gr, start_year: 1850, end_year: 2014}
           - {dataset: GFDL-ESM4, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gr1, start_year: 1850, end_year: 2014}
           - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: [historical, ssp245], ensemble: "r(1:4)i1p1f3", grid: gn, start_year: 1850, end_year: 2014}
           - {dataset: INM-CM4-8, project: CMIP6, exp: [historical, ssp245], ensemble: r1i1p1f1, grid: gr1, start_year: 1850, end_year: 2014}
@@ -89,8 +90,8 @@ diagnostics:
           - { dataset: EC-Earth3-Veg, project: CMIP6, exp: [historical, ssp245], ensemble: [ r2i1p1f1, r4i1p1f1 ], grid: gr, start_year: 1850, end_year: 2014 }
       tasmax:
         mip: day
-        additional_datasets:
-          - { dataset: EC-Earth3, project: CMIP6, exp: [historical, ssp245], ensemble: [ r1i1p1f1, r11i1p1f1, r13i1p1f1 ], grid: gr, start_year: 1850, end_year: 2014 }
+#        additional_datasets:
+#          - { dataset: EC-Earth3, project: CMIP6, exp: [historical, ssp245], ensemble: [ r1i1p1f1, r11i1p1f1, r13i1p1f1 ], grid: gr, start_year: 1850, end_year: 2014 }
     scripts:
       xcbox32:
         script: liza_trials/ls_path.py

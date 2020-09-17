@@ -117,7 +117,7 @@ models_cmip6_nat: &models_cmip6_nat
 # - {dataset: NorESM2-LM, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
 
 diagnostics:
-ipcc_ar6_wg1_fgd_3_18:
+  ipcc_ar6_wg1_fgd_3_18:
     description: plot the sie scatter plot, figure 3_18
     variables:
       sic_cmip5_hist_nh:

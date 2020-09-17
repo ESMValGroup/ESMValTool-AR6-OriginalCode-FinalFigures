@@ -145,9 +145,9 @@ def main(cfg):
     cmip_data_dict={}
 
     cmip_data_dict['cmip5_NH'] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP5', cfg['month_latitude_NH'][0], cfg['month_latitude_NH'][1],
-                                     90, cfg['concatinate_cmip5'], concat_list=cfg['cmip5_exps_concatinate'])
+                                     90, cfg['concatinate_cmip5'], exp_list=cfg['cmip5_exps_concatinate'])
     cmip_data_dict['cmip5_SH'] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP5', cfg['month_latitude_SH'][0], -90,
-                                     cfg['month_latitude_SH'][1],cfg['concatinate_cmip5'], concat_list=cfg['cmip5_exps_concatinate'])
+                                     cfg['month_latitude_SH'][1],cfg['concatinate_cmip5'], exp_list=cfg['cmip5_exps_concatinate'])
     cmip_data_dict['cmip6_NH'] =ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP6',  cfg['month_latitude_NH'][0], cfg['month_latitude_NH'][1], 90)
     cmip_data_dict['cmip6_SH'] =ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP6',  cfg['month_latitude_SH'][0], -90, cfg['month_latitude_SH'][1])
     # check again with original code the lat limits!!!
