@@ -1050,7 +1050,7 @@ def calc_slr_full(cfg,
     gravity = 9.7963 # m /s^2
     # Performd SLR calculation for Climatology cube
     # If cube already exists, then just load the clim SLR data.
-    p_ref = 'default' #'2000m' #'default' #'SeaFloor' # 'default'
+    p_ref = '2000m' #'default' #'2000m' #'default' #'SeaFloor' # 'default'
 
     if os.path.exists(output_fns['clim']):
         print ('loading from', output_fns['clim'])
@@ -1123,6 +1123,9 @@ def calc_slr_full(cfg,
         # cube0.standard_name = 'steric_change_in_mean_sea_level'
         # iris.save(cube0, output_fns['clim'])
 
+        if depths_bar.ndim == 1:
+           depth_bar = np.tile(depths_bar, (len(lat[0]), 1)).T
+
         # Iterate over each y line:
         for y in np.arange(len(lat[:,0])):
             sal_bar = psal_bar.data[:, y, :]
@@ -1134,14 +1137,9 @@ def calc_slr_full(cfg,
             print('Calculate SLR in 1D:', (y,)) #, 'latitude:', la, lo)
 
             # load clim depth
-            if depths_bar.ndim == 1:
-                depth_bar = np.tile(depths_bar, (len(la), 1)).T
-                print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar.shape)
-                if depth_bar.shape != sal_bar.shape: assert 0
-            elif depths_bar.ndim == 3:
+            if depths_bar.ndim == 3:
                 depth_bar = depths_bar[:, y, :]
-            else:
-                assert 0
+            if depth_bar.shape != sal_bar.shape: assert 0
 
             # Calculate climatoligical pressure
             # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
@@ -1164,7 +1162,8 @@ def calc_slr_full(cfg,
             elif p_ref == '2000m':
                 seafloorpres = pressure_bar.max(axis=0)
                 ref_pressure = gsw.conversions.p_from_z(-2000., la)
-                ref_pressure = np.min([ref_pressure, seafloorpres])
+                ref_pressure = np.array([np.min([r, f])for r, f in zip(ref_pressure, seafloorpres)])
+                print(sal_bar.shape, temp_bar.shape, pressure_bar.shape, ref_pressure.shape)
                 gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = ref_pressure)[0]
             else:
                 gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar)[0]
@@ -1189,6 +1188,9 @@ def calc_slr_full(cfg,
         iris.save(cube0, output_fns['clim'])
 
     # Now perform the SLR calculation for each point in time for each lat line:
+    if depths.ndim == 1:
+        depth = np.tile(depths, (len(lat[0]), 1)).T
+
     for y in np.arange(len(lat[:,0])):
         sal_bar = psal_bar.data[:, y, :]
         if np.ma.is_masked(sal_bar.max()):
@@ -1198,13 +1200,9 @@ def calc_slr_full(cfg,
         print('Calculate SLR in 1D:', y, 'of', len(la) )
 
         # Load depth dataset
-        if depths.ndim == 1:
-            #depth = depths
-            depth = np.tile(depths, (len(la), 1)).T
-            print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar.shape)
-            if depth.shape != sal_bar.shape: assert 0
-        elif depths.ndim == 3:
+        if depths.ndim == 3:
             depth = depths[:, y, :]
+        if depth.shape != sal_bar.shape: assert 0
 
         if depths.ndim != 4:
             pressure = gsw.conversions.p_from_z(depth, la) # dbar
@@ -1249,9 +1247,7 @@ def calc_slr_full(cfg,
                 gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = seafloorpres)[0]
             elif p_ref == '2000m':
                 ref_pressure = gsw.conversions.p_from_z(-2000., la)
-                ref_pressure = np.min([ref_pressure, seafloorpres])
-                print(seafloorpres.shape, ref_pressure.shape)
-                assert 0
+                ref_pressure = np.array([np.min([r, f])for r, f in zip(ref_pressure, seafloorpres)])
                 gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = ref_pressure)[0]
                 gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = ref_pressure)[0]
             else:
@@ -1274,9 +1270,7 @@ def calc_slr_full(cfg,
             slr_thermo[t, y, :] = gsdh_thermo
             count += 1
             if t == 0:
-                print(count, (t, y), 'performing 2D SLR:',
-                    gsdh_total,
-                    gsdh_thermo)
+                print(count, (t, y), 'performing 2D SLR')
     # # Now perform the SLR calculation for each point in time for each water column:
     # for (y, x), la in np.ndenumerate(lat):
     #     psal_yx_bar = psal_bar.data[:, y, x]
