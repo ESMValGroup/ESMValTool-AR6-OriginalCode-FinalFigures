@@ -1,0 +1,107 @@
+# ESMValTool
+# recipe_ocean_heat_content.yml
+---
+documentation:
+  description: |
+    Recipe to produce several figures for IPCC WG1 chapter 3,
+    including
+      ohc_timeseries, (figure 3.23)
+      ohu_timeseries, (figure 3.25)
+      halosteric_sea_level, (figure 3.27)
+      thermosteric_sea_level (figure 3.28)
+
+    unfortunately, a lot of the procesing needs to be done in the diagnostic script,
+    so there's only limited preprocessing done here.
+
+  authors:
+    - demora_lee
+
+  references:
+    - demora2018gmd
+
+
+  projects:
+    - ukesm
+
+
+preprocessors:
+
+    prep_annual:
+      annual_statistics:
+        operator: mean
+      regrid_time:
+        frequency: yr
+        #      regrid:
+        # target_grid: 5x5
+        # scheme: linear
+
+
+
+diagnostics:
+
+  diag_ohc:
+    variables:
+      thetao:
+        short_name: thetao
+        preprocessor: prep_annual
+        mip: Omon
+        grid: gn
+        project: CMIP6
+        additional_datasets: &dataset_anchor
+          - {dataset: ACCESS-ESM1-5,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: ACCESS-ESM1-5,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: CESM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: CESM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: CIESM,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: CIESM,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: MPI-ESM1-2-LR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: MPI-ESM1-2-LR,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: MPI-ESM1-2-HR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: MPI-ESM1-2-HR,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: SAM0-UNICON,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {dataset: SAM0-UNICON,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: NorESM2-LM,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014, grid: gr}
+          - {dataset: NorESM2-LM,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014, grid: gr}
+
+          - {dataset: NorESM2-MM,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014,  grid: gr}
+          - {dataset: NorESM2-MM,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014,  grid: gr}
+
+          # working fine:
+          - {dataset: HadGEM3-GC31-LL,     exp: historical, ensemble: r1i1p1f3, start_year: 1860, end_year: 2014}
+          - {dataset: HadGEM3-GC31-LL,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+
+          - {dataset: UKESM1-0-LL,     exp: historical, ensemble: r2i1p1f2, start_year: 1860, end_year: 2014}
+          - {dataset: UKESM1-0-LL,     exp: piControl,  ensemble: r1i1p1f2, start_year: 2175, end_year: 2329}
+## Not registered yet      - {dataset: CESM2-FV2}
+## Not registered yet      - {dataset: CESM2-WACCM-FV2}
+## Lon/Lat bounds error      - {dataset: FGOALS-f3-L}
+## Coord bound error      - {dataset: MCM-UA-1-0}
+## Not registered yet      - {dataset: NorCPM1, grid: gr}
+
+
+
+      so:
+        short_name: so
+        preprocessor: prep_annual
+        additional_datasets: *dataset_anchor
+      volcello:
+        short_name: volcello
+        preprocessor: prep_annual
+        additional_datasets: *dataset_anchor
+      areacello:
+        short_name: areacello
+        additional_datasets:
+        #         - {dataset: UKESM1-0-LL,     project: CMIP6, mip: fx  , exp: piControl,  ensemble: r1i1p1f2, grid: gn, start_year: 2275, end_year: 2329}
+         - {dataset: HadGEM3-GC31-LL, project: CMIP6, mip: Ofx  , exp: piControl,  ensemble: r1i1p1f1, grid: gn, start_year: 2275, end_year: 2329}
+    scripts:
+      diagnostic:
+        script: ocean/diagnostic_chap3_ocean_heat_content.py
