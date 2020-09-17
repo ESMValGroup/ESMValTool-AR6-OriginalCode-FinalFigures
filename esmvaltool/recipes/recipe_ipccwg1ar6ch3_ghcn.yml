@@ -1,0 +1,42 @@
+# ESMValTool
+# recipe_ncl.yml
+---
+documentation:
+  description: |
+    Example recipe that plots air temperature.
+
+  authors:
+    - bock_lisa
+
+  maintainer:
+    - righi_mattia
+
+  references:
+    - acknow_project
+
+  projects:
+    - esmval
+
+
+
+diagnostics:
+  example:
+    description: Example diagnostic
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      pr:
+        reference_dataset: GHCN
+        mip: Amon
+        additional_datasets:
+          - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2,
+             start_year: 1950, end_year: 2014}
+    scripts:
+      test_ta: &settings
+        script: ipcc_ar6/pr_map.ncl
+        projection: Robinson
+        colormap: WhiteBlueGreenYellowRed
+        ncdf: default
+        caption: "GHCN Climatology 1950-2014"
