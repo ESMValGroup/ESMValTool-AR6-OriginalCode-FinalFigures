@@ -21,9 +21,8 @@ RICH_TTL:
   cmor_strict: false
   input_dir:
     default: '/'
-  #input_file: '{dataset}_{ensemble}_gridded_*_fixed2_invertlat.nc'
-  input_file: '{ensemble}_gridded_2019.nc' 
-  output_file: '{ensemble}'
+  input_file: '{dataset}_{ensemble}_gridded_*_fixed2_invertlat.nc'
+  output_file: '{dataset}_{ensemble}'
 
 RAOB_TTL:
   cmor_strict: false

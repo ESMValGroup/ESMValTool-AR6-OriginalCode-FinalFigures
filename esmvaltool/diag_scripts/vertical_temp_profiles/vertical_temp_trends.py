@@ -108,6 +108,7 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, obs_trend
     
     # whole period
     ax1.axvline(x=0, color='gray', alpha=0.5, linestyle='--')
+    ax1.fill_betweenx(y=plevs[:-1], x1=obs_trends_all["rens"][0], x2=obs_trends_all["rens"][1], color='lightgrey')
     ax1.plot(obs_trends_all["rich"], plevs, color="black", linestyle="--", linewidth="4")
     ax1.plot(obs_trends_all["raob"], plevs, color="black", linestyle=":", linewidth="4")
     ax1.plot(obs_trends_all["era5"], plevs, color="black", linestyle="-", linewidth="4")
@@ -115,12 +116,12 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, obs_trend
     ha_means = np.nanmean(hist_trends_all, axis=0)
     ha_perts = np.nanpercentile(hist_trends_all, [5, 95], axis=0)
     ax1.errorbar(ha_means, plevs, xerr=[ha_means-ha_perts[0], ha_perts[1]-ha_means], marker="s", \
-                 color=colours["coupled"], elinewidth=2, linestyle="none")
+                 markersize=5, color=colours["coupled"], elinewidth=3, linestyle="none")
     # atmos-only
     aa_means = np.nanmean(amip_trends_all, axis=0)
     aa_perts = np.nanpercentile(amip_trends_all, [5, 95], axis=0)
     ax1.errorbar(aa_means, plevs+(plevs*0.08), xerr=[aa_means-aa_perts[0], aa_perts[1]-aa_means], marker="s", \
-                 color=colours["atmos"], elinewidth=2, linestyle="none")
+                 markersize=5, color=colours["atmos"], elinewidth=3, linestyle="none")
     # overall
     ax1.set_title("a) "+str(syr)+"-"+str(eyr))
     ax1.spines["right"].set_visible(False)
@@ -142,19 +143,20 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, obs_trend
 
     # pre-ozone
     ax2.axvline(x=0, color='gray', alpha=0.5, linestyle='--')
-    ax2.plot(obs_trends_preoz["rich"], plevs, color="black", linestyle="--", linewidth="4", label="RICH v1.5")
+    ax2.fill_betweenx(y=plevs[:-1], x1=obs_trends_preoz["rens"][0], x2=obs_trends_preoz["rens"][1], color='lightgrey', label="RICH-obs v1.5 ensemble")
+    ax2.plot(obs_trends_preoz["rich"], plevs, color="black", linestyle="--", linewidth="4", label="RICH-obs v1.5 mean")
     ax2.plot(obs_trends_preoz["raob"], plevs, color="black", linestyle=":", linewidth="4", label="RAOBCORE v1.5")
     ax2.plot(obs_trends_preoz["era5"], plevs, color="black", linestyle="-", linewidth="4", label="ERA5/5.1")
     # coupled
     hpr_means = np.nanmean(hist_trends_preoz, axis=0)
     hpr_perts = np.nanpercentile(hist_trends_preoz, [5, 95], axis=0)
     ax2.errorbar(hpr_means, plevs, xerr=[hpr_means-hpr_perts[0], hpr_perts[1]-hpr_means], marker="s", \
-                 color=colours["coupled"], elinewidth=2, linestyle="none")
+                 markersize=5, color=colours["coupled"], elinewidth=3, linestyle="none")
     # atmos-only
     apre_means = np.nanmean(amip_trends_preoz, axis=0)
     apre_perts = np.nanpercentile(amip_trends_preoz, [5, 95], axis=0)
     ax2.errorbar(apre_means, plevs+(plevs*0.08), xerr=[apre_means-apre_perts[0], apre_perts[1]-apre_means], marker="s", \
-                 color=colours["atmos"], elinewidth=2, linestyle="none")
+                 markersize=5, color=colours["atmos"], elinewidth=3, linestyle="none")
     # overall
     ax2.set_title("b) "+str(syr)+"-"+str(myr))
     ax2.spines["right"].set_visible(False)
@@ -173,6 +175,7 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, obs_trend
 
     # post-ozone
     ax3.axvline(x=0, color='gray', alpha=0.5, linestyle='--')
+    ax3.fill_betweenx(y=plevs[:-1], x1=obs_trends_postoz["rens"][0], x2=obs_trends_postoz["rens"][1], color='lightgrey')
     ax3.plot(obs_trends_postoz["rich"], plevs, color="black", linestyle="--", linewidth="4")
     ax3.plot(obs_trends_postoz["raob"], plevs, color="black", linestyle=":", linewidth="4")
     ax3.plot(obs_trends_postoz["era5"], plevs, color="black", linestyle="-", linewidth="4")
@@ -180,12 +183,12 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, obs_trend
     hpo_means = np.nanmean(hist_trends_postoz, axis=0)
     hpo_perts = np.nanpercentile(hist_trends_postoz, [5, 95], axis=0)
     ax3.errorbar(hpo_means, plevs, xerr=[hpo_means-hpo_perts[0], hpo_perts[1]-hpo_means], marker="s", \
-                 color=colours["coupled"], elinewidth=2, linestyle="none") 
+                 markersize=5, color=colours["coupled"], elinewidth=3, linestyle="none") 
     # atmos-only
     apo_means = np.nanmean(amip_trends_postoz, axis=0)
     apo_perts = np.nanpercentile(amip_trends_postoz, [5, 95], axis=0)
     ax3.errorbar(apo_means, plevs+(plevs*0.08), xerr=[apo_means-apo_perts[0], apo_perts[1]-apo_means], marker="s", \
-                 color=colours["atmos"], elinewidth=2, linestyle="none") 
+                 markersize=5, color=colours["atmos"], elinewidth=3, linestyle="none") 
     # overall
     ax3.set_title("c) "+str(myr+1)+"-"+str(eyr))
     ax3.spines["right"].set_visible(False)
@@ -202,7 +205,7 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, obs_trend
 
     # save
     plt.tight_layout()
-    png_name = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_all_5-95.png"
+    png_name = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_rio_range_all_5-95.png"
     plt.savefig(os.path.join(local_path, png_name))
     plt.close()
 
@@ -219,16 +222,26 @@ def main(cfg):
     # load regridded data
     # start_year and end_year of data defined in recipe
 
-    # RICH1.5
-    input_rich_data = select_metadata(cfg['input_data'].values(), dataset="rich17obs")
-    # cubelist of 1
-    rich_cube = iris.load(input_rich_data[0]['filename'])  
-
     # RAOBCORE 1.5
     input_raob_data = select_metadata(cfg['input_data'].values(), dataset="raobcore17")
     # cubelist of 1
     raob_cube = iris.load(input_raob_data[0]['filename'])
-    
+   
+    # RICH1.5-obs mean, with 10 hPa
+    input_rich_data = select_metadata(cfg['input_data'].values(), dataset="rich17obs")
+    # cubelist of 1
+    rich_cube = iris.load(input_rich_data[0]['filename'])
+
+    # RICH1.5-obs ensemble
+    input_rens_data = select_metadata(cfg['input_data'].values(), dataset="rich")
+    rens_cubes = iris.cube.CubeList()
+    for (version, [data]) in group_metadata(input_rens_data, 'version').items():
+        # load in deg Celsius
+        cube = iris.load_cube(data['filename'])
+        cube.data -= 273.15
+        cube.units = 'celsius'  
+        rens_cubes.append(cube)
+
     # ERA5/5.1
     input_era5_data = select_metadata(cfg['input_data'].values(), dataset="era5.1")
     # cubelist of 1
@@ -236,7 +249,6 @@ def main(cfg):
     
     # CMIP6
     input_hist_data = select_metadata(cfg['input_data'].values(), exp="historical")
-    
     input_amip_data = select_metadata(cfg['input_data'].values(), exp="amip")
     if not input_hist_data:
         raise ValueError("This diagnostic needs historical data")
@@ -274,15 +286,17 @@ def main(cfg):
         amip_cubes.append(cube)
     
     # turn into annual values, discarding years with more than 3 months of data missing
-    rich_annuals = annual_mean(rich_cube)
     raob_annuals = annual_mean(raob_cube)
+    rich_annuals = annual_mean(rich_cube)
+    rens_annuals = annual_mean(rens_cubes)
     era5_annuals = annual_mean(era5_cube)
     hist_annuals = annual_mean(hist_cubes)     
     amip_annuals = annual_mean(amip_cubes)
     
     # tropical means
-    rich_tropmeans = area_mean(rich_annuals)
     raob_tropmeans = area_mean(raob_annuals)
+    rich_tropmeans = area_mean(rich_annuals)
+    rens_tropmeans = area_mean(rens_annuals)
     era5_tropmeans = area_mean(era5_annuals)
     hist_tropmeans = area_mean(hist_annuals)
     amip_tropmeans = area_mean(amip_annuals)
@@ -292,11 +306,14 @@ def main(cfg):
     
     # whole period
     yrs_all = np.arange(1979, 2014+1)
-    rich_trends_allyrs = ta_trends(rich_tropmeans, nlevs, yrx=yrs_all)
     raob_trends_allyrs = ta_trends(raob_tropmeans, nlevs, yrx=yrs_all)
+    rich_trends_allyrs = ta_trends(rich_tropmeans, nlevs, yrx=yrs_all)
+    rens_trends_allyrs = ta_trends(rens_tropmeans, nlevs-1, yrx=yrs_all)
     era5_trends_allyrs = ta_trends(era5_tropmeans, nlevs, yrx=yrs_all)
     # gather obs/reanalysis in a dict
-    obs_trends_allyrs = {"rich":rich_trends_allyrs[0], "raob":raob_trends_allyrs[0], "era5":era5_trends_allyrs[0]}
+    rens_trends_allyrs_l = np.min(rens_trends_allyrs, axis=0)
+    rens_trends_allyrs_h = np.max(rens_trends_allyrs, axis=0)
+    obs_trends_allyrs = {"raob":raob_trends_allyrs[0], "rich":rich_trends_allyrs[0], "rens":[rens_trends_allyrs_l, rens_trends_allyrs_h], "era5":era5_trends_allyrs[0]}
     # models
     hist_trends_allyrs = ta_trends(hist_tropmeans, nlevs, yrx=yrs_all) 
     amip_trends_allyrs = ta_trends(amip_tropmeans, nlevs, yrx=yrs_all)
@@ -304,11 +321,14 @@ def main(cfg):
     # pre-ozone
     yrs_preoz = np.arange(1979, 1997+1)
     preoz_constraint = iris.Constraint(time=lambda cell: 1979 <= cell.point.year <= 1997)
-    rich_trends_preoz = ta_trends(rich_tropmeans.extract(preoz_constraint), nlevs, yrx=yrs_preoz)
     raob_trends_preoz = ta_trends(raob_tropmeans.extract(preoz_constraint), nlevs, yrx=yrs_preoz)
+    rich_trends_preoz = ta_trends(rich_tropmeans.extract(preoz_constraint), nlevs, yrx=yrs_preoz)
+    rens_trends_preoz = ta_trends(rens_tropmeans.extract(preoz_constraint), nlevs-1, yrx=yrs_preoz)
     era5_trends_preoz = ta_trends(era5_tropmeans.extract(preoz_constraint), nlevs, yrx=yrs_preoz)
     # gather obs/reanalysis in a dict
-    obs_trends_preoz = {"rich":rich_trends_preoz[0], "raob":raob_trends_preoz[0], "era5":era5_trends_preoz[0]}
+    rens_trends_preoz_l = np.min(rens_trends_preoz, axis=0)
+    rens_trends_preoz_h = np.max(rens_trends_preoz, axis=0)
+    obs_trends_preoz = {"raob":raob_trends_preoz[0], "rich":rich_trends_preoz[0], "rens":[rens_trends_preoz_l, rens_trends_preoz_h], "era5":era5_trends_preoz[0]}
     # models
     hist_trends_preoz = ta_trends(hist_tropmeans.extract(preoz_constraint), nlevs, yrx=yrs_preoz)
     amip_trends_preoz = ta_trends(amip_tropmeans.extract(preoz_constraint), nlevs, yrx=yrs_preoz)
@@ -316,11 +336,14 @@ def main(cfg):
     # post-ozone   
     yrs_postoz = np.arange(1998, 2014+1) 
     postoz_constraint = iris.Constraint(time=lambda cell: 1998 <= cell.point.year <= 2014)
-    rich_trends_postoz = ta_trends(rich_tropmeans.extract(postoz_constraint), nlevs, yrx=yrs_postoz)
     raob_trends_postoz = ta_trends(raob_tropmeans.extract(postoz_constraint), nlevs, yrx=yrs_postoz)
+    rich_trends_postoz = ta_trends(rich_tropmeans.extract(postoz_constraint), nlevs, yrx=yrs_postoz)
+    rens_trends_postoz = ta_trends(rens_tropmeans.extract(postoz_constraint), nlevs-1, yrx=yrs_postoz)
     era5_trends_postoz = ta_trends(era5_tropmeans.extract(postoz_constraint), nlevs, yrx=yrs_postoz)
     # gather obs/reanalysis in a dict
-    obs_trends_postoz = {"rich":rich_trends_postoz[0], "raob":raob_trends_postoz[0], "era5":era5_trends_postoz[0]}    
+    rens_trends_postoz_l = np.min(rens_trends_postoz, axis=0)
+    rens_trends_postoz_h = np.max(rens_trends_postoz, axis=0)
+    obs_trends_postoz = {"raob":raob_trends_postoz[0], "rich":rich_trends_postoz[0], "rens":[rens_trends_postoz_l, rens_trends_postoz_h], "era5":era5_trends_postoz[0]}    
     # models
     hist_trends_postoz = ta_trends(hist_tropmeans.extract(postoz_constraint), nlevs, yrx=yrs_postoz)
     amip_trends_postoz = ta_trends(amip_tropmeans.extract(postoz_constraint), nlevs, yrx=yrs_postoz)
@@ -338,13 +361,22 @@ def main(cfg):
     with open(os.path.join(local_path,"amip_models.txt"), "w") as f:
         for item in amip_models:
             f.write("%s\n" % item)
+    np.save(os.path.join(local_path,"rio_trends_allyrs.npy"), rens_trends_allyrs)
     np.save(os.path.join(local_path,"hist_trends_allyrs.npy"), hist_trends_allyrs)
     np.save(os.path.join(local_path,"amip_trends_allyrs.npy"), amip_trends_allyrs)
+    np.save(os.path.join(local_path,"rio_trends_preoz.npy"), rens_trends_preoz)
     np.save(os.path.join(local_path,"hist_trends_preoz.npy"), hist_trends_preoz)
     np.save(os.path.join(local_path,"amip_trends_preoz.npy"), amip_trends_preoz)
+    np.save(os.path.join(local_path,"rio_trends_postoz.npy"), rens_trends_postoz)
     np.save(os.path.join(local_path,"hist_trends_postoz.npy"), hist_trends_postoz)
     np.save(os.path.join(local_path,"amip_trends_postoz.npy"), amip_trends_postoz)
 
+    # save other stuff for checking
+    ens_no = np.arange(32)
+    for nens, rc, ra, rt in zip(ens_no, rens_cubes, rens_annuals, rens_tropmeans):
+        iris.save(rc, os.path.join(local_path,"rio"+"{:02d}".format(nens)+"_cube.nc"))
+        iris.save(ra, os.path.join(local_path,"rio"+"{:02d}".format(nens)+"_annual.nc"))
+        iris.save(rt, os.path.join(local_path,"rio"+"{:02d}".format(nens)+"_tropmean.nc"))
  
 if __name__ == '__main__':
 

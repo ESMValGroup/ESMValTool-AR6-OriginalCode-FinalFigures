@@ -18,10 +18,44 @@ documentation:
 
 datasets:
   # observations
-  - {dataset: rich17obs, project: RICH_TTL, ensemble: "rio(00:31)" , start_year: 1979, end_year: 2014}
   - {dataset: raobcore17, project: RAOB_TTL, start_year: 1979, end_year: 2014}
+  - {dataset: rich17obs, project: RICH_TTL, ensemble: mean, start_year: 1979, end_year: 2014}
   - {dataset: era5.1, project: ERA_TTL, start_year: 1979, end_year: 2014}
   
+  # rich-obs ensemble
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio00, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio01, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio02, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio03, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio04, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio05, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio06, start_year: 1979, end_year: 2014} 
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio07, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio08, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio09, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio10, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio11, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio12, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio13, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio14, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio15, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio16, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio17, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio18, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio19, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio20, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio21, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio22, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio23, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio24, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio25, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio26, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio27, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio28, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio29, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio30, start_year: 1979, end_year: 2014}
+  - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio31, start_year: 1979, end_year: 2014}
+ 
   # CMIP6 Coupled, JASMIN
   - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: ACCESS-ESM1-5, institute: CSIRO, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
