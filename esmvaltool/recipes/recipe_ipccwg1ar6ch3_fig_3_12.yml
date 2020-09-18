@@ -159,7 +159,7 @@ models_cmip6_hist-nat_pr_ghcn: &models_cmip6_hist-nat_pr_ghcn
   - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
   - {dataset: FGOALS-g3, grid: gn} 
   - {dataset: GFDL-ESM4, grid: gr1}
-  - {dataset: GISS-E2-1-G, grid: gn}
+  #- {dataset: GISS-E2-1-G, grid: gn} #permission denied
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
   - {dataset: IPSL-CM6A-LR}
   - {dataset: MIROC6, grid: gn}
@@ -182,7 +182,7 @@ diagnostics:
   # Global and zonal average anomalies in annual mean precipitation
   # **********************************************************************
  
-  pr_hist_global_land: &diag_pr
+  pr_hist_global_land:
     description: IPCC AR6 Ch. 3, Fig. 3.12 (precipitation)
     variables:
       pr_historical_global: &var_pr
@@ -234,7 +234,7 @@ diagnostics:
         exp: hist-nat
         additional_datasets: *models_cmip6_hist-nat_pr_ghcn
     scripts:
-      tsline: &tsline_settings_pr
+      tsline:
         script: ipcc_ar6/precip_anom.ncl
         ts_anomaly: "anom"
         ref_start: 1961
@@ -254,197 +254,4 @@ diagnostics:
         y_min: -0.2
         y_max: 0.2
 
-#  pr_hist-nat_global_land:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        exp: hist-nat
-#    additional_datasets: *models_cmip6_hist-nat_pr_ghcn
-#
-#  fig_3_12_global_land:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#    additional_datasets:
-#      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
-#    scripts:
-#      collect: &tsline_collect_settings
-#        <<: *tsline_settings_pr
-#        script: ipcc_ar6/tsline_collect.ncl
-#        ancestors: [pr, 'pr_*_global_land/tsline*']
-#        start_year: 1950
-#        end_year: 2014
-#        ref: ["GHCN"]
-#        order: ["CMIP6_hist-nat", "CMIP6_historical"]
-#        stat_shading: True
-#
-#  ########################################################################
-#  # 60-90N
-#  ########################################################################
-#
-#  pr_hist_60N-90N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_60N-90N
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "60N-90N"
-#
-#  pr_hist-nat_60N-90N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_60N-90N   
-#        exp: hist-nat
-#    additional_datasets: *models_cmip6_hist-nat_pr_ghcn
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "60N-90N"
-#
-#  fig_3_12_60N-90N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_60N-90N   
-#    additional_datasets:
-#      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
-#    scripts:
-#      collect: 
-#        <<: *tsline_collect_settings
-#        region: "60N-90N"
-#        ancestors: [pr, 'pr_*_60N-90N/tsline*']
-#
-#  ########################################################################
-#  # 30N-60N
-#  ########################################################################
-#
-#  pr_hist_30N-60N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30N-60N
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "30N-60N"
-#
-#  pr_hist-nat_30N-60N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30N-60N   
-#        exp: hist-nat
-#    additional_datasets: *models_cmip6_hist-nat_pr_ghcn
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "30N-60N"
-#
-#  fig_3_12_30N-60N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30N-60N   
-#    additional_datasets:
-#      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
-#    scripts:
-#      collect: 
-#        <<: *tsline_collect_settings
-#        ancestors: [pr, 'pr_*_30N-60N/tsline*']
-#        region: "30N-60N"
-#
-#  ########################################################################
-#  # 30S-30N
-#  ########################################################################
-#
-#  pr_hist_30S-30N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30S-30N
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "30S-30N"
-#
-#  pr_hist-nat_30S-30N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30S-30N   
-#        exp: hist-nat
-#    additional_datasets: *models_cmip6_hist-nat_pr_ghcn
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "30S-30N"
-#
-#  fig_3_12_30S-30N:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30S-30N   
-#    additional_datasets:
-#      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
-#    scripts:
-#      collect: 
-#        <<: *tsline_collect_settings
-#        ancestors: [pr, 'pr_*_30S-30N/tsline*']
-#        region: "30S-30N"
-#
-#  ########################################################################
-#  # 30S-60S
-#  ########################################################################
-#
-#  pr_hist_30S-60S:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30S-60S
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "30S-60S"
-#
-#  pr_hist-nat_30S-60S:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30S-60S   
-#        exp: hist-nat
-#    additional_datasets: *models_cmip6_hist-nat_pr_ghcn
-#    scripts:
-#      tsline: 
-#        <<: *tsline_settings_pr
-#        region: "30S-60S"
-#
-#  fig_3_12_30S-60S:
-#    <<: *diag_pr
-#    variables:
-#      pr:
-#        <<: *var_pr
-#        preprocessor: clim_5x5_land_30S-60S   
-#    additional_datasets:
-#      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
-#    scripts:
-#      collect: 
-#        <<: *tsline_collect_settings
-#        ancestors: [pr, 'pr_*_30S-60S/tsline*']
-#        region: "30S-60S"
-#
+

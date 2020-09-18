@@ -217,7 +217,7 @@ begin
       var0 = info_items[0]@short_name
       exp0 = info_items[0]@exp
       ;project0 = input_file_info[0]@project
-      datasetnames = metadata_att_as_array(info_items, "dataset")
+      datasetnames := metadata_att_as_array(info_items, "dataset")
       dim_MOD = ListCount(info_items)
 
       ; get multi-model mean index
@@ -328,10 +328,10 @@ begin
 
       ; calculate multi model statistics
       if (isatt(info_items[0], "reference_dataset")) then
-        ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
+        ind_mod := ind(datasetnames.ne."MultiModelMean" .and. \
                       datasetnames.ne.info_items[0]@reference_dataset)
       else
-        ind_mod = ind(datasetnames.ne."MultiModelMean")
+        ind_mod := ind(datasetnames.ne."MultiModelMean")
       end if
 
       model_arr_stat&exp(iexp) =  var
@@ -347,6 +347,24 @@ begin
 
       delete(model_arr)
       delete(A_ref)
+
+      ; --------------------------------------------------------------------
+      ; Low pass filter
+      ; --------------------------------------------------------------------
+
+      ;create filter
+      nwt = 9      ; number of weights
+      fca = 0.2
+      nsigma = 1.
+      wgt = filwgts_lanczos (nwt, 0, fca, 0, nsigma) 
+
+      ;apply filter
+      model_arr_stat(iexp, 0, :) = wgt_runave_n_Wrap(model_arr_stat(iexp, 0, :), wgt, 1, 0)
+      model_arr_stat(iexp, 1, :) = wgt_runave_n_Wrap(model_arr_stat(iexp, 1, :), wgt, 1, 0)
+      model_arr_stat(iexp, 2, :) = wgt_runave_n_Wrap(model_arr_stat(iexp, 2, :), wgt, 1, 0)
+      if (iexp .eq. 0 .and. isatt(info_items[0], "reference_dataset")) then
+        model_arr_stat(2, 0, :) = wgt_runave_n_Wrap(model_arr_stat(2, 0, :), wgt, 1, 0)
+      end if
 
     end do
 
@@ -369,7 +387,7 @@ begin
     cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
 
     res@xyDashPatterns    := (/0, 0/)
-    res@xyLineThicknesses := (/5, 5/)
+    res@xyLineThicknesses := (/3, 3/)
     res@xyLineColors := cmap(:,:)
 
     ;res@pmLegendDisplayMode = "Never"
@@ -380,7 +398,12 @@ begin
     ;res@pmLegendParallelPosF   = .45                 ; move units right
     ;res@pmLegendOrthogonalPosF = -0.4                ; move units down
 
-    if (diag_script_info@header) then
+    ymax = max(model_arr_stat)
+    ymin = min(model_arr_stat)
+    res@trYMaxF := max((/0.2, ymax + 0.05 * (ymax - ymin)/))
+    res@trYMinF := min((/-0.2, ymin - 0.05 * (ymax - ymin)/))
+
+    if (isatt(diag_script_info, "header")) then
       res@tiMainString = diag_script_info@header(ivar)
     else
       res@tiMainString = ""
@@ -403,34 +426,6 @@ begin
     plots(ivar) = gsn_csm_xy(wks, time, model_arr_stat(0:1, 0, :), res)  ; create plot
 
     res@pmLegendDisplayMode = "Never"
-
-    ; ---------------------------------------------------------------------
-    ; Create legend
-    ; ---------------------------------------------------------------------
-    if (ivar .eq. 0) then
-      res_text                    = True                  ; text mods desired
-      res_text@txFontHeightF      = 0.015                 ; change text size
-      res_text@txJust             = "CenterLeft"          ; text justification
-
-      res_lines                   = True                  ; polyline mods desired
-      res_lines@gsLineDashPattern = 0.                    ; solid line
-      res_lines@gsLineThicknessF  = 5.                    ; line thicker
-      res_lines@gsLineColor       = cmap(0,:)                 ; line color
-      xx = (/1952,1958/)
-      yy = (/-.120,-.12/)
-      dum1 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)              ; add polyline
-      dum2 = gsn_add_text(wks,plots(ivar),"Anthropogenic + Natural",1960,-.120,res_text); add text
-      
-      yy = (/-.15,-.15/)
-      res_lines@gsLineColor       = cmap(1,:)
-      dum3 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
-      dum4 = gsn_add_text(wks,plots(ivar),"Natural",1960,-.15,res_text)       ; add text
-      
-      yy = (/-.180,-.180/)
-      res_lines@gsLineColor       := "black"                                ; change to black
-      dum5 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
-      dum6 = gsn_add_text(wks,plots(ivar),"Observations",1960,-.180,res_text) ; add text
-    end if
 
     
     ; ---------------------------------------------------------------------
@@ -458,11 +453,43 @@ begin
     ; add reference datasets
     ; ---------------------------------------------------------------------
     res@xyDashPatterns    := (/0/)
-    res@xyLineThicknesses := (/5/) ; thicks  ; make 2nd lines thicker
+    res@xyLineThicknesses := (/3/) ; thicks  ; make 2nd lines thicker
     res@xyLineColors      := "black"  ; change line color
 
     ref_p = gsn_csm_xy(wks, time, model_arr_stat(2, 0, :), res)  ; create plot
     overlay(plots(ivar), ref_p)
+
+
+    ; ---------------------------------------------------------------------
+    ; Create legend
+    ; ---------------------------------------------------------------------
+    if (ivar .eq. 0) then
+      res_text                    = True                  ; text mods desired
+      res_text@txFontHeightF      = 0.015                 ; change text size
+      res_text@txJust             = "CenterLeft"          ; text justification
+
+      res_lines                   = True                  ; polyline mods desired
+      res_lines@gsLineDashPattern = 0.                    ; solid line
+      res_lines@gsLineThicknessF  = 4.                    ; line thicker
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
+      res_lines@gsLineColor       = cmap(0,:)                 ; line color
+      xx = (/1952,1958/)
+      yy = (/-.120,-.12/)
+      dum1 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)
+      dum2 = gsn_add_text(wks,plots(ivar),"Anthropogenic + Natural",\
+                          1960,-.120,res_text)
+      
+      yy = (/-.15,-.15/)
+      res_lines@gsLineColor       = cmap(1,:)
+      dum3 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
+      dum4 = gsn_add_text(wks,plots(ivar),"Natural",1960,-.15,res_text)       ; add text
+      
+      yy = (/-.180,-.180/)
+      res_lines@gsLineColor       := "black"                                ; change to black
+      dum5 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
+      dum6 = gsn_add_text(wks,plots(ivar),"Observations",1960,-.180,res_text) ; add text
+    end if
+
 
   end do
 
@@ -472,15 +499,17 @@ begin
   pres = True
 
   pres@gsnPanelMainString = "Precipitation Anomaly"
-  pres@gsnPanelRowSpec = True
 
-  pres@gsnPanelFigureStrings = (/"a)","b)","c)","d)"/)
+  pres@gsnPanelRowSpec = True
+  pres@gsnPanelCenter  = False
+
+  pres@gsnPanelFigureStrings = (/"a)","c)","d)","e)", "f)"/)
   pres@gsnPanelFigureStringsPerimOn = False
   pres@gsnPanelFigureStringsBackgroundFillColor ="transparent"
   pres@gsnPanelFigureStringsJust = "TopLeft"
   pres@gsnPanelFigureStringsFontHeightF = 0.016
 
-  gsn_panel(wks, plots, (/1,1/), pres)
+  gsn_panel(wks, plots, (/1,2,2/), pres)
 
   log_info(" wrote " + outfile + "." + file_type)
 
