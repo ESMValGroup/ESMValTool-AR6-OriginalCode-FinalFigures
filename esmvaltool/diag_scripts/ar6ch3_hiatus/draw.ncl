@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200917 kosaka_yu: revised.
 ;    20200910 kosaka_yu: revised.
 ;    20200531 kosaka_yu: written.
 ;
@@ -218,7 +219,7 @@ begin
 
   color_cmip = "seagreen"
   color_cmip6 = (/204., 35., 35./)/255. 
-  color_cmip5 = (/37., 81., 204./)/255. 
+  color_cmip5 = "grey40" ;(/37., 81., 204./)/255. 
   color_cmip_mean = color_cmip
   color_cmip6_mean = color_cmip6
   color_cmip5_mean = color_cmip5
@@ -228,9 +229,9 @@ begin
   color_obs_ens = (/ "grey40", "black"/)
 ;  color_obs_single = (/ "blue2", "green4", "purple3", "red" /)
   color_obs_single = (/ "blue2", "green4", "orange3", "red" /)
-  opacity_pdf = 0.2
-  opacity_selected_pdf = 0.2
-  opacity_selected_line = 0.5
+  opacity_pdf = 0.15 ;0.2
+  opacity_selected_pdf = 0.25
+  opacity_selected_line = 0.25
   
   periphery_thickness = 1.
   line_thickness = 1.5
@@ -476,6 +477,9 @@ begin
     PDFpostCMIP6@mean = weighted_mean(GMSTtrendCMIP6Post, weight)
     PDFpostCMIP6@nmodels = count_unique_values(model)
     PDFpostCMIP6@nruns = num(.not.ismissing(GMSTtrendCMIP6Post))
+
+    GMSTtrendCMIP6Post_composited = GMSTtrendCMIP6Post
+    
     delete(weight)
     delete(esize)
     delete(model)
@@ -504,7 +508,7 @@ begin
   ; 2 trend patterns
   vpX = (/0.09, 0.09, 0.46, 0.46/)
   vpW = (/0.35, 0.35, 0.54, 0.54/)
-  vpY = (/0.84, 0.46, 0.84, 0.48/)
+  vpY = (/0.84, 0.44, 0.84, 0.48/)
   vpH = (/0.30, 0.30, 0.27, 0.27/)
  
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
@@ -525,16 +529,23 @@ begin
   res@tmXBLabelFontHeightF = 0.016
   res@tmYLPrecision = 1
   res@tmXBPrecision = 1
+  res@tmYLLabelJust = "CenterCenter"
+  res@tmYLLabelDeltaF = -0.25
+  res@tmXBLabelDeltaF = -0.5
+  res@gsnXRefLine = 0.
+  res@gsnXRefLineDashPattern = 2
+  res@gsnXRefLineThicknessF = 0.25
+;  res@gsnXRefLineColor =
   res@vpXF = vpX(0)
   res@vpYF = vpY(0)
   res@vpHeightF = vpH(0)
   res@vpWidthF = vpW(0)
   res@tiMainFontHeightF = 0.017
-  res@tiMainFont = "helvetica-bold"
-  res@tiMainString = "(a) "+hiatus_period+" GMST trend"
+  res@tiMainFont = "helvetica" ;"helvetica-bold"
+  res@tiMainString = "(a) "+hiatus_period ;+" GMST trend"
   res@tiMainOffsetYF = 0. ;-0.01
   res@tiMainFontThicknessF = 2.
-  res@tiYAxisString = "Probability Density [("+unit+")~S~-1~N~]"
+  res@tiYAxisString = "Normalized Density" ;"Probability Density [("+unit+")~S~-1~N~]"
   res@tiYAxisFontHeightF = 0.015
   txres         = True
   txres@gsnDraw = False
@@ -548,18 +559,20 @@ begin
   xaxis@long_name = long_name+"("+unit+")"
   pdfs(0) = gsn_csm_xy(wks, (/-1., 1./), (/ 0., 0./), res)
   idummy = 0
-  ilabel = 0
-  xlabel = res@trXMaxF - 0.015
+  ilabel = 0.
+  xlabelR = res@trXMaxF - 0.015
+  xlabelL = res@trXMinF + 0.015
+  xlabel = xlabelR
   ylabel = res@trYMaxF - 0.2
   ylabeli = 0.35
 
   if (isvar("PDFhiatusCMIP5")) then
     polyPDFhiatusCMIP5 = pdf_polygon(PDFhiatusCMIP5)
     ; CMIP5 PDF fill
-;    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, opacity_pdf)
-;    dummy(idummy) = gsn_add_polygon(wks, pdfs(0), \
-;                                    polyPDFhiatusCMIP5(0, :), polyPDFhiatusCMIP5(1, :), resp)
-;    idummy = idummy + 1
+    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, opacity_pdf)
+    dummy(idummy) = gsn_add_polygon(wks, pdfs(0), \
+                                    polyPDFhiatusCMIP5(0, :), polyPDFhiatusCMIP5(1, :), resp)
+    idummy = idummy + 1
   end if
   if (isvar("PDFhiatusCMIP6")) then
     polyPDFhiatusCMIP6 = pdf_polygon(PDFhiatusCMIP6)
@@ -571,31 +584,65 @@ begin
   end if
   if (isvar("PDFhiatusCMIP5")) then
     ; CMIP5 PDF periphery
-    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
-                                     polyPDFhiatusCMIP5(0, :), polyPDFhiatusCMIP5(1, :), resp)
-    idummy = idummy + 1
+;    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
+;                                     polyPDFhiatusCMIP5(0, :), polyPDFhiatusCMIP5(1, :), resp)
+;    idummy = idummy + 1
     ; CMIP5 PDF mean
-    tmp = addline_PDF(polyPDFhiatusCMIP5(0, :), polyPDFhiatusCMIP5(1, :), PDFhiatusCMIP5@mean)
-    resp = Res_drawPDF(color_cmip5_mean, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
-                                     tmp(0, :), tmp(1, :), resp)
-    delete(tmp)
-    idummy = idummy + 1
+;    tmp = addline_PDF(polyPDFhiatusCMIP5(0, :), polyPDFhiatusCMIP5(1, :), PDFhiatusCMIP5@mean)
+;    resp = Res_drawPDF(color_cmip5_mean, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
+;                                     tmp(0, :), tmp(1, :), resp)
+;    delete(tmp)
+;    idummy = idummy + 1
+    polyres := True
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    polyres@gsFillColor = color_cmip5
+    datatondc(pdfs(0), PDFhiatusCMIP5@mean, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+;    txres@txFontColor := color_obs_single(j)
+;    dummy(idummy) = gsn_add_text(wks, pdfs(0), "CMIP5 mean", xlabel, ylabel-ilabel*ylabeli, txres)
+;    ilabel = ilabel + 1.
+    delete(xmarker)
+    delete(ymarker)
   end if
   if (isvar("PDFhiatusCMIP6")) then
     ; CMIP6 PDF periphery
-    resp = Res_drawPDF(color_cmip6, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
-                                     polyPDFhiatusCMIP6(0, :), polyPDFhiatusCMIP6(1, :), resp)
-    idummy = idummy + 1
+;    resp = Res_drawPDF(color_cmip6, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
+;                                     polyPDFhiatusCMIP6(0, :), polyPDFhiatusCMIP6(1, :), resp)
+;    idummy = idummy + 1
     ; CMIP6 PDF mean
-    tmp = addline_PDF(polyPDFhiatusCMIP6(0, :), polyPDFhiatusCMIP6(1, :), PDFhiatusCMIP6@mean)
-    resp = Res_drawPDF(color_cmip6_mean, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
-                                     tmp(0, :), tmp(1, :), resp)
-    delete(tmp)
-    idummy = idummy + 1
+;    tmp = addline_PDF(polyPDFhiatusCMIP6(0, :), polyPDFhiatusCMIP6(1, :), PDFhiatusCMIP6@mean)
+;    resp = Res_drawPDF(color_cmip6_mean, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(0), \
+;                                     tmp(0, :), tmp(1, :), resp)
+;    delete(tmp)
+;    idummy = idummy + 1
+    polyres := True
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    polyres@gsFillColor = color_cmip6
+    datatondc(pdfs(0), PDFhiatusCMIP6@mean, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+;    txres@txFontColor := color_obs_single(j)
+;    dummy(idummy) = gsn_add_text(wks, pdfs(0), "CMIP6 mean", xlabel, ylabel-ilabel*ylabeli, txres)
+;    ilabel = ilabel + 1.
+    delete(xmarker)
+    delete(ymarker)
   end if
   if (composite_project.eq."cmip6") then
     tmp = tail_PDF(polyPDFhiatusCMIP6(0, :), polyPDFhiatusCMIP6(1, :), threshold_GSTtrend_composite)
@@ -614,13 +661,124 @@ begin
   end if
   if (isvar("PDFhiatusCMIP6")) then
     txres@txFontColor := color_cmip6
-    dummy(idummy) = gsn_add_text(wks, pdfs(0), "CMIP6: "+PDFhiatusCMIP6@nmodels+" models, "+PDFhiatusCMIP6@nruns+" runs", xlabel, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "CMIP6: "+PDFhiatusCMIP6@nmodels+" models,     ~C~             "+PDFhiatusCMIP6@nruns+" members ", xlabel, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
-    ilabel = ilabel + 1
+    ilabel = ilabel + 2.
+    polyres := True
+    polyres@gsFillColor = color_cmip6
+    polyres@gsFillOpacityF = 1.
+    x = xlabel-0.05
+    y = ylabel-ilabel*ylabeli
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    datatondc(pdfs(0), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    polyres@gsFillOpacityF = opacity_pdf
+    y = ylabel-ilabel*ylabeli
+    xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
+    ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
+    dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, polyres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "histogram", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    if (isStrSubset(composite_project, "cmip6")) then
+      polyres@gsFillColor := color_cmip6_selected
+      polyres@gsFillOpacityF = opacity_selected_pdf
+      xmarker(1) = xmarker(0)+0.01
+      xmarker(2) = xmarker(1)
+      dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, polyres)
+      idummy = idummy + 1    
+      ilabel = ilabel + 1.
+      txres@txFontOpacityF = 0.7
+      dummy(idummy) = gsn_add_text(wks, pdfs(0), "selected members", xlabel, ylabel-ilabel*ylabeli, txres)
+      idummy = idummy + 1
+      txres@txFontColor := color_cmip6_selected
+      dummy(idummy) = gsn_add_text(wks, pdfs(0), "selected members", xlabel, ylabel-ilabel*ylabeli, txres)
+      txres@txFontOpacityF = 1.
+      idummy = idummy + 1
+      polyres@gsLineColor = color_cmip6_selected
+      x = (xmarker(0)+xmarker(1))/2.
+      y = ylabel-ilabel*ylabeli
+      dummy(idummy) = gsn_add_polyline(wks, pdfs(0), (/x, x-0.01/), (/y+ylabeli/2., y/), polyres)
+      idummy = idummy + 1    
+      ilabel = ilabel + 1.
+    end if
+    ilabel = ilabel + 0.5
+    delete(xmarker)
+    delete(ymarker)
   end if
   if (isvar("PDFhiatusCMIP5")) then
     txres@txFontColor := color_cmip5
-    dummy(idummy) = gsn_add_text(wks, pdfs(0), "CMIP5: "+PDFhiatusCMIP5@nmodels+" models, "+PDFhiatusCMIP5@nruns+" runs", xlabel, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "CMIP5: "+PDFhiatusCMIP5@nmodels+" models,     ~C~             "+PDFhiatusCMIP5@nruns+" members ", xlabel, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 2.
+    polyres := True
+    polyres@gsFillColor = color_cmip5
+    polyres@gsFillOpacityF = 1.
+    x = xlabel-0.05
+    y = ylabel-ilabel*ylabeli
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    datatondc(pdfs(0), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "ensemble mean", x, y, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    polyres@gsFillOpacityF = opacity_pdf
+    y = ylabel-ilabel*ylabeli
+    xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
+    ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
+    dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, polyres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "histogram", x, y, txres)
+    idummy = idummy + 1
+    if (isStrSubset(composite_project, "cmip5")) then
+      polyres@gsFillColor := color_cmip5_selected
+      polyres@gsFillOpacityF = opacity_selected_pdf
+      xmarker(1) = xmarker(0)+0.01
+      xmarker(2) = xmarker(1)
+      dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, polyres)
+      idummy = idummy + 1    
+      ilabel = ilabel + 1.
+      txres@txFontOpacityF = 0.7
+      dummy(idummy) = gsn_add_text(wks, pdfs(0), "selected members", xlabel, ylabel-ilabel*ylabeli, txres)
+      idummy = idummy + 1
+      txres@txFontColor := color_cmip5_selected
+      dummy(idummy) = gsn_add_text(wks, pdfs(0), "selected members", xlabel, ylabel-ilabel*ylabeli, txres)
+      txres@txFontOpacityF = 1.
+      idummy = idummy + 1
+      polyres@gsLineColor = color_cmip5_selected
+      x = (xmarker(0)+xmarker(1))/2.
+      y = ylabel-ilabel*ylabeli
+      dummy(idummy) = gsn_add_polyline(wks, pdfs(0), (/x, x-0.01/), (/y+ylabeli/2., y/), polyres)
+      idummy = idummy + 1    
+      ilabel = ilabel + 1.
+    end if
+    ilabel = ilabel + 0.5
+    delete(xmarker)
+    delete(ymarker)
+  end if
+  xlabel = xlabelL
+  ilabel = 0.
+  txres@txJust = "TopLeft"
+  if (isdefined("PDFhiatusObs").or.isdefined("SingleValhiatusObs")) then
+    txres@txFontColor := "black"
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "Observations", xlabel, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
     ilabel = ilabel + 1
   end if
@@ -636,15 +794,30 @@ begin
                                        polyPDFhiatusObs(0, :), polyPDFhiatusObs(1, :), resp)
       idummy = idummy + 1
       delete(polyPDFhiatusObs)
-      txres@txFontColor := color_obs_ens(j)
-      dummy(idummy) = gsn_add_text(wks, pdfs(0), PDFhiatusObs[ii]@dataset, xlabel, ylabel-ilabel*ylabeli, txres)
+      resp@gsFillScaleF = 0.7
+      x = xlabel+0.05
+      y = ylabel-ilabel*ylabeli
+      xmarker = (/x-0.01, x-0.05, x-0.05, x-0.01/)
+      ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
+      dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, resp)
       idummy = idummy + 1
-      ilabel = ilabel + 1
+      xmarker2 = array_append_record(xmarker, xmarker(0), 0)
+      ymarker2 = array_append_record(ymarker, ymarker(0), 0)
+      dummy(idummy) = gsn_add_polyline(wks, pdfs(0), xmarker2, ymarker2, resp)
+      idummy = idummy + 1
+      txres@txFontColor := color_obs_ens(j)
+      dummy(idummy) = gsn_add_text(wks, pdfs(0), PDFhiatusObs[ii]@dataset, x, y, txres)
+      idummy = idummy + 1
+      ilabel = ilabel + 1.
       j = j + 1
+      delete(xmarker)
+      delete(ymarker)
+      delete(xmarker2)
+      delete(ymarker2)
     end do
   end if
   if (isdefined("SingleValhiatusObs")) then
-    polyres = True
+    polyres := True
     xmarker = new(3, "float")
     ymarker = new(3, "float")
     j = 0
@@ -656,8 +829,22 @@ begin
       ymarker(1) = ymarker(0) + 0.02
       ymarker(2) = ymarker(1)
       gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+      x = xlabel+0.05
+      y = ylabel-ilabel*ylabeli
+      datatondc(pdfs(0), x-0.03, y, xmarker(0), ymarker(0))
+      xmarker(1) = xmarker(0) 
+      xmarker(2) = xmarker(0) + 0.004
+      xmarker(0) = xmarker(0) - 0.004
+      ymarker(1) = ymarker(0) - 0.0125
+      ymarker(2) = ymarker(0)
+      gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
       txres@txFontColor := color_obs_single(j)
-      dummy(idummy) = gsn_add_text(wks, pdfs(0), SingleValhiatusObs[ii]@dataset, xlabel, ylabel-ilabel*ylabeli, txres)
+      dataset_name = SingleValhiatusObs[ii]@dataset
+      if (dataset_name.eq."NOAAGlobalTemp") then
+        dataset_name = "NOAA~C~GlobalTemp"
+        ilabel = ilabel + 1
+      end if
+      dummy(idummy) = gsn_add_text(wks, pdfs(0), dataset_name, x, y, txres)
       ilabel = ilabel + 1
       j = j + 1
     end do
@@ -678,20 +865,19 @@ begin
   res@vpYF = vpY(1)
   res@vpHeightF = vpH(1)
   res@vpWidthF = vpW(1)
-  res@tiMainString = "(b) "+post_period+" GMST trend"
-  res@tiMainOffsetYF = -0.02
+  res@tiMainString = "(b) "+post_period; +" GMST trend"
+  res@tiMainOffsetYF = 0. ;-0.02
   pdfs(1) = gsn_csm_xy(wks, (/-1., 1./), (/ 0., 0./), res)
-  ilabel = 0
-;  xlabel = res@trXMinF + 0.025
-;  txres@txJust = "TopLeft"
-  
+  ilabel = 0.
+  xlabel = xlabelR
+  txres@txJust = "TopRight"
   if (isvar("PDFpostCMIP5")) then
     polyPDFpostCMIP5 = pdf_polygon(PDFpostCMIP5)
     ; CMIP5 PDF fill
-;    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, opacity_pdf)
-;    dummy(idummy) = gsn_add_polygon(wks, pdfs(1), \
-;                                    polyPDFpostCMIP5(0, :), polyPDFpostCMIP5(1, :), resp)
-;    idummy = idummy + 1
+    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, opacity_pdf)
+    dummy(idummy) = gsn_add_polygon(wks, pdfs(1), \
+                                    polyPDFpostCMIP5(0, :), polyPDFpostCMIP5(1, :), resp)
+    idummy = idummy + 1
   end if
   if (isvar("PDFpostCMIP6")) then
     polyPDFpostCMIP6 = pdf_polygon(PDFpostCMIP6)
@@ -731,43 +917,172 @@ begin
 
   if (isvar("PDFpostCMIP5")) then
     ; CMIP5 PDF periphery
-    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
-                                     polyPDFpostCMIP5(0, :), polyPDFpostCMIP5(1, :), resp)
-    idummy = idummy + 1
+;    resp = Res_drawPDF(color_cmip5, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
+;                                     polyPDFpostCMIP5(0, :), polyPDFpostCMIP5(1, :), resp)
+;    idummy = idummy + 1
     ; CMIP5 PDF mean
-    tmp = addline_PDF(polyPDFpostCMIP5(0, :), polyPDFpostCMIP5(1, :), PDFpostCMIP5@mean)
-    resp = Res_drawPDF(color_cmip5_mean, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
-                                     tmp(0, :), tmp(1, :), resp)
-    delete(tmp)
-    idummy = idummy + 1
+;    tmp = addline_PDF(polyPDFpostCMIP5(0, :), polyPDFpostCMIP5(1, :), PDFpostCMIP5@mean)
+;    resp = Res_drawPDF(color_cmip5_mean, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
+;                                     tmp(0, :), tmp(1, :), resp)
+;    delete(tmp)
+;    idummy = idummy + 1
+    polyres := True
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    polyres@gsFillColor = color_cmip5
+    datatondc(pdfs(1), PDFpostCMIP5@mean, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+;    txres@txFontColor := color_CMIP5
+;    dummy(idummy) = gsn_add_text(wks, pdfs(1), "CMIP5 mean", xlabel, ylabel-ilabel*ylabeli, txres)
+;    ilabel = ilabel + 1
+    delete(xmarker)
+    delete(ymarker)
   end if
   if (isvar("PDFpostCMIP6")) then
     ; CMIP6 PDF periphery
-    resp = Res_drawPDF(color_cmip6, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
-                                     polyPDFpostCMIP6(0, :), polyPDFpostCMIP6(1, :), resp)
-    idummy = idummy + 1
+;    resp = Res_drawPDF(color_cmip6, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
+;                                     polyPDFpostCMIP6(0, :), polyPDFpostCMIP6(1, :), resp)
+;    idummy = idummy + 1
     ; CMIP6 PDF mean
-    tmp = addline_PDF(polyPDFpostCMIP6(0, :), polyPDFpostCMIP6(1, :), PDFpostCMIP6@mean)
-    resp = Res_drawPDF(color_cmip6_mean, periphery_thickness, 0, 1.)
-    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
-                                     tmp(0, :), tmp(1, :), resp)
-    idummy = idummy + 1
-    delete(tmp)
+;    tmp = addline_PDF(polyPDFpostCMIP6(0, :), polyPDFpostCMIP6(1, :), PDFpostCMIP6@mean)
+;    resp = Res_drawPDF(color_cmip6_mean, periphery_thickness, 0, 1.)
+;    dummy(idummy) = gsn_add_polyline(wks, pdfs(1), \
+;                                     tmp(0, :), tmp(1, :), resp)
+;    idummy = idummy + 1
+;    delete(tmp)
+    polyres := True
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    polyres@gsFillColor = color_cmip6
+    datatondc(pdfs(1), PDFpostCMIP6@mean, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+;    txres@txFontColor := color_CMIP6
+;    dummy(idummy) = gsn_add_text(wks, pdfs(1), "CMIP6 mean", xlabel, ylabel-ilabel*ylabeli, txres)
+;    ilabel = ilabel + 1
+    delete(xmarker)
+    delete(ymarker)
   end if
   if (isvar("PDFpostCMIP6")) then
     txres@txFontColor := color_cmip6
-    dummy(idummy) = gsn_add_text(wks, pdfs(1), "CMIP6: "+PDFpostCMIP6@nmodels+" models, "+PDFpostCMIP6@nruns+" runs", xlabel, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "CMIP6: "+PDFpostCMIP6@nmodels+" models,     ~C~             "+PDFpostCMIP6@nruns+" members ", xlabel, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
-    ilabel = ilabel + 1
+    ilabel = ilabel + 2.
+    polyres := True
+    polyres@gsFillColor = color_cmip6
+    polyres@gsFillOpacityF = 1.
+    x = xlabel-0.05
+    y = ylabel-ilabel*ylabeli
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    datatondc(pdfs(1), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    polyres@gsFillOpacityF = opacity_pdf
+    y = ylabel-ilabel*ylabeli
+    xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
+    ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
+    dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "histogram", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    if (isStrSubset(composite_project, "cmip6")) then
+      polyres@gsFillColor := color_cmip6_selected
+      polyres@gsFillOpacityF = opacity_selected_pdf
+      ymarker(0) = ymarker(2)+(ymarker(0)-ymarker(2))*0.3
+      ymarker(1) = ymarker(0)
+      dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
+      idummy = idummy + 1    
+      ilabel = ilabel + 1.
+      txres@txFontOpacityF = 0.7
+      dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a)", xlabel, ylabel-ilabel*ylabeli, txres)
+      idummy = idummy + 1
+      txres@txFontColor := color_cmip6_selected
+      dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a)", xlabel, ylabel-ilabel*ylabeli, txres)
+      txres@txFontOpacityF = 1.
+      idummy = idummy + 1
+      polyres@gsLineColor = color_cmip6_selected
+      x = (xmarker(0)+xmarker(1))/2.
+      y = ymarker(2)+(ymarker(0)-ymarker(2))*0.5
+      dummy(idummy) = gsn_add_polyline(wks, pdfs(1), (/x, x-0.015/), (/y, ylabel-ilabel*ylabeli/), polyres)
+      idummy = idummy + 1    
+      ilabel = ilabel + 1.
+    end if
+    ilabel = ilabel + 0.5
+    delete(xmarker)
+    delete(ymarker)
   end if
   if (isvar("PDFpostCMIP5")) then
     txres@txFontColor := color_cmip5
-    dummy(idummy) = gsn_add_text(wks, pdfs(1), "CMIP5: "+PDFpostCMIP5@nmodels+" models, "+PDFpostCMIP5@nruns+" runs", xlabel, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "CMIP5: "+PDFpostCMIP5@nmodels+" models,     ~C~             "+PDFpostCMIP5@nruns+" members ", xlabel, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
-    ilabel = ilabel + 1
+    ilabel = ilabel + 2.
+    polyres := True
+    polyres@gsFillColor = color_cmip5
+    polyres@gsFillOpacityF = 1.
+    x = xlabel-0.05
+    y = ylabel-ilabel*ylabeli
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
+    datatondc(pdfs(1), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    polyres@gsFillOpacityF = opacity_pdf
+    y = ylabel-ilabel*ylabeli
+    xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
+    ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
+    dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
+    idummy = idummy + 1
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "histogram", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    if (isStrSubset(composite_project, "cmip5")) then
+      y = ylabel-ilabel*ylabeli
+      ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
+      dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
+      idummy = idummy + 1
+      polyres@gsFillColor := color_cmip5_selected
+      polyres@gsFillOpacityF = opacity_selected_pdf
+      dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
+      idummy = idummy + 1    
+;      dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a) that~C~     extend to "+str_get_field(post_period, 2, "-"), x, ylabel-ilabel*ylabeli, txres)
+      dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a)", x, ylabel-ilabel*ylabeli, txres)
+      idummy = idummy + 1
+      ilabel = ilabel + 1.8
+    end if
+    ilabel = ilabel + 0.5
+    delete(xmarker)
+    delete(ymarker)
   end if
 
 ; ======================================================================
@@ -818,6 +1133,7 @@ begin
   resTs@res_lbTitlePosition = "Bottom"
   resTs@res_lbTitleFontHeightF = 0.016
   resTs@res_lbTitleOffsetF = 0.1
+  resTs@res_tiMainFont = "helvetica"
   resTs@res_tiMainFontHeightF = 0.017
   resTs@res_tiMainOffsetYF = -0.012
 ;  resTs@res_tmXTOn = False
@@ -844,8 +1160,9 @@ begin
   
   txres@txJust = "TopRight"
   
-  resTs@res_tiMainString = "(c) "+hiatus_period+" "+\
-                           str_sub_str(obs_dataset_pattern, "_", " ")+" trend"
+;  resTs@res_tiMainString = "(c) "+hiatus_period+" "+\
+;                           str_sub_str(obs_dataset_pattern, "_", " ")+" trend"
+  resTs@res_tiMainString = "(c) "+str_sub_str(obs_dataset_pattern, "_", " ")
   resTs@res_vpXF = vpX(2)
   resTs@res_vpYF = vpY(2)
   resTs@res_vpHeightF = vpH(2)
@@ -853,7 +1170,8 @@ begin
   copy_VarAtts(resTs, TstrendObsHiatus)
   patterns( 0 ) = contour_map(wks, TstrendObsHiatus, "")
 
-  resTs@res_tiMainString = "(d) "+hiatus_period+" "+str_upper(composite_project)+" trend composite"
+;  resTs@res_tiMainString = "(d) "+hiatus_period+" "+str_upper(composite_project)+" trend composite"
+  resTs@res_tiMainString = "(d) "+str_upper(composite_project)+" composite"
   resTs@res_vpXF = vpX(3)
   resTs@res_vpYF = vpY(3)
   resTs@res_vpHeightF = vpH(3)
@@ -871,7 +1189,7 @@ begin
   ylabel = resTs@res_vpYF
   ylabeli = 0.015
   if (isatt(TstrendCMIPHiatus, "nmembers_CMIP6")) then
-    txres@txFontColor := color_cmip6
+    txres@txFontColor := color_cmip6_selected
     nmodels = count_unique_values(where(composite_projects.eq."CMIP6", \
                                   composite_models, composite_models@_FillValue))
     if (isatt(TstrendCMIPHiatus, "nmembers_CMIP5")) then
@@ -884,7 +1202,7 @@ begin
     ilabel = ilabel + 1
   end if
   if (isatt(TstrendCMIPHiatus, "nmembers_CMIP5")) then
-    txres@txFontColor := color_cmip5
+    txres@txFontColor := color_cmip5_selected
     nmodels = count_unique_values(where(composite_projects.eq."CMIP5", \
                                   composite_models, composite_models@_FillValue))
     if (isatt(TstrendCMIPHiatus, "nmembers_CMIP6")) then
@@ -909,6 +1227,15 @@ begin
 ;  gsn_text_ndc(wks, "cmip5: "+TStrendCMIPPost@ncomposite_cmip5, 0.98, 0.35, txres)
 ;  gsn_text_ndc(wks, "cmip6: "+TStrendCMIPPost@ncomposite_cmip6, 0.98, 0.335, txres)
 
+  txres@txFontColor := "black"
+  txres@txFontHeightF = 0.02
+  txres@txFont = "helvetica"
+  txres@txJust = "TopCenter"
+  gsn_text_ndc(wks, "Decadal modulation of the surface global warming trend", 0.5, max(vpY)+0.12, txres)
+  txres@txFont = "helvetica-bold"
+  txres@txFontHeightF = 0.018
+  gsn_text_ndc(wks, "Distribution of the GMST trend", (vpX(0)+vpX(3))/2.-0.01, vpY(0)+0.075, txres)
+  gsn_text_ndc(wks, "Pattern of trend over 1998-2012", (vpX(3)+1.)/2., vpY(0)+0.075, txres)
   draw(pdfs)
   draw(patterns)
   frame(wks)

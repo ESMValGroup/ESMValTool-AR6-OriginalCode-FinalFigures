@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20200917 kosaka_yu: added statistical significance to the trend maps
 ;    20200525 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -22,34 +23,6 @@ load "$diag_scripts/shared/statistics.ncl"
 
 load "$diag_scripts/ar6ch3_hiatus/functions.ncl"
 load "$diag_scripts/ar6ch3_hiatus/io_globalmean.ncl"
-
-;function check_info_consistency(info1, info2)
-;local consistency
-;begin
-;  consistency = True
-;  if (isatt(info1, "project") then
-;    if (.not.isatt(info2, "project").or.info1@project.ne.info2@project) then
-;      consistency = False
-;    end if
-;  elseif (isatt(info2, "project")) then
-;    consistency = False
-;  end if
-;  if (isatt(info1, "dataset")) then
-;    if (.not.isatt(info2, "dataset").or.info1@dataset.ne.info2@dataset) then
-;      consistency = False
-;    end if
-;  elseif (isatt(info2, "dataset")) then
-;    consistency = False
-;  end if
-;  if (isatt(info1, "ensemble")) then
-;    if (.not.isatt(info2, "ensemble").or.info1@ensemble.ne.info2@ensemble) then
-;      consistency = False
-;    end if
-;  elseif (isatt(info2, "ensemble")) then
-;    consistency = False
-;  end if
-;  return(consistency)
-;end
 
 function get_info_match(infoRef, infoList, atts, opt)
 local info, i, j, match, unique, tmp
@@ -144,102 +117,6 @@ begin
   end if
   return(tail)
 end
-
-;function get_filename(info, var)
-;local info, var, name, project, dataset, ensemble, experment
-;begin
-;  project    = info@project   ; obs/obs4mips/ana4mips/CMIP5/CMIP6
-;  dataset    = info@dataset   ; model/dataset name
-;  if (isatt(info, "exp")) then
-;    experiment = info@exp       ; historical-rcp45 etc.
-;  else
-;    experiment = ""
-;  end if
-;  if (isatt(info, "ensemble")) then
-;    ensemble   = info@ensemble  ; r*i*p*
-;  else
-;    ensemble   = ""
-;  end if
-;  name = var+"_"+project+"_"+dataset
-;  if (experiment.ne."") then
-;    name = name+"_"+experiment
-;  end if
-;  if (ensemble.ne."") then
-;    name = name+"_"+ensemble
-;  end if
-;  name = name+".nc"
-;  return(name)
-;end
-
-;procedure pushObsList(ObsList, array, info)
-;local ens, nens, dims, dimsnew, dataset_names, i, str
-;begin
-;  ; For HadCRUT4 and CowtanWay, get ensemble number
-;  if (isStrSubset(info@dataset, "HadCRUT").or.\
-;      isStrSubset(info@dataset, "CowtanWay")) then
-;    if (isStrSubset(info@filename, "_median_").or.isStrSubset(info@filename, "_mean_")) then
-;      ens = 0      
-;    else
-;      str = str_split(info@filename, "_")
-;      i = str_match_ind(str, "ens")
-;      ens = toint(str_sub_str(str(i), "ens", ""))
-;      delete(str)
-;      delete(i)
-;    end if
-;    if (isStrSubset(info@dataset, "HadCRUT4").or.\
-;        isStrSubset(info@dataset, "CowtanWay")) then
-;      nens = 101
-;    elseif (isStrSubset(info@dataset, "HadCRUT5")) then
-;      nens = 201
-;    end if
-;      
-;    if (ListCount(ObsList).lt.1) then
-;      dims = dimsizes(array)
-;      if (dimsizes(dims).eq.1) then
-;        dimsnew = nens
-;      else
-;        dimsnew = array_append_record(nens, dims, 0)
-;      end if
-;      delete(dims)
-;      ListAppend(ObsList, new(dimsnew, typeof(array))) ; ens = 0: median or mean
-;      i = ListCount(ObsList) - 1
-;      ObsList[i]!0 = "ensemble"
-;      ObsList[i]&ensemble = ispan(0, nens-1, 1)
-;    else
-;      dataset_names = metadata_att_as_array(ObsList, "dataset")
-;      if (any(dataset_names.eq.info@dataset)) then
-;        i = ind(dataset_names.eq.info@dataset)
-;      else
-;        dims = dimsizes(array)
-;        if (dimsizes(dims).eq.1) then
-;          dimsnew = nens
-;        else
-;          dimsnew = array_append_record(nens, dims, 0)
-;        end if
-;        delete(dims)
-;        ListAppend(ObsList, new(dimsnew, typeof(array))) ; ens = 0: median
-;        i = ListCount(ObsList) - 1
-;        ObsList[i]!0 = "ensemble"
-;        ObsList[i]&ensemble = ispan(0, nens-1, 1)
-;      end if
-;      delete(dataset_names)
-;    end if
-;    if (dimsizes(dimsizes(array)).eq.2) then
-;      ObsList[i](ens, :, :) = array
-;    else
-;      ObsList[i](ens) = array
-;    end if
-;  else
-;    ListAppend(ObsList, new(dimsizes(array), typeof(array)))
-;    i = ListCount(ObsList) - 1
-;    ObsList[i] = array
-;    if (dimsizes(dimsizes(array)).eq.1) then
-;      ObsList[i]!0 = "ensemble"
-;      ObsList[i]&ensemble = 0
-;    end if
-;  end if
-;  ObsList[i]@dataset = info@dataset
-;end
   
 begin
 
@@ -544,100 +421,7 @@ begin
   delete([/datasets_tmp, infoDummy, opt/])
   GMList = make_GMList(work_dir, do_post, do_maskGlobalmean_post, do_blend, do_mask, \
                        syear_hiatus, eyear_hiatus, syear_post, eyear_post, datasets)
- 
-;  if (do_post) then
-;    head_unmasked = "# Dataset            ensemble    "+syear_hiatus+"-"+eyear_hiatus+"  "+syear_post+"-"+eyear_post
-;    if (do_maskGlobalmean_post) then
-;      head_masked = head_unmasked
-;    else
-;      head_masked = head_unmasked+" (unmasked)"
-;    end if
-;  else
-;    head_unmasked = "# Dataset            ensemble    "+syear_hiatus+"-"+eyear_hiatus
-;    head_masked   = head_unmasked
-;  end if
-;   
-;  GMList = NewList("fifo")
-;  ListAppend(GMList, new(1, string))
-;  l = 0
-;  GMList[l] = "CMIP6"
-;  GMList[l]@ofile_GSATunmasked = work_dir + "trendGSAT_unmasked_CMIP6.txt"
-;  write_table(GMList[l]@ofile_GSATunmasked, "w", [/head_unmasked/], "%s")
-;  if (do_mask) then
-;    GMList[l]@ofile_GSATmasked = work_dir + "trendGSAT_masked_CMIP6.txt"
-;    write_table(GMList[l]@ofile_GSATmasked, "w", [/head_masked/], "%s")
-;  end if
-;  if (do_blend) then
-;    GMList[l]@ofile_GMSTunmasked = work_dir + "trendGMST_unmasked_CMIP6.txt"
-;    write_table(GMList[l]@ofile_GMSTunmasked, "w", [/head_unmasked/], "%s")
-;  end if
-;  if (do_mask.and.do_blend) then
-;    GMList[l]@ofile_GMSTmasked = work_dir + "trendGMST_masked_CMIP6.txt"
-;    write_table(GMList[l]@ofile_GMSTmasked, "w", [/head_masked/], "%s")
-;  end if
-;
-;  ListAppend(GMList, new(1, string))
-;  l = 1
-;  GMList[l] = "CMIP5"
-;  GMList[l]@ofile_GSATunmasked = work_dir + "trendGSAT_unmasked_CMIP5.txt"
-;  write_table(GMList[l]@ofile_GSATunmasked, "w", [/head_unmasked/], "%s")
-;  if (do_mask) then
-;    GMList[l]@ofile_GSATmasked = work_dir + "trendGSAT_masked_CMIP5.txt"
-;    write_table(GMList[l]@ofile_GSATmasked, "w", [/head_masked/], "%s")
-;  end if
-;  if (do_blend) then
-;    GMList[l]@ofile_GMSTunmasked = work_dir + "trendGMST_unmasked_CMIP5.txt"
-;    write_table(GMList[l]@ofile_GMSTunmasked, "w", [/head_unmasked/], "%s")
-;  end if
-;  if (do_mask.and.do_blend) then
-;    GMList[l]@ofile_GMSTmasked = work_dir + "trendGMST_masked_CMIP5.txt"
-;    write_table(GMList[l]@ofile_GMSTmasked, "w", [/head_masked/], "%s")
-;  end if
-;  
-;  datasets = get_unique_values(array_append_record(array_append_record(dataset_names_tas, dataset_names_tasa, 0), dataset_names_tasaga, 0))
-;  infoDummy = True
-;  opt = True
-;  opt@unique = "any"
-;  do k = 0, dimsizes(datasets)-1
-;    infoDummy@dataset = datasets(k)
-;    info = get_info_match(infoDummy, infoTas, (/"dataset"/), opt)
-;    if (.not.info) then
-;      info = get_info_match(infoDummy, infoTasa, (/"dataset"/), opt)
-;    end if
-;    if (.not.info) then
-;      info = get_info_match(infoDummy, infoTasaga, (/"dataset"/), opt)
-;    end if
-;    if (any(info@project.eq.(/"CMIP5", "CMIP6"/))) then
-;      delete(info)
-;      continue
-;    end if
-;    delete(info)
-;
-;    ListAppend(GMList, new(1, string))
-;    l = ListCount(GMList)-1
-;    GMList[l] = datasets(k)
-;    if (any(datasets(k).eq.reanalyses)) then
-;      GMList[l]@ofile_GSATunmasked = work_dir + "trendGSAT_unmasked_"+datasets(k)+"_OBS.txt"
-;      write_table(GMList[l]@ofile_GSATunmasked, "w", [/head_unmasked/], "%s")
-;      if (do_mask) then
-;        GMList[l]@ofile_GSATmasked = work_dir + "trendGSAT_masked_"+datasets(k)+"_OBS.txt"
-;        write_table(GMList[l]@ofile_GSATmasked, "w", [/head_masked/], "%s")
-;      end if
-;      if (do_blend) then
-;        GMList[l]@ofile_GMSTunmasked = work_dir + "trendGMST_unmasked_"+datasets(k)+"_OBS.txt"
-;        write_table(GMList[l]@ofile_GMSTunmasked, "w", [/head_unmasked/], "%s")
-;      end if
-;      if (do_mask.and.do_blend) then
-;        GMList[l]@ofile_GMSTmasked = work_dir + "trendGMST_masked_"+datasets(k)+"_OBS.txt"
-;        write_table(GMList[l]@ofile_GMSTmasked, "w", [/head_masked/], "%s")
-;      end if
-;    else
-;      GMList[l]@ofile_GSATunmasked = work_dir + "trendGMST_"+datasets(k)+"_OBS.txt"
-;      write_table(GMList[l]@ofile_GSATunmasked, "w", [/head_unmasked/], "%s")
-;    end if
-;  end do
-;  delete([/infoDummy, opt/])
-  
+   
 ; ========================================================================
 ;
 ;               Loop for each (historical) SAT/SATa/GMST data

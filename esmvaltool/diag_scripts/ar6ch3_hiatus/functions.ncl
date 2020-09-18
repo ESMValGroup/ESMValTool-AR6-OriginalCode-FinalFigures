@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20200917 kosaka_yu: revised to add significance in calc_trend.
 ;    20200914 kosaka_yu: revised to account for weighting in percentiles.
 ;    20200525 kosaka_yu: written.
 ;
@@ -408,12 +409,17 @@ begin
                         "ls", "LS"/))) then
       tmp = dtrend_msg(tofloat(ispan(1, dimsizes(y({ts:te})), 1)), y({ts:te}), True, True)
       tr = tmp@slope
+      tmp2 = trend_manken(y({ts:te}), False, 0)
+      sig = tmp2(0)
+      delete(tmp2)
     elseif (any(method.eq.(/"Sen", "sen", "median_slope", "MedianSlope", \
                             "Theil-Sen"/))) then
       tmp = trend_manken(y({ts:te}), True, 0)
       tr = tmp(1)
+      sig = tmp(0)
     end if
     copy_VarAtts(y, tr)
+    tr@sig = sig
   elseif (dimsizes(dimsizes(x)).eq.3) then
     frac_threshold = 0.8  ; For 3D field, at least 80% of the time series
                           ; is required for trend calculation.
@@ -424,6 +430,9 @@ begin
       tmp = dtrend_msg_n(tofloat(ispan(1, dims(0), 1)), y({ts:te}, :, :), True, True, 0)
       tr = where(dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0).gt.dims(0)*frac_threshold, \
                  reshape(tmp@slope, dims(1:2)), tmp@_FillValue)
+      tmp2 = trend_manken(y({ts:te}, :, :), False, 0)
+      sig = tmp2(0, :, :)
+      delete(tmp2)
       delete(dims)
     elseif (any(method.eq.(/"Sen", "sen", "median_slope", "MedianSlope", \
                             "Theil-Sen"/))) then
@@ -431,11 +440,15 @@ begin
       tmp = trend_manken(y({ts:te}, :, :), True, 0)
       tr = where(dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0).gt.dims(0)*frac_threshold, \
                  tmp(1, :, :), tmp@_FillValue)
+      sig = where(dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0).gt.dims(0)*frac_threshold, \
+                 tmp(0, :, :), tmp@_FillValue)
       delete(dims)
     end if
     copy_VarMeta(y(0, :, :), tr)
+    tr@sig = ndtooned(sig)
   end if
-
+  delete(sig)
+  
   tr = tr * scale
   if (isatt(x, "units")) then
     tr@units = x@units+" per year"
