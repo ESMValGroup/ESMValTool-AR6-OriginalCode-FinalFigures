@@ -23,7 +23,7 @@ def get_provenance_record(attributes, ancestor_files):
         'caption': caption,
         'statistics': ['mean'],
         'domains': ['global'],
-        'plot_type': 'zonal',
+        'plot_types': ['zonal'],
         'authors': [
             'andela_bouwe',
             'righi_mattia',
@@ -79,24 +79,33 @@ def main(cfg):
                 pformat(selection))
 
     grouped_input_data = group_metadata(
-        input_data, 'standard_name', sort='dataset')
+        input_data, 'dataset', sort='ensemble')
     logger.info(
-        "Example of how to group and sort input data by standard_name:"
+        "Group input data by model and sort by ensemble:"
         "\n%s", pformat(grouped_input_data))
 
     # Example of how to loop over variables/datasets in alphabetical order
-    for standard_name in grouped_input_data:
-        logger.info("Processing variable %s", standard_name)
-        for attributes in grouped_input_data[standard_name]:
-            logger.info("Processing dataset %s", attributes['dataset'])
-            input_file = attributes['filename']
-            cube = compute_diagnostic(input_file)
+    for dataset in grouped_input_data:
+        logger.info("*************** Processing model %s", dataset)
+        grouped_model_input_data = group_metadata(
+            grouped_input_data[dataset], 'ensemble', sort='variable_group')
+        for ensemble in grouped_model_input_data:
+            logger.info("** Processing ensemble %s", ensemble)
+            files=[]
+            for attributes in grouped_model_input_data[ensemble]:
+                logger.info("Processing variable %s", attributes['variable_group'])
+                files.append(attributes['filename'])
+            logger.info("*************** Files for blend and mask %s", files)
+ 
 
-            output_basename = os.path.splitext(
-                os.path.basename(input_file))[0] + '_mean'
-            provenance_record = get_provenance_record(
-                attributes, ancestor_files=[input_file])
-            plot_diagnostic(cube, output_basename, provenance_record, cfg)
+#                cube = compute_diagnostic(input_file)
+
+#                output_basename = os.path.splitext(
+#                    os.path.basename(input_file))[0] + '_mean'
+#                provenance_record = get_provenance_record(
+#                    attributes, ancestor_files=[input_file])
+#
+#                plot_diagnostic(cube, output_basename, provenance_record, cfg)
 
 
 if __name__ == '__main__':

@@ -32,6 +32,7 @@ preprocessors:
 
 datasets:
   - &cmip3 {dataset: bccr_bcm2_0, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
+  #- &cmip3 {dataset: cccma_cgcm3_1,  institute: CCCMA, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
   - {<<: *cmip3, dataset: cccma_cgcm3_1}
   - {<<: *cmip3, dataset: cccma_cgcm3_1_t63}
   - {<<: *cmip3, dataset: csiro_mk3_0, start_year: 1871}
@@ -54,7 +55,6 @@ datasets:
   - {<<: *cmip3, dataset: ukmo_hadcm3, start_year: 1860}
   - {<<: *cmip3, dataset: ukmo_hadgem1, start_year: 1860}
   - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2 }
-
 
 
 diagnostics:
@@ -85,8 +85,8 @@ diagnostics:
         script: ipcc_ar5/tsline.ncl
         time_avg: "yearly"
         ts_anomaly: "anom"   
-        ref_start: 1850
-        ref_end: 1900
+        ref_start: 1950
+        ref_end: 1979
         ref_mask: True
         plot_units: "degC"
         y_min: -0.5

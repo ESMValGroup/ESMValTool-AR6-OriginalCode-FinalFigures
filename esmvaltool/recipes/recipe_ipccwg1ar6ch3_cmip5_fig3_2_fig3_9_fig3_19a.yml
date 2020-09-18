@@ -137,8 +137,8 @@ diagnostics:
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
+        start_year: 1986
+        end_year: 2005
     additional_datasets: *cmip5_hist_models_tas_era
     scripts:
       fig_3_2: &fig-3-2_and_3-9_settings
@@ -146,7 +146,7 @@ diagnostics:
         projection: Robinson
         timemean: annualclim
         plot_rms_diff: True
-        plot_abs_diff: False
+        plot_abs_diff: True
         plot_rel_diff: False
 
 
@@ -172,8 +172,8 @@ diagnostics:
         grid: gr
         exp: historical
         ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
+        start_year: 1986
+        end_year: 2005
     additional_datasets: *cmip5_hist_models_pr_gpcp
     scripts:
       fig_3_9:
@@ -206,8 +206,8 @@ diagnostics:
         grid: gn
         exp: historical
         ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
+        start_year: 1986
+        end_year: 2005
     additional_datasets: *cmip5_hist_models_tos_woa
     scripts:
       fig_3_19:
@@ -226,8 +226,8 @@ diagnostics:
         grid: gn
         exp: historical
         ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
+        start_year: 1986
+        end_year: 2005
     additional_datasets: *cmip5_hist_models_tos_woa
     scripts:
       fig_3_19:

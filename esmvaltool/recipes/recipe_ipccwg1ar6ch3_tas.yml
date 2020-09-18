@@ -1,0 +1,497 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3_fig_3_2.yml
+---
+documentation:
+
+  description: |
+    Producing Fig. 3.2
+
+  authors:
+    - bock_lisa
+    - eyring_veronika
+
+
+preprocessors:
+
+  preproc_map:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+
+  clim:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_wo_mmm:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+
+  clim_5x5:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+
+
+models_cmip6_historical_era5: &models_cmip6_historical_era5
+  - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
+  - {dataset: AWI-CM-1-1-MR, grid: gn} #start 1851
+  - {dataset: AWI-ESM-1-1-LR, grid: gn}
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: BCC-ESM1, grid: gn}
+  - {dataset: CAMS-CSM1-0, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {dataset: CAS-ESM2-0, institute: CAS, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
+  - {dataset: CIESM}
+  #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: E3SM-1-0}
+  - {dataset: E3SM-1-1, institute: E3SM-Project}
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
+  #- {dataset: EC-Earth3, ensemble: r22i1p1f1} #permission denied
+  - {dataset: EC-Earth3-Veg}
+  - {dataset: FGOALS-f3-L}
+  - {dataset: FGOALS-g3, grid: gn} 
+  - {dataset: FIO-ESM-2-0, grid: gn}
+  #- {dataset: GFDL-CM4, grid: gr1} #permission denied
+  - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  #- {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #permission denied
+  - {dataset: GISS-E2-1-H, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1}
+  - {dataset: IPSL-CM6A-LR}
+  - {dataset: KACE-1-0-G}
+  - {dataset: MCM-UA-1-0, grid: gn}
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: NESM3, grid: gn} 
+  - {dataset: NorCPM1, grid: gn, institute: NCC}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC}
+  - {dataset: NorESM2-MM, grid: gn, institute: NCC}
+  - {dataset: SAM0-UNICON, grid: gn}
+  #- {dataset: TaiESM1, grid: gn} #empty folder in latestversion
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+
+
+models_cmip6_piControl: &models_cmip6_piControl
+  - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, start_year: 950, end_year: 1149}
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, start_year: 101, end_year: 1000}
+  - {dataset: AWI-CM-1-1-MR, grid: gn, start_year: 2401, end_year: 2900}
+  #- {dataset: AWI-ESM-1-1-LR, grid: gn, start_year: 1855, end_year: 1954} #zero not allowed as reference year
+  - {dataset: BCC-CSM2-MR, grid: gn, start_year: 1850, end_year: 2449}
+  - {dataset: BCC-ESM1, grid: gn, start_year: 1850, end_year: 2300}
+  - {dataset: CAMS-CSM1-0, grid: gn, start_year: 2900, end_year: 3399}
+  - {dataset: CanESM5, grid: gn, start_year: 5201, end_year: 6200}
+  - {dataset: CAS-ESM2-0, grid: gn, institute: CAS, start_year: 1, end_year: 549}
+  - {dataset: CESM2, grid: gn, start_year: 1, end_year: 1200}
+  - {dataset: CESM2-FV2, institute: NCAR, grid: gn, start_year: 1, end_year: 500}
+  - {dataset: CESM2-WACCM, institute: NCAR, grid: gn, start_year: 1, end_year: 499}
+  - {dataset: CESM2-WACCM-FV2, institute: NCAR, grid: gn, start_year: 1, end_year: 500}
+  - {dataset: CIESM, start_year: 1, end_year: 500}
+  - {dataset: CMCC-CM2-SR5, grid: gn, start_year: 1850, end_year: 2099}
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, start_year: 1850, end_year: 2349}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, start_year: 1850, end_year: 2149}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, start_year: 1850, end_year: 2349}
+  - {dataset: E3SM-1-0, start_year: 1, end_year: 500}
+  #- {dataset: E3SM-1-1, institute: E3SM-Project, start_year: 1850, end_year: 2014} #IAV nan
+  #- {dataset: E3SM-1-1-ECA, institute: E3SM-Project, start_year: 1850, end_year: 2014} #IAV nan
+  - {dataset: EC-Earth3, start_year: 2259, end_year: 2759}
+  - {dataset: EC-Earth3-LR, start_year: 2219, end_year: 2419}
+  - {dataset: EC-Earth3-Veg, start_year: 1850, end_year: 2349}
+  - {dataset: FGOALS-f3-L, start_year: 600, end_year: 1160}
+  - {dataset: FGOALS-g3, grid: gn, start_year: 200, end_year: 899}
+  - {dataset: FIO-ESM-2-0, grid: gn, start_year: 301, end_year: 875}
+  #- {dataset: GFDL-CM4, grid: gr1, start_year: 151, end_year: 650} #permission denied
+  - {dataset: GFDL-ESM4, grid: gr1, start_year: 151, end_year: 500}
+  - {dataset: GISS-E2-1-G, grid: gn, start_year: 4150, end_year: 5000}
+  #- {dataset: GISS-E2-1-G-CC, institute: NASA-GISS, grid: gn, start_year: 1850, end_year: 2014} #IAV nan
+  - {dataset: GISS-E2-1-H, grid: gn, start_year: 3180, end_year: 3980}
+  #- {dataset: GISS-E2-2-G, institute: NASA-GISS, grid: gn, start_year: 2000, end_year: 2150} #IAV nan
+  - {dataset: HadGEM3-GC31-LL, grid: gn, start_year: 1850, end_year: 2349}
+  - {dataset: HadGEM3-GC31-MM, grid: gn, start_year: 1850, end_year: 2349}
+  - {dataset: IITM-ESM,  grid: gn, start_year: 1926,  end_year: 2125}
+  - {dataset: INM-CM4-8, grid: gr1, start_year: 1850, end_year: 2380}
+  - {dataset: INM-CM5-0, grid: gr1, start_year: 1996, end_year: 3196}
+  - {dataset: IPSL-CM6A-LR, start_year: 1850, end_year: 2849}
+  #- {dataset: KACE-1-0-G, start_year: 2300, end_year: 2449} #IAV nan
+  - {dataset: MCM-UA-1-0, grid: gn, start_year: 1, end_year: 500}
+  - {dataset: MIROC6, grid: gn, start_year: 3200, end_year: 3999}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn, start_year: 1850, end_year: 2349}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn, start_year: 1850, end_year: 2629}
+  - {dataset: MPI-ESM1-2-HR, grid: gn, start_year: 1850, end_year: 2349}
+  - {dataset: MPI-ESM1-2-LR, grid: gn, start_year: 1850, end_year: 2849}
+  - {dataset: MRI-ESM2-0, grid: gn, start_year: 1850, end_year: 2550}
+  - {dataset: NESM3, grid: gn, start_year: 500, end_year: 999}
+  - {dataset: NorCPM1, institute: NCC, grid: gn, start_year: 1, end_year: 500}
+  - {dataset: NorESM1-F, institute: NCC, grid: gn, start_year: 1501, end_year: 1700}
+  - {dataset: NorESM2-LM, institute: NCC, grid: gn, start_year: 1600, end_year: 1799}
+  - {dataset: NorESM2-MM, institute: NCC, grid: gn, start_year: 1200, end_year: 1699}
+  - {dataset: SAM0-UNICON, grid: gn, start_year: 1, end_year: 700}
+  - {dataset: TaiESM1, grid: gn, start_year: 201, end_year: 700}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2709}
+
+
+models_cmip5_historical_era5: &models_cmip5_historical_era5
+  - {dataset: ACCESS1-0}
+  - {dataset: ACCESS1-3}
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: BNU-ESM}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-BGC}
+  - {dataset: CESM1-CAM5}
+  - {dataset: CESM1-FASTCHEM}
+  - {dataset: CESM1-WACCM}
+  - {dataset: CMCC-CESM}
+  - {dataset: CMCC-CM}
+  - {dataset: CMCC-CMS}
+  - {dataset: CNRM-CM5}
+  - {dataset: CNRM-CM5-2}
+  - {dataset: CSIRO-Mk3-6-0}
+  - {dataset: EC-EARTH}
+  - {dataset: FGOALS-g2}
+  #- {dataset: FGOALS-s2} # could not find v1
+  - {dataset: FIO-ESM}
+  - {dataset: GFDL-CM3}
+  - {dataset: GFDL-ESM2G}
+  - {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H}
+  - {dataset: GISS-E2-H-CC}
+  - {dataset: GISS-E2-R}
+  - {dataset: GISS-E2-R-CC}
+  - {dataset: HadGEM2-AO}
+  - {dataset: HadGEM2-CC}
+  - {dataset: HadGEM2-ES}
+  - {dataset: inmcm4}
+  - {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: IPSL-CM5B-LR}
+  - {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MPI-ESM-LR}
+  - {dataset: MPI-ESM-MR}
+  - {dataset: MPI-ESM-P}
+  - {dataset: MRI-CGCM3}
+  - {dataset: NorESM1-M}
+  - {dataset: NorESM1-ME}
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+
+
+models_cmip5_piControl: &models_cmip5_piControl
+  - {dataset: ACCESS1-0, start_year: 300, end_year: 799}
+  - {dataset: ACCESS1-3, start_year: 250, end_year: 749} 
+  - {dataset: bcc-csm1-1, start_year: 1, end_year: 500} 
+  - {dataset: bcc-csm1-1-m, start_year: 1, end_year: 400} 
+  - {dataset: BNU-ESM, start_year: 1450, end_year: 2008} 
+  - {dataset: CanESM2, start_year: 2015, end_year: 3010} 
+  - {dataset: CCSM4, start_year: 250, end_year: 1300} 
+  - {dataset: CESM1-BGC, start_year: 101, end_year: 600} 
+  - {dataset: CESM1-CAM5, start_year: 1, end_year: 319} 
+  - {dataset: CESM1-FASTCHEM, start_year: 70, end_year: 291} 
+  - {dataset: CESM1-WACCM, start_year: 96, end_year: 295} 
+  - {dataset: CMCC-CESM, start_year: 4324, end_year: 4600} 
+  - {dataset: CMCC-CM, start_year: 1550, end_year: 1879} 
+  - {dataset: CMCC-CMS, start_year: 3684, end_year: 4183} 
+  - {dataset: CNRM-CM5, start_year: 1850, end_year: 2699} 
+  - {dataset: CNRM-CM5-2, start_year: 1850, end_year: 2208} 
+  - {dataset: CSIRO-Mk3-6-0, start_year: 1, end_year: 500} 
+  #- {dataset: EC-EARTH, start_year: 2100, end_year: 2551} 
+  - {dataset: FGOALS-g2, start_year: 201, end_year: 900} 
+  - {dataset: FGOALS-s2, start_year: 1850, end_year: 2350} 
+  - {dataset: FIO-ESM, start_year: 401, end_year: 1200} 
+  - {dataset: GFDL-CM3, start_year: 1, end_year: 500} 
+  - {dataset: GFDL-ESM2G, start_year: 1, end_year: 500} 
+  - {dataset: GFDL-ESM2M, start_year: 1, end_year: 500} 
+  - {dataset: GISS-E2-H, start_year: 1180, end_year: 1419} 
+  - {dataset: GISS-E2-H-CC, start_year: 2081, end_year: 2331} 
+  - {dataset: GISS-E2-R, start_year: 3331, end_year: 3630} 
+  - {dataset: GISS-E2-R-CC, start_year: 2050, end_year: 2300} 
+  - {dataset: HadGEM2-AO, start_year: 1, end_year: 700} 
+  - {dataset: HadGEM2-CC, start_year: 1859, end_year: 2099} 
+  - {dataset: HadGEM2-ES, start_year: 1859, end_year: 2435} 
+  - {dataset: inmcm4, start_year: 1850, end_year: 2349} 
+  - {dataset: IPSL-CM5A-LR, start_year: 1800, end_year: 2799} 
+  - {dataset: IPSL-CM5A-MR, start_year: 1800, end_year: 2099} 
+  - {dataset: IPSL-CM5B-LR, start_year: 1830, end_year: 2129} 
+  #- {dataset: MIROC4h, start_year: 51, end_year: 150} #not enough years
+  - {dataset: MIROC5, start_year: 2000, end_year: 2669} 
+  - {dataset: MIROC-ESM, start_year: 1800, end_year: 2429} 
+  - {dataset: MIROC-ESM-CHEM, start_year: 1846, end_year: 2100} 
+  - {dataset: MPI-ESM-LR, start_year: 1850, end_year: 2849} 
+  - {dataset: MPI-ESM-MR, start_year: 1850, end_year: 2849} 
+  - {dataset: MPI-ESM-P, start_year: 1850, end_year: 3005} 
+  - {dataset: MRI-CGCM3, start_year: 1851, end_year: 2350} 
+  - {dataset: NorESM1-M, start_year: 700, end_year: 1200} 
+  - {dataset: NorESM1-ME, start_year: 901, end_year: 1152} 
+
+
+
+models_highresmip_hist-1950_era5: &models_highresmip_hist-1950_era5
+  # low res models
+  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
+  - {dataset: CNRM-CM6-1, exp: hist-1950, ensemble: r1i1p1f2}
+  #- {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-LR, exp: hist-1950}
+  - {dataset: HadGEM3-GC31-LL, exp: hist-1950, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
+  # high res models
+  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
+  - {dataset: CNRM-CM6-1-HR, exp: hist-1950, ensemble: r1i1p1f2}
+  #- {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-HR, exp: hist-1950}
+  - {dataset: HadGEM3-GC31-HM, exp: hist-1950, grid: gn}
+  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
+  # reference dataset
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+
+models_highresmip_low_control-1950: &models_highresmip_low_control-1950
+  - {dataset: CMCC-CM2-HR4, exp: control-1950, grid: gn,
+     start_year: 1950, end_year: 2049}
+  - {dataset: CNRM-CM6-1, exp: control-1950, ensemble: r1i1p1f2,
+     start_year: 1950, end_year: 2049}
+  #- {dataset: EC-Earth3P, exp: control-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-LR, exp: control-1950,
+     start_year: 1950, end_year: 2049}
+  - {dataset: HadGEM3-GC31-LL, exp: control-1950, grid: gn,
+     start_year: 1950, end_year: 2049}
+  - {dataset: MPI-ESM1-2-HR, exp: control-1950, grid: gn,
+     start_year: 1950, end_year: 2049}
+
+models_highresmip_high_control-1950: &models_highresmip_high_control-1950
+  - {dataset: CMCC-CM2-VHR4, exp: control-1950, grid: gn,
+     start_year: 1950, end_year: 2049}
+  - {dataset: CNRM-CM6-1-HR, exp: control-1950, ensemble: r1i1p1f2,
+     start_year: 1950, end_year: 2049}
+  #- {dataset: EC-Earth3P-HR, exp: control-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-HR, exp: control-1950,
+     start_year: 1950, end_year: 2049}
+  - {dataset: HadGEM3-GC31-HM, exp: control-1950, grid: gn,
+     start_year: 1950, end_year: 2049}
+  - {dataset: MPI-ESM1-2-XR, exp: control-1950, grid: gn,
+     start_year: 1950, end_year: 2049}
+
+
+
+
+diagnostics:
+
+#  # **********************************************************************
+#  # IPCC WGI AR6, chap. 3
+#  # Sect. 3.3
+#  # Fig. 3.2
+#  # **********************************************************************
+#  # Lisa
+#  # **********************************************************************
+#  # Multi model mean, multi model mean bias and root mean square error 
+#  # (geographical distributions) for CMIP6, CMIP5 and HighResMIP
+#  # **********************************************************************
+#
+#  IAV_calc_tas_cmip6: &diag_IAV
+#    description: Calculate temperature interannual variability
+#                 for stippling significance
+#    themes:
+#      - varmodes
+#    realms:
+#      - atmos
+#    variables:
+#      tas:
+#        preprocessor: preproc_map
+#        project: CMIP6
+#        mip: Amon
+#        exp: piControl
+#        ensemble: r1i1p1f1
+#        grid: gr
+#    additional_datasets: *models_cmip6_piControl
+#    scripts:
+#      calc_IAV_for_stippandhatch_tas: &IAV_script
+#        script: ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
+#        time_avg: annualclim
+#        periodlength: 20.
+#        iavmode: mmm
+#
+#  IAV_calc_tas_cmip5: 
+#    <<: *diag_IAV
+#    variables:
+#      tas:
+#        preprocessor: preproc_map
+#        project: CMIP5
+#        mip: Amon
+#        exp: piControl
+#        ensemble: r1i1p1
+#    additional_datasets: *models_cmip5_piControl
+#
+#  IAV_calc_tas_highresmip_low:
+#    <<: *diag_IAV
+#    variables:
+#      tas:
+#        preprocessor: preproc_map
+#        project: CMIP6
+#        mip: Amon
+#        grid: gr
+#        ensemble: r1i1p1f1
+#    additional_datasets: *models_highresmip_low_control-1950
+#    scripts:
+#      calc_IAV_for_stippandhatch_tas:
+#        <<: *IAV_script
+#        not_cut_100_years: True
+#
+#
+#  IAV_calc_tas_highresmip_high:
+#    <<: *diag_IAV
+#    additional_datasets: *models_highresmip_high_control-1950
+#    scripts:
+#      calc_IAV_for_stippandhatch_tas:
+#        <<: *IAV_script
+#        not_cut_100_years: True
+#
+#
+#  fig_3_2_cmip6:
+#    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim
+#        reference_dataset: ERA5
+#        mip: Amon
+#        project: CMIP6
+#        exp: historical
+#        ensemble: r1i1p1f1
+#        grid: gr
+#        start_year: 1995
+#        end_year: 2014
+#    additional_datasets: *models_cmip6_historical_era5
+#    scripts:
+#      fig_3_2: 
+#        script: ipcc_ar6/model_bias.ncl
+#        ancestors: ['tas', 'IAV_calc_tas_cmip6/calc_IAV_for_stippandhatch_tas']
+#        projection: Robinson
+#        mean_caption: "CMIP6"
+#        bias_caption: "CMIP6 bias"
+#        plot_rms_diff: True
+#        rmsd_caption: "CMIP6 root mean square error"
+#        stippandhatch: True
+#        panel_title: "Near-Surface Air Temperature"
+#
+#
+#  fig_3_2_cmip5:
+#    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim
+#        reference_dataset: ERA5
+#        mip: Amon
+#        project: CMIP5
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#    additional_datasets: *models_cmip5_historical_era5
+#    scripts:
+#      fig_3_2: 
+#        script: ipcc_ar6/model_bias.ncl
+#        ancestors: ['tas', 'IAV_calc_tas_cmip5/calc_IAV_for_stippandhatch_tas']
+#        projection: Robinson
+#        mean_caption: "CMIP5"
+#        bias_caption: "CMIP5 bias"
+#        panel_num: ['c)', 'd)']
+#        stippandhatch: True
+#
+#
+#  fig_3_2_highresmip:
+#    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim_wo_mmm
+#        reference_dataset: ERA5
+#        mip: Amon
+#        project: CMIP6
+#        ensemble: r1i1p1f1
+#        grid: gr
+#        start_year: 1995
+#        end_year: 2014
+#    additional_datasets: *models_highresmip_hist-1950_era5
+#    scripts:
+#      fig_3_2: 
+#        script: ipcc_ar6/model_bias_diff.ncl
+#        ancestors: ['tas', 
+#                    'IAV_calc_tas_highresmip_low/calc_IAV_for_stippandhatch_tas',
+#                    'IAV_calc_tas_highresmip_high/calc_IAV_for_stippandhatch_tas']
+#        projection: Robinson
+#        caption: ['HighResMIP (high) bias', 'HighResMIP (low) bias']
+#        panel_num: ['e)', 'f)']
+#        stippandhatch: True
+#        groups: ['highresmip_high', 'highresmip_low']
+#        modelgroup_1: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
+#                       'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+#        modelgroup_2: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR',
+#                       'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
+#
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig 3.4
+  # **********************************************************************
+  # Lisa
+  # **********************************************************************
+  # Global climate variability - surface temperature
+  # **********************************************************************
+
+  fig_3_4:
+    description: IPCC AR6 Ch. 3, Fig. 3.4 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_5x5
+        mip: Amon
+        project: CMIP6
+        exp: piControl
+        ensemble: r1i1p1f1
+        grid: gr
+        additional_datasets: *models_cmip6_piControl
+      tasa:
+        preprocessor: clim_5x5
+        mip: Amon
+        project: CMIP6
+        exp: piControl
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1850
+        end_year: 1900
+        additional_datasets:
+          - {dataset: GISTEMP, project: OBS, type: ground, version: v4, start_year: 1880, tier: 2}
+          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
+          #- {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      fig_3_4:
+        script: ipcc_ar6/zonal_st_dev.ncl
+        multi_model_mean: True
+        time_avg: "yearly"
+        plot_units: "degC"
+        styleset: CMIP6
+
+
