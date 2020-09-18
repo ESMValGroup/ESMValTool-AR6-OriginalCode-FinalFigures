@@ -145,16 +145,16 @@ diagnostics:
      areacello:
        short_name: areacello
        additional_datasets:
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-ESM1-5,     exp: piControl,  ensemble: r1i1p1f1, start_year: 171, end_year: 325}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 611, end_year: 765}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM,     exp: piControl,  ensemble: r1i1p1f1, start_year: 11, end_year: 165}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: HadGEM3-GC31-LL,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-HR,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
-          - {project: CMIP6, mip: Ofx, grid: gr, dataset: NorESM2-LM,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1660, end_year: 1814, }
-          - {project: CMIP6, mip: Ofx, grid: gr, dataset: NorESM2-MM,     exp: piControl,  ensemble: r1i1p1f1, start_year: 1261, end_year: 1415,}
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: SAM0-UNICON,     exp: piControl,  ensemble: r1i1p1f1, start_year: 284, end_year: 438}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-ESM1-5,     exp: historical,  ensemble: r1i1p1f1, start_year: 171, end_year: 325}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2,     exp: historical,  ensemble: r1i1p1f1, start_year: 611, end_year: 765}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM,     exp: historical, ensemble: r1i1p1f1, start_year: 11, end_year: 165}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: HadGEM3-GC31-LL,     exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-HR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-LM,     exp: historical,  ensemble: r1i1p1f1, start_year: 1660, end_year: 1814, }
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-MM,     exp: historical, ensemble: r1i1p1f1, start_year: 1261, end_year: 1415,}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: SAM0-UNICON,     exp: historical, ensemble: r1i1p1f1, start_year: 284, end_year: 438}
           - {project: CMIP6, mip: Ofx, grid: gn, dataset: UKESM1-0-LL,     exp: piControl,  ensemble: r1i1p1f2, start_year: 2175, end_year: 2329}
 
     scripts:

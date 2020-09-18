@@ -61,9 +61,15 @@ def main(cfg):
                                        units=units, calendar=calendar ).year # A
 
             diff = child_branch_yr - parent_branch_yr
-            print('difference:', diff )
+            #print('difference:', diff )
             historical_range = [1860, 2014]
-
+            print('Origin is:', 
+                cube.attributes['parent_activity_id'],
+                cube.attributes['parent_experiment_id'],
+                cube.attributes['parent_mip_era'],
+                cube.attributes['parent_source_id'],
+                cube.attributes['parent_variant_label'],
+                )
             print(dataset, ':\t', historical_range, 'is', [h-diff for h in historical_range])
 
     logger.info('Success')
