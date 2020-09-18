@@ -104,14 +104,9 @@ begin
       end if
     end if
 
-;    ; detrending all timeseries
-;    ;if(info_items[imod]@project .eq. "OBS") then
+    ; detrending all timeseries
     A0_detrend = dtrend_quadratic_msg_n(A0, False, False, 0)
-    ;A0_detrend@_FillValue = 1.e20
-
     
-    A0_detrend = where(A0_detrend.gt.1.e36, A0_detrend@_FillValue, A0_detrend)
-
     A0 = (/A0_detrend/)
 
     procmod = dim_avg_Wrap(A0)
@@ -181,8 +176,47 @@ begin
   outfile = config_user_info@plot_dir + var0 + "_std_dev_zonmean.nc" 
   wks = gsn_open_wks(file_type, outfile)
 
-  ; Set resources
-  res = True
+
+  ;xy_line(wks, model_arr, model_arr&lat, model_arr_stddev, res, info_items)
+
+  ; Select colors and other plotting attributes
+  ; (see ./diag_scripts/shared/plot/style.ncl)
+  colors = project_style(info_items, diag_script_info, "colors")
+  dashes = project_style(info_items, diag_script_info, "dashes")
+  thicks = project_style(info_items, diag_script_info, "thicks")
+  annots = project_style(info_items, diag_script_info, "annots")
+
+  colors = colors(::-1)
+  dashes = dashes(::-1)
+  thicks = thicks(::-1)
+  annots = annots(::-1)
+
+  ; Select colors and other plotting attributes for multi-model mean
+  if (diag_script_info@multi_model_mean) then
+    items_mmm = NewList("fifo")
+    mmm_var = True
+    mmm_var@dataset = "MultiModelMean"
+    ListPush(items_mmm, mmm_var)
+    colors_mmm = project_style(items_mmm, diag_script_info, "colors")
+    dashes_mmm = project_style(items_mmm, diag_script_info, "dashes")
+    thicks_mmm = project_style(items_mmm, diag_script_info, "thicks")
+    annots_mmm = project_style(items_mmm, diag_script_info, "annots")
+  end if
+
+  ; Set/copy resources
+  res                   = True
+  res@xyLineColors      = colors  ; change line color
+  res@xyLineThicknesses = thicks  ; make 2nd lines thicker
+  res@xyMonoDashPattern = False
+  res@xyDashPatterns    = dashes
+  res@gsnDraw           = False   ; don't draw yet
+  res@gsnFrame          = False   ; don't advance frame yet
+  res@tiMainFontHeightF = .025    ; font height
+  res@gsnMaximize       = True
+  res@vpHeightF = 0.4
+  res@vpWidthF = 0.8
+  res@trYMinF  = min(model_arr) - 0.05 * (max(model_arr) - min(model_arr))
+  res@trYMaxF  = max(model_arr) + 0.05 * (max(model_arr) - min(model_arr))
 
   ;restiMainString = "Zonal standard deviation ~C~~Z75~" + variable_info[0]@long_name
   res@tiMainString = "Variability of Near-Surface Air Temperature"
@@ -195,7 +229,64 @@ begin
   end if
   res@tiYAxisString = "(" + units + ")"
 
-  xy_line(wks, model_arr, model_arr&lat, model_arr_stddev, res, info_items)
+  ; Plot
+  plot = gsn_csm_xy(wks, model_arr&lat, model_arr(::-1, :), res)
+
+  ; Add multi model mean and stddev
+  if (diag_script_info@multi_model_mean) then
+    ; Stddev
+    res_stddev = True
+    copy_VarMeta(res, res_stddev)
+    res_stddev@gsnXYFillColors = "LightGrey"
+    delete(res_stddev@xyLineColors)
+    res_stddev@xyLineColor = -1  ; Make lines transparent
+    shading_plot = gsn_csm_xy(wks, model_arr&lat, model_arr_stddev(2:3, :), \
+                              res_stddev)
+    overlay(plot, shading_plot)
+    ; MMM
+    delete([/res@xyLineThicknesses, res@xyLineColors, res@xyDashPatterns/])
+    res@xyLineThicknesses = thicks_mmm
+    res@xyLineColors = colors_mmm
+    res@xyDashPatterns = dashes_mmm
+    mmm = gsn_csm_xy(wks, model_arr&lat, model_arr_stddev(0, :), res)
+    overlay(plot, mmm)
+  end if
+
+
+  ; ***********************************************
+  ; legend resources
+  ; ***********************************************
+
+  lgres                    = True
+  lgres@lgItemType         = "Lines"   ; show lines only (default)
+  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+  lgres@vpHeightF          = 0.7       ; height of legend (NDC)
+  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+
+  lgres@lgLineColors      = colors
+  lgres@lgDashIndexes     = dashes
+  lgres@lgLineThicknesses = thicks + 3
+  labels = annots
+  nitems = dimsizes(labels)
+  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
+
+  ; Create legend
+  lbid = gsn_create_legend(wks, nitems, labels, lgres)
+
+  amres = True
+  amres@amParallelPosF   = 0.65
+  amres@amOrthogonalPosF = 0.0
+  annoid1 = gsn_add_annotation(plot, lbid, amres)
+
+  resP = True
+  resP@gsnMaximize = True
+  ;resP@gsnPaperOrientation = "portrait"
+  ;resP@gsnPaperMargin =  0.8
+
+  gsn_panel(wks, plot, (/1, 1/), resP)
+
 
   log_info(" wrote " + outfile + "." + file_type)
 

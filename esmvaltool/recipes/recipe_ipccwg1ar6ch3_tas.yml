@@ -482,7 +482,7 @@ diagnostics:
         end_year: 1900
         additional_datasets:
           - {dataset: GISTEMP, project: OBS, type: ground, version: v4, start_year: 1880, tier: 2}
-          #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
           #- {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
           - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
