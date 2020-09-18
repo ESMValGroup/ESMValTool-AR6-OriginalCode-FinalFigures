@@ -13,14 +13,11 @@ import logging
 import os
 
 import iris
-import matplotlib.pyplot as plt
-import numpy as np
-import cftime
 
-from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
+from netCDF4 import num2date
+
 from esmvaltool.diag_scripts.shared import run_diagnostic
-
-from esmvalcore.preprocessor._time import climate_statistics
+from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 
 
 # This part sends debug statements to stdout
@@ -29,8 +26,10 @@ logger = logging.getLogger(os.path.basename(__file__))
 
 def main(cfg):
     """
-    Load the config file and some metadata, then pass them the plot making
-    tools.
+    Load the config file and some metadata, then print the linked pi years.
+
+    The recipe can use the config argument, time_range
+ 
 
     Parameters
     ----------
@@ -39,60 +38,33 @@ def main(cfg):
 
     """
     for index, metadata_filename in enumerate(cfg['input_files']):
-        logger.info('metadata filename:\t%s', metadata_filename)
-
         metadatas = diagtools.get_input_files(cfg, index=index)
-    #     if 'anomaly' in cfg.keys():
-    #         anomaly_period = cfg['anomaly']
-    #     else:
-    #         anomaly_period = None
-    #
-    #     #######
-    #     # Multi model time series
-    #     # Subtract anomaly
-    #     if anomaly_period:
-    #         multi_model_time_series(
-    #             cfg,
-    #             metadatas,
-    #             anomaly_period = anomaly_period
-    #         )
-    #
-    #         multi_model_time_series(
-    #            cfg,
-    #             metadatas,
-    #             anomaly_period = None
-    #         )
-    #     else:
-    #         multi_model_time_series(
-    #             cfg,
-    #             metadatas,
-    #         )
-    #
+
         for filename in sorted(metadatas):
             metadata = metadatas[filename]
             dataset = metadata['dataset']
-            print(dataset, metadata['exp'], metadata['ensemble'],metadata['project'], metadata['mip'])
+            print('-----------\n', dataset, metadata['exp'], 
+                  metadata['ensemble'],metadata['project'], metadata['mip'])
 
-            cube = iris.load(filename)
+            cube = iris.load_cube(filename)
             times = cube.coord('time')
             units = times.units.name
             calendar = times.units.calendar
 
             # We can assume a shared calendar!
 
-            child_branch_time = c.attributes['branch_time_in_child']
+            parent_branch_yr = num2date(cube.attributes['branch_time_in_parent'], 
+                                        units=cube.attributes['parent_time_units'], 
+                                        calendar=calendar ).year 
 
-            parent_branch_yr = num2date(c.attributes['branch_time_in_parent'], units=c.attributes['parent_time_units'], calendar=calendar ).year # A
-
-            child_branch_yr = num2date(c.attributes['branch_time_in_child'], units=units, calendar=calendar ).year # A
+            child_branch_yr = num2date(cube.attributes['branch_time_in_child'], 
+                                       units=units, calendar=calendar ).year # A
 
             diff = child_branch_yr - parent_branch_yr
             print('difference:', diff )
             historical_range = [1860, 2014]
 
-            print(dataset, ':\t', historical_range, 'is', historical_range + diff)
-
-
+            print(dataset, ':\t', historical_range, 'is', [h-diff for h in historical_range])
 
     logger.info('Success')
 
