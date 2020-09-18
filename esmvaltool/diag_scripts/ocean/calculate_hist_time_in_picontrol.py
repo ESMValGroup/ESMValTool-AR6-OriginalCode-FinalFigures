@@ -38,10 +38,10 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
-    # for index, metadata_filename in enumerate(cfg['input_files']):
-    #     logger.info('metadata filename:\t%s', metadata_filename)
-    #
-    #     metadatas = diagtools.get_input_files(cfg, index=index)
+    for index, metadata_filename in enumerate(cfg['input_files']):
+        logger.info('metadata filename:\t%s', metadata_filename)
+
+        metadatas = diagtools.get_input_files(cfg, index=index)
     #     if 'anomaly' in cfg.keys():
     #         anomaly_period = cfg['anomaly']
     #     else:
@@ -68,18 +68,32 @@ def main(cfg):
     #             metadatas,
     #         )
     #
-    #     for filename in sorted(metadatas):
-    #         continue
-    #         if metadatas[filename]['frequency'] != 'fx':
-    #             logger.info('-----------------')
-    #             logger.info(
-    #                 'model filenames:\t%s',
-    #                 filename,
-    #             )
-    #
-    #             ######
-    #             # Time series of individual model
-    #             make_time_series_plots(cfg, metadatas[filename], filename)
+        for filename in sorted(metadatas):
+            metadata = metadatas[filename]
+            dataset = metadata['dataset']
+            print(dataset, metadata['exp'], metadata['ensemble'],metadata['project'], metadata['mip'])
+
+            cube = iris.load(filename)
+            times = cube.coord('time')
+            units = times.units.name
+            calendar = times.units.calendar
+
+            # We can assume a shared calendar!
+
+            child_branch_time = c.attributes['branch_time_in_child']
+
+            parent_branch_yr = num2date(c.attributes['branch_time_in_parent'], units=c.attributes['parent_time_units'], calendar=calendar ).year # A
+
+            child_branch_yr = num2date(c.attributes['branch_time_in_child'], units=units, calendar=calendar ).year # A
+
+            diff = child_branch_yr - parent_branch_yr
+            print('difference:', diff )
+            historical_range = [1860, 2014]
+
+            print(dataset, ':\t', historical_range, 'is', historical_range + diff)
+
+
+
     logger.info('Success')
 
 
