@@ -37,14 +37,16 @@ begin
 
   enter_msg(DIAG_SCRIPT, "")
 
-  var0 = variable_info[1]@short_name
+  ;var0 = variable_info[1]@short_name
+  var0 = "tasa"
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
   dim_VAR = ListCount(variable_info)
 
   if (dim_VAR .gt. 1) then
-    var1 = variable_info[0]@short_name
+    ;var1 = variable_info[0]@short_name
+    var1 = "tas"
     info_items1 = select_metadata_by_name(input_file_info, var1)
     datasetnames1 = metadata_att_as_array(info_items1, "dataset")
     dim_MOD1 = ListCount(info_items1)
