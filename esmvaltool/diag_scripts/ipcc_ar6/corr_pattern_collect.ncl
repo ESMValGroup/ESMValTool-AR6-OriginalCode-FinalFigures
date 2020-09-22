@@ -293,11 +293,12 @@ begin
 
   ; Project Colors - TODO: let them be specified in cfg
   fcolors = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-            + "ipcc-ar6_line_03.rgb")
+            + "ipcc-ar6_cmip_line.rgb")
 
   res = True
   res@gsnDraw          = False
   res@gsnFrame         = False
+  res@tiMainString = "Pattern Correlation"
   res@vpWidthF = 0.8
   n_square = 16.
   if x_max.le. n_square then
@@ -318,7 +319,7 @@ begin
   res@tmXBMode = "Explicit"
   res@tmXBLabelFontHeightF = font_height
   if (n_var .gt. 3) then
-    res@tmXBLabelFontHeightF = font_height * 0.5
+    res@tmXBLabelFontHeightF = font_height * 0.6
   end if
   ; Set Marker Size to be half of line_length
   marker_size = res@vpWidthF * 3 * l_length / (res@trXMaxF - res@trXMinF)
@@ -338,7 +339,8 @@ begin
   ; Resources for obs data markers
   res_circ = True
   res_circ@gsMarkerIndex = 16
-  res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
+  ;res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
+  res_circ@gsMarkerColor = (/120,120,120,255/) / 255.
   res_circ@gsMarkerSizeF = 2 * marker_size
   res_circ@gsMarkerOpacityF = 0.4
 
