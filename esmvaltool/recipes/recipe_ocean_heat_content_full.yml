@@ -54,8 +54,8 @@ diagnostics:
           #  ACCESS-CM2 historical r1i1p1f1 CMIP6 Omon
           # Origin is: CMIP piControl CMIP6 ACCESS-CM2 r1i1p1f1
           # ACCESS-CM2 :     [1860, 2014] is [960, 1114]
-          - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
 
           # -----------
           #  ACCESS-ESM1-5 historical r1i1p1f1 CMIP6 Omon
@@ -149,8 +149,8 @@ diagnostics:
         preprocessor: prep_annual
         #additional_datasets: *dataset_anchor
         additional_datasets:
-          - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
 
 
           - {project: CMIP6, mip: Ofx,  grid: gn, dataset: CESM2,     exp: historical, ensemble: r1i1p1f1, start_year: 611, end_year: 765}
@@ -168,7 +168,7 @@ diagnostics:
       areacello:
        short_name: areacello
        additional_datasets:
-          - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+          - {project: CMIP6, mip: Ofx, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-ESM1-5,     exp: historical,  ensemble: r1i1p1f1, start_year: 171, end_year: 325}
           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2,     exp: historical,  ensemble: r1i1p1f1, start_year: 611, end_year: 765}
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM,     exp: historical, ensemble: r1i1p1f1, start_year: 11, end_year: 165}
