@@ -38,7 +38,7 @@ begin
   enter_msg(DIAG_SCRIPT, "")
 
   ;var0 = variable_info[1]@short_name
-  var0 = "tasa"
+  var0 = "tas"
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
@@ -46,7 +46,7 @@ begin
 
   if (dim_VAR .gt. 1) then
     ;var1 = variable_info[0]@short_name
-    var1 = "tas"
+    var1 = "tasa"
     info_items1 = select_metadata_by_name(input_file_info, var1)
     datasetnames1 = metadata_att_as_array(info_items1, "dataset")
     dim_MOD1 = ListCount(info_items1)
@@ -118,16 +118,16 @@ begin
     A0_timavg = time_operations(procmod, -1, -1, "average", "yearly", True)
     delete(procmod)
 
-    ;; Detrend
-    if (info_items[imod]@project .eq. "OBS") then
-        tmp = runave_n_Wrap(A0_timavg,5,0,0)
-        ;tmp = dtrend_n(A0_timavg, False, 0)
-        ;tmp = dtrend(A0_timavg, False)
-        copy_VarMeta(A0_timavg, tmp)
-        delete(A0_timavg)
-        A0_timavg = tmp
-        delete(tmp)
-    end if
+    ;;; Detrend
+    ;if (info_items[imod]@project .eq. "OBS") then
+    ;    tmp = runave_n_Wrap(A0_timavg,5,0,0)
+    ;    ;tmp = dtrend_n(A0_timavg, False, 0)
+    ;    ;tmp = dtrend(A0_timavg, False)
+    ;    copy_VarMeta(A0_timavg, tmp)
+    ;    delete(A0_timavg)
+    ;    A0_timavg = tmp
+    ;    delete(tmp)
+    ;end if
 
     ;; calculate zonal standard deviation
     A0_stddev = dim_stddev_n_Wrap(A0_timavg,0)
@@ -197,10 +197,10 @@ begin
   thicks = project_style(info_items, diag_script_info, "thicks")
   annots = project_style(info_items, diag_script_info, "annots")
 
-  colors = colors(::-1)
-  dashes = dashes(::-1)
-  thicks = thicks(::-1)
-  annots = annots(::-1)
+  ;colors = colors(::-1)
+  ;dashes = dashes(::-1)
+  ;thicks = thicks(::-1)
+  ;annots = annots(::-1)
 
   ; Select colors and other plotting attributes for multi-model mean
   if (diag_script_info@multi_model_mean) then
@@ -241,7 +241,8 @@ begin
   res@tiYAxisString = "(" + units + ")"
 
   ; Plot
-  plot = gsn_csm_xy(wks, model_arr&lat, model_arr(::-1, :), res)
+  ;plot = gsn_csm_xy(wks, model_arr&lat, model_arr(::-1, :), res)
+  plot = gsn_csm_xy(wks, model_arr&lat, model_arr, res)
 
   ; Add multi model mean and stddev
   if (diag_script_info@multi_model_mean) then
