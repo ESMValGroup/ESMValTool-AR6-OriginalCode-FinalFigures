@@ -182,7 +182,7 @@ diagnostics:
   # Global and zonal average anomalies in annual mean precipitation
   # **********************************************************************
  
-  pr_hist_global_land:
+  fig_3_12_precip_anom:   
     description: IPCC AR6 Ch. 3, Fig. 3.12 (precipitation)
     variables:
       pr_historical_global: &var_pr
@@ -254,4 +254,23 @@ diagnostics:
         y_min: -0.2
         y_max: 0.2
 
-
+  fig_3_12_precip_map:
+    description: Map of precipitation climatology
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      pr:
+        reference_dataset: GHCN
+        mip: Amon
+        additional_datasets:
+          - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2,
+             start_year: 1950, end_year: 2014}
+    scripts:
+      pr_map:
+        script: ipcc_ar6/pr_map.ncl
+        projection: Robinson
+        colormap: WhiteBlueGreenYellowRed
+        ncdf: default
+        caption: "GHCN Climatology 1950-2014"
