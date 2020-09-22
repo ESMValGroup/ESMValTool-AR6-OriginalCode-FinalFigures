@@ -114,7 +114,7 @@ diagnostics:
     variables:
       tas: &var_settings
         preprocessor: regrid_4_5
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5
         alternative_dataset: NCEP
         project: CMIP5
         exp: historical
@@ -182,7 +182,7 @@ diagnostics:
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}      
     scripts:
       pattern_cor: &fig_pattern_cor
@@ -266,7 +266,7 @@ diagnostics:
       psl:
         <<: *var_settings
         reference_dataset: JRA-55
-        alternative_dataset: ERA-Interim
+        alternative_dataset: ERA5
     additional_datasets:
       - {dataset: ACCESS1-0}
       - {dataset: ACCESS1-3}
@@ -327,7 +327,7 @@ diagnostics:
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: JRA-55, project: ana4mips, type: reanalysis, tier: 1}
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
 
   rlut:
     <<: *corr_diag
