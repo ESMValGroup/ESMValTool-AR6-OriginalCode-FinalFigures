@@ -1,0 +1,81 @@
+# ESMValTool
+# recipe_ocean_heat_content.yml
+---
+documentation:
+  description: |
+    Recipe to produce several figures for IPCC WG1 chapter 3,
+    including
+      ohc_timeseries, (figure 3.23)
+      ohu_timeseries, (figure 3.25)
+      halosteric_sea_level, (figure 3.27)
+      thermosteric_sea_level (figure 3.28)
+
+    unfortunately, a lot of the procesing needs to be done in the diagnostic script,
+    so there's only limited preprocessing done here.
+
+  authors:
+    - demora_lee
+
+  references:
+    - demora2018gmd
+
+
+  projects:
+    - ukesm
+
+
+preprocessors:
+
+    prep_annual:
+      annual_statistics:
+        operator: mean
+      regrid_time:
+        frequency: yr
+        #      regrid:
+        # target_grid: 5x5
+        # scheme: linear
+
+
+
+
+
+diagnostics:
+  diag_ohc:
+    variables:
+      thetao:
+        short_name: thetao
+        preprocessor: prep_annual
+        mip: Omon
+        grid: gn
+        project: CMIP6
+        additional_datasets: &dataset_anchor
+
+          # -----------
+          #  ACCESS-CM2 historical r1i1p1f1 CMIP6 Omon
+          # Origin is: CMIP piControl CMIP6 ACCESS-CM2 r1i1p1f1
+          # ACCESS-CM2 :     [1860, 2014] is [960, 1114]
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+
+      so:
+        short_name: so
+        preprocessor: prep_annual
+        additional_datasets: *dataset_anchor
+      volcello:
+        short_name: volcello
+        preprocessor: prep_annual
+        #additional_datasets: *dataset_anchor
+        additional_datasets:
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: piControl,  ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+
+
+      areacello:
+       short_name: areacello
+       additional_datasets:
+          - {project: CMIP6, mip: Ofx, grid: gn, institute: CSIRO-ARCCSS, dataset: ACCESS-CM2,     exp: historical, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+
+    scripts:
+      diagnostic:
+        script: ocean/diagnostic_chap3_ocean_heat_content.py
+        #script: ocean/calculate_hist_time_in_picontrol.py # Useful for calculating the time range.
