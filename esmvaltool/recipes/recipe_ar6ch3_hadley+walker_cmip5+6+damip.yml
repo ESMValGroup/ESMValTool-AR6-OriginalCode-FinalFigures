@@ -159,6 +159,9 @@ datasets:
     - {project: CMIP6, exp: historical, dataset: ACCESS-ESM1-5, ensemble: r3i1p1f1, grid: gn}
     - {project: CMIP6, exp: piControl, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn,
        start_year: 101, end_year: 1000}
+    #- {project: CMIP6, exp: hist-GHG, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+    #- {project: CMIP6, exp: hist-aer, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+    #- {project: CMIP6, exp: hist-nat, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
     - {project: CMIP6, exp: historical, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
     - {project: CMIP6, exp: historical, dataset: AWI-CM-1-1-MR, ensemble: r2i1p1f1, grid: gn}
     - {project: CMIP6, exp: historical, dataset: AWI-CM-1-1-MR, ensemble: r3i1p1f1, grid: gn}
@@ -292,7 +295,13 @@ datasets:
     - {project: CMIP6, exp: piControl, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn,
        start_year: 5201, end_year: 6200}
     - {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+    #- {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r2i1p1f1, grid: gn} #no uas
+    #- {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r3i1p1f1, grid: gn} #no uas
+    #- {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r4i1p1f1, grid: gn} #no uas
+    #- {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r5i1p1f1, grid: gn} #no uas
+    #- {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r6i1p1f1, grid: gn} #no uas
     - {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r7i1p1f1, grid: gn}
+    #- {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r8i1p1f1, grid: gn} #no uas
     - {project: CMIP6, exp: hist-GHG, dataset: CanESM5, ensemble: r9i1p1f1, grid: gn}
     - {project: CMIP6, exp: hist-aer, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
     - {project: CMIP6, exp: hist-nat, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
@@ -392,24 +401,24 @@ datasets:
     - {project: CMIP6, exp: historical, dataset: GISS-E2-1-H, ensemble: r10i1p1f1, grid: gn}
     - {project: CMIP6, exp: piControl, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn,
        start_year: 3180, end_year: 3980}
-    #- {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn} #fix metadata failure
-    #- {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: piControl, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f1, grid: gn,
-    #   start_year: 1850, end_year: 2349}
-    #- {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
-    #- {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
+    - {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+    - {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
+    - {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
+    - {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
+    - {project: CMIP6, exp: piControl, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f1, grid: gn,
+       start_year: 1850, end_year: 2349}
+    - {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-GHG, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-aer, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
+    - {project: CMIP6, exp: hist-nat, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn}
     - {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
     - {project: CMIP6, exp: historical, dataset: HadGEM3-GC31-MM, ensemble: r2i1p1f3, grid: gn}
     - {project: CMIP6, exp: piControl, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f1, grid: gn,

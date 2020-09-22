@@ -22,7 +22,11 @@ begin
           y = xx(j)
           break
         elseif (ww/wsum.gt.t) then
-          y = (xx(j) + xx(j-1))/2.
+          if (j.eq.0) then
+            y = xx(j)
+          else
+            y = (xx(j) + xx(j-1))/2.
+          end if
           break
         end if
       end if

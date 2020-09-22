@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200918 kosaka_yu: revised to show confidence intervals.
 ;    20200915 kosaka_yu: merged to include Walker circulation figures.
 ;    20200908 kosaka_yu: revised figure details
 ;    20200903 kosaka_yu: changed from pdf to box-whisker plots
@@ -32,30 +33,54 @@ load "$diag_scripts/shared/plot/contour_maps.ncl"
 load "$diag_scripts/shared/plot/contourplot.ncl"
 load "$diag_scripts/ar6ch3_hadley_walker/percentiles.ncl"
 
-function get_statistics(x)
-local weight, y, nmodels, n
+function get_statistics(x[*])
+local weight, esize, xx, y, nmodels, i, m, n
 begin
+  ; weighted mean and percentile ranges
   weight = x
   weight = 1./tofloat(x@esize)
-  y = new(5, typeof(x))
-  y(2) = weighted_mean(x, weight)
-  y(0) = weighted_percentile(x, weight, 0.05)
-  y(1) = weighted_percentile(x, weight, 0.25)
-  y(3) = weighted_percentile(x, weight, 0.75)
-  y(4) = weighted_percentile(x, weight, 0.95)
+  y = new(7, typeof(x))
+  y(0) = min(x)
+  y(1) = weighted_percentile(x, weight, 0.05)
+  y(3) = weighted_mean(x, weight)
+  y(5) = weighted_percentile(x, weight, 0.95)
+  y(6) = max(x)
   y@nruns = dimsizes(x)
-  nmodels = 0
-  n = 0
-  do while(n.lt.dimsizes(x))
-    n = n + x@esize(n)
-    nmodels = nmodels + 1
-  end do
+  nmodels = count_unique_values(x@model_id)
   y@nmodels = nmodels
+
+  models = get_unique_values(x@model_id)
+  ; unweighted confidence interval
+  esize = min(x@esize)
+  ;esize = max((/min(x@esize), 3/))
+  xx = new((/nmodels, esize/), typeof(x))
+  do n = 0, nmodels-1
+    i = ind(x@model_id.eq.models(n))
+    if (dimsizes(i).ge.esize) then
+      xx(n, :) = x(i(0:esize-1))
+    end if
+    delete(i)
+  end do
+  n = dimsizes(ndtooned(xx))
+;print("nmodels = "+nmodels+"  esize = "+esize+"  sample size = "+n)
+  y(2) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
+  y(4) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
+
+; unweighted average of individual models
+  delete(xx)
+  xx = new(nmodels, typeof(x))
+  do n = 0, nmodels-1
+    if (num(x@model_id.eq.models(n)).gt.3) then
+      xx(n) = avg(x(ind(x@model_id.eq.models(n))))
+    end if
+  end do
+  y@means = xx
+;  print(""+xx)
   return(y)
 end
 
-procedure box_whisker(wks, plot, x, w, percentiles, color, add_exp, dum, i)
-local lres, plres, txres, y, add_exp
+procedure box_whisker(wks, plot, x, w, percentiles, type, color, add_exp, dum, i)
+local lres, plres, txres, y, add_exp, mkres, type
 begin
   lres = True
   lres@gsLineColor := color
@@ -63,59 +88,94 @@ begin
   lres@gsLineThicknessF = 2.
   plres = True
 
-  dum(i) = gsn_add_polyline(wks, plot, (/x, x/), \
-                            (/percentiles(0), percentiles(4)/), lres)
-  i = i + 1
-  dum(i) = gsn_add_polyline(wks, plot, (/x-w/3., x+w/3./), \
-                            (/percentiles(0), percentiles(0)/), lres)
-  i = i + 1
-  dum(i) = gsn_add_polyline(wks, plot, (/x-w/3., x+w/3./), \
-                            (/percentiles(4), percentiles(4)/), lres)
-  i = i + 1
-  if (percentiles@project.eq."CMIP6") then
-    plres@gsFillColor := color
-    dum(i) = gsn_add_polygon(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
-                             (/percentiles(1), percentiles(3), \
-                               percentiles(3), percentiles(1)/), plres)
+  if (type.eq."percentile") then
+    dum(i) = gsn_add_polyline(wks, plot, (/x, x/), \
+                              (/percentiles(0), percentiles(6)/), lres)
     i = i + 1
-    lres@gsLineColor := "white"
-    dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x+w/2./), \
-                              (/percentiles(2), percentiles(2)/), lres)
-    i = i + 1
-  elseif (percentiles@project.eq."CMIP5") then
+;    dum(i) = gsn_add_polyline(wks, plot, (/x-w/3., x+w/3./), \
+;                              (/percentiles(0), percentiles(0)/), lres)
+;    i = i + 1
+;    dum(i) = gsn_add_polyline(wks, plot, (/x-w/3., x+w/3./), \
+;                              (/percentiles(6), percentiles(6)/), lres)
+;    i = i + 1
     plres@gsFillColor := "white"
     dum(i) = gsn_add_polygon(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
-                             (/percentiles(1), percentiles(3), \
-                             percentiles(3), percentiles(1)/), plres)
+                             (/percentiles(1), percentiles(5), \
+                               percentiles(5), percentiles(1)/), plres)
     i = i + 1                
     dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
-                              (/percentiles(1), percentiles(3), percentiles(3), \
+                              (/percentiles(1), percentiles(5), percentiles(5), \
                                 percentiles(1), percentiles(1)/), lres)
     i = i + 1
     dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x+w/2./), \
-                              (/percentiles(2), percentiles(2)/), lres)
+                              (/percentiles(3), percentiles(3)/), lres)
     i = i + 1
+  elseif (type.eq."confidence") then
+    plres@gsFillColor := color
+    dum(i) = gsn_add_polygon(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
+                             (/percentiles(2), percentiles(4), \
+                               percentiles(4), percentiles(2)/), plres)
+    i = i + 1                
+    dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
+                              (/percentiles(2), percentiles(4), percentiles(4), \
+                                percentiles(2), percentiles(2)/), lres)
+    i = i + 1
+    lres@gsLineColor := "white"
+    dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x+w/2./), \
+                              (/percentiles(3), percentiles(3)/), lres)
+    i = i + 1
+    
+    if (isatt(percentiles, "means")) then
+      mkres = True
+      mkres@gsMarkerIndex = 16
+      mkres@gsMarkerSizeF =  0.005
+      do j = 0, dimsizes(percentiles@means)-1
+;print(percentiles@means(j))
+        if (.not.ismissing(percentiles@means(j))) then
+          dum(i) = gsn_add_polymarker(wks, plot, x, \
+                                      percentiles@means(j), mkres)
+          i = i + 1
+        end if
+      end do
+    end if
   end if
+  
   if (add_exp) then
     y = 0.
     txres = True
     txres@txFontHeightF = 0.013
     txres@txFontColor := color
     if (percentiles@hemisphere.eq."NH") then
-      if (any(percentiles@exp.eq.(/"AMIP", "GHG", "natural"/))) then
+      if (any(str_squeeze(percentiles@exp).eq.(/"piControl", "GHG", "strat~C~ O3"/))) then
         txres@txJust = "BottomCenter"
-        y = percentiles(4) + 0.02
+        if (type.eq."percentile") then
+          y = percentiles(6) + 0.02
+        elseif (type.eq."confidence") then
+          y = max((/percentiles(4), max(percentiles@means)/)) + 0.02
+        end if
       else
         txres@txJust = "TopCenter"
-        y = percentiles(0) - 0.02
+        if (type.eq."percentile") then
+          y = percentiles(0) - 0.02
+        elseif (type.eq."confidence") then
+          y = min((/percentiles(2), min(percentiles@means)/)) - 0.02
+        end if
       end if
     else
       if (percentiles@exp.eq."AMIP") then
         txres@txJust = "TopCenter"
-        y = percentiles(0) - 0.02
+        if (type.eq."percentile") then
+          y = percentiles(0) - 0.02
+        elseif (type.eq."confidence") then
+          y = min((/percentiles(2), min(percentiles@means)/)) - 0.02
+        end if
       else
         txres@txJust = "BottomCenter"
-        y = percentiles(4) + 0.02
+        if (type.eq."percentile") then
+          y = percentiles(6) + 0.02
+        elseif (type.eq."confidence") then
+          y = max((/percentiles(4), max(percentiles@means)/)) + 0.02
+        end if
       end if
     end if
     dum(i) = gsn_add_text(wks, plot, percentiles@exp, x, y, txres)
@@ -192,12 +252,12 @@ begin
 ; ========================== Prepare drawing =========================
   
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                "hadleycell_edge_trends")
+                "hadley_walker_trends")
   output_dir = config_user_info@plot_dir + "/"
   system("mkdir -p "+output_dir)
 
   plots = new(dims, "graphic")
-  dummy = new(600, "graphic")
+  dummy = new(1000, "graphic")
   idummy = 0
 
   res := True
@@ -209,8 +269,8 @@ begin
   res@tmXBLabels = False
   res@tmYLPrecision = 2
   res@vpHeightF = 0.35
-  res@gsnXRefLine = 0.3
-  res@gsnYRefLineThicknessF = 1.
+;  res@gsnXRefLine = 0.3
+;  res@gsnYRefLineThicknessF = 0.5
   res@gsnYRefLine = 0.
   res@gsnYRefLineThicknessF = 0.5
   res@gsnYRefLineColor = "black"
@@ -223,6 +283,10 @@ begin
   txres = True
   txres@txJust = "CenterCenter"
   txres@txFontHeightF = 0.013       
+
+  polyres = True
+  polyres@gsFillColor = "grey80"
+  polyres@gsFillOpacityF = 0.5
 
   alphabet = str_split_by_length("abcdefghijklmnopqrstuvwxyz", 1)
 
@@ -288,6 +352,7 @@ begin
       
       ncmip5 = 0
       ncmip6 = 0
+      ncmip6_single = 0
       range = 0.
       do k = 0, dimsizes(paths)-1
         f = addfile(paths(k), "r")
@@ -307,13 +372,15 @@ begin
           eyear = toint(data@eyear)
         end if
         if (isStrSubset(paths(k), "_cmip5hist.nc")) then
+;print("cmip5 hist")
           cmip5hist = get_statistics(data)
           cmip5hist@project = "CMIP5"
-          cmip5hist@exp = "   all  ~C~forcing"
+          cmip5hist@exp = "    all  ~C~ forcing"
           cmip5hist@hemisphere = hemisphere
           range = max((/range, max(abs(cmip5hist))/))
           ncmip5 = ncmip5 + 1
         elseif (isStrSubset(paths(k), "_cmip5pi.nc")) then
+;print("cmip5 piControl")
           cmip5pi = get_statistics(data)
           cmip5pi@project = "CMIP5"
           cmip5pi@exp = "piControl"
@@ -321,21 +388,24 @@ begin
           range = max((/range, max(abs(cmip5pi))/))
           ncmip5 = ncmip5 + 1
         elseif (isStrSubset(paths(k), "_cmip6hist.nc")) then
+;print("cmip6 hist")
           cmip6hist = get_statistics(data)
           cmip6hist@project = "CMIP6"
-          cmip6hist@exp = "   all  ~C~forcing"
+          cmip6hist@exp = "    all  ~C~ forcing"
           cmip6hist@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6hist))/))
           ncmip6 = ncmip6 + 1
         elseif (isStrSubset(paths(k), "_cmip6pi.nc")) then
+;print("cmip6 piControl")
           cmip6pi = get_statistics(data)
           cmip6pi@project = "CMIP6"
-          cmip6pi@exp = "piControl  "
+          cmip6pi@exp = "piControl"
           cmip6pi@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6pi))/))
           ncmip6 = ncmip6 + 1
         elseif (isStrSubset(paths(k), "_cmip6amip.nc") .or. \
                 isStrSubset(paths(k), "_cmip6amip-hist.nc")) then
+;print("cmip6 amip")
           cmip6amip = get_statistics(data)
           cmip6amip@project = "CMIP6"
           cmip6amip@exp = "AMIP"
@@ -348,33 +418,41 @@ begin
           range = max((/range, max(abs(cmip6amip))/))
           ncmip6 = ncmip6 + 1
         elseif (isStrSubset(paths(k), "_cmip6GHG.nc")) then
+;print("cmip6 GHG")
           cmip6GHG = get_statistics(data)
           cmip6GHG@project = "CMIP6"
           cmip6GHG@exp = "GHG"
           cmip6GHG@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6GHG))/))
           ncmip6 = ncmip6 + 1
+          ncmip6_single = ncmip6_single + 1
         elseif (isStrSubset(paths(k), "_cmip6aer.nc")) then
+;print("cmip6 aer")
           cmip6aer = get_statistics(data)
           cmip6aer@project = "CMIP6"
           cmip6aer@exp = "aerosol"
           cmip6aer@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6aer))/))
           ncmip6 = ncmip6 + 1
+          ncmip6_single = ncmip6_single + 1
         elseif (isStrSubset(paths(k), "_cmip6nat.nc")) then
+;print("cmip6 nat")
           cmip6nat = get_statistics(data)
           cmip6nat@project = "CMIP6"
           cmip6nat@exp = "natural"
           cmip6nat@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6nat))/))
           ncmip6 = ncmip6 + 1
+          ncmip6_single = ncmip6_single + 1
         elseif (isStrSubset(paths(k), "_cmip6stratO3.nc")) then
+;print("cmip6 stratO3")
           cmip6stratO3 = get_statistics(data)
           cmip6stratO3@project = "CMIP6"
           cmip6stratO3@exp = "strat~C~ O3  "
           cmip6stratO3@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6stratO3))/))
           ncmip6 = ncmip6 + 1
+          ncmip6_single = ncmip6_single + 1
         else
           if (isvar("Obs")) then
             tmp = Obs
@@ -405,7 +483,7 @@ begin
       res@tiMainFontHeightF = 0.022
       if (varname.eq."lat") then
         if (range.gt.0.05*scale) then
-          res@trYMaxF = 0.07*scale
+          res@trYMaxF = 0.1*scale
         else
           res@trYMaxF = 0.05*scale
         end if
@@ -464,7 +542,7 @@ begin
       end if
       res@vpWidthF = 0.4
 
-      w = 0.8
+      w = 0.7
       xcmip5 = -0.4
       xcmip6 = 1.
       if (ncmip5.gt.0) then
@@ -472,11 +550,28 @@ begin
       else
         res@trXMinF = 0.5
       end if
-      res@trXMaxF =  tofloat(ncmip6+1) - 0.3
-
+      res@trXMaxF =  tofloat(ncmip6+1) + 0.1
+      if (isvar("cmip6hist")) then
+        res@trXMaxF = res@trXMaxF + 1.
+      end if
+      xcmip6_divide = tofloat(ncmip6 - ncmip6_single) + 0.7
+      
       res@xyLineColor = "transparent"
       plots(ii, jj) = gsn_csm_xy(wks, (/res@trXMinF, res@trXMaxF/), (/0., 0./), res)
 
+      lres@gsLineThicknessF = 0.5
+      lres@gsLineDashPattern = 0
+      lres@gsLineColor = "black"
+      dummy(idummy) = gsn_add_polyline(wks, plots(ii, jj), (/xcmip6_divide, xcmip6_divide/), \
+                                       (/res@trYMinF, res@trYMaxF/), lres)
+      idummy = idummy + 1
+
+      if (ncmip5.gt.0) then
+        dummy(idummy) = gsn_add_polygon(wks, plots(ii, jj), (/res@trXMinF, res@trXMinF, 0.3, 0.3/), \
+                                        (/res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/), polyres)
+        idummy = idummy + 1
+      end if
+      
       if (ii.eq.0 .and. jj.eq.0) then
         add_expname = True
       else
@@ -489,7 +584,8 @@ begin
           lres@gsLineColor = obslist@color(iobs) ;color_obs(n)
           lres@gsLineDashPattern = obslist@pattern(iobs) ; pattern_obs(n)
           lres@gsLineThicknessF = 2.
-          dummy(idummy) = gsn_add_polyline(wks, plots(ii, jj), (/res@trXMinF, res@trXMaxF/), \
+;          dummy(idummy) = gsn_add_polyline(wks, plots(ii, jj), (/res@trXMinF, res@trXMaxF/), \
+          dummy(idummy) = gsn_add_polyline(wks, plots(ii, jj), (/res@trXMinF, xcmip6_divide/), \
                                            (/Obs(n), Obs(n)/), lres)
           idummy = idummy + 1
           if (.not.isdefined("legend") .or. \
@@ -516,7 +612,8 @@ begin
       end if
 
       if (isvar("cmip5pi")) then
-        box_whisker(wks, plots(ii, jj), xcmip5, w, cmip5pi, color_cmip5pi, add_expname, dummy, idummy)
+        box_whisker(wks, plots(ii, jj), xcmip5, w, cmip5pi, "percentile", \
+                    color_cmip5pi, add_expname, dummy, idummy)
       
         if (.not.isdefined("legend") .or. \
             all(metadata_att_as_array(legend, "name").ne."cmip5pi")) then
@@ -539,7 +636,8 @@ begin
         xcmip5 = xcmip5 - 1.
       end if
       if (isvar("cmip5hist")) then
-        box_whisker(wks, plots(ii, jj), xcmip5, w, cmip5hist, color_cmip5hist, add_expname, dummy, idummy)
+        box_whisker(wks, plots(ii, jj), xcmip5, w, cmip5hist, "percentile", \
+                    color_cmip5hist, add_expname, dummy, idummy)
 
         if (.not.isdefined("legend") .or. \
             all(metadata_att_as_array(legend, "name").ne."cmip5hist")) then
@@ -561,8 +659,31 @@ begin
         delete(cmip5hist)
         xcmip5 = xcmip5 - 1.
       end if
+      if (isvar("cmip6hist")) then
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6hist, "percentile", \
+                    color_cmip6hist, add_expname, dummy, idummy)
+        if (.not.isdefined("legend") .or. \
+            all(metadata_att_as_array(legend, "name").ne."cmip6hist")) then
+          if (.not.isdefined("legend")) then
+            legend = NewList("fifo")
+          end if
+          dataset = "historical"  ; "CMIP6 historical"
+          dataset@name = "cmip6hist"
+          dataset@type = "ensemble"
+          dataset@nmodels = cmip6hist@nmodels
+          dataset@nruns = cmip6hist@nruns
+          dataset@color = color_cmip6hist
+          ListAppend(legend, new(1, "string"))
+          k = ListCount(legend)-1
+          legend[k] = dataset
+          delete(dataset)
+        end if
+        ;delete(cmip6hist)
+        xcmip6 = xcmip6 + 1.
+      end if
       if (isvar("cmip6amip")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6amip, color_cmip6amip, add_expname, dummy, idummy)
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6amip, "percentile", \
+                    color_cmip6amip, add_expname, dummy, idummy)
 
         if (.not.isdefined("legend") .or. \
             all(metadata_att_as_array(legend, "name").ne."cmip6amip")) then
@@ -588,128 +709,12 @@ begin
             legend[k]@activity := array_append_record(legend[k]@activity, cmip6amip@activity, 0)
           end if
         end if
-        
         delete(cmip6amip)
         xcmip6 = xcmip6 + 1.
       end if
-      if (isvar("cmip6hist")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6hist, color_cmip6hist, add_expname, dummy, idummy)
-
-
-        if (.not.isdefined("legend") .or. \
-            all(metadata_att_as_array(legend, "name").ne."cmip6hist")) then
-          if (.not.isdefined("legend")) then
-            legend = NewList("fifo")
-          end if
-          dataset = "historical"  ; "CMIP6 historical"
-          dataset@name = "cmip6hist"
-          dataset@type = "ensemble"
-          dataset@nmodels = cmip6hist@nmodels
-          dataset@nruns = cmip6hist@nruns
-          dataset@color = color_cmip6hist
-          ListAppend(legend, new(1, "string"))
-          k = ListCount(legend)-1
-          legend[k] = dataset
-          delete(dataset)
-        end if
-        
-        delete(cmip6hist)
-        xcmip6 = xcmip6 + 1.
-      end if
-      if (isvar("cmip6GHG")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6GHG, color_cmip6GHG, add_expname, dummy, idummy)
-
-        if (.not.isdefined("legend") .or. \
-            all(metadata_att_as_array(legend, "name").ne."cmip6GHG")) then
-          if (.not.isdefined("legend")) then
-            legend = NewList("fifo")
-          end if
-          dataset = "hist-GHG"  ;"CMIP6 hist-GHG"
-          dataset@name = "cmip6GHG"
-          dataset@type = "ensemble"
-          dataset@nmodels = cmip6GHG@nmodels
-          dataset@nruns = cmip6GHG@nruns
-          dataset@color = color_cmip6GHG
-          ListAppend(legend, new(1, "string"))
-          k = ListCount(legend)-1
-          legend[k] = dataset
-          delete(dataset)
-        end if
-        
-        delete(cmip6GHG)
-        xcmip6 = xcmip6 + 1.
-      end if
-      if (isvar("cmip6aer")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6aer, color_cmip6aer, add_expname, dummy, idummy)
-
-        if (.not.isdefined("legend") .or. \
-            all(metadata_att_as_array(legend, "name").ne."cmip6aer")) then
-          if (.not.isdefined("legend")) then
-            legend = NewList("fifo")
-          end if
-          dataset = "hist-aer"  ;"CMIP6 hist-aer"
-          dataset@name = "cmip6aer"
-          dataset@type = "ensemble"
-          dataset@nmodels = cmip6aer@nmodels
-          dataset@nruns = cmip6aer@nruns
-          dataset@color = color_cmip6aer
-          ListAppend(legend, new(1, "string"))
-          k = ListCount(legend)-1
-          legend[k] = dataset
-          delete(dataset)
-        end if
-        
-        delete(cmip6aer)
-        xcmip6 = xcmip6 + 1.
-      end if
-      if (isvar("cmip6stratO3")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6stratO3, color_cmip6stratO3, add_expname, dummy, idummy)
-
-        if (.not.isdefined("legend") .or. \
-            all(metadata_att_as_array(legend, "name").ne."cmip6stratO3")) then
-          if (.not.isdefined("legend")) then
-            legend = NewList("fifo")
-          end if
-          dataset = "hist-stratO3"  ;"CMIP6 hist-stratO3"
-          dataset@name = "cmip6stratO3"
-          dataset@type = "ensemble"
-          dataset@nmodels = cmip6stratO3@nmodels
-          dataset@nruns = cmip6stratO3@nruns
-          dataset@color = color_cmip6stratO3
-          ListAppend(legend, new(1, "string"))
-          k = ListCount(legend)-1
-          legend[k] = dataset
-          delete(dataset)
-        end if
-        
-        delete(cmip6stratO3)
-        xcmip6 = xcmip6 + 1.
-      end if
-      if (isvar("cmip6nat")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6nat, color_cmip6nat, add_expname, dummy, idummy)
-
-        if (.not.isdefined("legend") .or. \
-            all(metadata_att_as_array(legend, "name").ne."cmip6nat")) then
-          if (.not.isdefined("legend")) then
-            legend = NewList("fifo")
-          end if
-          dataset = "hist-nat"  ; "CMIP6 hist-nat"
-          dataset@name = "cmip6nat"
-          dataset@type = "ensemble"
-          dataset@nmodels = cmip6nat@nmodels
-          dataset@nruns = cmip6nat@nruns
-          dataset@color = color_cmip6nat
-          ListAppend(legend, new(1, "string"))
-          k = ListCount(legend)-1
-          legend[k] = dataset
-          delete(dataset)
-        end if
-        
-        delete(cmip6nat)
-        xcmip6 = xcmip6 + 1.
-      end if
       if (isvar("cmip6pi")) then
-        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6pi, color_cmip6pi, add_expname, dummy, idummy)
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6pi, "percentile", \
+                    color_cmip6pi, add_expname, dummy, idummy)
       
         if (.not.isdefined("legend") .or. \
             all(metadata_att_as_array(legend, "name").ne."cmip6pi")) then
@@ -735,6 +740,112 @@ begin
         end if
         
         delete(cmip6pi)
+        xcmip6 = xcmip6 + 1.
+      end if
+      if (xcmip6.gt.xcmip6_divide) then
+        xcmip6 = xcmip6 + 0.4
+      end if
+      if (isvar("cmip6hist")) then
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6hist, "confidence", \
+                    color_cmip6hist, add_expname, dummy, idummy)
+        delete(cmip6hist)
+        xcmip6 = xcmip6 + 1.
+      end if
+      
+      if (isvar("cmip6GHG")) then
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6GHG, "confidence", \
+                    color_cmip6GHG, add_expname, dummy, idummy)
+
+        if (.not.isdefined("legend") .or. \
+            all(metadata_att_as_array(legend, "name").ne."cmip6GHG")) then
+          if (.not.isdefined("legend")) then
+            legend = NewList("fifo")
+          end if
+          dataset = "hist-GHG"  ;"CMIP6 hist-GHG"
+          dataset@name = "cmip6GHG"
+          dataset@type = "ensemble"
+          dataset@nmodels = cmip6GHG@nmodels
+          dataset@nruns = cmip6GHG@nruns
+          dataset@color = color_cmip6GHG
+          ListAppend(legend, new(1, "string"))
+          k = ListCount(legend)-1
+          legend[k] = dataset
+          delete(dataset)
+        end if
+        
+        delete(cmip6GHG)
+        xcmip6 = xcmip6 + 1.
+      end if
+      if (isvar("cmip6aer")) then
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6aer, "confidence", \
+                    color_cmip6aer, add_expname, dummy, idummy)
+
+        if (.not.isdefined("legend") .or. \
+            all(metadata_att_as_array(legend, "name").ne."cmip6aer")) then
+          if (.not.isdefined("legend")) then
+            legend = NewList("fifo")
+          end if
+          dataset = "hist-aer"  ;"CMIP6 hist-aer"
+          dataset@name = "cmip6aer"
+          dataset@type = "ensemble"
+          dataset@nmodels = cmip6aer@nmodels
+          dataset@nruns = cmip6aer@nruns
+          dataset@color = color_cmip6aer
+          ListAppend(legend, new(1, "string"))
+          k = ListCount(legend)-1
+          legend[k] = dataset
+          delete(dataset)
+        end if
+        
+        delete(cmip6aer)
+        xcmip6 = xcmip6 + 1.
+      end if
+      if (isvar("cmip6stratO3")) then
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6stratO3, "confidence", \
+                    color_cmip6stratO3, add_expname, dummy, idummy)
+
+        if (.not.isdefined("legend") .or. \
+            all(metadata_att_as_array(legend, "name").ne."cmip6stratO3")) then
+          if (.not.isdefined("legend")) then
+            legend = NewList("fifo")
+          end if
+          dataset = "hist-stratO3"  ;"CMIP6 hist-stratO3"
+          dataset@name = "cmip6stratO3"
+          dataset@type = "ensemble"
+          dataset@nmodels = cmip6stratO3@nmodels
+          dataset@nruns = cmip6stratO3@nruns
+          dataset@color = color_cmip6stratO3
+          ListAppend(legend, new(1, "string"))
+          k = ListCount(legend)-1
+          legend[k] = dataset
+          delete(dataset)
+        end if
+        
+        delete(cmip6stratO3)
+        xcmip6 = xcmip6 + 1.
+      end if
+      if (isvar("cmip6nat")) then
+        box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6nat, "confidence", \
+                    color_cmip6nat, add_expname, dummy, idummy)
+
+        if (.not.isdefined("legend") .or. \
+            all(metadata_att_as_array(legend, "name").ne."cmip6nat")) then
+          if (.not.isdefined("legend")) then
+            legend = NewList("fifo")
+          end if
+          dataset = "hist-nat"  ; "CMIP6 hist-nat"
+          dataset@name = "cmip6nat"
+          dataset@type = "ensemble"
+          dataset@nmodels = cmip6nat@nmodels
+          dataset@nruns = cmip6nat@nruns
+          dataset@color = color_cmip6nat
+          ListAppend(legend, new(1, "string"))
+          k = ListCount(legend)-1
+          legend[k] = dataset
+          delete(dataset)
+        end if
+        
+        delete(cmip6nat)
         xcmip6 = xcmip6 + 1.
       end if
 ;      if (isvar("Obs")) then
@@ -768,22 +879,47 @@ begin
 ;        delete(Obs)
 ;      end if
 
-      if (ncmip5.gt.0.and.add_expname) then
-        txres@txFontColor = "black"
-        x = xcmip5 + tofloat(ncmip5)/2. + 0.5
-;        y = res@trYMaxF * 0.9
-        y = res@trYMinF * 0.9
-        dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "CMIP5", x, y, txres)
+      txres@txFontColor = "black"
+      if (hemisphere.eq."SH") then
+        y = res@trYMaxF * 0.98
+        txres@txJust = "TopCenter"
+        x = (xcmip6_divide + res@trXMinF)/2.
+        dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "Comparison with obs", x, y, txres)
         idummy = idummy + 1
-
-        x = xcmip6 - tofloat(ncmip6)/2. - 0.5
+        x = xcmip6_divide/2. + 0.2
+        dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "CMIP6", x, y-res@trYMaxF/10., txres)
+        idummy = idummy + 1
+        if (ncmip5.gt.0) then  ; .and.add_expname) then
+          txres@txFontColor = "grey30"
+          x = xcmip5 + tofloat(ncmip5)/2. + 0.5
+          dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "CMIP5", x, y-res@trYMaxF/10., txres)
+          idummy = idummy + 1
+        end if
+      else
+        y = res@trYMinF * 0.98
+        txres@txJust = "BottomCenter"
+        x = (xcmip6_divide + res@trXMinF)/2.
+        dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "Comparison with obs", x, y+res@trYMaxF/10., txres)
+        idummy = idummy + 1
+        x = xcmip6_divide/2. + 0.2
         dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "CMIP6", x, y, txres)
         idummy = idummy + 1
+        if (ncmip5.gt.0) then  ; .and.add_expname) then
+          txres@txFontColor = "grey30"
+          x = xcmip5 + tofloat(ncmip5)/2. + 0.5
+          dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "CMIP5", x, y, txres)
+          idummy = idummy + 1
+        end if
       end if
 
-      
+      txres@txFontColor = "black"
+      if (ncmip6_single.gt.0) then
+        x = (res@trXMaxF + xcmip6_divide)/2.
+        dummy(idummy) = gsn_add_text(wks, plots(ii, jj), "Forcing contribution~C~        in CMIP6", x, y, txres)
+        idummy = idummy + 1
+      end if
       ipanel = ipanel + 1
-      
+            
     end do
   end do
 
@@ -821,9 +957,8 @@ begin
 
   if (isdefined("legend")) then
     txres       := True
-    txres@txJust = "TopLeft"
 
-    x0 = 0.34 ; 0.22
+    x0 = 0.32 ; 0.22
     y0 = 0.16 ; 0.29
     h = 0.035
     if (any(str_match_bool_ic(metadata_att_as_array(legend, "name"), "cmip5")) .or. \
@@ -832,31 +967,72 @@ begin
        h1 = 0.02
        h2 = h
        lres := True
+       lres@gsLineThicknessF = 2.
        lres@gsLineColor := "grey50"
        lres@gsLineDashPattern = 0
-       lres@gsLineThicknessF = 2.
        plres := True
-       plres@gsFillColor := lres@gsLineColor
+       plres@gsFillColor := "white" ;lres@gsLineColor
        gsn_polyline_ndc(wks, (/x0, x0/), (/y0-h2, y0+h2/), lres)
-       gsn_polyline_ndc(wks, (/x0-w/3., x0+w/3./), (/y0+h2, y0+h2/), lres)
-       gsn_polyline_ndc(wks, (/x0-w/3., x0+w/3./), (/y0-h2, y0-h2/), lres)
+;       gsn_polyline_ndc(wks, (/x0-w/3., x0+w/3./), (/y0+h2, y0+h2/), lres)
+;       gsn_polyline_ndc(wks, (/x0-w/3., x0+w/3./), (/y0-h2, y0-h2/), lres)
        gsn_polygon_ndc(wks, (/x0-w/2., x0-w/2., x0+w/2., x0+w/2./), \
                             (/y0-h1, y0+h1, y0+h1, y0-h1/), plres)
-       lres@gsLineColor := "white"
        gsn_polyline_ndc(wks, (/x0-w/2., x0+w/2./), (/y0, y0/), lres)
-       txres@txFontColor = "black"
-       txres@txFontHeightF = 0.01
-       gsn_text_ndc(wks, "95th",  x0+w/2.+0.002, y0+h2, txres)
-       gsn_text_ndc(wks, "75th", x0+w/2.+0.002, y0+h1, txres)
-       gsn_text_ndc(wks, "mean", x0+w/2.+0.002, y0, txres)
-       gsn_text_ndc(wks, "25th", x0+w/2.+0.002, y0-h1, txres)
-       gsn_text_ndc(wks, "5th", x0+w/2.+0.002, y0-h2, txres)
+       gsn_polyline_ndc(wks, (/x0-w/2., x0-w/2., x0+w/2., x0+w/2., x0-w/2./), \
+                             (/y0-h1, y0+h1, y0+h1, y0-h1, y0-h1/), lres)
 
+       txres@txFontColor = "black"
+       txres@txFontHeightF = 0.009
+       txres@txJust = "CenterLeft"
+       txres@txAngleF = 0.
+;       gsn_text_ndc(wks, "max",  x0-w/2.-0.002, y0+h2, txres)
+       gsn_text_ndc(wks, "max",  x0+0.002, y0+h2, txres)
+       gsn_text_ndc(wks, "95th", x0+w/2.+0.002, y0+h1, txres)
+       gsn_text_ndc(wks, "mean", x0+w/2.+0.002, y0, txres)
+       gsn_text_ndc(wks, "5th", x0+w/2.+0.002, y0-h1, txres)
+;       gsn_text_ndc(wks, "min", x0-w/2.-0.002, y0-h2, txres)
+       gsn_text_ndc(wks, "min", x0+0.002, y0-h2, txres)
+       txres@txJust = "BottomCenter"
+       txres@txAngleF = 90.
+       gsn_text_ndc(wks, "Ensemble range", x0-w/2.-0.002, y0, txres)
+       
+       x = x0 + w*3.7
+       plres@gsFillColor = lres@gsLineColor
+       gsn_polygon_ndc(wks, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
+                            (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5/), plres)
+       lres@gsLineColor := "white"
+       lres@gsLineThicknessF = 2.
+       gsn_polyline_ndc(wks, (/x-w/2., x+w/2./), (/y0, y0/), lres)
+       lres@gsLineThicknessF = 1.
+       lres@gsLineColor := plres@gsFillColor
+       gsn_polyline_ndc(wks, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
+                             (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5, y0-h1/1.5/), lres)
+       txres@txJust = "TopCenter"
+       txres@txAngleF = 90.
+       gsn_text_ndc(wks, "5-95%", x+w/2.+0.003, y0, txres)
+       gsn_text_ndc(wks, "confidence int.", x+w/2.+0.015, y0, txres)
+       gsn_text_ndc(wks, "of mean", x+w/2.+0.027, y0, txres)
+       mkres = True
+       mkres@gsMarkerIndex = 16
+       mkres@gsMarkerSizeF =  0.005
+       gsn_polymarker_ndc(wks, (/x, x/), (/y0-h1/4., y0+h1/3./), mkres)
+       lres@gsLineThicknessF = 0.5
+       lres@gsLineColor = "black"
+       gsn_polyline_ndc(wks, (/x, x-w/3./), (/y0+h1/3., y0+h1/1.5+0.005/), lres)
+       txres@txAngleF = 0.
+       txres@txJust = "BottomCenter"
+       gsn_text_ndc(wks, "mean of", x-w/3., y0+h1/1.5+0.03, txres)
+       gsn_text_ndc(wks, "each", x-w/3., y0+h1/1.5+0.018, txres)
+       gsn_text_ndc(wks, "model", x-w/3., y0+h1/1.5+0.006, txres)
+
+       
+       lres@gsLineThicknessF = 1.
        txres@txFontHeightF = 0.011 ;0.014
+       txres@txJust = "TopLeft"
        m = 0
        do n = 0, ListCount(legend)-1
          if (legend[n]@type .eq. "ensemble") then
-           x = x0 + 0.06 + m/5 * 0.32  ; 0.35
+           x = x0 + 0.14 + m/5 * 0.32  ; 0.35
            y = y0 + h*1.2 - mod(m, 5)*h*0.55 ;0.6
            txres@txFontColor := legend[n]@color
            if (isStrSubset(legend[n], "piControl").and.count_unique_values(legend[n]@nruns).gt.1) then
@@ -902,7 +1078,7 @@ begin
      m = 0
      do n = 0, ListCount(legend)-1
        if (legend[n]@type .eq. "single") then
-         x1 = x0 - 0.04 - m/4 * 0.14
+         x1 = x0 - 0.055 - m/4 * 0.14
          x2 = x1 - 0.058
          y = y0 + h*0.9 - mod(m, 4)*h*0.6
          lres@gsLineColor := legend[n]@color

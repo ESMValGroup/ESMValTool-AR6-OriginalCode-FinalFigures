@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200918 kosaka_yu: output model id as attributes..
 ;    20200915 kosaka_yu: merged with Walker circulation figure.
 ;    20200901 kosaka_yu: added AMIP and DAMIP simulations; split piControl into
 ;                        time segments of specified length automatically
@@ -200,6 +201,8 @@ begin
 
   ndatasets = ListCount(input_file_info)
 
+  dataList = get_unique_values(metadata_att_as_array(input_file_info, "dataset"))
+  
 ; ========================================================================
 
   do ii = 0, ndatasets - 1
@@ -340,7 +343,7 @@ begin
         esize = num(metadata_att_as_array(input_file_info, "project").eq.input_file_info[ii]@project.and.\
                     metadata_att_as_array(input_file_info, "exp").eq.input_file_info[ii]@exp.and.\
                     metadata_att_as_array(input_file_info, "dataset").eq.input_file_info[ii]@dataset)
-
+        model_id = ind(input_file_info[ii]@dataset.eq.dataList)
         if (input_file_info[ii]@project.eq."CMIP5" .and. \
             isStrSubset(input_file_info[ii]@exp, "historical")) then
           if (isvar("trend_cmip5hist")) then
@@ -348,9 +351,11 @@ begin
             delete(trend_cmip5hist)
             trend_cmip5hist = array_append_record(tmp, trend_edge, 0)
             trend_cmip5hist@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip5hist@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip5hist = (/trend_edge/)
+            trend_cmip5hist@model_id = model_id
             trend_cmip5hist@esize = esize
             trend_cmip5hist@hemisphere = hemisphere
             trend_cmip5hist@season = season
@@ -369,9 +374,11 @@ begin
             delete(trend_cmip5pi)
             trend_cmip5pi = array_append_record(tmp, trend_edge, 0)
             trend_cmip5pi@esize := array_append_record(tmp@esize, nseg, 0)
+            trend_cmip5pi@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip5pi = (/trend_edge/)
+            trend_cmip5pi@model_id = model_id
             trend_cmip5pi@esize = nseg
             trend_cmip5pi@hemisphere = hemisphere
             trend_cmip5pi@season = season
@@ -390,9 +397,11 @@ begin
             delete(trend_cmip6hist)
             trend_cmip6hist = array_append_record(tmp, trend_edge, 0)
             trend_cmip6hist@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6hist@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6hist = (/trend_edge/)
+            trend_cmip6hist@model_id = model_id
             trend_cmip6hist@esize = esize
             trend_cmip6hist@hemisphere = hemisphere
             trend_cmip6hist@season = season
@@ -411,9 +420,11 @@ begin
             delete(trend_cmip6pi)
             trend_cmip6pi = array_append_record(tmp, trend_edge, 0)
             trend_cmip6pi@esize := array_append_record(tmp@esize, nseg, 0)
+            trend_cmip6pi@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6pi = (/trend_edge/)
+            trend_cmip6pi@model_id = model_id
             trend_cmip6pi@esize = nseg
             trend_cmip6pi@hemisphere = hemisphere
             trend_cmip6pi@season = season
@@ -431,9 +442,11 @@ begin
             delete(trend_cmip6amip)
             trend_cmip6amip = array_append_record(tmp, trend_edge, 0)
             trend_cmip6amip@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6amip@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6amip = (/trend_edge/)
+            trend_cmip6amip@model_id = model_id
             trend_cmip6amip@esize = esize
             trend_cmip6amip@hemisphere = hemisphere
             trend_cmip6amip@season = season
@@ -451,9 +464,11 @@ begin
             delete(trend_cmip6amiphist)
             trend_cmip6amiphist = array_append_record(tmp, trend_edge, 0)
             trend_cmip6amiphist@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6amiphist@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6amiphist = (/trend_edge/)
+            trend_cmip6amiphist@model_id = model_id
             trend_cmip6amiphist@esize = esize
             trend_cmip6amiphist@hemisphere = hemisphere
             trend_cmip6amiphist@season = season
@@ -471,9 +486,11 @@ begin
             delete(trend_cmip6GHG)
             trend_cmip6GHG = array_append_record(tmp, trend_edge, 0)
             trend_cmip6GHG@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6GHG@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6GHG = (/trend_edge/)
+            trend_cmip6GHG@model_id = model_id
             trend_cmip6GHG@esize = esize
             trend_cmip6GHG@hemisphere = hemisphere
             trend_cmip6GHG@season = season
@@ -491,9 +508,11 @@ begin
             delete(trend_cmip6aer)
             trend_cmip6aer = array_append_record(tmp, trend_edge, 0)
             trend_cmip6aer@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6aer@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6aer = (/trend_edge/)
+            trend_cmip6aer@model_id = model_id
             trend_cmip6aer@esize = esize
             trend_cmip6aer@hemisphere = hemisphere
             trend_cmip6aer@season = season
@@ -511,9 +530,11 @@ begin
             delete(trend_cmip6nat)
             trend_cmip6nat = array_append_record(tmp, trend_edge, 0)
             trend_cmip6nat@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6nat@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6nat = (/trend_edge/)
+            trend_cmip6nat@model_id = model_id
             trend_cmip6nat@esize = esize
             trend_cmip6nat@hemisphere = hemisphere
             trend_cmip6nat@season = season
@@ -531,9 +552,11 @@ begin
             delete(trend_cmip6stratO3)
             trend_cmip6stratO3 = array_append_record(tmp, trend_edge, 0)
             trend_cmip6stratO3@esize := array_append_record(tmp@esize, esize, 0)
+            trend_cmip6stratO3@model_id := array_append_record(tmp@model_id, model_id, 0)
             delete(tmp)
           else
             trend_cmip6stratO3 = (/trend_edge/)
+            trend_cmip6stratO3@model_id = model_id
             trend_cmip6stratO3@esize = esize
             trend_cmip6stratO3@hemisphere = hemisphere
             trend_cmip6stratO3@season = season
