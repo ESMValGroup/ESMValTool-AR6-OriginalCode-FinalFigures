@@ -1,0 +1,123 @@
+# ESMValTool
+# recipe_ipcc_ar6_wg1_fgd_3_18.yml
+---
+documentation:
+
+  description: |
+    plots scatter plot 3_18 for IPCC AR6 WGI Ch 3
+
+  authors:
+    - malinina_elizaveta
+
+#  projects:
+#    - ipcc_ar6
+
+preprocessors:
+  regr_preproc:
+    regrid:
+      target_grid: 1x1
+      lon_offset: True
+      lat_offset: True
+      scheme: nearest
+
+models_cmip5_list: &models_cmip5_list
+# CMIP5_ALL
+ - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1}
+ - {dataset: CanESM2, project: CMIP5, ensemble: "r(1:2)i1p1"}
+ - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1 }
+ - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1}
+
+models_cmip6_list: &models_cmip6_list
+# CMIP6_ALL
+ - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+ - {dataset: ACCESS-ESM1-5, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+ - {dataset: CanESM5, grid: gn, project: CMIP6, exp: historical, ensemble: "r(1:2)i1p1f1"}
+ - {dataset: INM-CM4-8, grid: gr1, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+ - {dataset: INM-CM5-0, grid: gr1, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+ - {dataset: MPI-ESM1-2-LR, grid: gn, project: CMIP6, exp: historical, ensemble: r1i1p1f1}
+
+diagnostics:
+  ipcc_ar6_wg1_fgd_3_18:
+    description: plot the sie scatter plot 3.18
+    variables:
+      sic_cmip5_hist:
+        short_name: sic
+        preprocessor: regr_preproc
+        mip: OImon
+        exp: historical
+        start_year: 1979
+        end_year: 2005
+        additional_datasets: *models_cmip5_list
+      sic_cmip5_rcp:
+        short_name: sic
+        preprocessor: regr_preproc
+        mip: OImon
+        exp: rcp45
+        start_year: 2006
+        end_year: 2014
+        additional_datasets: *models_cmip5_list
+      siconc_cmip6_hist:
+        short_name: siconc
+        preprocessor: regr_preproc
+        mip: SImon
+        exp: historical
+        start_year: 1979
+        end_year: 2014
+        additional_datasets: *models_cmip6_list
+
+    scripts:
+      ipcc_ar6_wg1_fgd_3_18:
+        script: /home/acrnemr/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_18.py
+        concatinate_cmip5: true
+        seaiceextent: true # if sea ice extent is false, sea ice area is used instead
+        cmip5_exps_concatinate: ['historical', 'rcp45'] # the order the cmip5 data should be concatenated
+        month_latitude_NH: [9, 50.] # month and latitude for NH panel
+        month_latitude_SH: [2, -50.] # month and latitude for SH panel
+
+  ipcc_ar6_wg1_fgd_3_19:
+    description: plot the sie timeseries figure 3.19
+    variables:
+      sic_cmip5_hist:
+        short_name: sic
+        preprocessor: regr_preproc
+        mip: OImon
+        exp: historical
+        start_year: 1979
+        end_year: 2005
+        additional_datasets: *models_cmip5_list
+      sic_cmip5_rcp:
+        short_name: sic
+        preprocessor: regr_preproc
+        mip: OImon
+        exp: rcp45
+        start_year: 2006
+        end_year: 2019
+        additional_datasets: *models_cmip5_list
+      siconc_cmip6_hist:
+        short_name: siconc
+        preprocessor: regr_preproc
+        mip: SImon
+        exp: historical
+        start_year: 1979
+        end_year: 2014
+        additional_datasets: *models_cmip6_list
+#       siconc_cmip6_ssp:
+#         short_name: siconc
+#         preprocessor: regr_preproc
+#         mip: SImon
+#         exp: historical
+#         start_year: 2015
+#         end_year: 2019
+#         additional_datasets: *models_cmip6_list
+
+    scripts:
+      ipcc_ar6_wg1_fgd_3_19:
+        script: /home/acrnemr/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_19.py
+        concatinate_cmip5: true
+        concatinate_cmip6: false
+        seaiceextent: true # if sea ice extent is false, sea ice area is used instead
+        cmip5_exps_concatinate: ['historical', 'rcp45'] # the order the cmip5 data should be concatenated
+        cmip6_exps_concatinate: ['historical', 'ssp245'] # the order the cmip6 data should be concatenated
+        month_latitude_NH: [[3,6,9,12], 50.] # month and latitude for NH panel
+        month_latitude_SH: [[2,6,9,12], -50.] # month and latitude for SH panel

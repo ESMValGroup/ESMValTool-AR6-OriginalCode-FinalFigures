@@ -1,0 +1,620 @@
+# ESMValTool
+# recipe_flato13ipcc.yml
+---
+documentation:
+
+  description: |
+    Reproducing IPCC AR5, Fig. 10.7 (Bindoff et al., 2013)
+
+  authors:
+    - bock_ls
+
+#  maintainer:
+    
+#  references:
+#    - bindoff13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim_5x5:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_5x5_land:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_5x5_land_60N-90N:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: 60.
+      end_latitude: 90.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_5x5_land_30N-60N:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: 30.
+      end_latitude: 60.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_5x5_land_30S-30N:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: -30.
+      end_latitude: 30.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_5x5_land_30S-60S:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: -60.
+      end_latitude: -30.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+Datasets_CMIP5_historical: &cmip5_historical_models
+  - {dataset: ACCESS1-0}
+  #- {dataset: ACCESS1-3} #landmask error
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: BNU-ESM}
+  #- {dataset: CanCM4}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-BGC}
+  - {dataset: CESM1-CAM5}
+  - {dataset: CESM1-CAM5-1-FV2}
+  - {dataset: CESM1-FASTCHEM}
+  - {dataset: CESM1-WACCM}
+  - {dataset: CMCC-CESM}
+  - {dataset: CMCC-CM}
+  - {dataset: CMCC-CMS}
+  - {dataset: CNRM-CM5}
+  - {dataset: CNRM-CM5-2}
+  - {dataset: CSIRO-Mk3-6-0}
+  - {dataset: EC-EARTH, ensemble: r6i1p1}
+  #- {dataset: FGOALS-g2}
+  - {dataset: FIO-ESM}
+  - {dataset: GFDL-CM2p1}
+  - {dataset: GFDL-CM3}
+  - {dataset: GFDL-ESM2G}
+  - {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H, ensemble: r1i1p2}
+  - {dataset: GISS-E2-H-CC}
+  - {dataset: GISS-E2-R, ensemble: r1i1p2}
+  - {dataset: GISS-E2-R-CC}
+  - {dataset: HadCM3}
+  - {dataset: HadGEM2-AO}
+  - {dataset: HadGEM2-CC}
+  - {dataset: HadGEM2-ES}
+  - {dataset: inmcm4}
+  - {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: IPSL-CM5B-LR}
+  - {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MPI-ESM-LR}
+  - {dataset: MPI-ESM-MR}
+  - {dataset: MPI-ESM-P}
+  - {dataset: MRI-CGCM3}
+  - {dataset: MRI-ESM1}
+  - {dataset: NorESM1-M}
+  - {dataset: NorESM1-ME}
+  - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2,
+     end_year: 2014}
+
+Datasets_CMIP5_historicalNat: &cmip5_historicalNat_models
+  - {dataset: ACCESS1-3}
+  - {dataset: bcc-csm1-1}
+  - {dataset: BNU-ESM}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-CAM5}
+  - {dataset: CNRM-CM5}
+  - {dataset: CSIRO-Mk3-6-0}
+  - {dataset: FGOALS-g2}
+  - {dataset: GFDL-CM3}
+  - {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H}
+  - {dataset: GISS-E2-R}
+  - {dataset: HadGEM2-ES}
+  #- {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MRI-CGCM3}
+  - {dataset: NorESM1-M}
+  - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2,
+     end_year: 2014}
+
+Datasets_CMIP6_historical: &cmip6_historical_models
+  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: IPSL-CM6A-LR, ensemble: r19i1p1f1}
+  - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2,
+     end_year: 2014}
+
+diagnostics:
+
+########################################################################
+# Global
+# ######################################################################
+
+  pr_cmip5_hist_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_historical_models
+    scripts:
+      tsline: &tsline_settings
+        script: ipcc_ar5/tsline.ncl
+        time_avg: "yearly"
+        ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
+        region: "Global"
+        ref_start: 1961       #start year of reference period for anomalies
+        ref_end: 1990         #end year of reference period for anomalies
+        ref_value: False      #attach absolute values on the right
+        ref_mask: True        #True: maksing of models by observations
+        stat_shading: True    #shading of multi model statistics
+        write_stat: True
+        #stat: "MinMax"
+        stat: "10-90"
+        run_ave: 11
+        plot_units: "mm/day"
+        styleset: CMIP5
+        y_min: -0.25
+        y_max: 0.25
+
+  pr_cmip5_hist_nat_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1950
+        end_year: 2004
+    additional_datasets: *cmip5_historicalNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+
+  pr_cmip6_hist_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        start_year: 1950
+        end_year: 2014
+        grid: gr
+    additional_datasets: *cmip6_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"
+        styleset: CMIP6
+
+  pr_collect_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: GHCN
+        start_year: 1950 #1990
+        end_year: 2014
+    additional_datasets:
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      collect: &tsline_collect_settings
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [pr, 'pr*global/tsline*']
+        start_year: 1950
+        end_year: 2014
+        ref: ["GHCN"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+########################################################################
+# 60-90N
+########################################################################
+
+  pr_cmip5_hist_60N-90N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_60N-90N
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "60N-90N"
+
+  pr_cmip5_hist_nat_60N-90N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_60N-90N   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1950
+        end_year: 2004
+    additional_datasets: *cmip5_historicalNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "60N-90N"
+
+  pr_cmip6_hist_60N-90N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_60N-90N   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        start_year: 1950
+        end_year: 2014
+        grid: gr
+    additional_datasets: *cmip6_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "60N-90N"
+        stat: "MinMax"
+        styleset: CMIP6
+
+  pr_collect_60N-90N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_60N-90N   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: GHCN
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_collect_settings
+        region: "60N-90N"
+        ancestors: [pr, 'pr*60N-90N/tsline*']
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+########################################################################
+# 30N-60N
+########################################################################
+
+  pr_cmip5_hist_30N-60N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30N-60N
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30N-60N"
+
+  pr_cmip5_hist_nat_30N-60N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30N-60N   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1950
+        end_year: 2004
+    additional_datasets: *cmip5_historicalNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30N-60N"
+
+  pr_cmip6_hist_30N-60N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30N-60N   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        start_year: 1950
+        end_year: 2014
+        grid: gr
+    additional_datasets: *cmip6_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30N-60N"
+        stat: "MinMax"
+        styleset: CMIP6
+
+  pr_collect_30N-60N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30N-60N   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: GHCN
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_collect_settings
+        ancestors: [pr, 'pr*30N-60N/tsline*']
+        region: "30N-60N"
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+########################################################################
+# 30S-30N
+########################################################################
+
+  pr_cmip5_hist_30S-30N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-30N
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30S-30N"
+
+  pr_cmip5_hist_nat_30S-30N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-30N   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1950
+        end_year: 2004
+    additional_datasets: *cmip5_historicalNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30S-30N"
+
+  pr_cmip6_hist_30S-30N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-30N   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        start_year: 1950
+        end_year: 2014
+        grid: gr
+    additional_datasets: *cmip6_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30S-30N"
+        stat: "MinMax"
+        styleset: CMIP6
+
+  pr_collect_30S-30N:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-30N   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: GHCN
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_collect_settings
+        ancestors: [pr, 'pr*30S-30N/tsline*']
+        region: "30S-30N"
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+########################################################################
+# 30S-60S
+########################################################################
+
+  pr_cmip5_hist_30S-60S:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-60S
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30S-60S"
+
+  pr_cmip5_hist_nat_30S-60S:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-60S   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1950
+        end_year: 2004
+    additional_datasets: *cmip5_historicalNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30S-60S"
+
+  pr_cmip6_hist_30S-60S:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-60S   
+        reference_dataset: GHCN   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        start_year: 1950
+        end_year: 2014
+        grid: gr
+    additional_datasets: *cmip6_historical_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "30S-60S"
+        stat: "MinMax"
+        styleset: CMIP6
+
+  pr_collect_30S-60S:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_30S-60S   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: GHCN
+        start_year: 1950 #1990
+        end_year: 2004
+    additional_datasets:
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_collect_settings
+        ancestors: [pr, 'pr*30S-60S/tsline*']
+        region: "30S-60S"
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
