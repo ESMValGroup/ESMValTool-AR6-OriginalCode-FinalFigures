@@ -373,6 +373,7 @@ begin
                             nbins)
   resPDF@bin_bounds = fspan(resPDF@bin_min, resPDF@bin_max, nbins + 1)
 
+print("trend (K/decade): hiatus    post-hiatus")
   if (isvar("GMSTtrendCMIP5")) then
     GMSTtrendCMIP5Hiatus = list_to_array(GMSTtrendCMIP5)
     GMSTtrendCMIP5Hiatus = GMSTtrendCMIP5Hiatus * scale
@@ -421,7 +422,8 @@ begin
     delete(weight)
     delete(esize)
     delete(model)
-
+print("CMIP5: "+PDFhiatusCMIP5@mean+" "+PDFpostCMIP5@mean)
+    
     do ii = 0, ListCount(GMSTtrendCMIP5)-1
       if (isatt(GMSTtrendCMIP5[ii], "post_period")) then
         post_period = GMSTtrendCMIP5[ii]@post_period
@@ -484,6 +486,7 @@ begin
     delete(esize)
     delete(model)
 
+print("CMIP6: "+PDFhiatusCMIP6@mean+" "+PDFpostCMIP6@mean)
     if (.not.isvar("post_period")) then
       do ii = 0, ListCount(GMSTtrendCMIP6)-1
         if (isatt(GMSTtrendCMIP6[ii], "post_period")) then

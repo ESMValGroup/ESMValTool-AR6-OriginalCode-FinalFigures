@@ -396,6 +396,8 @@ begin
         do_maskPattern_post = True
       end if
     end if
+  else
+    do_maskGlobalmean_post = False
   end if
 
 ; 1.3 Prepare outputs of GSAT/GMST trends

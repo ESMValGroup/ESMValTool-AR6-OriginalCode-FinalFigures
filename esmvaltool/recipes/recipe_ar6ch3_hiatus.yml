@@ -3682,23 +3682,23 @@ diagnostics:
       tas:
         <<: *tas_setting
         preprocessor: regrid2x2
-        end_year: 2012
+        end_year: 2015
       tos:
         <<: *tos_setting
         preprocessor: regrid2x2
-        end_year: 2012
+        end_year: 2015
       sic:
         <<: *sic_setting
         preprocessor: regrid2x2
-        end_year: 2012
+        end_year: 2015
       siconc:
         <<: *siconc_setting
         preprocessor: regrid2x2
-        end_year: 2012
+        end_year: 2015
       siconca:
         <<: *siconca_setting
         preprocessor: regrid2x2
-        end_year: 2012
+        end_year: 2015
       tasa:
         <<: *tasa_setting
         preprocessor: regrid2x2
@@ -3725,11 +3725,11 @@ diagnostics:
       tas:
         <<: *tas_setting
         preprocessor: regrid1x1
-        end_year: 2012
+        end_year: 2015
       tos:
         <<: *tos_setting
         preprocessor: regrid1x1
-        end_year: 2012
+        end_year: 2015
       sic:
         <<: *sic_setting
         preprocessor: regrid1x1
@@ -3737,11 +3737,11 @@ diagnostics:
       siconc:
         <<: *siconc_setting
         preprocessor: regrid1x1
-        end_year: 2012
+        end_year: 2015
       siconca:
         <<: *siconca_setting
         preprocessor: regrid1x1
-        end_year: 2012
+        end_year: 2015
       tasa:
         <<: *tasa_setting
         preprocessor: regrid1x1
