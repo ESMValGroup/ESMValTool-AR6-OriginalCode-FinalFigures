@@ -332,37 +332,41 @@ begin
     elseif (isatt(diag_script_info, "project_order")) then
       data_temp = data_all
       n_proj = dimsizes(diag_script_info@project_order)
-      id1 = ind(projectnames.eq.diag_script_info@project_order(0)) 
+      id1 = ind(projectnames.eq.diag_script_info@project_order(0))
       n1 = dimsizes(id1)
+      breakpoints = n1
       pid1 = sort_alphabetically(data_all&models(id1), -1, "begin")
       if (dimsizes(dimsizes(data_all)).eq.3) then
-        data_all(:, 0:(n1-1), :) = data_temp(:, id1(pid1), :) 
+        data_all(:, 0:(n1-1), :) = data_temp(:, id1(pid1), :)
       else
-        data_all(:, 0:(n1-1)) = data_temp(:, id1(pid1)) 
+        data_all(:, 0:(n1-1)) = data_temp(:, id1(pid1))
       end if
       if (n_proj .gt. 1) then
-        id2 = ind(projectnames.eq.diag_script_info@project_order(1)) 
+        id2 = ind(projectnames.eq.diag_script_info@project_order(1))
         pid2 = sort_alphabetically(data_temp&models(id2), -1, "begin")
         n2 = dimsizes(id2)
+        breakpoints = n1
         if (dimsizes(dimsizes(data_all)).eq.3) then
-          data_all(:, n1:(n1+n2-1), :) = data_temp(:, id2(pid2), :) 
+          data_all(:, n1:(n1+n2-1), :) = data_temp(:, id2(pid2), :)
         else
-          data_all(:, n1:(n1+n2-1)) = data_temp(:, id2(pid2)) 
+          data_all(:, n1:(n1+n2-1)) = data_temp(:, id2(pid2))
         end if
         if (n_proj .gt. 2) then
-          id3 = ind(projectnames.eq.diag_script_info@project_order(2)) 
+          id3 = ind(projectnames.eq.diag_script_info@project_order(2))
           pid3 = sort_alphabetically(data_temp&models(id3), -1, "begin")
           n3 = dimsizes(id3)
+          breakpoints := array_append_record(breakpoints, n1+n2, 0)
           if (dimsizes(dimsizes(data_all)).eq.3) then
-            data_all(:, (n1+n2):(n1+n2+n3-1), :) = data_temp(:, id3(pid3), :) 
+            data_all(:, (n1+n2):(n1+n2+n3-1), :) = data_temp(:, id3(pid3), :)
           else
-            data_all(:, (n1+n2):(n1+n2+n3-1)) = data_temp(:, id3(pid3)) 
+            data_all(:, (n1+n2):(n1+n2+n3-1)) = data_temp(:, id3(pid3))
           end if
           if (n_proj .gt. 3) then
             error_msg("w", DIAG_SCRIPT, "", "number of projects greater" + \
                       "than 3, not implemented")
           end if
         end if
+        data_all@breakpoints = breakpoints
       end if
     end if
 
