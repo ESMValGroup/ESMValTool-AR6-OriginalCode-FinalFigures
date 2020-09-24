@@ -290,9 +290,13 @@ begin
   res@vpYF = 0.2 + res@vpHeightF
 
   ; Title
-  res@tiMainFontHeightF = 0.020
+  res@tiMainFontHeightF = 0.01
   if (isatt(data, "metric")) then
-    res@tiMainString = data@metric
+    if (isatt(data, "caption")) then
+      res@tiMainString = data@caption
+    else
+      res@tiMainString = data@metric
+    end if 
   end if
 
   ; Override defaults with "res_" attributes of "data"
@@ -306,6 +310,7 @@ begin
   resTxt = True
   resTxt@txFontHeightF = 0.010
   resTxt@txJust = "CenterCenter"
+  resTxt@txFont = "times-roman"
 
   ; Polygons resources
   resPol = True
@@ -523,18 +528,24 @@ begin
     scale_font = 1.
   end if
   resTxt@txFontHeightF = min((/0.012 * scale_font, \
-                              0.57 * scale_font / max((/ndiag, nmod/))/))
+                              0.57 * scale_font / max((/ndiag, (nmod)/))/))
   resTxt@txJust = "CenterRight"
   step = res@vpHeightF / ndiag
   xpos = 0.195
   ypos = 0.2 + step / 2.
   do idiag = 0, ndiag - 1
-    gsn_text_ndc(wks, data&diagnostics(idiag), xpos, ypos, resTxt)
+    if (isatt(data, "diag_label")) then
+      gsn_text_ndc(wks, data@diag_label(idiag), xpos, ypos, resTxt)
+    else
+      gsn_text_ndc(wks, data&diagnostics(idiag), xpos, ypos, resTxt)
+    end if
     ypos = ypos + step
   end do
 
   ; Add text for the models
-  resTxt@txAngleF = 90.
+  resTxt@txAngleF = 45.
+  resTxt@txFontHeightF = min((/0.12 * scale_font, \
+                              0.37 * scale_font / max((/ndiag, (nmod)/))/))
   step = res@vpWidthF / nmod
   resTxt@txJust = "CenterRight"
   xposs = 0.2 + (x_space+.5)*(res@vpWidthF/(nmod+2.*nbreak)) ;step / 2.
