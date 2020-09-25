@@ -73,40 +73,60 @@ def main(cfg):
         if name=="ESRL":
             cube = cube.collapsed(['longitude', 'latitude'], iris.analysis.MEAN)
             ax1.plot(cube.coord("year").points, cube.data, color="black",
-                     label = "OBS", linewidth = 2.0)
+                     label = "OBS", linewidth = 1.5)
         else:
             style = plot.get_dataset_style(name, 'cmip6_ipcc')
-            if name in n_cycle_models:
-                linestyle = "--"
-            else:
-                linestyle = "-"
             legend_items[name] = {'color': style['color'],
-                                  'linestyle': linestyle,
+                                  #'linestyle': linestyle,
                                   'linewidth': style['thick']}
 
             ax1.plot(cube.coord("year").points, cube.data, color = style['color'],
-                     linestyle = legend_items[name]['linestyle'], label = name,
+                     label = name, linestyle = "-",
                      linewidth = legend_items[name]['linewidth'])
+
+    n = 0
+    hist = 0
+    esmhist = 0
 
     for data in tas_data:
         # Deal with co2 read-in differently!
         name = data['dataset']
         logger.info("Processing %s", name)
         cube = iris.load_cube(data['filename'])
-        cube.convert_units('celsius')
+        #cube.convert_units('celsius')
         iris.coord_categorisation.add_year(cube, 'time')
         cube = cube.aggregated_by('year', iris.analysis.MEAN)
-        cube.data -= np.mean(
-            cube.extract(
-                iris.Constraint(year=lambda cell: 1850 <= cell <= 1901)).data)
+        if data['exp'] == 'historical' and name != "HadCRUT4":
+            linestyle = "--"
+            if hist == 0:
+                historical = cube.data
+                hist = 1
+            else:
+                historical += cube.data
+            n += 1
+        elif data['exp'] == 'esm-hist' and name != "HadCRUT4":
+            linestyle = "-"
+            if esmhist == 0:
+                esmhistorical = cube.data
+                esmhist = 1
+            else:
+                esmhistorical += cube.data
         if name=="HadCRUT4":
+            time = cube.coord("year").points
             ax2.plot(cube.coord("year").points, cube.data, color="black",
-                     label = "OBS", linewidth = 2.0, zorder= 100)
+                     label = "OBS", linewidth = 1.5, zorder= 100)
+            ax2.axhline(color="grey", linestyle = "--")
         else:
             ax2.plot(cube.coord("year").points, cube.data,
                      color = legend_items[name]['color'],
-                     linestyle = legend_items[name]['linestyle'], label = name,
+                     linestyle = linestyle, label = name,
                      linewidth = legend_items[name]['linewidth'])
+
+    # Compute tas MMMs and plot:
+    ax2.plot(time, esmhistorical/n, color=legend_items["MultiModelMean"]['color'],
+             linewidth = legend_items["MultiModelMean"]['linewidth'], linestyle="-")
+    ax2.plot(time, historical/n, color=legend_items["MultiModelMean"]['color'],
+             linewidth = legend_items["MultiModelMean"]['linewidth'], linestyle="--")
 
     for data in nbp_data:
         # Deal with co2 read-in differently!
@@ -121,13 +141,15 @@ def main(cfg):
             cube = cube.collapsed(['longitude', 'latitude'], iris.analysis.MEAN)
             cube.data = cube.data * 148300000000000. #multiply by area
             ax3.plot(cube.coord("year").points, cube.data, color="black",
-                     label = "OBS", linewidth = 2.0, zorder= 100)
+                     label = "OBS", linewidth = 1.5, zorder= 100)
             ax3.fill_between(cube.coord("year").points, cube.data - 0.6, cube.data + 0.6,
                              color = "black", alpha = 0.2, zorder = 101)
+
+            ax3.axhline(color="grey", linestyle = "--")
         else:
             ax3.plot(cube.coord("year").points, cube.data,
                      color = legend_items[name]['color'],
-                     linestyle = legend_items[name]['linestyle'], label = name,
+                     linestyle = "-", label = name,
                      linewidth = legend_items[name]['linewidth'])
 
     for data in fgco2_data:
@@ -143,23 +165,38 @@ def main(cfg):
             cube = cube.collapsed(['longitude', 'latitude'], iris.analysis.MEAN)
             cube.data = cube.data * 360000000000000. #multiply by area
             ax4.plot(cube.coord("year").points, cube.data, color="black",
-                     label = "OBS", linewidth = 2.0, zorder= 100)
+                     label = "OBS", linewidth = 1.5, zorder= 100)
             ax4.fill_between(cube.coord("year").points, cube.data - 0.5, cube.data + 0.5,
                              color = "black", alpha = 0.2, zorder= 101)
+
+            ax4.axhline(color="grey", linestyle = "--")
         else:
+            cube_ini = cube.extract(iris.Constraint(year=1850))
+            cube = cube - cube_ini
             ax4.plot(cube.coord("year").points, cube.data,
                      color = legend_items[name]['color'],
-                     linestyle = legend_items[name]['linestyle'], label = name,
+                     linestyle = "-", label = name,
                      linewidth = legend_items[name]['linewidth'])
 
+    #tick_params(labelright=True)
+    ax1.set_xlim(1850, 2014)
+    #ax1.set_ylim(320, 420)
+    ax2.set_xlim(1850, 2014)
+    ax3.set_xlim(1850, 2014)
+    ax4.set_xlim(1850, 2014)
+    #ax4.set_ylim(0.5, 3.2)
     ax1.set_xlabel("Year")
     ax1.set_ylabel(r"Atmospheric CO$_2$ [ppmv]")
+    ax1.yaxis.set_ticks_position('both')
     ax2.set_xlabel("Year")
     ax2.set_ylabel("Temperature anomaly [°C]")
+    ax2.yaxis.set_ticks_position('both')
     ax3.set_xlabel("Year")
     ax3.set_ylabel("Net Land C Flux [PgC yr$^{-1}$]")
+    ax3.yaxis.set_ticks_position('both')
     ax4.set_xlabel("Year")
     ax4.set_ylabel("Net Ocean C Flux [PgC yr$^{-1}$]")
+    ax4.yaxis.set_ticks_position('both')
 
     lines = []
     labels = []
@@ -167,11 +204,12 @@ def main(cfg):
     lines, labels = ax1.get_legend_handles_labels()
 
     fig.legend(lines, labels,
-               loc='upper left', bbox_to_anchor=(1, 1))
+               loc='upper left', bbox_to_anchor=(1, 0.92))
     plot_path = get_plot_filename('carbonsinks_timeseries', cfg)
 
+    fig.suptitle("Carbon sinks in CMIP6 emission driven simulations")
     fig.tight_layout()
-    fig.savefig(plot_path, bbox_inches='tight')
+    fig.savefig(plot_path, bbox_inches='tight', dpi = 300)
     plt.close(fig)
 
     # Write netcdf file TODO! Currently just dummy

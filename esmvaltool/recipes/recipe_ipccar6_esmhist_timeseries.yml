@@ -46,10 +46,20 @@ preprocessors:
       #exclude: [reference_dataset]
 
   glob_mean_ref:
-    mask_multimodel: true
+    custom_order: true
+    anomalies:
+      period: full
+      reference:
+        start_year: 1850
+        start_month: 1
+        start_day: 1
+        end_year: 1900
+        end_month: 12
+        end_day: 31
     regrid:
       target_grid: reference_dataset
       scheme: linear
+    #mask_multimodel: true
     area_statistics:
       operator: mean
     #multi_model_statistics:
