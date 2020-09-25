@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200918 kosaka_yu: adjusted parameter for confidence intervals.
 ;    20200918 kosaka_yu: revised to show confidence intervals.
 ;    20200915 kosaka_yu: merged to include Walker circulation figures.
 ;    20200908 kosaka_yu: revised figure details
@@ -34,7 +35,7 @@ load "$diag_scripts/shared/plot/contourplot.ncl"
 load "$diag_scripts/ar6ch3_hadley_walker/percentiles.ncl"
 
 function get_statistics(x[*])
-local weight, esize, xx, y, nmodels, i, m, n
+local weight, esize, xx, y, nmodels, nmodels_ens, i, m, n
 begin
   ; weighted mean and percentile ranges
   weight = x
@@ -51,31 +52,37 @@ begin
 
   models = get_unique_values(x@model_id)
   ; unweighted confidence interval
-  esize = min(x@esize)
-  ;esize = max((/min(x@esize), 3/))
-  xx = new((/nmodels, esize/), typeof(x))
-  do n = 0, nmodels-1
-    i = ind(x@model_id.eq.models(n))
-    if (dimsizes(i).ge.esize) then
-      xx(n, :) = x(i(0:esize-1))
-    end if
-    delete(i)
-  end do
-  n = dimsizes(ndtooned(xx))
+  ;esize = min(x@esize)
+  ;;esize = max((/min(x@esize), 3/))
+  ;xx = new((/nmodels, esize/), typeof(x))
+  ;do n = 0, nmodels-1
+  ;  i = ind(x@model_id.eq.models(n))
+  ;  if (dimsizes(i).ge.esize) then
+  ;    xx(n, :) = x(i(0:esize-1))
+  ;  end if
+  ;  delete(i)
+  ;end do
+  ;n = dimsizes(ndtooned(xx))
 ;print("nmodels = "+nmodels+"  esize = "+esize+"  sample size = "+n)
-  y(2) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
-  y(4) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
+  ;y(2) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
+  ;y(4) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
 
 ; unweighted average of individual models
-  delete(xx)
+  ;delete(xx)
   xx = new(nmodels, typeof(x))
+  nmodels_ens = 0
   do n = 0, nmodels-1
-    if (num(x@model_id.eq.models(n)).gt.3) then
+    if (num(.not.ismissing(x(ind(x@model_id.eq.models(n))))).ge.3) then
       xx(n) = avg(x(ind(x@model_id.eq.models(n))))
+      nmodels_ens = nmodels_ens + 1
     end if
   end do
   y@means = xx
-;  print(""+xx)
+
+; unweighted confidence interval
+  y(2) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+  y(4) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+  
   return(y)
 end
 
