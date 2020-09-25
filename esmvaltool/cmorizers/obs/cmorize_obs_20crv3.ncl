@@ -14,26 +14,36 @@
 ; Download and processing instructions
 ;    To facilitate the download, the links to the ftp server are provided.
 ;    Since the filenames are sometimes identical across different
-;    save the data in two subdirectories in input_dir_path.
-;    Subdirectory pressure/:
+;    save the data in the following subdirectories in input_dir_path.
+;
+;    Subdirectory ensemble_mean/pressure/:
 ;      ftp://ftp.cdc.noaa.gov/Datasets/20thC_ReanV3/Monthlies/prsSI-MO/
 ;
-;    Subdirectory surface/:
+;    Subdirectory ensemble_mean/surface/:
 ;      ftp://ftp2.psl.noaa.gov/Datasets/20thC_ReanV3/Monthlies/miscSI-MO/
 ;        prmsl.mon.mean.nc
 ;      ftp://ftp2.psl.noaa.gov/Datasets/20thC_ReanV3/Monthlies/10mSI-MO/
 ;        uwnd.10m.mon.mean.nc
 ;        vwnd.10m.mon.mean.nc
-;
+;;
 ;    Select the section "Pressure" and "Surface" and download the variables
 ;    listed below. Since raw data on pressure levels and for surface have the
 ;    same file and variable name, save the data in two different subdirectories
 ;    "pressure" and "surface" in input_dir_path.
+;
+;   Subdirectory every_member/pressure/:
+;
+;   Subdirectory every_member/surface/:
+;    wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/PRMSL/PRMSL_{1806..2015}_mnmean.tar
+;    wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD10m/UGRD10m_{1806..2015}_mnmean.tar
+;    wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD10m/UGRD10m_{1806..2015}_mnmean.tar
+;
 ;    Specify the time range of the data as YEAR1-YEAR2 below, considering only
 ;    complete years (Jan to Dec).
 ;
 ; Modification history
-;    20200915-yu_kosaka: written based on cmorize_obs_ncep.ncl.
+;    20200924-yu_kosaka: revised to add every_member.
+;    20200915-yu_kosaka: written based on cmorize_obs_ncep.ncl.	
 ;
 ; #############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -53,6 +63,10 @@ begin
   ; Period
   YEAR1 = 1836
   YEAR2 = 2015
+
+  ; Ensemble
+  RUN1 = 1
+  RUN2 = 80
 
   ; Selected variable (standard name)
   VAR = (/"psl", "uas", "vas"/)
@@ -94,15 +108,35 @@ begin
   ; Loop over variables
   do vv = 0, dimsizes(VAR) - 1
 
-    log_info("Processing " + VAR(vv) + " (" + MIP(vv) + ")")
+  do rr = RUN1-1, RUN2
+  
+    if (rr.eq.RUN1-1) then
+      ens = "mean"
+    else
+      ens = sprinti("%0.3i", rr)
+    end if
+
+    log_info("Processing " + VAR(vv) + " (" + MIP(vv) + ") " + ens)
 
     do yy = YEAR1, YEAR2
 
       if (isStrSubset(MIP(vv), "mon")) then
-        if (any(NAME(vv).eq.(/"uwnd", "vwnd"/)).and.SUBDIR(vv).eq."surface/") then
-          fname = input_dir_path + SUBDIR(vv) + NAME(vv) + ".10m.mon.mean.nc"
-        else
-          fname = input_dir_path + SUBDIR(vv) + NAME(vv) + ".mon.mean.nc"
+        if (ens.eq."mean") then
+	  name = NAME(vv)
+          if (any(NAME(vv).eq.(/"uwnd", "vwnd"/)).and.SUBDIR(vv).eq."surface/") then
+            fname = input_dir_path + "ensemble_mean/" + SUBDIR(vv) + NAME(vv) + ".10m.mon.mean.nc"
+          else
+            fname = input_dir_path + "ensemble_mean/" + SUBDIR(vv) + NAME(vv) + ".mon.mean.nc"
+          end if
+	else
+          if (NAME(vv).eq."uwnd" .and. SUBDIR(vv).eq."surface/") then
+	    name = "UGRD10m"
+          elseif (NAME(vv).eq."vwnd" .and. SUBDIR(vv).eq."surface/") then
+	    name = "VGRD10m"
+          elseif (NAME(vv).eq."prmsl") then
+  	    name = "PRMSL"
+	  end if
+	  fname = input_dir_path + "every_member/" + SUBDIR(vv) + name + "/" + yy + "/" + name + "." + yy + ".mnmean_mem"+ens+".nc"
         end if
       end if
 
@@ -114,7 +148,7 @@ begin
       end if
 
       f = addfile(fname, "r")
-      tmp = f->$NAME(vv)$
+      tmp = f->$name$
       delete(fname)
       delete(f)
       fill_start = num(ismissing(tmp))
@@ -152,6 +186,9 @@ begin
         output = output / 1000.
         output@units = "1"
       end if
+      if (output@units.eq."m s**-1") then
+        output@units = "m/s"
+      end if
       if (output@units.ne.EXPUNITS(vv)) then
         error_msg("f", DIAG_SCRIPT, "", \
                   "possibly wrong input units for " + VAR(vv))
@@ -159,6 +196,13 @@ begin
 
       rank = dimsizes(dimsizes(output))
       output!0 = "time"
+      if (rank.eq.4 .and. SUBDIR(vv).eq."surface/") then
+        tmp = output(:, 0, :, :)
+        delete(output)
+        output = tmp
+        delete(tmp)
+        rank = 3 
+      end if
       if (rank.eq.4) then
         output!1 = "plev"
         output!2 = "lat"
@@ -196,7 +240,8 @@ begin
       ; Output file
       DATESTR = yy + "01-" + yy + "12"
       fout = output_dir_path + \
-        str_join((/"OBS", OBSNAME, TYPE, VERSION, \
+;        str_join((/"OBS", OBSNAME, TYPE, VERSION, \
+        str_join((/"OBS", OBSNAME, TYPE, ens, \
                    MIP(vv), VAR(vv), DATESTR/), "_") + ".nc"
 
       ; Add height coordinate to tas variable (required by the new backend)
@@ -228,4 +273,5 @@ begin
 
   end do
 
+  end do
 end
