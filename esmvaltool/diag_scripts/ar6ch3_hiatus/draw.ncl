@@ -37,6 +37,54 @@ begin
   return(y)
 end
 
+function weighted_percentile(x, w, t)
+local x, w, xx, ww, wsum, j, k, dims, idx
+begin
+  xx = x
+  dims = dimsizes(xx)
+  if (dimsizes(dims).eq.1) then
+    idx = dim_pqsort(xx, 2)
+    wsum = sum(where(ismissing(x), w@_FillValue, w))
+    ww = 0.
+    do j = 0, dims(0)-1
+      if (.not.ismissing(xx(j))) then
+        ww = ww + w(idx(j))
+        if (ww/wsum.eq.t) then
+          y = xx(j)
+          break
+        elseif (ww/wsum.gt.t) then
+          if (j.eq.0) then
+            y = xx(j)
+          else
+            y = (xx(j) + xx(j-1))/2.
+          end if
+          break
+        end if
+      end if
+    end do
+  else
+    y = new(dims(1), typeof(x))
+    idx = dim_pqsort_n(xx, 2, 0)
+    do k = 0, dims(1)-1
+      wsum = sum(where(ismissing(x(:, k)), w@_FillValue, w))
+      ww = 0.
+      do j = 0, dims(0)-1
+        if (.not.ismissing(xx(j, k))) then
+          ww = ww + w(idx(j, k))
+          if (ww/wsum.eq.t) then
+            y(k) = xx(j, k)
+            break
+          elseif (ww/wsum.gt.t) then
+            y(k) = (xx(j, k) + xx(j-1, k))/2.
+            break
+          end if
+        end if
+      end do
+    end do
+  end if
+  return(y)
+end
+
 function weighted_pdfx(x, w, res)
 local x, w, res, nbins, pdf, bounds, i, n
 begin
@@ -271,8 +319,10 @@ begin
 
   if (TstrendCMIPHiatus@blend_GST.eq.1) then
     GST = "GMST"
+    blending = "blended"
   else
     GST = "GSAT"
+    blending = "unblended"
   end if
   if (TstrendCMIPHiatus@mask_GST.eq.1) then
     masking = "masked"
@@ -1117,7 +1167,7 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
 
 ; ======================================================================
 ;
-;                          4. Read obs patterned trends
+;                          4. Draw patterned trends
 ;
 ; ======================================================================
 
@@ -1136,7 +1186,7 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   sigTstrendObsHiatus@units = ""
   
 ; -------------------------------------
-; Plot
+; Plot obs trend pattern
   patterns = new(2, "graphic")
   resTs = True
   resTs@res_gsnDraw = False
@@ -1230,7 +1280,9 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   patterns( 0 ) = contour_map(wks, TstrendObsHiatus, "")
   plot = gsn_csm_contour(wks, sigTstrendObsHiatus, sres)
   overlay( patterns( 0 ), plot )
-  
+
+; -------------------------------------
+; Plot composite trend pattern
 ;  resTs@res_tiMainString = "(d) "+hiatus_period+" "+str_upper(composite_project)+" trend composite"
   resTs@res_tiMainString = "(d) "+str_upper(composite_project)+" composite"
   resTs@res_vpXF = vpX(3)
@@ -1241,6 +1293,14 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   copy_VarAtts(resTs, TstrendCMIPHiatus)
   patterns( 1 ) = contour_map(wks, TstrendCMIPHiatus, "")
 
+  sign_match = TstrendCMIPHiatus
+  sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
+  sign_match@long_name = ""
+  sign_match@units = ""
+  sres@cnLevels = (/ 0.9 /)
+  plot = gsn_csm_contour(wks, sign_match, sres)
+  overlay( patterns( 1 ), plot )
+  
   composite_projects = str_get_field(composite_member_names, 1, " ")
   composite_models = str_get_field(composite_member_names, 2, " ")
   composite_models@_FillValue = ""
@@ -1317,5 +1377,5 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   draw(pdfs)
   draw(patterns)
   frame(wks)
-
+  
 end
