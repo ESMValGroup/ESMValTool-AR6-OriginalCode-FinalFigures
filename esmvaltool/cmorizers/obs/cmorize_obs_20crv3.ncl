@@ -42,7 +42,7 @@
 ;    complete years (Jan to Dec).
 ;
 ; Modification history
-;    20200924-yu_kosaka: revised to add every_member.
+;    20200925-yu_kosaka: revised to add every_member.
 ;    20200915-yu_kosaka: written based on cmorize_obs_ncep.ncl.	
 ;
 ; #############################################################################
