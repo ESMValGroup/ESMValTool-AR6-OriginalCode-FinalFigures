@@ -1210,7 +1210,7 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   resTs@res_mpInlandWaterFillColor = "LightGray"
   resTs@res_lbLabelBarOn = False
   resTs@res_lbLabelFontHeightF = 0.016
-  resTs@res_pmLabelBarOrthogonalPosF = 0.06
+  resTs@res_pmLabelBarOrthogonalPosF = 0.12
   resTs@res_lbTitleOn = True
   resTs@res_lbTitleString = "Near-surface temperature trend ("+unit+")"
   resTs@res_lbTitlePosition = "Bottom"
@@ -1281,6 +1281,27 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   plot = gsn_csm_contour(wks, sigTstrendObsHiatus, sres)
   overlay( patterns( 0 ), plot )
 
+  plres = True
+  x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
+  x1 = x2 - resTs@res_vpWidthF * 0.07
+  x3 = x2
+  x4 = x1
+  y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
+  y2 = y3 - resTs@res_vpHeightF * 0.07
+  y1 = y2
+  y4 = y3
+  plres = True
+  plres@gsFillScaleF = sres@cnFillScaleF
+  plres@gsFillIndex = sres@cnFillPatterns(1)
+  lres = True
+  lres@gsLineDashPattern = 0
+  lres@gsLineThicknessF = 1.
+  gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
+  gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
+  txres@txFontColor := "black"
+  txres@txJust = "TopRight"
+  gsn_text_ndc(wks, "p < "+(1.-sres@cnLevels(0)), x2, y2-0.005, txres)
+
 ; -------------------------------------
 ; Plot composite trend pattern
 ;  resTs@res_tiMainString = "(d) "+hiatus_period+" "+str_upper(composite_project)+" trend composite"
@@ -1297,9 +1318,31 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
   sign_match@long_name = ""
   sign_match@units = ""
-  sres@cnLevels = (/ 0.9 /)
+  sres@cnLevels = (/ 0.75 /)
+  sres@cnFillPatterns = (/ -1, 3 /)
   plot = gsn_csm_contour(wks, sign_match, sres)
   overlay( patterns( 1 ), plot )
+
+  plres = True
+  x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
+  x1 = x2 - resTs@res_vpWidthF * 0.07
+  x3 = x2
+  x4 = x1
+  y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
+  y2 = y3 - resTs@res_vpHeightF * 0.07
+  y1 = y2
+  y4 = y3
+  plres = True
+  plres@gsFillScaleF = sres@cnFillScaleF
+  plres@gsFillIndex = sres@cnFillPatterns(1)
+  lres = True
+  lres@gsLineDashPattern = 0
+  lres@gsLineThicknessF = 1.
+  gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
+  gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
+  txres@txFontColor := "black"
+  txres@txJust = "TopRight"
+  gsn_text_ndc(wks, "Sign agreement > "+(sres@cnLevels(0)*100)+"%", x2, y2-0.005, txres)
   
   composite_projects = str_get_field(composite_member_names, 1, " ")
   composite_models = str_get_field(composite_member_names, 2, " ")
