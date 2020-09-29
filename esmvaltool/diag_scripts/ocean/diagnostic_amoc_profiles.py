@@ -54,9 +54,12 @@ import iris
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.patches as patches
 import json
 
 from scipy.stats import linregress
+from scipy.interpolate import interp1d
+
 import cf_units
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
@@ -388,6 +391,50 @@ def count_models(metadatas, obs_filename):
     return model_numbers, number_models, projects
 
 
+def make_list_of_cube_amocs(cube_list):
+    """
+    Make a list of the AMOC values
+    """
+    means = []
+    depths = []
+    for cube in cube_list:
+        means.append(cube.data.max())
+        max_index = np.argmax(cube.data)
+        depths.append(cube.coord('depth').points[max_index])
+    return means, depths
+
+
+
+def make_range_of_cube_list(cube_list):
+    """
+    Return a smooth list of depths, a minimum and a mamimum range. 
+
+    """
+    new_depths= []
+    for cube in cube_list:
+        level_points = cube.coord(axis='Z').points
+        new_depths.append(level_points.min())
+        new_depths.append(level_points.max())
+    new_depths = np.arange(np.min(new_depths), np.max(new_depths), 2.)
+    data = {z:[] for z in new_depths}
+    for cube in cube_list:
+        level_points = cube.coord(axis='Z').points
+        cubedata = np.ma.masked_outside(cube.data, -10000., 10000.)
+        f2 = interp1d(level_points, cubedata, kind='linear')
+        func2 =  f2(np.ma.masked_outside(new_depths, level_points.min(), level_points.max()).compressed())
+        for z, d in zip(new_depths, func2):
+            if d>10000:
+                print(z, d, data[z])
+                data[z].append(np.ma.masked)
+                continue
+            data[z].append(d)
+
+    
+    minimums = np.ma.array([np.ma.min(data[z]) for z in new_depths])        
+    maximums = np.ma.array([np.ma.max(data[z]) for z in new_depths])
+
+    return new_depths, minimums, maximums
+
 
 def make_mean_of_cube_list(cube_list):
     """
@@ -423,37 +470,11 @@ def make_mean_of_cube_list(cube_list):
         cube.data = np.ma.masked_where(cube.data > 100000., cube.data)
         print('post_regrid (masked):',cube.data.max())
         cube_list[i] = cube
-        #rint(depth in cube.coord('depth').points)
 
-    #for t, v in sorted(full_times.items()):
-    #    if v != len(cube_list):
-    #        print('FAIL', t, v, '!=', len(cube_list),'\nfull times:',  full_times)
-    #        assert 0
-
-    cube_mean=cube_list[0].data
-    #try: iris.coord_categorisation.add_year(cube_mean, 'time')
-    #except: pass
-    #try: iris.coord_categorisation.add_month(cube_mean, 'time')
-    #except: pass
-
-    #cube_mean.remove_coord('year')
-    #cube.remove_coord('Year')
-    #try: model_name = cube_mean.metadata[4]['source_id']
-    #except: model_name = ''
-    #print(model_name,  cube_mean.coord('time'))
+    cube_mean=cube_list[0].data.copy()
 
     for i, cube in enumerate(cube_list[1:]):
-        #try: iris.coord_categorisation.add_year(cube, 'time')
-        #except: pass
-        #try: iris.coord_categorisation.add_month(cube, 'time')
-        #except: pass
-        #cube.remove_coord('year')
-        #cube.remove_coord('Year')
-        #try: model_name = cube_mean.metadata[4]['source_id']
-        #except: model_name = ''
-        #print(i, model_name, cube.coord('time'))
         cube_mean+=cube.data
-        #print(cube_mean.coord('time'), cube.coord('time'))
     cube_mean = cube_mean/ float(len(cube_list))
     cube.data = cube_mean
     return cube
@@ -465,7 +486,7 @@ def make_pane_a(
         ax=None
 ):
     """
-    Make a profile plot for an individual model.
+    Make a profile plot for multiple models.
 
     The optional observational dataset can also be added.
 
@@ -478,7 +499,7 @@ def make_pane_a(
     fig: Pyplot.figure()
         The pyplot figure
     ax: pyplot.axes
-        The pyplot axes.
+        the pyplot axes.
 
     Returns
     ----------
@@ -490,7 +511,7 @@ def make_pane_a(
     savefig = False
     if fig in [None,] and ax in [None,]:
         fig = plt.figure()
-        fig.set_size_inches(10., 9.)
+        fig.set_size_inches(4., 5.)
         ax = plt.subplot(111)
         savefig = True
 
@@ -517,27 +538,30 @@ def make_pane_a(
         project =  metadatas[filename]['project']
         if short_name == 'amoc':
             continue
-        print(dataset, short_name)
         cube = load_cube(filename, metadatas[filename])
         cube = get_26North(cube)
 
-        print('post get_26North:', cube.shape, cube.data.max(), cube.units)
+        print('post get_26North:',dataset, short_name, cube.shape, cube.data.max(), cube.units)
         if len(cube.coords('time')) and len(cube.coord('time').points) >1 :
+            assert 0 
             cubes[dataset] = climate_statistics(cube, operator='mean',
                                                 period='full')
         else:
             cubes[dataset] = cube
         projects[project].append(cube)
-
     cmap = plt.cm.get_cmap('jet')
 
     #####
     # calculate the number of models
     model_numbers, number_models, projects_numbers= count_models(metadatas, obs_filename)
 
+    #####
+    # Add single line for individual models.
     plot_details = {}
+    add_individual_models = False
     labeldone = {'CMIP5': False, 'CMIP6':False}
     for filename in sorted(metadatas.keys()):
+        if not add_individual_models: continue
         dataset =  metadatas[filename]['dataset']
         project =  metadatas[filename]['project']
         short_name = metadatas[filename]['short_name']
@@ -604,8 +628,32 @@ def make_pane_a(
                  zorder=plot_details[dataset]['zorder']
                  )
 
+
+    #####
+    # Add min/max boundaries for projects.
     for project in projects:
-        colour = cmap(value)
+        if project == 'CMIP5':
+            colour = 'dodgerblue'
+        if project == 'CMIP6':
+            colour = 'red'
+
+        depths, minimums, maximums = make_range_of_cube_list(projects[project])
+
+        #label = ' '.join([project, 
+        #                  ])
+        #plot_details[project] = {
+        #    'c': colour,
+        #    'ls': '-',
+        #    'lw': 5.,
+        #    'label': label,
+        #    'zorder': 10,
+        #}
+
+        ax.fill_betweenx(depths, minimums, maximums, facecolor=colour,alpha=0.4)
+
+    #####
+    # Add project mean lines.
+    for project in projects:
         if project == 'CMIP5':
             colour = 'darkblue'
         if project == 'CMIP6':
@@ -647,6 +695,45 @@ def make_pane_a(
                  zorder = plot_details[project]['zorder']
                  )
 
+    #####
+    # Add box and whisker lines.
+    add_box_whisker = True
+    depth_ll_x = {'CMIP5':-3., 'CMIP6':-1.,}
+    mean_ll_y = {'CMIP5':5500, 'CMIP6':6000,}
+    for project in projects:
+        if not add_box_whisker: continue
+        if project == 'CMIP5':
+            colour = 'dodgerblue'
+        if project == 'CMIP6':
+            colour = 'red'
+
+        # Mean amocs
+        means, depths = make_list_of_cube_amocs(projects[project])
+        box_height = 250
+        line_height = 20
+        mean_box_ll = np.percentile(means, 25)
+        mean_box_width = np.percentile(means, 75)- mean_box_ll
+        ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project]], mean_box_width, box_height,  color = colour) )
+        print(project, 'A', means, mean_box_ll, mean_ll_y[project], mean_box_width, box_height)
+        mean_box_ll = np.percentile(means, 5)
+        mean_box_width = np.percentile(means, 95)- mean_box_ll
+        print(project, 'B',means, mean_box_ll, mean_ll_y[project], mean_box_width, box_height )
+        ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project] +(box_height/2.)-(line_height/2.)], 
+            mean_box_width, 
+            line_height, 
+            color = colour,
+            transform = ax.transData))
+        # Mean Depts:
+        box_widtht = 1.
+        line_width = 0.1
+        depth_box_ll = np.percentile(depths, 25)
+        depth_box_height = np.percentile(depths, 75)- np.percentile(depths, 25)
+        ax.add_patch(patches.Rectangle([depth_ll_x[project], depth_box_ll], box_widtht, depth_box_height, color = colour) )
+
+        depth_box_ll = np.percentile(depths, 5)
+        depth_box_height = np.percentile(depths, 95)- np.percentile(depths, 5)
+        ax.add_patch(patches.Rectangle([depth_ll_x[project]+box_widtht/2. - line_width/2., depth_box_ll], line_width, depth_box_height, color = colour) )
+
     add_obs = True
     if add_obs:
         # RAPID data from: https://www.rapid.ac.uk/rapidmoc/rapid_data/datadl.php
@@ -675,15 +762,21 @@ def make_pane_a(
                                  'lw': 3,
                                  'label': label}
 
-        qplt.plot(obs_cube, obs_cube.coord('depth'),
-            color = plot_details[obs_dataset]['c'],
-            linewidth = plot_details[obs_dataset]['lw'],
-            linestyle = plot_details[obs_dataset]['ls'],
-            label = label
-            )
+        add_obs_lines = True
+        if add_obs_lines:
+            plt.axhline(obs_cube.coord('depth').points[max_index], c='k', lw=8, alpha=0.2, zorder = 0) 
+            plt.axvline(obs_cube.data[max_index], c='k', lw=8, alpha=0.2, zorder = 0) 
 
-        # Add a marker at the maximum
-        plt.plot(obs_cube.data[max_index],
+        else:
+            qplt.plot(obs_cube, obs_cube.coord('depth'),
+                color = plot_details[obs_dataset]['c'],
+                linewidth = plot_details[obs_dataset]['lw'],
+                linestyle = plot_details[obs_dataset]['ls'],
+                label = label
+                )
+
+            # Add a marker at the maximum
+            plt.plot(obs_cube.data[max_index],
                  obs_cube.coord('depth').points[max_index],
                  c =  plot_details[obs_dataset]['c'],
                  marker = 'd',
@@ -700,9 +793,11 @@ def make_pane_a(
 
     # Add Legend outside right.
     # diagtools.add_legend_outside_right(plot_details, plt.gca())
-    leg = plt.legend(loc='lower right', prop={'size':6})
-    leg.draw_frame(False)
-    leg.get_frame().set_alpha(0.)
+    add_legend = False
+    if add_legend:
+        leg = plt.legend(loc='lower right', prop={'size':6})
+        leg.draw_frame(False)
+        leg.get_frame().set_alpha(0.)
 
     if not savefig:
         return fig, ax
@@ -877,6 +972,7 @@ def make_pane_bc(
     else:
         # Draw the trend/variability as a box and whisker diagram.
         box_data = [trends[dataset] for dataset in box_order]
+        print(dataset, box_data)
         box = ax.boxplot(box_data,
                          0,
                          sym = 'k.',
@@ -1228,12 +1324,11 @@ def main(cfg):
 
     """
     # individual plots:
-    # make_timeseriespane_bc(cfg, pane='b')
     # make_timeseriespane_bc(cfg, pane='c')
 
     make_figure(cfg, timeseries= False)
     make_amoc_trends(cfg, savefig=True)
-
+    make_pane_a(cfg)
 
     #make_pane_a(cfg)
     #make_pane_a(cfg)

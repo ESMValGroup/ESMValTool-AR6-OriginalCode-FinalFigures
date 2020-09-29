@@ -77,5 +77,5 @@ diagnostics:
 
     scripts:
       diagnostic:
-        script: ocean/diagnostic_chap3_ocean_heat_content.py
-        #script: ocean/calculate_hist_time_in_picontrol.py # Useful for calculating the time range.
+        #script: ocean/diagnostic_chap3_ocean_heat_content.py
+        script: ocean/calculate_hist_time_in_picontrol.py # Useful for calculating the time range.

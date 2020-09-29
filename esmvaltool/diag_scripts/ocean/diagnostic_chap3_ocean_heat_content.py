@@ -304,7 +304,9 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
     ensembles = list({index[3]:True for index in ocean_heat_content_timeseries.keys()}.keys())
 
     datasets = sorted(datasets)
-    color_dict = {da:c for da, c in zip(datasets, ['r' ,'b'])}
+    #color_dict = {da:c for da, c in zip(datasets, ['r' ,'b'])}
+    color_dict = {dataset:c for dataset, c in zip(datasets, plt.cm.viridis(np.linspace(0,1,len(datasets))))}
+
     color_dict['Observations'] = 'black'
     # ocean_heat_content_timeseries keys:
     # (project, dataset, 'piControl', pi_ensemble, 'ohc', 'intact', depth_range)
@@ -1019,7 +1021,7 @@ def calc_slr_full(cfg,
         lon = lons
 
     # Load depth data, ensuring depth is negative
-    depths = -1.*np.abs(thetao_cube.coord('depth').points)
+    depths = -1.*np.abs(thetao_cube.coord(axis='z').points)
 
     # Load time array as decidimal time.
     times = diagtools.cube_time_to_float(thetao_cube)
@@ -1038,7 +1040,7 @@ def calc_slr_full(cfg,
     print('clim: so:', psal_bar.shape)
     ztemp_bar = temp_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: thetao:', ztemp_bar.shape)
-    depths_bar = -1.*np.abs(ztemp_bar.coord('depth').points)
+    depths_bar = -1.*np.abs(ztemp_bar.coord(axis='z').points)
 
     # Create output cubes to receive SLR data.
     print('Creating output arrays')
@@ -1050,7 +1052,7 @@ def calc_slr_full(cfg,
     gravity = 9.7963 # m /s^2
     # Performd SLR calculation for Climatology cube
     # If cube already exists, then just load the clim SLR data.
-    p_ref = '2000m' #'default' #'2000m' #'default' #'SeaFloor' # 'default'
+    p_ref = 'default' #'2000m' #'default' #'SeaFloor' # 'default'
 
     if os.path.exists(output_fns['clim']):
         print ('loading from', output_fns['clim'])
@@ -1143,7 +1145,8 @@ def calc_slr_full(cfg,
 
             # Calculate climatoligical pressure
             # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
-            pressure_bar = gsw.conversions.p_from_z(depth_bar, la[y])
+            #print(y, lola[y], la.shape, lo.shape, lat[:,0].shape)
+            pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
             pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
 
             if dataset in EOS80:
@@ -1458,14 +1461,14 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     so_cube = iris.load_cube(so_fn)
     vol_cube = iris.load_cube(volcello_fn)
 
-    for fn in [thetao_fn, so_fn, volcello_fn, output_ohc_fn]:
-        if fn.find(exp) == -1:
-            print('ERROR:', exp, 'not in', fn)
-            assert 0
+    #for fn in [thetao_fn, so_fn, volcello_fn, output_ohc_fn]:
+    #    if fn.find(exp) == -1:
+    #        print('ERROR:', exp, 'not in', fn)
+    #        assert 0
 
     lats = thetao_cube.coord('latitude').points
     lons = thetao_cube.coord('longitude').points
-    depths = -1.*np.abs(thetao_cube.coord('depth').points) # depth is negative here.
+    depths = -1.*np.abs(thetao_cube.coord(axis='z').points) # depth is negative here.
     times = diagtools.cube_time_to_float(thetao_cube) # decidmal time.
     ohc_data = thetao_cube.data.copy()
 
@@ -1479,6 +1482,9 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
         lat = lats
         lon = lons
 
+    if vol_cube.ndim not in [3, 4]:
+        print("Looks like the volume has a weird shape:",vol_cube.ndim, vol_cube.data.shape, vol_cube)
+        assert 0
     # 2D!
     for z in np.arange(thetao_cube.data.shape[1]):
         if  depths.ndim == 1:
@@ -1691,6 +1697,25 @@ def guess_areacello_fn(dicts, keys):
             return value
     print('Did Not find Areacello:', keys)
     assert 0
+
+def guess_volcello_fn(dicts, keys, optional = []):
+    """
+    Take a punt at the volcello filename.
+    """
+    for index, value in dicts.items():
+        both = (keys+optional)
+        intersection = set(index) & set(both)
+        if len(intersection) == len(both):
+            print("guess_volcello_fn: full match", index, keys, optional, value)
+            return value
+        
+        intersection = set(index) & set(keys)
+        if len(intersection) == len(keys):
+            print("guess_volcello_fn: partial match", index, keys, value)
+            return value
+    print('Did Not find Volcello:', keys, optional)
+    assert 0
+
 
 
 def mpi_fit(iter_pack, cubedata, time_itr, tmin): #, mpi_data):
@@ -1979,7 +2004,9 @@ def main(cfg):
 
     print('\n-------------\nCalculate Sea Level Rise')
     slr_fns = {}
+    do_SLR = False
     for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
+        if not do_SLR: continue
         detrended_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
         if short_name != 'thetao':
             continue
@@ -2020,9 +2047,12 @@ def main(cfg):
         #if exp ==  'piControl': # no need to calculate this.
         #    continue
         # volcello is in same ensemble, same exp.
-        if (project, dataset, exp, ensemble, 'volcello') in file_dict:
-            volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
-        else:
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        if not volcello_fn:
+            #(project, dataset, exp, ensemble, 'volcello') in file_dict:
+            #volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+            #volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
+        #else:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
 
@@ -2058,9 +2088,12 @@ def main(cfg):
         #    continue
 
         # volcello is in same ensemble, same exp.
-        if (project, dataset, exp, ensemble, 'volcello') in file_dict:
-            volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
-        else:
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        if not volcello_fn:
+#       if (project, dataset, exp, ensemble, 'volcello') in file_dict:
+#           volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+#           volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
+#       else:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
 
