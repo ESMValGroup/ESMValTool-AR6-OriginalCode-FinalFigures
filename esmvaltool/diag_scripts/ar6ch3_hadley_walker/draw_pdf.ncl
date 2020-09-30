@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20200930 kosaka_yu: enabled ensemble obs/reanalysis datasets.
 ;    20200918 kosaka_yu: adjusted parameter for confidence intervals.
 ;    20200918 kosaka_yu: revised to show confidence intervals.
 ;    20200915 kosaka_yu: merged to include Walker circulation figures.
@@ -47,10 +48,12 @@ begin
   y(5) = weighted_percentile(x, weight, 0.95)
   y(6) = max(x)
   y@nruns = dimsizes(x)
-  nmodels = count_unique_values(x@model_id)
-  y@nmodels = nmodels
 
-  models = get_unique_values(x@model_id)
+  if (isatt(x, "model_id")) then
+    nmodels = count_unique_values(x@model_id)
+    y@nmodels = nmodels
+
+    models = get_unique_values(x@model_id)
   ; unweighted confidence interval
   ;esize = min(x@esize)
   ;;esize = max((/min(x@esize), 3/))
@@ -69,20 +72,26 @@ begin
 
 ; unweighted average of individual models
   ;delete(xx)
-  xx = new(nmodels, typeof(x))
-  nmodels_ens = 0
-  do n = 0, nmodels-1
-    if (num(.not.ismissing(x(ind(x@model_id.eq.models(n))))).ge.3) then
-      xx(n) = avg(x(ind(x@model_id.eq.models(n))))
-      nmodels_ens = nmodels_ens + 1
-    end if
-  end do
-  y@means = xx
+    xx = new(nmodels, typeof(x))
+    nmodels_ens = 0
+    do n = 0, nmodels-1
+      if (num(.not.ismissing(x(ind(x@model_id.eq.models(n))))).ge.3) then
+        xx(n) = avg(x(ind(x@model_id.eq.models(n))))
+        nmodels_ens = nmodels_ens + 1
+      end if
+    end do
+    y@means = xx
 
 ; unweighted confidence interval
-  y(2) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
-  y(4) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
-  
+    y(2) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+    y(4) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+
+  else
+    esize = dimsizes(x)
+    y(2) = avg(x) + cdft_t(0.05, esize-1)*stddev(x)/sqrt(tofloat(esize))
+    y(4) = avg(x) + cdft_t(0.95, esize-1)*stddev(x)/sqrt(tofloat(esize))
+  end if
+    
   return(y)
 end
 
@@ -128,6 +137,7 @@ begin
                                 percentiles(2), percentiles(2)/), lres)
     i = i + 1
     lres@gsLineColor := "white"
+    lres@gsLineThicknessF = 1.
     dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x+w/2./), \
                               (/percentiles(3), percentiles(3)/), lres)
     i = i + 1
@@ -245,7 +255,11 @@ begin
   obslist@pattern = (/0, 3, 1, 2, 0, 3, 1, 2/)
 ;  color_obs = (/"black", "black", "black", "black", "black", "black", "black"/)
 ;  pattern_obs = (/3, 0, 1, 2, 4, 5, 6/)
+  obsenslist = (/"20CRv2", "20CRv2c", "20CRv3", "CERA-20C"/)
+  obsenslist@pattern = (/3, 3, 3, 5/)
+  obsenslist@color = (/"grey60", "grey60", "grey60", "grey60"/)
 
+  
   color_cmip5hist = (/204., 35., 35. /)/255. ;(/37., 81., 204./)/255.
   color_cmip5pi = (/150., 150., 150./)/255.
   color_cmip6hist = (/204., 35., 35./)/255.
@@ -294,7 +308,8 @@ begin
   polyres = True
   polyres@gsFillColor = "grey80"
   polyres@gsFillOpacityF = 0.5
-
+  plres = True
+  
   alphabet = str_split_by_length("abcdefghijklmnopqrstuvwxyz", 1)
 
   ipanel = 0
@@ -461,17 +476,43 @@ begin
           ncmip6 = ncmip6 + 1
           ncmip6_single = ncmip6_single + 1
         else
-          if (isvar("Obs")) then
-            tmp = Obs
-            delete(Obs)
-            Obs = array_append_record(tmp, data, 0)
-            delete(Obs@dataset)
-            Obs@dataset = array_append_record(tmp@dataset, data@dataset, 0)
-            delete(tmp)
+          if (any(data@dataset.eq.obsenslist)) then
+            if (isvar("ObsEns")) then
+              tmp = ObsEns
+              delete(ObsEns)
+              dimstmp = dimsizes(tmp)
+              if (dimsizes(dimstmp).eq.1) then
+                ObsEns = new((/2, dimstmp(0)/), typeof(tmp))
+                ObsEns(0, :) = tmp
+                ObsEns(1, :) = get_statistics(data)
+              else
+                ObsEns = new((/dimstmp(0)+1, dimstmp(1)/), typeof(tmp))
+                ObsEns(0:dimstmp(0)-1, :) = tmp
+                ObsEns(dimstmp(0), :) = get_statistics(data)
+              end if
+              ObsEns@dataset = array_append_record(tmp@dataset, data@dataset, 0)
+              delete(tmp)
+              delete(dimstmp)
+            else
+              tmp = get_statistics(data)
+              ObsEns = new((/1, dimsizes(tmp)/), typeof(tmp))
+              ObsEns(0, :) = tmp
+              ObsEns@dataset = data@dataset
+              delete(tmp)
+            end if
           else
-            Obs = data
+            if (isvar("Obs")) then
+              tmp = Obs
+              delete(Obs)
+              Obs = array_append_record(tmp, data, 0)
+              delete(Obs@dataset)
+              Obs@dataset = array_append_record(tmp@dataset, data@dataset, 0)
+              delete(tmp)
+            else
+              Obs = data
+            end if
+            range = max((/range, abs(data)/))
           end if
-          range = max((/range, abs(data)/))
         end if
         delete(data)
       end do
@@ -585,6 +626,51 @@ begin
         add_expname = False
       end if
       
+      if (isvar("ObsEns")) then
+        dimstmp = dimsizes(ObsEns)
+        do n = 0, dimstmp(0)-1
+          iobs = ind(obsenslist.eq.ObsEns@dataset(n))
+          plres@gsFillColor = obsenslist@color(iobs)
+          plres@gsFillIndex = obsenslist@pattern(iobs)
+          dummy(idummy) = gsn_add_polygon(wks, plots(ii, jj), \
+                                          (/res@trXMinF, xcmip6_divide, \
+                                            xcmip6_divide, res@trXMinF/), \
+                                          (/ObsEns(n, 0), ObsEns(n, 0), \
+                                            ObsEns(n, 6), ObsEns(n, 6)/), \
+                                          plres)  ; max-min range
+          idummy = idummy + 1
+          if (plres@gsFillIndex.ne.0) then
+            lres@gsLineThicknessF = 1.
+            lres@gsLineColor = obsenslist@color(iobs)
+            lres@gsLineDashPattern = 0
+            dummy(idummy) = gsn_add_polyline(wks, plots(ii, jj), \
+                                            (/res@trXMinF, xcmip6_divide, \
+                                              xcmip6_divide, res@trXMinF, res@trXMinF/), \
+                                            (/ObsEns(n, 0), ObsEns(n, 0), \
+                                              ObsEns(n, 6), ObsEns(n, 6), ObsEns(n, 0)/), \
+                                            lres)  ; max-min range
+            idummy = idummy + 1
+          end if
+          if (.not.isdefined("legend") .or. \
+              all(metadata_att_as_array(legend, "name").ne.ObsEns@dataset(n))) then
+            if (.not.isdefined("legend")) then
+              legend = NewList("fifo")
+            end if
+            dataset = ObsEns@dataset(n)
+            dataset@name = ObsEns@dataset(n)
+            dataset@type = "ensemble_obs"
+            dataset@color = plres@gsFillColor
+            dataset@pattern = plres@gsFillIndex
+            ListAppend(legend, new(1, "string"))
+            k = ListCount(legend)-1
+            legend[k] = dataset
+            delete(dataset)
+          end if
+        end do
+        delete(ObsEns)
+        delete(dimstmp)
+      end if
+
       if (isvar("Obs")) then
         do n = 0, dimsizes(Obs)-1
           iobs = ind(obslist.eq.Obs@dataset(n))
@@ -602,7 +688,7 @@ begin
             end if
             dataset = Obs@dataset(n)
             dataset@name = Obs@dataset(n)
-            dataset@type = "single"
+            dataset@type = "single_obs"
             dataset@color = lres@gsLineColor
             dataset@pattern = lres@gsLineDashPattern
             dataset@thick = lres@gsLineThicknessF
@@ -1008,7 +1094,7 @@ begin
        gsn_polygon_ndc(wks, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
                             (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5/), plres)
        lres@gsLineColor := "white"
-       lres@gsLineThicknessF = 2.
+       lres@gsLineThicknessF = 1.
        gsn_polyline_ndc(wks, (/x-w/2., x+w/2./), (/y0, y0/), lres)
        lres@gsLineThicknessF = 1.
        lres@gsLineColor := plres@gsFillColor
@@ -1084,20 +1170,43 @@ begin
      
      m = 0
      do n = 0, ListCount(legend)-1
-       if (legend[n]@type .eq. "single") then
-         x1 = x0 - 0.055 - m/4 * 0.14
-         x2 = x1 - 0.058
+       if (any(legend[n]@type .eq. (/"single_obs", "ensemble_obs"/))) then
+         x1 = x0 - 0.05 - m/4 * 0.14
+         x2 = x1 - 0.057
          y = y0 + h*0.9 - mod(m, 4)*h*0.6
-         lres@gsLineColor := legend[n]@color
-         lres@gsLineThicknessF = legend[n]@thick
-         lres@gsLineDashPattern = legend[n]@pattern
-         if (isatt(legend[n], "seg")) then
-           lres@gsLineDashSegLenF = legend[n]@seg
+         if (legend[n]@type.eq."single_obs") then
+           lres@gsLineColor := legend[n]@color
+           lres@gsLineThicknessF = legend[n]@thick
+           lres@gsLineDashPattern = legend[n]@pattern
+           if (isatt(legend[n], "seg")) then
+             lres@gsLineDashSegLenF = legend[n]@seg
+           end if
+           gsn_polyline_ndc(wks, (/x1, x2/), (/y, y/), lres)
+         elseif (legend[n]@type.eq."ensemble_obs") then
+           plres@gsFillColor := legend[n]@color
+           plres@gsFillIndex = legend[n]@pattern
+           gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y-h*0.2, y-h*0.2, y+h*0.2, y+h*0.2/), plres)
+           if (plres@gsFillIndex.ne.0) then
+             lres@gsLineThicknessF = 1.
+             lres@gsLineColor = obsenslist@color(iobs)
+             lres@gsLineDashPattern = 0
+             gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), \
+                              (/y-h*0.2, y-h*0.2, y+h*0.2, y+h*0.2, y-h*0.2/), lres)
+           end if
+           txres@txFontColor := legend[n]@color
+           txres@txJust = "CenterCenter"
+           txres@txFontHeightF = 0.008
+           txres@txBackgroundFillColor = "white"
+           txres@txPerimColor = "transparent"
+           txres@txPerimSpaceF = 0.1
+           gsn_text_ndc(wks, "max", (x1+x2)/2., y+h*0.2, txres)
+           gsn_text_ndc(wks, "min", (x1+x2)/2., y-h*0.2, txres)
          end if
-         gsn_polyline_ndc(wks, (/x1, x2/), (/y, y/), lres)
          x = x2 - 0.01
          txres@txFontColor := legend[n]@color
          txres@txJust = "CenterRight"
+         txres@txFontHeightF = 0.011
+         txres@txBackgroundFillColor = "transparent"
          name = legend[n]
          gsn_text_ndc(wks, name, x, y, txres)
          m = m + 1

@@ -8,7 +8,8 @@
 ;    Outputs:
 ;
 ; History
-;    20200918 kosaka_yu: output model id as attributes..
+;    20200929 kosaka_yu: support ensemble reanalyses.
+;    20200918 kosaka_yu: output model id as attributes.
 ;    20200915 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -321,19 +322,100 @@ begin
       delete(dslp)
 
       if (any(ii.eq.iObs)) then
-        ; output obs trends
-        trendObs = trend_dslp
-        trendObs@season = season
-        trendObs@syear = syear
-        trendObs@eyear = eyear
-        trendObs@dataset = input_file_info[ii]@dataset
-        trendObs@var = "dslp"
-        trendObs@long_name = "trend of Walker circulation strength"
-        trendObs@diag_script = DIAG_SCRIPT
+        esize = num(metadata_att_as_array(input_file_info, "dataset").eq.input_file_info[ii]@dataset)
+        if (esize.eq.1) then
+          ; output obs trends
+          trendObs = trend_dslp
+          trendObs@season = season
+          trendObs@syear = syear
+          trendObs@eyear = eyear
+          trendObs@dataset = input_file_info[ii]@dataset
+          trendObs@var = "dslp"
+          trendObs@long_name = "trend of Walker circulation strength"
+          trendObs@diag_script = DIAG_SCRIPT
 
-        write_data(trendObs, input_file_info[ii]@dataset)
+          write_data(trendObs, input_file_info[ii]@dataset)
 
-        delete(trendObs)
+          delete(trendObs)
+        else
+          if (input_file_info[ii]@dataset.eq."20CRv3") then
+            if (isvar("trend_20crv3")) then
+              tmp = trend_20crv3
+              delete(trend_20crv3)
+              trend_20crv3 = array_append_record(tmp, trend_dslp, 0)
+              trend_20crv3@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+            else
+              trend_20crv3 = (/trend_dslp/)
+              trend_20crv3@esize = esize
+              trend_20crv3@season = season
+              trend_20crv3@syear = syear
+              trend_20crv3@eyear = eyear
+              trend_20crv3@dataset = input_file_info[ii]@dataset
+              trend_20crv3@var = "dslp"
+              trend_20crv3@long_name \
+                = "trend of Walker circulation strength"
+              trend_20crv3@diag_script = DIAG_SCRIPT
+            end if
+          elseif (input_file_info[ii]@dataset.eq."20CRv2c") then
+            if (isvar("trend_20crv2c")) then
+              tmp = trend_20crv2c
+              delete(trend_20crv2c)
+              trend_20crv2c = array_append_record(tmp, trend_dslp, 0)
+              trend_20crv2c@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+            else
+              trend_20crv2c = (/trend_dslp/)
+              trend_20crv2c@esize = esize
+              trend_20crv2c@season = season
+              trend_20crv2c@syear = syear
+              trend_20crv2c@eyear = eyear
+              trend_20crv2c@dataset = input_file_info[ii]@dataset
+              trend_20crv2c@var = "dslp"
+              trend_20crv2c@long_name \
+                = "trend of Walker circulation strength"
+              trend_20crv2c@diag_script = DIAG_SCRIPT
+            end if
+          elseif (input_file_info[ii]@dataset.eq."20CRv2") then
+            if (isvar("trend_20crv2")) then
+              tmp = trend_20crv2
+              delete(trend_20crv2)
+              trend_20crv2 = array_append_record(tmp, trend_dslp, 0)
+              trend_20crv2@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+            else
+              trend_20crv2 = (/trend_dslp/)
+              trend_20crv2@esize = esize
+              trend_20crv2@season = season
+              trend_20crv2@syear = syear
+              trend_20crv2@eyear = eyear
+              trend_20crv2@dataset = input_file_info[ii]@dataset
+              trend_20crv2@var = "dslp"
+              trend_20crv2@long_name \
+                = "trend of Walker circulation strength"
+              trend_20crv2@diag_script = DIAG_SCRIPT
+            end if
+          elseif (input_file_info[ii]@dataset.eq."CERA-20C") then
+            if (isvar("trend_cera20c")) then
+              tmp = trend_cera20c
+              delete(trend_cera20c)
+              trend_cera20c = array_append_record(tmp, trend_dslp, 0)
+              trend_cera20c@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+            else
+              trend_cera20c = (/trend_dslp/)
+              trend_cera20c@esize = esize
+              trend_cera20c@season = season
+              trend_cera20c@syear = syear
+              trend_cera20c@eyear = eyear
+              trend_cera20c@dataset = input_file_info[ii]@dataset
+              trend_cera20c@var = "dslp"
+              trend_cera20c@long_name \
+                = "trend of Walker circulation strength"
+              trend_cera20c@diag_script = DIAG_SCRIPT
+            end if
+          end if
+        end if
       else
         ; save model trends
         esize = num(metadata_att_as_array(input_file_info, "project").eq.input_file_info[ii]@project.and.\
@@ -568,6 +650,20 @@ begin
     delete(dy2)
     delete(dx2)
   end do
+  
+  ; output ensemble obs/reanalysis
+  if (isvar("trend_20crv3")) then
+    write_data(trend_20crv3, "20CRv3")
+  end if
+  if (isvar("trend_20crv2c")) then
+    write_data(trend_20crv2c, "20CRv2c")
+  end if
+  if (isvar("trend_20crv2")) then
+    write_data(trend_20crv2, "20CRv2")
+  end if
+  if (isvar("trend_cera20c")) then
+    write_data(trend_cera20c, "CERA-20C")
+  end if
   
   ; output model trends
   if (isvar("trend_cmip5hist")) then
