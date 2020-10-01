@@ -41,12 +41,12 @@ begin
   ; weighted mean and percentile ranges
   weight = x
   weight = 1./tofloat(x@esize)
-  y = new(7, typeof(x))
+  y = new(8, typeof(x))
   y(0) = min(x)
   y(1) = weighted_percentile(x, weight, 0.05)
-  y(3) = weighted_mean(x, weight)
-  y(5) = weighted_percentile(x, weight, 0.95)
-  y(6) = max(x)
+  y(2) = weighted_mean(x, weight)
+  y(3) = weighted_percentile(x, weight, 0.95)
+  y(4) = max(x)
   y@nruns = dimsizes(x)
 
   if (isatt(x, "model_id")) then
@@ -66,9 +66,8 @@ begin
   ;  delete(i)
   ;end do
   ;n = dimsizes(ndtooned(xx))
-;print("nmodels = "+nmodels+"  esize = "+esize+"  sample size = "+n)
-  ;y(2) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
-  ;y(4) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
+  ;y(5) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
+  ;y(7) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
 
 ; unweighted average of individual models
   ;delete(xx)
@@ -83,13 +82,14 @@ begin
     y@means = xx
 
 ; unweighted confidence interval
-    y(2) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
-    y(4) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
-
+    y(5) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+    y(6) = avg(xx)
+    y(7) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
   else
     esize = dimsizes(x)
-    y(2) = avg(x) + cdft_t(0.05, esize-1)*stddev(x)/sqrt(tofloat(esize))
-    y(4) = avg(x) + cdft_t(0.95, esize-1)*stddev(x)/sqrt(tofloat(esize))
+    y(5) = avg(x) + cdft_t(0.05, esize-1)*stddev(x)/sqrt(tofloat(esize))
+    y(6) = avg(x)
+    y(7) = avg(x) + cdft_t(0.95, esize-1)*stddev(x)/sqrt(tofloat(esize))
   end if
     
   return(y)
@@ -106,40 +106,30 @@ begin
 
   if (type.eq."percentile") then
     dum(i) = gsn_add_polyline(wks, plot, (/x, x/), \
-                              (/percentiles(0), percentiles(6)/), lres)
+                              (/percentiles(0), percentiles(4)/), lres)
     i = i + 1
-;    dum(i) = gsn_add_polyline(wks, plot, (/x-w/3., x+w/3./), \
-;                              (/percentiles(0), percentiles(0)/), lres)
-;    i = i + 1
-;    dum(i) = gsn_add_polyline(wks, plot, (/x-w/3., x+w/3./), \
-;                              (/percentiles(6), percentiles(6)/), lres)
-;    i = i + 1
     plres@gsFillColor := "white"
     dum(i) = gsn_add_polygon(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
-                             (/percentiles(1), percentiles(5), \
-                               percentiles(5), percentiles(1)/), plres)
+                             (/percentiles(1), percentiles(3), \
+                               percentiles(3), percentiles(1)/), plres)
     i = i + 1                
     dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
-                              (/percentiles(1), percentiles(5), percentiles(5), \
+                              (/percentiles(1), percentiles(3), percentiles(3), \
                                 percentiles(1), percentiles(1)/), lres)
     i = i + 1
     dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x+w/2./), \
-                              (/percentiles(3), percentiles(3)/), lres)
+                              (/percentiles(2), percentiles(2)/), lres)
     i = i + 1
   elseif (type.eq."confidence") then
     plres@gsFillColor := color
     dum(i) = gsn_add_polygon(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
-                             (/percentiles(2), percentiles(4), \
-                               percentiles(4), percentiles(2)/), plres)
-    i = i + 1                
-    dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
-                              (/percentiles(2), percentiles(4), percentiles(4), \
-                                percentiles(2), percentiles(2)/), lres)
+                             (/percentiles(5), percentiles(7), \
+                               percentiles(7), percentiles(5)/), plres)
     i = i + 1
     lres@gsLineColor := "white"
     lres@gsLineThicknessF = 1.
-    dum(i) = gsn_add_polyline(wks, plot, (/x-w/2., x+w/2./), \
-                              (/percentiles(3), percentiles(3)/), lres)
+    dum(i) = gsn_add_polyline(wks, plot, (/x-w/2.+0.02, x+w/2.-0.02/), \
+                              (/percentiles(6), percentiles(6)/), lres)
     i = i + 1
     
     if (isatt(percentiles, "means")) then
@@ -147,7 +137,6 @@ begin
       mkres@gsMarkerIndex = 16
       mkres@gsMarkerSizeF =  0.005
       do j = 0, dimsizes(percentiles@means)-1
-;print(percentiles@means(j))
         if (.not.ismissing(percentiles@means(j))) then
           dum(i) = gsn_add_polymarker(wks, plot, x, \
                                       percentiles@means(j), mkres)
@@ -166,16 +155,16 @@ begin
       if (any(str_squeeze(percentiles@exp).eq.(/"piControl", "GHG", "strat~C~ O3"/))) then
         txres@txJust = "BottomCenter"
         if (type.eq."percentile") then
-          y = percentiles(6) + 0.02
+          y = percentiles(4) + 0.02
         elseif (type.eq."confidence") then
-          y = max((/percentiles(4), max(percentiles@means)/)) + 0.02
+          y = max((/percentiles(7), max(percentiles@means)/)) + 0.02
         end if
       else
         txres@txJust = "TopCenter"
         if (type.eq."percentile") then
           y = percentiles(0) - 0.02
         elseif (type.eq."confidence") then
-          y = min((/percentiles(2), min(percentiles@means)/)) - 0.02
+          y = min((/percentiles(5), min(percentiles@means)/)) - 0.02
         end if
       end if
     else
@@ -184,14 +173,14 @@ begin
         if (type.eq."percentile") then
           y = percentiles(0) - 0.02
         elseif (type.eq."confidence") then
-          y = min((/percentiles(2), min(percentiles@means)/)) - 0.02
+          y = min((/percentiles(5), min(percentiles@means)/)) - 0.02
         end if
       else
         txres@txJust = "BottomCenter"
         if (type.eq."percentile") then
-          y = percentiles(6) + 0.02
+          y = percentiles(4) + 0.02
         elseif (type.eq."confidence") then
-          y = max((/percentiles(4), max(percentiles@means)/)) + 0.02
+          y = max((/percentiles(7), max(percentiles@means)/)) + 0.02
         end if
       end if
     end if
@@ -256,7 +245,7 @@ begin
 ;  color_obs = (/"black", "black", "black", "black", "black", "black", "black"/)
 ;  pattern_obs = (/3, 0, 1, 2, 4, 5, 6/)
   obsenslist = (/"20CRv2", "20CRv2c", "20CRv3", "CERA-20C"/)
-  obsenslist@pattern = (/3, 3, 3, 5/)
+  obsenslist@pattern = (/3, 3, 3, 2/)
   obsenslist@color = (/"grey60", "grey60", "grey60", "grey60"/)
 
   
@@ -490,7 +479,7 @@ begin
                 ObsEns(0:dimstmp(0)-1, :) = tmp
                 ObsEns(dimstmp(0), :) = get_statistics(data)
               end if
-              ObsEns@dataset = array_append_record(tmp@dataset, data@dataset, 0)
+              ObsEns@dataset := array_append_record(tmp@dataset, data@dataset, 0)
               delete(tmp)
               delete(dimstmp)
             else
@@ -536,10 +525,12 @@ begin
           res@trYMaxF = 0.05*scale
         end if
       elseif (varname.eq."dslp") then
-        if (range.gt.0.0125*scale) then
+        if (range.gt.0.02*scale) then
           res@trYMaxF = 0.038*scale
+;        elseif (range.gt.0.012*scale) then
+;          res@trYMaxF = 0.018*scale
         elseif (range.gt.0.005*scale) then
-          res@trYMaxF = 0.013*scale
+          res@trYMaxF = 0.014*scale
         elseif (range.gt.0.0025*scale) then
           res@trYMaxF = 0.005*scale
         elseif (range.gt.0.001*scale) then
@@ -755,22 +746,6 @@ begin
       if (isvar("cmip6hist")) then
         box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6hist, "percentile", \
                     color_cmip6hist, add_expname, dummy, idummy)
-        if (.not.isdefined("legend") .or. \
-            all(metadata_att_as_array(legend, "name").ne."cmip6hist")) then
-          if (.not.isdefined("legend")) then
-            legend = NewList("fifo")
-          end if
-          dataset = "historical"  ; "CMIP6 historical"
-          dataset@name = "cmip6hist"
-          dataset@type = "ensemble"
-          dataset@nmodels = cmip6hist@nmodels
-          dataset@nruns = cmip6hist@nruns
-          dataset@color = color_cmip6hist
-          ListAppend(legend, new(1, "string"))
-          k = ListCount(legend)-1
-          legend[k] = dataset
-          delete(dataset)
-        end if
         ;delete(cmip6hist)
         xcmip6 = xcmip6 + 1.
       end if
@@ -841,6 +816,22 @@ begin
       if (isvar("cmip6hist")) then
         box_whisker(wks, plots(ii, jj), xcmip6, w, cmip6hist, "confidence", \
                     color_cmip6hist, add_expname, dummy, idummy)
+        if (.not.isdefined("legend") .or. \
+            all(metadata_att_as_array(legend, "name").ne."cmip6hist")) then
+          if (.not.isdefined("legend")) then
+            legend = NewList("fifo")
+          end if
+          dataset = "historical"  ; "CMIP6 historical"
+          dataset@name = "cmip6hist"
+          dataset@type = "ensemble"
+          dataset@nmodels = cmip6hist@nmodels
+          dataset@nruns = cmip6hist@nruns
+          dataset@color = color_cmip6hist
+          ListAppend(legend, new(1, "string"))
+          k = ListCount(legend)-1
+          legend[k] = dataset
+          delete(dataset)
+        end if
         delete(cmip6hist)
         xcmip6 = xcmip6 + 1.
       end if
@@ -1050,9 +1041,11 @@ begin
 
   if (isdefined("legend")) then
     txres       := True
-
-    x0 = 0.32 ; 0.22
-    y0 = 0.16 ; 0.29
+    fontHeightL = 0.011
+    fontHeightS = 0.008
+    
+    x0 = 0.33
+    y0 = 0.16
     h = 0.035
     if (any(str_match_bool_ic(metadata_att_as_array(legend, "name"), "cmip5")) .or. \
         any(str_match_bool_ic(metadata_att_as_array(legend, "name"), "cmip6"))) then
@@ -1075,7 +1068,7 @@ begin
                              (/y0-h1, y0+h1, y0+h1, y0-h1, y0-h1/), lres)
 
        txres@txFontColor = "black"
-       txres@txFontHeightF = 0.009
+       txres@txFontHeightF = fontHeightS
        txres@txJust = "CenterLeft"
        txres@txAngleF = 0.
 ;       gsn_text_ndc(wks, "max",  x0-w/2.-0.002, y0+h2, txres)
@@ -1087,7 +1080,8 @@ begin
        gsn_text_ndc(wks, "min", x0+0.002, y0-h2, txres)
        txres@txJust = "BottomCenter"
        txres@txAngleF = 90.
-       gsn_text_ndc(wks, "Ensemble range", x0-w/2.-0.002, y0, txres)
+       gsn_text_ndc(wks, "Ensemble range", x0-w/2.-0.014, y0, txres)
+       gsn_text_ndc(wks, "(all models)", x0-w/2.-0.002, y0, txres)
        
        x = x0 + w*3.7
        plres@gsFillColor = lres@gsLineColor
@@ -1095,16 +1089,18 @@ begin
                             (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5/), plres)
        lres@gsLineColor := "white"
        lres@gsLineThicknessF = 1.
-       gsn_polyline_ndc(wks, (/x-w/2., x+w/2./), (/y0, y0/), lres)
-       lres@gsLineThicknessF = 1.
-       lres@gsLineColor := plres@gsFillColor
-       gsn_polyline_ndc(wks, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
-                             (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5, y0-h1/1.5/), lres)
+       gsn_polyline_ndc(wks, (/x-w/2.+0.0005, x+w/2.-0.0005/), (/y0, y0/), lres)
+;       lres@gsLineThicknessF = 1.
+;       lres@gsLineColor := plres@gsFillColor
+;       gsn_polyline_ndc(wks, (/x-w/2., x-w/2., x+w/2., x+w/2., x-w/2./), \
+;                             (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5, y0-h1/1.5/), lres)
        txres@txJust = "TopCenter"
        txres@txAngleF = 90.
        gsn_text_ndc(wks, "5-95%", x+w/2.+0.003, y0, txres)
        gsn_text_ndc(wks, "confidence int.", x+w/2.+0.015, y0, txres)
-       gsn_text_ndc(wks, "of mean", x+w/2.+0.027, y0, txres)
+;       gsn_text_ndc(wks, "of mean", x+w/2.+0.027, y0, txres)
+       gsn_text_ndc(wks, "(models with   ", x+w/2.+0.027, y0, txres)
+       gsn_text_ndc(wks, "  ~F34~3~F21~ 3 runs only)", x+w/2.+0.039, y0, txres)
        mkres = True
        mkres@gsMarkerIndex = 16
        mkres@gsMarkerSizeF =  0.005
@@ -1120,13 +1116,13 @@ begin
 
        
        lres@gsLineThicknessF = 1.
-       txres@txFontHeightF = 0.011 ;0.014
+       txres@txFontHeightF = fontHeightL
        txres@txJust = "TopLeft"
        m = 0
        do n = 0, ListCount(legend)-1
          if (legend[n]@type .eq. "ensemble") then
-           x = x0 + 0.14 + m/5 * 0.32  ; 0.35
-           y = y0 + h*1.2 - mod(m, 5)*h*0.55 ;0.6
+           x = x0 + 0.14 + m/5 * 0.32
+           y = y0 + h*1.2 - mod(m, 5)*h*0.55
            txres@txFontColor := legend[n]@color
            if (isStrSubset(legend[n], "piControl").and.count_unique_values(legend[n]@nruns).gt.1) then
              name = legend[n]+" ("+legend[n]@nmodels+" models, "
@@ -1195,7 +1191,7 @@ begin
            end if
            txres@txFontColor := legend[n]@color
            txres@txJust = "CenterCenter"
-           txres@txFontHeightF = 0.008
+           txres@txFontHeightF = fontHeightS
            txres@txBackgroundFillColor = "white"
            txres@txPerimColor = "transparent"
            txres@txPerimSpaceF = 0.1
@@ -1205,7 +1201,7 @@ begin
          x = x2 - 0.01
          txres@txFontColor := legend[n]@color
          txres@txJust = "CenterRight"
-         txres@txFontHeightF = 0.011
+         txres@txFontHeightF = fontHeightL
          txres@txBackgroundFillColor = "transparent"
          name = legend[n]
          gsn_text_ndc(wks, name, x, y, txres)
