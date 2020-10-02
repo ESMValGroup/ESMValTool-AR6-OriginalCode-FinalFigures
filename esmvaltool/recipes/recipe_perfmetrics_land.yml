@@ -81,8 +81,8 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -168,8 +168,8 @@ diagnostics:
       - {dataset: CMCC-CESM}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -249,8 +249,8 @@ diagnostics:
       - {dataset: CESM1-WACCM, ensemble: r2i1p1}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -325,8 +325,8 @@ diagnostics:
       - {dataset: CESM1-WACCM, ensemble: r2i1p1}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -380,8 +380,8 @@ diagnostics:
       fgco2:
         short_name: fgco2
         preprocessor: ppNOLEV2
-        reference_dataset: JMA-TRANSCOM
-        alternative_dataset: Landschuetzer2016
+        reference_dataset: Landschuetzer2016
+        alternative_dataset: JMA-TRANSCOM
         mip: Omon
         project: CMIP5
         exp: historical
@@ -398,8 +398,8 @@ diagnostics:
       - {dataset: GFDL-ESM2M}
       - {dataset: GISS-E2-H-CC}
       - {dataset: GISS-E2-R-CC}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -423,7 +423,7 @@ diagnostics:
          institute: NCAR, project: CMIP6}
       - { dataset: CMCC-ESM2, grid: gn, ensemble: r1i1p1f1, project: CMIP6 }
       - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r7i1p1f2, project: CMIP6}
-      - { dataset: EC-Earth3-CC, grid: gr, ensemble: r1i1p1f1, project: CMIP6 }
+      - { dataset: EC-Earth3-CC, grid: gn, ensemble: r1i1p1f1, project: CMIP6 }
       #- {dataset: GISS-E2-1-G, grid: gn, ensemble: r10i1p1f1}
       - {dataset: INM-CM4-8, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
@@ -482,8 +482,8 @@ diagnostics:
       - {dataset: GFDL-ESM2M}
       - {dataset: GISS-E2-H-CC}
       - {dataset: GISS-E2-R-CC}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -549,8 +549,8 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -616,8 +616,8 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -687,8 +687,8 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
@@ -759,8 +759,8 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: GFDL-ESM2G}
       - {dataset: GFDL-ESM2M}
-      - {dataset: HadGEM2-CC}
-      - {dataset: HadGEM2-ES}
+      #- {dataset: HadGEM2-CC}
+      #- {dataset: HadGEM2-ES}
       - {dataset: inmcm4}
       - {dataset: IPSL-CM5A-LR}
       - {dataset: IPSL-CM5A-MR}
