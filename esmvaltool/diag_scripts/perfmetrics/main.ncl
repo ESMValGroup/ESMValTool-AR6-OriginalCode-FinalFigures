@@ -169,8 +169,6 @@ begin
 
   ; Save projects
   projectnames = metadata_att_as_array(info_items, "project")
-print("projectnames")
-print(projectnames)
 
   ; Save list of preproc files for provenance in collect.ncl
   preproc_files = metadata_att_as_array(info_items, "filename")
@@ -224,8 +222,6 @@ print(projectnames)
       grading&reference = datasetnames(ref_inds)
     end if
     grading@projects = str_join(remove_index(projectnames, ref_inds), " ")
-print("grading@projects")
-print(grading@projects)
 
     ; Special case Taylor
     if (any(diag_script_info@metric.eq."taylor")) then
@@ -404,23 +400,25 @@ begin
         diag_script_info@metric(met) + ".nc"
 
       if (fileexists(temp_dir)) then
-        temp_file = addfile(temp_dir, "r")
-        temp_list = temp_file->temp_list
-        temp_list := tostring(temp_list)
-        temp_list := array_append_record(temp_list, ncdf_dir(met), 0)
-        temp_list := tochar(temp_list)
+      ;  temp_file = addfile(temp_dir, "r")
+      ;  temp_list = temp_file->temp_list
+      ;  temp_list := tostring(temp_list)
+      ;  temp_list := array_append_record(temp_list, ncdf_dir(met), 0)
+      ;  temp_list := tochar(temp_list)
         system("rm -f " + temp_dir)
-      else
+      end if
+      ;else
         ncdf_char = tochar(ncdf_dir(met))
         temp_list = new((/1, dimsizes(ncdf_char)/), character)
         temp_list(0, :) = ncdf_char
-      end if
+        delete(ncdf_char)
+      ;end if
 
       ; Create new file and add list
       temp = addfile(temp_dir, "c")
       temp->temp_list = temp_list
 
-      delete([/metric, temp_dir, temp_list, ncdf_char/])
+      delete([/metric, temp_dir, temp_list/])
 
     end do
 
