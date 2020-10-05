@@ -1,5 +1,6 @@
 # ESMValTool
-# recipe_ocean_heat_content.yml
+# recipe_ocean_heat_content_full_calcpiyears.yml
+# Calculate the years from the pi control.
 ---
 documentation:
   description: |
