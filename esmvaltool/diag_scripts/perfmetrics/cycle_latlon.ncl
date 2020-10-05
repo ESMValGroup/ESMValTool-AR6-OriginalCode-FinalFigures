@@ -83,8 +83,14 @@ begin
       var_all_mod&models = grading&models
       copy_VarAtts(diag_script_info, var_all_mod)
     end if
-    if (imod.ne.ref_ind .and. imod.ne.alt_ind) then
-      var_all_mod(:,:,:,:,imod) = var_all
+    if (l_altern) then
+      if (imod .ne. ref_ind .and. imod .ne. alt_ind) then
+        var_all_mod(:,:,:,:,imod) = var_all
+      end if
+    else
+      if (imod.ne.ref_ind) then
+        var_all_mod(:,:,:,:,imod) = var_all
+      end if
     end if 
 
     ; Store reference dataset
@@ -241,7 +247,7 @@ begin
     n_proj = dimsizes(projects)
 
     do iproj = 0, n_proj - 1
-      ind_proj = ind(projectnames_em .eq. projects(iproj))
+      ind_proj := ind(projectnames_em .eq. projects(iproj))
 
       tmp := dim_avg_n_Wrap(var_all_mod(:, :, :, :, ind_proj), 4)
       mean_ref = calculate_metric(tmp(:, :, :, 0), var_ref(:, :, :, 0), \
