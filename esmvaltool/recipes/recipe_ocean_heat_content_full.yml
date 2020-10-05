@@ -175,7 +175,7 @@ diagnostics:
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM,     exp: historical, ensemble: r1i1p1f1, start_year: 11, end_year: 165}
           - {project: CMIP6, mip: Ofx, grid: gn, dataset: HadGEM3-GC31-LL,     exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-HR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
-          # - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+          - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR,     exp: historical, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-LM,     exp: historical,  ensemble: r1i1p1f1, start_year: 1660, end_year: 1814, }
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-MM,     exp: historical, ensemble: r1i1p1f1, start_year: 1261, end_year: 1415,}
           # - {project: CMIP6, mip: Ofx, grid: gn, dataset: SAM0-UNICON,     exp: historical, ensemble: r1i1p1f1, start_year: 284, end_year: 438}

@@ -122,50 +122,71 @@ diagnostics:
 
   diag_timeseries_amoc_hist:
     variables:
-#      amoc:
-#        mip: Omon
-#        derive: true
-#        force_derivation: false
-#        additional_datasets:
-#          - {dataset: CanESM2,          project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CCSM4,            project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CESM1-BGC,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CESM1-CAM5-1-FV2, project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CESM1-CAM5,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CESM1-FASTCHEM,   project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CESM1-WACCM,      project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CNRM-CM5-2,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: CNRM-CM5,         project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+      amoc:
+        mip: Omon
+        derive: true
+        force_derivation: false
+        additional_datasets:
+          - {dataset: CanESM2,          project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CCSM4,            project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CESM1-BGC,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CESM1-CAM5-1-FV2, project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CESM1-CAM5,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CESM1-FASTCHEM,   project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CESM1-WACCM,      project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CNRM-CM5-2,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: CNRM-CM5,         project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
 #          - {dataset: FGOALS-g2,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: MIROC5,           project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: MPI-ESM-LR,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: MPI-ESM-MR,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: MPI-ESM-P,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: MRI-CGCM3,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: MRI-ESM1,         project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: NorESM1-ME,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#          - {dataset: NorESM1-M,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
-#
-#          - {dataset: CNRM-CM6-1,       project: CMIP6,    exp: historical,  ensemble: r1i1p1f2, grid: gn, start_year: 1860,  end_year: 2014} # rlat probles
-#          - {dataset: CNRM-ESM2-1,      project: CMIP6,    exp: historical,  ensemble: r1i1p1f2, grid: gn, start_year: 1860,  end_year: 2014} # rlat latitude is wrong
-#          # - {dataset: EC-Earth3-Veg,    project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2014}
-#          - {dataset: HadGEM3-GC31-LL,  project: CMIP6,    exp: historical,  ensemble: r1i1p1f3, grid: gn, start_year: 1860,  end_year: 2014}
-#          - {dataset: IPSL-CM6A-LR,     project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2014} # No grid_latitude field.
-#          - {dataset: UKESM1-0-LL,      project: CMIP6,    exp: historical,  ensemble: r1i1p1f2, grid: gn, start_year: 1860,  end_year: 2014}
-#
-#          - {dataset: CanESM5,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2014}
-#          - {dataset: CESM2,          project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2014}
-#          - {dataset: CESM2-WACCM,    project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2014}
-#          - {dataset: SAM0-UNICON,    project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1860,  end_year: 2014}
-# # /badc/cmip6/data/CMIP6/CMIP/EC-Earth-Consortium/EC-Earth3-Veg/historical/r1i1p1f1/Omon/msftyz/
+          - {dataset: MIROC5,           project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: MPI-ESM-LR,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: MPI-ESM-MR,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: MPI-ESM-P,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: MRI-CGCM3,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: MRI-ESM1,         project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: NorESM1-ME,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+          - {dataset: NorESM1-M,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1860,  end_year: 2004}
+ 
+          # msftyz
+          - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: ACCESS-ESM1-5, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+#          - {dataset: CIESM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CNRM-CM6-1, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f2, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CNRM-ESM2-1, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f2, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f3, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: HadGEM3-GC31-MM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f3, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: MRI-ESM2-0, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gnz, start_year: 1860, end_year: 2014, }
+          - {dataset: UKESM1-0-LL, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f2, grid: gn, start_year: 1860, end_year: 2014, }
+    
+
+          #  msftmz:
+#          - {dataset: ACCESS-CM2, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+#          - {dataset: ACCESS-ESM1-5, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CESM2, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CESM2-FV2, institute: NCAR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CESM2-WACCM, institute: NCAR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CESM2-WACCM-FV2, institute: NCAR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: CanESM5, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+#         - {dataset: E3SM-1-0, institute: E3SM-Project, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr, start_year: 1860, end_year: 2014, }
+#          - {dataset: E3SM-1-1, institute: E3SM-Project, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr, start_year: 1860, end_year: 2014, }
+#          - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr, start_year: 1860, end_year: 2014, }
+          - {dataset: FGOALS-f3-L, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: FGOALS-g3, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: INM-CM4-8, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr1, start_year: 1860, end_year: 2014, }
+          - {dataset: INM-CM5-0, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr1, start_year: 1860, end_year: 2014, }
+          - {dataset: MPI-ESM-1-2-HAM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: MPI-ESM1-2-HR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+          - {dataset: MPI-ESM1-2-LR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
+#          - {dataset: MRI-ESM2-0, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr2z, start_year: 1860, end_year: 2014, }
+          - {dataset: NorCPM1, institute: NCC, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: grz, start_year: 1860, end_year: 2014, }
+          - {dataset: NorESM2-LM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: grz, start_year: 1860, end_year: 2014, }
+          - {dataset: NorESM2-MM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: grz, start_year: 1860, end_year: 2014, }
+          - {dataset: SAM0-UNICON, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1860, end_year: 2014, }
 
       msftmyz:
         short_name: msftmyz
         preprocessor: prep_transect
         mip: Omon
-        exp: historical
-        # start_year: 2000
-        # end_year: 2004
         additional_datasets:
           - {dataset: CanESM2,          project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1994,  end_year: 2004}
           - {dataset: CCSM4,            project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1994,  end_year: 2004}
@@ -185,43 +206,51 @@ diagnostics:
           - {dataset: MRI-ESM1,         project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1994,  end_year: 2004}
           - {dataset: NorESM1-ME,       project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1994,  end_year: 2004}
           - {dataset: NorESM1-M,        project: CMIP5,    exp: historical,  ensemble: r1i1p1,  start_year: 1994,  end_year: 2004}
-          #CMIP6 
-          # - {dataset: GISS-E2-1-G,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014} #msftmyz should be msftyz or msftmz
-          #
-
 
    # # CMIP6:
       msftyz:
         short_name: msftyz
         preprocessor: prep_transect
-        field: TO2M
         mip: Omon
-        exp: historical
-        # start_year: 2000
-        #         # end_year: 2004
         additional_datasets:
-        #                     
-          # - {dataset: GISS-E2-1-G,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014} #msftmyz
-          - {dataset: CNRM-CM6-1,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f2, grid: gn, start_year: 1994,  end_year: 2014} # rlat probles
-          - {dataset: CNRM-ESM2-1,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f2, grid: gn, start_year: 1994,  end_year: 2014} #rlat latitude is wrong
-          # - {dataset: EC-Earth3-Veg,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014} # does not exist.
-          - {dataset: HadGEM3-GC31-LL,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f3, grid: gn, start_year: 1994,  end_year: 2014}
-          - {dataset: IPSL-CM6A-LR,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014} # No grid_latitude field.
-          - {dataset: UKESM1-0-LL,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f2, grid: gn, start_year: 1994,  end_year: 2014}
+          - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: ACCESS-ESM1-5, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+#          - {dataset: CIESM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CNRM-CM6-1, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f2, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CNRM-ESM2-1, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f2, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f3, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: HadGEM3-GC31-MM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f3, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: MRI-ESM2-0, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gnz, start_year: 1994, end_year: 2014, }
+          - {dataset: UKESM1-0-LL, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f2, grid: gn, start_year: 1994, end_year: 2014, }
+
       msftmz:
         short_name: msftmz
         preprocessor: prep_transect
-        field: TO2M
         mip: Omon
-        exp: historical
         additional_datasets:
-          # msftmz
-          - {dataset: CanESM5,        project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014}
-          - {dataset: CESM2,          project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014} 
-#          - {dataset: CESM2-WACCM,    project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014}
-          - {dataset: SAM0-UNICON,    project: CMIP6,    exp: historical,  ensemble: r1i1p1f1, grid: gn, start_year: 1994,  end_year: 2014}
-       # rsync -avLP /badc/cmip6/data/CMIP6/CMIP/*/*/piControl/r1i1p1f?/Omon/msftyz//gn/latest/*.nc ledm@pmpc1564.npm.ac.uk:/data/sthenno1/scratch/ledm/CMIP6/msftyz/.
-
+#          - {dataset: ACCESS-CM2, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+#          - {dataset: ACCESS-ESM1-5, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CESM2, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CESM2-FV2, institute: NCAR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CESM2-WACCM, institute: NCAR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CESM2-WACCM-FV2, institute: NCAR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: CanESM5, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+#         - {dataset: E3SM-1-0, institute: E3SM-Project, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr, start_year: 1994, end_year: 2014, }
+#          - {dataset: E3SM-1-1, institute: E3SM-Project, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr, start_year: 1994, end_year: 2014, }
+#          - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr, start_year: 1994, end_year: 2014, }
+          - {dataset: FGOALS-f3-L, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: FGOALS-g3, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: INM-CM4-8, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr1, start_year: 1994, end_year: 2014, }
+          - {dataset: INM-CM5-0, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr1, start_year: 1994, end_year: 2014, }
+          - {dataset: MPI-ESM-1-2-HAM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: MPI-ESM1-2-HR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+          - {dataset: MPI-ESM1-2-LR, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
+#          - {dataset: MRI-ESM2-0, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gr2z, start_year: 1994, end_year: 2014, }
+          - {dataset: NorCPM1, institute: NCC, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: grz, start_year: 1994, end_year: 2014, }
+          - {dataset: NorESM2-LM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: grz, start_year: 1994, end_year: 2014, }
+          - {dataset: NorESM2-MM, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: grz, start_year: 1994, end_year: 2014, }
+          - {dataset: SAM0-UNICON, project: CMIP6, exp: historical, mip: Omon, ensemble: r1i1p1f1, grid: gn, start_year: 1994, end_year: 2014, }
 
     scripts:
       AMOC_timeseries:

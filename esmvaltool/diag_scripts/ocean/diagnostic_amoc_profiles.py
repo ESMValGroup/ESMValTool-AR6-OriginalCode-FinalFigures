@@ -318,7 +318,7 @@ def annual_mean_from_april(cube, ):
     # Apply the categorisation.
     iris.coord_categorisation.add_categorised_coord(cube, name, coord, _year_from_april)
 
-    print(cube.coord('time'), cube.coord(name))
+    print('annual_mean_from_april', cube.coord(name))
     cube = cube.aggregated_by([name, ], iris.analysis.MEAN)
     return cube
 
@@ -351,8 +351,8 @@ def get_max_amoc(cube):
     """
     Extract maximum AMOC in the profile.
     """
-    cube = cube.collapsed('depth', iris.analysis.MAX)
-    print('get_max_amoc:',cube.data.shape)
+    depth=cube.coord(axis='z').standard_name
+    cube = cube.collapsed(depth, iris.analysis.MAX)
     return cube
 
 
@@ -698,7 +698,7 @@ def make_pane_a(
     #####
     # Add box and whisker lines.
     add_box_whisker = True
-    depth_ll_x = {'CMIP5':-3., 'CMIP6':-1.,}
+    depth_ll_x = {'CMIP5':-8., 'CMIP6':-5.,}
     mean_ll_y = {'CMIP5':5500, 'CMIP6':6000,}
     for project in projects:
         if not add_box_whisker: continue
@@ -714,17 +714,29 @@ def make_pane_a(
         mean_box_ll = np.percentile(means, 25)
         mean_box_width = np.percentile(means, 75)- mean_box_ll
         ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project]], mean_box_width, box_height,  color = colour) )
-        print(project, 'A', means, mean_box_ll, mean_ll_y[project], mean_box_width, box_height)
+
         mean_box_ll = np.percentile(means, 5)
         mean_box_width = np.percentile(means, 95)- mean_box_ll
-        print(project, 'B',means, mean_box_ll, mean_ll_y[project], mean_box_width, box_height )
         ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project] +(box_height/2.)-(line_height/2.)], 
             mean_box_width, 
             line_height, 
             color = colour,
             transform = ax.transData))
+
+        median_width = 0.3
+        median = np.percentile(means, 50)
+        #print('box:', colour, [median - median_width/2, mean_ll_y[project]],  median_width, box_height)
+        ax.add_patch(
+            patches.Rectangle([median - median_width/2., mean_ll_y[project]],
+                median_width, box_height,  color = 'white', transform = ax.transData, ))#zorder=10))
+
+#        ax.add_patch(
+#            patches.Rectangle([median - median_width/2, mean_ll_y[project]],
+#                median_width, box_height,  color = 'green')) #order=10))
+
+
         # Mean Depts:
-        box_widtht = 1.
+        box_widtht = 2.
         line_width = 0.1
         depth_box_ll = np.percentile(depths, 25)
         depth_box_height = np.percentile(depths, 75)- np.percentile(depths, 25)
@@ -733,6 +745,12 @@ def make_pane_a(
         depth_box_ll = np.percentile(depths, 5)
         depth_box_height = np.percentile(depths, 95)- np.percentile(depths, 5)
         ax.add_patch(patches.Rectangle([depth_ll_x[project]+box_widtht/2. - line_width/2., depth_box_ll], line_width, depth_box_height, color = colour) )
+
+        median_height = 30. 
+        median = np.percentile(depths, 50)
+        ax.add_patch(patches.Rectangle([depth_ll_x[project], median - median_height/2, ],
+            box_widtht, median_height, color = 'white', transform = ax.transData, zorder=10))
+        
 
     add_obs = True
     if add_obs:
@@ -871,7 +889,11 @@ def make_pane_bc(
         if short_name != 'amoc':
             continue
         cube = load_cube(filename, metadatas[filename])
-        print (cube.data.shape)
+
+        # Don't need these for amoc already calculated 
+        # cube = get_26North(cube)
+        # cube = get_max_amoc(cube)
+
         if time_res=='monthly':
             cube = cube.aggregated_by(['month','year'], iris.analysis.MEAN)
         elif time_res=='annual':
@@ -879,6 +901,7 @@ def make_pane_bc(
         elif time_res=="April-March":
             cube = annual_mean_from_april(cube)
         else: assert 0
+     
         if pane == 'b':
             #cube = get_max_amoc(cube)
             #cube = cube.aggregated_by('year', iris.analysis.MEAN)
@@ -891,10 +914,10 @@ def make_pane_bc(
             #cube = get_max_amoc(cube)
             #cube = cube.aggregated_by('year', iris.analysis.MEAN)
             trends[dataset] = calculate_interannual(cube)
+        print('make_pane_bc: calculate trends', pane, dataset, trends[dataset])
         projects[project].append(dataset)
 
     box_order = []
-
     #####
     # Add observational data.
     add_obs = False
@@ -972,6 +995,7 @@ def make_pane_bc(
     else:
         # Draw the trend/variability as a box and whisker diagram.
         box_data = [trends[dataset] for dataset in box_order]
+        print(dataset, trends[dataset])
         print(dataset, box_data)
         box = ax.boxplot(box_data,
                          0,
@@ -1325,12 +1349,12 @@ def main(cfg):
     """
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='c')
+    make_pane_a(cfg)
+
 
     make_figure(cfg, timeseries= False)
     make_amoc_trends(cfg, savefig=True)
-    make_pane_a(cfg)
 
-    #make_pane_a(cfg)
     #make_pane_a(cfg)
 
     #make_pane_bc(cfg, pane='b', timeseries=False)
