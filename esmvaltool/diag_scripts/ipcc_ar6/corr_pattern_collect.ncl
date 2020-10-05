@@ -293,11 +293,12 @@ begin
 
   ; Project Colors - TODO: let them be specified in cfg
   fcolors = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-            + "ipcc-ar6_line_03.rgb")
+            + "ipcc-ar6_cmip_line.rgb")
 
   res = True
   res@gsnDraw          = False
   res@gsnFrame         = False
+  res@tiMainString = "Pattern Correlation"
   res@vpWidthF = 0.8
   n_square = 16.
   if x_max.le. n_square then
@@ -318,7 +319,7 @@ begin
   res@tmXBMode = "Explicit"
   res@tmXBLabelFontHeightF = font_height
   if (n_var .gt. 3) then
-    res@tmXBLabelFontHeightF = font_height * 0.5
+    res@tmXBLabelFontHeightF = font_height * 0.6
   end if
   ; Set Marker Size to be half of line_length
   marker_size = res@vpWidthF * 3 * l_length / (res@trXMaxF - res@trXMinF)
@@ -338,7 +339,8 @@ begin
   ; Resources for obs data markers
   res_circ = True
   res_circ@gsMarkerIndex = 16
-  res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
+  ;res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
+  res_circ@gsMarkerColor = (/120,120,120,255/) / 255.
   res_circ@gsMarkerSizeF = 2 * marker_size
   res_circ@gsMarkerOpacityF = 0.4
 
@@ -400,6 +402,8 @@ begin
         res_lines@gsLineColor = fcolors(iproj,:)
         plot@$unique_string("dum")$ = gsn_add_polyline( \
           wks, plot, xx_mean, yy_mean, res_mlines)
+        ymin = 1.
+        ymax = 0.
         do imod = 0, dimsizes(data_all(:, 0)) - 1
           ; Only plot if model in right project
           if data_all&models@project(imod).eq.projects(iproj) then
@@ -410,12 +414,29 @@ begin
                 plot@$unique_string("dum")$ = gsn_add_polyline( \
                   wks, plot, xx, yy, res_lines)
                 end if
+                if (yy(0) .lt. ymin) then
+                  ymin = yy(0)
+                end if
+                if (yy(0) .gt. ymax) then
+                  ymax = yy(0)
+                end if
             end if
           end if
         end do
         if (diag_script_info@plot_median) then
           plot@$unique_string("dum_ci")$ = gsn_add_polymarker( \
             wks, plot, x_val_proj(iproj, ivar), median(iproj, ivar), res_circw)
+        end if
+        if (isatt(diag_script_info, "model_spread")) then
+          if (diag_script_info@model_spread) then
+            yyyy = (/ymin, ymin, ymax, ymax/)
+            xxxx = (/xx(0), xx(1), xx(1), xx(0)/)
+            res_shading = res_lines
+            res_shading@gsFillColor = fcolors(iproj,:)
+            res_shading@gsFillOpacityF = 0.2
+            plot@$unique_string("dum")$ = gsn_add_polygon( \
+              wks, plot, xxxx, yyyy, res_shading)
+          end if
         end if
       end if
       delete(proj_mods)
