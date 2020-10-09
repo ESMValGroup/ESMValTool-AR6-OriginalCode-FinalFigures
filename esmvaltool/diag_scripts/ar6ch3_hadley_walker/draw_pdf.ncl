@@ -42,32 +42,24 @@ begin
   weight = x
   weight = 1./tofloat(x@esize)
   y = new(8, typeof(x))
-  y(0) = min(x)
-  y(1) = weighted_percentile(x, weight, 0.05)
+;  y(0) = min(x)
+;  y(1) = weighted_percentile(x, weight, 0.05)
+  y(0) = weighted_percentile(x, weight, 0.05)
+  y(1) = weighted_percentile(x, weight, 0.25)
   y(2) = weighted_mean(x, weight)
-  y(3) = weighted_percentile(x, weight, 0.95)
-  y(4) = max(x)
+  y(3) = weighted_percentile(x, weight, 0.75)
+  y(4) = weighted_percentile(x, weight, 0.95)
+;  y(3) = weighted_percentile(x, weight, 0.95)
+;  y(4) = max(x)
   y@nruns = dimsizes(x)
 
+  confint_threshold = True  ; False
+  
   if (isatt(x, "model_id")) then
     nmodels = count_unique_values(x@model_id)
     y@nmodels = nmodels
 
     models = get_unique_values(x@model_id)
-  ; unweighted confidence interval
-  ;esize = min(x@esize)
-  ;;esize = max((/min(x@esize), 3/))
-  ;xx = new((/nmodels, esize/), typeof(x))
-  ;do n = 0, nmodels-1
-  ;  i = ind(x@model_id.eq.models(n))
-  ;  if (dimsizes(i).ge.esize) then
-  ;    xx(n, :) = x(i(0:esize-1))
-  ;  end if
-  ;  delete(i)
-  ;end do
-  ;n = dimsizes(ndtooned(xx))
-  ;y(5) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
-  ;y(7) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
 
 ; unweighted average of individual models
   ;delete(xx)
@@ -81,10 +73,30 @@ begin
     end do
     y@means = xx
 
-; unweighted confidence interval
-    y(5) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
-    y(6) = avg(xx)
-    y(7) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+    if (confint_threshold) then
+  ; unweighted confidence interval
+      y(5) = avg(xx) + cdft_t(0.05, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+      y(6) = avg(xx)
+      y(7) = avg(xx) + cdft_t(0.95, nmodels_ens-1)*stddev(xx)/sqrt(tofloat(nmodels_ens))
+    else
+  ; unweighted confidence interval
+      delete(xx)
+      esize = min(x@esize)
+      ;esize = max((/min(x@esize), 3/))
+      xx = new((/nmodels, esize/), typeof(x))
+      do n = 0, nmodels-1
+        i = ind(x@model_id.eq.models(n))
+        if (dimsizes(i).ge.esize) then
+          xx(n, :) = x(i(0:esize-1))
+        end if
+        delete(i)
+      end do
+      n = dimsizes(ndtooned(xx))
+      y(5) = avg(xx) + cdft_t(0.05, n-1)*stddev(xx)/sqrt(tofloat(n))
+      y(6) = y(2)
+      y(7) = avg(xx) + cdft_t(0.95, n-1)*stddev(xx)/sqrt(tofloat(n))
+    end if
+    delete(xx)
   else
     esize = dimsizes(x)
     y(5) = avg(x) + cdft_t(0.05, esize-1)*stddev(x)/sqrt(tofloat(esize))
@@ -152,7 +164,8 @@ begin
     txres@txFontHeightF = 0.013
     txres@txFontColor := color
     if (percentiles@hemisphere.eq."NH") then
-      if (any(str_squeeze(percentiles@exp).eq.(/"piControl", "GHG", "strat~C~ O3"/))) then
+;      if (any(str_squeeze(percentiles@exp).eq.(/"piControl", "GHG", "strat~C~ O3"/))) then
+      if (any(str_squeeze(percentiles@exp).eq.(/"AMIP", "GHG", "strat~C~ O3"/))) then
         txres@txJust = "BottomCenter"
         if (type.eq."percentile") then
           y = percentiles(4) + 0.02
@@ -367,6 +380,9 @@ begin
       range = 0.
       do k = 0, dimsizes(paths)-1
         f = addfile(paths(k), "r")
+        tmppath = str_split(paths(k), "/")
+        fname = tmppath(dimsizes(tmppath)-1)
+        delete(tmppath)
         if (isfilevar(f, "lat")) then
           varname = "lat"
         elseif (isfilevar(f, "dslp")) then
@@ -378,7 +394,7 @@ begin
           data@units = "hPa"
         end if
         data = data * scale
-        if (.not.isStrSubset(paths(k), "pi.nc")) then
+        if (isStrSubset(fname, "_cmip").and..not.isStrSubset(fname, "pi.nc")) then
           syear = toint(data@syear)
           eyear = toint(data@eyear)
         end if
@@ -519,22 +535,22 @@ begin
       res@tiMainOffsetYF = -0.028
       res@tiMainFontHeightF = 0.022
       if (varname.eq."lat") then
-        if (range.gt.0.05*scale) then
-          res@trYMaxF = 0.1*scale
+;        if (range.gt.0.05*scale) then
+;          res@trYMaxF = 0.1*scale
+;        else
+;          res@trYMaxF = 0.05*scale
+;        end if
+        if (range.gt.0.04*scale) then
+          res@trYMaxF = 0.065*scale
         else
-          res@trYMaxF = 0.05*scale
+          res@trYMaxF = 0.045*scale
         end if
       elseif (varname.eq."dslp") then
         if (range.gt.0.02*scale) then
           res@trYMaxF = 0.038*scale
-;        elseif (range.gt.0.012*scale) then
-;          res@trYMaxF = 0.018*scale
         elseif (range.gt.0.005*scale) then
-          res@trYMaxF = 0.014*scale
-        elseif (range.gt.0.0025*scale) then
-          res@trYMaxF = 0.005*scale
-        elseif (range.gt.0.001*scale) then
-          res@trYMaxF = 0.002*scale
+;          res@trYMaxF = 0.014*scale
+          res@trYMaxF = 0.012*scale
         else
           res@trYMaxF = 0.1*scale
         end if
@@ -1071,17 +1087,19 @@ begin
        txres@txFontHeightF = fontHeightS
        txres@txJust = "CenterLeft"
        txres@txAngleF = 0.
-;       gsn_text_ndc(wks, "max",  x0-w/2.-0.002, y0+h2, txres)
-       gsn_text_ndc(wks, "max",  x0+0.002, y0+h2, txres)
-       gsn_text_ndc(wks, "95th", x0+w/2.+0.002, y0+h1, txres)
+;       gsn_text_ndc(wks, "max",  x0+0.002, y0+h2, txres)
+;       gsn_text_ndc(wks, "95th", x0+w/2.+0.002, y0+h1, txres)
+       gsn_text_ndc(wks, "95th",  x0+0.002, y0+h2, txres)
+       gsn_text_ndc(wks, "75th", x0+w/2.+0.002, y0+h1, txres)
        gsn_text_ndc(wks, "mean", x0+w/2.+0.002, y0, txres)
-       gsn_text_ndc(wks, "5th", x0+w/2.+0.002, y0-h1, txres)
-;       gsn_text_ndc(wks, "min", x0-w/2.-0.002, y0-h2, txres)
-       gsn_text_ndc(wks, "min", x0+0.002, y0-h2, txres)
+       gsn_text_ndc(wks, "25th", x0+w/2.+0.002, y0-h1, txres)
+       gsn_text_ndc(wks, "5th", x0+0.002, y0-h2, txres)
+;       gsn_text_ndc(wks, "5th", x0+w/2.+0.002, y0-h1, txres)
+;       gsn_text_ndc(wks, "min", x0+0.002, y0-h2, txres)
        txres@txJust = "BottomCenter"
        txres@txAngleF = 90.
        gsn_text_ndc(wks, "Ensemble range", x0-w/2.-0.014, y0, txres)
-       gsn_text_ndc(wks, "(all models)", x0-w/2.-0.002, y0, txres)
+       gsn_text_ndc(wks, "(all members)", x0-w/2.-0.002, y0, txres)
        
        x = x0 + w*3.7
        plres@gsFillColor = lres@gsLineColor
@@ -1098,9 +1116,11 @@ begin
        txres@txAngleF = 90.
        gsn_text_ndc(wks, "5-95%", x+w/2.+0.003, y0, txres)
        gsn_text_ndc(wks, "confidence int.", x+w/2.+0.015, y0, txres)
-;       gsn_text_ndc(wks, "of mean", x+w/2.+0.027, y0, txres)
+;;       gsn_text_ndc(wks, "of mean", x+w/2.+0.027, y0, txres)
        gsn_text_ndc(wks, "(models with   ", x+w/2.+0.027, y0, txres)
-       gsn_text_ndc(wks, "  ~F34~3~F21~ 3 runs only)", x+w/2.+0.039, y0, txres)
+       gsn_text_ndc(wks, "  ~F34~3~F21~ 3 runs)", x+w/2.+0.039, y0, txres)
+;       gsn_text_ndc(wks, "(equal ensemble size", x+w/2.+0.027, y0, txres)
+;       gsn_text_ndc(wks, "   across models)", x+w/2.+0.039, y0, txres)
        mkres = True
        mkres@gsMarkerIndex = 16
        mkres@gsMarkerSizeF =  0.005

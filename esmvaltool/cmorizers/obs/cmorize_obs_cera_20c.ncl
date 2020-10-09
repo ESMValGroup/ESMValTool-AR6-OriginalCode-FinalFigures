@@ -20,6 +20,7 @@
 ;  v10.1901-2010.ens{0-9}.nc
 ;
 ; Modification history
+;    20201007-yu_kosaka: added ua and va.
 ;    20200930-yu_kosaka: written based on cmorize_obs_era_20c.ncl.
 ;
 ; #############################################################################
@@ -42,25 +43,25 @@ begin
   YEAR2 = 2010
 
   ; Selected variable (standard name)
-  VAR = (/"psl", "uas", "vas"/)
+  VAR = (/"psl", "uas", "vas", "ua", "va"/)
 
   ; Name in the raw data
-  NAME = (/"msl", "u10", "v10"/)
+  NAME = (/"msl", "u10", "v10", "u", "v"/)
 
   ; Name in the file name
-  FNAME = (/"msl", "10u", "10v"/)
+  FNAME = (/"msl", "10u", "10v", "u", "v"/)
 
   ; Subdirectory
-  SUBDIR = (/"surface/", "surface/", "surface/"/)
+  SUBDIR = (/"surface/", "surface/", "surface/", "pressure/", "pressure/"/)
 
   ; Expected units (according to CMOR standard)
-  EXPUNITS = (/"Pa", "m/s", "m/s"/)
+  EXPUNITS = (/"Pa", "m/s", "m/s", "m/s", "m/s"/)
 
   ; MIP
-  MIP = (/"Amon", "Amon", "Amon"/)
+  MIP = (/"Amon", "Amon", "Amon", "Amon", "Amon"/)
 
   ; Frequency
-  FREQ = (/"mon", "mon", "mon"/)
+  FREQ = (/"mon", "mon", "mon", "mon", "mon"/)
 
   ; CMOR tables
   CMOR_TABLE = getenv("cmor_tables") + "/cmip5/Tables/CMIP5_" + MIP
@@ -137,7 +138,7 @@ begin
         output = output / 1000.
         output@units = "1"
       end if
-      if (any(VAR(vv).eq.(/"uas", "vas"/))) then
+      if (any(VAR(vv).eq.(/"uas", "vas", "ua", "va"/))) then
         output@units = EXPUNITS(vv)
       end if
       if (output@units.ne.EXPUNITS(vv)) then
@@ -151,7 +152,7 @@ begin
         output!1 = "plev"
         output!2 = "lat"
         output!3 = "lon"
-        output&plev = output&plev * 100.  ; [mb] --> [Pa]
+        output&plev := output&plev * 100.  ; [mb] --> [Pa]
       elseif (rank.eq.3)
         output!1 = "lat"
         output!2 = "lon"

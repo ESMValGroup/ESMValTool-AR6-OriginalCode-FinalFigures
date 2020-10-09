@@ -250,9 +250,12 @@ begin
       syear = year(0)
       eyear = year(dimsizes(year)-1)
       if (any(ii.eq.iObs).and.(syear.gt.syear_trend.or.eyear.lt.eyear_trend)) then
-        overlap_frac = tofloat(min((/eyear, eyear_trend/)) - max((/syear, syear_trend/))+1) \
-                       / tofloat(eyear_trend - syear_trend + 1)
-        if (overlap_frac.gt.0.85) then
+;        overlap_frac = tofloat(min((/eyear, eyear_trend/)) - max((/syear, syear_trend/))+1) \
+;                       / tofloat(eyear_trend - syear_trend + 1)
+;        if (overlap_frac.gt.0.85) then
+        nyears_missing = eyear_trend - min((/eyear, eyear_trend/)) + \
+                         max((/syear, syear_trend/)) - syear_trend
+        if (nyears_missing.lt.2) then
           ts(0) = (/ind(year.eq.max((/syear, syear_trend/)))/)
           te(0) = (/ind(year.eq.min((/eyear, eyear_trend/)))/)
         else
@@ -266,6 +269,7 @@ begin
         ts(0) = (/ind(year.eq.syear_trend)/)
         te(0) = (/ind(year.eq.eyear_trend)/)
       end if
+      print(ts(0)+" "+te(0))
     end if
 
     do n = 0, nseg-1

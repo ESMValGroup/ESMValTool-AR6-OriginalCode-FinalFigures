@@ -42,6 +42,7 @@
 ;    complete years (Jan to Dec).
 ;
 ; Modification history
+;    20201003-yu_kosaka: added pressure level ua and va.
 ;    20200924-yu_kosaka: revised to add every_member.
 ;    20200915-yu_kosaka: written based on cmorize_obs_ncep.ncl.	
 ;
@@ -69,22 +70,23 @@ begin
   RUN2 = 80
 
   ; Selected variable (standard name)
-  VAR = (/"psl", "uas", "vas"/)
+  VAR = (/"psl", "uas", "vas", "ua", "va"/)
 
   ; Name in the raw data
-  NAME = (/"prmsl", "uwnd", "vwnd"/)
+  NAME_ensmean = (/"prmsl", "uwnd", "vwnd", "uwnd", "vwnd"/)
+  NAME_members = (/"PRMSL", "UGRD10m", "VGRD10m", "UGRD", "VGRD"/)
 
   ; Subdirectory
-  SUBDIR = (/"surface/", "surface/", "surface/"/)
+  SUBDIR = (/"surface/", "surface/", "surface/", "pressure/", "pressure/"/)
 
   ; Expected units (according to CMOR standard)
-  EXPUNITS = (/"Pa", "m/s", "m/s"/)
+  EXPUNITS = (/"Pa", "m/s", "m/s", "m/s", "m/s"/)
 
   ; MIP
-  MIP = (/"Amon", "Amon", "Amon"/)
+  MIP = (/"Amon", "Amon", "Amon", "Amon", "Amon"/)
 
   ; Frequency
-  FREQ = (/"mon", "mon", "mon"/)
+  FREQ = (/"mon", "mon", "mon", "mon", "mon"/)
 
   ; CMOR tables
   CMOR_TABLE = getenv("cmor_tables") + "/cmip5/Tables/CMIP5_" + MIP
@@ -120,34 +122,68 @@ begin
 
       if (isStrSubset(MIP(vv), "mon")) then
         if (ens.eq."mean") then
-	  name = NAME(vv)
-          if (any(NAME(vv).eq.(/"uwnd", "vwnd"/)).and.SUBDIR(vv).eq."surface/") then
-            fname = input_dir_path + "ensemble_mean/" + SUBDIR(vv) + NAME(vv) + ".10m.mon.mean.nc"
+	  name = NAME_ensmean(vv)
+          if (any(name.eq.(/"uwnd", "vwnd"/)).and.SUBDIR(vv).eq."surface/") then
+            fname = input_dir_path + "ensemble_mean/" + SUBDIR(vv) + name + ".10m.mon.mean.nc"
           else
-            fname = input_dir_path + "ensemble_mean/" + SUBDIR(vv) + NAME(vv) + ".mon.mean.nc"
+            fname = input_dir_path + "ensemble_mean/" + SUBDIR(vv) + name + ".mon.mean.nc"
           end if
 	else
-          if (NAME(vv).eq."uwnd" .and. SUBDIR(vv).eq."surface/") then
-	    name = "UGRD10m"
-          elseif (NAME(vv).eq."vwnd" .and. SUBDIR(vv).eq."surface/") then
-	    name = "VGRD10m"
-          elseif (NAME(vv).eq."prmsl") then
-  	    name = "PRMSL"
-	  end if
-	  fname = systemfunc("ls "+input_dir_path + "every_member/" + SUBDIR(vv) + name + "/*/" + name + ".*.mnmean_mem"+ens+".nc")
+          name = NAME_members(vv)
+          if (SUBDIR(vv).eq."surface/") then
+            fname = systemfunc("ls "+input_dir_path + "every_member/" + SUBDIR(vv) + name + "/{"+YEAR1+".."+YEAR2+"}/" + name + ".*.mnmean_mem"+ens+".nc")
+          else
+            fname_head = input_dir_path + "every_member/" + SUBDIR(vv) + "/*/" + name 
+            fname_tail = ".*.mnmean_mem"+ens+".nc"
+          end if
         end if
       end if
 
-      if (dimsizes(fname).eq.1) then
-        f = addfile(fname, "r")
-        tmp = f->$name$
+      if (isvar("fname")) then
+        if (dimsizes(fname).eq.1) then
+          f = addfile(fname, "r")
+          tmp = f->$name$
+        else
+          f = addfiles(fname, "r")
+          ListSetType(f, "cat")
+          tmp = f[:]->$name$
+        end if
+        delete(fname)
+        delete(f)
       else
-        f = addfiles(fname, "r")
-        ListSetType(f, "cat")
-        tmp = f[:]->$name$
+        fname_head_YEAR1 = str_sub_str(fname_head, "*", YEAR1)
+        fname_tail_YEAR1 = str_sub_str(fname_tail, "*", YEAR1)
+        fname = systemfunc("ls "+fname_head_YEAR1+"*"+fname_tail_YEAR1)
+        zsize = dimsizes(fname)
+        lev = new(zsize, "integer")
+        do z = 0, zsize - 1
+          lev(z) = toint(str_sub_str(str_sub_str(fname(z), fname_head_YEAR1, ""), fname_tail_YEAR1, ""))
+        end do
+        qsort(lev)
+        lev = lev(::-1)
+        delete(fname)
+        do z = 0, zsize - 1
+          fname = systemfunc("ls "+str_sub_str(fname_head, "*", "{"+YEAR1+".."+YEAR2+"}")+lev(z)+fname_tail)
+          f = addfiles(fname, "r")
+          ListSetType(f, "cat")
+          if (z.eq.0) then
+            tmptmp = f[:]->$name$
+            dims = dimsizes(tmptmp)
+            dims(1) = zsize
+            tmp = new(dims, typeof(tmptmp))
+printVarSummary(tmp)
+            delete(dims)
+            delete(tmptmp)
+          end if
+          tmptmp = f[:]->$name$
+printVarSummary(tmptmp)
+          tmp(:, z:z, :, :) = tmptmp
+          delete(tmptmp)
+          delete(fname)
+          delete(f)
+        end do
+        delete(lev)
       end if
-      delete(fname)
-      delete(f)
       fill_start = num(ismissing(tmp))
 
       ; Extract time range
@@ -206,7 +242,7 @@ begin
         output!1 = "plev"
         output!2 = "lat"
         output!3 = "lon"
-        output&plev = output&plev * 100.  ; [mb] --> [Pa]
+;        output&plev = output&plev * 100.  ; [mb] --> [Pa]
       elseif (rank.eq.3)
         output!1 = "lat"
         output!2 = "lon"
