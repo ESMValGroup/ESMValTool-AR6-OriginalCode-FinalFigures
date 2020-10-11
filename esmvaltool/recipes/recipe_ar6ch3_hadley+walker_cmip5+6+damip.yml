@@ -709,6 +709,166 @@ diagnostics:
              tier: 3, end_year: 2013}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1,
              tier: 3}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "001", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "002", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "003", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "004", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "005", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "006", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "007", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "008", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "009", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "010", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "011", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "012", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "013", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "014", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "015", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "016", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "017", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "018", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "019", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "020", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "021", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "022", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "023", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "024", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "025", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "026", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "027", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "028", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "029", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "030", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "031", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "032", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "033", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "034", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "035", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "036", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "037", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "038", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "039", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "040", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "041", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "042", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "043", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "044", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "045", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "046", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "047", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "048", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "049", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "050", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "051", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "052", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "053", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "054", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "055", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "056", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "057", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "058", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "059", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "060", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "061", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "062", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "063", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "064", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "065", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "066", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "067", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "068", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "069", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "070", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "071", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "072", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "073", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "074", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "075", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "076", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "077", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "078", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "079", 
+             tier: 2}
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: "080", 
+             tier: 2}
           - {project: CMIP6, exp: amip, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
           - {project: CMIP6, exp: amip, dataset: ACCESS-CM2, ensemble: r2i1p1f1, grid: gn}
           - {project: CMIP6, exp: amip, dataset: ACCESS-CM2, ensemble: r3i1p1f1, grid: gn}
