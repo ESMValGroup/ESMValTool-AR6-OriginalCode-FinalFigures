@@ -14,10 +14,13 @@
 ;
 ; Download and processing instructions
 ; Download with scripts based on ECMWF WebAPI.
-;  surfacex/
-;  msl.1901-2010.ens{0-9}.nc
-;  u10.1901-2010.ens{0-9}.nc
-;  v10.1901-2010.ens{0-9}.nc
+;  pressure/
+;   u.1901-2010.ens{0-9}.nc
+;   u.1901-2010.ens{0-9}.nc 
+;  surface/
+;   msl.1901-2010.ens{0-9}.nc
+;   u10.1901-2010.ens{0-9}.nc
+;   v10.1901-2010.ens{0-9}.nc
 ;
 ; Modification history
 ;    20201007-yu_kosaka: added ua and va.
@@ -201,8 +204,12 @@ begin
       delete(bounds)
 
       ; Add height coordinate to tas variable (required by the new backend)
-      if (VAR(vv).eq."tas") then
-        height = 2.d
+      if (any(VAR(vv).eq.(/"tas", "uas", "vas"/))) then
+        if (VAR(vv).eq."tas") then
+          height = 2.d
+        else
+          height = 10.d
+        end if
         height!0 = "ncl_scalar"
         height@units = "m"
         height@axis = "Z"

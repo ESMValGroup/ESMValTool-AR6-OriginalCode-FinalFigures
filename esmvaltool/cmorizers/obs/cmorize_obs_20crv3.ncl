@@ -18,6 +18,8 @@
 ;
 ;    Subdirectory ensemble_mean/pressure/:
 ;      ftp://ftp.cdc.noaa.gov/Datasets/20thC_ReanV3/Monthlies/prsSI-MO/
+;        uwnd.mon.mean.nc
+;        vwnd.mon.mean.nc
 ;
 ;    Subdirectory ensemble_mean/surface/:
 ;      ftp://ftp2.psl.noaa.gov/Datasets/20thC_ReanV3/Monthlies/miscSI-MO/
@@ -31,12 +33,17 @@
 ;    same file and variable name, save the data in two different subdirectories
 ;    "pressure" and "surface" in input_dir_path.
 ;
-;   Subdirectory every_member/pressure/:
+;    Subdirectory every_member/pressure/:
+;     for lev in 1000 850 500 200
+;     do
+;      wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD${lev}/UGRD${lev}_{1806..2015}_mnmean.tar
+;      wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/VGRD${lev}/VGRD${lev}_{1806..2015}_mnmean.tar
+;    done
 ;
-;   Subdirectory every_member/surface/:
-;    wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/PRMSL/PRMSL_{1806..2015}_mnmean.tar
-;    wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD10m/UGRD10m_{1806..2015}_mnmean.tar
-;    wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD10m/UGRD10m_{1806..2015}_mnmean.tar
+;    Subdirectory every_member/surface/:
+;     wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/PRMSL/PRMSL_{1806..2015}_mnmean.tar
+;     wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD10m/UGRD10m_{1806..2015}_mnmean.tar
+;     wget https://portal.nersc.gov/archive/home/projects/incite11/www/20C_Reanalysis_version_3/everymember_anal_netcdf/mnmean/UGRD10m/UGRD10m_{1806..2015}_mnmean.tar
 ;
 ;    Specify the time range of the data as YEAR1-YEAR2 below, considering only
 ;    complete years (Jan to Dec).
@@ -291,8 +298,12 @@ printVarSummary(tmptmp)
       delete(bounds)
 
       ; Add height coordinate to tas variable (required by the new backend)
-      if (VAR(vv).eq."tas") then
-        height = 2.d
+      if (any(VAR(vv).eq.(/"tas", "uas", "vas"/))) then
+        if (VAR(vv).eq."tas") then
+          height = 2.d
+        else
+          height = 10.d
+        end if
         height!0 = "ncl_scalar"
         height@units = "m"
         height@axis = "Z"
