@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20201009 kosaka_yu: enabled to handle ensemble reanayses for u and v.
 ;    20200825 kosaka_yu: calculate multimodel means individually for CMIP5 and CMIP6.
 ;    20200513 kosaka_yu: cleaned up.
 ;    20191130 kosaka_yu: bug fix for monsoon circulation index.
@@ -605,6 +606,9 @@ begin
       dataset = infoU[ii]@dataset
       if (isatt(infoU[ii], "ensemble")) then
         ensemble = infoU[ii]@ensemble
+      elseif (any(dataset.eq.(/"20CRv3", "20CRv2c", "20CRv2", "CERA-20C"/))) then
+        ensemble = str_sub_str(str_sub_str(infoU[ii]@alias, infoU[ii]@project+"_", ""), \
+                               infoU[ii]@dataset+"_", "")
       end if
       
       u = read_data(infoU[ii])
@@ -630,6 +634,7 @@ begin
       uMonsoon@smonth_SHsummer = smonth_SHsummer
       uMonsoon@emonth_SHsummer = emonth_SHsummer
       if (isvar("ensemble")) then
+        uMonsoon@ensemble = ensemble
         nc_filename = work_dir + "u_monsoon_"+dataset+"_"+ensemble+".nc"
       else
         nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
@@ -687,6 +692,9 @@ begin
       dataset = infoV[ii]@dataset
       if (isatt(infoV[ii], "ensemble")) then
         ensemble = infoV[ii]@ensemble
+      elseif (any(dataset.eq.(/"20CRv3", "20CRv2c", "20CRv2", "CERA-20C"/))) then
+        ensemble = str_sub_str(str_sub_str(infoV[ii]@alias, infoV[ii]@project+"_", ""), \
+                                           infoV[ii]@dataset+"_", "")
       end if
       
       v = read_data(infoV[ii])
@@ -713,6 +721,7 @@ begin
       vMonsoon@smonth_SHsummer = smonth_SHsummer
       vMonsoon@emonth_SHsummer = emonth_SHsummer
       if (isvar("ensemble")) then
+        vMonsoon@ensemble = ensemble
         nc_filename = work_dir + "v_monsoon_"+dataset+"_"+ensemble+".nc"
       else
         nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
@@ -932,7 +941,7 @@ begin
       if (.not.isatt(pr, "_FillValue")) then
         pr@_FillValue = default_fillvalue(typeof(pr))
       end if
-      
+
       if (varying_domain) then
         opt = True
         opt@smonth_NHsummer = smonth_NHsummer
@@ -1022,6 +1031,7 @@ begin
         work_dir = config_user_info@work_dir + "/"
         system("mkdir -p " + work_dir)
         if (isatt(infoPr[ii], "ensemble")) then
+          GMpr@ensemble = infoPr[ii]@ensemble
           nc_filename = work_dir + "GMprecip_summer_"\
                          + infoPr[ii]@dataset + "_" + infoPr[ii]@ensemble + ".nc"
         else
@@ -1058,6 +1068,7 @@ begin
         NHMpr@dataset = infoPr[ii]@dataset
 
         if (isatt(infoPr[ii], "ensemble")) then
+          NHMpr@ensemble = infoPr[ii]@ensemble
           nc_filename = work_dir + "NHMprecip_summer_" + infoPr[ii]@dataset \
                          + "_" + infoPr[ii]@ensemble + ".nc"
         else
@@ -1078,7 +1089,7 @@ begin
         delete(SHMpr@lat)
         clim = avg(SHMpr({syear_clim:eyear_clim}))
         SHMpr = SHMpr - clim
-        NHMpr@long_name = "NH summer monsoon precipitation anomaly"
+        SHMpr@long_name = "SH summer monsoon precipitation anomaly"
         if (scale_monsoonPr) then
           SHMpr = SHMpr / clim
           SHMpr@units = ""
@@ -1093,6 +1104,7 @@ begin
         SHMpr@dataset = infoPr[ii]@dataset
 
         if (isatt(infoPr[ii], "ensemble")) then
+          SHMpr@ensemble = infoPr[ii]@ensemble
           nc_filename = work_dir + "SHMprecip_summer_" + infoPr[ii]@dataset \
                          + "_"+infoPr[ii]@ensemble + ".nc"
         else
@@ -1161,9 +1173,19 @@ begin
 
         work_dir = config_user_info@work_dir + "/"
         system("mkdir -p " + work_dir)
+
         if (isatt(infoU[ii], "ensemble")) then
+          ensemble = infoU[ii]@ensemble
+        elseif (any(infoU[ii]@dataset.eq.(/"20CRv3", "20CRv2c", "20CRv2", "CERA-20C"/))) then
+          ensemble = str_sub_str(str_sub_str(infoU[ii]@alias, infoU[ii]@project+"_", ""), \
+                                 infoU[ii]@dataset+"_", "")
+        end if
+        
+        if (isvar("ensemble")) then
+          NHMu@ensemble = ensemble
           nc_filename = work_dir + "NHMcirculation_summer_" \
-                         + infoU[ii]@dataset + "_" + infoU[ii]@ensemble + ".nc"
+                         + infoU[ii]@dataset + "_" + ensemble + ".nc"
+          delete(ensemble)
         else
           nc_filename = work_dir + "NHMcirculation_summer_" \
                          + infoU[ii]@dataset + ".nc"

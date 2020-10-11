@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20201010 kosaka_yu: added ensemble reanalyses.
 ;    20200824 kosaka_yu: changed figure layouts.
 ;    20200514 kosaka_yu: enabled specifying plots to draw; cleaned up the codes
 ;    20191030 kosaka_yu: written.
@@ -43,20 +44,26 @@ begin
 
   enter_msg(DIAG_SCRIPT, "")
 
-  colors_satellite = (/"purple", "orange", "brown"/)
+;  colors_satellite = (/"purple", "orange", "brown"/)
   colors_satellite = (/"black", "black", "black"/)
   patterns_satellite = (/14, 16, 6/)
   seglens_satellite = (/0.05, 0.06, 0.15 /)
-  colors_insitu = (/"green", "blue", "darkorchid4", "deepping4"/)
+;  colors_insitu = (/"green", "blue", "darkorchid4", "deepping4"/)
   colors_insitu = (/"black", "black", "black", "black"/)
   patterns_insitu = (/0, 3, 2, 1/)
   seglens_insitu = (/0.15, 0.1, 0.05, 0.15/)
   
-  colors_reanal = (/"blue3", "darkgreen", "darkslategray", "darkseagreen"/)
-  colors_reanal = (/"black", "black", "black", "black"/)
-  patterns_reanal = (/0, 1, 14, 7/)
-  seglens_reanal = (/0.15, 0.1, 0.05, 0.15 /)
+  colors_reanal_single = (/"black", "black", "black", "black"/)
+;  patterns_reanal_single = (/0, 1, 14, 7/)
+;  seglens_reanal_single = (/0.15, 0.1, 0.05, 0.15 /)
+  patterns_reanal_single = (/7, 0, 1, 14/)
+  seglens_reanal_single = (/0.15, 0.15, 0.1, 0.05/)
 
+  obs_reanal_ens = (/"20CRv2", "20CRv2c", "20CRv3", "CERA-20C"/)
+  colors_reanal_ens = (/"grey40", "grey40"/)
+  patterns_reanal_ens = (/3, 2/)
+  fillscale_reanal_ens = (/0.8, 0.8/)
+  
   color_CMIP6 = (/204., 35., 35./)/255.
   color_CMIP5 = (/37., 81., 204./)/255.
   color_AMIP  = (/236., 156., 46./)/255.  ; (/236., 209., 81./)/255.
@@ -653,11 +660,6 @@ begin
       if (moving_ave.gt.1) then
         tmp = wgt_runave_n(tmp, wgt, 0, 0)
       end if
-;      if (isatt(tmp, "experiment_id")) then
-;        print(tmp@dataset+" "+tmp@experiment_id)
-;      else
-;        print(tmp@dataset)
-;      end if
       if (any(tmp@project \
               .eq.(/"obs", "OBS", "OBS6", "obs4mips", "ana4mips"/))) then
         if (.not.isdefined("gObs")) then
@@ -691,56 +693,47 @@ begin
       delete(tmp)
     end do
 
-    syear = 999999
-    eyear = -999999
-    nobs = ListCount(gObs)
-    do ii = 0, nobs-1
-      syear = min((/toint(gObs[ii]&time(0)), syear/))
-      eyear = max((/toint(gObs[ii]&time(dimsizes(gObs[ii]&time)-1)), eyear/))
-    end do
-    GMprObs = new((/ nobs, eyear-syear+1 /), "float")
-    GMprObs!0 = "dset"
-    GMprObs!1 = "time"
-    GMprObs&dset = ispan(1, nobs, 1)
-    GMprObs&time = ispan(syear, eyear, 1)
+    dataset_obs = get_unique_values(metadata_att_as_array(gObs, "dataset"))
+    nobs = dimsizes(dataset_obs)
     icolor_satellite = 0
     icolor_insitu = 0
-    colors   = new(nobs, "string")
-    patterns = new(nobs, "integer")
-    seglens  = new(nobs, "float")
     do ii = 0, nobs-1
-      syr = gObs[ii]&time(0)
-      eyr = gObs[ii]&time(dimsizes(gObs[ii]&time)-1)
-      GMprObs(ii, {syr:eyr}) = (/ gObs[ii] /)
-      if (gObs[ii]@units.eq."") then
-        GMprObs(ii, :) = GMprObs(ii, :) * 100.
-        GMprObs@units = "%"
+      if (.not.isdefined("GMprObsSingle")) then
+        GMprObsSingle = NewList("fifo")
+      end if
+      idx = ind(metadata_att_as_array(gObs, "dataset").eq.dataset_obs(ii))
+      tmp = (/gObs[idx]/)
+      tmp!0 = "time"
+      tmp&time = gObs[idx]&time
+      if (gObs[idx]@units.eq."") then
+        tmp = tmp * 100.
+        tmp@units = "%"
       else
-        GMprObs@units = gObs[ii]@units
+        tmp@units = gObs[idx]@units
       end if
 
-      if (any((/isStrSubset(gObs[ii]@dataset, "GPCP"), \
-              isStrSubset(gObs[ii]@dataset, "CMAP"), \
-              isStrSubset(gObs[ii]@dataset, "TRMM")/))) then
-        colors(ii) = colors_satellite(icolor_satellite)
-        patterns(ii) = patterns_satellite(icolor_satellite)
-        seglens(ii)  = seglens_satellite(icolor_satellite)
+      ListAppend(GMprObsSingle, new(dimsizes(tmp), typeof(tmp)))
+      kk = ListCount(GMprObsSingle) - 1
+      if (any((/isStrSubset(dataset_obs(ii), "GPCP"), \
+              isStrSubset(dataset_obs(ii), "CMAP"), \
+              isStrSubset(dataset_obs(ii), "TRMM")/))) then
+        tmp@color = colors_satellite(icolor_satellite)
+        tmp@pattern = patterns_satellite(icolor_satellite)
+        tmp@seglen = seglens_satellite(icolor_satellite)
         icolor_satellite = icolor_satellite+1
       else
-        colors(ii) = colors_insitu(icolor_insitu)
-        patterns(ii) = patterns_insitu(icolor_insitu)
-        seglens(ii)  = seglens_insitu(icolor_insitu)
+        tmp@color = colors_insitu(icolor_insitu)
+        tmp@pattern = patterns_insitu(icolor_insitu)
+        tmp@seglen = seglens_insitu(icolor_insitu)
         icolor_insitu = icolor_insitu+1
       end if
-      if (ii.eq.0) then
-        GMprObs@dataset := (/ gObs[ii]@dataset /)
-      else
-        GMprObs@dataset := array_append_record(GMprObs@dataset, \
-                                               gObs[ii]@dataset, 0)
-      end if
+      tmp@dataset = dataset_obs(ii)
+      GMprObsSingle[kk] = tmp
+      delete(tmp)
+      delete(idx)
     end do
     delete(gObs)
-
+      
     syear = 999999
     eyear = -999999
     nruns = ListCount(gCMIP6)
@@ -923,41 +916,69 @@ begin
         delete(tmp)
       end do
 
-      syear = 999999
-      eyear = -999999
-      nobsu = ListCount(uObs)
+      dataset_obsu = get_unique_values(metadata_att_as_array(uObs, "dataset"))
+      nobsu = dimsizes(dataset_obsu)
       do ii = 0, nobsu-1
-        syear = min((/toint(uObs[ii]&time(0)), syear/))
-        eyear = max((/toint(uObs[ii]&time(dimsizes(uObs[ii]&time)-1)), eyear/))
-      end do
-      NHMuObs = new((/ nobsu, eyear-syear+1 /), "float")
-      NHMuObs!0 = "dset"
-      NHMuObs!1 = "time"
-      NHMuObs&dset = ispan(1, nobsu, 1)
-      NHMuObs&time = ispan(syear, eyear, 1)
-
-      icolor_reanal = 0
-      colorsu   = new(nobsu, "string")
-      patternsu = new(nobsu, "integer")
-      seglensu  = new(nobsu, "float")
-      do ii = 0, nobsu-1
-        syr = uObs[ii]&time(0)
-        eyr = uObs[ii]&time(dimsizes(uObs[ii]&time)-1)
-        NHMuObs(ii, {syr:eyr}) = (/ uObs[ii] /)
-
-        colorsu(ii)   = colors_reanal(icolor_reanal)
-        patternsu(ii) = patterns_reanal(icolor_reanal)
-        seglensu(ii)  = seglens_reanal(icolor_reanal)
-        icolor_reanal = icolor_reanal+1
-        if (ii.eq.0) then
-          NHMuObs@dataset := (/ uObs[ii]@dataset /)
+        if (any(dataset_obsu(ii).eq.obs_reanal_ens)) then
+          if (.not.isdefined("NHMuObsEns")) then
+            NHMuObsEns = NewList("fifo")
+          end if
+          idx = ind(metadata_att_as_array(uObs, "dataset").eq.dataset_obsu(ii))
+          syear = -999999
+          eyear = 999999
+          do jj = 0, dimsizes(idx)-1
+            syear = max((/toint(uObs[idx(jj)]&time(0)), syear/))
+            eyear = min((/toint(uObs[idx(jj)]&time(dimsizes(uObs[idx(jj)]&time)-1)), eyear/))
+          end do
+          tmp = new((/dimsizes(idx), eyear-syear+1/), typeof(uObs[idx(0)]))
+          tmp!0 = "ensemble"
+          tmp!1 = "year"
+          tmp&year = ispan(syear, eyear, 1)
+          do jj = 0, dimsizes(idx)-1
+            tmp(jj, :) = (/uObs[idx(jj)]({syear:eyear})/)
+          end do
+;          tmpesize = tmp(:, 0)
+;          tmpesize = tofloat(dimsizes(idx))
+          ranges = new((/2, eyear-syear+1/), typeof(tmp))
+          ranges!1 = "time"
+          ranges&time = ispan(syear, eyear, 1)
+;          ranges(0, :) = (/weighted_percentile(tmp, 1./tmpesize, 0.05)/)
+;          ranges(1, :) = (/weighted_percentile(tmp, 1./tmpesize, 0.95)/)
+          ranges(0, :) = dim_min_n(tmp, 0)
+          ranges(1, :) = dim_max_n(tmp, 0)
+          
+          ListAppend(NHMuObsEns, new(dimsizes(ranges), typeof(ranges)))
+          kk = ListCount(NHMuObsEns) - 1
+          ranges@color = colors_reanal_ens(kk)
+          ranges@pattern = patterns_reanal_ens(kk)
+          ranges@dataset = dataset_obsu(ii)
+          ranges@fillscale = fillscale_reanal_ens(kk)
+          NHMuObsEns[kk] = ranges
+          delete(ranges)
+          delete(tmp)
+;          delete(tmpesize)
+          delete(idx)
         else
-          NHMuObs@dataset \
-            := array_append_record(NHMuObs@dataset, uObs[ii]@dataset, 0)
+          if (.not.isdefined("NHMuObsSingle")) then
+            NHMuObsSingle = NewList("fifo")
+          end if
+          idx = ind(metadata_att_as_array(uObs, "dataset").eq.dataset_obsu(ii))
+          tmp = (/uObs[idx]/)
+          tmp!0 = "time"
+          tmp&time = uObs[idx]&time
+          ListAppend(NHMuObsSingle, new(dimsizes(tmp), typeof(tmp)))
+          kk = ListCount(NHMuObsSingle) - 1
+          tmp@color = colors_reanal_single(kk)
+          tmp@pattern = patterns_reanal_single(kk)
+          tmp@seglen = seglens_reanal_single(kk)
+          tmp@dataset = dataset_obsu(ii)
+          NHMuObsSingle[kk] = tmp
+          delete(tmp)
+          delete(idx)
         end if
       end do
       delete(uObs)
-
+      
       syear = 999999
       eyear = -999999
       nruns = ListCount(uCMIP6)
@@ -1109,20 +1130,8 @@ begin
   resl := True
 ;  resl@tfPolyDrawOrder = "Draw"
 
-  x2 = 0.57
-  x3 = 0.61
-  xc = (x2 + x3)/2.
-  wLegend = 0.065
-  iLegend = 0.02
-  yLegend1 = 0.23
-  yLegend2 = 0.26
-  yLegendC = (yLegend1 + yLegend2)/2.
-  yLegend  = yLegendC - 0.004
-  done_CMIP5legend = False
-  done_CMIP6legend = False
-  done_AMIPlegend = False
   if (drawPr) then
-    range = max(abs(GMprObs))
+    range = 0.
     if (isvar("GMprCMIP6mean")) then
       range = max((/range, max(abs(GMprCMIP6_5th))/))
       range = max((/range, max(abs(GMprCMIP6_95th))/))
@@ -1138,6 +1147,12 @@ begin
       range = max((/range, max(abs(GMprAMIP_95th))/))
       pr_units = GMprAMIPmean@units
     end if
+    if (isdefined("GMprObsSingle")) then
+      do jj = 0, ListCount(GMprObsSingle)-1
+        range = max((/range, max(abs(GMprObsSingle[jj]))/))
+      end do
+    end if
+
     ranges := (/2., 3., 4., 5., 6., 7., 8., 10., 12., 15., 20., 30., 40., 50., 60., 70., 80., 100./)
     rests@trYMaxF = min(where(ranges.lt.range, 9999., ranges))
     rests@trYMinF = -rests@trYMaxF
@@ -1189,20 +1204,6 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprCMIP5mean&time, GMprCMIP5mean, resl)
       idummy = idummy + 1
-
-      x4 = x3 + wLegend
-      gsn_polygon_ndc(wks, (/x3,x3,x4,x4/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-      gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
-      txres@txJust = "TopCenter"
-      txres@txFontColor := resp@gsFillColor
-      txres@txFontHeightF = 0.012
-      gsn_text_ndc(wks, "CMIP5", (x3+x4)/2., yLegend1-0.004, txres)
-      if (all((/nruns_CMIP5_pr, nmodels_CMIP5_pr/).eq.(/nruns_CMIP5_u, nmodels_CMIP5_u/))) then
-        txres@txFontHeightF = 0.008
-        gsn_text_ndc(wks, nmodels_CMIP5_pr+"models, "+nruns_CMIP5_pr+"runs", (x3+x4)/2., yLegend1-0.02, txres)
-      end if
-      done_CMIP5legend = True
-      x3 = x4 + iLegend
     end if
 
     if (isvar("GMprCMIP6mean")) then
@@ -1217,30 +1218,6 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprCMIP6mean&time, GMprCMIP6mean, resl)
       idummy = idummy + 1
-
-      x1 = x2 - wLegend
-      gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-      gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
-      txres@txJust = "TopCenter"
-      txres@txFontColor := resp@gsFillColor
-      txres@txFontHeightF = 0.012
-      gsn_text_ndc(wks, "CMIP6", (x1+x2)/2., yLegend1-0.004, txres)
-      if (all((/nruns_CMIP6_pr, nmodels_CMIP6_pr/).eq.(/nruns_CMIP6_u, nmodels_CMIP6_u/))) then
-        txres@txFontHeightF = 0.008
-        gsn_text_ndc(wks, nmodels_CMIP6_pr+"models, "+nruns_CMIP6_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
-      end if
-      txres@txFontColor := "black"
-      txres@txFontHeightF = 0.01
-;      txres@txJust = "CenterLeft"
-;      gsn_text_ndc(wks, "95th", x2+0.004, yLegend2, txres)
-;      gsn_text_ndc(wks, "mean", x2+0.004, yLegendC, txres)
-;      gsn_text_ndc(wks, "5th",  x2+0.004, yLegend1, txres)
-      txres@txJust = "CenterCenter"
-      gsn_text_ndc(wks, "95th", xc, yLegend2, txres)
-      gsn_text_ndc(wks, "mean", xc, yLegendC, txres)
-      gsn_text_ndc(wks, "5th",  xc, yLegend1, txres)
-      done_CMIP6legend = True
-      x2 = x1 - iLegend
     end if
 
     if (isvar("GMprAMIPmean")) then
@@ -1255,67 +1232,26 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprAMIPmean&time, GMprAMIPmean, resl)
       idummy = idummy + 1
-
-;      x4 = x3 + wLegend
-;      gsn_polygon_ndc(wks, (/x3,x3,x4,x4/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-;      gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
-;      txres@txJust = "TopCenter"
-;      txres@txFontColor := resp@gsFillColor
-;      txres@txFontHeightF = 0.012
-;      gsn_text_ndc(wks, "AMIP", (x3+x4)/2., yLegend1-0.004, txres)
-;      if (all((/nruns_AMIP_pr, nmodels_AMIP_pr/).eq.(/nruns_AMIP_u, nmodels_AMIP_u/))) then
-;        txres@txFontHeightF = 0.008
-;        gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs", (x3+x4)/2., yLegend1-0.02, txres)
-;      end if
-;      done_AMIPlegend = True
-;      x3 = x4 + iLegend
-
-      x1 = x2 - wLegend - 0.01
-      x2 = x2 - 0.01
-      gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-      gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
-      txres@txJust = "TopCenter"
-      txres@txFontColor := resp@gsFillColor
-      txres@txFontHeightF = 0.012
-      gsn_text_ndc(wks, "AMIP", (x1+x2)/2., yLegend1-0.004, txres)
-      if (all((/nruns_AMIP_pr, nmodels_AMIP_pr/).eq.(/nruns_AMIP_u, nmodels_AMIP_u/))) then
-        txres@txFontHeightF = 0.008
-        gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
-      end if
-      done_AMIPlegend = True
-      x2 = x1 - iLegend
     end if
 
-    if (isvar("GMprObs")) then
+    if (isdefined("GMprObsSingle")) then
       resl@gsLineThicknessF = 1.5
-      do n = 0, nobs-1
-        resl@gsLineColor := colors(n)
-        resl@gsLineDashPattern = patterns(n)
-        resl@gsLineDashSegLenF = seglens(n)
-        dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprObs&time, GMprObs(n, :), resl)
+      do n = 0, ListCount(GMprObsSingle)-1
+        resl@gsLineColor := GMprObsSingle[n]@color
+        resl@gsLineDashPattern = GMprObsSingle[n]@pattern
+        resl@gsLineDashSegLenF = GMprObsSingle[n]@seglen
+        dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprObsSingle[n]&time, GMprObsSingle[n], resl)
         idummy = idummy + 1
-
-        x1 = x2 - wLegend
-        gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
-        txres@txJust = "TopCenter"
-        txres@txFontColor := resl@gsLineColor
-        txres@txFontHeightF = 0.012
-        if (GMprObs@dataset(n).eq."GPCP-SG") then
-          gsn_text_ndc(wks, "GPCP", (x1+x2)/2., yLegend, txres)
-        else
-          gsn_text_ndc(wks, GMprObs@dataset(n), (x1+x2)/2., yLegend, txres)
-        end if
-        x2 = x1 - iLegend
-        delete(resl@gsLineDashSegLenF)
       end do
     end if
+
   end if
 
   if (drawCirc) then
     restsu = rests
 ;    restsu@tmYLPrecision = 1
 ;    restsu@tmYLLabelJust = "CenterCenter"
-    range = max(abs(NHMuObs))
+    range = 0.
     if (isvar("NHMuCMIP6mean")) then
       range = max((/range, max(abs(NHMuCMIP6_5th))/))
       range = max((/range, max(abs(NHMuCMIP6_95th))/))
@@ -1328,7 +1264,17 @@ begin
       range = max((/range, max(abs(NHMuAMIP_5th))/))
       range = max((/range, max(abs(NHMuAMIP_95th))/))
     end if
-    
+    if (isdefined("NHMuObsEns")) then
+      do jj = 0, ListCount(NHMuObsEns)-1
+        range = max((/range, max(abs(NHMuObsEns[jj]))/))
+      end do
+    end if
+    if (isdefined("NHMuObsSingle")) then
+      do jj = 0, ListCount(NHMuObsSingle)-1
+        range = max((/range, max(abs(NHMuObsSingle[jj]))/))
+      end do
+    end if
+
     ranges := (/1.5, 1.8, 2., 2.2, 2.4, 2.6, 2.8, 3., 3.5, 4., 6., 8., 10., 15., 20./)
     restsu@trYMaxF = min(where(ranges.lt.range, 9999., ranges))
     restsu@trYMinF = -restsu@trYMaxF
@@ -1341,11 +1287,11 @@ begin
     restsu@gsnLeftString = "(d)"
     restsu@gsnLeftStringOrthogonalPosF = restsu@gsnCenterStringOrthogonalPosF - 0.02
     restsu@tiYAxisString = "(m s~S~-1~N~)"
-    plotts(1) = gsn_csm_xy(wks, (/rests@trXMinF, rests@trXMaxF/), (/NHMuCMIP6mean@_FillValue, NHMuCMIP6mean@_FillValue/), restsu)
+    plotts(1) = gsn_csm_xy(wks, (/restsu@trXMinF, restsu@trXMaxF/), (/NHMuCMIP6mean@_FillValue, NHMuCMIP6mean@_FillValue/), restsu)
 
     if (isvar("syear_clim").and.isvar("eyear_clim")) then
       x := (/syear_clim, syear_clim, eyear_clim, eyear_clim/)
-      y := (/rests@trYMinF, rests@trYMaxF, rests@trYMaxF, rests@trYMinF/)
+      y := (/restsu@trYMinF, restsu@trYMaxF, restsu@trYMaxF, restsu@trYMinF/)
       resp@gsFillColor := "grey75"
       dummy(idummy) = gsn_add_polygon(wks, plotts(1), x, y, resp)
       idummy = idummy + 1
@@ -1363,18 +1309,6 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuCMIP5mean&time, NHMuCMIP5mean, resl)
       idummy = idummy + 1
-
-      if (.not.done_CMIP5legend) then
-        x4 = x3 + wLegend
-        gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-        gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
-        txres@txJust = "TopCenter"
-        txres@txFontColor := resp@gsFillColor
-        txres@txFontHeightF = 0.012
-        gsn_text_ndc(wks, "CMIP5", (x1+x2)/2., yLegend1-0.004, txres)
-        done_CMIP5legend = True
-        x3 = x4 + iLegend
-      end if
     end if
     if (isvar("NHMuCMIP6mean")) then
       x := array_append_record(NHMuCMIP6_5th&time, NHMuCMIP6_95th&time(::-1), 0)
@@ -1388,28 +1322,6 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuCMIP6mean&time, NHMuCMIP6mean, resl)
       idummy = idummy + 1
-      
-      if (.not.done_CMIP6legend) then
-        x1 = x2 - wLegend
-        gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-        gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
-        txres@txJust = "TopCenter"
-        txres@txFontColor := resp@gsFillColor
-        txres@txFontHeightF = 0.012
-        gsn_text_ndc(wks, "CMIP6", (x1+x2)/2., yLegend1-0.004, txres)
-        txres@txFontColor := "black"
-        txres@txFontHeightF = 0.01
-;        txres@txJust = "CenterLeft"
-;        gsn_text_ndc(wks, "95th", x2+0.004, yLegend2, txres)
-;        gsn_text_ndc(wks, "mean", x2+0.004, yLegendC, txres)
-;        gsn_text_ndc(wks, "5th",  x2+0.004, yLegend1, txres)
-        txres@txJust = "CenterCenter"
-        gsn_text_ndc(wks, "95th", xc, yLegend2, txres)
-        gsn_text_ndc(wks, "mean", xc, yLegendC, txres)
-        gsn_text_ndc(wks, "5th",  xc, yLegend1, txres)
-        done_CMIP6legend = True
-        x2 = x1 - iLegend
-      end if
     end if
     if (isvar("NHMuAMIPmean")) then
       x := array_append_record(NHMuAMIP_5th&time, NHMuAMIP_95th&time(::-1), 0)
@@ -1423,42 +1335,193 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuAMIPmean&time, NHMuAMIPmean, resl)
       idummy = idummy + 1
-      
-      if (.not.done_AMIPlegend) then
-        x4 = x3 + wLegend
-        gsn_polygon_ndc(wks, (/x3,x3,x4,x4/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
-        gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
-        txres@txJust = "TopCenter"
-        txres@txFontColor := resp@gsFillColor
-        txres@txFontHeightF = 0.012
-        gsn_text_ndc(wks, "AMIP", (x3+x4)/2., yLegend1-0.004, txres)
-        txres@txFontHeightF = 0.008
-        gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
-        done_AMIPlegend = True
-        x3 = x4 + iLegend
-      end if
     end if
-    if (isvar("NHMuObs")) then
-      resl@gsLineThicknessF = 1.5
-      do n = 0, nobsu-1
-        resl@gsLineColor := colorsu(n)
-        resl@gsLineDashPattern = patternsu(n)
-        resl@gsLineDashSegLenF = seglensu(n)
-        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObs&time, NHMuObs(n, :), resl)
+    if (isvar("NHMuObsEns")) then
+      resl@gsLineThicknessF = 1.
+      do n = 0, ListCount(NHMuObsEns)-1
+        resp@gsFillColor := NHMuObsEns[n]@color
+        resp@gsFillIndex = NHMuObsEns[n]@pattern
+        resp@gsFillScaleF = NHMuObsEns[n]@fillscale
+        resp@gsFillLineThicknessF = resl@gsLineThicknessF
+        x := array_append_record(NHMuObsEns[n]&time, NHMuObsEns[n]&time(::-1), 0)
+        y := array_append_record(NHMuObsEns[n](0, :), NHMuObsEns[n](1, ::-1), 0)
+        dummy(idummy) = gsn_add_polygon(wks, plotts(1), x, y, resp)
         idummy = idummy + 1
-        
-        x4 = x3 + wLegend
-        gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
-        txres@txJust = "TopCenter"
-        txres@txFontColor := resl@gsLineColor
-        txres@txFontHeightF = 0.012
-        gsn_text_ndc(wks, NHMuObs@dataset(n), (x3+x4)/2., yLegend, txres)
-        x3 = x4 + iLegend
-        delete(resl@gsLineDashSegLenF)
+        delete(x)
+        delete(y)
+        resl@gsLineColor := NHMuObsEns[n]@color
+        resl@gsLineDashPattern = 0
+        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsEns[n]&time, NHMuObsEns[n](0, :), resl)
+        idummy = idummy + 1
+        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsEns[n]&time, NHMuObsEns[n](1, :), resl)
+        idummy = idummy + 1
       end do
     end if
+    if (isvar("NHMuObsSingle")) then
+      resl@gsLineThicknessF = 1.5
+      do n = 0, ListCount(NHMuObsSingle)-1
+        resl@gsLineColor := NHMuObsSingle[n]@color
+        resl@gsLineDashPattern = NHMuObsSingle[n]@pattern
+        resl@gsLineDashSegLenF = NHMuObsSingle[n]@seglen
+        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsSingle[n]&time, NHMuObsSingle[n], resl)
+        idummy = idummy + 1
+      end do
+    end if
+    
   end if
 
+; Legend
+  x2 = 0.51  ; 0.57
+  x3 = 0.54  ; 0.61
+  wLegend = 0.06
+  iLegend = 0.015
+  yLegend1 = 0.23
+  yLegend2 = 0.26
+  yLegendC = (yLegend1 + yLegend2)/2.
+  yLegend  = yLegendC - 0.004
+  xc = (x2 + x3)/2.
+  if (isvar("GMprCMIP5mean").or.isvar("NHMuCMIP5mean")) then
+    resp@gsFillIndex = 0
+    resp@gsFillColor := color_CMIP5
+    resl@gsLineColor := resp@gsFillColor
+    resl@gsLineThicknessF = 2.5
+    resl@gsLineDashPattern = 0
+    x4 = x3 + wLegend
+    gsn_polygon_ndc(wks, (/x3,x3,x4,x4/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
+    gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
+    txres@txJust = "TopCenter"
+    txres@txFontColor := resp@gsFillColor
+    txres@txFontHeightF = 0.012
+    gsn_text_ndc(wks, "CMIP5", (x3+x4)/2., yLegend1-0.004, txres)
+    if (all((/nruns_CMIP5_pr, nmodels_CMIP5_pr/).eq.(/nruns_CMIP5_u, nmodels_CMIP5_u/))) then
+      txres@txFontHeightF = 0.008
+      gsn_text_ndc(wks, "    "+nmodels_CMIP5_pr+"models, "+nruns_CMIP5_pr+"runs", (x3+x4)/2., yLegend1-0.02, txres)
+    end if
+    x3 = x4 + iLegend
+  end if
+  if (isvar("GMprCMIP6mean").or.isvar("NHMuCMIP6mean")) then
+    resp@gsFillIndex = 0
+    resp@gsFillColor := color_CMIP6
+    resl@gsLineColor := resp@gsFillColor
+    resl@gsLineThicknessF = 2.5
+    resl@gsLineDashPattern = 0
+    x1 = x2 - wLegend
+    gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
+    gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
+    txres@txJust = "TopCenter"
+    txres@txFontColor := resp@gsFillColor
+    txres@txFontHeightF = 0.012
+    gsn_text_ndc(wks, "CMIP6", (x1+x2)/2., yLegend1-0.004, txres)
+    if (all((/nruns_CMIP6_pr, nmodels_CMIP6_pr/).eq.(/nruns_CMIP6_u, nmodels_CMIP6_u/))) then
+      txres@txFontHeightF = 0.008
+      gsn_text_ndc(wks, nmodels_CMIP6_pr+"models, "+nruns_CMIP6_pr+"runs", (x1+x2)/2., yLegend1-0.02, txres)
+    end if
+    txres@txFontColor := "black"
+    txres@txFontHeightF = 0.008
+    txres@txJust = "CenterCenter"
+    gsn_text_ndc(wks, "95th", xc, yLegend2, txres)
+    gsn_text_ndc(wks, "mean", xc, yLegendC, txres)
+    gsn_text_ndc(wks, "5th",  xc, yLegend1, txres)
+    x2 = x1 - iLegend
+  end if
+  if (isvar("GMprAMIPmean").or.isvar("NHMuAMIPmean")) then
+    resp@gsFillIndex = 0
+    resp@gsFillColor := color_AMIP
+    resl@gsLineColor := resp@gsFillColor
+    resl@gsLineThicknessF = 2.5
+    resl@gsLineDashPattern = 0
+    x1 = x2 - wLegend - 0.015
+    x2 = x2 - 0.015
+    gsn_polygon_ndc(wks, (/x1,x1,x2,x2/), (/yLegend1,yLegend2,yLegend2,yLegend1/), resp)
+    gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
+    txres@txJust = "TopCenter"
+    txres@txFontColor := resp@gsFillColor
+    txres@txFontHeightF = 0.012
+    gsn_text_ndc(wks, "AMIP", (x1+x2)/2., yLegend1-0.004, txres)
+    if (all((/nruns_AMIP_pr, nmodels_AMIP_pr/).eq.(/nruns_AMIP_u, nmodels_AMIP_u/))) then
+      txres@txFontHeightF = 0.008
+      gsn_text_ndc(wks, nmodels_AMIP_pr+"models, "+nruns_AMIP_pr+"runs    ", (x1+x2)/2., yLegend1-0.02, txres)
+    end if
+    xc = x2 + (iLegend + 0.015)/2.
+    txres@txFontColor := "black"
+    txres@txFontHeightF = 0.008
+    txres@txJust = "CenterCenter"
+    gsn_text_ndc(wks, "95th", xc, yLegend2, txres)
+    gsn_text_ndc(wks, "mean", xc, yLegendC, txres)
+    gsn_text_ndc(wks, "5th",  xc, yLegend1, txres)
+    
+    x2 = x1 - iLegend  
+  end if
+
+  if (isvar("GMprObsSingle")) then
+    resl@gsLineThicknessF = 1.5
+    do n = 0, ListCount(GMprObsSingle)-1    
+      resl@gsLineColor := GMprObsSingle[n]@color
+      resl@gsLineDashPattern = GMprObsSingle[n]@pattern
+      resl@gsLineDashSegLenF = GMprObsSingle[n]@seglen
+      x1 = x2 - wLegend
+      gsn_polyline_ndc(wks, (/x1, x2/), (/yLegendC, yLegendC/), resl)
+      txres@txJust = "TopCenter"
+      txres@txFontColor := resl@gsLineColor
+      txres@txFontHeightF = 0.012
+      if (GMprObsSingle[n]@dataset.eq."GPCP-SG") then
+        gsn_text_ndc(wks, "GPCP", (x1+x2)/2., yLegend, txres)
+      else
+        gsn_text_ndc(wks, GMprObsSingle[n]@dataset, (x1+x2)/2., yLegend, txres)
+      end if
+      x2 = x1 - iLegend
+      delete(resl@gsLineDashSegLenF)
+    end do
+  end if
+  
+  if (isvar("NHMuObsEns")) then
+    resl@gsLineThicknessF = 1.
+    do n = 0, ListCount(NHMuObsEns)-1    
+      resp@gsFillColor := NHMuObsEns[n]@color
+      resp@gsFillIndex = NHMuObsEns[n]@pattern
+      resp@gsFillLineThicknessF = resl@gsLineThicknessF
+      resp@gsFillScaleF = NHMuObsEns[n]@fillscale
+      resl@gsLineColor := NHMuObsEns[n]@color
+      resl@gsLineDashPattern = 0
+      x4 = x3 + wLegend
+      y1 = yLegend1 + 0.004
+      y2 = yLegend2 - 0.004
+      gsn_polygon_ndc(wks, (/x3, x3, x4, x4/), (/y1, y2, y2, y1/), resp)
+      gsn_polyline_ndc(wks, (/x3, x3, x4, x4, x3/), (/y1, y2, y2, y1, y1/), resl)
+      txres@txJust = "TopCenter"
+      txres@txFontColor := resl@gsLineColor
+      txres@txFontHeightF = 0.012
+      gsn_text_ndc(wks, NHMuObsEns[n]@dataset, (x3+x4)/2., yLegend1-0.004, txres)
+
+      txres@txJust = "CenterCenter"
+      txres@txFontHeightF = 0.008
+      txres@txBackgroundFillColor = "white"
+      txres@txPerimColor = "transparent"
+      txres@txPerimSpaceF = 0.1
+      gsn_text_ndc(wks, "max", (x3+x4)/2., y2, txres)
+      gsn_text_ndc(wks, "min", (x3+x4)/2., y1, txres)
+
+      x3 = x4 + iLegend
+    end do
+  end if
+
+  if (isvar("NHMuObsSingle")) then
+    resl@gsLineThicknessF = 1.5
+    do n = 0, ListCount(NHMuObsSingle)-1    
+      resl@gsLineColor := NHMuObsSingle[n]@color
+      resl@gsLineDashPattern = NHMuObsSingle[n]@pattern
+      resl@gsLineDashSegLenF = NHMuObsSingle[n]@seglen
+      x4 = x3 + wLegend
+      gsn_polyline_ndc(wks, (/x3, x4/), (/yLegendC, yLegendC/), resl)
+      txres@txJust = "TopCenter"
+      txres@txFontColor := resl@gsLineColor
+      txres@txFontHeightF = 0.012
+      gsn_text_ndc(wks, NHMuObsSingle[n]@dataset, (x3+x4)/2., yLegend, txres)
+      x3 = x4 + iLegend
+      delete(resl@gsLineDashSegLenF)
+    end do
+  end if
+  
   pres                  := True
   pres@gsnFrame          = False
   pres@gsnPanelTop       = 0.63
