@@ -298,8 +298,12 @@ printVarSummary(tmptmp)
       delete(bounds)
 
       ; Add height coordinate to tas variable (required by the new backend)
-      if (VAR(vv).eq."tas") then
-        height = 2.d
+      if (any(VAR(vv).eq.(/"tas", "uas", "vas"/))) then
+        if (VAR(vv).eq."tas") then
+          height = 2.d
+        else
+          height = 10.d
+        end if
         height!0 = "ncl_scalar"
         height@units = "m"
         height@axis = "Z"
