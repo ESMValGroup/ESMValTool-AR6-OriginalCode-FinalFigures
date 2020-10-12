@@ -37,12 +37,18 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
+    differences = {}
     for index, metadata_filename in enumerate(cfg['input_files']):
         metadatas = diagtools.get_input_files(cfg, index=index)
 
         for filename in sorted(metadatas):
             metadata = metadatas[filename]
             dataset = metadata['dataset']
+            exp = metadata['exp']
+            ensemble = metadata['ensemble']
+            project = metadata['project']
+
+
             print('-----------\n', dataset, metadata['exp'], 
                   metadata['ensemble'],metadata['project'], metadata['mip'])
 
@@ -61,7 +67,8 @@ def main(cfg):
                                        units=units, calendar=calendar ).year # A
 
             diff = child_branch_yr - parent_branch_yr
-            #print('difference:', diff )
+            differences[(dataset,  exp)] = diff
+
             historical_range = [1860, 2014, 2100]
             print('Origin is:', 
                 cube.attributes['parent_activity_id'],
@@ -71,6 +78,23 @@ def main(cfg):
                 cube.attributes['parent_variant_label'],
                 )
             print(dataset, ':\t', historical_range, 'is', [h-diff for h in historical_range])
+
+            dates = num2date(times.points, units, calendar=calendar)
+            for t, d in zip(dates, cube.data):
+                if exp == 'piControl':
+                    print(t.year - diff, ',', d)
+                else:
+                    print(t.year, ',', d)
+
+
+    for index, metadata_filename in enumerate(cfg['input_files']):
+        metadatas = diagtools.get_input_files(cfg, index=index)
+        for filename in sorted(metadatas):
+            dataset = metadata['dataset']
+            exp = metadata['exp']
+            if exp != 'piControl': continue
+            diff = differences[(dataset,  'historical')]
+            
 
     logger.info('Success')
 

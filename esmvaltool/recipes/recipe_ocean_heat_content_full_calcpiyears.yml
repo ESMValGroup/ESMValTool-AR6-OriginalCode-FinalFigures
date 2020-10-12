@@ -38,44 +38,42 @@ preprocessors:
 
 
 
-
-
 diagnostics:
   diag_ohc:
     variables:
-      thetao:
-        short_name: thetao
+      so:
+        short_name: so    
         preprocessor: prep_annual
         mip: Omon
-        grid: gn
         project: CMIP6
-        additional_datasets: &dataset_anchor
-          - {project: CMIP6, mip: Omon, grid: gn, institute: AWI  ,     dataset: AWI-CM-1-1-M, exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: BCC,     dataset: BCC-CSM2-MR,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: BCC,     dataset: BCC-ESM1,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: CAMS,     dataset: CAMS-CSM1-0,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: CCCma,     dataset: CanESM5,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+        additional_datasets: 
+          - {project: CMIP6, mip: Omon, grid: gn, institute: AWI,           dataset: AWI-CM-1-1-MR,    exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: BCC,           dataset: BCC-CSM2-MR,      exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: BCC,           dataset: BCC-ESM1,         exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CAMS,          dataset: CAMS-CSM1-0,      exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CCCma,         dataset: CanESM5,          exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
           - {project: CMIP6, mip: Omon, grid: gn, institute: CSIRO-ARCCSS,  dataset: ACCESS-CM2,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: IPSL,     dataset: IPSL-CM6A-LR,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: MIROC,     dataset: MIROC6,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: MOHC,     dataset: HadGEM3-GC31-LL,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: MOHC,     dataset: HadGEM3-GC31-MM,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NASA-GISS,     dataset: GISS-E2-1-G,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NCAR,     dataset: CESM2,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NCAR,     dataset: CESM2-WACCM,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NOAA-GFDL,     dataset: GFDL-CM4,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NOAA-GFDL,     dataset: GFDL-ESM4,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NUIST,     dataset: NESM3,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: UA,     dataset: MCM-UA-1-0,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: IPSL,          dataset: IPSL-CM6A-LR,     exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: MIROC,         dataset: MIROC6,           exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: MOHC,          dataset: HadGEM3-GC31-LL,  exp: historical, ensemble: r1i1p1f3, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: MOHC,          dataset: HadGEM3-GC31-MM,  exp: historical, ensemble: r1i1p1f3, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: NASA-GISS,     dataset: GISS-E2-1-G,      exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: NCAR,          dataset: CESM2,            exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: NCAR,          dataset: CESM2-WACCM,      exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: NOAA-GFDL,     dataset: GFDL-CM4,         exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: NOAA-GFDL,     dataset: GFDL-ESM4,        exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+          - {project: CMIP6, mip: Omon, grid: gn, institute: NUIST,         dataset: NESM3,            exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
+#          - {project: CMIP6, mip: Omon, grid: gn, institute: UA,            dataset: MCM-UA-1-0,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014} # Longitude below zero
 
-          - {project: CMIP6, mip: Omon, grid: gn, institute: CNRM-CERFACS,     dataset: CNRM-CM6-1,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: CNRM-CERFACS,     dataset: CNRM-ESM2-1,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: MIROC,     dataset: MIROC-ES2L,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: MOHC,     dataset:UKESM1-0-LL,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NASA-GISS,     dataset: GISS-E2-1-G,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
-          - {project: CMIP6, mip: Omon, grid: gn, institute: NASA-GISS,     dataset: MCM-UA-1-0,       exp: historical, ensemble: r1i1p1f1, start_year: 2013, end_year: 2014}
-
-#           # -----------
+          - {project: CMIP6, mip: Omon, grid: gn, institute: CNRM-CERFACS,  dataset: CNRM-CM6-1,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
+#          - {project: CMIP6, mip: Omon, grid: gn, institute: CNRM-CERFACS,  dataset: CNRM-ESM2-1,      exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014} # No so.
+#          - {project: CMIP6, mip: Omon, grid: gn, institute: MIROC,         dataset: MIROC-ES2L,       exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014} # No Omon in historical data.
+          - {project: CMIP6, mip: Omon, grid: gn, institute: MOHC,          dataset: UKESM1-0-LL,      exp: historical, ensemble: r1i1p1f2, start_year: 2013, end_year: 2014}
+#
+#
+#
+#
+##           # -----------
 #           #  ACCESS-CM2 historical r1i1p1f1 CMIP6 Omon
 #           # Origin is: CMIP piControl CMIP6 ACCESS-CM2 r1i1p1f1
 #           # ACCESS-CM2 :     [1860, 2014] is [960, 1114]
