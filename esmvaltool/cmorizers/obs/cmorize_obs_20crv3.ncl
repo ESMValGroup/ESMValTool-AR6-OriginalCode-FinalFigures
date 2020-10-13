@@ -49,6 +49,7 @@
 ;    complete years (Jan to Dec).
 ;
 ; Modification history
+;    20201012-yu_kosaka: bug fix.
 ;    20201003-yu_kosaka: added pressure level ua and va.
 ;    20200924-yu_kosaka: revised to add every_member.
 ;    20200915-yu_kosaka: written based on cmorize_obs_ncep.ncl.	
@@ -178,12 +179,10 @@ begin
             dims = dimsizes(tmptmp)
             dims(1) = zsize
             tmp = new(dims, typeof(tmptmp))
-printVarSummary(tmp)
             delete(dims)
             delete(tmptmp)
           end if
           tmptmp = f[:]->$name$
-printVarSummary(tmptmp)
           tmp(:, z:z, :, :) = tmptmp
           delete(tmptmp)
           delete(fname)
@@ -287,7 +286,7 @@ printVarSummary(tmptmp)
                    MIP(vv), VAR(vv), DATESTR/), "_") + ".nc"
 
       ; Add height coordinate to tas variable (required by the new backend)
-      if (VAR(vv).eq."tas") then
+      if (any(VAR(vv).eq.(/"tas", "uas", "vas"/))) then
         output@coordinates = "height"
       end if
 

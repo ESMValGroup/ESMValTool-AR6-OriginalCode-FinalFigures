@@ -350,76 +350,72 @@ begin
             if (isvar("trend_20crv3")) then
               tmp = trend_20crv3
               delete(trend_20crv3)
-              trend_20crv3 = array_append_record(tmp, trend_dslp, 0)
+              trend_20crv3 = array_append_record(tmp, trend_edge, 0)
               trend_20crv3@esize := array_append_record(tmp@esize, esize, 0)
               delete(tmp)
             else
-              trend_20crv3 = (/trend_dslp/)
+              trend_20crv3 = (/trend_edge/)
               trend_20crv3@esize = esize
               trend_20crv3@season = season
               trend_20crv3@syear = syear
               trend_20crv3@eyear = eyear
               trend_20crv3@dataset = input_file_info[ii]@dataset
-              trend_20crv3@var = "dslp"
-              trend_20crv3@long_name \
-                = "trend of Walker circulation strength"
+              trend_20crv3@var = "lat"
+              trend_20crv3@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_20crv3@diag_script = DIAG_SCRIPT
             end if
           elseif (input_file_info[ii]@dataset.eq."20CRv2c") then
             if (isvar("trend_20crv2c")) then
               tmp = trend_20crv2c
               delete(trend_20crv2c)
-              trend_20crv2c = array_append_record(tmp, trend_dslp, 0)
+              trend_20crv2c = array_append_record(tmp, trend_edge, 0)
               trend_20crv2c@esize := array_append_record(tmp@esize, esize, 0)
               delete(tmp)
             else
-              trend_20crv2c = (/trend_dslp/)
+              trend_20crv2c = (/trend_edge/)
               trend_20crv2c@esize = esize
               trend_20crv2c@season = season
               trend_20crv2c@syear = syear
               trend_20crv2c@eyear = eyear
               trend_20crv2c@dataset = input_file_info[ii]@dataset
-              trend_20crv2c@var = "dslp"
-              trend_20crv2c@long_name \
-                = "trend of Walker circulation strength"
+              trend_20crv2c@var = "lat"
+              trend_20crv2c@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_20crv2c@diag_script = DIAG_SCRIPT
             end if
           elseif (input_file_info[ii]@dataset.eq."20CRv2") then
             if (isvar("trend_20crv2")) then
               tmp = trend_20crv2
               delete(trend_20crv2)
-              trend_20crv2 = array_append_record(tmp, trend_dslp, 0)
+              trend_20crv2 = array_append_record(tmp, trend_edge, 0)
               trend_20crv2@esize := array_append_record(tmp@esize, esize, 0)
               delete(tmp)
             else
-              trend_20crv2 = (/trend_dslp/)
+              trend_20crv2 = (/trend_edge/)
               trend_20crv2@esize = esize
               trend_20crv2@season = season
               trend_20crv2@syear = syear
               trend_20crv2@eyear = eyear
               trend_20crv2@dataset = input_file_info[ii]@dataset
-              trend_20crv2@var = "dslp"
-              trend_20crv2@long_name \
-                = "trend of Walker circulation strength"
+              trend_20crv2@var = "lat"
+              trend_20crv2@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_20crv2@diag_script = DIAG_SCRIPT
             end if
           elseif (input_file_info[ii]@dataset.eq."CERA-20C") then
             if (isvar("trend_cera20c")) then
               tmp = trend_cera20c
               delete(trend_cera20c)
-              trend_cera20c = array_append_record(tmp, trend_dslp, 0)
+              trend_cera20c = array_append_record(tmp, trend_edge, 0)
               trend_cera20c@esize := array_append_record(tmp@esize, esize, 0)
               delete(tmp)
             else
-              trend_cera20c = (/trend_dslp/)
+              trend_cera20c = (/trend_edge/)
               trend_cera20c@esize = esize
               trend_cera20c@season = season
               trend_cera20c@syear = syear
               trend_cera20c@eyear = eyear
               trend_cera20c@dataset = input_file_info[ii]@dataset
-              trend_cera20c@var = "dslp"
-              trend_cera20c@long_name \
-                = "trend of Walker circulation strength"
+              trend_cera20c@var = "lat"
+              trend_cera20c@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_cera20c@diag_script = DIAG_SCRIPT
             end if
           end if
