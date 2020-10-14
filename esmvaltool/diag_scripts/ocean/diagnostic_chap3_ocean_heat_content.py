@@ -51,7 +51,13 @@ try:
 except:
     print('Unable to load gsw.\n You need to install it in your conda environmetn with:\npip install gsw')
 
-EOS80 = []
+
+model_type = {
+    'EOS80': [], # The default
+    'TEOS-10': ['GFDL', 'ACCESS-CM2', 'ACCESS-ESM1-5', ],
+    'in situ': [], # Hopefully none!
+    'potential temperature': [],
+    }
 
 
 # This part sends debug statements to stdout
@@ -912,46 +918,38 @@ def derive_ohc(cube, volume):
     return cube
 
 
-def calc_ohc_basic(cfg, metadatas, thetao_fn, volcello_fn, trend=''):
+def step_4and5(
+        dataset, 
+        lon, 
+        lat,
+        pressure,
+        sal,
+        temp):
     """
-    Calculate OHC form files using basic fudge factor..
+    Calculates correct conservative temperature and absolute salinity.
     """
-    exp = metadatas[thetao_fn]['exp']
-    dataset = metadatas[thetao_fn]['dataset']
-    ensemble = metadatas[thetao_fn]['ensemble']
-    project = metadatas[thetao_fn]['project']
+    # 4 i) In all cases, we interpret the model salinity as equal to Preformed Salinity
+    if dataset in model_type['TEOS-10']:
+        sal = gsw.SA_from_Sstar(sal, pressure, lon, lat)
+    else: #if dataset in model_type['EOS80']:
+        #print('assuming that ', dataset, 'is EOS-80')
+        sal = gsw.SA_from_Sstar(sal* 35.16504 / 35., pressure, lon, lat)
 
-    work_dir = diagtools.folder([cfg['work_dir'], 'OHC'])
-    output_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'ocean_heat', trend])+'.nc'
 
-    if os.path.exists(output_fn):
-        return output_fn
+     # 5) Conversions of temperature to Conservative Temperature
 
-    times = diagtools.cube_time_to_float(cube)
-    const = 4.09169e+6
+     # 5 a) If the model is using TEOS-10, and the variable you have is thetao (potential temperature),
+     #      then you should convert thetao (potential temperature) to CT=bigthetao (Conservative Temperature)
+     if dataset in model_type['TEOS-10'] and dataset in model_type['potential temperature']:
+         temp = gsw.CT_from_pt(sal, temp)
 
-    if volume.ndim == 3:
-        print('calculating volume sum (3D):')
-        for t, time in enumerate(times):
-            cube.data[t] = cube.data[t] * volume.data * const
-    elif volume.ndim == 4:
-        for t, time in enumerate(times):
-            cube.data[t] = cube.data[t] * volume[t].data * const
-    else:
-        print('Volume and temperature do not match')
+     # 5 b) If the model is not using TEOS-10, then you should interpret thetao as equal to bigthetao.  CT=thetao.  DO NOT RECALCULATE.
+     # Do nothing.
 
-    cube = iris.load_cube(thetao_fn)
-    vol_cube = iris.load_cube(volcello_fn)
-    ohc_cube = derive_ohc(cube, vol_cube)
-    iris.save(ohc_cube, output_fn)
-
-    for t in [0, -1]:
-        single_pane_map_plot(
-                cfg,
-                metadatas[thetao_fn],
-                ohc_cube[t, 0],
-                key='OHC'
-                )
+     # 5 c) If you have in situ temperature (T), then you should convert to Conservative Temperature
+     if dataset in model_type['in situ']:
+         temp = gsw.CT_from_t(sal, temp, pressure)
+     return sal, temp
 
 
 def calc_slr_full(cfg,
@@ -1061,69 +1059,6 @@ def calc_slr_full(cfg,
     else:
         print('Starting clim SLR calculation from fresh')
         slr_clim = slr_total[0].copy() # 2D
-        # # print('Starting clim SLR calculation from fresh')
-        # slr_clim = slr_total[0].copy() # 2D
-        #
-        # # Iterate over each water column:
-        # for (y,x), la in np.ndenumerate(lat):
-        #     sal_bar = psal_bar.data[:, y, x]
-        #     temp_bar= ztemp_bar.data[:, y, x]
-        #     if np.ma.is_masked(sal_bar.max()):
-        #          continue
-        #
-        #     lo = lon[y, x]
-        #     print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
-        #
-        #     # load clim depth
-        #     if depths_bar.ndim == 1:
-        #         depth_bar = depths_bar
-        #     elif depths_bar.ndim == 3:
-        #         depth_bar = depths_bar[:, y, x]
-        #     else:
-        #         assert 0
-        #
-        #     # Calculate climatoligical pressure
-        #     pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
-        #     pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
-        #
-        #     if dataset in EOS80:
-        #         # Calculuate climatological conservative temperature
-        #         temp_bar = gsw.conversions.CT_from_t(sal_bar, temp_bar.data[:, y, x], pressure_bar)
-        #
-        #         # Calculuate climatological salinity
-        #         sal_bar = gsw.conversions.SA_from_SP(sal_bar, pressure_bar, lo, la)
-        #
-        #     # Calculuate climatological Dynamic height anomaly
-        #     # max_dp is the maximum difference between layers, set to a very high value
-        #     # to avoid expensive interpolation.
-        #     seafloorpres = pressure_bar.max()
-        #     if  p_ref == 'SeaFloor':
-        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = seafloorpres)[0]
-        #     elif p_ref == '2000m':
-        #         ref_pressure = gsw.conversions.p_from_z(-2000., la)
-        #         ref_pressure = np.min([ref_pressure, seafloorpres])
-        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = ref_pressure)[0]
-        #     else:
-        #         gsdh_clim = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar)[0]
-        #
-        # #     print('sal_bar:',sal_bar, '\ntemp_bar:', temp_bar, '\npressure_bar:', pressure_bar)
-        # #     for pref in [0, 10, 2000, pressure_bar.max()]:
-        # #         print('reference pressure:', pref, gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar, p_ref = pref)* 1000. / gravity)
-        # #     assert 0
-        #
-        #     # Convert dynamic height into mm.
-        #     slr_clim[y, x] = gsdh_clim * 1000. / gravity
-        #
-        # # Save climatological SLR cube as a netcdf.
-        # cube0 = thetao_cube[0, 0, :, :].copy()
-        # cube0.data = np.ma.masked_where(slr_clim==0., slr_clim)
-        # cube0.units = cf_units.Unit('mm')
-        # cube0.name = 'Climatological Sea Level Rise'
-        # cube0.long_name = 'Climatological Sea Level Rise'
-        # cube0.short_name = 'slr_clim'
-        # cube0.var_name = 'slr_clim'
-        # cube0.standard_name = 'steric_change_in_mean_sea_level'
-        # iris.save(cube0, output_fns['clim'])
 
         if depths_bar.ndim == 1:
            depth_bar = np.tile(depths_bar, (len(lat[0]), 1)).T
@@ -1149,12 +1084,7 @@ def calc_slr_full(cfg,
             pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
             pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
 
-            if dataset in EOS80:
-                # Calculuate climatological conservative temperature
-                temp_bar = gsw.conversions.CT_from_t(sal_bar, temp_bar, pressure_bar)
-
-                # Calculuate climatological salinity
-                sal_bar = gsw.conversions.SA_from_SP(sal_bar, pressure_bar, lo, la)
+            sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
 
             # Calculuate climatological Dynamic height anomaly
             # max_dp is the maximum difference between layers, set to a very high value
@@ -1237,11 +1167,8 @@ def calc_slr_full(cfg,
             temp = thetao_cube.data[t, :, y, :]
             pressure = np.ma.masked_where(temp.mask, pressure)
 
-            if dataset in EOS80:
-                # Convert temperature to conservative temperature
-                temp = gsw.conversions.CT_from_t(sal, temp, pressure)
-                # Convert salinity to absolute salininty
-                sal = gsw.conversions.SA_from_SP(sal, pressure, lo, la)
+            # Confirm that we use absolute salininty & conservative temperature
+            sal, temp = step_4and5(dataset, lo, la, pressure, sal, temp)
 
             # Calculate Dynamic height anomaly
             seafloorpres = pressure.max(axis=0)
@@ -1266,7 +1193,6 @@ def calc_slr_full(cfg,
         #         print('reference pressure:', pref, gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = pref)* 1000. / gravity)
         #         print('slr_clim[y, x]:',[y,x], pref, slr_clim[y, x],gsdh_total,  gsdh_total, gsdh_thermo)
             #
-        #     assert 0
 
             # Put in the output array:
             slr_total[t, y, :] = gsdh_total
@@ -1274,87 +1200,6 @@ def calc_slr_full(cfg,
             count += 1
             if t == 0:
                 print(count, (t, y), 'performing 2D SLR')
-    # # Now perform the SLR calculation for each point in time for each water column:
-    # for (y, x), la in np.ndenumerate(lat):
-    #     psal_yx_bar = psal_bar.data[:, y, x]
-    #     if np.ma.is_masked(psal_yx_bar.max()):
-    #          continue
-    #
-    #     lo = lon[y, x]
-    #     print('Calculate SLR in 1D:', (y, x), 'latitude:', la, lo)
-    #
-    #     # Load depth dataset
-    #     if depths.ndim == 1:
-    #         depth = depths
-    #     elif depths.ndim == 3:
-    #         depth = depths[:, y, x]
-    #
-    #     if depths.ndim != 4:
-    #         pressure = gsw.conversions.p_from_z(depth, la) # dbar
-    #
-    #     # Load climatological depth dataset
-    #     if depths_bar.ndim == 1:
-    #         depth_bar = depths_bar
-    #     elif depths_bar.ndim == 3:
-    #         depth_bar = depths_bar[:, y, x]
-    #     else: assert 0
-    #
-    #     if dataset in EOS80:
-    #         pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
-    #         pressure_bar = np.ma.masked_where(psal_yx_bar.mask, pressure_bar)
-    #         sal_bar = gsw.conversions.SA_from_SP(psal_yx_bar, pressure_bar, lo, la)
-    #     else:
-    #         sal_bar = psal_yx_bar
-    #     # Calculate SLR for each point in time in the historical dataset.
-    #     for t, time in enumerate(times):
-    #         if depths.ndim == 4:
-    #             depth = depths[t, :, y, x]
-    #             pressure = gsw.conversions.p_from_z(depth, la) # dbar
-    #
-    #         # load salinity and temperature data
-    #         sal = so_cube.data[t, :, y, x]
-    #         temp = thetao_cube.data[t, :, y, x]
-    #         pressure = np.ma.masked_where(temp.mask, pressure)
-    #
-    #         if dataset in EOS80:
-    #             # Convert temperature to conservative temperature
-    #             temp = gsw.conversions.CT_from_t(sal, temp, pressure)
-    #             # Convert salinity to absolute salininty
-    #             sal = gsw.conversions.SA_from_SP(sal, pressure, lo, la)
-    #
-    #         # Calculate Dynamic height anomaly
-    #         seafloorpres = pressure.max()
-    #         if p_ref == 'SeaFloor':
-    #             gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = seafloorpres)[0]
-    #             gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = seafloorpres)[0]
-    #         elif p_ref == '2000m':
-    #             ref_pressure = gsw.conversions.p_from_z(-2000., la)
-    #             ref_pressure = np.min([ref_pressure, seafloorpres])
-    #             gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = ref_pressure)[0]
-    #             gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = ref_pressure)[0]
-    #         else:
-    #             gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, )[0]
-    #             gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure)[0]
-    #
-    #         # Convert to mm and calculate anomaly relative to clim data
-    #         gsdh_total = gsdh_total * 1000. / gravity - slr_clim[y, x]
-    #         gsdh_thermo = gsdh_thermo * 1000. /  gravity - slr_clim[y, x]
-    #
-    #     #     print('sal:',sal, '\ntemp:', temp, '\npressure:', pressure)
-    #     #     for pref in [0, 10, 2000, seafloorpres]:
-    #     #         print('reference pressure:', pref, gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = pref)* 1000. / gravity)
-    #     #         print('slr_clim[y, x]:',[y,x], pref, slr_clim[y, x],gsdh_total,  gsdh_total, gsdh_thermo)
-    #         #
-    #     #     assert 0
-    #
-    #         # Put in the output array:
-    #         slr_total[t, y, x] = gsdh_total
-    #         slr_thermo[t, y, x] = gsdh_thermo
-    #         count += 1
-    #         if t == 0:
-    #             print(count, (t, y, x), 'performing 2D SLR:',
-    #                 gsdh_total,
-    #                 gsdh_thermo)
 
     # Save SLR data as a cube and then a netcdf..
     cube0 = thetao_cube[:, 0, :, :].copy()
@@ -1457,15 +1302,12 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
 
         return output_ohc_fn
 
+    # Load netcdf files
     thetao_cube = iris.load_cube(thetao_fn)
     so_cube = iris.load_cube(so_fn)
     vol_cube = iris.load_cube(volcello_fn)
 
-    #for fn in [thetao_fn, so_fn, volcello_fn, output_ohc_fn]:
-    #    if fn.find(exp) == -1:
-    #        print('ERROR:', exp, 'not in', fn)
-    #        assert 0
-
+    # Load coordinates
     lats = thetao_cube.coord('latitude').points
     lons = thetao_cube.coord('longitude').points
     depths = -1.*np.abs(thetao_cube.coord(axis='z').points) # depth is negative here.
@@ -1504,15 +1346,30 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
 
             sal = so_cube.data[t,z]
             temp = thetao_cube.data[t,z]
-            pressure = gsw.conversions.p_from_z(depth, lat) # dbar
-            if dataset in EOS80:
-                temp = gsw.conversions.CT_from_t(sal, temp, pressure)
-                sal = gsw.conversions.SA_from_SP(sal, pressure, lon, lat)
-            rho = gsw.density.rho(sal, temp, pressure) #  kg/ m3
-            energy = gsw.energy.internal_energy(sal, temp, pressure) # J/kg
-            #enthalpy = gsw.energy.enthalpy(asal, ctemp, pressure) # J/kg
 
-            cell_energy = energy * rho * vol
+            # 4.) Calculate the pressure at each gridpoint: p=gsw_p_from_z(z,lat).  
+            pressure = gsw.conversions.p_from_z(depth, lat) # dbar
+
+
+            # Confirm that we use absolute salininty & conservative temperature
+            sal, temp = step_4and5(dataset, lo, la, pressure, sal, temp)
+
+            # 6) Calculation of "heat content"
+            # 6a) The global ocean heat content is interpreted to be calculated as the volume integral of the product of in situ density, ρ , and potential enthalpy, h0 (with reference sea pressure of 0 dbar).
+            # 6b) The in situ density is calculated using gsw_rho(SA,CT,p).  Here the actual pressure at the target depth is used (i.e., the mass of the water).
+            # 6c) The *surface referenced* enthalpy should be calculated using gsw_enthalpy(SA,CT,0).  Note that here the 0 dbar pressure is critical to arrive at the surface value, which is the value of enthalpy and absolute salinity that is available for exchange with the atmosphere.
+            # 6d) The product of the in situ density times the surface-referenced enthalpy is the relevant energy quantity: gsw_rho(SA,CT,p)*gsw_enthalpy(SA,CT,0)
+            # 6e) For the anomalous energy, which is what we want, we calculate gsw_rho(SA,CT,p)*gsw_enthalpy(SA,CT,0)-gsw_rho(<SA>,<CT>,p)*gsw_enthalpy(<SA>,<CT>,0).
+            # 6f) integrate the surface-referenced enthalpy times rho, i.e., the previous line gives the 3D integrand, and then we want to integrate it from the bottom up.  (Brodie & I would like the vertical integral done first, so we can make maps, Chps 2, 3 probably only want the global integral?)
+
+            # 6b) The in situ density is calculated using gsw_rho(SA,CT,p).  Here the actual pressure at the target depth is used (i.e., the mass of the water).
+            rho = gsw.density.rho(sal, temp, pressure) #  kg/ m3
+
+            # 6c) The *surface referenced* enthalpy should be calculated using gsw_enthalpy(SA,CT,0).  Note that here the 0 dbar pressure is critical to arrive at the surface value, which is the value of enthalpy and absolute salinity that is available for exchange with the atmosphere.
+            enthalpy = gsw.energy.enthalpy(sal, temp, 0.)
+
+            # 6d) The product of the in situ density times the surface-referenced enthalpy is the relevant energy quantity: gsw_rho(SA,CT,p)*gsw_enthalpy(SA,CT,0)
+            cell_energy = enthalpy * rho *vol
             ohc_data[t,z] = cell_energy
 
     cube = thetao_cube.copy()
@@ -2064,8 +1921,7 @@ def main(cfg):
             print('trend intact calculation:', dataset, ':', index)
 
         if detrending_method == 'Basic':
-            ohc_fn = calc_ohc_basic(cfg, metadatas, fn, volcello_fn, trend='intact')
-#            specvol_fn = ''
+            assert 0
         elif detrending_method == 'Full':
             so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
             ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
@@ -2075,25 +1931,17 @@ def main(cfg):
             assert 0
 
         ocean_heat_content[(project, dataset, exp, ensemble, 'ohc','intact')] = ohc_fn
-#        specvol_anomalies[(project, dataset, exp, ensemble, 'specvol_anom','intact')] = specvol_fn
 
         metadatas[ohc_fn] = metadatas[fn].copy()
-#        metadatas[specvol_fn] = metadatas[fn].copy()
 
     print('\nCalculate ocean heat content - detrended')
     for (project, dataset, exp, ensemble, short_name), detrended_fn in detrended_ncs.items():
+        # Only calculate once for each dataset, exp, ensemble.
         if short_name != 'thetao':
             continue
-        #if exp ==  'piControl': # no need to calculate this.
-        #    continue
 
-        # volcello is in same ensemble, same exp.
         volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
         if not volcello_fn:
-#       if (project, dataset, exp, ensemble, 'volcello') in file_dict:
-#           volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
-#           volcello_fn = file_dict[(project, dataset, exp, ensemble, 'volcello')]
-#       else:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
 
@@ -2104,7 +1952,7 @@ def main(cfg):
             print(dataset, ':', index)
 
         if detrending_method == 'Basic':
-            ohc_fn = calc_ohc_basic(cfg, metadatas, detrended_fn, volcello_fn, trend='detrended')
+            assert 0
         elif detrending_method == 'Full':
             print('detrending_method:', detrending_method, project, dataset, exp, ensemble)
             so_fn = detrended_ncs[(project, dataset, exp, ensemble, 'so')]
