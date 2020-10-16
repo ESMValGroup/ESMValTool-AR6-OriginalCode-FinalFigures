@@ -1911,8 +1911,6 @@ begin
 
   ; ---------------------------------------------------------------------
 
-  if (diag_script_info@ts_anomaly .eq. "anom") then
-
     ; ---------------------------------------------------------------------
     ; grey shading of reference period
     ; ---------------------------------------------------------------------
@@ -1929,8 +1927,6 @@ begin
     txtres@txFontHeightF = 0.013
     ref_txt = gsn_add_text(wks, plot, "reference period", \
                            0.5*(ref_start + ref_end), res@trYMinF + 0.1, txtres)
-
-  end if
 
   ; ---------------------------------------------------------------------
   ; add lines and names for volcanic eruptions
@@ -2011,6 +2007,23 @@ begin
   ; legend resources
   ; ***********************************************
 
+  do i = 0, dimsizes(annots)-1
+    tmp := str_split(annots(i), "_")
+    annots(i) = tmp(0)
+  end do
+  labels = get_unique_values(annots)
+print(labels)
+  ;ind_end = ind(labels .eq. "MultiModelMean" .or. \
+  ;              labels .eq. source@ref)
+  ind_end = ind(labels .eq. source@ref .or. \
+                labels .eq. "MultiModelMean")
+print(ind_end)
+  labels := labels(sort_alphabetically(labels, ind_end, "end"))
+  ;labels := labels(sort_alphabetically(labels, ind_end, "begin"))
+print(labels)
+  label_ind = get1Dindex(annots, labels)
+print(label_ind)
+
   lgres                    = True
   lgres@lgItemType         = "Lines"   ; show lines only (default)
   lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
@@ -2019,11 +2032,10 @@ begin
   lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
   lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
 
-  lgres@lgLineColors      = colors
-  lgres@lgDashIndexes     = dashes
-  ;lgres@lgLineThicknesses = thicks + 3
+  lgres@lgLineColors      = colors(label_ind)
+  lgres@lgDashIndexes     = dashes(label_ind)
+  ;lgres@lgLineThicknesses = thicks(label_ind) + 3
   lgres@lgLineThicknessF = 3
-  labels = annots
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
 
@@ -2268,8 +2280,7 @@ begin
   ;  end if
   ;end if
 
-  if (diag_script_info@ts_anomaly .eq. "anom" .and. \
-      diag_script_info@ref_shading) then
+  if (diag_script_info@ref_shading) then
 
     ; ---------------------------------------------------------------------
     ; yellow shading of reference period

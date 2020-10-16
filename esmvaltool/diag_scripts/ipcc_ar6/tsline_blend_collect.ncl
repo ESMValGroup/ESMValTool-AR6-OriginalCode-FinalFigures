@@ -11,9 +11,6 @@
 ;    styleset: as in diag_scripts/shared/plot/style.ncl functions
 ;
 ; Optional diag_script_info attributes
-;    time_avg: type of time average (currently only "yearly" and "monthly" are
-;              available).
-;    ts_anomaly: calculates anomalies with respect to the defined period
 ;    ref_start: start year of reference period for anomalies
 ;    ref_end: end year of reference period for anomalies
 ;    region: name of domain
@@ -57,11 +54,11 @@ begin
   datasets = metadata_att_as_array(info_var, "dataset")
   dim_MOD = ListCount(info_var)
 
-  if (var0 .eq. "tasa") then
+  if (diag_script_info@blending) then
     var = "gmst"
     units0 = "degC"
   else
-    var = var0
+    var = "gsat"
   end if
 
 ;  if(any(var_names .eq. "tasStderr")) then
@@ -82,21 +79,7 @@ begin
     file_type = "ps"
   end if
 
-  ; Time averaging
-  if (isatt(diag_script_info, "time_avg")) then
-    time_avg = diag_script_info@time_avg
-    if (all(time_avg.ne.(/"yearly", "monthly"/))) then
-        error_msg("f", DIAG_SCRIPT, "", \
-                  "time averaging option " + time_avg + " not yet " + \
-                  "implemented")
-    end if
-  else
-    time_avg = "monthly"
-  end if
-
   ; Set default values for non-required diag_script_info attributes
-  set_default_att(diag_script_info, "time_avg", "monthly")
-  set_default_att(diag_script_info, "ts_anomaly", "noanom")
   set_default_att(diag_script_info, "region", "Global")
   set_default_att(diag_script_info, "run_ave", 0)
   set_default_att(diag_script_info, "header", True)
@@ -109,44 +92,12 @@ begin
   all_years = ispan(start_year, end_year, 1)
 
   ; Create time coordinate
-  if (time_avg.eq."monthly") then
-    ntime = 12 * (end_year - start_year + 1)
-    time = new(ntime, integer)
-    do yy = start_year, end_year
-        do mm = 1, 12
-            time(12 * (yy - start_year) + mm - 1) = 100 * yy + mm
-        end do
-    end do
-  elseif (time_avg.eq."yearly") then
-    ntime = end_year - start_year + 1
-    time = new(ntime, integer)
-    time = ispan(start_year, end_year, 1)
-  end if
+  ntime = end_year - start_year + 1
+  time = new(ntime, integer)
+  time = ispan(start_year, end_year, 1)
 
-  ; Anomaly
-  if (isatt(diag_script_info, "ts_anomaly")) then
-    anom = diag_script_info@ts_anomaly
-    if (anom .eq. "anom") then
-      if (isatt(diag_script_info, "ref_start") .and. \
-          isatt(diag_script_info, "ref_end")) then
-        ref_start = diag_script_info@ref_start
-        ref_end   = diag_script_info@ref_end
-        if ((ref_start.lt.start_year) .or. (ref_end.gt.end_year) .or. \
-            (ref_end.lt.ref_start)) then
-          error_msg("f", DIAG_SCRIPT, "", \
-                    "period for reference years is not properly defined")
-        end if
-      else
-        error_msg("f", DIAG_SCRIPT, "", \
-                  "period for reference years is not defined " + \
-                  "(needed for anomaly)")
-      end if
-      anom_ref = 0.
-
-    end if
-  else
-    anom = "noanom"
-  end if
+  ref_start = diag_script_info@ref_start
+  ref_end = diag_script_info@ref_end
 
 
   ; -------------------------------------------
@@ -192,20 +143,12 @@ begin
                                  0., 360., "average", True)
 
       ; yearly average
-      if (time_avg .eq. "yearly") then
-        diag = time_operations(A0_mean, -1, -1, "average", \
-                                "yearly", True)
-      else
-        diag = A0_mean
-      end if
+      diag = time_operations(A0_mean, -1, -1, "average", \
+                             "yearly", True)
 
 
       ; Match time coordinate
-      if (time_avg.eq."monthly") then
-        date = cd_calendar(diag&time, -1)
-      elseif (time_avg.eq."yearly") then
-        date = diag&year
-      end if
+      date = diag&year
       idx1 = ind(date(0).eq.data_ref&time)
       idx2 = ind(date(dimsizes(date) - 1).eq.data_ref&time)
       delete(date)
@@ -225,7 +168,8 @@ begin
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-    "tsline_gmst_" + anom + "_stat.nc"
+    "tsline_gmst_anom" + "_stat.nc"
+    ;"tsline_mm_tas_anom" + "_stat.nc"
   input_files := tostring(input_files)
 
   ; Filter out non-existing files
@@ -271,11 +215,7 @@ begin
     end if
 
     ; Match time coordinate
-    if (time_avg.eq."monthly") then
-      date = cd_calendar(data_temp&time, -1)
-    elseif (time_avg.eq."yearly") then
-      date = data_temp&time
-    end if
+    date = data_temp&time
     idx1 = ind(date(0).eq.data_mean&time)
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
     delete(date)
@@ -291,39 +231,6 @@ begin
 
   end do
 
-;  ; -------------------------------------------
-;  ; Read extern observational uncertainty
-;  ; -------------------------------------------
-;
-;  if (obs_stderr) then
-;
-;    data_ref_stderr = new ((/2, ntime/), double)
-;    data_ref_stderr!0 = "statistics"
-;    data_ref_stderr!1 = "time"
-;    data_ref_stderr&time = time
-;
-;;    data_temp = read_data(info_items1[0])
-;
-;;    data_ref_stderr(0, :) = data_ref(0, :) - data_temp(:)
-;;    data_ref_stderr(1, :) = data_ref(0, :) + data_temp(:)
-;
-;    fdata = "/work/bd0854/b309059/data/HadCRUT4/HadCRUT.4.6.0.0.annual_ns_avg.txt"
-;    data   = asciiread(fdata,(/171,12/),"float")
-;  
-;    data_temp = data(:, 1) - data(:, 10)
-;print(data_temp)
-;    data_ref_stderr(0, :) = data_ref(0, :) - (/data_temp(0:(ntime-1))/)
-;    data_temp = data(:, 11) - data(:, 1)
-;print(data_temp)
-;    data_ref_stderr(1, :) = data_ref(0, :) + (/data_temp(0:(ntime-1))/)
-;
-;  else
-;
-    data_ref_stderr = 0
-;
-;  end if
-
- 
 
   ; -------------------------------------------
   ; NetCDF Output
@@ -343,14 +250,14 @@ begin
   out_path1 = out_path + "tsline_collect_" + var0 + ".nc"
   data_mean@ncdf = out_path
   data_mean@diag_script = DIAG_SCRIPT
-  data_mean@var = var0
+  data_mean@var = var
   ncdf_outfile = ncdf_write(data_mean, out_path1)
 
   if (isatt(diag_script_info, "ref")) then
     out_path1 = out_path + "tsline_collect_" + var0 + "_ref.nc"
     data_ref@ncdf = out_path
     data_ref@diag_script = DIAG_SCRIPT
-    data_ref@var = var0
+    data_ref@var = var
     ncdf_outfile = ncdf_write(data_ref, out_path1)
   end if
 
@@ -361,11 +268,58 @@ begin
   ; Define workstation
   outfile = config_user_info@plot_dir + data_mean@var + "_" + \
     str_sub_str(diag_script_info@region, " ", "_") + \
-    "_multimodel_" + anom + "_" + start_year + "-" + end_year
+    "_multimodel_anom_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
-  ; Set resources
-  res = True
+
+  ; Select colors and other plotting attributes
+  ; (see ./diag_scripts/lib/ncl/style.ncl)
+  colors = project_style(info_var, diag_script_info, "colors")
+  dashes = project_style(info_var, diag_script_info, "dashes")
+  thicks = project_style(info_var, diag_script_info, "thicks")
+  annots = project_style(info_var, diag_script_info, "annots")
+
+  ; ************************************************
+  ; plotting parameters
+  ; ************************************************
+
+  plot = new(1, graphic)
+
+  res           = True
+  res@gsnDraw   = False
+  res@gsnFrame  = False
+
+  res@vpXF      = 0.05
+  res@vpYF      = 0.7
+  res@vpHeightF = 0.4
+  res@vpWidthF  = 0.7
+  res@pmLegendDisplayMode = "Never"
+  res@tmYRLabelFontHeightF = 0.016
+  res@tmYLLabelFontHeightF = 0.016
+  res@tiXAxisFontHeightF = 0.016
+  res@tiYAxisFontHeightF = 0.016
+  res@tmXBMajorOutwardLengthF = 0.006
+  res@tmYLMajorOutwardLengthF = 0.006
+  res@tmXBMinorOutwardLengthF = 0.003
+  res@tmYLMinorOutwardLengthF = 0.003
+  res@tmXBMajorLengthF = 0.006
+  res@tmYLMajorLengthF = 0.006
+  res@tmXBMinorLengthF = 0.003
+  res@tmYLMinorLengthF = 0.003
+
+  if (isatt(diag_script_info, "ref")) then
+    min_tmp = (/min(data_mean), min(data_ref)/)
+    max_tmp = (/max(data_mean), max(data_ref)/)
+  else
+    min_tmp = (/min(data_mean), min(data_stat)/)
+    max_tmp = (/max(data_mean), max(data_stat)/)
+  end if
+  res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
+  res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
+  res@tiYAxisOn = True
+  res@tiXAxisString = "Year"
+  res@gsnStringFontHeightF = 0.016
+
   xmin = start_year
   xmax = end_year
   res@trXMinF = xmin
@@ -390,13 +344,8 @@ begin
     ;res@trYMaxF = 1.2
   end if
 
-  ;if (xmin .eq. 1850) then
-  ;  res@tmXBMode         = "Manual"
-  ;  res@tmXBTickSpacingF = 50
-  ;elseif (xmin .eq. 1950) then
-    res@tmXBMode         = "Manual"
-    res@tmXBTickSpacingF = 20
-  ;end if
+  res@tmXBMode         = "Manual"
+  res@tmXBTickSpacingF = 20
 
   if (isatt(diag_script_info, "title")) then
     res@tiMainString = diag_script_info@title
@@ -404,43 +353,189 @@ begin
     res@tiMainString = ""
   end if
 
-  ;res@tiMainString = diag_script_info@region
+  res@tiYAxisString = "Change in Temperature (~F34~0~F~ C)"
 
-  if (isatt(variable_info[0], "long_name")) then
-    if (var0 .eq. "tasa") then
-      varname = "Temperature"
-    elseif (var0 .eq. "siconc")
-      varname = "Sea Ice"
-    else
-      varname = variable_info[0]@long_name
+
+  ; ---------------------------------------------------------------------
+  ; add multi model mean of different experiments
+  ; ---------------------------------------------------------------------
+  ; number of different experiments
+  nexp     = dim_data(0)
+
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_cmip_line.rgb")
+  res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
+  res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
+  res@xyLineColors = cmap(::-1,:)
+
+  if (nexp .gt. 6) then
+    error_msg("w", scriptname, funcname, "Color palette not defined for " \
+              + "more than " + nexp + " experiments")
+  end if
+
+  res@pmLegendDisplayMode = "Always"
+  res@xyExplicitLegendLabels = data_mean&experiment
+  res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
+
+  plot(0) = gsn_csm_xy(wks, data_ref&time, data_mean(:,0,:), res)  ; create plot
+
+  res@pmLegendDisplayMode = "Never"
+
+  ; ---------------------------------------------------------------------
+  ; Add multi model statistics (5% and 95% quantile)
+  ; ---------------------------------------------------------------------
+  if (isatt(diag_script_info, "stat_shading")) then
+    if (diag_script_info@stat_shading .ne. False) then
+      res_stat = True
+      res_stat@gsnXYFillOpacities = 0.2
+      ;cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_cmip_shading.rgb")
+      copy_VarMeta(res, res_stat)
+      res_stat@gsnXYFillColors = cmap(2,:)
+      delete(res_stat@xyLineColors)
+      ; We don't want the line, so make it transparent.
+      ;res_stat@xyLineColor = -1
+      res_stat@xyLineColor = cmap(2,:)
+      delete(res_stat@xyLineThicknesses)
+      res_stat@xyLineThicknesses = (/1, 1/)
+      shading_plot = gsn_csm_xy(wks, data_ref&time, data_mean(0, 1:2, :), \
+      ;shading_plot = gsn_csm_xy(wks, data_ref&time, data_stat(0:1, 0, :), \
+                                res_stat)
+      overlay(plot(0), shading_plot)
+      if(nexp .ge. 2) then
+        res_stat@gsnXYFillColors = cmap(1,:)
+        res_stat@xyLineColor = cmap(1,:)
+        shading_plot = gsn_csm_xy(wks, data_ref&time, data_mean(1, 1:2, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .ge. 3) then
+        res_stat@gsnXYFillColors = cmap(0,:)
+        res_stat@xyLineColor = cmap(0,:)
+        shading_plot = gsn_csm_xy(wks, data_ref&time, data_mean(2, 1:2, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .ge. 4) then
+        res_stat@gsnXYFillColors = cmap(3,:)
+        res_stat@xyLineColor = cmap(3,:)
+        shading_plot = gsn_csm_xy(wks, data_ref&time, data_mean(3, 1:2, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .gt. 4) then
+        error_msg("w", scriptname, funcname, "Color palette not defined for " \
+                  + nexp + " experiments")
+      end if
     end if
-  else
-    varname = var0
   end if
 
-  if (data_mean@units .eq. "degC") then
-    units = "~F34~0~F~ C"
-  else
-    units = data_mean@units
-  end if
-
-  if (anom .eq. "anom") then
-    res@tiYAxisString = "Change in " + varname + " (" + units + ")"
-  else
-    res@tiYAxisString = varname + " (" + units + ")"
-  end if
-
-  res0 = True
-  ref_start = diag_script_info@ref_start
-  ref_end = diag_script_info@ref_end
-
+  ; ---------------------------------------------------------------------
+  ; add reference datasets
+  ; ---------------------------------------------------------------------
   if (isatt(diag_script_info, "ref")) then
-    xy_line_collect(wks, data_mean, data_ref, data_ref_stderr, data_ref&time, \
-                   0, ref_start, ref_end, res, res0, info_var)
-  else
-    xy_line_collect(wks, data_mean, 0, 0, data_mean&time, \
-                    0, ref_start, ref_end, res, res0, info_var)
+    delete(res@xyDashPatterns)
+    delete(res@xyLineThicknesses)
+    delete(res@xyLineColors)
+    res@xyDashPatterns    = dashes
+    ;res@xyLineThicknesses = thicks
+    res@xyLineThicknesses = (/3, 3, 3, 3, 3/)   ; make lines thicker
+    res@xyLineColors      = colors  ; change line color
+
+    ref_p = gsn_csm_xy(wks, data_ref&time, data_ref, res)  ; create plot
+    overlay(plot(0), ref_p)
   end if
+
+  if (diag_script_info@ref_shading) then
+
+    ; ---------------------------------------------------------------------
+    ; yellow shading of reference period
+    ; ---------------------------------------------------------------------
+    gsres                = True
+    gsres@gsFillColor    = "Grey70" ;"yellow"
+    gsres@gsFillOpacityF = 0.1
+    xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+    ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+    newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+
+    txtres               = True
+    txtres@txFont        = "helvetica-bold"
+    txtres@txFontColor   = "Grey40"
+    txtres@txFontHeightF = 0.013
+    ref_txt = gsn_add_text(wks, plot, "reference period", \
+                           0.5*(ref_start + ref_end), \
+                           res@trYMinF + 0.05 * (res@trYMaxF - res@trYMinF), \
+                           txtres)
+
+  end if
+
+
+  ; ---------------------------------------------------------------------
+  ; Draw some lines to create a legend
+  ; ---------------------------------------------------------------------
+  res_lines                   = True      ; polyline mods desired
+  res_lines@tfPolyDrawOrder   = "Predraw"
+  res_lines@gsLineColor       = "grey"    ; line color
+  res_lines@gsLineThicknessF  = 1.        ; line thicker
+  res_lines@gsLineDashPattern = 1.        ; dash pattern
+
+  xx = (/res@trXMinF, res@trXMaxF/)
+  yy = (/0.0, 0.0/)
+  dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
+
+  ; ***********************************************
+  ; legend resources
+  ; ***********************************************
+
+  lgres                    = True
+  lgres@lgItemType         = "Lines"   ; show lines only (default)
+  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+  lgres@vpHeightF          = 0.15      ; height of legend (NDC)
+  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+  ;lgres@lgBoxBackground    = "white"
+  lgres@lgPerimFill        = 0
+  lgres@lgPerimFillColor   = "white"
+
+  delete(cmap)
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_cmip_line.rgb")
+  tmp := tostring(cmap)
+  tmp1 = (/"(/" + tmp(2,0) + "," + tmp(2,1) + "," + tmp(2,2) + "/)" , \
+           "(/" + tmp(1,0) + "," + tmp(1,1) + "," + tmp(1,2) + "/)" , \
+           "(/" + tmp(0,0) + "," + tmp(0,1) + "," + tmp(0,2) + "/)"/)
+  lgres@lgLineColors      = array_append_record(colors, tmp1, 0)
+  lgres@lgDashIndexes     = array_append_record(dashes, (/0,0,0/), 0)
+  ;lgres@lgLineThicknesses = thicks + 3
+  lgres@lgLineThicknessF = 3
+  labels = array_append_record(annots, data_mean&experiment, 0)
+  nitems = dimsizes(labels)
+  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
+
+  ; Create legend
+  lbid = gsn_create_legend(wks, nitems, labels, lgres)
+
+  amres = True
+  amres@amParallelPosF   = -0.38  ;0.81
+  amres@amOrthogonalPosF = -0.3  ;0.0
+  annoid1 = gsn_add_annotation(plot(0), lbid, amres)
+
+
+  resP = True
+  resP@gsnMaximize = True
+  resP@gsnPaperOrientation = "portrait"
+  resP@gsnPaperMargin =  0.8
+
+  ;if (isatt(diag_script_info, "panel_num")) then
+  ;  resP@gsnPanelFigureStrings = diag_script_info@panel_num
+  ;else
+  ;  resP@gsnPanelFigureStrings = (/"a)"/)
+  ;end if
+  ;resP@gsnPanelFigureStringsPerimOn = False
+  ;resP@gsnPanelFigureStringsBackgroundFillColor ="transparent"
+  ;resP@gsnPanelFigureStringsJust = "TopLeft"
+  ;resP@gsnPanelFigureStringsFontHeightF = 0.016
+
+  gsn_panel(wks, plot, (/1, 1/), resP)
 
   log_info(" wrote " + outfile + "." + file_type)
 
@@ -454,11 +549,7 @@ begin
 ;    domain = "reg"
 ;  end if
 ;
-;  if (anom .eq. "anom") then
-;    statistics = "anomaly"
-;  else
-;    statistics = "mean"
-;  end if
+;  statistics = "anomaly"
 ;
 ;  caption = "Multi model mean time series of the " + statistics + \
 ;             " for variable " + varname + ", similar to IPCC AR5, fig. 10.21."
