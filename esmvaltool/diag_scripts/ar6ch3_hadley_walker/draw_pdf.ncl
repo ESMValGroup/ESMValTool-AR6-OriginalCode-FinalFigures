@@ -8,6 +8,8 @@
 ;    Outputs:
 ;
 ; History
+;    20201024 kosaka_yu: added ERA-Interim..
+;    20201019 kosaka_yu: modified the legend format.
 ;    20200930 kosaka_yu: enabled ensemble obs/reanalysis datasets.
 ;    20200918 kosaka_yu: adjusted parameter for confidence intervals.
 ;    20200918 kosaka_yu: revised to show confidence intervals.
@@ -252,9 +254,9 @@ begin
               "Failed to identify the path corresponding to layout.")
   end if
 
-  obslist = (/"ERA5", "JRA-55", "MERRA2", "CFSR", "HadSLP2", "ICOADS", "ERA-20C", "20CRv3"/)
-  obslist@color = (/"black", "black", "black", "black", "grey60", "grey60", "grey60", "grey60"/)
-  obslist@pattern = (/0, 3, 1, 2, 0, 3, 1, 2/)
+  obslist = (/"ERA5", "JRA-55", "MERRA2", "CFSR", "ERA-Interim", "HadSLP2", "ICOADS", "ERA-20C", "20CRv3"/)
+  obslist@color = (/"black", "black", "black", "black", "black", "grey60", "grey60", "grey60", "grey60"/)
+  obslist@pattern = (/0, 3, 1, 4, 2, 0, 3, 1, 2/)
 ;  color_obs = (/"black", "black", "black", "black", "black", "black", "black"/)
 ;  pattern_obs = (/3, 0, 1, 2, 4, 5, 6/)
   obsenslist = (/"20CRv2", "20CRv2c", "20CRv3", "CERA-20C"/)
@@ -1186,10 +1188,32 @@ begin
      
      m = 0
      do n = 0, ListCount(legend)-1
-       if (any(legend[n]@type .eq. (/"single_obs", "ensemble_obs"/))) then
+       if (legend[n]@type .eq."single_obs") then
          x1 = x0 - 0.05 - m/4 * 0.14
-         x2 = x1 - 0.057
+         x2 = x1 - 0.044
          y = y0 + h*0.9 - mod(m, 4)*h*0.6
+         legend[n]@x1 = x1
+         legend[n]@x2 = x2
+         legend[n]@y = y
+         m = m + 1
+       end if
+     end do
+     do n = 0, ListCount(legend)-1
+       if (legend[n]@type .eq."ensemble_obs") then
+         x1 = x0 - 0.05 - m/4 * 0.14
+         x2 = x1 - 0.044
+         y = y0 + h*0.9 - mod(m, 4)*h*0.6
+         legend[n]@x1 = x1
+         legend[n]@x2 = x2
+         legend[n]@y = y
+         m = m + 1
+       end if
+     end do
+     do n = 0, ListCount(legend)-1
+       if (any(legend[n]@type .eq. (/"single_obs", "ensemble_obs"/))) then
+         x1 = legend[n]@x1
+         x2 = legend[n]@x2
+         y  = legend[n]@y
          if (legend[n]@type.eq."single_obs") then
            lres@gsLineColor := legend[n]@color
            lres@gsLineThicknessF = legend[n]@thick
@@ -1219,13 +1243,13 @@ begin
            gsn_text_ndc(wks, "min", (x1+x2)/2., y-h*0.2, txres)
          end if
          x = x2 - 0.01
+         x = x2 - 0.005
          txres@txFontColor := legend[n]@color
          txres@txJust = "CenterRight"
          txres@txFontHeightF = fontHeightL
          txres@txBackgroundFillColor = "transparent"
          name = legend[n]
          gsn_text_ndc(wks, name, x, y, txres)
-         m = m + 1
        end if
      end do
   end if

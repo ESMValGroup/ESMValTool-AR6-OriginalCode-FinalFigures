@@ -705,9 +705,11 @@ diagnostics:
              tier: 3}
           - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
              tier: 3}
-          - {dataset: CFSR, project: ana4mips, type: reanalysis, version: 1,
-             tier: 3, end_year: 2013}
+#          - {dataset: CFSR, project: ana4mips, type: reanalysis, version: 1,
+#             tier: 3, end_year: 2013}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1,
+             tier: 3}
+          - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, 
              tier: 3}
           - {dataset: 20CRv3, project: OBS, type: reanaly, version: "001", 
              tier: 2}
@@ -1189,10 +1191,12 @@ diagnostics:
              tier: 3, start_year: 1979, end_year: 2014}
           - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
              tier: 3, start_year: 1979, end_year: 2014}
-          - {dataset: CFSR, project: ana4mips, type: reanalysis, version: 1,
-             tier: 2, start_year: 1979, end_year: 2013}
+#          - {dataset: CFSR, project: ana4mips, type: reanalysis, version: 1,
+#             tier: 2, start_year: 1979, end_year: 2013}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1,
              tier: 2, start_year: 1980, end_year: 2014}
+          - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, 
+             tier: 3, start_year: 1979, end_year: 2014}
           - {project: CMIP6, exp: amip-hist, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
           - {project: CMIP6, exp: amip-hist, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
           - {project: CMIP6, exp: amip-hist, dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn}
