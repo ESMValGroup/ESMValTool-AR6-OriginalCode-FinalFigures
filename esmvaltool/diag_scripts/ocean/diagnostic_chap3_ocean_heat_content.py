@@ -692,8 +692,8 @@ def single_pane_map_plot(
     unique_id = [dataset, exp, ensemble, short_name, year, key]
 
     # Determine image filename
-
-    path = diagtools.folder([cfg['plot_dir'], key]) + '_'.join(unique_id)
+    filename = '_'.join(unique_id).replace('/', '_')
+    path = diagtools.folder([cfg['plot_dir'], key]) + filename
     path = path.replace(' ', '') + diagtools.get_image_format(cfg)
 
     if not overwrite and os.path.exists(path):
@@ -1018,12 +1018,12 @@ def derive_ohc(cube, volume):
 
 
 def step_4and5(
-        dataset, 
-        lon, 
+        dataset,
+        lon,
         lat,
         pressure,
         sal,
-        temp, 
+        temp,
         debug = False):
     """
     Calculates correct conservative temperature and absolute salinity.
@@ -1034,7 +1034,7 @@ def step_4and5(
     if isinstance(temp, iris.cube.Cube):
         temp = temp.data
 
-    mask1 = sal.mask 
+    mask1 = sal.mask
     mask2 = temp.mask
 #    mask_sum = np.int(mask1)+np.int(mask2)
 #    print('step_4and5, mask_sum:', mask_sum)
@@ -1042,20 +1042,22 @@ def step_4and5(
 
     # 4 i) In all cases, we interpret the model salinity as equal to Preformed Salinity
     if dataset in model_type['TEOS-10']:
-        if debug:  print('applying:SA_from_Sstar') 
+        if debug:
+            print('applying:SA_from_Sstar')
         sal = gsw.SA_from_Sstar(sal, pressure, lon, lat)
     else: #if dataset in model_type['EOS80']:
         #print('assuming that ', dataset, 'is EOS-80')
-        if debug: print('applying:SA_from_Sstar * 35.16504 / 35.') 
+        if debug:
+            print('applying:SA_from_Sstar * 35.16504 / 35.')
         sal = gsw.SA_from_Sstar(sal* 35.16504 / 35., pressure, lon, lat)
 
 
     # 5) Conversions of temperature to Conservative Temperature
-
     # 5 a) If the model is using TEOS-10, and the variable you have is thetao (potential temperature),
     #      then you should convert thetao (potential temperature) to CT=bigthetao (Conservative Temperature)
     if dataset in model_type['TEOS-10'] and dataset in model_type['potential temperature']:
-        if debug: print('applying gsw.CT_from_pt')
+        if debug:
+            print('applying gsw.CT_from_pt')
         temp = gsw.CT_from_pt(sal, temp)
 
     # 5 b) If the model is not using TEOS-10, then you should interpret thetao as equal to bigthetao.  CT=thetao.  DO NOT RECALCULATE.
@@ -1063,16 +1065,198 @@ def step_4and5(
 
     # 5 c) If you have in situ temperature (T), then you should convert to Conservative Temperature
     if dataset in model_type['in situ']:
-        if debug: print('applying gsw.CT_from_t')
+        if debug:
+            print('applying gsw.CT_from_t')
         temp = gsw.CT_from_t(sal, temp, pressure)
 
     sal = np.ma.masked_where(mask1 + sal.mask, sal)
     temp = np.ma.masked_where(mask2 + temp.mask, temp)
 
-    if debug: print('step_4and5: post.', dataset,'\nsal:', sal,'\ntemp:',temp)
-    sal = np.ma.masked_where(mask1 + sal.mask, sal)
-
     return sal, temp
+
+
+def calc_dyn_height_clim(cfg,
+        metadatas,
+        hist_thetao_fn,
+        hist_so_fn,
+        clim_type='fullhistorical',
+        trend='detrended',):
+
+    """
+    Calculate the climatoligical dyncamic height.
+    """
+    # Load relevant metadata
+    exp = metadatas[hist_thetao_fn]['exp']
+    dataset = metadatas[hist_thetao_fn]['dataset']
+    ensemble = metadatas[hist_thetao_fn]['ensemble']
+    project = metadatas[hist_thetao_fn]['project']
+
+    # Generate output paths for SLR netcdfs
+    work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
+    clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend, clim_type])+'.nc'
+
+    if os.path.exists(clim_fn):
+        print ('loading from', clim_fn)
+        return clim_fn
+
+    # Load historical temperature and salinity netcdfs
+    print('load hist netcdfs')
+    psal_bar = iris.load_cube(hist_so_fn)
+    thetao_bar = iris.load_cube(hist_thetao_fn)
+
+    # Calculate climatologies for historical period Temperature and salinity.
+    # Note that _bar suffix indicates climatology data.
+    print('Calculate clim', dataset, clim_type)
+    if clim_type == '1971-2018':
+        # 1) vs. 1971-2018 (in comparison to cross-chapter Box 9.1)
+        psal_bar = extract_time(psal_bar, 1971, 1, 1, 2018, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 1971, 1, 1, 2018, 12, 31)
+    elif clim_type == '2005-2018':
+        # 2) vs. 2005-2018 (in comparison to Argo Period)
+        psal_bar = extract_time(psal_bar, 2005, 1, 1, 2018, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 2005, 1, 1, 2018, 12, 31)
+    elif clim_type == '1850-1900':
+        # 3) vs. 1850-1900 (traditional "pre-industrial")
+        psal_bar = extract_time(psal_bar, 1850, 1, 1, 1900, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 1850, 1, 1, 1900, 12, 31)
+    elif clim_type == '1971-2018':
+        # 4) vs. 1995-2014 (AR5 standard)
+        psal_bar = extract_time(psal_bar, 1995, 1, 1, 2014, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 1995, 1, 1, 2014, 12, 31)
+    elif clim_type == '1971-2018':
+        # 5) vs. 1985-2014 (Convenient 30 yr from AR5)
+        psal_bar = extract_time(psal_bar, 1985, 1, 1, 2014, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 1985, 1, 1, 2014, 12, 31)
+    elif clim_type == '1971-2018':
+        # 6) vs. 2004-2018 (in comparison to RAPID Period)
+        psal_bar = extract_time(psal_bar, 2004, 1, 1, 2018, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 2004, 1, 1, 2018, 12, 31)
+    elif clim_type == 'fullhistorical':
+        # 7) Full historical
+        pass
+    elif clim_type == 'picontrol':
+        # 8) vs. detrended PI-control (same window as full historical)
+        if exp != 'piControl': assert 0
+
+    # Calculaste average along the time dimension
+    psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
+    thetao_bar = thetao_bar.collapsed('time', iris.analysis.MEAN)
+
+    single_pane_map_plot(
+          cfg,
+          metadatas[hist_so_fn],
+          psal_bar[0],
+          key='Dyn_height_clim/'+clim_type+'_surface_psal',
+          sym_zero=False,
+          )
+    single_pane_map_plot(
+          cfg,
+          metadatas[hist_thetao_fn],
+          thetao_bar[0],
+          key='Dyn_height_clim/'+clim_type+'_surface_thetao',
+          sym_zero=False,
+          )
+
+    # load latitude longitude dimensions
+    lats = thetao_bar.coord('latitude').points
+    lons = thetao_bar.coord('longitude').points
+
+    # Make sure latitude and longitude are 2D
+    if lats.ndim == 1:
+        lon, lat = np.meshgrid(lons, lats)
+    elif lats.ndim == 2:
+        lat = lats
+        lon = lons
+
+    # Load depth & pressure data, ensuring depth is negative
+    depths_bar = -1.*np.abs(thetao_bar.coord(axis='z').points)
+    pressure_bar = gsw.conversions.p_from_z(depths_bar, lat)
+
+    # Create output cubes to receive SLR data.
+    print('Creating output arrays')
+    dyn_height_clim = np.zeros(thetao_cube[0].shape) #2d + time
+    count = 0
+    gravity = 9.7963 # m /s^2
+    # Performd SLR calculation for Climatology cube
+    # If cube already exists, then just load the clim SLR data.
+
+    print('Starting clim SLR calculation from fresh')
+    slr_clim = slr_total[0].copy() # 2D
+
+    # calculate corerct conservative temperature and absolute salinity
+    psal_bar.data, temp_bar.data = step_4and5(dataset, lon, lat, pressure_bar, psal_bar.data, temp_bar.data)
+
+    single_pane_map_plot(
+          cfg,
+          metadatas[hist_so_fn],
+          psal_bar[0],
+          key='Dyn_height_clim/'+clim_type+'_surface_asal',
+          sym_zero=False,
+          )
+    single_pane_map_plot(
+          cfg,
+          metadatas[hist_thetao_fn],
+          thetao_bar,
+          key='Dyn_height_clim/'+clim_type+'_surface_ctemp',
+          sym_zero=False,
+          )
+
+    if depths_bar.ndim == 1:
+       depth_bar = np.tile(depths_bar, (len(lat[0]), 1)).T
+
+    # Iterate over each y line:
+    for y in np.arange(len(lat[:,0])):
+        sal_bar = psal_bar.data[:, y, :]
+        temp_bar = thetao_bar.data[:, y, :]
+        if np.ma.is_masked(sal_bar.max()):
+             continue
+        la = lat[y, :]
+        lo = lon[y, :]
+        print('Calculate SLR in 1D:', (y,)) #, 'latitude:', la, lo)
+
+        # load clim depth
+        if depths_bar.ndim == 3:
+            depth_bar = depths_bar[:, y, :]
+            p_bar = pressure_bar[:, y, :]
+        else:
+            p_bar = pressure_bar
+        if depth_bar.shape != sal_bar.shape:
+            assert 0
+
+        # Calculate climatoligical pressure
+        # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
+        #print(y, lola[y], la.shape, lo.shape, lat[:,0].shape)
+        #pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
+        #pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
+        #psal_bar, temp_bar = step_4and5(dataset, lon, lat, pressure_bar, psal_bar, temp_bar)
+
+        # Calculuate climatological Dynamic height anomaly
+        # max_dp is the maximum difference between layers, set to a very high value
+        # to avoid expensive interpolation.
+
+        # Convert dynamic height into mm.
+        dyn_height_clim[y, :] = gsw.geo_strf_dyn_height(sal_bar, temp_bar, p_bar)[0] * 1000. / gravity
+
+    # Save climatological SLR cube as a netcdf.
+    print("saving output cube:", clim_fn)
+    cube0 = thetao_bar[0, :, :].copy()
+    cube0.data = slr_clim #p.ma.masked_where(slr_clim==0., slr_clim)
+    cube0.units = cf_units.Unit('mm')
+    cube0.name = 'Climatological ('+ clim_type+') Sea Level Rise'
+    cube0.long_name = 'Climatological ('+ clim_type+') Sea Level Rise '
+    cube0.short_name = 'slr_clim'
+    cube0.var_name = 'slr_clim'
+    cube0.standard_name = 'steric_change_in_mean_sea_level'
+    iris.save(cube0, clim_fn)
+
+    single_pane_map_plot(
+          cfg,
+          metadatas[hist_thetao_fn],
+          cube0,
+          key='Dyn_height_clim/'+clim_type+'_dynamic_heightsurface_ctemp',
+          sym_zero=False,
+          )
+    return clim_fn
 
 
 def calc_slr_full(cfg,
@@ -1129,6 +1313,21 @@ def calc_slr_full(cfg,
         for key, fn in output_fns.items():
             if not os.path.exists(fn):
                 print('file does not exist:', key, fn)
+
+
+    clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
+                  '1985-2014', '2004-2018', 'fullhistorical', 'picontrol']
+    for clim_type in clim_types:
+        clim_fn = calc_dyn_height_clim(
+            cfg,
+            metadatas,
+            hist_thetao_fn,
+            hist_so_fn,
+            clim_type=clim_type,
+            trend='detrended')
+        
+    assert 0
+
 
     # Load historical temperature and salinity netcdfs
     print('load hist netcdfs')
@@ -1215,7 +1414,7 @@ def calc_slr_full(cfg,
             #print(y, lola[y], la.shape, lo.shape, lat[:,0].shape)
             pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
             pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
-          
+
 
             sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
 
@@ -1492,7 +1691,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
             sal = so_cube.data[t,z]
             temp = thetao_cube.data[t,z]
 
-            # 4.) Calculate the pressure at each gridpoint: p=gsw_p_from_z(z,lat).  
+            # 4.) Calculate the pressure at each gridpoint: p=gsw_p_from_z(z,lat).
             pressure = gsw.conversions.p_from_z(depth, lat) # dbar
 
 
@@ -1562,7 +1761,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
 
 def volume_integrated_plot(cfg, metadata, ohc_fn, area_fn):
     """
-    Make a plot of the final year in the ohc data. 
+    Make a plot of the final year in the ohc data.
     """
     short_name = metadata['short_name']
     dataset = metadata['dataset']
@@ -1579,7 +1778,7 @@ def volume_integrated_plot(cfg, metadata, ohc_fn, area_fn):
     t2 = t2.collapsed([t2.coord('time'),], iris.analysis.MEAN)
 
     cube = t1 - t2
-    cube = cube.collapsed([cube.coord(axis='z'),], 
+    cube = cube.collapsed([cube.coord(axis='z'),],
                           iris.analysis.SUM)
     cube.data = cube.data / area.data
 
@@ -1667,7 +1866,7 @@ def SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = 'all'):
     
 
 
-def SLR_map_plot(cfg, metadata, slr_fn, slr_type): 
+def SLR_map_plot(cfg, metadata, slr_fn, slr_type):
     """
      Make a plot of the SLR final decade.
     """
@@ -1860,7 +2059,7 @@ def guess_volcello_fn(dicts, keys, optional = []):
         if len(intersection) == len(both):
             print("guess_volcello_fn: full match", index, keys, optional, value)
             return value
-        
+
         intersection = set(index) & set(keys)
         if len(intersection) == len(keys):
             print("guess_volcello_fn: partial match", index, keys, value)
@@ -2178,7 +2377,7 @@ def main(cfg):
                 hist_thetao_fn,
                 hist_so_fn,
                 trend=trend
-            )
+                ) 
 
             print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
             slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
@@ -2292,10 +2491,10 @@ def main(cfg):
 
         metadatas[ohc_fn] = metadatas[detrended_fn].copy()
 
-    for (project, dataset, exp, ensemble, keya, keyb), ohc_fn in ocean_heat_content.items():       
+    for (project, dataset, exp, ensemble, keya, keyb), ohc_fn in ocean_heat_content.items():
         areacello_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
         volume_integrated_plot(cfg, metadatas[ohc_fn], ohc_fn, areacello_fn)
-    
+
     print('\n---------------------\nCalculate OHC time series')
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     for depth_range in depth_ranges:
