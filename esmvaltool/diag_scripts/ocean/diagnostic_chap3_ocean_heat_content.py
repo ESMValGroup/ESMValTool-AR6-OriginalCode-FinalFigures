@@ -1081,7 +1081,6 @@ def calc_dyn_height_clim(cfg,
         hist_so_fn,
         clim_type='fullhistorical',
         trend='detrended',):
-
     """
     Calculate the climatoligical dyncamic height.
     """
@@ -1093,7 +1092,7 @@ def calc_dyn_height_clim(cfg,
 
     # Generate output paths for SLR netcdfs
     work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
-    clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend, clim_type])+'.nc'
+    clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend, clim_type]) + '.nc'
 
     if os.path.exists(clim_fn):
         print ('loading from', clim_fn)
@@ -1170,22 +1169,61 @@ def calc_dyn_height_clim(cfg,
 
     # Load depth & pressure data, ensuring depth is negative
     depths_bar = -1.*np.abs(thetao_bar.coord(axis='z').points)
-    pressure_bar = gsw.conversions.p_from_z(depths_bar, lat)
 
     # Create output cubes to receive SLR data.
     print('Creating output arrays')
     dyn_height_clim = np.zeros(thetao_cube[0].shape) #2d + time
     count = 0
     gravity = 9.7963 # m /s^2
-    # Performd SLR calculation for Climatology cube
-    # If cube already exists, then just load the clim SLR data.
 
     print('Starting clim SLR calculation from fresh')
     slr_clim = slr_total[0].copy() # 2D
 
-    # calculate corerct conservative temperature and absolute salinity
-    psal_bar.data, temp_bar.data = step_4and5(dataset, lon, lat, pressure_bar, psal_bar.data, temp_bar.data)
+    if depths_bar.ndim == 1:
+       depth_bar = np.tile(depths_bar, (len(lat[0]), 1)).T
 
+    # Iterate over each y line:
+    for y in np.arange(len(lat[:,0])):
+        sal_bar = psal_bar.data[:, y, :]
+        temp_bar = thetao_bar.data[:, y, :]
+
+        if np.ma.is_masked(sal_bar.max()):
+             continue
+        la = lat[y, :]
+        lo = lon[y, :]
+        print('Calculate SLR in 1D:', (y,)) #, 'latitude:', la, lo)
+
+        # load clim depth
+        if depths_bar.ndim == 3:
+            depth_bar = depths_bar[:, y, :]
+
+        if depth_bar.shape != sal_bar.shape:
+            assert 0
+
+        # calculate pressure
+        pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
+        pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
+
+        # calculate corerct conservative temperature and absolute salinity
+        sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
+
+        psal_bar.data[:, y, :] = sal_bar
+        thetao_bar.data[:, y, :] = temp_bar
+
+        # Calculate climatoligical pressure
+        # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
+        #print(y, lola[y], la.shape, lo.shape, lat[:,0].shape)
+        #pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
+        #psal_bar, temp_bar = step_4and5(dataset, lon, lat, pressure_bar, psal_bar, temp_bar)
+
+        # Calculuate climatological Dynamic height anomaly
+        # max_dp is the maximum difference between layers, set to a very high value
+        # to avoid expensive interpolation.
+
+        # Convert dynamic height into mm.
+        dyn_height_clim[y, :] = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar)[0] * 1000. / gravity
+
+    # POlot fixed temperatrure and salinity.
     single_pane_map_plot(
           cfg,
           metadatas[hist_so_fn],
@@ -1200,42 +1238,6 @@ def calc_dyn_height_clim(cfg,
           key='Dyn_height_clim/'+clim_type+'_surface_ctemp',
           sym_zero=False,
           )
-
-    if depths_bar.ndim == 1:
-       depth_bar = np.tile(depths_bar, (len(lat[0]), 1)).T
-
-    # Iterate over each y line:
-    for y in np.arange(len(lat[:,0])):
-        sal_bar = psal_bar.data[:, y, :]
-        temp_bar = thetao_bar.data[:, y, :]
-        if np.ma.is_masked(sal_bar.max()):
-             continue
-        la = lat[y, :]
-        lo = lon[y, :]
-        print('Calculate SLR in 1D:', (y,)) #, 'latitude:', la, lo)
-
-        # load clim depth
-        if depths_bar.ndim == 3:
-            depth_bar = depths_bar[:, y, :]
-            p_bar = pressure_bar[:, y, :]
-        else:
-            p_bar = pressure_bar
-        if depth_bar.shape != sal_bar.shape:
-            assert 0
-
-        # Calculate climatoligical pressure
-        # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
-        #print(y, lola[y], la.shape, lo.shape, lat[:,0].shape)
-        #pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
-        #pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
-        #psal_bar, temp_bar = step_4and5(dataset, lon, lat, pressure_bar, psal_bar, temp_bar)
-
-        # Calculuate climatological Dynamic height anomaly
-        # max_dp is the maximum difference between layers, set to a very high value
-        # to avoid expensive interpolation.
-
-        # Convert dynamic height into mm.
-        dyn_height_clim[y, :] = gsw.geo_strf_dyn_height(sal_bar, temp_bar, p_bar)[0] * 1000. / gravity
 
     # Save climatological SLR cube as a netcdf.
     print("saving output cube:", clim_fn)
@@ -1325,7 +1327,7 @@ def calc_slr_full(cfg,
             hist_so_fn,
             clim_type=clim_type,
             trend='detrended')
-        
+
     assert 0
 
 
@@ -1816,7 +1818,7 @@ def SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = 'all'):
     fig.set_size_inches(10, 7)
     axes= {}
     subplots = {'slr_total_ts':311, 'slr_thermo_ts':312, 'slr_halo_ts':313}
-    subplot_ylabel = {311: 'Total, mm', 312: 'Thermosteric, mm', 313: 'Halosteric, mm'} 
+    subplot_ylabel = {311: 'Total, mm', 312: 'Thermosteric, mm', 313: 'Halosteric, mm'}
 
     for sbp_slr, subplot in subplots.items():
         plt.subplot(subplot)
@@ -1863,7 +1865,7 @@ def SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = 'all'):
         logger.info('Saving plots to %s', path)
         plt.savefig(path, dpi=200)
     plt.close()
-    
+
 
 
 def SLR_map_plot(cfg, metadata, slr_fn, slr_type):
@@ -1882,7 +1884,7 @@ def SLR_map_plot(cfg, metadata, slr_fn, slr_type):
     t1 = t1.collapsed([t1.coord('time'),], iris.analysis.MEAN)
     times = diagtools.cube_time_to_float(cube)
     time_str = str(int(times[-10])) + ' - ' + str(int(times[-1]))
- 
+
     cube = t1
     unique_id = [dataset, exp, ensemble, slr_type, time_str]
 
@@ -2377,7 +2379,7 @@ def main(cfg):
                 hist_thetao_fn,
                 hist_so_fn,
                 trend=trend
-                ) 
+                )
 
             print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
             slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
@@ -2401,7 +2403,7 @@ def main(cfg):
                 slr_ts_fn = calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type)
                 slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts', trend)] = slr_ts_fn
                 metadatas[slr_ts_fn] = metadatas[detrended_fn]
-            # break   
+            # break
 
     # Plot SLR maps:
     for (project, dataset, exp, ensemble, slr_type, trend), slr_fn in slr_fns.items():
