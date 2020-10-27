@@ -851,10 +851,15 @@ def SLR_sanity_check(
     steric = iris.load_cube(steric_fn)
     thermo =  iris.load_cube(thermo_fn)
     halo = iris.load_cube(halo_fn)
+    for cube in [steric, thermo, halo]:
+        cube.data = np.ma.masked_invalid(cube.data)
+
+    time_str = str(int(diagtools.cube_time_to_float(steric)[-1]))
+
     cube221 = halo[-1]
     cube222 = steric[-1] - thermo[-1]
     cube223 = cube221 - cube222
-    cube224 =  cube221/cube222
+    cube224 =  (cube221 - cube222)/(cube221 + cube222)
 
     # create the z axis for plots 2, 3, 4.
     extend = 'neither'
@@ -872,11 +877,11 @@ def SLR_sanity_check(
 
     # Add the sub plots to the figure.
     add_map_subplot(
-        221, cube221, linspace12, cmap='viridis', title='Detrended '+exp,
+        221, cube221, linspace12, cmap='viridis', title='Halosteric',
         extend=extend)
     add_map_subplot(
         222, cube222, linspace12, cmap='viridis',
-        title=exp + '(trend intact)',
+        title='Steric - Thermosteric',
         extend=extend)
     add_map_subplot(
         223,
@@ -891,12 +896,12 @@ def SLR_sanity_check(
             cube224,
             logspace4,
             cmap='bwr',
-            title='Quotient',
+            title='Difference/Sum',
             log=True)
 
     # Add overall title
     units = str(cube221.units)
-    fig.suptitle(long_name + ' [' + units + ']', fontsize=14)
+    fig.suptitle(long_name + ' [' + units + '] '+ time_str, fontsize=14)
 
     # Determine image filename
     fn_list = ['Detrended', project, dataset, ensemble, exp, short_name, 'quad_maps']
@@ -1150,12 +1155,14 @@ def calc_slr_full(cfg,
     # Calculate climatologies for historical period Temperature and salinity.
     # Note that _bar suffix indicates climatology data.
     print('Calculate clim')
-    if np.array(times).min() < 1880:
-        psal_bar = extract_time(so_cube.copy(), 1850, 1, 1, 1880, 12, 31)
-        thetao_bar = extract_time(thetao_cube.copy(), 1850, 1, 1, 1880, 12, 31)
-    else:
-        psal_bar = extract_time(so_cube.copy(), 1950, 1, 1, 1980, 12, 31)
-        thetao_bar = extract_time(thetao_cube.copy(), 1950, 1, 1, 1980, 12, 31)
+    psal_bar = so_cube.copy()
+    thetao_bar = thetao_cube.copy()
+#    if np.array(times).min() < 1880:
+#        psal_bar = extract_time(so_cube.copy(), 1850, 1, 1, 1880, 12, 31)
+#        thetao_bar = extract_time(thetao_cube.copy(), 1850, 1, 1, 1880, 12, 31)
+#    else:
+#        psal_bar = extract_time(so_cube.copy(), 1950, 1, 1, 1980, 12, 31)
+#        thetao_bar = extract_time(thetao_cube.copy(), 1950, 1, 1, 1980, 12, 31)
 
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
     print('clim: so:', psal_bar.shape)
@@ -1331,6 +1338,10 @@ def calc_slr_full(cfg,
             if t == 0:
                 print(count, (t, y), 'performing 2D SLR')
 
+    slr_total  = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_total)
+    slr_thermo = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_thermo)
+    slr_halo   = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_halo )
+
     # Save SLR data as a cube and then a netcdf..
     cube0 = thetao_cube[:, 0, :, :].copy()
     cube0.data = slr_total
@@ -1378,12 +1389,16 @@ def calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemb
     slr_cube = iris.load_cube(slr_fn)
     area_cube = iris.load_cube(areacella_fn)
 
+    slr_cube.data = np.ma.masked_invalid(slr_cube.data)
+    area_cube.data = np.ma.masked_invalid(area_cube.data)
+
     grid_areas = da.tile(area_cube.core_data(), [slr_cube.shape[0], 1, 1])
     slr_cube = slr_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=grid_areas)
 
     # Save NetCDF
     iris.save(slr_cube, slr_ts_fn)
 
+    print('calc_slr_timeseries:', dataset, exp, ensemble, slr_cube.data)
     # Make plot
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -1586,6 +1601,71 @@ def volume_integrated_plot(cfg, metadata, ohc_fn, area_fn):
         plt.savefig(path, dpi=200)
     plt.close()
 
+def SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = 'all'):
+    """
+    SLR_multimodel_plot: multimodel SLR time series plot
+    """
+
+    path = diagtools.folder([cfg['plot_dir'], 'SLR_multimodel_SLR']) + 'SLR_multimodel_SLR_'+plot_dataset
+    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+
+    datasets = list({index[1]:True for index in slr_fns.keys()}.keys())
+    datasets = sorted(datasets)
+    color_dict = {dataset:c for dataset, c in zip(datasets, plt.cm.viridis(np.linspace(0,1,len(datasets))))}
+
+    fig = plt.figure()
+    fig.set_size_inches(10, 7)
+    axes= {}
+    subplots = {'slr_total_ts':311, 'slr_thermo_ts':312, 'slr_halo_ts':313}
+    subplot_ylabel = {311: 'Total, mm', 312: 'Thermosteric, mm', 313: 'Halosteric, mm'} 
+
+    for sbp_slr, subplot in subplots.items():
+        plt.subplot(subplot)
+        plt.ylabel(subplot_ylabel[subplot])
+
+        for (project, dataset, exp, ensemble, slr_type, trend), slr_fn in slr_fns.items():
+            if sbp_slr != slr_type: continue
+            if plot_dataset == 'all': pass
+            elif dataset != plot_dataset: continue
+
+            if trend == 'detrended': ls = '-'
+            if trend == 'intact': ls = ':'
+
+            cube = iris.load_cube(slr_fn)
+            times = diagtools.cube_time_to_float(cube)
+            data = np.ma.masked_invalid(cube.data)
+            print(project, dataset, exp, ensemble, slr_type, sbp_slr, times, data)
+            plt.plot(times, data, c = color_dict[dataset], ls=ls)
+
+    if plot_dataset == 'all':
+        plt.suptitle('Steric Sea Level Rise')
+    else:
+        plt.suptitle('Steric Sea Level Rise - '+plot_dataset)
+
+    # Legend section
+    if len(datasets) <=5:
+        axleg = plt.axes([0.0, 0.00, 0.9, 0.10])
+    else:
+        axleg = plt.axes([0.0, 0.00, 0.9, 0.15])
+    axleg.axis('off')
+    for dataset in datasets:
+        axleg.plot([], [], c=color_dict[dataset], lw=2, ls='-', label=dataset)
+    legd = axleg.legend(
+            loc='upper center',
+            ncol=5,
+            prop={'size': 10},
+            bbox_to_anchor=(0.5, 0.5,),
+            fontsize=12)
+    legd.draw_frame(False)
+    legd.get_frame().set_alpha(0.)
+
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path, dpi=200)
+    plt.close()
+    
+
 
 def SLR_map_plot(cfg, metadata, slr_fn, slr_type): 
     """
@@ -1601,20 +1681,25 @@ def SLR_map_plot(cfg, metadata, slr_fn, slr_type):
 
     t1 = cube[-10:].copy()
     t1 = t1.collapsed([t1.coord('time'),], iris.analysis.MEAN)
-
+    times = diagtools.cube_time_to_float(cube)
+    time_str = str(int(times[-10])) + ' - ' + str(int(times[-1]))
+ 
     cube = t1
-    unique_id = [dataset, exp, ensemble, slr_type  ]
+    unique_id = [dataset, exp, ensemble, slr_type, time_str]
 
     # Determine image filename
     path = diagtools.folder([cfg['plot_dir'], 'SLR_map_plots']) + '_'.join(unique_id)
     path = path.replace(' ', '') + diagtools.get_image_format(cfg)
 
-    cmap='viridis'
+    cmap='coolwarm'
+    max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
     nspace = np.linspace(
-         cube.data.min(), cube.data.max(), 20, endpoint=True)
+        -max_val, max_val, 21, endpoint=True)
 
     title = ' '.join(unique_id)
+
     print('SLR_map_plot', unique_id, nspace, [cube.data.min(), cube.data.max()], cube.data.shape)
+
     add_map_subplot(111, cube, nspace, title=title,cmap=cmap)
     # Saving files:
     if cfg['write_plots']:
@@ -2069,55 +2154,66 @@ def main(cfg):
         detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
 
-
     print('\n-------------\nCalculate Sea Level Rise')
     slr_fns = {}
-    do_SLR = True 
-    for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
-        if not do_SLR: continue
-        detrended_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
-        if short_name != 'thetao':
-            continue
-        if exp ==  'piControl': # no need to calculate this.
-            continue
+    do_SLR = True
+    trends = ['detrended', 'intact']
+    for trend in trends:
+        for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
+            if not do_SLR: continue
+            if short_name != 'thetao':
+                continue
+            if exp ==  'piControl': # no need to calculate this.
+                continue
 
-        hist_thetao_fn = detrended_fn
-        hist_so_fn =  detrended_ncs[(project, dataset, exp, ensemble, 'so')]
+            if trend == 'detrended':
+                hist_thetao_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
+                hist_so_fn =  detrended_ncs[(project, dataset, exp, ensemble, 'so')]
+            if trend ==  'intact':
+                hist_thetao_fn = file_dict[(project, dataset, exp, ensemble, 'thetao')]
+                hist_so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
 
-        slr_total_fn, slr_thermo_fn, slr_halo_fn = calc_slr_full(cfg,
-            metadatas,
-            hist_thetao_fn,
-            hist_so_fn,
-            trend='detrended'
+            slr_total_fn, slr_thermo_fn, slr_halo_fn = calc_slr_full(cfg,
+                metadatas,
+                hist_thetao_fn,
+                hist_so_fn,
+                trend=trend
             )
 
-        print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
-        slr_fns[(project, dataset, exp, ensemble, 'slr_total')] = slr_total_fn
-        slr_fns[(project, dataset, exp, ensemble, 'slr_thermo')] = slr_thermo_fn
-        slr_fns[(project, dataset, exp, ensemble, 'slr_halo')] = slr_halo_fn
+            print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
+            slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
+            slr_fns[(project, dataset, exp, ensemble, 'slr_thermo', trend)] = slr_thermo_fn
+            slr_fns[(project, dataset, exp, ensemble, 'slr_halo', trend)] = slr_halo_fn
 
-        metadatas[slr_total_fn] = metadatas[detrended_fn]
-        metadatas[slr_thermo_fn] = metadatas[detrended_fn]
-        metadatas[slr_halo_fn] = metadatas[detrended_fn]
+            metadatas[slr_total_fn] = metadatas[hist_thetao_fn]
+            metadatas[slr_thermo_fn] = metadatas[hist_thetao_fn]
+            metadatas[slr_halo_fn] = metadatas[hist_thetao_fn]
 
-        SLR_sanity_check(
-            cfg,
-            metadatas[slr_total_fn],
-            slr_total_fn,
-            slr_thermo_fn,
-            slr_halo_fn)
+            SLR_sanity_check(
+                cfg,
+                metadatas[slr_total_fn],
+                slr_total_fn,
+                slr_thermo_fn,
+                slr_halo_fn)
 
-        # Calculate time series?
-        areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
-        for slr_fn, slr_type in zip([slr_total_fn, slr_thermo_fn, slr_halo_fn], ['slr_total', 'slr_thermo', 'slr_halo']):
-            slr_ts_fn = calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type)
-            slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts')] = slr_ts_fn
-            metadatas[slr_ts_fn] = metadatas[detrended_fn]
+            # Calculate time series?
+            areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
+            for slr_fn, slr_type in zip([slr_total_fn, slr_thermo_fn, slr_halo_fn], ['slr_total', 'slr_thermo', 'slr_halo']):
+                slr_ts_fn = calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type)
+                slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts', trend)] = slr_ts_fn
+                metadatas[slr_ts_fn] = metadatas[detrended_fn]
+            # break   
 
     # Plot SLR maps:
-    for (project, dataset, exp, ensemble, slr_type), slr_fn in slr_fns.items():
+    for (project, dataset, exp, ensemble, slr_type, trend), slr_fn in slr_fns.items():
+        # Can't make a map plot for a time series.
+        if slr_type.find('_ts') > -1: continue
         SLR_map_plot(cfg, metadatas[slr_fn], slr_fn, slr_type)
 
+    SLR_multimodel_plot(cfg, metadatas, slr_fns)
+    datasets = list({index[1]:True for index in slr_fns.keys()}.keys())
+    for dataset in datasets:
+        SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = dataset)
     assert 0
 
     print('\nCalculate ocean heat content - trend intact')
@@ -2200,7 +2296,6 @@ def main(cfg):
         areacello_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
         volume_integrated_plot(cfg, metadatas[ohc_fn], ohc_fn, areacello_fn)
     
-
     print('\n---------------------\nCalculate OHC time series')
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     for depth_range in depth_ranges:
