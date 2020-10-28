@@ -1140,9 +1140,9 @@ def calc_dyn_height_clim(cfg,
     elif clim_type == 'fullhistorical':
         # 7) Full historical
         pass
-    elif clim_type == 'picontrol':
+    elif clim_type == 'piControl':
         # 8) vs. detrended PI-control (same window as full historical)
-        return None
+#        return None
         if exp != 'piControl':
             assert 0
 
@@ -1538,11 +1538,11 @@ def calc_slr_full(cfg,
 #                print('file does not exist:', key, fn)
 
     clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
-                  '1985-2014', '2004-2018', 'fullhistorical', 'picontrol']
+                  '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
 
     clim_files = {}
     for clim_type in clim_types:
-        if clim_type == 'picontrol':
+        if clim_type == 'piControl':
             clim_fn = calc_dyn_height_clim(
                 cfg,
                 metadatas,
@@ -2609,14 +2609,14 @@ def main(cfg):
             if trend == 'detrended':
                 hist_thetao_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
                 hist_so_fn =  detrended_ncs[(project, dataset, exp, ensemble, 'so')]
-                picontrol_thetao_fn = detrended_ncs[(project, dataset, exp, pi_ensemble, short_name)]
-                picontrol_so_fn =  detrended_ncs[(project, dataset, exp, pi_ensemble, 'so')]
+                picontrol_thetao_fn = detrended_ncs[(project, dataset, 'piControl', pi_ensemble, short_name)]
+                picontrol_so_fn =  detrended_ncs[(project, dataset, 'piControl', pi_ensemble, 'so')]
 
             if trend ==  'intact':
                 hist_thetao_fn = file_dict[(project, dataset, exp, ensemble, 'thetao')]
                 hist_so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
-                picontrol_thetao_fn = file_dict[(project, dataset, exp, pi_ensemble, short_name)]
-                picontrol_so_fn =  file_dict[(project, dataset, exp, pi_ensemble, 'so')]
+                picontrol_thetao_fn = file_dict[(project, dataset, 'piControl', pi_ensemble, short_name)]
+                picontrol_so_fn =  file_dict[(project, dataset, 'piControl', pi_ensemble, 'so')]
 
 
             #slr_total_fn, slr_thermo_fn, slr_halo_fn =
