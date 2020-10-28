@@ -1295,7 +1295,7 @@ def calc_dyn_height(
         metadatas,
         hist_thetao_fn,
         hist_so_fn,
-        trend=trend):
+        trend='detrended'):
     """ Calculates the steric, thermo and haloseeteric dynamic height.
     """
 
@@ -1317,10 +1317,10 @@ def calc_dyn_height(
         for fn, key in zip([total_fn, thermo_fn, halo_fn], ['total', 'thermo', 'halo']):
             cube1 = iris.load_cube(fn)
             for t in [0, -1, 'mean']:
-                    if t == 'mean':
-                        dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
-                    else:
-                        dat = cube1[t]
+                if t == 'mean':
+                    dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
+                else:
+                    dat = cube1[t]
                 single_pane_map_plot(
                       cfg,
                       metadatas[hist_thetao_fn],
@@ -1373,7 +1373,7 @@ def calc_dyn_height(
         depth = np.tile(depths, (len(lat[0]), 1)).T
 
     for y in np.arange(len(lat[:,0])):
-        print('Calculate SLR in 1D:', dataset, y, 'of', len(la))
+        print('Calculate SLR in 1D:', dataset, y, 'of', len(lat[:,0]))
         sal_bar = psal_bar.data[:, y, :]
         if np.ma.is_masked(sal_bar.max()):
              continue
