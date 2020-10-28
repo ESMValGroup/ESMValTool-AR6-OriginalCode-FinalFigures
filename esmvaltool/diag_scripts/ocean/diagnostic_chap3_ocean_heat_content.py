@@ -1306,12 +1306,29 @@ def calc_dyn_height(
     project = metadatas[hist_thetao_fn]['project']
 
     # Generate output paths for SLR netcdfs
-    work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
-    output_fns = {}
-    # output_fns['total'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_SLR', trend])+'.nc'
-    # output_fns['thermo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_SLR', trend])+'.nc'
-    # output_fns['halo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_SLR', trend])+'.nc'
-    # output_fns['clim'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend])+'.nc'
+    work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height'])
+    total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_dyn_height', trend])+'.nc'
+    thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_dyn_height', trend])+'.nc'
+    halo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_dyn_height', trend])+'.nc'
+
+    # Check whether output paths exists already.
+    # If they exist, then make some basic figures and return paths.
+    if False not in [os.path.exists(fn) for fn in [total_fn, thermo_fn, halo_fn]]:
+        for fn, key in zip([total_fn, thermo_fn, halo_fn], ['total', 'thermo', 'halo']):
+            cube1 = iris.load_cube(fn)
+            for t in [0, -1, 'mean']:
+                    if t == 'mean':
+                        dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
+                    else:
+                        dat = cube1[t]
+                single_pane_map_plot(
+                      cfg,
+                      metadatas[hist_thetao_fn],
+                      dat,
+                      key='dyn_height_'+key+'_'+trend,
+                      sym_zero=True,
+                      )
+        return total_fn, thermo_fn, halo_fn
 
     # Load historical temperature and salinity netcdfs
     so_cube = iris.load_cube(hist_so_fn)
@@ -1344,9 +1361,9 @@ def calc_dyn_height(
     depths_bar = -1.*np.abs(thetao_bar.coord(axis='z').points)
 
     # Create output cubes to receive SLR data.
-    slr_total = np.zeros(thetao_cube[:, 0].shape) #2d + time
-    slr_thermo = slr_total.copy()
-    slr_halo = slr_total.copy()
+    dyn_total = np.zeros(thetao_cube[:, 0].shape) #2d + time
+    dyn_thermo = dyn_total.copy()
+    dyn_halo = dyn_total.copy()
 
     count = 0
     gravity = 9.7963 # m /s^2
@@ -1362,19 +1379,18 @@ def calc_dyn_height(
              continue
         temp_bar = thetao_bar.data[:, y, :]
 
+        # Load historical coords
         la = lat[y, :]
         lo = lon[y, :]
-
         # Load depth dataset
         if depths.ndim == 3:
             depth = depths[:, y, :]
-        if depth.shape != sal_bar.shape: assert 0
-
+        if depth.shape != sal_bar.shape:
+            assert 0
         if depths.ndim != 4:
             pressure = gsw.conversions.p_from_z(depth, la) # dbar
 
-        # Load climatological depth dataset
-        # load clim depth
+        # Sort out climatological data
         if depths_bar.ndim == 1:
             depth_bar = np.tile(depths_bar, (len(la), 1)).T
             print('tiling depth:', depths_bar.shape, sal_bar.shape, depth_bar.shape)
@@ -1383,7 +1399,6 @@ def calc_dyn_height(
             depth_bar = depths_bar[:, y, :]
         else:
             assert 0
-
         pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
         pressure_bar = np.ma.masked_where(sal_bar.mask, pressure_bar)
         sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
@@ -1399,81 +1414,78 @@ def calc_dyn_height(
             temp = thetao_cube.data[t, :, y, :]
             pressure = np.ma.masked_where(temp.mask, pressure)
 
-           # print('looping 1A:',t,y, time, sal, temp, pressure)
             # Confirm that we use absolute salininty & conservative temperature
             sal, temp = step_4and5(dataset, lo, la, pressure, sal, temp)
-            #print('looping 1B:',t,y, time, sal, temp, pressure)
 
             # Calculate Dynamic height anomaly
-            seafloorpres = pressure.max(axis=0)
-            if p_ref == 'SeaFloor':
-                gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = seafloorpres)[0]
-                gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = seafloorpres)[0]
-            elif p_ref == '2000m':
-                ref_pressure = gsw.conversions.p_from_z(-2000., la)
-                ref_pressure = np.array([np.min([r, f])for r, f in zip(ref_pressure, seafloorpres)])
-                gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, p_ref = ref_pressure)[0]
-                gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure, p_ref = ref_pressure)[0]
-            else:
-                gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, )[0] * 1000. / gravity
-                gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure)[0] * 1000. / gravity
-                gsdh_halo = gsw.geo_strf_dyn_height(sal, temp_bar, pressure)[0] * 1000. / gravity
-
-            # Convert to mm and calculate anomaly relative to clim data
-            #gsdh_total = gsdh_total - slr_clim[y, :]
-            #gsdh_thermo = gsdh_thermo - slr_clim[y, :]
-            #gsdh_halo = gsdh_halo - slr_clim[y, :]
+            gsdh_total = gsw.geo_strf_dyn_height(sal, temp, pressure, )[0] * 1000. / gravity
+            gsdh_thermo = gsw.geo_strf_dyn_height(sal_bar, temp, pressure)[0] * 1000. / gravity
+            gsdh_halo = gsw.geo_strf_dyn_height(sal, temp_bar, pressure)[0] * 1000. / gravity
 
             # Put in the output array:
-            slr_total[t, y, :] = gsdh_total
-            slr_thermo[t, y, :] = gsdh_thermo
-            slr_halo[t, y, :] = gsdh_halo
+            dyn_total[t, y, :] = gsdh_total
+            dyn_thermo[t, y, :] = gsdh_thermo
+            dyn_halo[t, y, :] = gsdh_halo
 
             print('----\n', [t,'of', len(times)], [y,'of',len(lat[:,0])], time)
             print(dataset, 'total', gsdh_total.min(),  gsdh_total.max())
-            print(dataset, 'slr_thermo', gsdh_thermo.min(), gsdh_thermo.max())
+            print(dataset, 'dyn_thermo', gsdh_thermo.min(), gsdh_thermo.max())
             print(dataset, 'halo', gsdh_halo.min(), gsdh_halo.max())
 
             count += 1
             if t == 0:
                 print(count, (t, y), 'performing 2D SLR')
 
-    slr_total  = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_total)
-    slr_thermo = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_thermo)
-    slr_halo   = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_halo )
+    dyn_total  = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, dyn_total)
+    dyn_thermo = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, dyn_thermo)
+    dyn_halo   = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, dyn_halo )
 
     # Save SLR data as a cube and then a netcdf..
     cube0 = thetao_cube[:, 0, :, :].copy()
-    cube0.data = slr_total
+    cube0.data = dyn_total
     cube0.units = cf_units.Unit('mm')
     cube0.name = 'Total Steric Dynamic Height'
     cube0.long_name = 'Total Steric Dynamic Height'
     cube0.short_name = 'dyn_total'
     cube0.var_name = 'dyn_total'
     cube0.standard_name = 'steric_change_in_mean_sea_level'
-    iris.save(cube0, output_fns['total'])
+    iris.save(cube0, total_fn)
 
     cube1 = thetao_cube[:, 0, :, :].copy()
-    cube1.data = slr_thermo
+    cube1.data = dyn_thermo
     cube1.units = cf_units.Unit('mm')
     cube1.name = 'Thermosteric Dynamic Height'
     cube1.long_name = 'Thermosteric Dynamic Height'
     cube1.short_name = 'dyn_thermo'
     cube1.var_name = 'dyn_thermo'
     cube1.standard_name = 'thermosteric_change_in_mean_sea_level'
-    iris.save(cube1, output_fns['thermo'])
+    iris.save(cube1, thermo_fn)
 
     cube2 = thetao_cube[:, 0, :, :].copy()
-    cube2.data = slr_halo
+    cube2.data = dyn_halo
     cube2.units = cf_units.Unit('mm')
     cube2.name = 'Halosteric Dynamic Height'
     cube2.long_name = 'Halosteric Dynamic Height'
     cube2.short_name = 'dyn_halo'
     cube2.var_name = 'dyn_halo'
     cube2.standard_name = 'halosteric_change_in_mean_sea_level'
-    iris.save(cube2, output_fns['halo'])
+    iris.save(cube2, halo_fn)
 
-    return output_fns['total'], output_fns['thermo'], output_fns['halo']
+    for cube, key in zip([cube0, cube1, cube2], ['total', 'thermo', 'halo']):
+        for t in [0, -1, 'mean']:
+            if t == 'mean':
+                dat = cube.copy().collapsed('time', iris.analysis.MEAN)
+            else:
+                dat = cube[t]
+            single_pane_map_plot(
+                cfg,
+                metadatas[hist_thetao_fn],
+                dat,
+                key='dyn_height_'+key+'_'+trend,
+                sym_zero=True,
+                )
+
+    return total_fn, thermo_fn, halo_fn
 
 
 
@@ -2038,6 +2050,7 @@ def volume_integrated_plot(cfg, metadata, ohc_fn, area_fn):
         logger.info('Saving plots to %s', path)
         plt.savefig(path, dpi=200)
     plt.close()
+
 
 def SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = 'all'):
     """
