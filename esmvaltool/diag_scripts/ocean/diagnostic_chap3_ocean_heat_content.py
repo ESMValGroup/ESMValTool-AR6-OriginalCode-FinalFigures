@@ -1142,29 +1142,27 @@ def calc_dyn_height_clim(cfg,
         pass
     elif clim_type == 'piControl':
         # 8) vs. detrended PI-control (same window as full historical)
-#        return None
         if exp != 'piControl':
             assert 0
 
     # Calculaste average along the time dimension
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
     thetao_bar = thetao_bar.collapsed('time', iris.analysis.MEAN)
+    single_pane_map_plot(
+        cfg,
+        metadatas[hist_so_fn],
+        psal_bar[0],
+        key='Dyn_height_clim/'+clim_type+'_surface_so',
+        sym_zero=False,
+        )
 
     single_pane_map_plot(
-          cfg,
-          metadatas[hist_so_fn],
-          psal_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_so',
-          sym_zero=False,
-          )
-
-    single_pane_map_plot(
-          cfg,
-          metadatas[hist_thetao_fn],
-          thetao_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_thetao',
-          sym_zero=False,
-          )
+        cfg,
+        metadatas[hist_thetao_fn],
+        thetao_bar[0],
+        key='Dyn_height_clim/'+clim_type+'_surface_thetao',
+        sym_zero=False,
+        )
 
     # load latitude longitude dimensions
     lats = thetao_bar.coord('latitude').points
@@ -1791,6 +1789,86 @@ def calc_dyn_height_full(cfg,
     iris.save(cube2, output_fns['halo'])
 
     return output_fns['total'], output_fns['thermo'], output_fns['halo']
+
+
+def plot_dyn_height_ts(cfg, metadata, dyn_averages,  trend):
+    """
+    Make some time series plots.
+    """
+    exp = metadata['exp']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+
+    clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
+                  '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.title(' '.join([project, dataset, exp, ensemble, trend, ]))
+
+    for dyn_type, dyn_fn in dyn_averages.items():
+        dyn_cube = iris.load_cube(dyn_fn)
+        if 'time' in [c.var_name for c in dyn_cube.coords()]:
+
+            times = diagtools.cube_time_to_float(dyn_cube)
+            plt.plot(times, dyn_cube.data, label = dyn_type)
+        else:
+            plt.axhline(dyn_cube.data, c = 'k', ls=':' )
+
+      plt.xlabel('Year')
+      plt.ylabel('Nonanomalous Dynamic Height, mm')
+
+      path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries'])
+      path += '_'.join([project, dataset, exp, ensemble, trend, 'all_timeseries'])+'.png'
+      print('Saving figure:', path)
+      plt.savefig(path)
+      plt.close()
+
+
+def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, slr_type, trend):
+    """
+    Calculate dynamic time series.
+    """
+    work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height_ts'])
+    slr_ts_fn = work_dir + '_'.join([project, dataset, exp, ensemble, slr_type, trend, 'timeseries'])+'.nc'
+    if os.path.exists(slr_ts_fn):
+        return slr_ts_fn
+
+    # Load data and calculate average.
+    dyn_cube = iris.load_cube(dyn_fn)
+    area_cube = iris.load_cube(areacella_fn)
+    dyn_cube.data = np.ma.masked_invalid(dyn_cube.data)
+    area_cube.data = np.ma.masked_invalid(area_cube.data)
+
+    grid_areas = da.tile(area_cube.core_data(), [dyn_cube.shape[0], 1, 1])
+    dyn_cube = dyn_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=grid_areas)
+
+    # Save NetCDF
+    iris.save(dyn_cube, slr_ts_fn)
+
+    print('calc_slr_timeseries:', dataset, exp, ensemble, dyn_cube.data)
+    # Make plot
+
+    if 'time' in [c.var_name for c in dyn_cube.coords()]:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        times = diagtools.cube_time_to_float(dyn_cube)
+        plt.plot(times, dyn_cube.data, color='red')
+        plt.title(' '.join([project, dataset, exp, ensemble, slr_type, trend, 'timeseries']))
+
+        plt.xlabel('Year')
+        plt.ylabel('Change in Sea Level, mm')
+        #plt.axhline(0., c = 'k', ls=':' )
+
+        path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries'])
+        path += '_'.join([project, dataset, exp, ensemble, slr_type, 'timeseries'])+'.png'
+        print('Saving figure:', path)
+        plt.savefig(path)
+        plt.close()
+
+    return slr_ts_fn
+
 
 
 def calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type):
@@ -2573,7 +2651,8 @@ def main(cfg):
         metadatas[detrended_fn] = metadatas[filename].copy()
 
     print('\n-------------\nCalculate Sea Level Rise')
-    slr_fns = {}
+    dyn_fns = {}
+    #slr_fns = {}
     do_SLR = True
     trends = ['detrended', 'intact']
     for trend in trends:
@@ -2607,15 +2686,21 @@ def main(cfg):
                 picontrol_so_fn,
                 trend=trend,
                 )
+            # dyn_fns
 
-            # Calculate time series?
+            # Calculate spatial average
+            dyn_averages = {}
             areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
             for dyn_type, dyn_fn in dyn_height_fns.items():
-                    dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type)
-                    slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts', trend)] = slr_ts_fn
-                    metadatas[slr_ts_fn] = metadatas[detrended_fn]
-            continue
+                dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type, trend)
+                dyn_averages[dyn_type] = dyn_ts_fn
+                dyn_fns[(project, dataset, exp, ensemble, dyn_type + '_ts', trend)] = dyn_ts_fn
+                metadatas[dyn_ts_fn] = metadatas[hist_thetao_fn]
 
+            #for dyn_type in ['total', 'thermo', 'halo']:
+            plot_dyn_height_ts(cfg, metadatas[dyn_ts_fn], dyn_averages, trend)
+
+            continue
 
             print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
             slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
