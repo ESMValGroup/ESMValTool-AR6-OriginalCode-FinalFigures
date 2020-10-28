@@ -722,7 +722,11 @@ def make_difference_plots(
         cfg,
         metadata,
         detrended_cube,
-        hist_cube):
+        hist_cube,
+        label1='',
+        label2='',
+        key='',
+        ):
     """
     Make a figure showing four maps and the other shows a scatter plot.
     The four pane image is a latitude vs longitude figures showing:
@@ -774,12 +778,16 @@ def make_difference_plots(
     logspace4 = np.logspace(-1., 1., 12, endpoint=True)
 
     # Add the sub plots to the figure.
+    if label1=='': label1 = 'Detrended '+exp
+    if label2=='': label2 = 'Trend intact '+exp
+    if key=='': key = 'Detrended'
     add_map_subplot(
-        221, cube221, linspace12, cmap='viridis', title='Detrended '+exp,
+        221, cube221, linspace12, cmap='viridis', 
+        title=label1,
         extend=extend)
     add_map_subplot(
         222, cube222, linspace12, cmap='viridis',
-        title=exp + '(trend intact)',
+        title=label2,
         extend=extend)
     add_map_subplot(
         223,
@@ -801,8 +809,8 @@ def make_difference_plots(
     fig.suptitle(long_name + ' [' + units + ']', fontsize=14)
 
     # Determine image filename
-    fn_list = ['Detrended', project, dataset, ensemble, exp, short_name, 'quad_maps']
-    path = diagtools.folder([cfg['plot_dir'], 'detrended_quad']) + '_'.join(fn_list)
+    fn_list = [key, project, dataset, ensemble, exp, short_name, 'quad_maps']
+    path = diagtools.folder([cfg['plot_dir'], key+'_quad']) + '_'.join(fn_list)
     path = path.replace(' ', '') + image_extention
 
     # Saving files:
@@ -1091,8 +1099,8 @@ def calc_dyn_height_clim(cfg,
     project = metadatas[hist_thetao_fn]['project']
 
     # Generate output paths for SLR netcdfs
-    work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
-    clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend, clim_type]) + '.nc'
+    work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height_clim'])
+    clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'dyn_height_clim', trend, clim_type]) + '.nc'
 
     if os.path.exists(clim_fn):
         print ('loading from', clim_fn)
@@ -1135,7 +1143,9 @@ def calc_dyn_height_clim(cfg,
         pass
     elif clim_type == 'picontrol':
         # 8) vs. detrended PI-control (same window as full historical)
-        if exp != 'piControl': assert 0
+        return None
+        if exp != 'piControl': 
+            assert 0
 
     # Calculaste average along the time dimension
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
@@ -1145,7 +1155,7 @@ def calc_dyn_height_clim(cfg,
           cfg,
           metadatas[hist_so_fn],
           psal_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_psal',
+          key='Dyn_height_clim/'+clim_type+'_surface_so',
           sym_zero=False,
           )
     single_pane_map_plot(
@@ -1172,12 +1182,12 @@ def calc_dyn_height_clim(cfg,
 
     # Create output cubes to receive SLR data.
     print('Creating output arrays')
-    dyn_height_clim = np.zeros(thetao_cube[0].shape) #2d + time
+    dyn_height_clim = np.zeros(thetao_bar[0].shape) #2d + time
     count = 0
     gravity = 9.7963 # m /s^2
 
     print('Starting clim SLR calculation from fresh')
-    slr_clim = slr_total[0].copy() # 2D
+    slr_clim = thetao_bar[0].copy() # 2D
 
     if depths_bar.ndim == 1:
        depth_bar = np.tile(depths_bar, (len(lat[0]), 1)).T
@@ -1191,7 +1201,7 @@ def calc_dyn_height_clim(cfg,
              continue
         la = lat[y, :]
         lo = lon[y, :]
-        print('Calculate SLR in 1D:', (y,)) #, 'latitude:', la, lo)
+        print('Calculate clim dyn height:', dataset, clim_type, (y,)) #, 'latitude:', la, lo)
 
         # load clim depth
         if depths_bar.ndim == 3:
@@ -1207,6 +1217,7 @@ def calc_dyn_height_clim(cfg,
         # calculate corerct conservative temperature and absolute salinity
         sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
 
+        # copy fixed data back into original cube.
         psal_bar.data[:, y, :] = sal_bar
         thetao_bar.data[:, y, :] = temp_bar
 
@@ -1234,20 +1245,31 @@ def calc_dyn_height_clim(cfg,
     single_pane_map_plot(
           cfg,
           metadatas[hist_thetao_fn],
-          thetao_bar,
+          thetao_bar[0],
           key='Dyn_height_clim/'+clim_type+'_surface_ctemp',
           sym_zero=False,
           )
 
+#   make_difference_plots(
+#       cfg,
+#       metadatas[hist_thetao_fn],
+#       psal_bar[0],
+#       hist_cube,
+#       label1='',
+#       label2='',
+#       key='',
+#       )
+
+
     # Save climatological SLR cube as a netcdf.
     print("saving output cube:", clim_fn)
     cube0 = thetao_bar[0, :, :].copy()
-    cube0.data = slr_clim #p.ma.masked_where(slr_clim==0., slr_clim)
+    cube0.data = dyn_height_clim #p.ma.masked_where(slr_clim==0., slr_clim)
     cube0.units = cf_units.Unit('mm')
-    cube0.name = 'Climatological ('+ clim_type+') Sea Level Rise'
-    cube0.long_name = 'Climatological ('+ clim_type+') Sea Level Rise '
-    cube0.short_name = 'slr_clim'
-    cube0.var_name = 'slr_clim'
+    cube0.name = 'Climatological ('+ clim_type+') dynamic height'
+    cube0.long_name = 'Climatological ('+ clim_type+') dynamic height '
+    cube0.short_name = 'dynh_clim'
+    cube0.var_name = 'dynh_clim'
     cube0.standard_name = 'steric_change_in_mean_sea_level'
     iris.save(cube0, clim_fn)
 
@@ -1265,8 +1287,13 @@ def calc_slr_full(cfg,
         metadatas,
         hist_thetao_fn,
         hist_so_fn,
+        picontrol_thetao_fn,
+        picontrol_so_fn,
         trend='detrended',
         ):
+    """
+    calc_slr_full: Calculates the Sea Level Rise
+    """
     # Load relevant metadata
     exp = metadatas[hist_thetao_fn]['exp']
     dataset = metadatas[hist_thetao_fn]['dataset']
@@ -1283,51 +1310,54 @@ def calc_slr_full(cfg,
 
     # Check whether output paths exists already.
     # If they exist, then make some basic figures and return paths.
-    if False not in [os.path.exists(fn) for fn in output_fns.values()]:
-        for key, fn in output_fns.items():
-            cube1 = iris.load_cube(fn)
-#            print('\---------', key, fn)
-#            print(cube1.data)
-# #           print(cube1.data.shape)
-#            print(np.ma.masked_invalid(cube1.data).min())
-#            assert 0
-            for t in [0, -1, 'mean']:
-                if fn.find('clim') > -1:
-                    dat = cube1
-                    if t != 0: continue
-                else:
-                    if t == 'mean':
-                        dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
-                    else:
-                        dat = cube1[t]
-                single_pane_map_plot(
-                      cfg,
-                      metadatas[hist_thetao_fn],
-                      dat,
-                      key='SLR_'+key+'_'+trend,
-                      sym_zero=True,
-                      )
-            print('files exist:', key, fn)
-        return output_fns['total'], output_fns['thermo'], output_fns['halo']
-
-    else:
-        print('outputs not found:', output_fns)
-        for key, fn in output_fns.items():
-            if not os.path.exists(fn):
-                print('file does not exist:', key, fn)
-
+#    if False not in [os.path.exists(fn) for fn in output_fns.values()]:
+#        for key, fn in output_fns.items():
+#            cube1 = iris.load_cube(fn)
+#            for t in [0, -1, 'mean']:
+#                if fn.find('clim') > -1:
+#                    dat = cube1
+#                    if t != 0: continue
+#                else:
+#                    if t == 'mean':
+#                        dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
+#                    else:
+#                        dat = cube1[t]
+#                single_pane_map_plot(
+#                      cfg,
+#                      metadatas[hist_thetao_fn],
+#                      dat,
+#                      key='SLR_'+key+'_'+trend,
+#                      sym_zero=True,
+#                      )
+#            print('files exist:', key, fn)
+#        return output_fns['total'], output_fns['thermo'], output_fns['halo']
+#    else:
+#        print('outputs not found:', output_fns)
+#        for key, fn in output_fns.items():
+#            if not os.path.exists(fn):
+#                print('file does not exist:', key, fn)
 
     clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
                   '1985-2014', '2004-2018', 'fullhistorical', 'picontrol']
-    for clim_type in clim_types:
-        clim_fn = calc_dyn_height_clim(
-            cfg,
-            metadatas,
-            hist_thetao_fn,
-            hist_so_fn,
-            clim_type=clim_type,
-            trend='detrended')
 
+    for clim_type in clim_types:
+        if clim_type == 'picontrol':
+            clim_fn = calc_dyn_height_clim(
+                cfg,
+                metadatas,
+                picontrol_thetao_fn,
+                picontrol_so_fn,
+                clim_type=clim_type,
+                trend=trend)
+        else:
+            clim_fn = calc_dyn_height_clim(
+                cfg,
+                metadatas,
+                hist_thetao_fn,
+                hist_so_fn,
+                clim_type=clim_type,
+                trend=trend)
+    return
     assert 0
 
 
@@ -2367,19 +2397,31 @@ def main(cfg):
             if exp ==  'piControl': # no need to calculate this.
                 continue
 
+            pi_ensemble = guess_PI_ensemble(trend_shelves, [project, dataset, short_name], ens_pos = 3)
+
             if trend == 'detrended':
                 hist_thetao_fn = detrended_ncs[(project, dataset, exp, ensemble, short_name)]
                 hist_so_fn =  detrended_ncs[(project, dataset, exp, ensemble, 'so')]
+                picontrol_thetao_fn = detrended_ncs[(project, dataset, exp, pi_ensemble, short_name)]
+                picontrol_so_fn =  detrended_ncs[(project, dataset, exp, pi_ensemble, 'so')]
+
             if trend ==  'intact':
                 hist_thetao_fn = file_dict[(project, dataset, exp, ensemble, 'thetao')]
                 hist_so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
+                picontrol_thetao_fn = file_dict[(project, dataset, exp, pi_ensemble, short_name)]
+                picontrol_so_fn =  file_dict[(project, dataset, exp, pi_ensemble, 'so')]
 
-            slr_total_fn, slr_thermo_fn, slr_halo_fn = calc_slr_full(cfg,
+
+            #slr_total_fn, slr_thermo_fn, slr_halo_fn = 
+            calc_slr_full(cfg,
                 metadatas,
                 hist_thetao_fn,
                 hist_so_fn,
+                picontrol_thetao_fn,
+                picontrol_so_fn,
                 trend=trend
                 )
+            continue
 
             print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
             slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
