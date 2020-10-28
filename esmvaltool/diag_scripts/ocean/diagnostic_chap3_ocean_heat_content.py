@@ -1495,7 +1495,7 @@ def calc_dyn_height(
 
 
 
-def calc_slr_full(cfg,
+def calc_dyn_height_full(cfg,
         metadatas,
         hist_thetao_fn,
         hist_so_fn,
@@ -1504,50 +1504,13 @@ def calc_slr_full(cfg,
         trend='detrended',
         ):
     """
-    calc_slr_full: Calculates the Sea Level Rise
+    calc_dyn_height_full: Calculates the Sea Level Rise
     """
     # Load relevant metadata
     exp = metadatas[hist_thetao_fn]['exp']
     dataset = metadatas[hist_thetao_fn]['dataset']
     ensemble = metadatas[hist_thetao_fn]['ensemble']
     project = metadatas[hist_thetao_fn]['project']
-
-    # Generate output paths for SLR netcdfs
-    work_dir = diagtools.folder([cfg['work_dir'], 'SLR'])
-    output_fns = {}
-    output_fns['total'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_SLR', trend])+'.nc'
-    output_fns['thermo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_SLR', trend])+'.nc'
-    output_fns['halo'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_SLR', trend])+'.nc'
-    output_fns['clim'] = work_dir + '_'.join([project, dataset, exp, ensemble, 'clim_SLR', trend])+'.nc'
-
-    # Check whether output paths exists already.
-    # If they exist, then make some basic figures and return paths.
-#    if False not in [os.path.exists(fn) for fn in output_fns.values()]:
-#        for key, fn in output_fns.items():
-#            cube1 = iris.load_cube(fn)
-#            for t in [0, -1, 'mean']:
-#                if fn.find('clim') > -1:
-#                    dat = cube1
-#                    if t != 0: continue
-#                else:
-#                    if t == 'mean':
-#                        dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
-#                    else:
-#                        dat = cube1[t]
-#                single_pane_map_plot(
-#                      cfg,
-#                      metadatas[hist_thetao_fn],
-#                      dat,
-#                      key='SLR_'+key+'_'+trend,
-#                      sym_zero=True,
-#                      )
-#            print('files exist:', key, fn)
-#        return output_fns['total'], output_fns['thermo'], output_fns['halo']
-#    else:
-#        print('outputs not found:', output_fns)
-#        for key, fn in output_fns.items():
-#            if not os.path.exists(fn):
-#                print('file does not exist:', key, fn)
 
     clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
                   '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
@@ -1578,6 +1541,12 @@ def calc_slr_full(cfg,
         hist_thetao_fn,
         hist_so_fn,
         trend=trend)
+
+    clim_files['total'] = steric_fn
+    clim_files['thermo'] = thermo_fn
+    clim_files['halo'] = halo_fn
+
+    return clim_files
     assert 0
 
 
@@ -1662,10 +1631,8 @@ def calc_slr_full(cfg,
 
             # Calculate climatoligical pressure
             # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
-            #print(y, lola[y], la.shape, lo.shape, lat[:,0].shape)
             pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
             pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
-
 
             sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
 
@@ -2631,17 +2598,24 @@ def main(cfg):
                 picontrol_thetao_fn = file_dict[(project, dataset, 'piControl', pi_ensemble, short_name)]
                 picontrol_so_fn =  file_dict[(project, dataset, 'piControl', pi_ensemble, 'so')]
 
-
-            #slr_total_fn, slr_thermo_fn, slr_halo_fn =
-            calc_slr_full(cfg,
+            dyn_height_fns = calc_dyn_height_full(
+                cfg,
                 metadatas,
                 hist_thetao_fn,
                 hist_so_fn,
                 picontrol_thetao_fn,
                 picontrol_so_fn,
-                trend=trend
+                trend=trend,
                 )
+
+            # Calculate time series?
+            areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
+            for dyn_type, dyn_fn in dyn_height_fns.items():
+                    dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type)
+                    slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts', trend)] = slr_ts_fn
+                    metadatas[slr_ts_fn] = metadatas[detrended_fn]
             continue
+
 
             print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
             slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
