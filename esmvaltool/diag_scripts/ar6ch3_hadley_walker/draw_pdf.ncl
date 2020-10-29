@@ -537,12 +537,12 @@ begin
       res@tiMainOffsetYF = -0.028
       res@tiMainFontHeightF = 0.022
       if (varname.eq."lat") then
-;        if (range.gt.0.05*scale) then
-;          res@trYMaxF = 0.1*scale
+        if (range.gt.0.06*scale) then
+          res@trYMaxF = 0.1*scale
 ;        else
 ;          res@trYMaxF = 0.05*scale
 ;        end if
-        if (range.gt.0.04*scale) then
+        elseif (range.gt.0.04*scale) then
           res@trYMaxF = 0.065*scale
         else
           res@trYMaxF = 0.045*scale

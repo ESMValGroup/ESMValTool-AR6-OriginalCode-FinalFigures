@@ -269,7 +269,7 @@ begin
         ts(0) = (/ind(year.eq.syear_trend)/)
         te(0) = (/ind(year.eq.eyear_trend)/)
       end if
-      print(ts(0)+" "+te(0))
+;      print(ts(0)+" "+te(0))
     end if
 
     do n = 0, nseg-1

@@ -992,6 +992,7 @@ diagnostics:
       trend: 
         <<: *trend_hadley
         syear_trend: 1981
+        eyear_trend: 2000
         hemisphere: SH
 
   Walker_trend:
