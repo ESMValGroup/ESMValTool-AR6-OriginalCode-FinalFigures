@@ -43,10 +43,46 @@ provenance_record <- function(infile) {
   return(xprov)
 }
 
+# create Multimodel figure name and folder (no ens and dataset)
+fig_multimodel_builder <- function(FIGDIR,
+                        dir_name,
+                        file_name,
+                        dataset,
+                        expid,
+                        year1,
+                        year2,
+                        season,
+                        output_file_type) {
+  # loop on descriptors that are concatenated to create dir and file name
+  descriptors <-
+    c(dataset, expid, paste0(year1, "-", year2), season)
+  for (dcode in descriptors) {
+    if (dcode != "NO") {
+      FIGDIR <- file.path(FIGDIR, dcode)
+      file_name <- paste0(file_name, "_", dcode)
+    }
+  }
+
+  # add directory name descriptor
+  FIGDIR <- file.path(FIGDIR, dir_name)
+
+  # actually dir.exists is in devtools only for R < 3.2,
+  # then is included in base package
+  if (exists("dir.exists")) {
+    if (!dir.exists(FIGDIR)) {
+      dir.create(FIGDIR, recursive = T)
+    }
+  } else {
+    dir.create(FIGDIR, recursive = T, showWarnings = F)
+  }
+
+  return(file.path(FIGDIR, paste0(file_name, ".", output_file_type)))
+}
+
 diag_scripts_dir <- Sys.getenv("diag_scripts")
 
 source(paste0(diag_scripts_dir, "/miles/basis_functions.R"))
-source(paste0(diag_scripts_dir, "/miles/block_figures.R"))
+source(paste0(diag_scripts_dir, "/miles/block_figures_groupby.R"))
 source(paste0(diag_scripts_dir, "/miles/block_fast.R"))
 source(paste0(diag_scripts_dir, "/miles/miles_parameters.R"))
 source(paste0(diag_scripts_dir, "/shared/external.R")) # nolint
@@ -144,6 +180,7 @@ if (write_plots) {
   legend_unit <- "Blocked Days (%)"
   legend_distance <- 3
   title_name <- "TM90 Instantaneous Blocking"
+  x_label <- "Longitude"
   fp <- list(
     color_field = color_field,
     color_diff = color_diff,
@@ -152,7 +189,8 @@ if (write_plots) {
     lev_hist = lev_hist,
     legend_unit = legend_unit,
     legend_distance = legend_distance,
-    title_name = title_name
+    title_name = title_name,
+    x_label = x_label
   )
   alpha <- 50 # transparency coefficient
   # panels option
@@ -173,6 +211,24 @@ if (write_plots) {
   project_list <- c("CMIP6", "CMIP5")
   i_project <- 1
   for (season in seasons) {
+
+    # create filenames to handle the provenance
+    filenames <- c()
+    # create figure names with ad-hoc function
+    dataset <- 'Multimodel'
+    expid <- 'historical'
+    figname <- fig_multimodel_builder(
+      plot_dir,
+      "Block",
+      field,
+      dataset,
+      expid,
+      year1,
+      year2,
+      season,
+      output_file_type
+    )
+    filenames <- c(filenames, figname)
     field_exp_all <- c() # store field for all datasets
     for (model_idx in c(1:(length(models_dataset)))) {
       expid <- models_exp[model_idx]
@@ -180,10 +236,10 @@ if (write_plots) {
       ens <- models_ensemble[model_idx]
       year1 <- models_start_year[model_idx]
       year2 <- models_end_year[model_idx]
-      project <- models_project[model_idx]
+      project <- models_projects[model_idx]
       # use file.builder function
       nomefile <- file_builder(
-      FILESDIR,
+      work_dir,
       "Block",
       "BlockClim",
       dataset,
@@ -196,27 +252,16 @@ if (write_plots) {
       field_exp <- ncdf_opener(nomefile, namevar = field, rotate = "no")
       assign(paste(field, "_exp", sep = ""), field_exp)
       field_exp_all <- c(field_exp_all, list(field_exp))
+
+      # Set provenance for output files (same as diagnostic files)
+      #xprov <- provenance_record(climofiles[model_idx])
+      #provenance[[filenames]] <- xprov
     }
 
-    filenames <- c()
-    # create figure names with ad-hoc function
-    figname <- fig_builder( ## Adjust this!!
-      FIGDIR,
-      "Block",
-      field,
-      dataset,
-      expid,
-      ens,
-      year1,
-      year2,
-      season,
-      output_file_type
-    )
-    filenames <- c(filenames, figname)
     open_plot_device(figname, output_file_type, special = TRUE)
-    text_legend <- c() # text of the legend
+    text_legend <- c() # text of the legendens <- ''
     for (project in project_list){
-      field_exp_mean <- field_exp_all[models_project == project]
+      field_exp_mean <- field_exp_all[models_projects == project]
       field_mean <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = mean)) # mean over datasets of the project
       field_std <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = sd)) # std
       n_datasets <- length(field_exp_mean) # number of datasets for the project
@@ -239,7 +284,7 @@ if (write_plots) {
           lwd = lwdline,
           ylim = fp$lev_field,
           main = fp$title_name,
-          xlab = "Longitude",
+          xlab = fp$x_label,
           ylab = fp$legend_unit,
           col = tm90cols[1]
         )
@@ -268,14 +313,8 @@ if (write_plots) {
       cex = 1.
     )
     dev.off()
-    ## Set provenance for output files (same as diagnostic files)
-    #xprov <- provenance_record(list(
-    #  climofiles[model_idx],
-    #  climofiles[ref_idx]
-    #))
-    #for (fname in filenames$figs) {
-    #  provenance[[fname]] <- xprov
-    #}
+    xprov <- provenance_record(list(climofiles))
+    provenance[[filenames]] <- xprov
   }
 }
 
