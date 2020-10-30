@@ -50,7 +50,7 @@ diagnostics:
 #       reference_exp: historical
     scripts:
         miles_block:
-            script: miles/miles_block_groupby.R
+            script: miles/miles_block_groupby_projects.R
             seasons: DJF # Select season ('DJF','MAM','JJA','SON')
             color_lines: ['dodgerblue', 'darkred', 'black', 'orange', 'green']
             legend_loc: [100, 30]
