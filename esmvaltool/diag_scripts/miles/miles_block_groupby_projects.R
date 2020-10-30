@@ -79,6 +79,18 @@ fig_multimodel_builder <- function(FIGDIR,
   return(file.path(FIGDIR, paste0(file_name, ".", output_file_type)))
 }
 
+##
+## Set default parameters
+##
+color_lines <- c("dodgerblue", "darkred", "black")
+legend_loc <- c(100, 30)
+linewidth <- 4
+plot_title <- "TM90 Instantaneous Blocking"
+transparency <- 0.15 # in [0, 1]
+xlabel <- "Longitude"
+ylabel <- "Blocked Days (%)"
+yrange <- c(0, 30)
+
 diag_scripts_dir <- Sys.getenv("diag_scripts")
 
 source(paste0(diag_scripts_dir, "/miles/basis_functions.R"))
@@ -172,15 +184,15 @@ for (model_idx in c(1:(length(models_dataset)))) {
 ## Plotting parameters
 ##
 if (write_plots) {
-  color_field <- c("dodgerblue", "darkred", "black")
+  color_field <- color_lines
   color_diff <- NULL
-  lev_field <- c(0, 30)
+  lev_field <- yrange
   lev_diff <- NULL
   lev_hist <- NULL
-  legend_unit <- "Blocked Days (%)"
+  legend_unit <- ylabel
   legend_distance <- 3
-  title_name <- "TM90 Instantaneous Blocking"
-  x_label <- "Longitude"
+  title_name <- plot_title
+  x_label <- xlabel
   fp <- list(
     color_field = color_field,
     color_diff = color_diff,
@@ -192,7 +204,7 @@ if (write_plots) {
     title_name = title_name,
     x_label = x_label
   )
-  alpha <- 50 # transparency coefficient
+  alpha <- transparency*255 # normalized transparency coefficient
   # panels option
   par(
     cex.main = 2,
@@ -201,7 +213,7 @@ if (write_plots) {
     mar = c(5, 5, 4, 3),
     oma = c(0, 0, 0, 0)
   )
-  lwdline <- 4
+  lwdline <- linewidth
   tm90cols <- fp$color_field
 
 ##
@@ -303,8 +315,8 @@ if (write_plots) {
       i_project <- i_project + 1
     }
     legend(
-     100,
-     30,
+      legend_loc[1],
+      legend_loc[2],
       legend = text_legend,
       lwd = lwdline,
       lty = 1,
