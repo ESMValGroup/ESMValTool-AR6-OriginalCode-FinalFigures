@@ -94,7 +94,6 @@ yrange <- c(0, 30)
 diag_scripts_dir <- Sys.getenv("diag_scripts")
 
 source(paste0(diag_scripts_dir, "/miles/basis_functions.R"))
-source(paste0(diag_scripts_dir, "/miles/block_figures_groupby.R"))
 source(paste0(diag_scripts_dir, "/miles/block_fast.R"))
 source(paste0(diag_scripts_dir, "/miles/miles_parameters.R"))
 source(paste0(diag_scripts_dir, "/shared/external.R")) # nolint
