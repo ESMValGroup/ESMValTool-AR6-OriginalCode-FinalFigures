@@ -480,11 +480,12 @@ begin
   ncdf_outfile = ncdf_write(model_arr, out_path1)
   ; statistics
   if (diag_script_info@write_stat) then
-    out_path2 = out_path + "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
+    out_path2 = out_path + "tsline_gmst_" + anom + "_stat.nc"
     model_arr_stat@ncdf = out_path
     model_arr_stat@experiment = project0 + "_" + exp0
     model_arr_stat@diag_script = DIAG_SCRIPT
-    model_arr_stat@var = var0
+    ;model_arr_stat@var = var0
+    model_arr_stat@var = "gmst_mean"
     model_arr_stat@units = model_arr@units
     ncdf_outfile = ncdf_write(model_arr_stat, out_path2)
   end if

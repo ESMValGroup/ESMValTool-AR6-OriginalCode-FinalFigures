@@ -66,11 +66,11 @@ begin
   set_default_att(diag_script_info, "volcanoes", False)
   set_default_att(diag_script_info, "write_stat", False)
 
-  exp0 = variable_info[0]@exp
-  project0 = input_file_info[0]@project
   var = metadata_att_as_array(variable_info, "short_name")
 
   info_tas = select_metadata_by_name(input_file_info, "tas")
+  project0 = info_tas[0]@project
+  exp0 = info_tas[0]@exp
 
   datasetnames = metadata_att_as_array(info_tas, "dataset")
   ensembles = metadata_att_as_array(info_tas, "ensemble")
@@ -275,11 +275,12 @@ begin
 
     end if
 
+    ; Determine start/end year
+    start_year = info_tas[imod]@start_year
+    end_year = info_tas[imod]@end_year
+
     ; masking anomaly with reference dataset
     if (diag_script_info@ref_mask) then
-      ; Determine start/end year
-      start_year = info_tas[imod]@start_year
-      end_year = info_tas[imod]@end_year
       tas_ref_mask := time_operations(tas_ref, start_year, \
                                        end_year, "extract", "", 0)
       tas0_anom = where(tas_ref_mask.eq.tas_ref_mask@_FillValue, \
@@ -287,15 +288,26 @@ begin
     end if
 
     ; calculate field mean
-    tas_mon := area_operations(tas0, -90., 90., \
-                               0., 360., "average", True) 
-    tas_mon_anom := area_operations(tas0_anom, -90., 90., \
-                               0., 360., "average", True) 
+    tmp1 := area_operations(tas0, -90., 0., \
+                           0., 360., "average", True) 
+    tmp2 := area_operations(tas0, 0., 90., \
+                           0., 360., "average", True) 
+    tas_mon := tmp1
+    tas_mon = (tmp1 + tmp2) / 2.
+    ;tas_mon := area_operations(tas0, -90., 90., \
+    ;                           0., 360., "average", True) 
+    tmp1 = area_operations(tas0_anom, -90., 0., \
+                           0., 360., "average", True) 
+    tmp2 = area_operations(tas0_anom, 0., 90., \
+                           0., 360., "average", True) 
+    tas_mon_anom := tmp1
+    tas_mon_anom = (tmp1 + tmp2) / 2.
+    ;tas_mon_anom := area_operations(tas0_anom, -90., 90., \
+    ;                           0., 360., "average", True) 
 
     ; yearly average
     diag_tas := time_operations(tas_mon_anom, -1, -1, "average", \
                            "yearly", True)
-
 
     if (ref_start .ne. 1961 .or. ref_end .ne. 1990) then
       ref_diag_tas = avg(diag_tas(ref_start-start_year:ref_end-start_year))
@@ -322,10 +334,22 @@ begin
       end if
 
       ; calculate field mean
-      gmst_mon := area_operations(tos0, -90., 90., \
-                                 0., 360., "average", True) 
-      gmst_mon_anom := area_operations(tos0_anom, -90., 90., \
-                                 0., 360., "average", True) 
+      tmp1 = area_operations(tos0, -90., 0., \
+                             0., 360., "average", True) 
+      tmp2 = area_operations(tos0, 0., 90., \
+                             0., 360., "average", True) 
+      gmst_mon := tmp1
+      gmst_mon = (tmp1 + tmp2) / 2.
+      ;gmst_mon := area_operations(tos0, -90., 90., \
+      ;                           0., 360., "average", True) 
+      tmp1 = area_operations(tos0_anom, -90., 0., \
+                             0., 360., "average", True) 
+      tmp2 = area_operations(tos0_anom, 0., 90., \
+                             0., 360., "average", True) 
+      gmst_mon_anom := tmp1
+      gmst_mon_anom = (tmp1 + tmp2) / 2.
+      ;gmst_mon_anom := area_operations(tos0_anom, -90., 90., \
+      ;                           0., 360., "average", True) 
 
       ; yearly average
       diag := time_operations(gmst_mon_anom, -1, -1, "average", \

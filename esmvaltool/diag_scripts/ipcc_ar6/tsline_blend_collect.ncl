@@ -238,9 +238,9 @@ begin
 
 
   do i = 0, dimsizes(data_mean&experiment) - 1
-    if (data_mean&experiment(i) .eq. "CMIP6_historical") then
+    if (any(data_mean&experiment(i) .eq. (/"CMIP6_historical", "CMIP6_historical-ssp245"/))) then
       data_mean&experiment(i) = "CMIP6"
-    elseif (data_mean&experiment(i) .eq. "CMIP5_historical") then
+    elseif (any(data_mean&experiment(i) .eq. (/"CMIP5_historical", "CMIP5_historical-rcp45"/))) 
       data_mean&experiment(i) = "CMIP5"
     end if
   end do
