@@ -267,7 +267,7 @@ begin
       dims = dimsizes(grading)
       tmp := new((/dims(0), dims(1), dims(2) +2, dims(3)/), float)
       copy_VarAtts(grading, tmp)
-      tmp(imet, 0, :dims(2)-1, :) = grading
+      tmp(imet, 0, :dims(2)-1, :) = grading(imet, 0, :, :)
       tmp(imet, 0, dims(2), 0) = (/mean_ref/)
       tmp(imet, 0, dims(2)+1, 0) = (/median_ref/)
       if (l_altern) then
