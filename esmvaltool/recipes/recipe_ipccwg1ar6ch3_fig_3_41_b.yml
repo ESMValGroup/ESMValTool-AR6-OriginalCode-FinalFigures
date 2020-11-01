@@ -877,7 +877,7 @@ diagnostics:
         start_year: 1980
         end_year: 1999
     additional_datasets:
-      - &cmip5: {dataset: ACCESS1-0, short_name: sic, mip: Omon}
+      - &cmip5 {dataset: ACCESS1-0, short_name: sic, mip: OImon, project: CMIP5}
       - {<<: *cmip5, dataset: ACCESS1-3}
       - {<<: *cmip5, dataset: bcc-csm1-1}
       - {<<: *cmip5, dataset: bcc-csm1-1-m}
@@ -955,7 +955,7 @@ diagnostics:
       - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
 
-      - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
+      - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading_shpolar:
         script: perfmetrics/main.ncl
