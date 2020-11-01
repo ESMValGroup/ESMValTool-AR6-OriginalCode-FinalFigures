@@ -197,6 +197,8 @@ begin
 
     data_temp = ncdf_read(input_files(ii), var_mean)
     data_stat = ncdf_read(input_files(ii), var_stddev)
+    data_stat1 = ncdf_read(input_files(ii), var+"_5quantile")
+    data_stat2 = ncdf_read(input_files(ii), var+"_95quantile")
 
     log_info("Experiment: " + data_temp@experiment)
 
@@ -223,11 +225,15 @@ begin
     data_mean(ii_n, 0, idx1:idx2)  = (/data_temp(:)/)
     data_mean(ii_n, 1, idx1:idx2)  = (/data_temp(:)-data_stat(:)/)
     data_mean(ii_n, 2, idx1:idx2)  = (/data_temp(:)+data_stat(:)/)
+    ;data_mean(ii_n, 1, idx1:idx2)  = (/data_stat1(:)/)
+    ;data_mean(ii_n, 2, idx1:idx2)  = (/data_stat2(:)/)
     data_mean&experiment(ii_n) = data_temp@experiment
     data_mean@units = units0
 
     delete(data_temp)
     delete(data_stat)
+    delete(data_stat1)
+    delete(data_stat2)
 
   end do
 
@@ -347,11 +353,12 @@ begin
   res@tmXBMode         = "Manual"
   res@tmXBTickSpacingF = 20
 
-  if (isatt(diag_script_info, "title")) then
-    res@tiMainString = diag_script_info@title
-  else
-    res@tiMainString = ""
-  end if
+  res@tiMainString = ""
+  ;if (isatt(diag_script_info, "title")) then
+  ;  res@tiMainString = diag_script_info@title
+  ;else
+  ;  res@tiMainString = ""
+  ;end if
 
   res@tiYAxisString = "Change in Temperature (~F34~0~F~ C)"
 
@@ -372,7 +379,8 @@ begin
               + "more than " + nexp + " experiments")
   end if
 
-  res@pmLegendDisplayMode = "Always"
+  ;res@pmLegendDisplayMode = "Always"
+  res@pmLegendDisplayMode = "Never"
   res@xyExplicitLegendLabels = data_mean&experiment
   res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
 

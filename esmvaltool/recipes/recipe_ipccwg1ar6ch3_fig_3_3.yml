@@ -244,4 +244,4 @@ diagnostics:
         stat_shading: True
         ref_shading: True
         ref_stderr: True
-        title: "Global Mean Surface Temperature"
+        #title: "Global Mean Surface Temperature"

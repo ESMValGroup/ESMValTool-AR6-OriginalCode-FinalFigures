@@ -288,22 +288,10 @@ begin
     end if
 
     ; calculate field mean
-    tmp1 := area_operations(tas0, -90., 0., \
-                           0., 360., "average", True) 
-    tmp2 := area_operations(tas0, 0., 90., \
-                           0., 360., "average", True) 
-    tas_mon := tmp1
-    tas_mon = (tmp1 + tmp2) / 2.
-    ;tas_mon := area_operations(tas0, -90., 90., \
-    ;                           0., 360., "average", True) 
-    tmp1 = area_operations(tas0_anom, -90., 0., \
-                           0., 360., "average", True) 
-    tmp2 = area_operations(tas0_anom, 0., 90., \
-                           0., 360., "average", True) 
-    tas_mon_anom := tmp1
-    tas_mon_anom = (tmp1 + tmp2) / 2.
-    ;tas_mon_anom := area_operations(tas0_anom, -90., 90., \
-    ;                           0., 360., "average", True) 
+    tas_mon := area_operations(tas0, -90., 90., \
+                               0., 360., "average", True) 
+    tas_mon_anom := area_operations(tas0_anom, -90., 90., \
+                               0., 360., "average", True) 
 
     ; yearly average
     diag_tas := time_operations(tas_mon_anom, -1, -1, "average", \
@@ -334,22 +322,10 @@ begin
       end if
 
       ; calculate field mean
-      tmp1 = area_operations(tos0, -90., 0., \
-                             0., 360., "average", True) 
-      tmp2 = area_operations(tos0, 0., 90., \
-                             0., 360., "average", True) 
-      gmst_mon := tmp1
-      gmst_mon = (tmp1 + tmp2) / 2.
-      ;gmst_mon := area_operations(tos0, -90., 90., \
-      ;                           0., 360., "average", True) 
-      tmp1 = area_operations(tos0_anom, -90., 0., \
-                             0., 360., "average", True) 
-      tmp2 = area_operations(tos0_anom, 0., 90., \
-                             0., 360., "average", True) 
-      gmst_mon_anom := tmp1
-      gmst_mon_anom = (tmp1 + tmp2) / 2.
-      ;gmst_mon_anom := area_operations(tos0_anom, -90., 90., \
-      ;                           0., 360., "average", True) 
+      gmst_mon := area_operations(tos0, -90., 90., \
+                                 0., 360., "average", True) 
+      gmst_mon_anom := area_operations(tos0_anom, -90., 90., \
+                                 0., 360., "average", True) 
 
       ; yearly average
       diag := time_operations(gmst_mon_anom, -1, -1, "average", \
@@ -407,8 +383,10 @@ begin
 
   model_arr_em = model_arr(:max(ensemble_assign)-1,:)
   model_arr_em = model_arr_em@_FillValue
+  model_arr_one = model_arr_em
   anom_ref_em = anom_ref(:max(ensemble_assign)-1)
   anom_ref_em = anom_ref_em@_FillValue
+  anom_ref_one = anom_ref_em
   datasetnames_em = datasetnames(:max(ensemble_assign)-1)
 
   do gg = 1,max(ensemble_assign)         ; calculate ensemble means
@@ -422,7 +400,10 @@ begin
       anom_ref_em(gg-1) = (/ dim_avg_n(anom_ref(wind),0) /)
       datasetnames_em(gg-1) = datasetnames(wind(0))
     end if
+    model_arr_one(gg-1, :) = (/model_arr(wind(0),:) /)
+    anom_ref_one(gg-1) = (/ anom_ref(wind(0)) /)
   end do
+  model_arr_one&model = datasetnames_em
 
   ; *************************************
   ; calculate multi-model mean
@@ -598,7 +579,7 @@ begin
   if (diag_script_info@header) then
     res@tiMainString = diag_script_info@region
   else
-    res@tiMainString = ""
+    res@tiMainString = "Anomaly of Near-Surface Temperature"
   end if
 
   res@tiYAxisString = "Change in Temperature (~F34~0~F~ C)"
