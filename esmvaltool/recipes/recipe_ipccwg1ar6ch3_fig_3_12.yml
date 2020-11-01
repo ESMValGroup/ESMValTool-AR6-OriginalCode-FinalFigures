@@ -236,7 +236,6 @@ diagnostics:
     scripts:
       tsline:
         script: ipcc_ar6/precip_anom.ncl
-        ts_anomaly: "anom"
         ref_start: 1961
         ref_end: 1990
         ref_mask: True
