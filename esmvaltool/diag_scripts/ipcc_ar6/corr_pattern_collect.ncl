@@ -298,7 +298,7 @@ begin
   res = True
   res@gsnDraw          = False
   res@gsnFrame         = False
-  res@tiMainString = "Pattern Correlation"
+  res@tiMainString = "Pattern Correlation With Observational Reference"
   res@vpWidthF = 0.8
   n_square = 16.
   if x_max.le. n_square then

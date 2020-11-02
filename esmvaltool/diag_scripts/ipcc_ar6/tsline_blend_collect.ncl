@@ -223,10 +223,10 @@ begin
     delete(date)
 
     data_mean(ii_n, 0, idx1:idx2)  = (/data_temp(:)/)
-    data_mean(ii_n, 1, idx1:idx2)  = (/data_temp(:)-data_stat(:)/)
-    data_mean(ii_n, 2, idx1:idx2)  = (/data_temp(:)+data_stat(:)/)
-    ;data_mean(ii_n, 1, idx1:idx2)  = (/data_stat1(:)/)
-    ;data_mean(ii_n, 2, idx1:idx2)  = (/data_stat2(:)/)
+    ;data_mean(ii_n, 1, idx1:idx2)  = (/data_temp(:)-data_stat(:)/)
+    ;data_mean(ii_n, 2, idx1:idx2)  = (/data_temp(:)+data_stat(:)/)
+    data_mean(ii_n, 1, idx1:idx2)  = (/data_stat1(:)/)
+    data_mean(ii_n, 2, idx1:idx2)  = (/data_stat2(:)/)
     data_mean&experiment(ii_n) = data_temp@experiment
     data_mean@units = units0
 
@@ -496,8 +496,8 @@ begin
 
   lgres                    = True
   lgres@lgItemType         = "Lines"   ; show lines only (default)
-  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
-  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+  lgres@lgLabelFontHeightF = .06       ; set the legend label font thickness
+  lgres@vpWidthF           = 0.2      ; width of legend (NDC)
   lgres@vpHeightF          = 0.15      ; height of legend (NDC)
   lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
   lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
@@ -523,8 +523,8 @@ begin
   lbid = gsn_create_legend(wks, nitems, labels, lgres)
 
   amres = True
-  amres@amParallelPosF   = -0.38  ;0.81
-  amres@amOrthogonalPosF = -0.3  ;0.0
+  amres@amParallelPosF   = - 0.3 ;-0.38  ;0.81
+  amres@amOrthogonalPosF = - 0.25 ;-0.3  ;0.0
   annoid1 = gsn_add_annotation(plot(0), lbid, amres)
 
 

@@ -365,6 +365,7 @@ begin
 
   ndim := dimsizes(datasetnames)
   ensemble_assign = new(ndim, integer)
+  ensemble_size = new(ndim, integer)
 
   enum = 1
   temp = datasetnames(0)
@@ -383,14 +384,13 @@ begin
 
   model_arr_em = model_arr(:max(ensemble_assign)-1,:)
   model_arr_em = model_arr_em@_FillValue
-  model_arr_one = model_arr_em
   anom_ref_em = anom_ref(:max(ensemble_assign)-1)
   anom_ref_em = anom_ref_em@_FillValue
-  anom_ref_one = anom_ref_em
   datasetnames_em = datasetnames(:max(ensemble_assign)-1)
 
   do gg = 1,max(ensemble_assign)         ; calculate ensemble means
     wind := ind(ensemble_assign.eq.gg)
+    ensemble_size(wind) = dimsizes(wind)
     if (dimsizes(wind).eq.1) then
       model_arr_em(gg-1,:) = (/ model_arr(wind,:) /)
       anom_ref_em(gg-1) = (/ anom_ref(wind) /)
@@ -400,34 +400,70 @@ begin
       anom_ref_em(gg-1) = (/ dim_avg_n(anom_ref(wind),0) /)
       datasetnames_em(gg-1) = datasetnames(wind(0))
     end if
-    model_arr_one(gg-1, :) = (/model_arr(wind(0),:) /)
-    anom_ref_one(gg-1) = (/ anom_ref(wind(0)) /)
   end do
-  model_arr_one&model = datasetnames_em
 
   ; *************************************
   ; calculate multi-model mean
   ; *************************************
 
   if (ref_ind .ge. 0) then
-    ind_mod = ind(datasetnames_em.ne."MultiModelMean" .and. \
+    ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
                   datasetnames_em.ne.variable_info[0]@reference_dataset)
   elseif (ref_ind .eq. -1)
-    ind_mod = ind(datasetnames_em.ne."MultiModelMean" .and. \
+    ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
                   datasetnames_em.ne.ref_dataset)
   else
-    ind_mod = ind(datasetnames_em.ne."MultiModelMean")
+    ind_mod := ind(datasetnames_em.ne."MultiModelMean")
   end if
   model_arr(mmm_ind, :) = dim_avg_n(model_arr_em(ind_mod,:),0) 
   anom_ref(mmm_ind) = avg(anom_ref_em(ind_mod))
 
+  ; *************************************
+  ; calculate 5% and 95% quantiles
+  ; *************************************
+
+  q_05 = new(ntime, double)
+  q_95 = new(ntime, double)
+  do itime = 0, ntime -1
+    model_num = num(.not.ismissing(model_arr_em(ind_mod, itime)))
+    if (ref_ind .ge. 0) then
+      ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+                   datasetnames.ne."MultiModelMean" .and. \
+                   datasetnames.ne.variable_info[0]@reference_dataset)
+    elseif (ref_ind .eq. -1)
+      ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+                   datasetnames.ne."MultiModelMean" .and. \
+                   datasetnames.ne.ref_dataset)
+    else
+      ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+                   datasetnames.ne."MultiModelMean") 
+    end if
+    ind_sort := dim_pqsort(model_arr(ind_m, itime), 1)
+    count = 0.
+    do imodel = 0, dimsizes(ind_m) - 1
+      count = count + 1./(model_num*ensemble_size(ind_m(ind_sort(imodel))))
+      if(count .gt. 0.95) then
+        break  
+      end if
+      if(ismissing(q_05(itime)) .and. count .gt. 0.05) then
+        q_05(itime) =  model_arr(ind_m(ind_sort(imodel)), itime)
+      end if
+      q_95(itime) =  model_arr(ind_m(ind_sort(imodel)), itime)
+    end do
+  end do
+
+
+  ; *************************************
   ; Convert time coordinate to years (required by the plot routine)
+  ; *************************************
+
   xmin = min(model_arr&time)
   xmax = max(model_arr&time)
   tmp = todouble(model_arr&time)
   delete(model_arr&time)
   model_arr&time = tmp
   delete(tmp)
+
 
   ; *************************************
   ; output to NetCDF
@@ -448,6 +484,7 @@ begin
   model_arr@var = var0
   model_arr@long_name = "Global Mean Surface Temperature"
   ncdf_outfile = ncdf_write(model_arr, out_path1)
+
 
   ; *************************************
   ; optional output with statistics
@@ -482,6 +519,11 @@ begin
     if (isatt(variable_info[0], "reference_dataset")) then
       model_arr_stat(:, 9) = (/model_arr(ref_ind, :)/)
     end if
+
+    model_arr_stat(:, 0) = (/model_arr(mmm_ind, :)/)
+    model_arr_stat(:, 4) = (/q_05/)
+    model_arr_stat(:, 7) = (/q_95/)
+
 
     out_path2 = out_path + "tsline_gmst_anom_stat.nc"
 
