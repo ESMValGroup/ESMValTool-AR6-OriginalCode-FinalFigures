@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20201029 kosaka_yu: removed MME mean.
 ;    20200916 kosaka_yu: revised.
 ;    20191120 kosaka_yu: written.
 ;
@@ -229,14 +230,17 @@ begin
       sam_villalba({syr:eyr}) = (/data(:, 1)/)
       sam_villalba = sam_villalba - avg(sam_villalba({syear_ref:eyear_ref}))
       sam_villalba@source = "Villalba et al. (2012)"
-      sam_villalba@color = (/237., 128., 55./)/255.
+      ;sam_villalba@color = (/237., 128., 55./)/255.
+      sam_villalba@color = (/197., 90., 17./)/255.
     elseif (path.eq.file_datwyler_ann) then
       sam_datwyler_ann = sam(0, :)
       sam_datwyler_ann = sam_datwyler_ann@_FillValue
       sam_datwyler_ann({syr:eyr}) = (/data(:, 1)/)
       sam_datwyler_ann = sam_datwyler_ann - avg(sam_datwyler_ann({syear_ref:eyear_ref}))
-      sam_datwyler_ann@source = "Datwyler et al. (2018)"
-      sam_datwyler_ann@color = (/127., 68., 170./)/255.
+;      sam_datwyler_ann@source = "Datwyler et al. (2018)"
+      sam_datwyler_ann@source = "Da~H-13V2F35~H~FV-2H3~twyler et al. (2018)"
+      ;sam_datwyler_ann@color = (/127., 68., 170./)/255.
+      sam_datwyler_ann@color = (/68., 113., 212./)/255.
     elseif (path.eq.file_datwyler_djf) then
       sam_datwyler_djf = sam(0, :)
       sam_datwyler_djf = sam_datwyler_djf@_FillValue
@@ -338,7 +342,7 @@ begin
   rests@xyLineThicknessF  = 0.5
   rests@xyLineColor       = "transparent"
 
-  rests@tiMainString = "SAM indices in the last millenium"
+  rests@tiMainString = "SAM index in the last millenium"
   rests@tiMainFontHeightF = 0.02
   rests@trYMaxF           = 3.5 ;2.
   rests@trYMinF           = -13.
@@ -375,14 +379,14 @@ begin
   dummy(idummy) = gsn_add_polyline(wks, plot, sam_villalba_runmean&time, sam_villalba_runmean+dy1, lres)
   idummy = idummy + 1
     
-  color_cmip5 = (/0.3, 0.3, 0.3/)
+  color_cmip5 = (/0.5, 0.5, 0.5/)
   do ii = 0, nintegrations-1
     if (cmip_phase(ii).eq."CMIP5") then
-    lres@gsLineColor    = color_cmip5
+      lres@gsLineColor    = color_cmip5
     elseif (cmip_phase(ii).eq."CMIP6") then
-    lres@gsLineColor    = get_color(model_name(ii))
+      lres@gsLineColor    = get_color(model_name(ii))
     end if
-    lres@gsLineOpacityF = 0.4
+    lres@gsLineOpacityF = 0.5
     dummy(idummy) = gsn_add_polyline(wks, plot, sam_runmean&time, sam_runmean(ii, :)+dy2, lres)
     idummy = idummy + 1
   end do
@@ -430,45 +434,69 @@ begin
   idummy = idummy + 1
   
   
-  lres@gsLineThicknessF = 0.75
+;  lres@gsLineThicknessF = 0.75
+;  lres@gsLineThicknessF = 1.5
   do n = 0, nintegrations-1
     if (cmip_phase(n).eq."CMIP5") then
       lres@gsLineColor := color_cmip5
+      lres@gsLineThicknessF = 1.5
     elseif (cmip_phase(n).eq."CMIP6") then
       lres@gsLineColor := get_color(model_name(n))
+      lres@gsLineThicknessF = 2.5
     end if
     dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass&time, sam_lowpass(n, :)+dy2, lres)
     idummy = idummy + 1
   end do
-  if (isvar("sam_lowpass_cmip5mean")) then
-    lres@gsLineThicknessF = 4.
-    lres@gsLineColor     := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip5mean&time, \
-                                     sam_lowpass_cmip5mean+dy2, lres)
+;  if (isvar("sam_lowpass_cmip5mean")) then
+;    lres@gsLineThicknessF = 4.
+;    lres@gsLineColor     := "white"
+;    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip5mean&time, \
+;                                     sam_lowpass_cmip5mean+dy2, lres)
+;    idummy = idummy + 1
+;    lres@gsLineThicknessF = 2.5
+;    lres@gsLineColor     := color_cmip5
+;    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip5mean&time, \
+;                                     sam_lowpass_cmip5mean+dy2, lres)
+;    idummy = idummy + 1
+;    txres@txFontColor := lres@gsLineColor
+;    dummy(idummy) = gsn_add_text(wks, plot, "CMIP5", 1900., -2.0+dy2, txres)
+;    idummy = idummy + 1
+;  end if
+;  if (isvar("sam_lowpass_cmip6mean")) then
+;    lres@gsLineThicknessF = 4.
+;    lres@gsLineColor     := "white"
+;    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip6mean&time, \
+;                                     sam_lowpass_cmip6mean+dy2, lres)
+;    idummy = idummy + 1
+;    lres@gsLineThicknessF = 2.5
+;    lres@gsLineColor     := get_color("CMIP6")
+;    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip6mean&time, \
+;                                     sam_lowpass_cmip6mean+dy2, lres)
+;    idummy = idummy + 1
+;    txres@txFontColor := lres@gsLineColor
+;    dummy(idummy) = gsn_add_text(wks, plot, "CMIP6", 1900., -2.6+dy2, txres)
+;    idummy = idummy + 1
+;  end if
+
+
+  txres@txJust = "TopLeft"
+  legend = get_unique_values(where(cmip_phase.ne."CMIP5", model_name, "CMIP5"))
+  nlegend = dimsizes(legend)
+  x = syear + 50.
+  dx = tofloat(eyear-syear-100)/40.
+  do n = 0, nlegend-1
+    if (legend(n).ne."CMIP5") then
+      txres@txFontColor := get_color(legend(n))  
+      dummy(idummy) = gsn_add_text(wks, plot, legend(n), x, -2.5+dy2, txres)
+      idummy = idummy + 1
+      x = x + dx*(strlen(legend(n))*0.6+5.)
+    end if
+  end do
+  if (any(legend.eq."CMIP5")) then
+    txres@txFontColor := color_cmip5
+    dummy(idummy) = gsn_add_text(wks, plot, "CMIP5", x, -2.5+dy2, txres)
     idummy = idummy + 1
-    lres@gsLineThicknessF = 2.5
-    lres@gsLineColor     := color_cmip5
-    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip5mean&time, \
-                                     sam_lowpass_cmip5mean+dy2, lres)
-    idummy = idummy + 1
-    txres@txFontColor := lres@gsLineColor
-    dummy(idummy) = gsn_add_text(wks, plot, "CMIP5", 1900., -2.0+dy2, txres)
-    idummy = idummy + 1
-  end if
-  if (isvar("sam_lowpass_cmip6mean")) then
-    lres@gsLineThicknessF = 4.
-    lres@gsLineColor     := "white"
-    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip6mean&time, \
-                                     sam_lowpass_cmip6mean+dy2, lres)
-    idummy = idummy + 1
-    lres@gsLineThicknessF = 2.5
-    lres@gsLineColor     := get_color("CMIP6")
-    dummy(idummy) = gsn_add_polyline(wks, plot, sam_lowpass_cmip6mean&time, \
-                                     sam_lowpass_cmip6mean+dy2, lres)
-    idummy = idummy + 1
-    txres@txFontColor := lres@gsLineColor
-    dummy(idummy) = gsn_add_text(wks, plot, "CMIP6", 1900., -2.6+dy2, txres)
-    idummy = idummy + 1
+    x = x + dx*strlen("CMIP5")
   end if
   
   draw(plot)
