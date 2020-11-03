@@ -324,7 +324,7 @@ if (write_plots) {
       cex = 1.
     )
     dev.off()
-    xprov <- provenance_record(list(climofiles))
+    xprov <- provenance_record(climofiles)
     provenance[[filenames]] <- xprov
   }
 }
