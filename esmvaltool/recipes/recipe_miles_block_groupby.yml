@@ -21,7 +21,11 @@ documentation:
 
 datasets:
    - {dataset: EC-EARTH,    project: CMIP5,  exp: historical,  ensemble: r2i1p1,  start_year: 1980,  end_year: 1989}
-   - {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3, start_year: 1980,  end_year: 1989 }
+   - {dataset: CMCC-CM,    project: CMIP5,  exp: historical,  ensemble: r1i1p1,  start_year: 1980,  end_year: 1989}
+   - {dataset: IPSL-CM5A-LR,    project: CMIP5,  exp: historical,  ensemble: r1i1p1,  start_year: 1980,  end_year: 1989}
+   - {dataset: INM-CM4-8,    project: CMIP6,  exp: historical,  mip: day,  ensemble: r1i1p1f1,  grid: gr1,  start_year: 1980,  end_year: 1989}
+   - {dataset: IPSL-CM6A-LR,    project: CMIP6,  exp: historical,  mip: day,  ensemble: r1i1p1f1,  grid: gr,  start_year: 1980,  end_year: 1989}
+   - {dataset: MPI-ESM1-2-LR,    project: CMIP6,  exp: historical,  mip: day,  ensemble: r1i1p1f1,  grid: gn,  start_year: 1980,  end_year: 1989}
 
 preprocessors:
     preproc1:
