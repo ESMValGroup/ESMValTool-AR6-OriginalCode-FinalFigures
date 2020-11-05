@@ -55,6 +55,7 @@ import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as patches
+from matplotlib.ticker import MultipleLocator, ScalarFormatter
 import json
 
 from scipy.stats import linregress
@@ -386,7 +387,6 @@ def count_models(metadatas, obs_filename):
         number_models[metadata['dataset']] = True
         projects[metadata['project']] = True
     model_numbers = {model:i for i, model in enumerate(sorted(number_models))}
-    print (number_models, model_numbers)
     number_models = len(number_models)
     return model_numbers, number_models, projects
 
@@ -695,11 +695,16 @@ def make_pane_a(
                  zorder = plot_details[project]['zorder']
                  )
 
+    plt.ylim((5050., 0.))
+
     #####
     # Add box and whisker lines.
     add_box_whisker = True
-    depth_ll_x = {'CMIP5':-8., 'CMIP6':-5.,}
-    mean_ll_y = {'CMIP5':5500, 'CMIP6':6000,}
+    depth_ll_x = {'CMIP5':-8., 'CMIP6':-2.,}
+    mean_ll_y = {'CMIP5':4100, 'CMIP6':4500,}
+    label_x = {'CMIP5': 10, 'CMIP6': 10,}
+    label_y = {'CMIP5': 4250., 'CMIP6': 4650.,}
+
     for project in projects:
         if not add_box_whisker: continue
         if project == 'CMIP5':
@@ -707,49 +712,54 @@ def make_pane_a(
         if project == 'CMIP6':
             colour = 'red'
 
+        ax.text(label_x[project], label_y[project], project,
+            horizontalalignment='center',
+            color = colour,
+            verticalalignment='center', transform=ax.transData)
+
         # Mean amocs
         means, depths = make_list_of_cube_amocs(projects[project])
         box_height = 250
-        line_height = 20
+        line_height = 10
         mean_box_ll = np.percentile(means, 25)
         mean_box_width = np.percentile(means, 75)- mean_box_ll
-        ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project]], mean_box_width, box_height,  color = colour) )
+        # amoc box
+        ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project]], mean_box_width, box_height,  color = colour, lw=1, ec='k'))
 
+        # amoc line
         mean_box_ll = np.percentile(means, 5)
         mean_box_width = np.percentile(means, 95)- mean_box_ll
         ax.add_patch(patches.Rectangle([mean_box_ll, mean_ll_y[project] +(box_height/2.)-(line_height/2.)], 
             mean_box_width, 
             line_height, 
-            color = colour,
+            color = 'black',
             transform = ax.transData))
 
-        median_width = 0.3
-        median = np.percentile(means, 50)
-        #print('box:', colour, [median - median_width/2, mean_ll_y[project]],  median_width, box_height)
-        ax.add_patch(
-            patches.Rectangle([median - median_width/2., mean_ll_y[project]],
-                median_width, box_height,  color = 'white', transform = ax.transData, ))#zorder=10))
-
-#        ax.add_patch(
-#            patches.Rectangle([median - median_width/2, mean_ll_y[project]],
-#                median_width, box_height,  color = 'green')) #order=10))
-
+        # amoc median
+        median_width = 0.15
+        for pc in [5, 50, 95]:
+            median = np.percentile(means, pc)
+            ax.add_patch(
+                patches.Rectangle([median - median_width/2., mean_ll_y[project]],
+                    median_width, box_height,  color = 'black', transform = ax.transData, ))#zorder=10))
 
         # Mean Depts:
-        box_widtht = 2.
-        line_width = 0.1
+        box_widtht = 3.
+        line_width = 0.06
         depth_box_ll = np.percentile(depths, 25)
         depth_box_height = np.percentile(depths, 75)- np.percentile(depths, 25)
-        ax.add_patch(patches.Rectangle([depth_ll_x[project], depth_box_ll], box_widtht, depth_box_height, color = colour) )
+        ax.add_patch(patches.Rectangle([depth_ll_x[project], depth_box_ll], box_widtht, depth_box_height, color = colour, lw=1, ec='k'))
 
+        # depth line
         depth_box_ll = np.percentile(depths, 5)
         depth_box_height = np.percentile(depths, 95)- np.percentile(depths, 5)
-        ax.add_patch(patches.Rectangle([depth_ll_x[project]+box_widtht/2. - line_width/2., depth_box_ll], line_width, depth_box_height, color = colour) )
-
-        median_height = 30. 
-        median = np.percentile(depths, 50)
-        ax.add_patch(patches.Rectangle([depth_ll_x[project], median - median_height/2, ],
-            box_widtht, median_height, color = 'white', transform = ax.transData, zorder=10))
+        ax.add_patch(patches.Rectangle([depth_ll_x[project]+box_widtht/2. - line_width/2., depth_box_ll], line_width, depth_box_height, color = 'black'))
+        # depth medians
+        median_height = 15. 
+        for pc in [5, 50, 95]:
+            median = np.percentile(depths, pc)
+            ax.add_patch(patches.Rectangle([depth_ll_x[project], median - median_height/2, ],
+                box_widtht, median_height, color = 'black', transform = ax.transData, zorder=10))
         
 
     add_obs = True
@@ -960,6 +970,8 @@ def make_pane_bc(
 
     ####
     # Add project datasets
+    # Also counting the number of CMIP5
+    count_pcs = {'CMIP5':{}, 'CMIP6':{}}
     for project in sorted(projects.keys()):
         datasets = projects[project]
         if len(datasets) == 0:
@@ -968,16 +980,35 @@ def make_pane_bc(
         trends[project] = []
         for dataset in datasets:
             print(project, dataset)
+            count_pcs[project][dataset] = np.percentile(trends[dataset], 5)
             print('trends[dataset]:',project, dataset, len(trends[dataset]))
             trends[project].extend(list(trends[dataset]))
-            #except: trends[project] = trends[dataset]
             print('trends[project]:',project,len(trends[project]))
-
+            
         if project == 'CMIP6':
             box_order.extend(sorted(datasets))
+    print('-----\nCount the number of models that have a 5th percentile lower than the observed value:')
+    for pc in [1, 5]: 
+        for project in sorted(projects.keys()):
+            counts = 0
+            total = 0
+            pane_obs_data = {'b': -5.3, 'c': -4.4}
+            for dataset in projects[project]:
+                pc_value = np.percentile(trends[dataset], pc)
+                if  pc_value < pane_obs_data[pane]:
+                    counts+=1
+                total+=1
+                print(pane, project, dataset, pc_value, ('pc:', pc), (counts, '/', total))
+
+            print('Pane', pane+': there are',counts,'of', total, project, 'models with a',pc,'percentile lower than the observed value (', pane_obs_data[pane],')')
     #assert 0
+
     if add_obs:
         box_order.append(obs_dataset)
+
+
+    # 3. Count the number of CMIP5 and CMIP6 (separately) models that have a 5th percentile lower than the observed value for panels b and c (my estimate is that 5 CMIP6 models produce the observed 8-yr trend in their 90% confidence interval range).
+
 
     if timeseries:
         # Draw the trend/variability as a time series
@@ -1015,10 +1046,12 @@ def make_pane_bc(
 
         box_colours = {'CMIP5': 'dodgerblue', 'CMIP6': 'red'}
         for box_label, patch in zip(box_order,box['boxes']):
-            if box_label in ['CMIP5', 'CMIP6']:
-                patch.set_facecolor(box_colours[box_label])
-            else:
-                patch.set_facecolor('white')
+            for proj in ['CMIP5', 'CMIP6']:
+                if box_label == proj:
+                    patch.set_facecolor(box_colours[box_label])
+                elif box_label in projects[proj]:
+                    patch.set_facecolor(box_colours[proj])
+                    patch.set_alpha(0.5)
 
     if savefig:
         plt.subplots_adjust(bottom=0.25)
@@ -1028,20 +1061,26 @@ def make_pane_bc(
         plt.title('(b) Distribution of 8 year AMOC trends')
         if decadal:
             ax.set_ylabel('Sv/decade')
-            plt.axhline(-5.3, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
+            plt.axhline(-5.3, c='k', lw=4, alpha=0.1, zorder = 0) # Wrong numbers!
         else:
-            plt.axhline(-0.53, c='k', lw=8, alpha=0.1, zorder = 0) # Wrong numbers!
+            plt.axhline(-0.53, c='k', lw=4, alpha=0.1, zorder = 0) # Wrong numbers!
             plt.ylabel('Sv yr'+r'$^{-1}$')
         #if not savefig:
         #    plt.setp( ax.get_xticklabels(), visible=False)
 
     if pane == 'c':
         plt.title('(c) Distribution of interannual AMOC changes')
-        plt.axhline(-4.4, c='k', lw=8, alpha=0.1, zorder = 0) # wrong numbers!
+        plt.axhline(-4.4, c='k', lw=4, alpha=0.1, zorder = 0) # wrong numbers!
         plt.ylabel('Sv')
+
+    
+    # 3.     Count the number of CMIP5 and CMIP6 (separately) models that have a 5th percentile lower than the observed value for panels b and c (my estimate is that 5 CMIP6 models produce the observed 8-yr trend in their 90% confidence interval range).
 
     ax.axhline(0., ls='--', color='k', lw=0.5)
 
+    ax.yaxis.set_major_locator(MultipleLocator(10))
+    ax.yaxis.set_minor_locator(MultipleLocator(5))
+    ax.yaxis.set_major_formatter(ScalarFormatter())
 
     # If putting all the panes in one figure, return them now.
     if not savefig:
@@ -1349,6 +1388,9 @@ def main(cfg):
     """
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='c')
+    #make_pane_bc(cfg, pane='b', timeseries=False)
+    make_pane_bc(cfg, pane='c', timeseries=False)
+
     make_pane_a(cfg)
 
 
