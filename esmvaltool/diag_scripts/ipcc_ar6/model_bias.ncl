@@ -211,6 +211,7 @@ begin
     data_mon = convert_units(data_mon, "mm/day")
   elseif (var0.eq."tas") then
     mmdata = convert_units(mmdata, "degC")
+    data = convert_units(data, "degC")
     refdata = convert_units(refdata, "degC")
   elseif (var0.eq."tos" .or. var0.eq."thetao") then
     if (mmdata@units .eq. "K") then
@@ -371,7 +372,7 @@ begin
     diff@res_cnFillPalette = pal
     if (plot_abs_diff) then
       pal3 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
-                                + "ipcc-ar6_temperature_10.rgb")
+                                + "ipcc-ar6_temperature_div.rgb")
     end if
     if (plot_rel_diff) then
       pal4 = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
@@ -448,22 +449,22 @@ begin
 
   if (plot_abs_diff) then
     copy_VarMeta(diff, absdiff)
-    if (isvar("pal3")) then
-      delete(absdiff@res_cnFillColors)
-      absdiff@res_cnFillColors = pal3(4:0,:)
-      nt = dimsizes(pal3(4:0,:))
-      n = nt(0)
-    else
-      n = dimsizes(diff@res_cnLevels)
-    end if
-
-    mx = max(diff@res_cnLevels)
-    delete(absdiff@res_cnLevels)
-
-    tmp = fspan(0.0, mx, n)
-
-    absdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
-    delete(tmp)
+;    if (isvar("pal3")) then
+;      delete(absdiff@res_cnFillColors)
+;      absdiff@res_cnFillColors = pal3(4:0,:)
+;      nt = dimsizes(pal3(4:0,:))
+;      n = nt(0)
+;    else
+;      n = dimsizes(diff@res_cnLevels)
+;    end if
+;
+;    mx = max(diff@res_cnLevels)
+;    delete(absdiff@res_cnLevels)
+;
+;    tmp = fspan(0.0, mx, n)
+;
+;    absdiff@res_cnLevels = tmp(1:dimsizes(tmp)-1)
+;    delete(tmp)
 
     absdiff@res_tiMainString = "Multi Model Mean of Absolute Error"
 

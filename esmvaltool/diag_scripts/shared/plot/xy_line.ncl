@@ -1804,11 +1804,11 @@ begin
   annots = project_style(items, diag_script_info, "annots")
   avgstd = project_style(items, diag_script_info, "avgstd")
 
-  colors := array_append_record(colors, "(/1,0,0/)", 0)
-  dashes := array_append_record(dashes, 0, 0)
-  thicks := array_append_record(thicks, 3., 0)
-  annots := array_append_record(annots, "MultiModelMean", 0)
-  avgstd := array_append_record(avgstd, 1, 0)
+;  colors := array_append_record(colors, "(/1,0,0/)", 0)
+;  dashes := array_append_record(dashes, 0, 0)
+;  thicks := array_append_record(thicks, 3., 0)
+;  annots := array_append_record(annots, "MultiModelMean", 0)
+;  avgstd := array_append_record(avgstd, 1, 0)
   
   ; ************************************************
   ; plotting parameters
@@ -2021,8 +2021,8 @@ begin
 
   resP = True
   resP@gsnMaximize = True
-  resP@gsnPaperOrientation = "portrait"
-  resP@gsnPaperMargin =  0.8
+  ;resP@gsnPaperOrientation = "portrait"
+  ;resP@gsnPaperMargin =  0.8
 
   gsn_panel(wks, plot, (/1, 1/), resP)
 
@@ -3000,7 +3000,7 @@ begin
   res_lines@gsLineColor = interval_colors(n_val-1, :)
   plot@$unique_string("dum")$ = gsn_add_polyline(wks_out, plot, xx, yy, \
                                                  res_lines)
-  plot@$unique_string("dum")$ = gsn_add_text(wks_out, plot, "CMIP5", \
+  plot@$unique_string("dum")$ = gsn_add_text(wks_out, plot, data@project, \
                                              (xx(1) + 0.3 * (xx(1) - xx(0))), \
                                              yy(0), res_text)
 
