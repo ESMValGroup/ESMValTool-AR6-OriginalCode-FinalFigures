@@ -1125,15 +1125,15 @@ def calc_dyn_height_clim(cfg,
         # 3) vs. 1850-1900 (traditional "pre-industrial")
         psal_bar = extract_time(psal_bar, 1850, 1, 1, 1900, 12, 31)
         thetao_bar = extract_time(thetao_bar, 1850, 1, 1, 1900, 12, 31)
-    elif clim_type == '1971-2018':
+    elif clim_type == '1995-2014':
         # 4) vs. 1995-2014 (AR5 standard)
         psal_bar = extract_time(psal_bar, 1995, 1, 1, 2014, 12, 31)
         thetao_bar = extract_time(thetao_bar, 1995, 1, 1, 2014, 12, 31)
-    elif clim_type == '1971-2018':
+    elif clim_type == '1985-2014':
         # 5) vs. 1985-2014 (Convenient 30 yr from AR5)
         psal_bar = extract_time(psal_bar, 1985, 1, 1, 2014, 12, 31)
         thetao_bar = extract_time(thetao_bar, 1985, 1, 1, 2014, 12, 31)
-    elif clim_type == '1971-2018':
+    elif clim_type == '2004-2018':
         # 6) vs. 2004-2018 (in comparison to RAPID Period)
         psal_bar = extract_time(psal_bar, 2004, 1, 1, 2018, 12, 31)
         thetao_bar = extract_time(thetao_bar, 2004, 1, 1, 2018, 12, 31)
@@ -1144,7 +1144,8 @@ def calc_dyn_height_clim(cfg,
         # 8) vs. detrended PI-control (same window as full historical)
         if exp != 'piControl':
             assert 0
-
+    else:
+        assert 0
     # Calculaste average along the time dimension
     psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
     thetao_bar = thetao_bar.collapsed('time', iris.analysis.MEAN)
@@ -1215,8 +1216,8 @@ def calc_dyn_height_clim(cfg,
         sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
 
         # copy fixed data back into original cube.
-        psal_bar.data[:, y, :] = sal_bar
-        thetao_bar.data[:, y, :] = temp_bar
+        psal_bar.data[:, y, :] = psal_bar.data[:, y, :] - sal_bar
+        thetao_bar.data[:, y, :] = thetao_bar.data[:, y, :] - temp_bar
 
         # Calculate climatoligical pressure
         # pressure_bar = np.array([gsw.conversions.p_from_z(depth_bar[:, y, :], la[y]) for y in np.arange(len(la))]) # dbar
@@ -1236,14 +1237,14 @@ def calc_dyn_height_clim(cfg,
           cfg,
           metadatas[hist_so_fn],
           psal_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_asal',
+          key='Dyn_height_clim/'+clim_type+'_surface_sal_fix',
           sym_zero=False,
           )
     single_pane_map_plot(
           cfg,
           metadatas[hist_thetao_fn],
           thetao_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_ctemp',
+          key='Dyn_height_clim/'+clim_type+'_surface_temp_fix',
           sym_zero=False,
           )
 
@@ -1274,7 +1275,7 @@ def calc_dyn_height_clim(cfg,
           cfg,
           metadatas[hist_thetao_fn],
           cube0,
-          key='Dyn_height_clim/'+clim_type+'_dynamic_heightsurface_ctemp',
+          key='Dyn_height_clim/'+clim_type+'_dynamic_height',
           sym_zero=False,
           )
     return clim_fn
@@ -1438,6 +1439,10 @@ def calc_dyn_height(
     dyn_thermo = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, dyn_thermo)
     dyn_halo   = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, dyn_halo )
 
+    dyn_total = np.ma.masked_invalid(dyn_total)
+    dyn_thermo = np.ma.masked_invalid(dyn_thermo)
+    dyn_halo = np.ma.masked_invalid(dyn_halo)
+
     # Save SLR data as a cube and then a netcdf..
     cube0 = thetao_cube[:, 0, :, :].copy()
     cube0.data = dyn_total
@@ -1545,9 +1550,10 @@ def calc_dyn_height_full(cfg,
     clim_files['halo'] = halo_fn
 
     return clim_files
-    assert 0
 
 
+
+def ignortethis():
     # Load historical temperature and salinity netcdfs
     so_cube = iris.load_cube(hist_so_fn)
     thetao_cube = iris.load_cube(hist_thetao_fn)
@@ -1809,21 +1815,166 @@ def plot_dyn_height_ts(cfg, metadata, dyn_averages,  trend):
 
     for dyn_type, dyn_fn in dyn_averages.items():
         dyn_cube = iris.load_cube(dyn_fn)
-        if 'time' in [c.var_name for c in dyn_cube.coords()]:
-
+        if dyn_cube.data.ndim == 0:
+            plt.axhline(dyn_cube.data, c = 'k', ls=':' )
+        else:
             times = diagtools.cube_time_to_float(dyn_cube)
             plt.plot(times, dyn_cube.data, label = dyn_type)
+
+    plt.xlabel('Year')
+    plt.ylabel('Nonanomalous Dynamic Height, mm')
+    plt.legend()
+
+    path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries'])
+    path += '_'.join([project, dataset, exp, ensemble, trend, 'all_timeseries'])+'.png'
+    print('Saving figure:', path)
+    plt.savefig(path)
+    plt.close()
+
+
+def plot_slr_full_ts(cfg, metadata, dyn_averages, trend):
+    """
+    Make SLR time series plots for individual models.
+ 
+    8 pane picture, with 
+    """
+    exp = metadata['exp']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+
+    steric_types = ['total', 'thermo', 'halo']
+    cubes = {}
+    print('---------\n', project, dataset, exp, ensemble)
+    for dyn_type, fn in dyn_averages.items():
+        cubes[dyn_type] = iris.load_cube(fn)
+        print(dyn_type, ':',cubes[dyn_type].data.shape, 'mean:', cubes[dyn_type].data.mean())#s.path.basename fn)
+    panes = {'1971-2018':424, '2005-2018':428, '1850-1900':423 , '1995-2014':426,
+             '1985-2014':425, '2004-2018':427, 'fullhistorical':422, 'piControl':421} 
+    yranges = {
+       '1971-2018': [1971, 2018 + 1], 
+       '2005-2018': [2005, 2018 + 1],
+       '1850-1900': [1850, 1900 + 1],
+       '1995-2014': [1995, 2014 + 1],
+       '1985-2014': [1985, 2014 + 1],
+       '2004-2018': [2004, 2018 + 1],
+       'fullhistorical': [1850, 2015 + 1],
+       'piControl': [1850, 2015 + 1],
+       }
+
+    fig = plt.figure()
+    fig.set_size_inches(12, 8)
+    for clim_type, sbp in panes.items():
+        ax = fig.add_subplot(sbp)
+        for steric_type in steric_types:
+            times = diagtools.cube_time_to_float(cubes[steric_type])
+            data = - cubes[steric_type].data + cubes[clim_type].data
+            plt.plot(times, data, label = steric_type.title())
+        plt.axhline(0., c = 'k', ls='-', lw=0.5)
+        plt.axhline(0.5, c = 'k', ls=':', lw=0.5)
+        plt.axhline(-0.5, c = 'k', ls=':', lw=0.5)
+
+        if clim_type == 'piControl':
+            ax.axvspan(yranges[clim_type][0], yranges[clim_type][1], alpha=0.35, color='red')
         else:
-            plt.axhline(dyn_cube.data, c = 'k', ls=':' )
+            ax.axvspan(yranges[clim_type][0], yranges[clim_type][1], alpha=0.35, color='black')
 
-      plt.xlabel('Year')
-      plt.ylabel('Nonanomalous Dynamic Height, mm')
+        ax.text(.5,.82, clim_type,
+            horizontalalignment='center',
+            transform=ax.transAxes)
 
-      path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries'])
-      path += '_'.join([project, dataset, exp, ensemble, trend, 'all_timeseries'])+'.png'
-      print('Saving figure:', path)
-      plt.savefig(path)
-      plt.close()
+    fig.add_subplot(111, frame_on=False)
+    plt.tick_params(labelcolor="none", bottom=False, left=False)
+    plt.xlabel('Year')
+    plt.ylabel('Steric anomaly, mm')
+    plt.suptitle(' '.join([project, dataset, exp, ensemble, trend, 'SLR']))
+    path = diagtools.folder([cfg['plot_dir'], 'SLR_timeseries'])
+    path += '_'.join([project, dataset, exp, ensemble, trend, 'slr_timeseries'])+'.png'
+    print('Saving figure:', path)
+    plt.savefig(path)
+    plt.close()
+
+
+
+
+
+
+
+
+def plot_slr_full3d_ts(cfg, metadata, dyn_files, area_fn, trend):
+    """
+    8 pane picture, with
+    """
+    exp = metadata['exp']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+
+    steric_types = ['total', 'thermo', 'halo']
+    cubes = {}
+    print('---------\n', project, dataset, exp, ensemble)
+    for dyn_type, fn in dyn_files.items():
+        cubes[dyn_type] = iris.load_cube(fn)
+        cubes[dyn_type].data = np.ma.masked_invalid(cubes[dyn_type].data)
+
+        print(dyn_type, ':',cubes[dyn_type].data.shape, 'mean:', cubes[dyn_type].data.mean())#s.path.basename fn)
+    panes = {'1971-2018':424, '2005-2018':428, '1850-1900':423 , '1995-2014':426,
+             '1985-2014':425, '2004-2018':427, 'fullhistorical':422, 'piControl':421}
+
+    yranges = {
+       '1971-2018': [1971, 2018 + 1],
+       '2005-2018': [2005, 2018 + 1],
+       '1850-1900': [1850, 1900 + 1],
+       '1995-2014': [1995, 2014 + 1],
+       '1985-2014': [1985, 2014 + 1],
+       '2004-2018': [2004, 2018 + 1],
+       'fullhistorical': [1850, 2015 + 1],
+       'piControl': [1850, 2015 + 1],
+       }
+    area_cube = iris.load_cube(area_fn)
+    area_cube.data = np.ma.masked_invalid(area_cube.data)
+
+    fig = plt.figure()
+    fig.set_size_inches(12, 8)
+    for clim_type, sbp in panes.items():
+        ax = fig.add_subplot(sbp)
+        for steric_type in steric_types:
+            steric_cube = cubes[steric_type].copy()
+            times = diagtools.cube_time_to_float(steric_cube)
+
+            clim_tile = da.tile(cubes[clim_type].core_data(), [steric_cube.shape[0], 1, 1])
+            grid_areas = da.tile(area_cube.core_data(), [steric_cube.shape[0], 1, 1])
+            print('calculating:', dataset, steric_type, clim_type)
+            print(steric_cube.data.shape, clim_tile.shape, grid_areas.shape)
+            steric_cube.data = steric_cube.data - clim_tile
+            steric_cube = steric_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=grid_areas)
+
+            plt.plot(times, -1.*steric_cube.data, label = steric_type.title())
+        plt.axhline(0., c = 'k', ls='-', lw=0.5)
+        plt.axhline(0.5, c = 'k', ls=':', lw=0.5)
+        plt.axhline(-0.5, c = 'k', ls=':', lw=0.5)
+
+        if clim_type == 'piControl':
+            ax.axvspan(yranges[clim_type][0], yranges[clim_type][1], alpha=0.35, color='red')
+        else:
+            ax.axvspan(yranges[clim_type][0], yranges[clim_type][1], alpha=0.35, color='black')
+
+        ax.text(.5,.82, clim_type,
+            horizontalalignment='center',
+            transform=ax.transAxes)
+
+    fig.add_subplot(111, frame_on=False)
+    plt.tick_params(labelcolor="none", bottom=False, left=False)
+    plt.xlabel('Year')
+    plt.ylabel('Steric anomaly, mm')
+    plt.suptitle(' '.join([project, dataset, exp, ensemble, trend, 'SLR']))
+    path = diagtools.folder([cfg['plot_dir'], 'SLR_timeseries_3d'])
+    path += '_'.join([project, dataset, exp, ensemble, trend, 'slr_timeseries_3d'])+'.png'
+    print('Saving figure:', path)
+    plt.savefig(path)
+    plt.close()
+
+
 
 
 def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, slr_type, trend):
@@ -1841,7 +1992,14 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemb
     dyn_cube.data = np.ma.masked_invalid(dyn_cube.data)
     area_cube.data = np.ma.masked_invalid(area_cube.data)
 
-    grid_areas = da.tile(area_cube.core_data(), [dyn_cube.shape[0], 1, 1])
+    # coord_names = [c.var_name for c in dyn_cube.coords()]
+    # print('calc_dyn_timeseries:', dyn_fn, '\ncoord_names:', coord_names)
+    ndim = dyn_cube.data.ndim
+    if ndim == 3:
+        grid_areas = da.tile(area_cube.core_data(), [dyn_cube.shape[0], 1, 1])
+    else: 
+        grid_areas = area_cube.data
+    print(dataset, grid_areas.shape, area_cube.shape, dyn_cube.shape)
     dyn_cube = dyn_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=grid_areas)
 
     # Save NetCDF
@@ -1849,8 +2007,7 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemb
 
     print('calc_slr_timeseries:', dataset, exp, ensemble, dyn_cube.data)
     # Make plot
-
-    if 'time' in [c.var_name for c in dyn_cube.coords()]:
+    if ndim == 3:
         fig = plt.figure()
         ax = fig.add_subplot(111)
         times = diagtools.cube_time_to_float(dyn_cube)
@@ -2230,6 +2387,7 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
 
     if os.path.exists(output_fn):
         print('Detrended already exists:', output_fn)
+        return output_fn
         cube = iris.load_cube(filename)
         detrended = iris.load_cube(output_fn)
         make_difference_plots(
@@ -2655,8 +2813,9 @@ def main(cfg):
     #slr_fns = {}
     do_SLR = True
     trends = ['detrended', 'intact']
-    for trend in trends:
-        for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
+    for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
+        for trend in trends:
+
             if not do_SLR: continue
             if short_name != 'thetao':
                 continue
@@ -2686,20 +2845,25 @@ def main(cfg):
                 picontrol_so_fn,
                 trend=trend,
                 )
-            # dyn_fns
 
-            # Calculate spatial average
+            # Calculate spatial average/time series
             dyn_averages = {}
             areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
             for dyn_type, dyn_fn in dyn_height_fns.items():
                 dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type, trend)
                 dyn_averages[dyn_type] = dyn_ts_fn
+                dyn_fns[(project, dataset, exp, ensemble, dyn_type, trend)] = dyn_fn
                 dyn_fns[(project, dataset, exp, ensemble, dyn_type + '_ts', trend)] = dyn_ts_fn
                 metadatas[dyn_ts_fn] = metadatas[hist_thetao_fn]
 
             #for dyn_type in ['total', 'thermo', 'halo']:
             plot_dyn_height_ts(cfg, metadatas[dyn_ts_fn], dyn_averages, trend)
 
+            plot_slr_full_ts(cfg, metadatas[dyn_ts_fn], dyn_averages, trend)
+
+            plot_slr_full3d_ts(cfg, metadatas[dyn_ts_fn], dyn_height_fns, areacella_fn, trend)
+
+            #assert 0
             continue
 
             print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
