@@ -3424,14 +3424,16 @@ tasa_datasets: &tasa_datasets
   - {dataset: HadCRUT5, project: OBS, type: ens200, version: 5.0, tier: 2}
   - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
-  - {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
+  #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
+  - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: v5, tier: 2}
+  - {dataset: Kadow, project: OBS, type: median, version: 4.6.0.0, tier: 2}
   - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
 
 tasaga_datasets: &tasaga_datasets
   - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
   - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
-  - {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
+  #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
   - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
   - {dataset: CowtanWay, project: OBS, type: ens001, version: version2.0, tier: 2}
   - {dataset: CowtanWay, project: OBS, type: ens002, version: version2.0, tier: 2}
