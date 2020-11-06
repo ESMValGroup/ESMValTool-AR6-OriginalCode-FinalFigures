@@ -92,7 +92,6 @@ diagnostics:
       - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1}
       - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1}
       - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1}
-      - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1}
       - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1}
       - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1}
       - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1}
