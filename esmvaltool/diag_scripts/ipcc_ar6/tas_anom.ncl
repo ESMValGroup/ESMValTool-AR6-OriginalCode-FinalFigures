@@ -621,7 +621,7 @@ begin
   if (diag_script_info@header) then
     res@tiMainString = diag_script_info@region
   else
-    res@tiMainString = "Anomaly of Near-Surface Temperature"
+    res@tiMainString = "Anomaly of Near-Surface Air Temperature"
   end if
 
   res@tiYAxisString = "Change in Temperature (~F34~0~F~ C)"

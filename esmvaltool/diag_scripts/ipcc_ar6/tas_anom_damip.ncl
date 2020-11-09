@@ -178,8 +178,13 @@ begin
   panels = diag_script_info@panels
   reference = diag_script_info@reference
   tmp := dimsizes(panels)
-  npanels = tmp(0)
-  nexp = tmp(1)
+  if(dimsizes(tmp).gt.1) then
+    npanels = tmp(0)
+    nexp = tmp(1)
+  else 
+    npanels = 1
+    nexp = tmp(0)
+  end if
   delete(tmp)
   plots = new((/npanels/), graphic)
 
@@ -227,6 +232,20 @@ begin
     diag_ref := area_operations(tmp, -90., 90., \
                              0., 360., "average", True)
 
+    ref_arr = new((/ntime/), double)
+    ref_arr!0 = "time"
+    ref_arr&time = time
+    ref_arr@_FillValue = 1e+20
+    ref_arr = ref_arr@_FillValue
+
+    ; Match time coordinate
+    date = diag_ref&year
+    idx1 = ind(date(0).eq.ref_arr&time)
+    idx2 = ind(date(dimsizes(date) - 1).eq.ref_arr&time)
+    ref_arr(idx1:idx2) = (/diag_ref/)
+    copy_VarAtts(diag_ref, ref_arr)
+    delete(diag_ref)
+    delete(date)
 
     ; ------------------------------------------------------------------
     ; Read model datasets
@@ -240,10 +259,20 @@ begin
     model_arr_stat&exp = (/"exp1", "exp2", "exp3", "exp4"/)
     model_arr_stat&time = time
     model_arr_stat&stat = (/"mean", "min", "max"/)
+    ;model_arr_stat@_FillValue = 1e+20
+    ;model_arr_stat = model_arr_stat@_FillValue
+
+print("nexp = " + nexp)
 
     do iexp = 0, nexp - 1
 
-      var = panels(ivar, iexp)
+print("iexp = " + iexp)
+
+      if(npanels .gt. 1) then
+        var = panels(ivar, iexp)
+      else
+        var = panels(iexp)
+      end if
 
       log_info("processing " + var)
 
@@ -404,24 +433,30 @@ begin
 
       q_05 = new(ntime, double)
       q_95 = new(ntime, double)
-      do itime = 0, ntime -1
-        model_num = num(.not.ismissing(model_arr_em(ind_mod, itime)))
-        ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
-                     datasetnames.ne."MultiModelMean") 
-        ind_sort := dim_pqsort(model_arr(ind_m, itime), 1)
-        count = 0.
-        do imodel = 0, dimsizes(ind_m) - 1
-          count = count + 1./(model_num*ensemble_size(ind_m(ind_sort(imodel))))
-          if(count .gt. 0.95) then
-            break  
-          end if
-          if(ismissing(q_05(itime)) .and. count .gt. 0.05) then
-            q_05(itime) =  model_arr(ind_m(ind_sort(imodel)), itime)
-          end if
-          q_95(itime) =  model_arr(ind_m(ind_sort(imodel)), itime)
-        end do
-      end do
+      ;q_05@_FillValue = 1e+20
+      ;q_95@_FillValue = 1e+20
+      ;q_05 = q_05@_FillValue
+      ;q_95 = q_95@_FillValue
 
+      do itime = 0, ntime -1
+        if (any(.not.ismissing(model_arr(:, itime)))) then
+          model_num = num(.not.ismissing(model_arr_em(ind_mod, itime)))
+          ind_m := ind(.not.ismissing(model_arr(:, itime)) .and. \
+                       datasetnames.ne."MultiModelMean") 
+          ind_sort := dim_pqsort(model_arr(ind_m, itime), 1)
+          count = 0.
+          do imodel = 0, dimsizes(ind_m) - 1
+            count = count + 1./(model_num*ensemble_size(ind_m(ind_sort(imodel))))
+            if(count .gt. 0.95) then
+              break  
+            end if
+            if(ismissing(q_05(itime)) .and. count .gt. 0.05) then
+              q_05(itime) =  model_arr(ind_m(ind_sort(imodel)), itime)
+            end if
+            q_95(itime) =  model_arr(ind_m(ind_sort(imodel)), itime)
+          end do
+        end if
+      end do
 
       model_arr_stat&exp(iexp) =  var
       model_arr_stat(iexp, 0, :) = (/model_arr(mmm_ind, :)/)
@@ -456,8 +491,8 @@ begin
 
     ymax = max(model_arr_stat)
     ymin = min(model_arr_stat)
-    res@trYMaxF := max((/0.2, ymax + 0.05 * (ymax - ymin)/))
-    res@trYMinF := min((/-0.2, ymin - 0.05 * (ymax - ymin)/))
+    ;res@trYMaxF := max((/0.2, ymax + 0.05 * (ymax - ymin)/))
+    ;res@trYMinF := min((/-0.2, ymin - 0.05 * (ymax - ymin)/))
 
     if (isatt(diag_script_info, "header")) then
       res@tiMainString = diag_script_info@header(ivar)
@@ -518,14 +553,14 @@ begin
     res@xyLineThicknesses := (/3/) ; thicks  ; make 2nd lines thicker
     res@xyLineColors      := "black"  ; change line color
 
-    ref_p = gsn_csm_xy(wks, time, diag_ref, res)  ; create plot
+    ref_p = gsn_csm_xy(wks, time, ref_arr, res)  ; create plot
     overlay(plots(ivar), ref_p)
 
 
     ; ---------------------------------------------------------------------
     ; Create legend
     ; ---------------------------------------------------------------------
-    if (ivar .eq. 1) then
+    if (ivar .eq. 1 .and. var .eq. "tas_hist-aer_global") then
       res_text                    = True                  ; text mods desired
       res_text@txFontHeightF      = 0.02                 ; change text size
       res_text@txJust             = "CenterLeft"          ; text justification
@@ -536,27 +571,27 @@ begin
       cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
       res_lines@gsLineColor       = cmap(0,:)                 ; line color
       xx = (/1880,1895/)
-      yy = (/1.4,1.4/)
+      yy = (/3.0,3.0/)
       dum1 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)
       dum2 = gsn_add_text(wks,plots(ivar),"Anthropogenic + Natural",\
                           1905, yy(0),res_text)
       
-      yy = (/1.2,1.2/)
+      yy = (/2.5,2.5/)
       res_lines@gsLineColor       = cmap(1,:)
       dum3 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
       dum4 = gsn_add_text(wks,plots(ivar),"Natural",1905,yy(0),res_text)       ; add text
       
-      yy = (/1.0,1.0/)
+      yy = (/2.0,2.0/)
       res_lines@gsLineColor       = cmap(2,:)
       dum5 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
       dum6 = gsn_add_text(wks,plots(ivar),"Greenhouse Gases",1905,yy(0),res_text)       ; add text
       
-      yy = (/0.8,0.8/)
+      yy = (/1.5,1.5/)
       res_lines@gsLineColor       = cmap(3,:)
       dum7 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
       dum8 = gsn_add_text(wks,plots(ivar),"Aerosols",1905,yy(0),res_text)       ; add text
       
-      yy = (/0.6,0.6/)
+      yy = (/1.0,1.0/)
       res_lines@gsLineColor       := "black"                                ; change to black
       dum9 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
       dum10 = gsn_add_text(wks,plots(ivar),"Observations",1905,yy(0),res_text) ; add text
