@@ -202,7 +202,7 @@ diagnostics:
 #        # - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #        - {dataset: HadCM3, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
 #            - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
-            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
+#            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
               #            - {dataset: HadGEM2-ES, project: CMIP5, ensemble: r2i1p1, mip: Omon, exp: historical, }
 
 #        - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1, mip: Omon, exp: historical, }
