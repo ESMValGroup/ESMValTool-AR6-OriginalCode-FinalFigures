@@ -39,6 +39,8 @@ load "$diag_scripts/shared/ensemble.ncl"
 load "$diag_scripts/shared/plot/style.ncl"
 load "$diag_scripts/shared/plot/xy_line.ncl"
 
+load "$diag_scripts/ipcc_ar6/percentiles.ncl"
+
 
 undef("blend")
 function blend()
@@ -169,6 +171,13 @@ begin
   model_arr@units = "degC"
   model_arr@ref = ref_dataset
   delete(time)
+
+  if (ref_ind .ge. 0) then
+    model_fullspan = new(dim_MOD, logical)
+  else
+    model_fullspan = new(dim_MOD+1, logical)
+  end if
+  model_fullspan = 1
 
   ; get multi-model mean index
   mmm_ind = ind(datasetnames .eq. "MultiModelMean")
@@ -352,6 +361,12 @@ begin
     date = procmod&year
     idx1 = ind(date(0).eq.model_arr&time)
     idx2 = ind(date(dimsizes(date) - 1).eq.model_arr&time)
+    if (idx1 .ne. 0) then
+      model_fullspan(imod) = 0
+    end if
+    if (idx2 .ne. (ntime - 1)) then
+      model_fullspan(imod) = 0
+    end if
     model_arr(imod, idx1:idx2) = (/procmod/)
 
     delete(procmod)
@@ -387,6 +402,7 @@ begin
   anom_ref_em = anom_ref(:max(ensemble_assign)-1)
   anom_ref_em = anom_ref_em@_FillValue
   datasetnames_em = datasetnames(:max(ensemble_assign)-1)
+  model_fullspan_em =  model_fullspan(:max(ensemble_assign)-1)
 
   do gg = 1,max(ensemble_assign)         ; calculate ensemble means
     wind := ind(ensemble_assign.eq.gg)
@@ -395,10 +411,12 @@ begin
       model_arr_em(gg-1,:) = (/ model_arr(wind,:) /)
       anom_ref_em(gg-1) = (/ anom_ref(wind) /)
       datasetnames_em(gg-1) = datasetnames(wind)
+      model_fullspan_em(gg-1) = model_fullspan(wind)
     else
       model_arr_em(gg-1,:) = (/ dim_avg_n(model_arr(wind,:),0) /)
       anom_ref_em(gg-1) = (/ dim_avg_n(anom_ref(wind),0) /)
       datasetnames_em(gg-1) = datasetnames(wind(0))
+      model_fullspan_em(gg-1) = model_fullspan(wind(0))
     end if
   end do
 
@@ -408,12 +426,15 @@ begin
 
   if (ref_ind .ge. 0) then
     ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
-                  datasetnames_em.ne.variable_info[0]@reference_dataset)
+                   model_fullspan_em .and. \
+                   datasetnames_em.ne.variable_info[0]@reference_dataset)
   elseif (ref_ind .eq. -1)
     ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
-                  datasetnames_em.ne.ref_dataset)
+                   model_fullspan_em .and. \
+                   datasetnames_em.ne.ref_dataset)
   else
-    ind_mod := ind(datasetnames_em.ne."MultiModelMean")
+    ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
+                   model_fullspan_em)
   end if
   model_arr(mmm_ind, :) = dim_avg_n(model_arr_em(ind_mod,:),0) 
   anom_ref(mmm_ind) = avg(anom_ref_em(ind_mod))
@@ -424,18 +445,45 @@ begin
 
   q_05 = new(ntime, double)
   q_95 = new(ntime, double)
+
+;  do itime = 0, ntime -1
+;    if (ref_ind .ge. 0) then
+;      ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+;                   model_fullspan .and. \
+;                   datasetnames.ne."MultiModelMean" .and. \
+;                   datasetnames.ne.variable_info[0]@reference_dataset)
+;    elseif (ref_ind .eq. -1)
+;      ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+;                   model_fullspan .and. \
+;                   datasetnames.ne."MultiModelMean" .and. \
+;                   datasetnames.ne.ref_dataset)
+;    else
+;      ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+;                   model_fullspan .and. \
+;                   datasetnames.ne."MultiModelMean") 
+;    end if
+;
+;    q_05(itime) = weighted_percentile(model_arr(ind_m, itime), ensemble_size(ind_m), 0.05)
+;    q_95(itime) = weighted_percentile(model_arr(ind_m, itime), ensemble_size(ind_m), 0.05)
+;    model_arr(mmm_ind, itime) = weighted_mean(model_arr(ind_m, itime), ensemble_size(ind_m))
+;    anom_ref(mmm_ind) = weighted_mean(anom_ref(ind_m), ensemble_size(ind_m))
+;  end do
+
   do itime = 0, ntime -1
     model_num = num(.not.ismissing(model_arr_em(ind_mod, itime)))
     if (ref_ind .ge. 0) then
       ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+                   model_fullspan .and. \
                    datasetnames.ne."MultiModelMean" .and. \
                    datasetnames.ne.variable_info[0]@reference_dataset)
     elseif (ref_ind .eq. -1)
       ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+                   model_fullspan .and. \
                    datasetnames.ne."MultiModelMean" .and. \
                    datasetnames.ne.ref_dataset)
     else
       ind_m := ind(.not.ismissing(model_arr(:,itime)) .and. \
+                   model_fullspan .and. \
                    datasetnames.ne."MultiModelMean") 
     end if
     ind_sort := dim_pqsort(model_arr(ind_m, itime), 1)
