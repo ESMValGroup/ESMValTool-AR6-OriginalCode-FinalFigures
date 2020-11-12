@@ -27,7 +27,7 @@ preprocessors:
       target_grid: 5x5
       scheme: linear
     multi_model_statistics:
-      span: overlap
+      span: full
       statistics: [mean]
       exclude: [reference_dataset]
 
@@ -43,7 +43,7 @@ preprocessors:
       start_latitude: 60.
       end_latitude: 90.
     multi_model_statistics:
-      span: overlap
+      span: full
       statistics: [mean]
       exclude: [reference_dataset]
 
@@ -59,7 +59,7 @@ preprocessors:
       start_latitude: 30.
       end_latitude: 60.
     multi_model_statistics:
-      span: overlap
+      span: full
       statistics: [mean]
       exclude: [reference_dataset]
 
@@ -75,7 +75,7 @@ preprocessors:
       start_latitude: -30.
       end_latitude: 30.
     multi_model_statistics:
-      span: overlap
+      span: full
       statistics: [mean]
       exclude: [reference_dataset]
 
@@ -91,14 +91,14 @@ preprocessors:
       start_latitude: -60.
       end_latitude: -30.
     multi_model_statistics:
-      span: overlap
+      span: full
       statistics: [mean]
       exclude: [reference_dataset]
 
 models_cmip6_historical_pr_ghcn: &models_cmip6_historical_pr_ghcn
   - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
   - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
-  #- {dataset: AWI-CM-1-1-MR, grid: gn} #start 1851
+  - {dataset: AWI-CM-1-1-MR, grid: gn} #start 1851
   - {dataset: AWI-ESM-1-1-LR, grid: gn}
   - {dataset: BCC-CSM2-MR, grid: gn}
   - {dataset: BCC-ESM1, grid: gn}
@@ -111,7 +111,8 @@ models_cmip6_historical_pr_ghcn: &models_cmip6_historical_pr_ghcn
   - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
   - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
   - {dataset: CIESM}
-  #- {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
+  - {dataset: CMCC-CM2-HR4, grid: gn}
+  - {dataset: CMCC-CM2-SR5, grid: gn} #folder empty
   - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
@@ -120,6 +121,7 @@ models_cmip6_historical_pr_ghcn: &models_cmip6_historical_pr_ghcn
   - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
   #- {dataset: EC-Earth3, ensemble: r22i1p1f1} #permission denied
   - {dataset: EC-Earth3-Veg}
+  - {dataset: EC-Earth3-Veg-LR}
   - {dataset: FGOALS-f3-L}
   - {dataset: FGOALS-g3, grid: gn} 
   - {dataset: FIO-ESM-2-0, grid: gn}
@@ -130,6 +132,7 @@ models_cmip6_historical_pr_ghcn: &models_cmip6_historical_pr_ghcn
   - {dataset: GISS-E2-1-H, grid: gn}
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
   - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: IITM-ESM, grid: gn}
   - {dataset: INM-CM4-8, grid: gr1}
   - {dataset: INM-CM5-0, grid: gr1}
   - {dataset: IPSL-CM6A-LR}
@@ -142,13 +145,16 @@ models_cmip6_historical_pr_ghcn: &models_cmip6_historical_pr_ghcn
   - {dataset: MPI-ESM1-2-LR, grid: gn}
   - {dataset: MRI-ESM2-0, grid: gn}
   - {dataset: NESM3, grid: gn} 
-  - {dataset: NorCPM1, grid: gn, institute: NCC}
+  #- {dataset: NorCPM1, grid: gn, institute: NCC} # empty folder
   - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: NorESM2-MM, grid: gn, institute: NCC}
   - {dataset: SAM0-UNICON, grid: gn}
   - {dataset: TaiESM1, grid: gn}
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
   - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+  - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1, start_year: 1979}
+  - {dataset: CRU, mip: Amon, project: OBS, type: reanaly, version: TS4.02, tier: 2}
+  #- {dataset: ERA5,  mip: Amon, project: OBS6, type: reanaly, version: v1, tier: 3, start_year: 1979}
 
 
 models_cmip6_hist-nat_pr_ghcn: &models_cmip6_hist-nat_pr_ghcn
@@ -166,6 +172,9 @@ models_cmip6_hist-nat_pr_ghcn: &models_cmip6_hist-nat_pr_ghcn
   - {dataset: MRI-ESM2-0, grid: gn}
   - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+  - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1, start_year: 1979}
+  - {dataset: CRU, mip: Amon, project: OBS, type: reanaly, version: TS4.02, tier: 2}
+  #- {dataset: ERA5,  mip: Amon, project: OBS6, type: reanaly, version: v1, tier: 3, start_year: 1979}
 
 
 
@@ -242,6 +251,8 @@ diagnostics:
         start_year: 1950
         end_year: 2014
         experiments: ["historical", "hist-nat"]
+        #header: ["Global"]
+        #panels: [["pr_historical_global", "pr_hist-nat_global"]]
         header: ["Global", "60N-90N", "30N-60N", "30S-30N", "60S-30S"]
         panels: [["pr_historical_global", "pr_hist-nat_global"],
                  ["pr_historical_60N-90N", "pr_hist-nat_60N-90N"],
@@ -252,24 +263,3 @@ diagnostics:
         plot_units: "mm/day"
         y_min: -0.2
         y_max: 0.2
-
-  fig_3_12_precip_map:
-    description: Map of precipitation climatology
-    themes:
-      - phys
-    realms:
-      - atmos
-    variables:
-      pr:
-        reference_dataset: GHCN
-        mip: Amon
-        additional_datasets:
-          - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2,
-             start_year: 1950, end_year: 2014}
-    scripts:
-      pr_map:
-        script: ipcc_ar6/pr_map.ncl
-        projection: Robinson
-        colormap: WhiteBlueGreenYellowRed
-        ncdf: default
-        caption: "GHCN Climatology 1950-2014"
