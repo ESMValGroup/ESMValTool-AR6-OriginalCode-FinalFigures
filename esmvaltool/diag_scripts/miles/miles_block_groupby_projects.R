@@ -14,7 +14,7 @@
 # ECMWF ERA-Interim reanalysis.
 #
 # Modification history
-#   20201028-kazeroni_remi: modified to average over projects (CMIP5, OBS...)
+#   20201112-kazeroni_remi: modified to average over projects (CMIP5, OBS...)
 #   20181203-vonhardenberg_jost: Completed conversion, rlint compliant
 #
 # ############################################################################
@@ -82,9 +82,10 @@ fig_multimodel_builder <- function(FIGDIR,
 ##
 ## Set default parameters
 ##
-color_lines <- c("dodgerblue", "darkred", "black")
+color_lines <- c("dodgerblue", "darkred", "black", "green", "orange")
 legend_loc <- c(100, 30)
 linewidth <- 4
+obs_legend <- c("OBS", "OBS2", "OBS3", "OBS4", "OBS5")
 plot_title <- "TM90 Instantaneous Blocking"
 transparency <- 0.15 # in [0, 1]
 xlabel <- "Longitude"
@@ -151,6 +152,8 @@ models_ensemble <- unname(sapply(list0, "[[", "ensemble"))
 ## Run it all
 ##
 
+project_list <- c("OBS", "CMIP5", "CMIP6")
+project_obs_list <- c("OBS", "OBS6", "RAWOBS", "native6")
 for (model_idx in c(1:(length(models_dataset)))) {
   exp <- models_exp[model_idx]
   dataset <- models_dataset[model_idx]
@@ -159,6 +162,9 @@ for (model_idx in c(1:(length(models_dataset)))) {
   year2 <- models_end_year[model_idx]
   infile <- climofiles[model_idx]
   project <- models_projects[model_idx]
+  if (is.element(project, project_obs_list)) {
+    models_projects[model_idx] <- "OBS" # gather all observation data
+  }
   for (seas in seasons) {
     filenames <- miles_block_fast(
       year1 = year1,
@@ -178,6 +184,7 @@ for (model_idx in c(1:(length(models_dataset)))) {
     }
   }
 }
+obs_idx <- which(models_projects == "OBS") # isolate OBS datasets
 
 ##
 ## Plotting parameters
@@ -219,8 +226,6 @@ if (write_plots) {
 ## Compute mean and std for datasets grouped by project
 ##
   field <- "TM90"
-  project_list <- c("CMIP6", "CMIP5")
-  i_project <- 1
   for (season in seasons) {
 
     # create filenames to handle the provenance
@@ -270,56 +275,82 @@ if (write_plots) {
     }
 
     open_plot_device(figname, output_file_type, special = TRUE)
+    # rotation to simplify the view (90 deg to the west)
+    n <- (-length(ics) / 4)
+    ics2 <- c(tail(ics, n), head(ics, -n) + 360)
     text_legend <- c() # text of the legendens <- ''
+    i_project <- 1
     for (project in project_list){
       field_exp_mean <- field_exp_all[models_projects == project]
-      field_mean <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = mean)) # mean over datasets of the project
-      field_std <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = sd)) # std
-      n_datasets <- length(field_exp_mean) # number of datasets for the project
-      text_legend <- c(text_legend, paste(project, ":", n_datasets, "datasets"))
-      mycol <- rgb(aperm(col2rgb(tm90cols[i_project])), max = 255, alpha = alpha) # adjust color for the shaded area (std)
+      if (length(field_exp_mean) > 0) { # plot mean by CMIP5-6-project or obs data is available
+        if (project != "OBS") { # mean computed only for CMIP5 and 6 datasets
+          field_mean <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = mean)) # mean over datasets of the project
+          field_std <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = sd)) # std
+          n_datasets <- length(field_exp_mean) # number of datasets for the project
+          mycol <- rgb(aperm(col2rgb(tm90cols[i_project])), max = 255, alpha = alpha) # adjust color for the shaded area (std)
+          text_legend <- c(text_legend, paste(project, ":", n_datasets, "datasets"))
+          field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
+          field_std2 <- c(tail(field_std, n), head(field_std, -n))
+          field_mean_up2 <- unlist(field_mean2) + unlist(field_std2)
+          field_mean_do2 <- unlist(field_mean2) - unlist(field_std2)
+        } else { #start with the first obs data
+          field_mean <- field_exp_mean[1]
+          field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
+          text_legend <- c(text_legend, obs_legend[1])
+        }
 
-      # rotation to simplify the view (90 deg to the west)
-      n <- (-length(ics) / 4)
-      ics2 <- c(tail(ics, n), head(ics, -n) + 360)
-      field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
-      field_std2 <- c(tail(field_std, n), head(field_std, -n))
-      field_mean_up2 <- unlist(field_mean2) + unlist(field_std2)
-      field_mean_do2 <- unlist(field_mean2) - unlist(field_std2)
+        if (i_project == 1){
+          plot(
+            ics2,
+            unlist(field_mean2),
+            type = "l",
+            lwd = lwdline,
+            ylim = fp$lev_field,
+            main = fp$title_name,
+            xlab = fp$x_label,
+            ylab = fp$legend_unit,
+            col = tm90cols[1]
+          )
+          grid()
+        }
+        else if (project == "OBS" && length(field_exp_mean) > 1) {
+          for (idx in c(2, length(field_exp_mean))) {
+            field_mean <- field_exp_mean[idx]
+            field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
+            text_legend <- c(text_legend, obs_legend[idx])
+            i_project <- i_project +1
+            points(
+              ics2,
+              unlist(field_mean2),
+              type = "l",
+              lwd = lwdline,
+              col = tm90cols[i_project]
+            )
+          }
+        }
+        else {
+          points(
+            ics2,
+            unlist(field_mean2),
+            type = "l",
+            lwd = lwdline,
+            col = tm90cols[i_project]
+          )
+        }
+        if (project != "OBS") {
+          polygon(c(ics2, rev(ics2)), c(field_mean_do2, rev(field_mean_up2)), col = mycol, border = NA) # shaded area [mean-std; mean+std]
+        }
+        i_project <- i_project + 1
+      }
 
-      if (i_project == 1){
-        plot(
-          ics2,
-          unlist(field_mean2),
-          type = "l",
-          lwd = lwdline,
-          ylim = fp$lev_field,
-          main = fp$title_name,
-          xlab = fp$x_label,
-          ylab = fp$legend_unit,
-          col = tm90cols[1]
-        )
-        grid()
-      }
-      else {
-        points(
-          ics2,
-          unlist(field_mean2),
-          type = "l",
-          lwd = lwdline,
-          col = tm90cols[i_project]
-        )
-      }
-      polygon(c(ics2, rev(ics2)), c(field_mean_do2, rev(field_mean_up2)), col = mycol, border = NA) # shaded area [mean-std; mean+std]
-      i_project <- i_project + 1
     }
     legend(
-      legend_loc[1],
-      legend_loc[2],
+     100,
+     30,
       legend = text_legend,
       lwd = lwdline,
       lty = 1,
-      col = tm90cols[1:length(project_list)],
+      col = tm90cols[1:length(project_list)+length(obs_idx)-1],
       bg = "white",
       cex = 1.
     )
