@@ -109,7 +109,7 @@ diagnostics:
             color_lines: ['dodgerblue', 'darkred', 'black', 'orange', 'green']
             legend_loc: [100, 30]
             linewidth: 4
-	    obs_legend: ['OBS']
+            obs_legend: ['OBS']
             plot_title: 'TM90 Instantaneous Blocking'
             transparency: 0.15 # in [0, 1]
             xlabel: 'Longitude'
