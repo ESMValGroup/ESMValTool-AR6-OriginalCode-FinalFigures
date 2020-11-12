@@ -1,0 +1,116 @@
+# ESMValTool
+# recipe_miles_block.yml
+---
+documentation:
+  description: |
+    Recipe for computing and plotting blocking statistics using
+    the MiLES (Mid-Latitude Evaluation System) package
+  authors:
+    - vonhardenberg_jost
+    - davini_paolo
+    - arnone_enrico
+
+  references:
+    - davini18
+    - davini12jclim
+    - tibaldi90tel
+
+  projects:
+    - c3s-magic
+
+preprocessors:
+    preproc1:
+      extract_levels:
+        levels: 50000
+        scheme: linear
+      regrid:
+        target_grid: 2.5x2.5
+        lat_offset: False
+        scheme: linear_extrapolate
+      extract_region:
+        start_longitude: 0.
+        end_longitude: 360.
+        start_latitude: -1.25
+        end_latitude: 90.
+
+diagnostics:
+
+  miles_diagnostics:
+    description: MiLES Blocking Diagnostics
+    variables:
+      zg:
+        preprocessor: preproc1
+        mip: day
+        exp: historical
+        start_year: 1979
+        end_year: 2000
+    additional_datasets:
+      - {dataset: ACCESS-CM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: AWI-ESM-1-1-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: BCC-ESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: CanESM5, project: CMIP6, ensemble: r10i1p1f1, grid: gn}
+      - {dataset: CESM2-FV2, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: CESM2, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: CESM2-WACCM-FV2, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: CESM2-WACCM, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: CNRM-CM6-1-HR, project: CMIP6, ensemble: r1i1p1f2, grid: gr}
+      - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r11i1p1f2, grid: gr}
+      - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gr}
+      - {dataset: FGOALS-f3-L, project: CMIP6, ensemble: r1i1p1f1, grid: gr}
+      - {dataset: FGOALS-g3, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn}
+      - {dataset: HadGEM3-GC31-MM, project: CMIP6, ensemble: r1i1p1f3, grid: gn}
+      - {dataset: INM-CM4-8, project: CMIP6, ensemble: r1i1p1f1, grid: gr1}
+      - {dataset: INM-CM5-0, project: CMIP6, ensemble: r10i1p1f1, grid: gr1}
+      - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r10i1p1f1, grid: gr}
+      - {dataset: KACE-1-0-G, project: CMIP6, ensemble: r1i1p1f1, grid: gr}
+      - {dataset: MIROC6, project: CMIP6, ensemble: r10i1p1f1, grid: gn}
+      - {dataset: MPI-ESM-1-2-HAM, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: MPI-ESM1-2-HR, project: CMIP6, ensemble: r10i1p1f1, grid: gn}
+      - {dataset: MPI-ESM1-2-LR, project: CMIP6, ensemble: r10i1p1f1, grid: gn}
+      - {dataset: MRI-ESM2-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: NorESM2-LM, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: NorESM2-MM, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: TaiESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn}
+      - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r17i1p1f2, grid: gn}
+      - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: BNU-ESM, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: CanESM2, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: CCSM4, project: CMIP5, ensemble: r6i1p1}
+      - {dataset: CMCC-CESM, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: CMCC-CM, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: CMCC-CMS, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: CNRM-CM5, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: EC-EARTH, project: CMIP5, ensemble: r12i1p1}
+      - {dataset: FGOALS-g2, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: GFDL-CM3, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: GFDL-ESM2G, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: GFDL-ESM2M, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MIROC5, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MPI-ESM-MR, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MPI-ESM-P, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: MRI-ESM1, project: CMIP5, ensemble: r1i1p1}
+      - {dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1}
+    scripts:
+        miles_block:
+            script: miles/miles_block_groupby_projects.R
+            seasons: DJF # Select season ('DJF','MAM','JJA','SON')
+            color_lines: ['dodgerblue', 'darkred', 'black', 'orange', 'green']
+            legend_loc: [100, 30]
+            linewidth: 4
+            plot_title: 'TM90 Instantaneous Blocking'
+            transparency: 0.15 # in [0, 1]
+            xlabel: 'Longitude'
+            ylabel: 'Blocked Days (%)'
+            yrange: [0, 30]
