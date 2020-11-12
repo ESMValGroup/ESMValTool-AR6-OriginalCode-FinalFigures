@@ -446,7 +446,7 @@ diagnostics:
         y_max: 4.0
         ref_mask: True
         experiments: ["historical", "hist-nat", "hist-GHG", "hist-aer"]
-        header: ["Global Land", "Global", "Global Ocean"]
+        header: ["Global Ocean", "Global", "Global Land"]
         panels: [["tas_historical_ocean", "tas_hist-nat_ocean", "tas_hist-GHG_ocean", "tas_hist-aer_ocean"],
                  ["tas_historical_global", "tas_hist-nat_global", "tas_hist-GHG_global", "tas_hist-aer_global"],
                  ["tas_historical_land", "tas_hist-nat_land", "tas_hist-GHG_land", "tas_hist-aer_land"]]

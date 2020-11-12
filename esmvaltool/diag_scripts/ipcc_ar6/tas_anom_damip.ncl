@@ -262,11 +262,7 @@ begin
     ;model_arr_stat@_FillValue = 1e+20
     ;model_arr_stat = model_arr_stat@_FillValue
 
-print("nexp = " + nexp)
-
     do iexp = 0, nexp - 1
-
-print("iexp = " + iexp)
 
       if(npanels .gt. 1) then
         var = panels(ivar, iexp)
@@ -433,10 +429,6 @@ print("iexp = " + iexp)
 
       q_05 = new(ntime, double)
       q_95 = new(ntime, double)
-      ;q_05@_FillValue = 1e+20
-      ;q_95@_FillValue = 1e+20
-      ;q_05 = q_05@_FillValue
-      ;q_95 = q_95@_FillValue
 
       do itime = 0, ntime -1
         if (any(.not.ismissing(model_arr(:, itime)))) then
@@ -491,8 +483,8 @@ print("iexp = " + iexp)
 
     ymax = max(model_arr_stat)
     ymin = min(model_arr_stat)
-    ;res@trYMaxF := max((/0.2, ymax + 0.05 * (ymax - ymin)/))
-    ;res@trYMinF := min((/-0.2, ymin - 0.05 * (ymax - ymin)/))
+    res@trYMaxF := max((/0.2, ymax + 0.05 * (ymax - ymin)/))
+    res@trYMinF := min((/-0.2, ymin - 0.05 * (ymax - ymin)/))
 
     if (isatt(diag_script_info, "header")) then
       res@tiMainString = diag_script_info@header(ivar)
@@ -500,13 +492,18 @@ print("iexp = " + iexp)
       res@tiMainString = ""
     end if
 
+
     if (isatt(diag_script_info, "plot_units")) then
       units = diag_script_info@plot_units
     else
       units = info_items[0]@units
     end if
 
-    res@tiYAxisString = "Change in Temperature (~F34~0~F~ C)"
+    if (ivar .eq. 0) then
+      res@tiYAxisString = "Change in Temperature (~F34~0~F~ C)"
+    else
+      res@tiYAxisString = ""
+    end if
 
     plots(ivar) = gsn_csm_xy(wks, time, model_arr_stat(:, 0, :), res)  ; create plot
 
@@ -517,20 +514,14 @@ print("iexp = " + iexp)
     ; Add multi model statistics
     ; ---------------------------------------------------------------------
     res_stat = True
-    res_stat@gsnXYFillOpacities = 0.2
+    res_stat@gsnXYFillOpacities = 0.1
     cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_shading.rgb")
     copy_VarMeta(res, res_stat)
     delete(res_stat@xyLineColors)
-    res_stat@gsnXYFillColors = cmap(0,:)
-    res_stat@xyLineColor := cmap(0,:)
+    res_stat@gsnXYFillColors = cmap(3,:)
+    res_stat@xyLineColor := cmap(3,:)
     res_stat@xyLineThicknesses := (/1, 1/)
-    shading_plot = gsn_csm_xy(wks, time, model_arr_stat(0, 1:2, :), \
-                              res_stat)
-    overlay(plots(ivar), shading_plot)
-
-    res_stat@gsnXYFillColors = cmap(1,:)
-    res_stat@xyLineColor = cmap(1,:)
-    shading_plot = gsn_csm_xy(wks, time, model_arr_stat(1, 1:2, :), \
+    shading_plot = gsn_csm_xy(wks, time, model_arr_stat(3, 1:2, :), \
                               res_stat)
     overlay(plots(ivar), shading_plot)
 
@@ -540,9 +531,15 @@ print("iexp = " + iexp)
                               res_stat)
     overlay(plots(ivar), shading_plot)
 
-    res_stat@gsnXYFillColors = cmap(3,:)
-    res_stat@xyLineColor = cmap(3,:)
-    shading_plot = gsn_csm_xy(wks, time, model_arr_stat(3, 1:2, :), \
+    res_stat@gsnXYFillColors = cmap(1,:)
+    res_stat@xyLineColor = cmap(1,:)
+    shading_plot = gsn_csm_xy(wks, time, model_arr_stat(1, 1:2, :), \
+                              res_stat)
+    overlay(plots(ivar), shading_plot)
+
+    res_stat@gsnXYFillColors = cmap(0,:)
+    res_stat@xyLineColor = cmap(0,:)
+    shading_plot = gsn_csm_xy(wks, time, model_arr_stat(0, 1:2, :), \
                               res_stat)
     overlay(plots(ivar), shading_plot)
 
@@ -560,42 +557,42 @@ print("iexp = " + iexp)
     ; ---------------------------------------------------------------------
     ; Create legend
     ; ---------------------------------------------------------------------
-    if (ivar .eq. 1 .and. var .eq. "tas_hist-aer_global") then
-      res_text                    = True                  ; text mods desired
-      res_text@txFontHeightF      = 0.02                 ; change text size
-      res_text@txJust             = "CenterLeft"          ; text justification
+    ;if (ivar .eq. 1 .and. var .eq. "tas_hist-aer_global") then
+    ;  res_text                    = True                  ; text mods desired
+    ;  res_text@txFontHeightF      = 0.02                 ; change text size
+    ;  res_text@txJust             = "CenterLeft"          ; text justification
 
-      res_lines                   = True                  ; polyline mods desired
-      res_lines@gsLineDashPattern = 0.                    ; solid line
-      res_lines@gsLineThicknessF  = 4.                    ; line thicker
-      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
-      res_lines@gsLineColor       = cmap(0,:)                 ; line color
-      xx = (/1880,1895/)
-      yy = (/3.0,3.0/)
-      dum1 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)
-      dum2 = gsn_add_text(wks,plots(ivar),"Anthropogenic + Natural",\
-                          1905, yy(0),res_text)
-      
-      yy = (/2.5,2.5/)
-      res_lines@gsLineColor       = cmap(1,:)
-      dum3 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
-      dum4 = gsn_add_text(wks,plots(ivar),"Natural",1905,yy(0),res_text)       ; add text
-      
-      yy = (/2.0,2.0/)
-      res_lines@gsLineColor       = cmap(2,:)
-      dum5 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
-      dum6 = gsn_add_text(wks,plots(ivar),"Greenhouse Gases",1905,yy(0),res_text)       ; add text
-      
-      yy = (/1.5,1.5/)
-      res_lines@gsLineColor       = cmap(3,:)
-      dum7 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
-      dum8 = gsn_add_text(wks,plots(ivar),"Aerosols",1905,yy(0),res_text)       ; add text
-      
-      yy = (/1.0,1.0/)
-      res_lines@gsLineColor       := "black"                                ; change to black
-      dum9 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
-      dum10 = gsn_add_text(wks,plots(ivar),"Observations",1905,yy(0),res_text) ; add text
-    end if
+    ;  res_lines                   = True                  ; polyline mods desired
+    ;  res_lines@gsLineDashPattern = 0.                    ; solid line
+    ;  res_lines@gsLineThicknessF  = 4.                    ; line thicker
+    ;  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_damip_line.rgb")
+    ;  res_lines@gsLineColor       = cmap(0,:)                 ; line color
+    ;  xx = (/1880,1895/)
+    ;  yy = (/3.0,3.0/)
+    ;  dum1 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)
+    ;  dum2 = gsn_add_text(wks,plots(ivar),"Anthropogenic + Natural",\
+    ;                      1905, yy(0),res_text)
+    ;  
+    ;  yy = (/2.5,2.5/)
+    ;  res_lines@gsLineColor       = cmap(1,:)
+    ;  dum3 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
+    ;  dum4 = gsn_add_text(wks,plots(ivar),"Natural",1905,yy(0),res_text)       ; add text
+    ;  
+    ;  yy = (/2.0,2.0/)
+    ;  res_lines@gsLineColor       = cmap(2,:)
+    ;  dum5 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
+    ;  dum6 = gsn_add_text(wks,plots(ivar),"Greenhouse Gases",1905,yy(0),res_text)       ; add text
+    ;  
+    ;  yy = (/1.5,1.5/)
+    ;  res_lines@gsLineColor       = cmap(3,:)
+    ;  dum7 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
+    ;  dum8 = gsn_add_text(wks,plots(ivar),"Aerosols",1905,yy(0),res_text)       ; add text
+    ;  
+    ;  yy = (/1.0,1.0/)
+    ;  res_lines@gsLineColor       := "black"                                ; change to black
+    ;  dum9 = gsn_add_polyline(wks,plots(ivar),xx,yy,res_lines)                ; add polyline
+    ;  dum10 = gsn_add_text(wks,plots(ivar),"Observations",1905,yy(0),res_text) ; add text
+    ;end if
 
 
   end do
