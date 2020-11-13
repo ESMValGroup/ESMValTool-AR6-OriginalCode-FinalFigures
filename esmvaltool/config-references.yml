@@ -189,6 +189,10 @@ authors:
     name: Gier, Bettina
     institute: University of Bremen, Germany
     orcid:
+  gillett_nathan:
+    name: Gillett, Nathan
+    institute: Environment and Climate Change Canada, Canada
+    orcid: https://orcid.org/0000-0002-2957-0002
   gottschaldt_klaus-dirk:
     name: Gottschaldt, Klaus-Dirk
     institute: DLR, Germany
@@ -760,6 +764,7 @@ projects:
   qa4ecv: QA4ECV
   trr181: DFG Project TRR-181, Energy transfers in Atmosphere and Ocean
   ukesm: UKESM, UK Earth System Model project (NERC)
+  ipcc_ar6: IPCC Sixth Assessment Report
 
 realms:
   aerosol: aerosol

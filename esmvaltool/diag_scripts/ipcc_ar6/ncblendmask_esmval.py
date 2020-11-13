@@ -19,7 +19,7 @@ def areas( grid ):
   return area
 
 
-def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,dec_warming,had4_dec_warming,ann_warming,gmst_comp_warming,diag_name,had5_flag=False):
+def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,dec_warming,obs_dec_warming,ann_warming,gmst_comp_warming,diag_name,obs='had4',ensobs='',ensobs_diag=[],ensobs_dec_warming=[]):
 # MAIN PROGRAM
 
 # m = mask
@@ -29,17 +29,16 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
 
   # read tas.nc
   nc = netCDF4.Dataset(tas_file, "r")
-  print(nc.variables.keys(),file=sys.stderr)
   lats1 = nc.variables["lat"][:]
   lons1 = nc.variables["lon"][:]
-  year=nc.variables["year"][:]
-  y0=year[0]#NPG - Added since existing y0 definition below did not work on ESMValTool preprocessed files.   
+#  year=nc.variables["year"][:]
+#  y0=year[0]#NPG - Added since existing y0 definition below did not work on ESMValTool preprocessed files.
+  y0=1850 #Assume 1850 start time.
   tas = numpy.ma.filled(nc.variables["tas"][:,:,:],-1.0e30)
   nc.close()
 
   # read tos.nc
   nc = netCDF4.Dataset(tos_file, "r")
-  print(nc.variables.keys(),file=sys.stderr)
   lats2 = nc.variables["lat"][:]
   lons2 = nc.variables["lon"][:]
   tos = numpy.ma.filled(nc.variables["tos"][:,:,:],-1.0e30)
@@ -48,7 +47,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
 
   # read sic.nc
   nc = netCDF4.Dataset(sic_file, "r")
-  print(nc.variables.keys(),file=sys.stderr)
   lats3 = nc.variables["lat"][:]
   lons3 = nc.variables["lon"][:]
   #Use siconca if it exists, otherwise use siconc.
@@ -60,7 +58,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
 
   # read sftlf.nc (NPG - Changed from sftof, because of better data availability for sftlf).
   nc = netCDF4.Dataset(sftlf_file, "r")
-  print(nc.variables.keys(),file=sys.stderr)
   lats4 = nc.variables["lat"][:]
   lons4 = nc.variables["lon"][:]
   sftof = 1-numpy.ma.filled(nc.variables["sftlf"][:,:],-1.0e30) #NPG - added '1-' to use lf.
@@ -70,39 +67,34 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
 
   if 'm' in options:
     # read HadCRUT4 data as mask
-    nc = netCDF4.Dataset(had4_file, "r")
-    print(nc.variables.keys(),file=sys.stderr)
+    nc = netCDF4.Dataset(obs_file, "r")
     lats5 = nc.variables["latitude"][:]
     lons5 = nc.variables["longitude"][:]
-    if had5_flag:
-        had4_tas = nc.variables["tas_median"][:,:,:]
-    #Hack to make it work with HadCRUT5 - repeat last year in had4_tas
-        had4_tas=numpy.concatenate((had4_tas,had4_tas[2016:2028,:,:]))
+    if obs=='had5':
+        enssize=200
+        obs_tas = nc.variables["tas_median"][:,:,:]
+    #Make it work with HadCRUT5 - repeat last year in obs_tas
+        obs_tas=numpy.concatenate((obs_tas,obs_tas[2016:2028,:,:]))
     else:
-        had4_tas = nc.variables["temperature_anomaly"][:,:,:]
-#    had4_tas = nc.variables["tas_median"][:,:,:]
-    #Hack to make it work with HadCRUT5 - repeat last year in had4_tas
-#    had4_tas=numpy.concatenate((had4_tas,had4_tas[:,:,2016:2028]))
+        enssize=100
+        obs_tas = nc.variables["temperature_anomaly"][:,:,:]
     #Pad with missing values to match length of tas from model.
-    if tas.shape[0]>had4_tas.shape[0]:
-      had4_tas = numpy.concatenate((had4_tas,numpy.full((tas.shape[0]-had4_tas.shape[0],had4_tas.shape[1],had4_tas.shape[2]),fill_value=-1e30)))
-    cvgmsk = numpy.ma.filled(had4_tas,-1.0e30)
+    if tas.shape[0]>obs_tas.shape[0]:
+      obs_tas = numpy.concatenate((obs_tas,numpy.full((tas.shape[0]-obs_tas.shape[0],obs_tas.shape[1],obs_tas.shape[2]),fill_value=-1e30)))
+    elif tas.shape[0]<obs_tas.shape[0]:
+    #Or clip obs to match length of simulations if obs are longer than simulations.
+      obs_tas=obs_tas[0:tas.shape[0],:,:]
+    cvgmsk = numpy.ma.filled(obs_tas,-1.0e30)
     nc.close()
     #Simple regridding to agree with ESMValTool output, HadCRUT4 longitudes start from -177.5.
     regrid_index=list(range(int(lons5.shape[0]*0.5),lons5.shape[0]))+list(range(int(lons5.shape[0]*0.5)))
     lons5=lons5[regrid_index]
-    had4_tas=had4_tas[:,:,regrid_index]
+    obs_tas=obs_tas[:,:,regrid_index]
     cvgmsk=cvgmsk[:,:,regrid_index]
-
-
-#  print (tas.shape,file=sys.stderr)
-#  print (tos.shape,file=sys.stderr)
-#  print (sftof.shape,file=sys.stderr)
-#  print (sic.shape,file=sys.stderr)
+    #Print missing value fraction
+    print('Missing value frction',1.0*numpy.count_nonzero(cvgmsk<-100.)/numpy.size(cvgmsk),file=sys.stderr)
 
   sic = sic[0:tas.shape[0],:,:]
-#  print (sic.shape,file=sys.stderr)
-
 
   # dates
   dates = (numpy.arange(tas.shape[0])+0.5)/12.0 + y0
@@ -139,7 +131,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
   for m in range(sic.shape[0]):
     sic[m,:,:] = (1.0-sic[m,:,:])*sftof
 
-  print (sic.shape)
   printmask=0
   if printmask==1:
     # print mask
@@ -154,7 +145,7 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
     s = ""
     for i in range(tos.shape[1]-1,0,-tos.shape[1]//25):
       for j in range(0,tos.shape[2],tos.shape[2]//50):
-        s += "#" if 100 < tos[-1,i,j] < 500 else "."
+        s += "#" if -500 < tos[-1,i,j] < 500 else "."
       s += "\n"
     print (s, "\n",file=sys.stderr)
     # print cvg mask
@@ -162,7 +153,8 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
       s = ""
       for i in range(cvgmsk.shape[1]-1,0,-cvgmsk.shape[1]//25):
         for j in range(0,cvgmsk.shape[2],cvgmsk.shape[2]//50):
-          s += "#" if -100 < cvgmsk[-1,i,j] < 500 else "."
+#          s += "#" if -100 < cvgmsk[-1,i,j] < 500 else "."
+          s += "#" if -100 < cvgmsk[400,i,j] < 500 else "."
         s += "\n"
       print (s, "\n",file=sys.stderr)
 
@@ -209,7 +201,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
       norm = numpy.mean(base[m::12,:,:],axis=0)
       tos[m::12,:,:] = tos[m::12,:,:] - norm
 
-#  print (sic.dtype, tos.dtype,file=sys.stderr)
 
   # deal with any remaining nans
   for m in range(sic.shape[0]):
@@ -231,14 +222,30 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,had4_file,d
   # calculate diagnostic
   diag=calc_diag(tos,wm,diag_name) #Diagnostic for attribution analysis.
   dec_warming.append(calc_dec_warming(tas,w)) #Diagnose SAT warming with global coverage for attributable trends.
-  had4_dec_warming.append(calc_dec_warming(had4_tas,wm))
+  obs_dec_warming.append(calc_dec_warming(obs_tas,wm))
   
   if ann_warming!=0:
     ann_warming.append(calc_ann_warming(tas,w)) #Calculate ann warming.
   if gmst_comp_warming!=0:
     gmst_comp_warming.append(calc_ann_warming(tos,w)) #Calculate warming in globally-complete blended data.
-  had4_diag=calc_diag(had4_tas[0:tos.shape[0],:,:],wm,diag_name)
-  return (diag,had4_diag)
+  obs_diag=calc_diag(obs_tas[0:tos.shape[0],:,:],wm,diag_name)
+
+  #Repeat obs diagnostics for each member of ensemble observational dataset if ensobs is set. Assume missing data mask is the same as for main obs dataset.
+  if ensobs != '':
+    #Assume 100 member ensemble observations dataset.
+    for ens in range(1,enssize+1):
+      nc = netCDF4.Dataset(ensobs+str(ens)+'.nc', "r")
+      if obs=='had5':
+        obs_tas = nc.variables["tas"][:,:,:]
+    #Make it work with HadCRUT5 - repeat last year in obs_tas
+        obs_tas=numpy.concatenate((obs_tas,obs_tas[2016:2028,:,:]))
+      else:
+        obs_tas = nc.variables["temperature_anomaly"][:,:,:]
+      nc.close()
+      obs_tas=obs_tas[:,:,regrid_index] #Regrid to match esmvaltool output.
+      ensobs_dec_warming.append(calc_dec_warming(obs_tas[0:tas.shape[0],:,:],wm))
+      ensobs_diag.append(calc_diag(obs_tas[0:tas.shape[0],:,:],wm,diag_name))
+  return (diag,obs_diag)
 
 def calc_diag(tos,wm,diag_name):
   av_per=int(diag_name[4:6])*12 #Last two digits of diag_name are averaging period in yrs.
@@ -255,7 +262,6 @@ def calc_diag(tos,wm,diag_name):
   # calculate temperatures
   for m in range(nper):
     for l in range(nlat):
-#      print ('****calc_diag',type(l*tos.shape[1]//nlat),type((l+1)*tos.shape[1]//nlat),type(m*av_per),tos.shape[1],nlat,l,av_per,type(av_per))
       diag[l,m]=numpy.sum( wm[m*av_per:(m+1)*av_per,l*tos.shape[1]//nlat:(l+1)*tos.shape[1]//nlat,:] * tos[m*av_per:(m+1)*av_per,l*tos.shape[1]//nlat:(l+1)*tos.shape[1]//nlat,:] ) / numpy.sum( wm[m*av_per:(m+1)*av_per,l*tos.shape[1]//nlat:(l+1)*tos.shape[1]//nlat,:] )
   diag=diag-numpy.mean(diag,axis=1,keepdims=True) #Take anomalies over whole period.
   diag=numpy.reshape(diag,nper*nlat)
@@ -264,13 +270,11 @@ def calc_diag(tos,wm,diag_name):
 def calc_dec_warming(tas,w):
   gmt_mon=numpy.zeros(tas.shape[0])
   # calculate 2010-2019 mean relative to 1850-1900, assuming data starts in 1850.
-  # If last decade is incomplete, just computes mean from available data.
+  # If last decade is incomplete, just compute mean from available data.
   for m in range(tas.shape[0]):
       s = numpy.sum( w[m,:,:] )
       gmt_mon[m] = numpy.sum( w[m,:,:] * tas[m,:,:] ) / s
   return (numpy.nanmean(gmt_mon[(2010-1850)*12:(2020-1850)*12])-numpy.mean(gmt_mon[0:(1901-1850)*12]))
-#Changed to calculate 1986-2005 warming.
-#  return (numpy.nanmean(gmt_mon[(1986-1850)*12:(2005-1850)*12])-numpy.mean(gmt_mon[0:(1901-1850)*12]))
 
 def calc_ann_warming(tas,w):
   nyr=math.ceil(tas.shape[0]/12) #Round up number of years. 

@@ -50,113 +50,16 @@ diagnostics:
         end_year: 2019
 #        fx_files: [sftlf]
         additional_datasets: &damip_simulations
-#          - {dataset: EC-Earth3, ensemble: r1i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r2i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r4i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r6i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r9i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r11i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r12i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r13i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r14i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r15i1p1f1}
-##          - {dataset: EC-Earth3, ensemble: r16i1p1f1} #NetCDF file 'unknown file format' 
-#          - {dataset: EC-Earth3, ensemble: r17i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r18i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r19i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r20i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r22i1p1f1}
-#          - {dataset: EC-Earth3, ensemble: r24i1p1f1}
-          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1}
-          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1}
-          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1}
-          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1}
-          - {dataset: IPSL-CM6A-LR, ensemble: r11i1p1f1}
-          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-nat}
-          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-GHG}
-          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-stratO3}
-#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
-#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn}
-#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn}
-#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}#Stops in 2014.
-#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: hist-nat} 
-#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
-#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
-#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
-#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
-          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
-          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2}
-          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2}
-          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2}
-          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2}
-          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, exp: hist-GHG}
-          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, exp: hist-aer}
-          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, exp: hist-nat}
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: BCC-CSM2-MR, ensemble: r2i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: BCC-CSM2-MR, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: BCC-CSM2-MR, ensemble: r2i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: BCC-CSM2-MR, ensemble: r3i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: BCC-CSM2-MR, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: BCC-CSM2-MR, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
           - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
           - {dataset: CanESM5, ensemble: r2i1p1f1, grid: gn}
           - {dataset: CanESM5, ensemble: r3i1p1f1, grid: gn}
@@ -217,6 +120,26 @@ diagnostics:
           - {dataset: CanESM5, ensemble: r8i1p1f1, grid: gn, exp: hist-nat}
           - {dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, exp: hist-nat}
           - {dataset: CanESM5, ensemble: r10i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r11i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r12i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r13i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r14i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r15i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r1i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r2i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r3i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r4i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r5i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r6i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r7i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r8i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r9i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r10i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r11i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r12i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r13i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r14i1p2f1, grid: gn, exp: hist-nat}
+          - {dataset: CanESM5, ensemble: r15i1p2f1, grid: gn, exp: hist-nat}
           - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
           - {dataset: CanESM5, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
           - {dataset: CanESM5, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
@@ -227,6 +150,46 @@ diagnostics:
           - {dataset: CanESM5, ensemble: r8i1p1f1, grid: gn, exp: hist-GHG}
           - {dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, exp: hist-GHG}
           - {dataset: CanESM5, ensemble: r10i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r11i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r12i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r13i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r14i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r15i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r16i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r17i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r18i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r19i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r20i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r21i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r22i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r23i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r24i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r25i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r1i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r2i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r3i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r4i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r5i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r6i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r7i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r8i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r9i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r10i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r11i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r12i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r13i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r14i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r15i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r16i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r17i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r18i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r19i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r20i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r21i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r22i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r23i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r24i1p2f1, grid: gn, exp: hist-GHG}
+          - {dataset: CanESM5, ensemble: r25i1p2f1, grid: gn, exp: hist-GHG}
           - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, exp: hist-aer}
           - {dataset: CanESM5, ensemble: r2i1p1f1, grid: gn, exp: hist-aer}
           - {dataset: CanESM5, ensemble: r3i1p1f1, grid: gn, exp: hist-aer}
@@ -237,6 +200,26 @@ diagnostics:
           - {dataset: CanESM5, ensemble: r8i1p1f1, grid: gn, exp: hist-aer}
           - {dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, exp: hist-aer}
           - {dataset: CanESM5, ensemble: r10i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r11i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r12i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r13i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r14i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r15i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r1i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r2i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r3i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r4i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r5i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r6i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r7i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r8i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r9i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r10i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r11i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r12i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r13i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r14i1p2f1, grid: gn, exp: hist-aer}
+          - {dataset: CanESM5, ensemble: r15i1p2f1, grid: gn, exp: hist-aer}
           - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, exp: hist-CO2}
           - {dataset: CanESM5, ensemble: r2i1p1f1, grid: gn, exp: hist-CO2}
           - {dataset: CanESM5, ensemble: r3i1p1f1, grid: gn, exp: hist-CO2}
@@ -277,6 +260,77 @@ diagnostics:
           - {dataset: CanESM5, ensemble: r8i1p1f1, grid: gn, exp: hist-volc}
           - {dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, exp: hist-volc}
           - {dataset: CanESM5, ensemble: r10i1p1f1, grid: gn, exp: hist-volc}
+#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn}
+#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn}
+#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}#Stops in 2014.
+#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: hist-nat} 
+#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
+#          - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
+#          - {dataset: CESM2, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
+#          - {dataset: CESM2, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, exp: hist-GHG}
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, exp: hist-aer}
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r3i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r4i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r5i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r6i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r7i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r8i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r9i1p1f2, exp: hist-nat}
+          - {dataset: CNRM-CM6-1, ensemble: r10i1p1f2, exp: hist-nat}
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-nat}
+          - {dataset: GFDL-ESM4, ensemble: r2i1p1f1, grid: gr1, exp: hist-nat}
+          - {dataset: GFDL-ESM4, ensemble: r3i1p1f1, grid: gr1, exp: hist-nat}
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-aer}
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r2i1p1f1}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r3i1p1f1}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r4i1p1f1}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r5i1p1f1}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r1i1p1f1, exp: hist-nat}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r2i1p1f1, exp: hist-nat}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r3i1p1f1, exp: hist-nat}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r4i1p1f1, exp: hist-nat}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r5i1p1f1, exp: hist-nat}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r1i1p1f1, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r2i1p1f1, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r3i1p1f1, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r4i1p1f1, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r5i1p1f1, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r1i1p1f1, exp: hist-aer}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r2i1p1f1, exp: hist-aer}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r3i1p1f1, exp: hist-aer}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r4i1p1f1, exp: hist-aer}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r5i1p1f1, exp: hist-aer}
           - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
           - {dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn}
           - {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn}
@@ -293,6 +347,81 @@ diagnostics:
           - {dataset: HadGEM3-GC31-LL, ensemble: r2i1p1f3, grid: gn, exp: hist-aer}
           - {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn, exp: hist-aer}
           - {dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r11i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r14i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r22i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r25i1p1f1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-nat}
+          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-GHG}
+          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r2i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r3i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r4i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r5i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r7i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r8i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r9i1p1f1, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, exp: hist-stratO3}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-sol}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-sol}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-sol}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-volc}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-volc}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-volc}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-CO2}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-CO2}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-CO2}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-stratO3}
+          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-stratO3}
+          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-stratO3}
           - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
           - {dataset: MRI-ESM2-0, ensemble: r2i1p1f1, grid: gn}
           - {dataset: MRI-ESM2-0, ensemble: r3i1p1f1, grid: gn}
@@ -310,62 +439,25 @@ diagnostics:
           - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, exp: hist-sol}
           - {dataset: MRI-ESM2-0, ensemble: r3i1p1f1, grid: gn, exp: hist-sol}
           - {dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, exp: hist-sol}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-nat}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-sol}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-sol}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-sol}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-volc}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-volc}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-volc}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-aer}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-aer}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-aer}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-CO2}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-CO2}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-CO2}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
-          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, exp: hist-stratO3}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn, exp: hist-stratO3}
-          - {dataset: MIROC6, ensemble: r3i1p1f1, grid: gn, exp: hist-stratO3}
-#          - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
-#          - {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn}
-##          - {dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}#lat,lon contcatenate error.
-#          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-#          - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1} #time coordinate error
-#          - {dataset: EC-Earth3-Veg, ensemble: r2i1p1f1}
-#          - {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1}
-#          - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1} #gr1 causes problems for tos.
-#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
-#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-nat}
-#          - {dataset: GFDL-ESM4, ensemble: r2i1p1f1, grid: gr1, exp: hist-nat}
-#          - {dataset: GFDL-ESM4, ensemble: r3i1p1f1, grid: gr1, exp: hist-nat}
-#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-aer}
-#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: hist-GHG}
-#          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-#          - {dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn} 
-#          - {dataset: NESM3, ensemble: r1i1p1f1, grid: gn} #problem with time coordinate.
-#          - {dataset: NESM3, ensemble: r2i1p1f1, grid: gn} 
-#          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn} #problem reading times.
-#          - {dataset: UKESM1-0-LL, ensemble: r2i1p1f2, grid: gn}
-#          - {dataset: UKESM1-0-LL, ensemble: r3i1p1f2, grid: gn}
-#          - {dataset: UKESM1-0-LL, ensemble: r4i1p1f2, grid: gn}
-#          - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
-#        additional_datasets:
-#          - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1} #gr1 causes problems for tos.
-#          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: NorESM2-LM, ensemble: r3i1p1f1, grid: gn}
+          - {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: NorESM2-LM, ensemble: r3i1p1f1, grid: gn, exp: hist-nat}
+          - {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: NorESM2-LM, ensemble: r3i1p1f1, grid: gn, exp: hist-GHG}
+          - {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn, exp: hist-aer}
+          - {dataset: NorESM2-LM, ensemble: r3i1p1f1, grid: gn, exp: hist-aer}
 
 
-      tos:
-        <<: *tas_settings
-        mip: Omon
-        grid: gn
+
+#      tos:
+#        <<: *tas_settings
+#        mip: Omon
+#        grid: gn
 #        preprocessor: regrid_5_5
 #        mip: Omon
 #        field: T2Ms
@@ -380,10 +472,10 @@ diagnostics:
 #          - {dataset: GFDL-CM4, ensemble: r1i1p1f1} 
 #          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1}
 
-      siconc:
-        <<: *tas_settings
-        mip: SImon
-        grid: gn
+#      siconc:
+#        <<: *tas_settings
+#        mip: SImon
+#        grid: gn
 #        preprocessor: regrid_5_5
 #        mip: SImon
 #        field: T2Ms
@@ -397,6 +489,23 @@ diagnostics:
 #        additional_datasets:
 #          - {dataset: GFDL-CM4, ensemble: r1i1p1f1} 
 #          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1}
+#      siconca: 
+#        preprocessor: regrid_5_5   
+#        reference_dataset: HadCRUT4
+#        field: T2Ms
+#        mip: SImon
+#        project: CMIP6
+#        exp: [historical,ssp245]
+#        grid: gn
+#        start_year: 1850
+#        end_year: 2019
+#        additional_datasets: 
+#          - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1}
+#          - {dataset: GISS-E2-1-G, ensemble: r2i1p1f1}
+#          - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1}
+#          - {dataset: GISS-E2-1-G, ensemble: r4i1p1f1}
+#          - {dataset: GISS-E2-1-G, ensemble: r5i1p1f1}
+
 
 
     scripts:

@@ -1,5 +1,6 @@
 #################################################################################
 # A set of functions for the detection and attribution of climate signals
+# Megan Kirchmeier-Young
 #
 # Many functions adapted from other code as noted.
 #
