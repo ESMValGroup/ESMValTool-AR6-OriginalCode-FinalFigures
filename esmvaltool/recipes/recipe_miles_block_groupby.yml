@@ -101,7 +101,7 @@ diagnostics:
       - {dataset: MRI-CGCM3, project: CMIP5, mip: day, exp: historical, ensemble: r1i1p1}
       - {dataset: MRI-ESM1, project: CMIP5, mip: day, exp: historical, ensemble: r1i1p1}
       - {dataset: NorESM1-M, project: CMIP5, mip: day, exp: historical, ensemble: r1i1p1}
-      - {dataset: ERA5, project: native6, mip: E1hr, era5_name: geopotential, era5_freq: hourly, type: reanaly, version: '1', tier: 3}
+      - {dataset: ERA5, project: native6, mip: E1hr, frequency: 1hr, era5_name: geopotential, era5_freq: hourly, type: reanaly, version: '1', tier: 3}
     scripts:
         miles_block:
             script: miles/miles_block_groupby_projects.R
