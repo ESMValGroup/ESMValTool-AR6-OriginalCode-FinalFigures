@@ -43,7 +43,6 @@ diagnostics:
         start_year: 1979
         end_year: 2000
     additional_datasets:
-      - {dataset: CMCC-CM2-HR4, project: CMIP6, mip: day, exp: hist-1950, ensemble: r1i1p1f1, grid: gn}
       - {dataset: CNRM-CM6-1, project: CMIP6, mip: day, exp: hist-1950, ensemble: r1i1p1f2, grid: gr}
       - {dataset: ECMWF-IFS-HR, project: CMIP6, mip: day, exp: hist-1950, ensemble: r1i1p1f1, grid: gr}
       - {dataset: ECMWF-IFS-LR, project: CMIP6, mip: day, exp: hist-1950, ensemble: r1i1p1f1, grid: gr}
