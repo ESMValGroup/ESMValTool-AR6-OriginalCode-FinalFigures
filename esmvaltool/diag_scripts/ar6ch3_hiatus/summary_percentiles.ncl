@@ -36,17 +36,17 @@ begin
   system("rm -f "+output_dir+"percentiles_GMSTtrend_hiatus_*.txt")
   
   do n = 0, ndirs-1
-    do ii = 0, 3
-      if (ii.eq.0) then
+    do jj = 0, 3
+      if (jj.eq.0) then
         masking = "masked"
         blending = "blended"
-      elseif (ii.eq.1) then
+      elseif (jj.eq.1) then
         masking = "masked"
         blending = "unblended"
-      elseif (ii.eq.2) then
+      elseif (jj.eq.2) then
         masking = "unmasked"
         blending = "blended"
-      elseif (ii.eq.3) then
+      elseif (jj.eq.3) then
         masking = "unmasked"
         blending = "unblended"
       end if

@@ -299,6 +299,10 @@ begin
             compositeHiatusTrendPattern = trend*wgt
             copy_VarCoords(trend, compositeHiatusTrendPattern)
             ncompositeHiatusTrendPattern = where(ismissing(trend), 0, wgt)
+            signHiatusTrendPattern = (/toint(trend)/)
+            signHiatusTrendPattern = 0
+            signHiatusTrendPattern@_FillValue = default_fillvalue("integer")
+            nsignHiatusTrendPattern = signHiatusTrendPattern
             signHiatusTrendPattern = where(trend.gt.0., 1, 0)
             nsignHiatusTrendPattern = where(ismissing(trend), 0, 1)
             datasetCompositeHiatus = "CMIP5 "+trendGSThiatusCMIP5[ii]@dataset+" "+trendGSThiatusCMIP5[ii]@ensemble
@@ -326,6 +330,10 @@ begin
             compositePostTrendPattern = trend*wgt
             copy_VarCoords(trend, compositePostTrendPattern)
             ncompositePostTrendPattern = where(ismissing(trend), 0, wgt)
+            signPostTrendPattern = (/toint(trend)/)
+            signPostTrendPattern = 0
+            signPostTrendPattern@_FillValue = default_fillvalue("integer")
+            nsignPostTrendPattern = signPostTrendPattern
             signPostTrendPattern = where(trend.gt.0., 1, 0)
             nsignPostTrendPattern = where(ismissing(trend), 0, 1)
             datasetCompositePost = "CMIP5 "+trendGSThiatusCMIP5[ii]@dataset+" "+trendGSThiatusCMIP5[ii]@ensemble
@@ -360,6 +368,10 @@ begin
             compositeHiatusTrendPattern = trend*wgt
             copy_VarCoords(trend, compositeHiatusTrendPattern)            
             ncompositeHiatusTrendPattern = where(ismissing(trend), 0, wgt)
+            signHiatusTrendPattern = (/toint(trend)/)
+            signHiatusTrendPattern = 0
+            signHiatusTrendPattern@_FillValue = default_fillvalue("integer")
+            nsignHiatusTrendPattern = signHiatusTrendPattern
             signHiatusTrendPattern = where(trend.gt.0., 1, 0)
             nsignHiatusTrendPattern = where(ismissing(trend), 0, 1)
             datasetCompositeHiatus = "CMIP6 "+trendGSThiatusCMIP6[ii]@dataset+" "+trendGSThiatusCMIP6[ii]@ensemble
@@ -387,6 +399,10 @@ begin
             compositePostTrendPattern = trend*wgt
             copy_VarCoords(trend, compositePostTrendPattern)
             ncompositePostTrendPattern = where(ismissing(trend), 0, wgt)
+            signPostTrendPattern = (/toint(trend)/)
+            signPostTrendPattern = 0
+            signPostTrendPattern@_FillValue = default_fillvalue("integer")
+            nsignPostTrendPattern = signPostTrendPattern
             signPostTrendPattern = where(trend.gt.0., 1, 0)
             nsignPostTrendPattern = where(ismissing(trend), 0, 1)
             datasetCompositePost = "CMIP6 "+trendGSThiatusCMIP6[ii]@dataset+" "+trendGSThiatusCMIP6[ii]@ensemble
@@ -450,13 +466,13 @@ begin
     compositeHiatusTrendPattern@mask_pattern = mask_pattern
     compositeHiatusTrendPattern@dataset = datasetCompositeHiatus
     compositeHiatusTrendPattern@trend_GST = compositeHiatusTrendGST
-    nsignHiatusTrendPattern@_FillValue = default_fillvalue(typeof(nsignHiatusTrendPattern))
+    ;nsignHiatusTrendPattern@_FillValue = default_fillvalue(typeof(nsignHiatusTrendPattern))
     nsignHiatusTrendPattern = where(nsignHiatusTrendPattern.eq.0, nsignHiatusTrendPattern@_FillValue, nsignHiatusTrendPattern)
     signConsistency = where(compositeHiatusTrendPattern.gt.0., \
                             tofloat(signHiatusTrendPattern)/tofloat(nsignHiatusTrendPattern), \
                             1.-tofloat(signHiatusTrendPattern)/tofloat(nsignHiatusTrendPattern))
     signConsistency = where(compositeHiatusTrendPattern.eq.0., signConsistency@_FillValue, signConsistency)
-    compositeHiatusTrendPattern@frac_sign_match = signConsistency
+;    compositeHiatusTrendPattern@frac_sign_match = signConsistency
     nc_filename = work_dir + "HiatusTrendPattern_composite.nc"
     nc_outfile = ncdf_write(compositeHiatusTrendPattern, nc_filename)
   end if
@@ -487,14 +503,14 @@ begin
     compositePostTrendPattern@mask_pattern = mask_pattern
     compositePostTrendPattern@dataset = datasetCompositePost
     compositePostTrendPattern@trend_GST = compositePostTrendGST
-    nsignPostTrendPattern@_FillValue = default_fillvalue(typeof(nsignPostTrendPattern))
+    ;nsignPostTrendPattern@_FillValue = default_fillvalue(typeof(nsignPostTrendPattern))
     nsignPostTrendPattern = where(nsignPostTrendPattern.eq.0, nsignPostTrendPattern@_FillValue, nsignPostTrendPattern)
-    signPostTrendPattern = where(nsignPostTrendPattern.eq.0, signPostTrendPattern@_FillVlaue, signPostTrendPattern)
+    signPostTrendPattern = where(nsignPostTrendPattern.eq.0, signPostTrendPattern@_FillValue, signPostTrendPattern)
     signConsistency = where(compositePostTrendPattern.gt.0., \
                             tofloat(signPostTrendPattern)/tofloat(nsignPostTrendPattern), \
                             1.-tofloat(signPostTrendPattern)/tofloat(nsignPostTrendPattern))
     signConsistency = where(compositePostTrendPattern.eq.0., signConsistency@_FillValue, signConsistency)
-    compositePostTrendPattern@frac_sign_match = signConsistency
+;    compositePostTrendPattern@frac_sign_match = signConsistency
     nc_filename = work_dir + "PostTrendPattern_composite.nc"
     nc_outfile = ncdf_write(compositePostTrendPattern, nc_filename)
   end if

@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim
 ;    20200917 kosaka_yu: added statistical significance to the trend maps
 ;    20200525 kosaka_yu: written.
 ;
@@ -170,9 +171,12 @@ begin
     if (method_GMST.eq."BerkeleyEarth") then
       syear_clim = 1951
       eyear_clim = 1980
-    elseif (method_GMST.eq."CowtanWay") then
+    elseif (any(method_GMST.eq.(/"CowtanWay", "Kadow"/))) then
       syear_clim = 1961
       eyear_clim = 1990
+    elseif (method_GMST.eq."NOAAGlobalTemp-Interim") then
+      syear_clim = 1971
+      eyear_clim = 2000
     elseif (method_GMST.eq."global") then
       syear_clim = 1961
       eyear_clim = 1990
@@ -519,11 +523,15 @@ begin
           infoObs = True
           iObsProject = 0
           do while(.not.infoFrac)
-            infoObs@project = obs_projects(iObsProject)
-            infoFrac = get_into_match(infoObs, infoSftlf, (/"project"/), opt)
+            if (iObsProject.ge.dimsizes(obs_projects)) then
+              infoFrac = infoSftlf[0]
+            else
+              infoObs@project = obs_projects(iObsProject)
+              infoFrac = get_info_match(infoObs, infoSftlf, (/"project"/), opt)
+            end if
             Fracvar = "sftlf"
             if (.not.infoFrac.and.isdefined("infoSftof")) then
-              infoFrac = get_into_match(infoObs, infoSftof, (/"project"/), opt)
+              infoFrac = get_info_match(infoObs, infoSftof, (/"project"/), opt)
               Fracvar = "sftof"
             end if
             iObsProject = iObsProject + 1

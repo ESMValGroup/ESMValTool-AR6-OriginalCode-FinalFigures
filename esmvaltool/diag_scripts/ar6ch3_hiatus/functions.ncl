@@ -407,16 +407,18 @@ begin
     if (any(method.eq.(/"least_square",  "LeastSquare",  "Least_Square", \
                         "least_squares", "LeastSquares", "Least_Squares", \
                         "ls", "LS"/))) then
-      tmp = dtrend_msg(tofloat(ispan(1, dimsizes(y({ts:te})), 1)), y({ts:te}), True, True)
-      tr = tmp@slope
-      tmp2 = trend_manken(y({ts:te}), False, 0)
-      sig = tmp2(0)
-      delete(tmp2)
+      tr = regline(tofloat(ispan(1, dimsizes(y({ts:te})), 1)), y({ts:te}))
+      tmp = esacr(y({ts:te}), 1)
+      edof = num(.not.ismissing(y({ts:te}))) * min((/(1.-tmp(1))/(1.+tmp(1)), 1./)) - 2.
+      delete(tmp)
+      sig = 1. - betainc(edof/(edof + tr@tval^2), edof/2.0, 0.5)
+      delete(edof)
     elseif (any(method.eq.(/"Sen", "sen", "median_slope", "MedianSlope", \
                             "Theil-Sen"/))) then
       tmp = trend_manken(y({ts:te}), True, 0)
       tr = tmp(1)
       sig = tmp(0)
+      delete(tmp)
     end if
     copy_VarAtts(y, tr)
     tr@sig = sig
@@ -427,13 +429,24 @@ begin
                         "least_squares", "LeastSquares", "Least_Squares", \
                         "ls", "LS"/))) then
       dims = dimsizes(y({ts:te}, :, :))
-      tmp = dtrend_msg_n(tofloat(ispan(1, dims(0), 1)), y({ts:te}, :, :), True, True, 0)
+;      tmp = dtrend_msg_n(tofloat(ispan(1, dims(0), 1)), y({ts:te}, :, :), True, True, 0)
+;      tr = y(0, :, :)
+      tr = regCoef_n(tofloat(ispan(1, dims(0), 1)), y({ts:te}, :, :), 0, 0)
       tr = where(dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0).gt.dims(0)*frac_threshold, \
-                 reshape(tmp@slope, dims(1:2)), tmp@_FillValue)
-      tmp2 = trend_manken(y({ts:te}, :, :), False, 0)
-      sig = tmp2(0, :, :)
-      delete(tmp2)
+                 tr, tr@_FillValue)
+;      tmp2 = trend_manken(y({ts:te}, :, :), False, 0)
+;      sig = tr
+;      sig = where(ismissing(tr), tr@_FillValue, tmp2(0, :, :))
+;      delete(tmp2)
       delete(dims)
+      tmp = esacr_n(y({ts:te}, :, :), 1, 0)
+      edof = dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0) * where(tmp(1, :, :).gt.0., (1.-tmp(1, :, :))/(1.+tmp(1, :, :)), 1.) - 2.
+      delete(tmp)
+      b = edof
+      b = 0.5
+      sig = 1. - betainc(edof/(edof + reshape(tr@tval, dimsizes(tr))^2), edof/2.0, b)
+      delete(edof)
+      delete(b)
     elseif (any(method.eq.(/"Sen", "sen", "median_slope", "MedianSlope", \
                             "Theil-Sen"/))) then
       dims = dimsizes(y({ts:te}, :, :))
@@ -453,7 +466,7 @@ begin
   if (isatt(x, "units")) then
     tr@units = x@units+" per year"
   end if
-  delete(tmp)
+;  delete(tmp)
 
   tr@syear_trend = syr
   tr@eyear_trend = eyr

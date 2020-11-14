@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim.
 ;    20200924 kosaka_yu: revised figure details.
 ;    20200917 kosaka_yu: revised figure details.
 ;    20200910 kosaka_yu: revised.
@@ -210,6 +211,8 @@ begin
 ;
 ; ======================================================================
 
+  load "$diag_scripts/ar6ch3_hiatus/config_datasets.ncl"
+  
   scale = 10.  ; trend in "per [scale] years" 
   long_name = "GMST trend"
   unit = "K/decade"
@@ -278,8 +281,8 @@ begin
   color_cmip5_legend = "grey50"
   color_cmip6_legend = color_cmip6
   color_obs_ens = (/ "grey40", "black"/)
-;  color_obs_single = (/ "blue2", "green4", "purple3", "red" /)
-  color_obs_single = (/ "blue2", "green4", "orange3", "red" /)
+  color_obs_single = tofloat((/(/54, 156, 232/),  (/36, 147, 126/), \
+                               (/127, 68, 170/), (/237, 128, 55/), (/48, 79, 191/) /))/255.
   opacity_pdf_cmip5 = 0.7
   opacity_pdf_cmip6 = 0.15 ;0.2
   opacity_selected_pdf = 0.25
@@ -347,11 +350,19 @@ begin
       GMSTtrendCMIP5 = read_GMtrend_as_list(files(ii))
     elseif (filename.eq. "trend"+GST+"_"+masking+"_CMIP6.txt") then
       GMSTtrendCMIP6 = read_GMtrend_as_list(files(ii))
-    elseif (isStrSubset(filename, "trendGMST_").and.isStrSubset(filename, "_OBS.txt")) then
+    elseif ((isStrSubset(filename, "trendGMST_").or.isStrSubset(filename, "trendGSAT_")) \
+            .and.isStrSubset(filename, "_OBS.txt")) then
+      tmp = read_GMtrend_as_list(files(ii))
+      if (any(tmp[0]@dataset.eq.reanalyses)) then
+        if (.not.isStrSubset(filename, "trend"+GST).or. \
+            .not.isStrSubset(filename, "_"+masking+"_")) then
+          delete(tmp)
+          continue
+        end if
+      end if
       if (.not.isdefined("GMSTtrendObs")) then
         GMSTtrendObs = NewList("fifo")
       end if
-      tmp = read_GMtrend_as_list(files(ii))
       if (ListCount(tmp).gt.1) then
         ensemble = metadata_att_as_array(tmp, "ensemble")
         x = list_to_array(tmp)
@@ -574,7 +585,7 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     delete(esize)
     delete(model)
 
-print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
+    print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
     if (.not.isvar("post_period")) then
       do ii = 0, ListCount(GMSTtrendCMIP6)-1
         if (isatt(GMSTtrendCMIP6[ii], "post_period")) then
@@ -899,31 +910,47 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   end if
   if (isdefined("SingleValhiatusObs")) then
     polyres := True
-    xmarker = new(3, "float")
-    ymarker = new(3, "float")
+    xmarker = new(4, "float")
+    ymarker = new(4, "float")
     j = 0
     do ii = 0, ListCount(SingleValhiatusObs)-1
-      polyres@gsFillColor = color_obs_single(j)
+      polyres@gsFillColor := color_obs_single(j, :)
+      polyres@gsLineColor := color_obs_single(j, :)
       datatondc(pdfs(0), tofloat(SingleValhiatusObs[ii]), res@trYMaxF, xmarker(0), ymarker(0))
       xmarker(1) = xmarker(0) - 0.007
       xmarker(2) = xmarker(0) + 0.007
+      xmarker(3) = xmarker(0)
       ymarker(1) = ymarker(0) + 0.02
       ymarker(2) = ymarker(1)
-      gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+      ymarker(3) = ymarker(0)
+      if (any(SingleValhiatusObs[ii]@dataset.eq.reanalyses)) then
+        gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+      else
+        gsn_polygon_ndc(wks, xmarker(0:2), ymarker(0:2), polyres)
+      end if
       x = xlabel+0.05
       y = ylabel-ilabel*ylabeli
       datatondc(pdfs(0), x-0.03, y, xmarker(0), ymarker(0))
       xmarker(1) = xmarker(0) 
       xmarker(2) = xmarker(0) + 0.004
       xmarker(0) = xmarker(0) - 0.004
+      xmarker(3) = xmarker(0)
       ymarker(1) = ymarker(0) - 0.0125
       ymarker(2) = ymarker(0)
-      gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
-      txres@txFontColor := color_obs_single(j)
+      ymarker(3) = ymarker(0)
+      if (any(SingleValhiatusObs[ii]@dataset.eq.reanalyses)) then
+        gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+      else
+        gsn_polygon_ndc(wks, xmarker(0:2), ymarker(0:2), polyres)
+      end if
+      txres@txFontColor := color_obs_single(j, :)
       dataset_name = SingleValhiatusObs[ii]@dataset
       if (dataset_name.eq."NOAAGlobalTemp") then
         dataset_name = "NOAA~C~GlobalTemp"
         ilabel = ilabel + 1
+      elseif (dataset_name.eq."NOAAGlobalTemp-Interim") then
+        dataset_name = "NOAA~C~GlobalTemp~C~-Interim"
+        ilabel = ilabel + 2
       end if
       dummy(idummy) = gsn_add_text(wks, pdfs(0), dataset_name, x, y, txres)
       ilabel = ilabel + 1
@@ -1180,10 +1207,16 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
       break
     end if
   end do
-  sigTstrendObsHiatus = TstrendObsHiatus
-  sigTstrendObsHiatus = reshape(TstrendObsHiatus@sig, dimsizes(TstrendObsHiatus))
-  sigTstrendObsHiatus@long_name = ""
-  sigTstrendObsHiatus@units = ""
+
+  if (isatt(TstrendObsHiatus, "sig")) then
+    draw_sig = True
+    sigTstrendObsHiatus = TstrendObsHiatus
+    sigTstrendObsHiatus = reshape(TstrendObsHiatus@sig, dimsizes(TstrendObsHiatus))
+    sigTstrendObsHiatus@long_name = ""
+    sigTstrendObsHiatus@units = ""
+  else
+    draw_sig = False
+  end if
   
 ; -------------------------------------
 ; Plot obs trend pattern
@@ -1241,10 +1274,10 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
 ;  resTs@res_cnLevels = (/ -1.3, -0.9, -0.6, -0.4, -0.3, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.3, 0.4, 0.6, 0.9, 1.3 /)
 ;  resTs@res_cnLevels = (/ -0.9, -0.4, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.4, 0.9 /)
   resTs@res_cnLevelSelectionMode = "ManualLevels"
-  resTs@res_cnMinLevelValF = -1.05
-  resTs@res_cnMaxLevelValF = 1.05
+  resTs@res_cnMinLevelValF = -1.05 ;-0.95 ; -1.05
+  resTs@res_cnMaxLevelValF = 1.05 ;0.95 ; 1.05
   resTs@res_cnLevelSpacingF = 0.1
-  resTs@res_cnFillPalette = "temp_div_21" ;"AR6_temp_11" ;"temp_diff_18lev"
+  resTs@res_cnFillPalette = "temp_div"
   resTs@res_lbAutoManage = False
   resTs@res_lbLabelAutoStride = True
   
@@ -1264,7 +1297,11 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   sres@cnFillOpacityF = 0.4
   sres@cnLevelSelectionMode = "ExplicitLevels"
   sres@cnLevels = (/ 0.9 /)
-  sres@cnFillPatterns = (/ -1, 17 /)
+;  sres@cnFillPatterns = (/ -1, 17 /)
+  sres@cnFillPatterns = (/ 17, -1 /)
+  sres@cnFillOpacityF = 0.1
+  sres@cnFillColor = "grey30"
+  sres@cnFillScaleF = 1.4
   sres@cnInfoLabelOn = False
   sres@lbLabelBarOn   = False
   sres@gsnAddCyclic = True
@@ -1278,29 +1315,34 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   resTs@res_vpWidthF = vpW(2)
   copy_VarAtts(resTs, TstrendObsHiatus)
   patterns( 0 ) = contour_map(wks, TstrendObsHiatus, "")
-  plot = gsn_csm_contour(wks, sigTstrendObsHiatus, sres)
-  overlay( patterns( 0 ), plot )
+  if (draw_sig) then
+    plot = gsn_csm_contour(wks, sigTstrendObsHiatus, sres)
+    overlay( patterns( 0 ), plot )
 
-  plres = True
-  x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
-  x1 = x2 - resTs@res_vpWidthF * 0.07
-  x3 = x2
-  x4 = x1
-  y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
-  y2 = y3 - resTs@res_vpHeightF * 0.07
-  y1 = y2
-  y4 = y3
-  plres = True
-  plres@gsFillScaleF = sres@cnFillScaleF
-  plres@gsFillIndex = sres@cnFillPatterns(1)
-  lres = True
-  lres@gsLineDashPattern = 0
-  lres@gsLineThicknessF = 1.
-  gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
-  gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
-  txres@txFontColor := "black"
-  txres@txJust = "TopRight"
-  gsn_text_ndc(wks, "p < "+(1.-sres@cnLevels(0)), x2, y2-0.005, txres)
+    plres = True
+    x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
+    x1 = x2 - resTs@res_vpWidthF * 0.07
+    x3 = x2
+    x4 = x1
+    y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
+    y2 = y3 - resTs@res_vpHeightF * 0.07
+    y1 = y2
+    y4 = y3
+    plres = True
+    plres@gsFillScaleF = sres@cnFillScaleF
+;    plres@gsFillIndex = sres@cnFillPatterns(1)
+    plres@gsFillIndex = sres@cnFillPatterns(0)
+    plres@gsFillOpacityF = sres@cnFillOpacityF
+    plres@gsFillColor = sres@cnFillColor
+    lres = True
+    lres@gsLineDashPattern = 0
+    lres@gsLineThicknessF = 1.
+    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
+    gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
+    txres@txFontColor := "black"
+    txres@txJust = "TopRight"
+    gsn_text_ndc(wks, "not significant~C~  at "+toint((1.-sres@cnLevels(0))*100.)+"% level", x2, y2-0.005, txres)
+  end if
 
 ; -------------------------------------
 ; Plot composite trend pattern
@@ -1314,35 +1356,40 @@ print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
   copy_VarAtts(resTs, TstrendCMIPHiatus)
   patterns( 1 ) = contour_map(wks, TstrendCMIPHiatus, "")
 
-  sign_match = TstrendCMIPHiatus
-  sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
-  sign_match@long_name = ""
-  sign_match@units = ""
-  sres@cnLevels = (/ 0.75 /)
-  sres@cnFillPatterns = (/ -1, 3 /)
-  plot = gsn_csm_contour(wks, sign_match, sres)
-  overlay( patterns( 1 ), plot )
+  if (isatt(TstrendCMIPHiatus, "frac_sign_match")) then
+    draw_sign_match = True
+    sign_match = TstrendCMIPHiatus
+    sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
+    sign_match@long_name = ""
+    sign_match@units = ""
+    sres@cnLevels = (/ 0.8 /)
+;    sres@cnFillPatterns = (/ -1, 3 /)
+    sres@cnFillPatterns = (/ 6, -1 /)
+    plot = gsn_csm_contour(wks, sign_match, sres)
+    overlay( patterns( 1 ), plot )
 
-  plres = True
-  x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
-  x1 = x2 - resTs@res_vpWidthF * 0.07
-  x3 = x2
-  x4 = x1
-  y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
-  y2 = y3 - resTs@res_vpHeightF * 0.07
-  y1 = y2
-  y4 = y3
-  plres = True
-  plres@gsFillScaleF = sres@cnFillScaleF
-  plres@gsFillIndex = sres@cnFillPatterns(1)
-  lres = True
-  lres@gsLineDashPattern = 0
-  lres@gsLineThicknessF = 1.
-  gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
-  gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
-  txres@txFontColor := "black"
-  txres@txJust = "TopRight"
-  gsn_text_ndc(wks, "Sign agreement > "+(sres@cnLevels(0)*100)+"%", x2, y2-0.005, txres)
+    plres = True
+    x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
+    x1 = x2 - resTs@res_vpWidthF * 0.07
+    x3 = x2
+    x4 = x1
+    y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
+    y2 = y3 - resTs@res_vpHeightF * 0.07
+    y1 = y2
+    y4 = y3
+    plres = True
+    plres@gsFillScaleF = sres@cnFillScaleF
+;    plres@gsFillIndex = sres@cnFillPatterns(1)
+    plres@gsFillIndex = sres@cnFillPatterns(0)
+    lres = True
+    lres@gsLineDashPattern = 0
+    lres@gsLineThicknessF = 1.
+    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
+    gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
+    txres@txFontColor := "black"
+    txres@txJust = "TopRight"
+    gsn_text_ndc(wks, "Sign agreement < "+(sres@cnLevels(0)*100)+"%", x2, y2-0.005, txres)
+  end if
   
   composite_projects = str_get_field(composite_member_names, 1, " ")
   composite_models = str_get_field(composite_member_names, 2, " ")
