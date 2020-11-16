@@ -240,7 +240,7 @@ if (write_plots) {
     # create filenames to handle the provenance
     filenames <- c()
     # create figure names with ad-hoc function
-    dataset <- 'Multimodel'
+    dataset <- 'Multimodel_resolution'
     expid <- 'historical'
     figname <- fig_multimodel_builder(
       plot_dir,

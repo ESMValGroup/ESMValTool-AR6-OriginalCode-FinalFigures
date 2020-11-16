@@ -56,8 +56,8 @@ diagnostics:
             linewidth: 4
             modelgroup_HR: ['ECMWF-IFS-HR']
             modelgroup_LR: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR']
-            obs_legend: ['OBS']
-            plot_title: 'TM90 Instantaneous Blocking - resolution comparison'
+            obs_legend: ['ERA5']
+            plot_title: 'Blocking - resolution comparison'
             reso_legend: ['LR', 'HR']
             transparency: 0.15 # in [0, 1]
             xlabel: 'Longitude'
