@@ -168,7 +168,7 @@ def recalendar(cube, calendar, units = 'days since 1950-1-1 00:00:00'):
 
 def regrid_to_1x1(cube, scheme = 'linear'):
     """
-    regrid a cube to a common 1x1 grid. 
+    regrid a cube to a common 1x1 grid.
     """
     # regrid to a common grid:
     return regrid(cube, '1x1', scheme)
@@ -189,7 +189,7 @@ def make_mean_of_cube_list(cube_list):
     times = []
     for cube in cube_list:
         # make time coords uniform:
-       
+
         cube.coord('time').long_name='Time axis'
         cube.coord('time').attributes={'time_origin': '1950-01-01 00:00:00'}
         times.append(cube.coord('time').points)
@@ -259,7 +259,7 @@ def make_mean_of_cube_list_notime(cube_list):
         #try: iris.coord_categorisation.add_month(cube, 'time')
         #except: pass
         try: cube.remove_coord('year')
-        except: pass 
+        except: pass
         #cube.remove_coord('Year')
         try: model_name = cube_mean.metadata[4]['source_id']
         except: model_name = ''
@@ -1280,7 +1280,7 @@ def calc_dyn_height_clim(cfg,
         # Mask below 2000m
         temp_bar =  np.ma.masked_where(temp_bar.mask + (depth_bar<-2000.), temp_bar)
         sal_bar = np.ma.masked_where(sal_bar.mask + (depth_bar<-2000.), sal_bar)
- 
+
         # calculate pressure
         pressure_bar = gsw.conversions.p_from_z(depth_bar, la)
         pressure_bar = np.ma.masked_where(temp_bar.mask, pressure_bar)
@@ -1325,16 +1325,6 @@ def calc_dyn_height_clim(cfg,
           sym_zero=False,
           )
 
-#   make_difference_plots(
-#       cfg,
-#       metadatas[hist_thetao_fn],
-#       psal_bar[0],
-#       hist_cube,
-#       label1='',
-#       label2='',
-#       key='',
-#       )
-
     # Save climatological SLR cube as a netcdf.
     print("saving output cube:", clim_fn)
     if method == 'dyn_height'
@@ -1350,13 +1340,22 @@ def calc_dyn_height_clim(cfg,
     cube0.standard_name = 'steric_change_in_mean_sea_level'
     iris.save(cube0, clim_fn)
 
-    single_pane_map_plot(
-          cfg,
-          metadatas[hist_thetao_fn],
-          cube0,
-          key='Dyn_height_clim/'+clim_type+'_dynamic_height',
-          sym_zero=False,
-          )
+    if method == 'dyn_height'
+        single_pane_map_plot(
+              cfg,
+              metadatas[hist_thetao_fn],
+              cube0,
+              key='Dyn_height_clim/'+method+clim_type+'_dynamic_height',
+              sym_zero=False,
+              )
+    if method == 'Landerer'
+        single_pane_map_plot(
+              cfg,
+              metadatas[hist_thetao_fn],
+              cube0[0],
+              key='Dyn_height_clim/'+method+clim_type+'_dynamic_height',
+              sym_zero=False,
+              )
     return clim_fn
 
 
@@ -1394,7 +1393,6 @@ def calc_dyn_height(
         total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_dyn_height', trend])+'.nc'
         thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_dyn_height', trend])+'.nc'
         halo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_dyn_height', trend])+'.nc'
-
 
     # Check whether output paths exists already.
     # If they exist, then make some basic figures and return paths.
@@ -1435,7 +1433,7 @@ def calc_dyn_height(
     # Load depth data, ensuring depth is negative
     depths = -1.*np.abs(thetao_cube.coord(axis='z').points.copy())
     thicknesses =np.abs (thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
-    assert 0
+
     # Load time array as decidimal time.
     times = diagtools.cube_time_to_float(thetao_cube)
 
@@ -1604,7 +1602,7 @@ def calc_dyn_height(
 
 
 def check_units(cfg, metadata, files = [], keys = []):
-    
+
     print('--------\nChecking units:')
     print(keys)
     for fn in files:
@@ -1638,7 +1636,7 @@ def calc_dyn_height_full(cfg,
     project = metadatas[hist_thetao_fn]['project']
 
     clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
-                  '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
+                      '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
 
     clim_files = {}
     for clim_type in clim_types:
@@ -1676,6 +1674,276 @@ def calc_dyn_height_full(cfg,
 
     return clim_files
 
+
+def calc_landerer_slr(
+        cfg,
+        metadatas,
+        hist_thetao_fn,
+        hist_so_fn,
+        picontrol_thetao_fn,
+        picontrol_so_fn,
+        trend='detrended',
+        ):
+    """
+    calc_landerer_slr: Calculates the Sea Level Rise using the Landerer method.
+    """
+    # Load relevant metadata
+    exp = metadatas[hist_thetao_fn]['exp']
+    dataset = metadatas[hist_thetao_fn]['dataset']
+    ensemble = metadatas[hist_thetao_fn]['ensemble']
+    project = metadatas[hist_thetao_fn]['project']
+
+    method = 'Landerer'
+    clim_type = '1850-1900'
+    clim_fn = calc_dyn_height_clim(
+            cfg,
+            metadatas,
+            hist_thetao_fn,
+            hist_so_fn,
+            clim_type=clim_type,
+            trend=trend,
+            method=method)
+
+
+    # clim_file = calc_dyn_height_clim(
+    #             cfg,
+    #             metadatas,
+    #             picontrol_thetao_fn,
+    #             picontrol_so_fn,
+    #             clim_type=clim_type,
+    #             trend=trend,
+    #             method=method)
+    work_dir = diagtools.folder([cfg['work_dir'], 'Landerer'])
+    total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_slr', trend])+'.nc'
+    thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_slr', trend])+'.nc'
+    halo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_slr', trend])+'.nc'
+
+    slr_fn_dict= {}
+    slr_fn_dict['total'] = total_fn
+    slr_fn_dict['thermo'] = thermo_fn
+    slr_fn_dict['halo'] = halo_fn
+
+    # Check whether output paths exists already.
+    # If they exist, then make some basic figures and return paths.
+    if False not in [os.path.exists(fn) for fn in [total_fn, thermo_fn, halo_fn]]:
+        for fn, key in zip([total_fn, thermo_fn, halo_fn], ['total', 'thermo', 'halo']):
+            cube1 = iris.load_cube(fn)
+            for t in [0, -1, 'mean']:
+                if t == 'mean':
+                    dat = cube1.copy().collapsed('time', iris.analysis.MEAN)
+                else:
+                    dat = cube1[t]
+                single_pane_map_plot(
+                      cfg,
+                      metadatas[hist_thetao_fn],
+                      dat,
+                      key=method+'_'+key+'_'+trend,
+                      sym_zero=True,
+                      )
+        return slr_fn_dict
+
+    # Load historical temperature and salinity netcdfs
+    so_cube = iris.load_cube(hist_so_fn)
+    thetao_cube = iris.load_cube(hist_thetao_fn)
+    so_cube_data = so_cube.data
+    thetao_cube_data = thetao_cube.data
+
+    # load latitude longitude dimensions
+    lats = thetao_cube.coord('latitude').points
+    lons = thetao_cube.coord('longitude').points
+
+    # Make sure latitude and longitude are 2D
+    if lats.ndim == 1:
+        lon, lat = np.meshgrid(lons, lats)
+    elif lats.ndim == 2:
+        lat = lats
+        lon = lons
+
+    # Load depth data, ensuring depth is negative
+    depths = -1.*np.abs(thetao_cube.coord(axis='z').points.copy())
+    thicknesses =np.abs (thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
+
+    # Load time array as decidimal time.
+    times = diagtools.cube_time_to_float(thetao_cube)
+
+    # Calculate climatologies for historical period Temperature and salinity.
+    # Note that _bar suffix indicates climatology data.
+    # Acrtually, this is clim_rho.
+    rho_clim_cube = iris.load_cube(clim_fn)
+    rho_clim_data = rho_clim_cube.data
+
+    psal_bar = so_cube.copy()
+    thetao_bar = thetao_cube.copy()
+    if clim_type == '1850-1900':
+        psal_bar = extract_time(psal_bar, 1850, 1, 1, 1900, 12, 31)
+        thetao_bar = extract_time(thetao_bar, 1850, 1, 1, 1900, 12, 31)
+        psal_bar = psal_bar.collapsed('time', iris.analysis.MEAN)
+        thetao_bar = thetao_bar.collapsed('time', iris.analysis.MEAN)
+    else:
+        assert 0
+    psal_bar_data = psal_bar.data
+    thetao_bar_data = thetao_bar.data
+    depths_bar = -1.*np.abs(thetao_bar.coord(axis='z').points.copy())
+    #thickneses_bar = np.abs(thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
+
+    if str(thetao_cube.coord(axis='z').units).lower() in ['cm', 'centimeters']:
+        depths = depths /100.
+        depths_bar = depths_bar/100,
+
+    # Create output cubes to receive SLR data.
+    slr_total = np.zeros(thetao_cube[:, 0, : , :].shape) #2d + time
+    slr_thermo = slr_total.copy()
+    slr_halo = slr_total.copy()
+
+    count = 0
+    gravity = 9.7963 # m /s^2
+
+    # Now perform the SLR calculation for each point in time for each lat line:
+    if depths.ndim == 1:
+        depth = depths
+        thickness = thicknesses
+    if depths_bar.ndim == 1:
+        depth_bar = depths_bar
+        #thickness_bar = thickneses_bar
+    #    depth = np.tile(depths, (len(lat[0]), 1)).T
+
+    for (y, x), la in np.ndenumerate(lat):
+        print('Calculate SLR in 1D:', dataset, (y,x), 'of', lat.shape)
+        sal_bar = psal_bar_data[:, y, x]
+        if np.ma.is_masked(sal_bar.max()):
+             continue
+        temp_bar = thetao_bar_data[:, y, x]
+        rho_bar = rho_clim_data[:, y, x]
+
+        # Load historical coords
+        # la = lat[y, x]
+        lo = lon[y, x]
+
+        # Load depth dataset
+        if depths.ndim == 3:
+            depth = depths[:, y, x]
+            thickness = thicknesses[:, y, x]
+        if depths.ndim != 4:
+            pressure = gsw.conversions.p_from_z(depth, la) # dbar
+
+        # Sort out climatological data
+        if depths_bar.ndim == 3:
+            depth_bar = depths_bar[:, y, x]
+            #thickness_bar = thicknesses_bar[:, y, x]
+
+        # Mask below 2000m
+        temp_bar =  np.ma.masked_where(temp_bar.mask + (depth_bar<-2000.), temp_bar)
+        sal_bar = np.ma.masked_where(sal_bar.mask + (depth_bar<-2000.), sal_bar)
+        pressure_bar = gsw.conversions.p_from_z(depth_bar, la) # dbar
+        pressure_bar = np.ma.masked_where(sal_bar.mask, pressure_bar)
+        sal_bar, temp_bar = step_4and5(dataset, lo, la, pressure_bar, sal_bar, temp_bar)
+
+        # Calculate SLR for each point in time in the historical dataset.
+        for t, time in enumerate(times):
+
+            if depths.ndim == 4:
+                depth = depths[t, :, y, x]
+                thickness = thicknesses[t, :, y, x]
+                pressure = gsw.conversions.p_from_z(depth, la) # dbar
+            if depth.shape != sal_bar.shape:
+                print(depth.shape, sal_bar.shape, depths.shape)
+                assert 0
+
+            # load salinity and temperature data
+            sal = so_cube_data[t, :, y, x]
+            temp = thetao_cube_data[t, :, y, x]
+            temp =  np.ma.masked_where(temp.mask + (depth<-2000.), temp)
+            sal = np.ma.masked_where(sal.mask + (depth<-2000.), sal)
+
+            pressure = np.ma.masked_where(temp.mask, pressure)
+
+            # Confirm that we use absolute salininty & conservative temperature
+            sal, temp = step_4and5(dataset, lo, la, pressure, sal, temp)
+
+            #Calculate SLR, and convert into mm
+            total = thickness*((rho_bar - gsw.rho(sal, temp, pressure) )/rho_bar)
+
+            halo3 = thickness*((rho_bar - gsw.rho(sal, temp_bar, pressure) )/rho_bar)
+            thermo3 = thickness*((rho_bar - gsw.rho(so_bar, temp, pressure) )/rho_bar)
+
+
+            # Put in the output array:
+            slr_total[t, y, x] = total * 1000.
+            slr_thermo[t, y, x] = thermo * 1000.
+            slr_halo[t, y, x] = halo * 1000.
+
+            count += 1
+            if t == 0:
+                print(count, (t, y, x), 'performing 2D SLR')
+
+    slr_total  = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_total)
+    slr_thermo = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_thermo)
+    slr_halo   = np.ma.masked_where(thetao_cube[:, 0, :, :].data.mask, slr_halo )
+
+    slr_total = np.ma.masked_invalid(slr_total)
+    slr_thermo = np.ma.masked_invalid(slr_thermo)
+    slr_halo = np.ma.masked_invalid(slr_halo)
+
+    # Save SLR data as a cube and then a netcdf..
+    cube0 = thetao_cube[:, 0, :, :].copy()
+    cube0.data = slr_total
+    cube0.units = cf_units.Unit('mm')
+    cube0.name = 'Total Steric Dynamic Height'
+    cube0.long_name = 'Total Steric Dynamic Height'
+    cube0.short_name = 'slr_total'
+    cube0.var_name = 'slr_total'
+    cube0.standard_name = 'steric_change_in_mean_sea_level'
+    iris.save(cube0, total_fn)
+
+    cube1 = thetao_cube[:, 0, :, :].copy()
+    cube1.data = slr_thermo
+    cube1.units = cf_units.Unit('mm')
+    cube1.name = 'Thermosteric Dynamic Height'
+    cube1.long_name = 'Thermosteric Dynamic Height'
+    cube1.short_name = 'slr_thermo'
+    cube1.var_name = 'slr_thermo'
+    cube1.standard_name = 'thermosteric_change_in_mean_sea_level'
+    iris.save(cube1, thermo_fn)
+
+    cube2 = thetao_cube[:, 0, :, :].copy()
+    cube2.data = slr_halo
+    cube2.units = cf_units.Unit('mm')
+    cube2.name = 'Halosteric Dynamic Height'
+    cube2.long_name = 'Halosteric Dynamic Height'
+    cube2.short_name = 'slr_halo'
+    cube2.var_name = 'slr_halo'
+    cube2.standard_name = 'halosteric_change_in_mean_sea_level'
+    iris.save(cube2, halo_fn)
+
+    for cube, key in zip([cube0, cube1, cube2], ['total', 'thermo', 'halo']):
+        for t in [0, -1, 'mean']:
+            if t == 'mean':
+                dat = cube.copy().collapsed('time', iris.analysis.MEAN)
+            else:
+                dat = cube[t]
+            single_pane_map_plot(
+                cfg,
+                metadatas[hist_thetao_fn],
+                dat,
+                key='slr_height_'+key+'_'+trend,
+                sym_zero=True,
+                )
+
+    return slr_fn_dict
+
+    # steric_fn, thermo_fn, halo_fn = calc_dyn_height(
+    #     cfg,
+    #     metadatas,
+    #     hist_thetao_fn,
+    #     hist_so_fn,
+    #     trend=trend,
+    #     method=method)
+    #
+    # clim_files['total'] = steric_fn
+    # clim_files['thermo'] = thermo_fn
+    # clim_files['halo'] = halo_fn
+    #
+    # return clim_files
 
 def plot_dyn_height_ts(cfg, metadata, dyn_averages,  trend, region):
     """
@@ -1715,8 +1983,8 @@ def plot_dyn_height_ts(cfg, metadata, dyn_averages,  trend, region):
 def plot_slr_full_ts(cfg, metadata, dyn_averages, trend, region):
     """
     Make SLR time series plots for individual models.
- 
-    8 pane picture, with 
+
+    8 pane picture, with
     """
     exp = metadata['exp']
     dataset = metadata['dataset']
@@ -1731,9 +1999,9 @@ def plot_slr_full_ts(cfg, metadata, dyn_averages, trend, region):
         cubes[dyn_type] = iris.load_cube(fn)
         print(dyn_type, ':',cubes[dyn_type].data.shape, 'mean:', cubes[dyn_type].data.mean())#s.path.basename fn)
     panes = {'1971-2018':424, '2005-2018':428, '1850-1900':423 , '1995-2014':426,
-             '1985-2014':425, '2004-2018':427, 'fullhistorical':422, 'piControl':421} 
+             '1985-2014':425, '2004-2018':427, 'fullhistorical':422, 'piControl':421}
     yranges = {
-       '1971-2018': [1971, 2018 + 1], 
+       '1971-2018': [1971, 2018 + 1],
        '2005-2018': [2005, 2018 + 1],
        '1850-1900': [1850, 1900 + 1],
        '1995-2014': [1995, 2014 + 1],
@@ -1827,10 +2095,10 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
                 if plot_region != region: continue
                 if trend_plot!= trend: continue
 
-                if pane_type+'_ts' != dyn_type: 
+                if pane_type+'_ts' != dyn_type:
                     continue
 
-                cube = iris.load_cube(fn) 
+                cube = iris.load_cube(fn)
                 times = diagtools.cube_time_to_float(cube)
                 all_keys = (project, dataset, exp, ensemble, clim_range+'_ts', plot_region, trend)
 
@@ -1838,10 +2106,10 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
 #                if all_keys not in  dyn_fns.keys(): continue
                 clim_fn = dyn_fns[all_keys]  #(project, dataset, exp, ensemble, clim_range+'_ts', trend)]
                 clim_value = iris.load_cube(clim_fn).data
-                if np.ma.is_masked(cube.data.max()): 
+                if np.ma.is_masked(cube.data.max()):
                     print('Data is all masked:',cube.data, clim_value)
                     assert 0
-                if np.ma.is_masked(clim_value.max()): 
+                if np.ma.is_masked(clim_value.max()):
                     print('Clim data is all masked:',cube.data, clim_value)
                     assert 0
 
@@ -1852,7 +2120,7 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
                 plt.plot(times, data, label = dataset)
                 timesdict[(project, dataset, exp, ensemble, dyn_type, region, trend)] = times
                 datadict[(project, dataset, exp, ensemble, dyn_type, region, trend)] = np.ma.array(data)
-       
+
             plt.legend()
             ax.text(.5,.82, pane_type.title(),
                 horizontalalignment='center',
@@ -1865,11 +2133,11 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
              if plot_region != region: continue
              if trend_plot!= trend: continue
              if dyn_type != 'total_ts': continue
-           
-             times = timesdict[(project, dataset, exp, ensemble, dyn_type, region, trend)]  
+
+             times = timesdict[(project, dataset, exp, ensemble, dyn_type, region, trend)]
              data = data - datadict[(project, dataset, exp, ensemble, 'halo_ts', region, trend)]
-             data = data - datadict[(project, dataset, exp, ensemble, 'thermo_ts', region, trend)]        
-            
+             data = data - datadict[(project, dataset, exp, ensemble, 'thermo_ts', region, trend)]
+
              plt.plot(times, data, label = dataset)
 
         plt.legend()
@@ -1877,7 +2145,7 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
              horizontalalignment='center',
              transform=ax.transAxes)
 
- 
+
         fig.add_subplot(111, frame_on=False)
         plt.tick_params(labelcolor="none", bottom=False, left=False)
         plt.xlabel('Year')
@@ -1889,17 +2157,17 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
         print('Saving figure:', path)
         plt.savefig(path)
         plt.close()
- 
 
 
-def plot_slr_regional(cfg, metadatas, dyn_fns, 
+
+def plot_slr_regional(cfg, metadatas, dyn_fns,
         plot_exp = 'historical',
         plot_clim = '1850-1900_ts',
         plot_dyn = 'halo_ts',
         plot_trend = 'detrended'
     ):
     """
-    Add a interannual trend plot for each model and for the 
+    Add a interannual trend plot for each model and for the
     """
     # First add individual models:
     trends = {}
@@ -1914,12 +2182,12 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
         datasets[dataset] = True
         ensembles[ensemble] = True
         cube = iris.load_cube(fn)
-        
+
         clim_file = dyn_fns[(project, dataset, exp, ensemble, plot_clim, region, trend)]
         #clim_series[region][(dataset, ensemble)] =
-        print('Clim files:', (project, dataset, exp, ensemble, plot_clim, region, trend), clim_file) 
+        print('Clim files:', (project, dataset, exp, ensemble, plot_clim, region, trend), clim_file)
         clim_data = iris.load_cube(clim_file).data
-            
+
         times = diagtools.cube_time_to_float(cube)
         data = np.array([-1*(d - clim_data) for d in  cube.data])
         print('------\n',project, dataset, exp, ensemble, dyn_type, region, trend)
@@ -1936,13 +2204,13 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
         alt =  trends.get((dataset, ensemble, 'Atlantic'), None)
         print('Scatter:', dataset, ensemble, 'pac:', pac, 'alt:', alt)
         if None in [pac, alt]: continue
-    
+
         plt.scatter(pac, alt, marker='s', label = dataset)
         count +=1
     if not count:
          plt.close()
          return
-    # assert 0        
+    # assert 0
     plt.legend()
     plt.axhline(0, c='k', ls='--')
     plt.axvline(0, c='k', ls='--')
@@ -1982,7 +2250,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
     multimodel_mean_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
     multimodel_mean_fn += '_'.join(unique_id)+'.nc'
 
-    
+
     if os.path.exists(multimodel_mean_fn):
         mean_cube = iris.load_cube(multimodel_mean_fn)
     else:
@@ -1991,8 +2259,8 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
         for (project, dataset, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
             datasets[dataset] = True
 
-        # Calculatge the individual model mean    
-        for dataset in datasets.keys(): 
+        # Calculatge the individual model mean
+        for dataset in datasets.keys():
             cube_list[dataset] = {}
             for (project, dataset_itr, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
                 if dataset != dataset_itr: continue
@@ -2006,7 +2274,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
                 # extract time
                 cube_list[dataset][exp] = extract_time(cube_list[dataset][exp], time_range[0], 1, 1, time_range[1],12,31)
                 cube_list[dataset][exp] = cube_list[dataset][exp].collapsed('time', iris.analysis.MEAN)
-                if (project, dataset, plot_exp, ensemble, plot_clim, plot_region, plot_trend) not in dyn_fns.keys(): 
+                if (project, dataset, plot_exp, ensemble, plot_clim, plot_region, plot_trend) not in dyn_fns.keys():
                     print('-----\n',(project, dataset, plot_exp, ensemble, plot_clim, plot_trend), 'not in dyn_fns')
                     assert 0
                 # subtract relevant clim
@@ -2025,7 +2293,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
 
             cube_list[dataset] = [c for exp, c in cube_list[dataset].items()]
             cube_list[dataset] = make_mean_of_cube_list_notime(cube_list[dataset])
-        
+
             # regrid to a common grid:
             cube_list[dataset] = regrid_to_1x1( cube_list[dataset])
 
@@ -2056,7 +2324,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
         logger.info('Saving plots to %s', path)
         plt.savefig(path, dpi=200)
     plt.close()
-    return multimodel_mean_fn 
+    return multimodel_mean_fn
 
 
 def plot_slr_full3d_ts(cfg, metadata, dyn_files, area_fn, trend):
@@ -2135,11 +2403,18 @@ def plot_slr_full3d_ts(cfg, metadata, dyn_files, area_fn, trend):
 
 
 
-def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, slr_type, region, trend):
+def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
+        project, dataset, exp, ensemble, slr_type, region,
+        trend,
+        method = 'dyn_height'):
     """
     Calculate dynamic time series.
     """
-    work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height_ts'])
+    if method == 'dyn_height':
+        work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height_ts'])
+    elif method =='Landerer':
+        work_dir = diagtools.folder([cfg['work_dir'], 'Landerer_slr_ts'])
+
     slr_ts_fn = work_dir + '_'.join([project, dataset, exp, ensemble, slr_type, region, trend, 'timeseries'])+'.nc'
     if os.path.exists(slr_ts_fn):
         return slr_ts_fn
@@ -2162,16 +2437,16 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemb
             area_cube,
             shapefile,
             )
-    elif region == 'Global': 
+    elif region == 'Global':
         pass
     else:
-        print('calc_dyn_timeseries, region not recognised:', region) 
+        print('calc_dyn_timeseries, region not recognised:', region)
         assert 0
 
     ndim = dyn_cube.data.ndim
     if ndim == 3:
         grid_areas = da.tile(area_cube.core_data(), [dyn_cube.shape[0], 1, 1])
-    else: 
+    else:
         grid_areas = area_cube.data
     print(dataset, grid_areas.shape, area_cube.shape, dyn_cube.shape)
 
@@ -2452,22 +2727,22 @@ def SLR_multimodel_plot(cfg, metadatas, slr_fns, plot_dataset = 'all'):
         plt.ylabel(subplot_ylabel[subplot])
         print('plotting slr ts:', sbp_slr, subplot, plot_dataset, len(slr_fns))
         #assert 0
-    
+
         for (project, dataset, exp, ensemble, slr_type, trend), slr_fn in slr_fns.items():
             print(sbp_slr, slr_type, (project, dataset, exp, ensemble, slr_type, trend))
-            if sbp_slr != slr_type: 
+            if sbp_slr != slr_type:
                 continue
 
             print('plot?', project, dataset, exp, ensemble, slr_type, sbp_slr, times, data)
 
-            if plot_dataset == 'all': 
+            if plot_dataset == 'all':
                 pass
-            elif plot_dataset != dataset: 
+            elif plot_dataset != dataset:
                 continue
 
-            if trend == 'detrended': 
+            if trend == 'detrended':
                 ls = '-'
-            if trend == 'intact': 
+            if trend == 'intact':
                 ls = ':'
 
             cube = iris.load_cube(slr_fn)
@@ -2526,11 +2801,11 @@ def SLR_map_plot(cfg, metadata, dyn_fn, clim_fn, time_range, keys = ['a', 'b']):
         time_str = str(int(time_range[0])) + ' - ' + str(int(time_range[1]))
         keys.append(time_str)
         clim_data = da.tile(clim_cube.core_data(), [cube.shape[0], 1, 1])
-    except: 
+    except:
         time_str = keys[4]
         print('No time here:',dyn_fn)
         clim_data = clim_cube.data
-    
+
     cube.data = -1.*(cube.data - clim_data)
     # Determine image filename
     path = diagtools.folder([cfg['plot_dir'], 'SLR_map_plots']) + '_'.join(keys)
@@ -3002,12 +3277,14 @@ def main(cfg):
 
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
-    #slr_fns = {}
+    slr_fns = {}
     do_SLR = True
+    method = 'Landerer'
+
     trends = ['detrended', ] #'intact']
     for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
         for trend in trends:
-            # if dataset != 'ACCESS-CM2': continue 
+            # if dataset != 'ACCESS-CM2': continue
             if dataset == 'CESM2': continue
 
             if not do_SLR: continue
@@ -3030,67 +3307,65 @@ def main(cfg):
                 picontrol_thetao_fn = file_dict[(project, dataset, 'piControl', pi_ensemble, short_name)]
                 picontrol_so_fn =  file_dict[(project, dataset, 'piControl', pi_ensemble, 'so')]
 
-            check_units(cfg, metadatas[hist_thetao_fn], 
+            check_units(cfg, metadatas[hist_thetao_fn],
                 files = [hist_thetao_fn, hist_so_fn, picontrol_thetao_fn, picontrol_so_fn],
                 keys = [project, dataset, exp, ensemble, short_name])
 
 
-            method = 'Landerer'
             #method = 'dyn_height'
+            if method == 'dyn_height':
+                dyn_height_fns = calc_dyn_height_full(
+                    cfg,
+                    metadatas,
+                    hist_thetao_fn,
+                    hist_so_fn,
+                    picontrol_thetao_fn,
+                    picontrol_so_fn,
+                    trend=trend,
+                    method=method,
+                    )
+                areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
+                regions = ['Global', 'Atlantic', 'Pacific']
+                for region in regions:
+                    dyn_averages={}
+                    for dyn_type, dyn_fn in dyn_height_fns.items():
+                        dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type, region, trend, method = method)
+                        dyn_fns[(project, dataset, exp, ensemble, dyn_type, region, trend)] = dyn_fn
+                        dyn_fns[(project, dataset, exp, ensemble, dyn_type + '_ts', region, trend)] = dyn_ts_fn
+                        metadatas[dyn_ts_fn] = metadatas[hist_thetao_fn]
+                        metadatas[dyn_fn] = metadatas[hist_thetao_fn]
+                        dyn_averages[dyn_type] = dyn_ts_fn
+            elif method == 'Landerer':
+                slr_fns = calc_landerer_slr(
+                    cfg,
+                    metadatas,
+                    hist_thetao_fn,
+                    hist_so_fn,
+                    picontrol_thetao_fn,
+                    picontrol_so_fn,
+                    trend=trend,
+                    method=method,
+                    )
+                areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
+                regions = ['Global', 'Atlantic', 'Pacific']
+                for region in regions:
+                    dyn_averages={}
+                    for dyn_type, dyn_fn in dyn_height_fns.items():
+                        dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type, region, trend, method = method)
+                        dyn_fns[(project, dataset, exp, ensemble, dyn_type, region, trend)] = dyn_fn
+                        dyn_fns[(project, dataset, exp, ensemble, dyn_type + '_ts', region, trend)] = dyn_ts_fn
+                        metadatas[dyn_ts_fn] = metadatas[hist_thetao_fn]
+                        metadatas[dyn_fn] = metadatas[hist_thetao_fn]
+                        dyn_averages[dyn_type] = dyn_ts_fn
+                # Calculate spatial average/time series
 
-            dyn_height_fns = calc_dyn_height_full(
-                cfg,
-                metadatas,
-                hist_thetao_fn,
-                hist_so_fn,
-                picontrol_thetao_fn,
-                picontrol_so_fn,
-                trend=trend,
-                method=method,
-                )
 
-            # Calculate spatial average/time series
-            areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
-            regions = ['Global', 'Atlantic', 'Pacific']
-            for region in regions:
-                dyn_averages={}
-                for dyn_type, dyn_fn in dyn_height_fns.items():
-                    dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type, region, trend)
-                    dyn_fns[(project, dataset, exp, ensemble, dyn_type, region, trend)] = dyn_fn
-                    dyn_fns[(project, dataset, exp, ensemble, dyn_type + '_ts', region, trend)] = dyn_ts_fn
-                    metadatas[dyn_ts_fn] = metadatas[hist_thetao_fn]
-                    metadatas[dyn_fn] = metadatas[hist_thetao_fn]
-                    dyn_averages[dyn_type] = dyn_ts_fn
-
+            if method == 'dyn_height':
                 plot_dyn_height_ts(cfg, metadatas[dyn_ts_fn], dyn_averages, trend, region)
 
                 plot_slr_full_ts(cfg, metadatas[dyn_ts_fn], dyn_averages, trend, region)
 
-            #print(slr_total_fn, slr_thermo_fn, slr_halo_fn)
-#            slr_fns[(project, dataset, exp, ensemble, 'slr_total', trend)] = slr_total_fn
-#            slr_fns[(project, dataset, exp, ensemble, 'slr_thermo', trend)] = slr_thermo_fn
-#            slr_fns[(project, dataset, exp, ensemble, 'slr_halo', trend)] = slr_halo_fn
-#
-#            metadatas[slr_total_fn] = metadatas[hist_thetao_fn]
-#            metadatas[slr_thermo_fn] = metadatas[hist_thetao_fn]
-#            metadatas[slr_halo_fn] = metadatas[hist_thetao_fn]
-#     
-#            SLR_sanity_check(
-#                cfg,
-#                metadatas[slr_total_fn],
-#                slr_total_fn,
-#                slr_thermo_fn,
-#                slr_halo_fn)
-#            continue 
-#            # Calculate time series?
-#            areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
-#            for region in ['Global', 'Pacific', 'Atlantic']:
-#                for slr_fn, slr_type in zip([slr_total_fn, slr_thermo_fn, slr_halo_fn], ['slr_total', 'slr_thermo', 'slr_halo']):
-#                    slr_ts_fn = calc_slr_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, region, slr_type)
-#                    slr_fns[(project, dataset, exp, ensemble, slr_type+'_ts', region, trend)] = slr_ts_fn
-#                    metadatas[slr_ts_fn] = metadatas[detrended_fn]
-#            # break
-
+    assert 0
     mmm_slr = {}
     slr_fns = {}
     if do_SLR:
@@ -3117,9 +3392,9 @@ def main(cfg):
             for (project, dataset, exp, ensemble, dyn_type, region, trend), dyn_fn in dyn_fns.items():
                 # Can't make a map plot for a time series.
                 if dyn_type.find('_ts') > -1: continue
-                if dyn_type not in ['halo', 'thermo', 'total']: continue 
+                if dyn_type not in ['halo', 'thermo', 'total']: continue
                 if region != 'Global': continue
-                clim_fn = dyn_fns[(project, dataset, exp, ensemble, '1850-1900', region, trend)] 
+                clim_fn = dyn_fns[(project, dataset, exp, ensemble, '1850-1900', region, trend)]
                 SLR_map_plot(cfg, metadatas[dyn_fn], dyn_fn, clim_fn, time_range, keys =(project, dataset, exp, ensemble, dyn_type, region, trend))
 
         plot_dyn = 'halo'
@@ -3128,7 +3403,7 @@ def main(cfg):
         time_ranges=[[1950, 2000], [1970, 2015], [1950, 2015]]
         plot_region = 'Global'
         for trend, time_range in itertools.product(trends, time_ranges, ):
-            multimodel_mean_fn = plot_halo_multimodel_mean(cfg, metadatas, dyn_fns, 
+            multimodel_mean_fn = plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
                 plot_trend = trend,
                 plot_dyn = plot_dyn,
                 plot_exp = plot_exp,
