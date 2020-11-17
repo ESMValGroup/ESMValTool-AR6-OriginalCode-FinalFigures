@@ -250,6 +250,7 @@ diagnostics:
         ref_mask: True
         start_year: 1950
         end_year: 2014
+        trend: True
         experiments: ["historical", "hist-nat"]
         #header: ["Global"]
         #panels: [["pr_historical_global", "pr_hist-nat_global"]]
