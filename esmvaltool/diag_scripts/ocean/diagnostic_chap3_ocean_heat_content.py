@@ -1138,7 +1138,8 @@ def calc_dyn_height_clim(cfg,
         hist_thetao_fn,
         hist_so_fn,
         clim_type='fullhistorical',
-        trend='detrended',):
+        trend='detrended',
+        method='dyn_height'):
     """
     Calculate the climatoligical dyncamic height.
     """
@@ -1149,13 +1150,17 @@ def calc_dyn_height_clim(cfg,
     project = metadatas[hist_thetao_fn]['project']
 
     # Generate output paths for SLR netcdfs
-    work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height_clim'])
-    clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'dyn_height_clim', trend, clim_type]) + '.nc'
+    if method == 'dyn_height':
+        work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height_clim'])
+        clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'dyn_height_clim', trend, clim_type]) + '.nc'
+    elif method == 'Landerer':
+        work_dir = diagtools.folder([cfg['work_dir'], 'Landerer_clim'])
+        clim_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'Landerer_clim', trend, clim_type]) + '.nc'
+    else: assert 0
 
     if os.path.exists(clim_fn):
         print ('loading from', clim_fn)
         return clim_fn
-
     # Load historical temperature and salinity netcdfs
     print('load hist netcdfs')
     psal_bar = iris.load_cube(hist_so_fn)
@@ -1204,7 +1209,7 @@ def calc_dyn_height_clim(cfg,
         cfg,
         metadatas[hist_so_fn],
         psal_bar[0],
-        key='Dyn_height_clim/'+clim_type+'_surface_so',
+        key=method+'_clim/'+clim_type+'_surface_so',
         sym_zero=False,
         )
 
@@ -1212,7 +1217,7 @@ def calc_dyn_height_clim(cfg,
         cfg,
         metadatas[hist_thetao_fn],
         thetao_bar[0],
-        key='Dyn_height_clim/'+clim_type+'_surface_thetao',
+        key=method+'_clim/'+clim_type+'_surface_thetao',
         sym_zero=False,
         )
 
@@ -1229,13 +1234,18 @@ def calc_dyn_height_clim(cfg,
 
     # Load depth & pressure data, ensuring depth is negative
     depths_bar = -1.*np.abs(thetao_bar.coord(axis='z').points)
+    thicknesses_bar =np.abs (thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
     if str(thetao_bar.coord(axis='z').units).lower() in ['cm', 'centimeters']:
         depths_bar = depths_bar /100.
         print('changed depth units')
+        thicknesses_bar = thickness_bar/100.
 
     # Create output cubes to receive SLR data.
     print('Creating output arrays')
-    dyn_height_clim = np.zeros(thetao_bar[0].shape) # 2d + time
+    if method == 'dyn_height':
+        dyn_height_clim = np.zeros(thetao_bar[0].shape) # 2d + time
+    else:
+        dyn_height_clim = np.zeros(thetao_bar.shape)
     count = 0
     gravity = 9.7963 # m /s^2
 
@@ -1243,7 +1253,7 @@ def calc_dyn_height_clim(cfg,
     slr_clim = thetao_bar[0].copy() # 2D
     if depths_bar.ndim == 1:
        depth_bar = depths_bar
-
+       thickness_bar = thicknesses_bar
     psal_bar_data = psal_bar.data
     thetao_bar_data =  thetao_bar.data
     # Iterate over each y line:
@@ -1262,6 +1272,7 @@ def calc_dyn_height_clim(cfg,
         # load clim depth
         if depths_bar.ndim == 3:
             depth_bar = depths_bar[:, y, x]
+            thickness_bar = thicknesses_bar[:, y, x]
 
         if depth_bar.shape != sal_bar.shape:
             assert 0
@@ -1292,21 +1303,25 @@ def calc_dyn_height_clim(cfg,
         # to avoid expensive interpolation.
 
         # Convert dynamic height into mm.
-        dyn_height_clim[y, x] = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar).sum() * 1000. / gravity
+        if method == 'dyn_height'
+            dyn_height_clim[y, x] = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar).sum() * 1000. / gravity
+        elif method == 'Landerer':
+            dyn_height_clim[:, y, x] = gsw.rho(sal_bar, temp_bar, pressure_bar)
+            assert 0 # Need to calculate this with and without clim thickness.
 
     # POlot fixed temperatrure and salinity.
     single_pane_map_plot(
           cfg,
           metadatas[hist_so_fn],
           psal_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_sal_fix',
+          key='Dyn_height_clim/'+method+clim_type+'_surface_sal_fix',
           sym_zero=False,
           )
     single_pane_map_plot(
           cfg,
           metadatas[hist_thetao_fn],
           thetao_bar[0],
-          key='Dyn_height_clim/'+clim_type+'_surface_temp_fix',
+          key='Dyn_height_clim/'+method+clim_type+'_surface_temp_fix',
           sym_zero=False,
           )
 
@@ -1322,7 +1337,10 @@ def calc_dyn_height_clim(cfg,
 
     # Save climatological SLR cube as a netcdf.
     print("saving output cube:", clim_fn)
-    cube0 = thetao_bar[0, :, :].copy()
+    if method == 'dyn_height'
+        cube0 = thetao_bar[0, :, :].copy()
+    elif method == 'Landerer':
+        cube0 = thetao_bar[:, :, :].copy()
     cube0.data = dyn_height_clim #p.ma.masked_where(slr_clim==0., slr_clim)
     cube0.units = cf_units.Unit('mm')
     cube0.name = 'Climatological ('+ clim_type+') dynamic height'
@@ -1366,10 +1384,17 @@ def calc_dyn_height(
     project = metadatas[hist_thetao_fn]['project']
 
     # Generate output paths for SLR netcdfs
-    work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height'])
-    total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_dyn_height', trend])+'.nc'
-    thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_dyn_height', trend])+'.nc'
-    halo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_dyn_height', trend])+'.nc'
+    if method == 'dyn_height'
+        work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height'])
+        total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_dyn_height', trend])+'.nc'
+        thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_dyn_height', trend])+'.nc'
+        halo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_dyn_height', trend])+'.nc'
+    elif method == 'Landerer':
+        work_dir = diagtools.folder([cfg['work_dir'], 'Landerer'])
+        total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_dyn_height', trend])+'.nc'
+        thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_dyn_height', trend])+'.nc'
+        halo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'halo_dyn_height', trend])+'.nc'
+
 
     # Check whether output paths exists already.
     # If they exist, then make some basic figures and return paths.
@@ -1385,7 +1410,7 @@ def calc_dyn_height(
                       cfg,
                       metadatas[hist_thetao_fn],
                       dat,
-                      key='dyn_height_'+key+'_'+trend,
+                      key=method+'_'+key+'_'+trend,
                       sym_zero=True,
                       )
         return total_fn, thermo_fn, halo_fn
@@ -1409,7 +1434,8 @@ def calc_dyn_height(
 
     # Load depth data, ensuring depth is negative
     depths = -1.*np.abs(thetao_cube.coord(axis='z').points.copy())
-
+    thicknesses =np.abs (thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
+    assert 0
     # Load time array as decidimal time.
     times = diagtools.cube_time_to_float(thetao_cube)
 
@@ -1600,7 +1626,7 @@ def calc_dyn_height_full(cfg,
         picontrol_thetao_fn,
         picontrol_so_fn,
         trend='detrended',
-        method='dyn_height_int'
+        method='dyn_height'
         ):
     """
     calc_dyn_height_full: Calculates the Sea Level Rise
@@ -3010,7 +3036,7 @@ def main(cfg):
 
 
             method = 'Landerer'
-            #method = 'dyn_height_int'
+            #method = 'dyn_height'
 
             dyn_height_fns = calc_dyn_height_full(
                 cfg,
@@ -3023,11 +3049,9 @@ def main(cfg):
                 method=method,
                 )
 
-
             # Calculate spatial average/time series
             areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
             regions = ['Global', 'Atlantic', 'Pacific']
-            method = 'Landerer'
             for region in regions:
                 dyn_averages={}
                 for dyn_type, dyn_fn in dyn_height_fns.items():
