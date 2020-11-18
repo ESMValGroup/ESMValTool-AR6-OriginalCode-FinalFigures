@@ -356,8 +356,8 @@ if (write_plots) {
 
     }
     legend(
-     100,
-     30,
+     legend_loc[1],
+     legend_loc[2],
       legend = text_legend,
       lwd = lwdline,
       lty = 1,

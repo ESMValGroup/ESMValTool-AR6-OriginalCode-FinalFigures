@@ -58,8 +58,6 @@ diagnostics:
       - {dataset: FGOALS-f3-L, project: CMIP6, exp: historical, ensemble: r1i1p1f1, grid: gr}
       - {dataset: FGOALS-g3, project: CMIP6, exp: historical, ensemble: r1i1p1f1, grid: gn}
       - {dataset: GISS-E2-1-G, project: CMIP6, exp: historical, ensemble: r1i1p1f1, grid: gn}
-      - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: historical, ensemble: r1i1p1f3, grid: gn}
-      - {dataset: HadGEM3-GC31-MM, project: CMIP6, exp: historical, ensemble: r1i1p1f3, grid: gn}
       - {dataset: INM-CM4-8, project: CMIP6, exp: historical, ensemble: r1i1p1f1, grid: gr1}
       - {dataset: INM-CM5-0, project: CMIP6, exp: historical, ensemble: r10i1p1f1, grid: gr1}
       - {dataset: IPSL-CM6A-LR, project: CMIP6, exp: historical, ensemble: r10i1p1f1, grid: gr}
@@ -89,7 +87,6 @@ diagnostics:
       - {dataset: GFDL-CM3, project: CMIP5, exp: historical, ensemble: r1i1p1}
       - {dataset: GFDL-ESM2G, project: CMIP5, exp: historical, ensemble: r1i1p1}
       - {dataset: GFDL-ESM2M, project: CMIP5, exp: historical, ensemble: r1i1p1}
-      - {dataset: HadGEM2-CC, project: CMIP5, exp: historical, ensemble: r1i1p1}
       - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historical, ensemble: r1i1p1}
       - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historical, ensemble: r1i1p1}
       - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: historical, ensemble: r1i1p1}
