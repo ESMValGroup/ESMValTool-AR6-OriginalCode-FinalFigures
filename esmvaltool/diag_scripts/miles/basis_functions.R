@@ -523,13 +523,13 @@ ncdf_opener_universal <- # nolint
           format = "%Y-%m-%d"
         )
 
-      if (max(timeline) < lastday | min(timeline) > firstday) {
-        print(firstday)
-        print(lastday)
-        print(min(timeline))
-        print(max(timeline))
-        stop("You requested a time interval that is not present in the NetCDF")
-      }
+      #if (max(timeline) < lastday | min(timeline) > firstday) {
+      #  print(firstday)
+      #  print(lastday)
+      #  print(min(timeline))
+      #  print(max(timeline))
+      #  stop("You requested a time interval that is not present in the NetCDF")
+      #}
     }
 
     # time selection and variable loading
