@@ -1303,11 +1303,11 @@ def calc_dyn_height_clim(cfg,
         # to avoid expensive interpolation.
 
         # Convert dynamic height into mm.
-        if method == 'dyn_height'
+        if method == 'dyn_height':
             dyn_height_clim[y, x] = gsw.geo_strf_dyn_height(sal_bar, temp_bar, pressure_bar).sum() * 1000. / gravity
         elif method == 'Landerer':
             dyn_height_clim[:, y, x] = gsw.rho(sal_bar, temp_bar, pressure_bar)
-            assert 0 # Need to calculate this with and without clim thickness.
+            # assert 0 # Need to calculate this with and without clim thickness.
 
     # POlot fixed temperatrure and salinity.
     single_pane_map_plot(
@@ -1327,7 +1327,7 @@ def calc_dyn_height_clim(cfg,
 
     # Save climatological SLR cube as a netcdf.
     print("saving output cube:", clim_fn)
-    if method == 'dyn_height'
+    if method == 'dyn_height':
         cube0 = thetao_bar[0, :, :].copy()
     elif method == 'Landerer':
         cube0 = thetao_bar[:, :, :].copy()
@@ -1340,7 +1340,7 @@ def calc_dyn_height_clim(cfg,
     cube0.standard_name = 'steric_change_in_mean_sea_level'
     iris.save(cube0, clim_fn)
 
-    if method == 'dyn_height'
+    if method == 'dyn_height':
         single_pane_map_plot(
               cfg,
               metadatas[hist_thetao_fn],
@@ -1348,7 +1348,7 @@ def calc_dyn_height_clim(cfg,
               key='Dyn_height_clim/'+method+clim_type+'_dynamic_height',
               sym_zero=False,
               )
-    if method == 'Landerer'
+    if method == 'Landerer':
         single_pane_map_plot(
               cfg,
               metadatas[hist_thetao_fn],
@@ -1383,7 +1383,7 @@ def calc_dyn_height(
     project = metadatas[hist_thetao_fn]['project']
 
     # Generate output paths for SLR netcdfs
-    if method == 'dyn_height'
+    if method == 'dyn_height':
         work_dir = diagtools.folder([cfg['work_dir'], 'dyn_height'])
         total_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'total_dyn_height', trend])+'.nc'
         thermo_fn = work_dir + '_'.join([project, dataset, exp, ensemble, 'thermo_dyn_height', trend])+'.nc'
@@ -1761,7 +1761,8 @@ def calc_landerer_slr(
 
     # Load depth data, ensuring depth is negative
     depths = -1.*np.abs(thetao_cube.coord(axis='z').points.copy())
-    thicknesses =np.abs (thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
+    # thicknesses =np.abs (thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
+    thicknesses =np.abs (thetao_cube.coord(axis='z').bounds[...,1] - thetao_cube.coord(axis='z').bounds[...,0])
 
     # Load time array as decidimal time.
     times = diagtools.cube_time_to_float(thetao_cube)
@@ -1862,15 +1863,13 @@ def calc_landerer_slr(
 
             #Calculate SLR, and convert into mm
             total = thickness*((rho_bar - gsw.rho(sal, temp, pressure) )/rho_bar)
-
-            halo3 = thickness*((rho_bar - gsw.rho(sal, temp_bar, pressure) )/rho_bar)
-            thermo3 = thickness*((rho_bar - gsw.rho(so_bar, temp, pressure) )/rho_bar)
-
+            halo = thickness*((rho_bar - gsw.rho(sal, temp_bar, pressure) )/rho_bar)
+            thermo = thickness*((rho_bar - gsw.rho(sal_bar, temp, pressure) )/rho_bar)
 
             # Put in the output array:
-            slr_total[t, y, x] = total * 1000.
-            slr_thermo[t, y, x] = thermo * 1000.
-            slr_halo[t, y, x] = halo * 1000.
+            slr_total[t, y, x] = total.sum() * 1000.
+            slr_thermo[t, y, x] = thermo.sum() * 1000.
+            slr_halo[t, y, x] = halo.sum() * 1000.
 
             count += 1
             if t == 0:
@@ -2468,7 +2467,7 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
         plt.ylabel('Change in Sea Level, mm')
         #plt.axhline(0., c = 'k', ls=':' )
 
-        path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries'])
+        path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries', method])
         path += '_'.join([project, dataset, exp, ensemble, slr_type, 'timeseries'])+diagtools.get_image_format(cfg)
         print('Saving figure:', path)
         plt.savefig(path)
@@ -3336,7 +3335,7 @@ def main(cfg):
                         metadatas[dyn_fn] = metadatas[hist_thetao_fn]
                         dyn_averages[dyn_type] = dyn_ts_fn
             elif method == 'Landerer':
-                slr_fns = calc_landerer_slr(
+                slr_fns_dict = calc_landerer_slr(
                     cfg,
                     metadatas,
                     hist_thetao_fn,
@@ -3344,19 +3343,18 @@ def main(cfg):
                     picontrol_thetao_fn,
                     picontrol_so_fn,
                     trend=trend,
-                    method=method,
                     )
                 areacella_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
                 regions = ['Global', 'Atlantic', 'Pacific']
                 for region in regions:
-                    dyn_averages={}
-                    for dyn_type, dyn_fn in dyn_height_fns.items():
-                        dyn_ts_fn = calc_dyn_timeseries(cfg, dyn_fn, areacella_fn, project, dataset, exp, ensemble, dyn_type, region, trend, method = method)
-                        dyn_fns[(project, dataset, exp, ensemble, dyn_type, region, trend)] = dyn_fn
-                        dyn_fns[(project, dataset, exp, ensemble, dyn_type + '_ts', region, trend)] = dyn_ts_fn
-                        metadatas[dyn_ts_fn] = metadatas[hist_thetao_fn]
-                        metadatas[dyn_fn] = metadatas[hist_thetao_fn]
-                        dyn_averages[dyn_type] = dyn_ts_fn
+                    slr_averages={}
+                    for slr_type, slr_fn in slr_fns_dict.items():
+                        slr_ts_fn = calc_dyn_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type, region, trend, method = method)
+                        slr_fns[(project, dataset, exp, ensemble, slr_type, region, trend)] = slr_fn
+                        slr_fns[(project, dataset, exp, ensemble, slr_type + '_ts', region, trend)] = slr_ts_fn
+                        metadatas[slr_ts_fn] = metadatas[hist_thetao_fn]
+                        metadatas[slr_fn] = metadatas[hist_thetao_fn]
+                        slr_averages[slr_type] = slr_ts_fn
                 # Calculate spatial average/time series
 
 
