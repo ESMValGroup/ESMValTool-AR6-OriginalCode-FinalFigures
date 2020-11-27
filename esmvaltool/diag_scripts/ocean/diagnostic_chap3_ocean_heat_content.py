@@ -3470,6 +3470,8 @@ def main(cfg):
 
             #method = 'dyn_height'
             if method == 'dyn_height':
+                assert 0
+                # Not ready to calculate using this method and ssp data.
                 dyn_height_fns = calc_dyn_height_full(
                     cfg,
                     metadatas,
