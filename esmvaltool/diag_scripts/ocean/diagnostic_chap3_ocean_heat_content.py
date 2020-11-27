@@ -48,6 +48,8 @@ from esmvaltool.diag_scripts.shared import run_diagnostic
 from esmvalcore.preprocessor._time import extract_time
 from esmvalcore.preprocessor._regrid import regrid
 from esmvalcore.preprocessor._area import extract_shape
+from esmvalcore.preprocessor._volume import volume_statistics
+
 try:
     import gsw
 except:
@@ -338,6 +340,20 @@ def load_convert(fn):
      return times, data
 
 
+def single_timeseries(fn, path, keys):
+    #times, data = load_convert(fn)
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    #single_pane(fig, ax, fn)
+    cube = iris.load_cube(fn)
+    times = diagtools.cube_time_to_float(cube)
+    data = cube.data
+    ax.plot(times, data,) #color)
+    plt.title(' '.join(keys))
+    print('Saving single_timeseries:', path)
+    plt.savefig(path)
+    plt.close()
+
 def single_pane(fig, ax, fn, color='red', xlim=False, no_ticks=False):
     times, data = load_convert(fn)
     ax.plot(times, data, c=color)
@@ -589,6 +605,32 @@ def fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemb
     plt.close()
 
 
+
+def shift_pi_time(hist_cube, pi_cube):
+    times = hist_cube.coord('time')
+    units = times.units.name
+    calendar = times.units.calendar
+    #num2date = times.units.num2date
+    parent_branch_yr = netCDF4.num2date(hist_cube.attributes['branch_time_in_parent'],
+                                units=hist_cube.attributes['parent_time_units'],
+                                calendar=calendar ).year
+
+    child_branch_yr = netCDF4.num2date(hist_cube.attributes['branch_time_in_child'],
+                               units=units, calendar=calendar ).year 
+
+    diff = child_branch_yr - parent_branch_yr
+
+    pi_dec_times = diagtools.cube_time_to_float(pi_cube)
+    pi_dec_times = np.array([t + diff for t in pi_dec_times])
+    return pi_dec_times
+#   print('date in parent:\t', historical_range, 'is', [h-diff for h in historical_range])
+
+#   dates = num2date(times.points, units, calendar=calendar)
+#   file_time_range = [dates[0].year, dates[-1].year]
+#   print('date range in file:\t', file_time_range, 'is', [h-diff for h in file_time_range] , 'in parent')
+
+
+
 def detrending_fig(cfg,
         metadatas,
         detrended_hist,
@@ -596,7 +638,11 @@ def detrending_fig(cfg,
         detrended_piC,
         trend_intact_piC,
         depth_range,
-        key):
+        key,
+        year = 1971,
+        draw_zero = True,
+        native_time = False,
+        ):
     """
     Make figure showing detrending process as a time series.
     """
@@ -614,22 +660,39 @@ def detrending_fig(cfg,
     project = metadatas[detrended_hist]['project']
     exp = metadatas[detrended_hist]['exp']
 
-
     cube_d_h = iris.load_cube(detrended_hist)
     cube_i_h = iris.load_cube(trend_intact_hist)
     cube_d_p = iris.load_cube(detrended_piC)
     if not  skip_intact_piC:
         cube_i_p = iris.load_cube(trend_intact_piC)
 
-    times = diagtools.cube_time_to_float(cube_d_h)
+    times = {}
+    if native_time:
+        times['dh'] = diagtools.cube_time_to_float(cube_d_h) 
+        times['ih'] = diagtools.cube_time_to_float(cube_i_h)
+        times['dp'] = shift_pi_time(cube_d_h, cube_d_p)
+        times['ip'] = shift_pi_time(cube_i_h, cube_i_p)
+    else:
 
-    print('detrending_fig:', key, cube_d_h.data.max(), cube_i_h.data.max())
-    print('detrending_fig: times', key, times)
-    d_h_data = zero_around_dat(times, cube_d_h.data, year=1971.)
-    i_h_data = zero_around_dat(times, cube_i_h.data, year=1971.)
-    d_p_data = zero_around_dat(times, cube_d_p.data, year=1971.)
-    if not  skip_intact_piC:
-        i_p_data = zero_around_dat(times, cube_i_p.data, year=1971.)
+        times['dh'] = diagtools.cube_time_to_float(cube_d_h)
+        times['ih'] = times['dh']
+        times['dp'] = times['dh']
+        times['ip'] = times['dh']
+
+#   print('detrending_fig:', key, cube_d_h.data.max(), cube_i_h.data.max())
+#    print('detrending_fig: times', key, times)
+    if year:
+        d_h_data = zero_around_dat(times['dh'], cube_d_h.data, year=year )
+        i_h_data = zero_around_dat(times['ih'], cube_i_h.data, year=year )
+        d_p_data = zero_around_dat(times['dp'], cube_d_p.data, year=year )
+        if not  skip_intact_piC:
+            i_p_data = zero_around_dat(times['ip'], cube_i_p.data, year=year )
+    else:
+        d_h_data = cube_d_h.data
+        i_h_data = cube_i_h.data
+        d_p_data = cube_d_p.data
+        if not  skip_intact_piC:
+            i_p_data = cube_i_p.data
 
     #print('detrending_fig:', key, d_h_data.max(), i_h_data.max(), i_p_data.max())
     print('detrending_fig: d h:', key, d_h_data.max())
@@ -637,21 +700,22 @@ def detrending_fig(cfg,
     print('detrending_fig: d p:', key, d_p_data.max())
     print('detrending_fig: i p:', key, i_p_data.max())
 
-
-    plt.plot(times, d_h_data, color = 'red', label = 'Detrended Historical')
-    plt.plot(times, i_h_data, color = 'blue', label = 'Historical')
-    plt.plot(times, d_p_data, color = 'orange', label = 'Detrended PI Control')
+    plt.plot(times['dh'], d_h_data, color = 'red', label = 'Detrended Historical')
+    plt.plot(times['ih'], i_h_data, color = 'blue', label = 'Historical')
+    plt.plot(times['dp'], d_p_data, color = 'orange', label = 'Detrended PI Control')
     if not  skip_intact_piC:
-        plt.plot(times, i_p_data, color = 'green', label = 'PI Control')
+        plt.plot(times['ip'], i_p_data, color = 'green', label = 'PI Control')
 
-    plt.axhline(0., c = 'k', ls=':' )
+    if draw_zero: 
+        plt.axhline(0., c = 'k', ls=':' )
     title = ' '.join([key, dataset, exp, ensemble, depth_range])
     plt.title(title)
     plt.legend()
 
-    fig_dir = diagtools.folder([cfg['plot_dir'], 'detrending_ts'])
+    fig_dir = diagtools.folder([cfg['plot_dir'], 'detrending_ts', key])
     image_extention = diagtools.get_image_format(cfg)
-    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, key, 'detrending_ts',
+    if not year: year=''
+    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, key, 'detrending_ts', str(year), 
                                    depth_range])+image_extention
 
     plt.savefig(fig_fn)
@@ -1170,7 +1234,7 @@ def calc_dyn_height_clim(cfg,
 
     # Calculate climatologies for historical period Temperature and salinity.
     # Note that _bar suffix indicates climatology data.
-    print('Calculate clim', dataset, clim_type)
+    print('Calculate clim', dataset, exp,  clim_type)
     if clim_type == '1971-2018':
         # 1) vs. 1971-2018 (in comparison to cross-chapter Box 9.1)
         psal_bar = extract_time(psal_bar, 1971, 1, 1, 2018, 12, 31)
@@ -2847,6 +2911,42 @@ def mpi_detrend(iter_pack, cubedata, decimal_time, slopes, intercepts):
     return index, np.array(line)
 
 
+def calculate_volume_weighted_mean(cfg, metadata, detrended_fn, volcello_fn, trend = 'detrended'): #max_depth=10000. ):
+    """
+    Calculate the volume weighted mean. 
+    """
+    exp = metadata['exp']
+    short_name = metadata['short_name']
+    dataset = metadata['dataset']
+    ensemble = metadata['ensemble']
+    project = metadata['project']
+
+    work_dir = diagtools.folder([cfg['work_dir'], 'vw_timeseries'])
+    keys = [project, dataset, exp, ensemble, short_name, trend, 'volume', 'weighted', 'mean']
+    output_fn = work_dir + '_'.join(keys)+'.nc'
+
+    img_path = diagtools.folder([cfg['plot_dir'], 'vw_timeseries', short_name,])
+    img_keys = '_'.join(keys)
+    img_path = img_path + img_keys + diagtools.get_image_format(cfg)
+
+    if os.path.exists(output_fn):
+        if not os.path.exists(img_path):
+            single_timeseries(output_fn, img_path, keys)
+        return output_fn
+
+    print('calculate_volume_weighted_mean', output_fn)
+    cube = iris.load_cube(detrended_fn)
+    vm_cube =  volume_statistics(
+        cube,
+        'mean',
+        fx_variables={'volcello': detrended_fn})
+
+    iris.save(vm_cube, output_fn)
+    single_timeseries(output_fn, img_path, keys)
+    return output_fn
+
+
+
 def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     """
     Use the shelve calculoated in calc_pi_trend to detrend
@@ -2953,6 +3053,7 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
 
     return output_fn
 
+
 def guess_PI_ensemble(dicts, keys, ens_pos = None):
     """
     Take a punt as the pi ensemble member.
@@ -2966,6 +3067,7 @@ def guess_PI_ensemble(dicts, keys, ens_pos = None):
             return index[ens_pos]
     print('Did Not find pi control ensemble:', keys, ens_pos)
     assert 0
+
 
 def guess_areacello_fn(dicts, keys):
     """
@@ -3064,8 +3166,8 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
     if count == len(dummy.compressed()):
         return output_shelve
     times = cube.coord('time')
-    assert 0
-    pi_year = times.units.num2date(times.points)[0].year + 11. # (1971 equivalent)
+
+    pi_year = np.array([t.units.num2date(times.points)[0].year for t in times]).mean() # mid point
 
     parrallel_calc = True
     if not parrallel_calc:
@@ -3283,6 +3385,51 @@ def main(cfg):
         detrended_fn = detrend_from_PI(cfg, metadatas, filename, trend_shelve)
         detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
+    
+    print('Make time series plots')
+    volume_weighted_means={}
+    for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
+        if short_name in ['volcello', 'areacello']:
+            continue
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        vwts = calculate_volume_weighted_mean(cfg, metadatas[filename], filename, volcello_fn, trend = 'intact')
+        volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'intact')] = vwts
+        metadatas[vwts] = metadatas[filename]
+
+    for (project, dataset, exp, ensemble, short_name), detrended_fn  in detrended_ncs.items():
+        if short_name in ['volcello', 'areacello']:
+            continue
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        vwts = calculate_volume_weighted_mean(cfg, metadatas[detrended_fn], detrended_fn, volcello_fn, trend = 'detrended') 
+        volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'detrended')] = vwts
+        metadatas[vwts] = metadatas[detrended_fn]
+
+    for (project, dataset, exp, ensemble, short_name, trend), fn in volume_weighted_means.items():
+        print('iterating VWM files:',(project, dataset, exp, ensemble, short_name, trend), fn)
+        if short_name in ['volcello', 'areacello']:
+            continue
+        if exp in 'piControl': continue
+        if trend == 'intact': continue
+        print('Listing VWM plots:',(project, dataset, exp, ensemble, short_name, trend))
+        hist_detrended = fn
+        hist_intact = volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'intact')]
+
+        pi_ensemble = guess_PI_ensemble(trend_shelves, [project, dataset, short_name], ens_pos = 3)
+        pi_detrended = volume_weighted_means[(project, dataset, 'piControl', pi_ensemble, short_name, 'detrended')]
+        pi_intact = volume_weighted_means[(project, dataset, 'piControl', pi_ensemble, short_name, 'intact')]
+
+        detrending_fig(cfg,
+            metadatas,
+            hist_detrended,
+            hist_intact,
+            pi_detrended,
+            pi_intact,
+            '',
+            short_name,
+            year = None,
+            draw_zero=False,
+            native_time=True,
+            )
 
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
