@@ -1,0 +1,33 @@
+---
+# Filename
+filename: 'tc-5-219-2011-supplement.zip'
+content_filename: 'Brown and Robinson 2011 SCE Series.xls'
+
+# Common global attributes for Cmorizer output
+attributes:
+  dataset_id: BR2011
+  version: 'v1'
+  tier: 2
+  modeling_realm: land
+  project_id: OBS
+  source: 'https://tc.copernicus.org/articles/5/219/2011/tc-5-219-2011-supplement.zip'
+  reference: 'br2011'
+  comment: 'March and April snow cover extent (SCE) series developed and presented in Brown and Robinson (2011).
+                The data is presented for North America (NA),  Eurasia (EUR), and Northen Hemisphere (NH)'
+
+excel_info:
+  months:
+    march:
+      columns: 'A:J'
+    april:
+      columns: 'M:V'
+  header: 5 # lines to skip in reading the file
+  skip_footer: 4
+  location: 'NH'
+  column_n: 7 # zero based index of a column one wants to take. Counting starts after a the years
+
+# Variables to cmorize
+variables:
+  scen:
+    mip: LImon
+    raw_units: 1e6 km2

@@ -1,5 +1,4 @@
 import iris
-from iris.experimental.equalise_cubes import equalise_attributes
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,163 +7,222 @@ from scipy import stats, special
 import sys
 
 # import internal esmvaltool modules here
-from esmvaltool.diag_scripts.shared import group_metadata, run_diagnostic
-from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
-from esmvaltool.diag_scripts.seaice import ipcc_sea_ice_diag_tools as ipcc_sea_ice_diag
+from esmvaltool.diag_scripts.shared import run_diagnostic, Datasets
+from esmvaltool.diag_scripts.seaice import \
+    ipcc_sea_ice_diag_tools as ipcc_sea_ice_diag
 
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-# #here will be the functions I need
 
 def calculate_entry_stat(cubelist):
-
-    list_dic= []
+    list_dic = []
 
     for cube in cubelist:
-        x = np.arange(0, len(cube.coord('time').points))  # here we calculate the trend, orig code logic
-        reg = stats.linregress(x, cube.data)
-        clim= np.average(cube.data)
-        stat_params = { 'mean': clim, 'lin_trend_slope': reg.slope}
-        # do here a slope check, and if everything is masked do slope np.nan, not 0
-        stat_params.update(cube.attributes)
-        list_dic.append( stat_params)
+        if np.all(cube.data.mask) | (np.all(cube.data == 0)):
+            mean = np.nan
+            slope = np.nan
+        else:
+            x = np.arange(0, len(cube.coord(
+                'time').points))  # here calculated the trend, orig code logic
+            reg = stats.linregress(x, cube.data)
+            mean = np.average(cube.data)
+            slope = reg.slope
+        # list of dictionaries. Not beautiful, but works. It is not needed
+        # which realisation the data belongs to.
+        list_dic.append({'mean': mean, 'lin_reg_slope': slope})
 
     return (list_dic)
 
-def update_dict(list_dict):
 
-    upd_dic=list_dict[1]
-
-    data_dict={}
-
-    for entry in list_dict[0]:
-        if upd_dic['project']=='CMIP5':
-            key = entry['model_id']
-        else:
-            key = entry ['source_id']
-        if key in data_dict.keys():
-            data_dict[key]['mean']=np.concatenate((data_dict[key]['mean'],[entry['mean']]))
-            data_dict[key]['lin_trend_slope']= np.average([data_dict[key]['lin_trend_slope'],entry['lin_trend_slope']])
-        else:
-            if upd_dic['project']=='CMIP5':
-                data_dict[key]={'mean': [entry['mean']], 'lin_trend_slope': [entry['lin_trend_slope']], 'institute' : entry['institute_id']}
-            else:
-                data_dict[key] = {'mean': [entry['mean']], 'lin_trend_slope': [entry['lin_trend_slope']],
-                                  'institute': entry['institution_id']}
-
-    for data_key in data_dict.keys():
-        data_dict[data_key]['mean'] = np.average(data_dict[data_key]['mean'])
-        data_dict[data_key]['lin_trend_slope'] = np.average(data_dict[data_key]['lin_trend_slope']) * 10 # was done in the original code
-
-    verb_month_dict={1:'JAN', 2:'FEB', 3:'MAR', 4:'APR', 5: 'MAY', 6:'JUN',
-                     7:'JUL', 8:'AUG', 9: 'SEP', 10:'OCT', 11:'NOV', 12:'DEC'}
-
-    upd_dic['verb_month'] = verb_month_dict[upd_dic['month']]
-
-    if upd_dic['start_lat'] > 0:
-        upd_dic['hemisphere'] = 'NH'
+def ens_average(ens_list_dic):
+    if len(ens_list_dic) == 1:
+        mod_mean = ens_list_dic[0]['mean']
+        mod_dec_slope = ens_list_dic[0]['lin_reg_slope'] * 10
     else:
-        upd_dic['hemisphere'] = 'SH'
+        means_arr = np.asarray([entry['mean'] for entry in ens_list_dic])
+        slopes_arr = np.asarray(
+            [entry['lin_reg_slope'] for entry in ens_list_dic])
+        mod_mean = np.nanmean(means_arr)
+        mod_dec_slope = np.nanmean(slopes_arr) * 10
 
-    upd_dic.update({'data': data_dict})
+    return (mod_mean, mod_dec_slope)
 
-    return(upd_dic)
 
 def model_stats(inp_dict):
+    means = np.asarray([inp_dict[key]['mean'] for key in inp_dict.keys()])
+    slopes = np.asarray(
+        [inp_dict[key]['dec_slope'] for key in inp_dict.keys()])
 
-    means = np.asarray([inp_dict['data'][key]['mean'] for key in inp_dict['data'].keys()])
-    slopes= np.asarray([inp_dict['data'][key]['lin_trend_slope'] for key in inp_dict['data'].keys()])
+    #  checks if we're not comparing numbers with nans
+    mask = np.isfinite(means) & np.isfinite(slopes)
 
-    # may be remove it in the future. Basically, checks if we're not comparing numbers with nans
-    mask = np.isfinite(means) &np.isfinite(slopes)
-
-    reg = stats.linregress(means [mask], slopes [mask])
+    reg = stats.linregress(means[mask], slopes[mask])
 
     # calculating p value
 
-    tval = reg.slope/reg.stderr
-    df= len(means[mask]) - 2
-    pval=special.betainc(df/2,0.5,df/(df+tval**2)) # this particular calculation was adopted from orig code, discuss
+    tval = reg.slope / reg.stderr
+    df = len(means[mask]) - 2
+    pval = special.betainc(df / 2, 0.5, df / (
+            df + tval ** 2))
+    # this particular calculation was adopted from orig code
 
-    inp_dict['slope_models'] = reg.slope
-    inp_dict['mme_mean'] = np.average(means[mask])
-    inp_dict['mme_slope'] = np.average(slopes[mask])
-    inp_dict['intercept'] = reg.intercept
-    inp_dict['p_val'] = pval
+    inp_dict['stat_params'] = {}
+    inp_dict['stat_params']['slope_models'] = reg.slope
+    inp_dict['stat_params']['mme_mean'] = np.average(means[mask])
+    inp_dict['stat_params']['mme_slope'] = np.average(slopes[mask])
+    inp_dict['stat_params']['intercept'] = reg.intercept
+    inp_dict['stat_params']['p_val'] = pval
+    inp_dict['stat_params']['corr_coef'] = \
+    stats.pearsonr(means[mask], slopes[mask])[0]
 
     return (inp_dict)
 
-def make_panel(data_dict,nrow,ncol,idx):
 
-    tmp_cbar=plt.cm.jet
+def make_panel(data_dict, nrow, ncol, idx, obs_dic, verb_month, hemisph, proj):
+    tmp_cbar = plt.cm.terrain
+    obs_cbar = plt.cm.Greys_r
 
-    ax = plt.subplot(nrow,ncol,idx)
-    title = data_dict['hemisphere'] + ' ' + data_dict['variable'] + ' ' +data_dict['verb_month'] + ' ' + 'Clim & Trend' + ' (' +data_dict['project']+')'
+    if hemisph == 'NH':
+        region = 'Arctic'
+    else:
+        region = 'Antarctic'
+
+    title = region + ' Sea Ice Area in ' + verb_month + ' (' + proj + ')'
+
+    ax = plt.subplot(nrow, ncol, idx)
+
     ax.set_title(title)
-    cmap_step=int(256/len(data_dict['data'].keys()))
-    xs=[]
-    for n, mod in enumerate(list(data_dict['data'].keys())):
-        ax.scatter(data_dict['data'][mod]['mean'],data_dict['data'][mod]['lin_trend_slope'],label=mod,c=tmp_cbar(n*cmap_step),marker='s')
-        xs.append(data_dict['data'][mod]['mean'])
-    xs=np.asarray(xs)
-    ax.scatter(data_dict['mme_mean'],data_dict['mme_slope'],s=60,marker='o',c='r',label='MME')
-    if data_dict['p_val']<0.05:
-        ax.plot(xs,xs*data_dict['slope_models']+data_dict['intercept'],c='k')
-    ax.set_ylabel('Trend(10^6km^2/decade)')
-    ax.set_xlabel('Clim.(10^6km^2)')
-    if idx%2==0:
-        ax.legend(loc=6, bbox_to_anchor=(1.0,0.5), fontsize=8, frameon=False, ncol=2)
+    stat_params = data_dict.pop('stat_params')
+    cmap_step = int(256 / len(data_dict.keys()))
+    obs_cmap_step = int(200 / len(obs_dic.keys()))
+    xs = []
+
+    for n_o, obs in enumerate(obs_dic.keys()):
+        ax.scatter(obs_dic[obs]['mean'], obs_dic[obs]['dec_slope'], label=obs,
+                   s=100, marker="*",
+                   c=obs_cbar(n_o * obs_cmap_step))
+
+    ax.scatter(stat_params['mme_mean'], stat_params['mme_slope'], s=80,
+               marker='o', c='r', label='MME')
+
+    for n, model in enumerate(data_dict.keys()):
+        ax.scatter(data_dict[model]['mean'], data_dict[model]['dec_slope'],
+                   label=model, c=tmp_cbar(n * cmap_step), marker='s', s=50)
+        xs.append(data_dict[model]['mean'])
+
+    xs = np.asarray(xs)
+    ax.plot(xs, xs * stat_params['slope_models'] + stat_params['intercept'],
+            c='k')
+
+    ax.set_ylabel(r'Trend(10$^6$ km$^2$/ decade)')
+    ax.set_xlabel(r'Clim. (10$^6$ km$^2$)')
+
+    if hemisph == 'NH':
+        ax.set_ylim(-1.5, 0)
+        ax.set_yticks(np.arange(-1.5, 0.1, 0.5))
+        ax.set_xlim(2, 12)
+        y_text = -1.45
+    else:
+        ax.set_ylim(-0.9, 0.3)
+        ax.set_yticks(np.arange(-0.9, 0.4, 0.3))
+        ax.set_xlim(0, 12)
+        y_text = -0.85
+
+    ax.text(7.5, y_text, 'r=' + str(np.around(stat_params['corr_coef'], 2)) +
+            ' (p=' + str(np.around(stat_params['p_val'], 2)) + ')')
+
+    if idx % 2 == 0:
+        ax.legend(loc=6, bbox_to_anchor=(1.0, 0.5), fontsize=8, frameon=False,
+                  ncol=2)
 
     return
+
 
 def make_plot(data_dict):
+    ncols = len(data_dict.keys())
 
-    n_panels=len(data_dict.keys())
-
-    projects = [data_dict[key]['project'] for key in data_dict.keys()]
-
-    nrow = len(set(projects))
-    ncol = n_panels/2
+    verb_month_dict = {1: 'JAN', 2: 'FEB', 3: 'MAR', 4: 'APR', 5: 'MAY',
+                       6: 'JUN',
+                       7: 'JUL', 8: 'AUG', 9: 'SEP', 10: 'OCT', 11: 'NOV',
+                       12: 'DEC'}
 
     fig = plt.figure()
-    fig.set_size_inches(10., 9.)
+    fig.set_size_inches(12., 9.)
 
-    for n, key in enumerate(data_dict.keys()):
-        make_panel(data_dict[key],nrow,ncol,n+1)
+    for n_h, hemisph in enumerate(data_dict.keys()):
+        verb_month = verb_month_dict[data_dict[hemisph].pop('month')]
+        obs_dic = data_dict[hemisph].pop('OBS')
+        nrows = len(data_dict[hemisph].keys())
+        for n_p, proj in enumerate(data_dict[hemisph].keys()):
+            make_panel(data_dict[hemisph][proj], nrows, ncols,
+                       (n_h + 1) + (n_p + 1) * n_p, obs_dic, verb_month,
+                       hemisph, proj)
 
-    fig.subplots_adjust(left=0.085, right=0.75, top=0.96, bottom=0.06, wspace=0.28, hspace= 0.2)
+    fig.suptitle(
+        'Climatology (x-axis) and trend (y-axis) in \n sea ice are (SIA)',
+        fontsize='x-large', x=0.38)
+    fig.subplots_adjust(left=0.08, right=0.7, top=0.9, bottom=0.06, wspace=0.3,
+                        hspace=0.28)
 
     return
 
+
 def main(cfg):
+    dtsts = Datasets(cfg)
 
-    metadatas = diagtools.get_input_files(cfg)
+    data_dict = {'NH': {'CMIP5': {}, 'CMIP6': {}},
+                 'SH': {'CMIP5': {}, 'CMIP6': {}}}
 
-    cmip_data_dict={}
+    for hemisph in data_dict.keys():
+        month = cfg['month_latitude_' + hemisph][0]
+        border_lat = cfg['month_latitude_' + hemisph][1]
+        for project in data_dict[hemisph].keys():
+            models = set(dtsts.get_info_list('dataset', project=project))
+            for model in models:
+                ens_fnames = dtsts.get_info_list('filename', dataset=model,
+                                                 project=project)
+                ens_cubelist = iris.load(ens_fnames)
+                ens_cubelist = ipcc_sea_ice_diag.select_months(ens_cubelist,
+                                                               month)
+                if hemisph == 'NH':
+                    ens_cubelist = ipcc_sea_ice_diag.select_latitudes(
+                        ens_cubelist, border_lat, 90)
+                else:
+                    ens_cubelist = ipcc_sea_ice_diag.select_latitudes(
+                        ens_cubelist, -90, border_lat)
+                sea_ice_cubelist = ipcc_sea_ice_diag.calculate_siparam(
+                    ens_cubelist, cfg['seaiceextent'])
+                ens_stats = calculate_entry_stat(sea_ice_cubelist)
+                mod_mean, mod_dec_slope = ens_average(ens_stats)
+                data_dict[hemisph][project][model] = {'mean': mod_mean}
+                data_dict[hemisph][project][model]['dec_slope'] = mod_dec_slope
+            data_dict[hemisph][project] = model_stats(
+                data_dict[hemisph][project])
+        # here observations are added, they are already provided as sia.
+        # no need to process them the same way as models
+        sia_var = 'siarea' + hemisph[0].lower()
+        obses = dtsts.get_info_list('dataset', project='OBS',
+                                    short_name=sia_var)
+        data_dict[hemisph]['OBS'] = {}
+        for obs in obses:
+            obs_fname = dtsts.get_info('filename', dataset=obs, project='OBS',
+                                       short_name=sia_var)
+            obs_cubelist = iris.load(obs_fname)
+            obs_cubelist = ipcc_sea_ice_diag.select_months(obs_cubelist, month)
+            obs_stats = calculate_entry_stat(obs_cubelist)
+            data_dict[hemisph]['OBS'][obs] = {'mean': obs_stats[0]['mean']}
+            data_dict[hemisph]['OBS'][obs]['dec_slope'] = obs_stats[0][
+                                            'lin_reg_slope'] * 10  # decadal
+        data_dict[hemisph]['month'] = month
 
-    cmip_data_dict['cmip5_NH'] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP5', cfg['month_latitude_NH'][0], cfg['month_latitude_NH'][1],
-                                     90, cfg['concatinate_cmip5'], exp_list=cfg['cmip5_exps_concatinate'])
-    cmip_data_dict['cmip5_SH'] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP5', cfg['month_latitude_SH'][0], -90,
-                                     cfg['month_latitude_SH'][1],cfg['concatinate_cmip5'], exp_list=cfg['cmip5_exps_concatinate'])
-    cmip_data_dict['cmip6_NH'] =ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP6',  cfg['month_latitude_NH'][0], cfg['month_latitude_NH'][1], 90)
-    cmip_data_dict['cmip6_SH'] =ipcc_sea_ice_diag.prepare_cmip_for_3_18(metadatas, 'CMIP6',  cfg['month_latitude_SH'][0], -90, cfg['month_latitude_SH'][1])
-    # check again with original code the lat limits!!!
+    make_plot(data_dict)
 
-    for cmip_data in list(cmip_data_dict.keys()):
-        cmip_data_dict[cmip_data][0] = ipcc_sea_ice_diag.calculate_siparam(cmip_data_dict[cmip_data][0], cfg['seaiceextent'])
-        cmip_data_dict[cmip_data][0] = calculate_entry_stat(cmip_data_dict[cmip_data][0])
-        cmip_data_dict[cmip_data] = update_dict(cmip_data_dict[cmip_data]) # this reforms dictionary with model as a key
-        cmip_data_dict[cmip_data] = model_stats(cmip_data_dict[cmip_data])  # here the statistics for a panel are calculated
-
-    make_plot(cmip_data_dict)
-
-    ipcc_sea_ice_diag.figure_handling(cfg, name = 'fig_3_18_scatter')
-
-    # check why cmip5 is crocked
+    ipcc_sea_ice_diag.figure_handling(cfg, name='fig_3_18_scatter')
 
     logger.info('Success')
+
 
 if __name__ == '__main__':
     # always use run_diagnostic() to get the config (the preprocessor

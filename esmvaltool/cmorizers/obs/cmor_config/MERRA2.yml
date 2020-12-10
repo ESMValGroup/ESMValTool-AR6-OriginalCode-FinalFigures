@@ -18,4 +18,4 @@ variables:
     short_name: sm
     mip: Lmon
     raw: SFMC
-    file: 'MERRA2_?00.tavgM_2d_lnd_Nx.{year}??.nc4'
+

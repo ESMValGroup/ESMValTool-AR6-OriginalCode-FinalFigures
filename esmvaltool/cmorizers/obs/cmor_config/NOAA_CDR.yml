@@ -1,0 +1,27 @@
+---
+# Filename
+filenames:
+  eurasia: 'moncov.eurasia.txt'
+  na_with_greenland: 'moncov.namgnld.txt'
+  na_no_greenland: 'moncov.nam.txt'
+
+# Common global attributes for Cmorizer output
+attributes:
+  dataset_id: NOAA_CDR
+  version: 'v1'
+  tier: 2
+  modeling_realm: land
+  project_id: OBS
+  source: 'https://climate.rutgers.edu/snowcover/table_area.php?ui_set=2' # monthly data
+  reference: 'br2011'
+  comment: 'March and April snow cover extent (SCE) series developed and presented in Brown and Robinson (2011).
+                The data is presented for North America (NA),  Eurasia (EUR), and Northen Hemisphere (NH)'
+
+custom:
+  greenland_masked: True
+
+# Variables to cmorize
+variables:
+  scen:
+    mip: LImon
+    raw_units: 1 km2

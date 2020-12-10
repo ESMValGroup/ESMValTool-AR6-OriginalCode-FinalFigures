@@ -1,0 +1,25 @@
+---
+filename: 'HadEX3_{raw_variable}_ANN.nc'
+
+# Common global attributes for Cmorizer output
+attributes:
+  dataset_id: HadEX3
+  version: 'v20200928'
+  tier: 2
+  modeling_realm: clim
+  project_id: OBS
+  source: 'https://www.metoffice.gov.uk/hadobs/hadex3/download.html'
+  reference: 'hadex3'
+  comment: 'ETCCDI (extreme indices) annual maximum value of daily maximum temperature'
+
+# Variables to cmorize
+variables:
+  txx:
+    raw: TXx
+    raw_units: celsius
+    mip: yr
+  rx1day:
+    raw: Rx1day
+#    actually raw units are mm, but since the "usual" description for precip is kg m-2 s-1 we call it kg m-2
+    raw_units: kg m-2
+    mip: yr

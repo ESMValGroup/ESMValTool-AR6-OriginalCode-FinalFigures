@@ -9,154 +9,70 @@ import os
 import sys
 
 # import internal esmvaltool modules here
-from esmvaltool.diag_scripts.shared import group_metadata, run_diagnostic
-from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
-from esmvaltool.diag_scripts.seaice import ipcc_sea_ice_diag_tools as ipcc_sea_ice_diag
+from esmvaltool.diag_scripts.shared import run_diagnostic, Datasets
+from esmvaltool.diag_scripts.seaice import \
+    ipcc_sea_ice_diag_tools as ipcc_sea_ice_diag
 
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-def model_wrap(cubelist, proj):
 
-    models=[]
+def detect_exp(datasets, panel_id, project):
+    experiments = list(set(datasets.get_info_list('exp', project=project)))
 
-    for cube in cubelist:
-        if proj == 'CMIP5':
-            models.append(cube.attributes['model_id'])
-        else:
-            models.append(cube.attributes['source_id'])
+    if project == 'CMIP5':
+        nat_exp = 'historicalNat'
+    else:
+        nat_exp = 'hist-nat'
 
-    model_cubelist = iris.cube.CubeList()
+    if 'nat' in panel_id.lower():
+        exp_name = nat_exp
+    else:
+        experiments.pop(experiments.index(nat_exp))
+        exp_name = experiments[0]
 
-    for nm, model in enumerate(set(models)):
-        sngl_mod_cubelist = iris.cube.CubeList()
-        for cube in cubelist:
-            # check if you could do it a better way, may be add function
-            if proj == 'CMIP5':
-                if cube.attributes['model_id'] == model:
-                    aux_coord = iris.coords.AuxCoord(len(sngl_mod_cubelist)+1, long_name= 'realization')
-                    cube.add_aux_coord(aux_coord)
-                    sngl_mod_cubelist.append(cube)
-            else:
-                if cube.attributes['source_id'] == model:
-                    aux_coord = iris.coords.AuxCoord(len(sngl_mod_cubelist)+1, long_name= 'realization')
-                    cube.add_aux_coord(aux_coord)
-                    sngl_mod_cubelist.append(cube)
+    return (exp_name)
 
-        if len(sngl_mod_cubelist) == 1:
-            mod_cube = sngl_mod_cubelist[0]
-        else:
-            equalise_attributes(sngl_mod_cubelist)
-            mod_cube = sngl_mod_cubelist.merge_cube()
-            mod_cube = mod_cube.collapsed('realization', iris.analysis.MEAN)
+
+def ensemble_average(cubelist):
+    if len(cubelist) == 1:
+        averaged_cube = cubelist[0]
+    else:
+        for n, cube in enumerate(cubelist):
+            aux_coord = iris.coords.AuxCoord(n, long_name='realization')
+            cube.add_aux_coord(aux_coord)
+
+        equalise_attributes(cubelist)
+        merged_cubelist = cubelist.merge_cube()
+        averaged_cube = merged_cubelist.collapsed('realization',
+                                                  iris.analysis.MEAN)
 
         # dirty trick to merge cubes in the future
-        mod_cube.remove_coord('realization')
-        mod_cube.cell_methods = None
+        averaged_cube.remove_coord('realization')
+        averaged_cube.cell_methods = None
 
-        mod_cube.add_aux_coord(iris.coords.AuxCoord(nm + 1, long_name='mod_n'))
+    return (averaged_cube)
 
-        model_cubelist.append(mod_cube)
 
-    return(model_cubelist)
+def mme_stats(data_cubelist):
+    # we can't do iris.analysis.MEAN because adding an aux coord realizes
+    # the data
+    # and then np.nans screw things over, also the averaging is easier because
+    # of time stamps
 
-def update_dict(list_dict):
+    n_models = len(data_cubelist)
 
-    upd_dic=list_dict[1]
+    mod_cube_arr = np.ma.masked_all(
+        (n_models, len(data_cubelist[0].coord('time').points)))
 
-    verb_month_dict={1:'JAN', 2:'FEB', 3:'MAR', 4:'APR', 5: 'MAY', 6:'JUN',
-                     7:'JUL', 8:'AUG', 9: 'SEP', 10:'OCT', 11:'NOV', 12:'DEC'}
-
-    upd_dic['verb_month'] = verb_month_dict[upd_dic['month']]
-
-    if upd_dic['start_lat'] > 0:
-        upd_dic['hemisphere'] = 'NH'
-    else:
-        upd_dic['hemisphere'] = 'SH'
-
-    model_cubelist = model_wrap(list_dict[0], upd_dic['project'])
-
-    upd_dic.update({'data': model_cubelist})
-
-    return(upd_dic)
-
-def substract_ref_period(cubelist, ref_period):
-
-    constr = iris.Constraint(time=lambda cell: ref_period[0] <= cell.point.year <= ref_period[1])
-
-    upd_cubelist = iris.cube.CubeList()
-
-    for cube in cubelist:
-        mean = cube.extract(constr).collapsed('time', iris.analysis.MEAN)
-        upd_cube = cube - mean
-        upd_cube.attributes = cube.attributes
-        upd_cubelist.append(upd_cube)
-
-    return(upd_cubelist)
-
-def create_coords(cubelist, year_n):
-    # dirty trick, we try to unify time to merge  the cubelist in the end
-
-    cb = cubelist [0]
-
-    for cube in cubelist:
-        if cube.coord('time').units.calendar == 'gregorian':
-            cb = cube
-            break
-
-    n_t = len(cb.coord('time').points)
-    coord = [np.average(cb.coord('time').points[year_n*i:year_n*i + year_n]) for i in range(0, int(n_t / year_n))]
-    bnds = [[cb.coord('time').bounds[year_n*i][0], cb.coord('time').bounds[year_n*i + (year_n - 1)][1]] for i in
-            range(0, int(n_t / year_n))]
-    if n_t%year_n != 0:
-        # raise warning
-        print('The n of years is not divisible by 3')
-        # coord.append(np.average(cb.coord('time').points[int(n_t / year_n):-1]))
-        # bnds.append([cb.coord('time').bounds[int(n_t / year_n) * year_n][0], cb.coord('time').bounds[-1][1]])
-
-    dcoord = iris.coords.DimCoord(np.asarray(coord), bounds=np.asarray(bnds),
-                                  standard_name=cb.coord('time').standard_name,
-                                  units=cb.coord('time').units, long_name=cb.coord('time').long_name,
-                                  var_name=cb.coord('time').var_name)
-
-    return (dcoord)
-
-def three_year_mean(cubelist):
-
-    threey_cubelist = iris.cube.CubeList()
-
-    dcoord = create_coords(cubelist, 3)
-
-    for cube in cubelist:
-        n_t = len(cube.coord('time').points)
-        data = [np.average(cube.data[3*i:3*i + 3]) for i in range(0, int(n_t / 3))]
-        if n_t%3!=0:
-            # add here a warning that the last is an average of n_t%3==0 years
-            print('The n of years is not divisible by 3, last years were not taken into account')
-            # data.append(np.average(cube.data[3*int(n_t/3):-1]))
-        threey_cube = iris.cube.Cube(np.asarray(data), long_name='sie anomaly, 3y mean', var_name='sie_ano', units=cube.units,
-                                     attributes=cube.attributes, dim_coords_and_dims=[(dcoord,0)])
-        threey_cubelist.append(threey_cube)
-
-    return (threey_cubelist)
-
-def stat_calc(inp_dict):
-
-    add_dict = {}
-
-    data_cubelist = inp_dict['data']
-    del inp_dict['data']  # can't do pop, because data_cubelist is list
-
-    # we can't do iris.analysis.MEAN because adding an aux coord realizes the data
-    # and then np.nans screw things over
-    mod_cube_arr = np.zeros((len(data_cubelist),len(data_cubelist[0].coord('time').points)))
+    var = data_cubelist[0].long_name
 
     for n, cube in enumerate(data_cubelist):
-        mod_cube_arr[n,:] = data_cubelist[n].data
+        mod_cube_arr[n, :] = data_cubelist[n].data
 
-    mme_arr = np.nanmean(mod_cube_arr, axis = 0)
-    std_arr = np.nanstd(mod_cube_arr, axis = 0)
+    mme_arr = np.ma.mean(mod_cube_arr, axis=0)
+    std_arr = np.ma.std(mod_cube_arr, axis=0)
 
     # this is to make as time coords only year and not a month
     # needed to further merge cubes
@@ -164,10 +80,13 @@ def stat_calc(inp_dict):
     yearly_stamp_bounds = []
 
     for cell in cube.coord('time').cells():
-        yearly_stamp_point.append(np.datetime64(str(cell.point.year)+'-06-30'))
-        # another dirty trick: since the bounds for december are 1of january next year,
-        # we just add +2 to the start year
-        yearly_stamp_bounds.append((np.datetime64(str(cell.bound[0].year)+'-01-01'),np.datetime64(str(cell.bound[0].year+2)+'-12-31')))
+        yearly_stamp_point.append(
+            np.datetime64(str(cell.point.year) + '-06-30'))
+        # another dirty trick: since the bounds for december are 1of january
+        # next year, we just add +2 to the start year
+        yearly_stamp_bounds.append(
+            (np.datetime64(str(cell.bound[0].year) + '-01-01'),
+             np.datetime64(str(cell.bound[0].year + 2) + '-12-31')))
 
     yearly_stamp_point = np.asarray(yearly_stamp_point)
     yearly_stamp_bounds = np.asarray(yearly_stamp_bounds)
@@ -176,169 +95,267 @@ def stat_calc(inp_dict):
     points_days_since = yearly_stamp_point - np.datetime64('1850-01-01')
     bounds_days_since = yearly_stamp_bounds - np.datetime64('1850-01-01')
 
-    time_coord = iris.coords.DimCoord(np.asarray(points_days_since,  dtype = np.int32), bounds=np.asarray(bounds_days_since, dtype = np.int32), standard_name='time',
-                                      long_name='time', var_name='time', units=cube.coord('time').units)
+    time_coord = iris.coords.DimCoord(
+        np.asarray(points_days_since, dtype=np.int32),
+        bounds=np.asarray(bounds_days_since, dtype=np.int32),
+        standard_name='time',
+        long_name='time', var_name='time', units=cube.coord('time').units)
 
-    mme = iris.cube.Cube(mme_arr, long_name= 'multi-model mean of '+inp_dict['variable']+' anomaly', var_name='mme_sie_ano',
-                         units=data_cubelist[0].units, dim_coords_and_dims=[(time_coord,0)])
+    mme = iris.cube.Cube(mme_arr,
+                         long_name='multi-model mean of ' + var + ' anomaly',
+                         var_name='mme_sie_ano',
+                         units=data_cubelist[0].units,
+                         dim_coords_and_dims=[(time_coord, 0)])
 
-    std = iris.cube.Cube(std_arr, long_name= 'multi-model std of '+inp_dict['variable']+' anomaly', var_name='std_sie_ano',
-                         units=data_cubelist[0].units, dim_coords_and_dims=[(time_coord,0)])
+    std = iris.cube.Cube(std_arr,
+                         long_name='multi-model std of ' + var + ' anomaly',
+                         var_name='std_sie_ano',
+                         units=data_cubelist[0].units,
+                         dim_coords_and_dims=[(time_coord, 0)])
 
     pl_sct_arr = np.zeros(mme_arr.shape)
     pl_sct_arr[:] = np.nan
-    pl_sct_arr[np.abs(mme_arr)>std_arr] = 1
+    pl_sct_arr[np.abs(mme_arr) > std_arr] = 1
 
-    pl_sct = iris.cube.Cube(pl_sct_arr, long_name= 'significance of '+inp_dict['variable']+' anomaly', var_name='mme_signif',
-                         units=data_cubelist[0].units, dim_coords_and_dims=[(time_coord,0)])
+    pl_sct = iris.cube.Cube(pl_sct_arr,
+                            long_name='significance of ' + var + ' anomaly',
+                            var_name='mme_signif',
+                            units=data_cubelist[0].units,
+                            dim_coords_and_dims=[(time_coord, 0)])
 
-    add_dict['mme'] = mme
-    add_dict['std'] = std
-    add_dict['n_models'] = len(data_cubelist)
-    add_dict['mme_sign'] = pl_sct
+    stat_dic = {'mme_mean': mme, 'mme_std': std, 'mme_significance': pl_sct,
+                'n_models': n_models}
 
-    inp_dict.update(add_dict)
+    return (stat_dic)
 
-    return (inp_dict)
 
-def merge_stats_cube(inp_dict):
+def reform_data_dic(data_dic):
+    verb_month_dict = {1: 'JAN', 2: 'FEB', 3: 'MAR', 4: 'APR', 5: 'MAY',
+                       6: 'JUN',  7: 'JUL', 8: 'AUG', 9: 'SEP', 10: 'OCT',
+                       11: 'NOV',  12: 'DEC'}
 
-    upd_dict = {}
+    reformed_dic = {}
 
-    merged_mme_cubelist = iris.cube.CubeList()
-    merged_std_cubelist = iris.cube.CubeList()
-    merged_sign_cubelist = iris.cube.CubeList()
+    for panel_id in data_dic.keys():
+        reformed_dic[panel_id] = {}
+        for proj_name in data_dic[panel_id].keys():
+            mean_merge_cubelist = iris.cube.CubeList()
+            sign_merge_cubelist = iris.cube.CubeList()
+            vb_month = []
+            for month in data_dic[panel_id][proj_name].keys():
+                data_dic[panel_id][proj_name][month]['mme_mean'].add_aux_coord(
+                    iris.coords.AuxCoord(month,
+                                         long_name='month',
+                                         var_name='month'))
+                mean_merge_cubelist.append(
+                    data_dic[panel_id][proj_name][month]['mme_mean'])
+                data_dic[panel_id][proj_name][month][
+                    'mme_significance'].add_aux_coord(
+                    iris.coords.AuxCoord(month,
+                                         long_name='month',
+                                         var_name='month'))
+                sign_merge_cubelist.append(
+                    data_dic[panel_id][proj_name][month]['mme_significance'])
+                vb_month.append(verb_month_dict[month])
+                n_models = data_dic[panel_id][proj_name][month]['n_models']
+            reformed_dic[panel_id][proj_name] = {
+                'means': mean_merge_cubelist.merge_cube(),
+                'significance': sign_merge_cubelist.merge_cube(),
+                'n_models': n_models,
+                'verb_months': vb_month}
 
-    vb_month = []
+    return (reformed_dic)
 
-    for month in inp_dict.keys():
-        # inp_dict[month]['mme'].add_aux_coord(iris.coords.AuxCoord(inp_dict[month]['verb_month'], long_name='month'))
-        inp_dict[month]['mme'].add_aux_coord(iris.coords.AuxCoord(month, long_name='month',var_name='month'))
-        merged_mme_cubelist.append(inp_dict[month]['mme'])
-        # inp_dict[month]['std'].add_aux_coord(iris.coords.AuxCoord(inp_dict[month]['verb_month'], long_name='month'))
-        inp_dict[month]['std'].add_aux_coord(iris.coords.AuxCoord(month, long_name='month',var_name='month'))
-        merged_std_cubelist.append(inp_dict[month]['std'])
-        # inp_dict[month]['mme_sign'].add_aux_coord(iris.coords.AuxCoord(inp_dict[month]['verb_month'], long_name='month'))
-        inp_dict[month]['mme_sign'].add_aux_coord(iris.coords.AuxCoord(month, long_name='month',var_name='month'))
-        merged_sign_cubelist.append(inp_dict[month]['mme_sign'])
 
-        vb_month.append(inp_dict[month]['verb_month'])
-
-    upd_dict['mme'] = merged_mme_cubelist.merge_cube()
-    upd_dict['std'] = merged_std_cubelist.merge_cube()
-    upd_dict['mme_sign'] = merged_sign_cubelist.merge_cube()
-
-    for key in ['mme','mme_sign','std','month','verb_month']:
-        del inp_dict[month][key]
-
-    upd_dict['verb_month'] = vb_month
-    upd_dict.update(inp_dict[month])
-
-    return (upd_dict)
-
-def make_panel(data_dict, fig, inner, title):
-
+def make_panel(data_dict, fig, inner, title='', panel_id='', put_ylabel=False):
     tmp_cmap = plt.cm.coolwarm_r
 
-    for n,proj in enumerate(data_dict.keys()):
-        ax = plt.Subplot(fig, inner [n])
-        pmesh = iplt.pcolormesh(data_dict[proj]['mme'], vmin = -1.2, vmax = 1.2, cmap = tmp_cmap, axes = ax)
-        ax.scatter((data_dict[proj]['mme_sign'].coord('time').points * data_dict[proj]['mme_sign'].data) ,
-                   data_dict[proj]['mme_sign'].coord('month').points[:, None] * data_dict[proj]['mme_sign'].data, s = 60, c= 'silver')
+    tot_subpans = len(data_dict.keys())
+
+    for n_p, proj in enumerate(data_dict.keys()):
+        ax = plt.Subplot(fig, inner[n_p])
+        pmesh = iplt.pcolormesh(data_dict[proj]['means'], vmin=-1.4, vmax=1.4,
+                                cmap=tmp_cmap, axes=ax)
+        if panel_id != 'OBS':
+            ax.scatter((data_dict[proj]['significance'].coord('time').points *
+                        data_dict[proj]['significance'].data),
+                       data_dict[proj]['significance'].coord('month').points[:,
+                       None] *
+                       data_dict[proj]['significance'].data, s=60, c='silver')
         ylims = ax.get_ylim()
         ax.set_ylim(ylims[::-1])
-        ax.set_yticks(data_dict[proj]['mme'].coord('month').points[::-1])
-        ax.set_yticklabels(data_dict[proj]['verb_month'][::-1])
-        ax.set_xlim((np.datetime64('1979-01-01')-np.datetime64('1850-01-01')).astype(np.int32),
-                    (np.datetime64('2018-01-01')-np.datetime64('1850-01-01')).astype(np.int32))
+        ax.set_yticks(data_dict[proj]['means'].coord('month').points[::-1])
+        ax.set_yticklabels(data_dict[proj]['verb_months'][::-1])
+        ax.set_xlim(
+            (np.datetime64('1979-01-01') - np.datetime64('1850-01-01')).astype(
+                np.int32),
+            (np.datetime64('2018-01-01') - np.datetime64('1850-01-01')).astype(
+                np.int32))
         yrs = np.arange(1980, 2018, 6)
-        tks_dates = (np.asarray( [np.datetime64(str(yr)+'-07-01') for yr in yrs ]) - np.datetime64('1850-01-01')).astype(np.int32)
+        tks_dates = (
+            np.asarray([np.datetime64(str(yr) + '-07-01') for yr in
+                        yrs]) - np.datetime64('1850-01-01')).astype(
+            np.int32)
         ax.set_xticks(tks_dates)
         ax.set_xticklabels([str(yr) for yr in yrs])
-        if n ==0 :
+        if (n_p == 0) & (title != ''):
             ax.set_title(title)
-            ax.set_xticks([])
-        else:
+
+        if n_p == tot_subpans - 1:
             ax.set_xticks(tks_dates)
             ax.set_xticklabels([str(yr) for yr in yrs])
-        ax.set_ylabel(proj+ ' ['+str(data_dict[proj]['n_models'])+']')#, rotation=0, labelpad=5)
-        # ax.yaxis.label.set_rotation(90)
+        else:
+            ax.set_xticks([])
+
+        if put_ylabel:
+            if data_dict[proj]['n_models'] > 1:
+                ax.set_ylabel(
+                    proj + ' [' + str(data_dict[proj]['n_models']) + ']',
+                    rotation=0, labelpad=32)
+            else:
+                ax.set_ylabel(proj, rotation=0, labelpad=32)
+        else:
+            ax.set_ylabel('')
         fig.add_subplot(ax)
 
     return (ax, pmesh)
 
-def make_plot(data_dict):
 
+def make_plot(data_dict):
     ncols = len(data_dict.keys())
-    nrows = np.asarray([len(data_dict[hemisph].keys()) for hemisph in data_dict.keys()]).max()
+    nrows = np.asarray(
+        [len(data_dict[hemisph].keys()) for hemisph in data_dict.keys()]).max()
 
     fig = plt.figure()
-    fig.set_size_inches(10., 9.)
+    fig.set_size_inches(10., 11.)
     outer = gridspec.GridSpec(nrows, ncols)
 
+    # this should go into the cfg
+    panel_order = ['OBS', 'ALL', 'NAT']
+
     for ncol, hemisph in enumerate(data_dict.keys()):
-        for nrow, exp in enumerate(data_dict[hemisph].keys()):
-            nsubpan = len(data_dict[hemisph][exp].keys())
+        h_ratios = []
+        for nrow, panel_id in enumerate(panel_order):
+            nsubpan = len(data_dict[hemisph][panel_id].keys())
             inner = gridspec.GridSpecFromSubplotSpec(nsubpan, 1,
-                                                     subplot_spec = outer[nrow, ncol], wspace = 0.0, hspace = 0.0)
-            if nrow ==0:
+                                                     subplot_spec=outer[
+                                                         nrow, ncol],
+                                                     wspace=0.0, hspace=0.0)
+            if nrow == 0:
                 if hemisph == 'NH':
-                    title = 'Arctic SIE'
+                    title = 'Arctic SIA'
                 else:
-                    title = 'Antarctic SIE'
+                    title = 'Antarctic SIA'
             else:
                 title = ''
-            ax , pmesh = make_panel(data_dict[hemisph][exp], fig, inner, title= title)
+            h_ratios.append(len(data_dict[hemisph][panel_id]))
+            if ncol == 0:
+                put_ylabel = True
+            else:
+                put_ylabel = False
 
-    cax = fig.add_axes([0.3,0.05,0.4,0.01])
+            ax, pmesh = make_panel(data_dict[hemisph][panel_id], fig, inner,
+                                   title=title,
+                                   panel_id=panel_id, put_ylabel=put_ylabel)
+
+    outer.set_height_ratios(h_ratios)
+    cax = fig.add_axes([0.35, 0.06, 0.4, 0.01])
     cbar = fig.colorbar(pmesh, cax=cax, orientation='horizontal')
-    cbar.ax.set_xlabel('10^6 km^2')
-    fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)#, wspace=0.28, hspace=0.2)
-    # make a joint colorbar
+    cbar.ax.set_xlabel(r'10$^6$ km$^2$' + '\n SIA anomaly')
+    fig.subplots_adjust(left=0.185, right=0.98, top=0.9, bottom=0.11,
+                        wspace=0.23)  # , hspace=0.2)
+    fig.suptitle(
+        'Timeseries of 3-year mean of observed and '
+        'simulated \n sea ice are (SIA) anomalies',
+        fontsize='x-large', x=0.55)
+
+    for n_id, panel_id in enumerate(panel_order):
+        bnds = outer[n_id, 0].get_position(fig)
+        crds = bnds.bounds
+        x = crds[0] / 10
+        y = crds[1] + crds[3] / 2
+        fig.text(x, y, panel_id, fontweight='semibold')
 
     return
 
+
 def main(cfg):
+    dtsts = Datasets(cfg)
 
-    metadatas = diagtools.get_input_files(cfg)
+    data_dict = {'NH': {}, 'SH': {}}
+    panel_ids = ['ALL', 'NAT']
+    mod_projects = ['CMIP5', 'CMIP6']
 
-    cmip_data_dict = {'NH':{}, 'SH': {}}
+    obs_names = set(dtsts.get_info_list('dataset', project='OBS'))
 
-    for hemisph in cmip_data_dict.keys():
-        cmip_data_dict[hemisph]['historical'] = {'CMIP5':{}, 'CMIP6':{}}
-        cmip_data_dict[hemisph]['hist-nat'] = {'CMIP5':{}, 'CMIP6':{}}
-        mon_lat_str = 'month_latitude_' + hemisph
-        if np.abs(cfg[mon_lat_str][1]) == cfg[mon_lat_str][1]:
-            start_lat = cfg[mon_lat_str][1]
-            end_lat = 90
-        else:
-            start_lat = -90
-            end_lat = cfg[mon_lat_str][1]
+    for hemisph in data_dict.keys():
+        for panel_id in panel_ids:
+            data_dict[hemisph][panel_id] = {}
+            for mod_project in mod_projects:
+                data_dict[hemisph][panel_id][mod_project] = {}
+        data_dict[hemisph]['OBS'] = {}
+        for obs_name in obs_names:
+            data_dict[hemisph]['OBS'][obs_name] = {}
+        # here an actual processing begins
+        months = cfg['month_latitude_' + hemisph][0]
+        border_lat = cfg['month_latitude_' + hemisph][1]
+        for month in months:
+            for panel_id in panel_ids:
+                for mod_project in mod_projects:
+                    data_dict[hemisph][panel_id][mod_project][month] = {}
+                    exp = detect_exp(dtsts, panel_id, mod_project)
+                    models = set(dtsts.get_info_list('dataset', exp=exp,
+                                                     project=mod_project))
+                    models_cubelist = iris.cube.CubeList()
+                    for model in models:
+                        ens_fnames = dtsts.get_info_list('filename',
+                                                         dataset=model,
+                                                         exp=exp,
+                                                         project=mod_project)
+                        ens_cubelist = iris.load(ens_fnames)
+                        ens_cubelist = ipcc_sea_ice_diag.select_months(
+                            ens_cubelist, month)
+                        if hemisph == 'NH':
+                            ens_cubelist = ipcc_sea_ice_diag.select_latitudes(
+                                ens_cubelist, border_lat, 90)
+                        else:
+                            ens_cubelist = ipcc_sea_ice_diag.select_latitudes(
+                                ens_cubelist, -90, border_lat)
+                        sea_ice_cubelist = ipcc_sea_ice_diag.calculate_siparam(
+                            ens_cubelist, cfg['seaiceextent'])
+                        ano_cubelist = ipcc_sea_ice_diag.substract_ref_period(
+                            sea_ice_cubelist, cfg['ref_period'])
+                        mean_ano_cubelist = ipcc_sea_ice_diag.n_year_mean(
+                            ano_cubelist, 3)
+                        mod_ano_cube = ensemble_average(mean_ano_cubelist)
+                        models_cubelist.append(mod_ano_cube)
+                    mme_dict = mme_stats(models_cubelist)
+                    data_dict[hemisph][panel_id][mod_project][month] = mme_dict
+            #   here observations added, they are already in sia, so they don't
+            #   need the same preprocessing as models.
+            sia_var = 'siarea' + hemisph[0].lower()
+            obses = dtsts.get_info_list('dataset', project='OBS',
+                                        short_name=sia_var)
+            for obs in obses:
+                obs_fname = dtsts.get_info('filename', dataset=obs,
+                                           project='OBS', short_name=sia_var)
+                obs_cubelist = iris.load(obs_fname)
+                obs_cubelist = ipcc_sea_ice_diag.select_months(obs_cubelist,
+                                                               month)
+                obs_cubelist = ipcc_sea_ice_diag.substract_ref_period(
+                    obs_cubelist, cfg['ref_period'])
+                obs_cubelist = ipcc_sea_ice_diag.n_year_mean(obs_cubelist, 3)
+                obs_cb = ensemble_average(obs_cubelist)
+                data_dict[hemisph]['OBS'][obs][month] = mme_stats([obs_cb])
 
-        for experiment in cmip_data_dict[hemisph].keys():
-            for entry in cmip_data_dict[hemisph][experiment].keys():
-                for month in cfg[mon_lat_str][0]:
-                    if experiment == 'historical':
-                        cmip_data_dict[hemisph][experiment][entry][month] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(
-                            metadatas, entry, month, start_lat, end_lat, cfg['concatinate_' + entry.lower()],
-                            exp_list=cfg[entry.lower() +'_exps_concatinate'])
-                    elif experiment == 'hist-nat':
-                        cmip_data_dict[hemisph][experiment][entry][month] = ipcc_sea_ice_diag.prepare_cmip_for_3_18(
-                            metadatas, entry, month, start_lat, end_lat, False, exp_list=[experiment])
-                    cmip_data_dict[hemisph][experiment][entry][month][0] = ipcc_sea_ice_diag.calculate_siparam(cmip_data_dict[hemisph][experiment][entry][month][0],
-                                                                               cfg['seaiceextent'])
-                    cmip_data_dict[hemisph][experiment][entry][month][0] = substract_ref_period(cmip_data_dict[hemisph][experiment][entry][month][0], cfg['ref_period'])
-                    cmip_data_dict[hemisph][experiment][entry][month][0] = three_year_mean(cmip_data_dict[hemisph][experiment][entry][month][0])
-                    cmip_data_dict[hemisph][experiment][entry][month] = update_dict(cmip_data_dict[hemisph][experiment][entry][month])
-                    cmip_data_dict[hemisph][experiment][entry][month] = stat_calc(cmip_data_dict[hemisph][experiment][entry][month])
-                cmip_data_dict[hemisph][experiment][entry] = merge_stats_cube(cmip_data_dict[hemisph][experiment][entry])
+        data_dict[hemisph] = reform_data_dic(data_dict[hemisph])
 
-    make_plot(cmip_data_dict)
+    make_plot(data_dict)
 
-    ipcc_sea_ice_diag.figure_handling(cfg, name = 'fig_3_19_timeseries')
-    # check why cmip5 is crocked
+    ipcc_sea_ice_diag.figure_handling(cfg, name='fig_3_19_timeseries')
 
     logger.info('Success')
+
 
 if __name__ == '__main__':
     # always use run_diagnostic() to get the config (the preprocessor

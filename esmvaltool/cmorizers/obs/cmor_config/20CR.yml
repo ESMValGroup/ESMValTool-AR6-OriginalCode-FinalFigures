@@ -1,0 +1,22 @@
+---
+# Filename
+filename: '{raw_variable}.mon.mean.nc'
+filename_land_mask : 'land.nc'
+
+# Common global attributes for Cmorizer output
+attributes:
+  dataset_id: 20CR
+  version: 'v2'
+  tier: 2
+  modeling_realm: reanaly
+  project_id: OBS
+  source: 'https://psl.noaa.gov/data/gridded/data.20thC_ReanV2.monolevel.mm.html' # monthly data
+  reference: '20cr'
+  comment: 'Twentieth Century Reanalysis (V2), Water Equiv. of Accum. Snow Depth, Monthly Means'
+
+# Variables to cmorize
+variables:
+  snw:
+    mip: LImon
+    raw_units: kg m-2
+    raw: weasd

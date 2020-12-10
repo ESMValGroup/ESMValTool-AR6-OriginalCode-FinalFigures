@@ -1,0 +1,20 @@
+---
+filename: 'SCE_timeseries.nc'
+
+# Common global attributes for Cmorizer output
+attributes:
+  dataset_id: Mudryk2020
+  version: 'v1'
+  tier: 2
+  modeling_realm: clim
+  project_id: OBS
+  source: 'https://doi.org/10.18164/cc133287-1a07-4588-b3b8-40d714edd90e'
+  reference: 'mudryk2020'
+  comment: 'Northern Hemisphere Blended Snow Extent Time Series'
+
+# Variables to cmorize
+variables:
+  scen:
+    mip: LImon
+    raw_units: 1e6 km2
+    raw: sce
