@@ -1074,6 +1074,11 @@ def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
 
     # depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     cube = iris.load_cube(ohc_fn)
+    zunits = str(cube.coord(axis='Z').units)
+    if zunits.lower() not in ['m', 'meter', 'meters']:
+        print('Unknown units in z direction:', zunits)
+        assert 0
+
     times = diagtools.cube_time_to_float(cube)
     print('calc_ohc_ts', exp, dataset, ensemble, project, depth_range, trend)
     if depth_range != 'total':
@@ -1097,7 +1102,7 @@ def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
             coord_values={
                 cube.coord(axis='Z'): lambda cell: zmin < cell.point < zmax})
         cube = cube.extract(z_constraint)
-
+    
     cube = cube.collapsed([cube.coord(axis='z'),
                            'longitude', 'latitude'],
                           iris.analysis.SUM)
@@ -2649,7 +2654,15 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     if vol_cube.ndim not in [3, 4]:
         print("Looks like the volume has a weird shape:",vol_cube.ndim, vol_cube.data.shape, vol_cube)
         assert 0
+    if vol_cube.ndim == 4 and vol_cube.shape != thetao_cube.shape:
+        print("Volume file is not the same shape as temperature:")
+        print('Volune file:',volcello_fn)
+        print('Temperature file:', thetao_fn)
+        print('Salinity file:', so_fn)
+        print(dataset, thetao_cube.shape, 'so:', so_cube.shape, vol_cube.shape, depths.shape)
+        assert 0 
     # 2D!
+    print(dataset, thetao_cube.shape, 'so:', so_cube.shape, vol_cube.shape, depths.shape)
     for z in np.arange(thetao_cube.data.shape[1]):
         if  depths.ndim == 1:
             depth = np.zeros_like(lat) + depths[z]
@@ -3012,12 +3025,24 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
         for index, arr in np.ndenumerate(dummy[0]):
             if np.ma.is_masked(arr): continue
             data = cube.data[:, index[0], index[1], index[2]]
+            slope = slopes.get(index, False)
+            intercept = intercepts.get(index, False)
+            if count%100000 == 0: 
+                print('dedrifting:', index, data.max(),  slope, intercept)
             if np.ma.is_masked(data.max()): continue
 
             if not count%250000:
                 print(count, index, 'detrending')
 
-            line = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
+            # Unable to detrend places where there's not a fit
+            #if slopes.get(index, False) == False: 
+            #    continue
+            #print(count, index, 'detrending', slopes.get(index, False), intercepts.get(index, False) )
+            if not slopes.get(index, False):
+                print('Failure:', filename)
+            # ne = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
+            line = [(t * slope) + intercept for t in np.arange(len(decimal_time))]
+
             dummy[:, index[0], index[1], index[2]] = np.array(line)
             count+=1
     else:
@@ -3062,6 +3087,36 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
     return output_fn
 
 
+def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,):
+    """
+    Calculated the multimodel means
+
+    check whethger the output exists already
+    if so, do nothing
+    
+    for each model:
+        for each model ensemble:
+            first extract the requires yeard, 
+            take the mean over the time axis
+        Take the multi ensemble member mean
+        regrid to 1x1
+
+    Once that is done, take the multi model mean. 
+    save the netcdf
+    make a plot.
+
+    """
+    #detrended_ncs.keys (project, dataset, exp, ensemble, short_name): fn
+    datasets = {index[1]:True for index in detrended_ncs.keys()}
+    time_ranges = ['1950', '2000', '1950-2000']
+    for master_dataset in datasets:
+        for (project, dataset, exp, ensemble, short_name), fn in detrended_ncs.items():
+           cube =  iris.load_cube(fn)
+           new_cube = extract_time(cube, year_initial, 1, 1, year_final, 12, 31)
+    return 
+
+
+
 def guess_PI_ensemble(dicts, keys, ens_pos = None):
     """
     Take a punt as the pi ensemble member.
@@ -3093,31 +3148,63 @@ def guess_areacello_fn(dicts, keys):
 def guess_volcello_fn(dicts, keys, optional = []):
     """
     Take a punt at the volcello filename.
+    # When it's hist-* we want historical
+    # When itr's piControl, we want piControl.
+    # When the model is a Ofx model, we want the Ofx version.
     """
+    print("guess_volcello_fn: looking for:", keys, optional)
     for index, value in dicts.items():
         both = (keys+optional)
+        
         intersection = set(index) & set(both)
-        if len(intersection) == len(both):
+        print('iterating: index:',index, 'both:',both, 'intersection:', intersection, 'file:',value)
+
+        if sorted([i for i in intersection]) == sorted([i for i in both]):
             print("guess_volcello_fn: full match", index, keys, optional, value)
             return value
 
+    for index, value in dicts.items():
+        for option in optional:
+            both = (keys+[option, ])
+            intersection = set(index) & set(both)
+            if len(intersection) == len(both):
+                print("guess_volcello_fn: partial match", index, keys, option, value)
+                return value
+
+    for index, value in dicts.items():
         intersection = set(index) & set(keys)
         if len(intersection) == len(keys):
-            print("guess_volcello_fn: partial match", index, keys, value)
+            print("guess_volcello_fn: minimal match", index, keys, value)
             return value
     print('Did Not find Volcello:', keys, optional)
     assert 0
 
 
+def guess_vol_exp(exp):
+    # there are no hist-* volume files.
+    if exp.find('hist')>-1: return 'historical'
+    return exp
 
-def mpi_fit(iter_pack, cubedata, time_itr, tmin): #, mpi_data):
-            index, _ = iter_pack
-            data = cubedata[:, index[0], index[1], index[2]]
-            if np.ma.is_masked(data.max()):
-                return [], index
-            data = data - np.ma.mean(data[tmin-1:tmin+2])
-            linreg = linregress(time_itr, data)
-            return linreg, index
+
+def mpi_fit(iter_pack, cubedata, time_itr):#, tmin): 
+    index, _ = iter_pack
+    data = cubedata[:, index[0], index[1], index[2]]
+    if np.ma.is_masked(data.max()):
+        return [], index
+
+    if data.mask.sum() ==  len(data):
+        # No masked values
+        data = data - np.ma.mean(data) #[tmin-1:tmin+2])
+        linreg = linregress(time_itr, data)
+        return linreg, index
+
+    times = np.ma.array(time_itr)
+    times = np.ma.masked_where(data.mask, times).compressed()
+    data = data.compressed()
+    data = data - np.ma.mean(data) #in-1:tmin+2])
+
+    linreg = linregress(times, data)
+    return linreg, index
 
 
 
@@ -3222,7 +3309,7 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
         time_arange = np.arange(len(times.points))
         ndenum = np.ndenumerate(dummy)
 
-        tmin = np.argmin(np.abs(np.array(decimal_time) - pi_year))
+#        tmin = np.argmin(np.abs(np.array(decimal_time) - pi_year))
         print('ProcessPoolExecutor: starting')
 #        executor = ProcessPoolExecutor(max_workers=1)
         with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
@@ -3231,12 +3318,19 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
                                               ndenum,
                                               itertools.repeat(cube.data),
                                               itertools.repeat(time_arange),
-                                              itertools.repeat(tmin),
+#                                              itertools.repeat(tmin),
                                               chunksize=100000):
 #                                              itertools.repeat(y_dat)):
 #                                             chunksize=10000):
 #               print(linreg, index, count)
                 if linreg:
+                    if linreg.slope > 1E10 or linreg.intercept>1E10:
+                        print('linear regression failed:', linreg)
+                        print('slope:', linreg.slope,'intercept', linreg.intercept)
+                        print('from time:', np.arange(len(decimal_time)))
+                        print('from data:', cube.data[:, index[0], index[1], index[2]])
+                        assert 0
+
                     if count%250000 == 0:
                         print(count, 'linreg:', linreg[0],linreg[1])
                     slopes[index] = linreg.slope
@@ -3361,9 +3455,11 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
+    bad_models = ['NorESM2-LM', 'NorESM2-MM',]
+
+
     print('\n\n\ncreation loop')
     for filename in sorted(metadatas):
-        #print('creation loop', filename,':', metadatas[filename])
         exp = metadatas[filename]['exp']
         variable_group = metadatas[filename]['variable_group']
         short_name = metadatas[filename]['short_name']
@@ -3371,6 +3467,8 @@ def main(cfg):
         ensemble = metadatas[filename]['ensemble']
         project = metadatas[filename]['project']
         print((project, dataset, exp, ensemble, short_name))
+        if dataset in bad_models: 
+            continue
         file_dict[(project, dataset, exp, ensemble, short_name)] = filename
 
     print('\nCalculating trend')
@@ -3394,12 +3492,16 @@ def main(cfg):
         detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
 
+    calculate_multi_model_mean(cfg, metadatas, detrended_ncs,)
+
+
     print('Make time series plots')
     volume_weighted_means={}
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
         if short_name in ['volcello', 'areacello']:
             continue
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        vol_exp = guess_vol_exp(exp)
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
         vwts = calculate_volume_weighted_mean(cfg, metadatas[filename], filename, volcello_fn, trend = 'intact')
         volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'intact')] = vwts
         metadatas[vwts] = metadatas[filename]
@@ -3407,7 +3509,8 @@ def main(cfg):
     for (project, dataset, exp, ensemble, short_name), detrended_fn  in detrended_ncs.items():
         if short_name in ['volcello', 'areacello']:
             continue
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        vol_exp = guess_vol_exp(exp)
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
         vwts = calculate_volume_weighted_mean(cfg, metadatas[detrended_fn], detrended_fn, volcello_fn, trend = 'detrended')
         volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'detrended')] = vwts
         metadatas[vwts] = metadatas[detrended_fn]
@@ -3438,18 +3541,20 @@ def main(cfg):
             draw_zero=False,
             native_time=True,
             )
+    #assert 0
+    #calculate_multi_model_mean()
 
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
     slr_fns = {}
     do_SLR = True
     method = 'Landerer'
-
+    bad_models = ['NorESM2-LM',]
     trends = ['detrended', ] #'intact']
     for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
         for trend in trends:
             # if dataset != 'ACCESS-CM2': continue
-            if dataset == 'CESM2': continue
+            if dataset in bad_models: continue
 
             if not do_SLR: continue
             if short_name != 'thetao':
@@ -3643,7 +3748,8 @@ def main(cfg):
         #if exp ==  'piControl': # no need to calculate this.
         #    continue
         # volcello is in same ensemble, same exp.
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        vol_exp = guess_vol_exp(exp)
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
         if not volcello_fn:
             #(project, dataset, exp, ensemble, 'volcello') in file_dict:
             #volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
@@ -3678,8 +3784,8 @@ def main(cfg):
         # Only calculate once for each dataset, exp, ensemble.
         if short_name != 'thetao':
             continue
-
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
+        vol_exp = guess_vol_exp(exp)
+        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
         if not volcello_fn:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
