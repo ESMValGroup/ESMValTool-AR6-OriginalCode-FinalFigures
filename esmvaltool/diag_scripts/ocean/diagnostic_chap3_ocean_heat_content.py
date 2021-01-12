@@ -2481,8 +2481,9 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
     """
     Make a multimodel mean halosteric plot.
     """
-    return
-    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', '-'.join([str(t) for t in time_range])]
+
+    time_range_str = '-'.join([str(t) for t in time_range]
+    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str)]
     multimodel_mean_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
     multimodel_mean_fn += '_'.join(unique_id)+'.nc'
 
@@ -2497,6 +2498,12 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
         # Calculatge the individual model mean
         for dataset in datasets.keys():
             cube_list[dataset] = {}
+            # dataset_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
+            # dataset_fn += '_'.join([dataset, dyn_type, plot_region, plot_trend, plot_clim, time_range_str])+'.nc'
+            # if os.path.exists(dataset_fn):
+            #     cube_list[dataset] = iris.load_cube(dataset_fn)
+            #     continue
+
             for (project, dataset_itr, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
                 print( (project, dataset_itr, exp, ensemble, dyn_type, region, trend))
                 if dataset != dataset_itr: continue
@@ -2505,25 +2512,27 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
                 if dyn_type != plot_dyn: continue
                 if region != plot_region: continue
 
-                print('\n found:',  (project, dataset_itr, exp, ensemble, dyn_type, region, trend))
+                trend_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
+                trend_fn += '_'.join([project, dataset_itr, exp, ensemble, dyn_type, region, trend, time_range_str])+'.nc'
+                if os.path.exists(trend_fn):
+                    cube_list[dataset][exp] = iris.load_cube(trend_fn)
+
                 cube_list[dataset][exp] = iris.load_cube(fn)
 
                 # extract time
                 cube_list[dataset][exp] = extract_time(cube_list[dataset][exp], time_range[0], 1, 1, time_range[1],12,31)
                 # need to calculate the linear regression here:
-                time_arange = np.arange(len(times.points))
-                ndenum = np.ndenumerate(dummy)
+                times = diagtools.cube_time_to_float(cube_list[dataset][exp])
+                time_arange = np.arange(len(times))
+                ndenum = np.ndenumerate((cube_list[dataset][exp][0])
+                slopes = {}
                 with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
                     print('ProcessPoolExecutor: executing')
                     for linreg, index in executor.map(mpi_fit,
                                                       ndenum,
-                                                      itertools.repeat(cube.data),
+                                                      itertools.repeat(cube_list[dataset][exp].data),
                                                       itertools.repeat(time_arange),
-        #                                              itertools.repeat(tmin),
                                                       chunksize=100000):
-        #                                              itertools.repeat(y_dat)):
-        #                                             chunksize=10000):
-        #               print(linreg, index, count)
                         if linreg:
                             if linreg.slope > 1E10 or linreg.intercept>1E10:
                                 print('linear regression failed:', linreg)
@@ -2535,32 +2544,21 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
                             if count%250000 == 0:
                                 print(count, 'linreg:', linreg[0],linreg[1])
                             slopes[index] = linreg.slope
-                            intercepts[index] = linreg.intercept
                             count+=1
+                #cube_list[dataset][exp] = cube_list[dataset][exp][0]
                 cube_list[dataset][exp] = cube_list[dataset][exp].collapsed('time', iris.analysis.MEAN)
 
+                for index, slope in slopes.items():
+                    print(index, slope)
+                    cube_list[dataset][exp][index[0], index[1]] = slope
+
+                print('saving trend file:', trend_fn)
+                iris.save(cube_list[dataset][exp], trend_fn)
                 if np.ma.is_masked(cube_list[dataset][exp].data.max()):
                     print('Data is all masked:',(project, dataset_itr, exp, ensemble, dyn_type, region, trend))
                     assert 0
 
-                # subtract relevant clim
-                if method == 'dyn_height':
-                    assert 0
-                    # if (project, dataset, plot_exp, ensemble, plot_clim, plot_region, plot_trend) not in dyn_fns.keys():
-                    #     print('-----\n',(project, dataset, plot_exp, ensemble, plot_clim, plot_trend), 'not in dyn_fns')
-                    #     assert 0
-                    #
-                    # clim_cube_fn = dyn_fns[(project, dataset, plot_exp, ensemble, plot_clim, plot_region, plot_trend)]
-                    # clim_cube = iris.load_cube(clim_cube_fn)
-                    # if np.ma.is_masked(clim_cube.data.max()):
-                    #     print('Clim data is all masked:', (project, dataset, plot_exp, ensemble, plot_clim, plot_region, plot_trend))
-                    #     assert 0
-                    #
-                    # # Convert dynamiuc ehight to anomaly.
-                    # cube_list[dataset][exp].data = -1.*(cube_list[dataset][exp].data - clim_cube.data)
-                elif method == 'Landerer':
-                    pass
-
+            # Calculated all trends, now take single model ensemble mean:
             cube_list[dataset] = [c for exp, c in cube_list[dataset].items()]
             cube_list[dataset] = make_mean_of_cube_list_notime(cube_list[dataset])
 
