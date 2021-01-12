@@ -2457,7 +2457,7 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
     # Saving files:
     path = diagtools.folder([cfg['plot_dir'], 'SLR_Regional_trend_scatter'])
     path += '_'.join([plot_exp, plot_clim, plot_dyn, plot_trend,
-                      str(int(time_range[0])+'-'+ str(int(time_range[1]),
+                      str(int(time_range[0]))+'-'+ str(int(time_range[1])),
                       'SLR_Regional_trend_scatter'])+diagtools.get_image_format(cfg)
 
     if cfg['write_plots']:
@@ -2545,7 +2545,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
 
                 # subtract relevant clim
                 if method == 'dyn_height':
-                    asssert 0
+                    assert 0
                     # if (project, dataset, plot_exp, ensemble, plot_clim, plot_region, plot_trend) not in dyn_fns.keys():
                     #     print('-----\n',(project, dataset, plot_exp, ensemble, plot_clim, plot_trend), 'not in dyn_fns')
                     #     assert 0
@@ -2591,7 +2591,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
 
     #add_map_subplot(111, mean_cube, nspace, title=title,cmap=cmap)
     subplot = 111
-    plt.subplot(subplot, 'projection': ccrs.Robinson()})
+    plt.subplot(subplot, projection=ccrs.Robinson())
 
     # print('add_map_subplot: ', subplot, title, (cmap, extend, log))
     plt.title(title)
