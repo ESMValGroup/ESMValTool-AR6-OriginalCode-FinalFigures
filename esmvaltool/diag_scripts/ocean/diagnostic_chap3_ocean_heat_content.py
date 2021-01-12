@@ -25,6 +25,8 @@ import os
 
 import iris
 import matplotlib.pyplot as plt
+plt.style.use("./ipcc_ar6_fgd.mplstyle")
+
 import numpy as np
 import itertools
 import cf_units
@@ -46,7 +48,7 @@ from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
 
 from esmvalcore.preprocessor._time import extract_time
-from esmvalcore.preprocessor._regrid import regrid
+from esmvalcore.preprocessor._regrid import regrid, extract_levels
 from esmvalcore.preprocessor._area import extract_shape
 from esmvalcore.preprocessor._volume import volume_statistics
 
@@ -255,11 +257,15 @@ def make_mean_of_cube_list_notime(cube_list):
     try: model_name = cube_mean.metadata[4]['source_id']
     except: model_name = ''
 
+    #cube_mean = fix_depth(cube_mean)
+
     for i, cube in enumerate(cube_list[1:]):
         #try: iris.coord_categorisation.add_year(cube, 'time')
         #except: pass
         #try: iris.coord_categorisation.add_month(cube, 'time')
         #except: pass
+        #cube = fix_depth(cube)
+
         try: cube.remove_coord('year')
         except: pass
         #cube.remove_coord('Year')
@@ -344,7 +350,6 @@ def single_timeseries(fn, path, keys):
     #times, data = load_convert(fn)
     fig = plt.figure()
     ax = plt.subplot(111)
-    #single_pane(fig, ax, fn)
     cube = iris.load_cube(fn)
     times = diagtools.cube_time_to_float(cube)
     data = cube.data
@@ -354,23 +359,22 @@ def single_timeseries(fn, path, keys):
     plt.savefig(path)
     plt.close()
 
-def single_pane(fig, ax, fn, color='red', xlim=False, no_ticks=False):
-    times, data = load_convert(fn)
-    ax.plot(times, data, c=color)
-    if xlim:
-        ax.set_xlim(xlim)
-    if no_ticks:
-        ax.set_xticklabels([])
-    return fig, ax
+#def single_pane(fig, ax, fn, color='red', xlim=False, no_ticks=False):
+#    times, data = load_convert(fn)
+#    ax.plot(times, data, c=color)
+#    if xlim:
+#        ax.set_xlim(xlim)
+#    if no_ticks:
+#        ax.set_xticklabels([])
+#    return fig, ax
 
 
-def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
+def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='viridis', plot_type='7_panes'):
     """
     Multimodel version of the 2.25 plot.
     """
 
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
-    RHS_xlim = [1995, 2017]
 
     projects = list({index[0]:True for index in ocean_heat_content_timeseries.keys()}.keys())
     datasets = list({index[1]:True for index in ocean_heat_content_timeseries.keys()}.keys())
@@ -378,72 +382,141 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
 
     datasets = sorted(datasets)
     #color_dict = {da:c for da, c in zip(datasets, ['r' ,'b'])}
-    color_dict = {dataset:c for dataset, c in zip(datasets, plt.cm.viridis(np.linspace(0,1,len(datasets))))}
 
+    if plot_style=='viridis':
+        color_dict = {dataset:c for dataset, c in zip(datasets, plt.cm.viridis(np.linspace(0,1,len(datasets))))}
+    if plot_style=='all_one':
+        color_dict = {dataset:'blue' for dataset in datasets}
+    if plot_style=='mono':
+        color_dict={}
     color_dict['Observations'] = 'black'
     # ocean_heat_content_timeseries keys:
     # (project, dataset, 'piControl', pi_ensemble, 'ohc', 'intact', depth_range)
 
-    depth_dict = { 321: 'total',
+    fig = plt.figure()
+
+    if  plot_type=='7_panes':
+        LHS_xlim = [1860, 2017]
+        RHS_xlim = [1960, 2017]
+
+        depth_dict = { 321: 'total',
                    322: '0-2000m',
                    323: '0-700m',
                    324: '0-700m',
                    326:  '700-2000m',
                    (6, 2, 9):  '700-2000m',
                    (6, 2, 11): '2000m_plus'}
-    xlims_dict = { 321: False,
+        xlims_dict = { 321: LHS_xlim,
                    322: RHS_xlim,
-                   323: False,
+                   323: LHS_xlim,
                    324: RHS_xlim,
                    326: RHS_xlim,
-                   (6, 2, 9):  False,
-                   (6, 2, 11): False}
-    no_ticks= {321: True,
+                   (6, 2, 9):  LHS_xlim,
+                   (6, 2, 11): LHS_xlim,}
+        no_ticks= {321: True,
                322: True,
                323: True,
                324: True,
                326: False,
                (6, 2, 9):  True,
                (6, 2, 11): False}
+        axes_texts = {
+            321: 'Full-depth',
+            322: '0-2000m',
+            323: '0-700m',
+            324: '0-700m',
+            326: '700m - 2000m',
+            (6, 2, 9): '700m - 2000m',
+            (6, 2, 11): '> 2000m',
+        }
+
+        fig.set_size_inches(10, 7)
+
+    if  plot_type=='4_panes':
+        LHS_xlim = [1860, 2019]
+        depth_dict = { 411: 'total',
+                   412: '0-700m',
+                   413: '700-2000m',
+                   414: '2000m_plus'  }
+        xlims_dict = { 411: LHS_xlim,    
+                   412: LHS_xlim,
+                   413: LHS_xlim, 
+                   414: LHS_xlim }
+        no_ticks= {411: True,
+               412: True,
+               413: True,
+               414: False,}
+        axes_texts ={411: 'Full-depth',
+               412: '0-700m',
+               413: '700m - 2000m',
+               414:  '> 2000m',}
+        fig.set_size_inches(10, 7)
+
 
     plot_details={}
-    fig = plt.figure()
-    fig.set_size_inches(10, 7)
     axes= {}
     for subplot in depth_dict.keys():
         if isinstance(subplot, int):
             axes[subplot] =  plt.subplot(subplot)
         else:
             axes[subplot] =  plt.subplot(subplot[0], subplot[1], subplot[2])
-        if subplot== 323:
-
+        if subplot in [413, 323]:
             plt.ylabel('OHC (ZJ)', fontsize=16)
 
-    for project, dataset, ensemble in itertools.product(projects, datasets, ensembles):
+    if plot_style=='mono': # just plot between the most extremem values.
+        fill_betweens = {subplot:{} for subplot in axes.keys()}
 
-        total_key = (project, dataset, 'historical', ensemble, 'ohc', 'detrended', 'total')
-        fn = ocean_heat_content_timeseries.get(total_key, False)
-        if not fn:
-            continue
+        for project, dataset, ensemble in itertools.product(projects, datasets, ensembles):
+            total_key = (project, dataset, 'historical', ensemble, 'ohc', 'detrended', 'total')
+            fn = ocean_heat_content_timeseries.get(total_key, False)
+            if not fn:
+                continue
 
-        for subplot, ax in axes.items():
-            key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
-            fn = ocean_heat_content_timeseries[key]
-            fig, ax = single_pane(fig, ax, fn,
-                                  color=color_dict[dataset],
-                                  xlim=xlims_dict[subplot],
-                                  no_ticks=no_ticks[subplot])
+            for subplot, ax in axes.items():
+                key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
+                fn = ocean_heat_content_timeseries[key]
+                times, data = load_convert(fn)
+                for t, d in zip(times, data):
+                    t = int(t) + 0.5
+                    try: fill_betweens[subplot][t].append(d)
+                    except: fill_betweens[subplot][t]= [d, ]
+
+        for subplot in fill_betweens.keys():
+            times = sorted(fill_betweens[subplot].keys())
+            mins = [np.min(fill_betweens[subplot][t]) for t in times]
+            maxs = [np.max(fill_betweens[subplot][t]) for t in times]
+            axes[subplot].fill_between(times, mins, maxs, color='grey', alpha=0.5)
+
+            if xlims_dict[subplot]:
+                axes[subplot].set_xlim(xlims_dict[subplot])
+            if no_ticks[subplot]:
+                axes[subplot].set_xticklabels([])
+
+
+    else:
+
+        for project, dataset, ensemble in itertools.product(projects, datasets, ensembles):
+            total_key = (project, dataset, 'historical', ensemble, 'ohc', 'detrended', 'total')
+            fn = ocean_heat_content_timeseries.get(total_key, False)
+            if not fn:
+                continue
+
+            for subplot, ax in axes.items():
+                key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
+                fn = ocean_heat_content_timeseries[key]
+
+                times, data = load_convert(fn)
+                ax.plot(times, data, c=color_dict[dataset], alpha=0.5)
+                if xlims_dict[subplot]:
+                    ax.set_xlim(xlims_dict[subplot])
+                if no_ticks[subplot]:
+                    ax.set_xticklabels([])
 
     for subplot, ax in axes.items():
         ax.axhline(0., c='k', ls=':')
 
-    top_left_text(axes[321], 'Full-depth')
-    top_left_text(axes[322], '0-2000m')
-    top_left_text(axes[323], '0-700m')
-    top_left_text(axes[324], '0-700m')
-    top_left_text(axes[326], '700m - 2000m')
-    top_left_text(axes[(6, 2, 9)], '700m - 2000m')
-    top_left_text(axes[(6, 2, 11)], '> 2000m')
+    for axes_key, text in axes_texts.items():
+        top_left_text(axes[axes_key], text)
 
     plt.suptitle('Global Ocean Heat Content')
 
@@ -490,32 +563,55 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries):
                 axes[subplot].plot(obs_years,
                            obs_series[name]*1E-21,
                            c = 'black',
-                           lw = 0.5,
+                           lw = 1.5, #0.5,
+                           zorder=2,
                            )
-
-    if len(datasets) <=5:
-        axleg = plt.axes([0.0, 0.00, 0.9, 0.10])
+    legend_fs = 12
+    if plot_style in ['all_one', 'mono']:leg_size=2
     else:
-        axleg = plt.axes([0.0, 0.00, 0.9, 0.15])
-    axleg.axis('off')
+        leg_size = len(datasets)
 
-    # Add emply plots to dummy axis.
-    for dataset in datasets:
-        axleg.plot([], [], c=color_dict[dataset], lw=2, ls='-', label=dataset)
+    if leg_size <=5:
+        axleg = plt.axes([0.05, 0.02, 0.9, 0.10])
+    elif leg_size <=10:
+        axleg = plt.axes([0.05, 0.02, 0.9, 0.15])
+    elif leg_size <=15:
+        axleg = plt.axes([0.05, 0.02, 0.9, 0.20])
+        Legend_fs = 8
+    else:
+        axleg = plt.axes([0.05, 0.02, 0.9, 0.25])
+        legend_fs = 8
+
+    axleg.axis('off')
+    if plot_style == 'mono':
+        axleg.plot([], [], c='grey', lw=5, ls='-', alpha=0.5, label='CMIP6')
+        axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
+
+    if plot_style == 'all_one':
+        axleg.plot([], [], c='blue', lw=3, ls='-', label='CMIP6')
+        axleg.plot([], [], c='black', lw=3, ls='-', label='Observations')
+
+    if plot_style == 'viridis':
+        # Add emply plots to dummy axis.
+        for dataset in datasets:
+            axleg.plot([], [], c=color_dict[dataset], lw=2, ls='-', label=dataset)
 
     legd = axleg.legend(
             loc='upper center',
+            #loc='lower center',
             ncol=5,
-            prop={'size': 10},
+            prop={'size': legend_fs},
             bbox_to_anchor=(0.5, 0.5,),
-            fontsize=12)
+            fontsize=legend_fs)
+
     legd.draw_frame(False)
     legd.get_frame().set_alpha(0.)
 
     fig_dir = diagtools.folder([cfg['plot_dir'], 'multimodel_ohc'])
     image_extention = diagtools.get_image_format(cfg)
-    fig_fn = fig_dir + '_'.join(['multimodel_ohc',
-                                 ])+image_extention
+    
+    fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,
+                                     ])+image_extention
 
     plt.savefig(fig_fn)
     print('multimodel_ohc: saving',fig_fn)
@@ -527,6 +623,13 @@ def fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemb
     Produce a 6 pane figure showing the time series.
     """
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
+
+    fig_dir = diagtools.folder([cfg['plot_dir'], 'ohc_summary'])
+    image_extention = diagtools.get_image_format(cfg)
+    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, 'ohc_summary',
+                                 ])+image_extention
+
+    if os.path.exists(fig_fn): return
 
     RHS_xlim = [1995, 2017]
     fns = {depth_range: ocean_heat_content_timeseries[(project, dataset, exp, ensemble, 'ohc', 'detrended',depth_range)] for depth_range in depth_ranges}
@@ -595,11 +698,6 @@ def fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemb
         for ax in [ax1, ax2, ax3, ax4, ax6, ax9, ax11]:
             ax.axhline(0., c='k', ls=':')
 
-    fig_dir = diagtools.folder([cfg['plot_dir'], 'ohc_summary'])
-    image_extention = diagtools.get_image_format(cfg)
-    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, 'ohc_summary',
-                                 ])+image_extention
-
     plt.savefig(fig_fn)
     print('detrending_fig: saving',fig_fn)
     plt.close()
@@ -654,11 +752,22 @@ def detrending_fig(cfg,
     if not trend_intact_piC:
         skip_intact_piC = True
     else: skip_intact_piC = False
+
+
     short_name = metadatas[detrended_hist]['short_name']
     dataset = metadatas[detrended_hist]['dataset']
     ensemble = metadatas[detrended_hist]['ensemble']
     project = metadatas[detrended_hist]['project']
     exp = metadatas[detrended_hist]['exp']
+
+    fig_dir = diagtools.folder([cfg['plot_dir'], 'detrending_ts', key])
+    image_extention = diagtools.get_image_format(cfg)
+    if not year: year=''
+    fig_fn = fig_dir + '_'.join([project, exp, dataset, ensemble, key, 'detrending_ts', str(year),
+                                   depth_range])+image_extention
+
+    if os.path.exists(fig_fn): 
+        return
 
     cube_d_h = iris.load_cube(detrended_hist)
     cube_i_h = iris.load_cube(trend_intact_hist)
@@ -789,7 +898,7 @@ def single_pane_map_plot(
         metadata,
         cube,
         key='',
-        overwrite = True,
+        overwrite = False,
         sym_zero = False,
         ):
     """
@@ -1074,9 +1183,15 @@ def calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend):
 
     # depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     cube = iris.load_cube(ohc_fn)
+    cube = fix_depth(cube)
     zunits = str(cube.coord(axis='Z').units)
     if zunits.lower() not in ['m', 'meter', 'meters']:
+        print('calc_ohc_ts', exp, dataset, ensemble, project, depth_range, trend)
         print('Unknown units in z direction:', zunits)
+#       if str(thetao_bar.coord(axis='z').units).lower() in ['cm', 'centimeters']:
+#           depths_bar = depths_bar /100.
+#           print('changed depth units')
+#           thicknesses_bar = thicknesses_bar/100.
         assert 0
 
     times = diagtools.cube_time_to_float(cube)
@@ -1309,7 +1424,7 @@ def calc_dyn_height_clim(cfg,
     if str(thetao_bar.coord(axis='z').units).lower() in ['cm', 'centimeters']:
         depths_bar = depths_bar /100.
         print('changed depth units')
-        thicknesses_bar = thickness_bar/100.
+        thicknesses_bar = thicknesses_bar/100.
 
     # Create output cubes to receive SLR data.
     print('Creating output arrays')
@@ -1876,11 +1991,12 @@ def calc_landerer_slr(
     psal_bar_data = psal_bar.data
     thetao_bar_data = thetao_bar.data
     depths_bar = -1.*np.abs(thetao_bar.coord(axis='z').points.copy())
+    print(project, dataset, exp, ensemble, 'slr', trend, 'depths_bar:', depths_bar)
     #thickneses_bar = np.abs(thetao_bar.coord(axis='z').bounds[...,1] - thetao_bar.coord(axis='z').bounds[...,0])
 
     if str(thetao_cube.coord(axis='z').units).lower() in ['cm', 'centimeters']:
         depths = depths /100.
-        depths_bar = depths_bar/100,
+        depths_bar = depths_bar/100
 
     # Create output cubes to receive SLR data.
     slr_total = np.zeros(thetao_cube[:, 0, : , :].shape) #2d + time
@@ -2241,43 +2357,46 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
     trends = {}
     datasets = {}
     ensembles = {}
+    exps = {}
 
     for (project, dataset, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
         if dyn_type != plot_dyn: continue
         if trend != plot_trend: continue
         if region == 'Global': continue # only want pacfic/atlantic
-        if exp != plot_exp: continue
+#       if exp != plot_exp: continue
         datasets[dataset] = True
+        exps[exp] = True
         ensembles[ensemble] = True
         cube = iris.load_cube(fn)
         times = diagtools.cube_time_to_float(cube)
 
         if method == 'dyn_height': # anomaly is
             assert 0
-            # clim_file = dyn_fns[(project, dataset, exp, ensemble, plot_clim, region, trend)]
-            # #clim_series[region][(dataset, ensemble)] =
-            # print('Clim files:', (project, dataset, exp, ensemble, plot_clim, region, trend), clim_file)
-            # clim_data = iris.load_cube(clim_file).data
-            #
-            # data = np.array([-1*(d - clim_data) for d in  cube.data])
-            # print('clim_data', clim_data, clim_data.shape)
         if method == 'Landerer': # anomaly is already calculated.
             data = cube.data
         print('------\n',project, dataset, exp, ensemble, dyn_type, region, trend)
         print('cube.data:', cube.data)
 
-        trends[(dataset, ensemble, region)] = np.mean(data[1:] - data[:-1])
+        trends[(dataset, exp, ensemble, region)] = np.mean(data[1:] - data[:-1])
         # times = (times[1:] + times[:-1])/2.
 
     fig = plt.figure()
+    ax = fig.add_subplot(111)
     count = 0
-    for dataset, ensemble in itertools.product(datasets, ensembles):
-        pac =  trends.get((dataset, ensemble, 'Pacific'), None)
-        alt =  trends.get((dataset, ensemble, 'Atlantic'), None)
-        print('Scatter:', dataset, ensemble, 'pac:', pac, 'alt:', alt)
+    colours = {'observations':'red', 'historical': 'black', 'hist-nat':'green'}
+    labels = []
+    for dataset, exp, ensemble in itertools.product(datasets, exps, ensembles):
+        pac =  trends.get((dataset, exp, ensemble, 'Pacific'), None)
+        alt =  trends.get((dataset, exp, ensemble, 'Atlantic'), None)
+        print('Scatter:', dataset, exp, ensemble, 'pac:', pac, 'alt:', alt)
         if None in [pac, alt]: continue
-
-        plt.scatter(pac, alt, marker='s', label = dataset)
+        col=  colours[exp]
+        label = exp
+        if label not in labels:
+            plt.scatter(pac, alt, c=col, marker='s', label = label)
+        else:
+            plt.scatter(pac, alt, c=col, marker='s')
+        labels.append(label)
         count +=1
     if not count:
          plt.close()
@@ -2287,12 +2406,15 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
     plt.axhline(0, c='k', ls='--')
     plt.axvline(0, c='k', ls='--')
 
+    ax.set_xlim([-1., 1])
+    ax.set_ylim([-1., 1])
+
     if plot_dyn == 'halo_ts':
-        plt.xlabel('Pacific mean interannual change in Halosteric Sea Level, mm/Yr-1')
-        plt.ylabel('Atlantic mean interannual change in Halosteric Sea Level, mm/Yr-1')
+        plt.xlabel('Pacific Halosteric Trend (mm yr'+r'$^{-1}$'+')')
+        plt.ylabel('Atlantic Halosteric Trend (mm yr'+r'$^{-1}$'+')')
     if plot_dyn == 'thermo_ts':
-        plt.xlabel('Pacific mean interannual change in Thermosteric Sea Level, mm/Yr-1')
-        plt.ylabel('Atlantic mean interannual change in Thermoosteric Sea Level, mm/Yr-1')
+        plt.xlabel('Pacific Thermosteric Trend (mm yr'+r'$^{-1}$'+')')
+        plt.ylabel('Atlantic Thermosteric Trend (mm yr'+r'$^{-1}$'+')')
 
     # Saving files:
     path = diagtools.folder([cfg['plot_dir'], 'SLR_Regional_trend_scatter'])
@@ -2375,6 +2497,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
             cube_list[dataset] = make_mean_of_cube_list_notime(cube_list[dataset])
 
             # regrid to a common grid:
+            print('Regridding', dataset, trend, exp, region, cube_list[dataset].shape)
             cube_list[dataset] = regrid_to_1x1( cube_list[dataset])
 
         # Take mean of several cubes
@@ -2398,13 +2521,106 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
 
     title = ' '.join(unique_id)
 
-    add_map_subplot(111, mean_cube, nspace, title=title,cmap=cmap)
+    #add_map_subplot(111, mean_cube, nspace, title=title,cmap=cmap)
+    subplot = 111
+    plt.subplot(subplot)
+
+    # print('add_map_subplot: ', subplot, title, (cmap, extend, log))
+    plt.title(title)
+    cmax = mean_cube.data.max()
+    cmax = np.max([cmax, 100.])
+
+    qplot = iris.plot.contourf(
+        mean_cube,
+        nspace,
+        linewidth=0,
+        cmap=plt.cm.get_cmap(cmap),
+        extend='neither',
+        zmin=nspace.min(),
+        zmax=nspace.max())
+    #print(qplot.get_extend())
+    #plt.gca().set_yxlim([-80 ,80  ])
+
+    cbar = plt.colorbar(orientation='horizontal')
+    if subplot!=111:
+        cbar.set_ticks(
+            [nspace.min(), (nspace.max() + nspace.min()) / 2.,
+             nspace.max()])
+
+    try: plt.gca().coastlines()
+    except: pass
+
     # Saving files:
     if cfg['write_plots']:
         logger.info('Saving plots to %s', path)
         plt.savefig(path, dpi=200)
     plt.close()
     return multimodel_mean_fn
+
+
+
+def plot_halo_obs_mean(cfg, metadatas, dyn_fns,
+        plot_trend = 'detrended',
+        plot_dyn = 'halo',
+        plot_exp = 'historical',
+        plot_clim = '1850-1900',
+        plot_region = 'Global',
+        time_range=[1950, 2000],
+        ):
+    """
+    make the observational halosteric observation plot.
+    """
+    # Make the plot.
+    unique_id = [plot_dyn, plot_exp, plot_region, 'mean', '-'.join([str(t) for t in time_range])]
+
+    # Determine image filename
+    filename = '_'.join(unique_id).replace('/', '_')
+    path = diagtools.folder([cfg['plot_dir'], 'obsthalosteric_map']) + filename
+    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+
+    aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
+ 
+#    nc = ncdfView(
+
+    cmap='coolwarm'
+    max_val = np.max(np.abs([mean_cube.data.min(), mean_cube.data.max()]))
+    nspace = np.linspace(
+        -max_val, max_val, 21, endpoint=True)
+
+    title = ' '.join(unique_id)
+
+    #add_map_subplot(111, mean_cube, nspace, title=title,cmap=cmap)
+    subplot = 111
+    plt.subplot(subplot)
+
+    # print('add_map_subplot: ', subplot, title, (cmap, extend, log))
+    plt.title(title)
+    cmax = mean_cube.data.max()
+    cmax = np.max([cmax, 100.])
+
+    qplot = iris.plot.contourf(
+        mean_cube,
+        nspace,
+        linewidth=0,
+        cmap=plt.cm.get_cmap(cmap),
+        extend=extend,
+        zmin=nspace.min(),
+        zmax=nspace.max())
+    cbar = plt.colorbar(orientation='horizontal')
+    if subplot!=111:
+        cbar.set_ticks(
+            [nspace.min(), (nspace.max() + nspace.min()) / 2.,
+             nspace.max()])
+
+    try: plt.gca().coastlines()
+    except: pass
+
+    # Saving files:
+    if cfg['write_plots']:
+        logger.info('Saving plots to %s', path)
+        plt.savefig(path, dpi=200)
+    plt.close()
+
 
 
 def plot_slr_full3d_ts(cfg, metadata, dyn_files, area_fn, trend):
@@ -2634,6 +2850,11 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     so_cube = iris.load_cube(so_fn)
     vol_cube = iris.load_cube(volcello_fn)
 
+    # Fix depth cubes.
+    thetao_cube = fix_depth(thetao_cube)
+    so_cube = fix_depth(so_cube)
+    vol_cube = fix_depth(vol_cube)
+
     # Load coordinates
     lats = thetao_cube.coord('latitude').points
     lons = thetao_cube.coord('longitude').points
@@ -2738,6 +2959,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     cube.name = 'Ocean heat Content ' + trend
     cube.short_name = 'ohc'
     cube.var_name = 'ohc'
+    print('Saving OHC file:', output_ohc_fn)
     iris.save(cube, output_ohc_fn)
 
     for t in [0, -1]:
@@ -2760,6 +2982,13 @@ def volume_integrated_plot(cfg, metadata, ohc_fn, area_fn):
     project = metadata['project']
     exp = metadata['exp']
 
+
+    # Determine image filename
+    unique_id = [dataset, exp, ensemble, short_name] #ear ]
+    path = diagtools.folder([cfg['plot_dir'], 'volume_integrated_plot']) + '_'.join(unique_id)
+    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+    if os.path.exists(path): return
+
     cube = iris.load_cube(ohc_fn)
     area = iris.load_cube(area_fn)
 
@@ -2772,11 +3001,6 @@ def volume_integrated_plot(cfg, metadata, ohc_fn, area_fn):
     cube = cube.collapsed([cube.coord(axis='z'),],
                           iris.analysis.SUM)
     cube.data = cube.data / area.data
-
-    # Determine image filename
-    unique_id = [dataset, exp, ensemble, short_name] #ear ]
-    path = diagtools.folder([cfg['plot_dir'], 'volume_integrated_plot']) + '_'.join(unique_id)
-    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
 
     cmap='viridis'
     nspace = np.linspace(
@@ -3039,7 +3263,7 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
             #    continue
             #print(count, index, 'detrending', slopes.get(index, False), intercepts.get(index, False) )
             if not slopes.get(index, False):
-                print('Failure:', filename)
+                print('Failure:', filename, index)
             # ne = [(t * slopes[index]) + intercepts[index] for t in np.arange(len(decimal_time))]
             line = [(t * slope) + intercept for t in np.arange(len(decimal_time))]
 
@@ -3086,34 +3310,149 @@ def detrend_from_PI(cfg, metadatas, filename, trend_shelve):
 
     return output_fn
 
+def fix_depth(cube):
+    z = cube.coord(axis='Z')
+    z.var_name = 'depth'
+    z.long_name='ocean depth coordinate'
+    z.standard_name='depth'
+    z.attributes={'positive': 'down'}
 
-def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,):
+    if str(z.units).lower() in ['cm', 'centimeters']:
+        z.units = cf_units.Unit('m')
+
+        if np.abs(z.points.max()) > 200000:
+            z.points = z.points/100.
+    
+        try: 
+            if np.abs(z.bounds.max()) > 200000:
+                z.bounds = z.bounds/100.
+        except: pass
+
+    print(cube, z)
+    return cube
+
+
+def calculate_multi_model_mean(cfg, metadatas, detrended_ncs, 
+    master_project = '',
+    master_short_name = '', 
+    master_exp = '',
+    trend = 'detrended',
+    time_range = '1950'):
     """
     Calculated the multimodel means
 
     check whethger the output exists already
     if so, do nothing
-    
+
     for each model:
         for each model ensemble:
-            first extract the requires yeard, 
+            first extract the requires yeard,
             take the mean over the time axis
         Take the multi ensemble member mean
         regrid to 1x1
 
-    Once that is done, take the multi model mean. 
+    Once that is done, take the multi model mean.
     save the netcdf
     make a plot.
-
     """
-    #detrended_ncs.keys (project, dataset, exp, ensemble, short_name): fn
+    work_dir = diagtools.folder([cfg['work_dir'], 'multi_model_mean'])
+    out_fn = work_dir + '_'.join(['multi_model_mean', master_project, master_short_name, master_exp, trend, time_range])+'.nc'
+    print('Preparing:', out_fn)
+    if os.path.exists(out_fn):
+        return
+    # detrended_ncs.keys (project, dataset, exp, ensemble, short_name): fn
     datasets = {index[1]:True for index in detrended_ncs.keys()}
-    time_ranges = ['1950', '2000', '1950-2000']
+    
+    #time_ranges = ['1950', '2000', '1950-2000']
+    multimodel_cubes = []
+    full_depth = False 
+    included_datasets = ''
     for master_dataset in datasets:
+        if master_dataset in ['FGOALS-f3-L','FGOALS-g3', ]:
+            continue
+        cubes = []
+        work_dir = diagtools.folder([cfg['work_dir'], 'regridded_means'])
+        single_fn = work_dir + '_'.join([master_dataset, master_project, master_short_name, master_exp, trend, time_range])+'.nc'
+
+        if os.path.exists(single_fn):
+            mean_cube =  iris.load_cube(single_fn)
+            multimodel_cubes.append(mean_cube.copy())   
+            for (project, dataset, exp, ensemble, short_name), fn in detrended_ncs.items():
+                if master_dataset != dataset: continue
+                if master_project != project: continue
+                if master_exp != exp: continue
+                if master_short_name != short_name: continue
+                included_datasets += ' '.join([dataset, ensemble, exp,])
+            included_datasets+='\n'
+            continue
+
+        cubes = []
         for (project, dataset, exp, ensemble, short_name), fn in detrended_ncs.items():
-           cube =  iris.load_cube(fn)
-           new_cube = extract_time(cube, year_initial, 1, 1, year_final, 12, 31)
-    return 
+            if master_dataset != dataset: continue 
+            if master_project != project: continue
+            if master_exp != exp: continue
+            if master_short_name != short_name: continue
+            
+            cube =  iris.load_cube(fn)
+            if time_range in ['1950', '2000']:
+               trnage = int(time_range)
+               cube = extract_time(cube, trnage, 1, 1, trnage, 12, 31)
+            elif  time_range == '1950-2000':
+               cube = extract_time(cube, 1950, 1, 1, 2000, 12, 31)
+               cube = cube.collapsed('time', iris.analysis.MEAN)
+            if not full_depth:
+                cube = fix_depth(cube)
+                cube = extract_levels(cube, [0., ], "nearest_horizontal_extrapolate_vertical")
+            cubes.append(cube.copy())
+            included_datasets += ' '.join([dataset, ensemble, exp,])
+        included_datasets+='\n'
+
+        if len(cubes) ==0:
+            print('did not find any cubes', master_dataset, master_project, master_exp, master_short_name)
+            assert 0
+        print('Making a multi ensemble member mean:',master_dataset)
+        mean_cube = make_mean_of_cube_list_notime(cubes)
+
+        # regrid:
+        print('regridding:',master_dataset)
+        mean_cube = regrid_to_1x1(mean_cube)
+
+        # vertical regrid:
+        if full_depth:
+            mean_cube = fix_depth(mean_cube)
+            levels = [1, 10, 25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450,
+                      500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1250,
+                      1500, 1750, 2000, 2400, 2800, 3200, 3600, 4000, 4400, 
+                      4800, 5200]
+            print('vertical regridding:',master_dataset)
+            mean_cube = extract_levels(mean_cube, levels, "nearest_horizontal_extrapolate_vertical")
+        
+        # Save single model mean.
+        iris.save(mean_cube, single_fn)
+
+        multimodel_cubes.append(mean_cube)
+
+    print('Making the multi model mean of regridded cubes:')
+    mean_cube = make_mean_of_cube_list_notime(multimodel_cubes)
+    mean_cube.attributes['included_datasets'] = included_datasets
+
+    print('Writing cube to file:', out_fn)
+    iris.save(mean_cube, out_fn)
+    metadata = {}
+    metadata['short_name'] = master_short_name
+    metadata['dataset'] = 'multi'
+    metadata['ensemble'] = 'multi'
+    metadata['project'] = master_project
+    metadata['exp'] = master_exp
+     
+    single_pane_map_plot(
+        cfg,
+        metadata,
+        mean_cube,
+        key='multimodel_mean/'+'_'.join([master_project, master_short_name, master_exp, trend, time_range]),
+        sym_zero=False,
+    )
+
 
 
 
@@ -3143,9 +3482,17 @@ def guess_areacello_fn(dicts, keys):
             print("guess_areacello_fn: full match", index, keys, value)
             return value
     print('Did Not find Areacello:', keys)
+
+    if 'FGOALS-g3' in keys:
+        # No area file for fgoals, but it's the same in FGOALS-f3-L
+        for i,a in enumerate(keys):
+            if a == 'FGOALS-g3':
+                keys[i] = 'FGOALS-f3-L'
+        return guess_areacello_fn(dicts, keys)
+    #return guess_volcello_fn(dicts, t_index, vol_key = 'areacello')
     assert 0
 
-def guess_volcello_fn(dicts, keys, optional = []):
+def guess_volcello_fn_old(dicts, keys, optional = []):
     """
     Take a punt at the volcello filename.
     # When it's hist-* we want historical
@@ -3176,8 +3523,55 @@ def guess_volcello_fn(dicts, keys, optional = []):
         if len(intersection) == len(keys):
             print("guess_volcello_fn: minimal match", index, keys, value)
             return value
-    print('Did Not find Volcello:', keys, optional)
+    print('Did Not find Volcello:', keys ) #ional)
     assert 0
+
+def guess_volcello_fn(dicts, t_index, vol_key = 'volcello'):
+    """
+    Take a punt at the volcello filename.
+    # When it's hist-* we want historical
+    # When itr's piControl, we want piControl.
+    # When the model is a Ofx model, we want the Ofx version.
+    """
+    (t_project, t_dataset, t_exp, t_ensemble, t_short_name) = t_index
+    
+    key_list = [[t_project, t_dataset, t_exp, t_ensemble, vol_key   ],] # everything.
+    enss = ['r1i1p1f1', 'r1i1p1f2', 'r1i1p2f1', 'r1i1p1f3']
+    for pi_ens in enss:
+        key_list.append([t_project, t_dataset, 'piControl', pi_ens, vol_key   ]) # piControl volcello
+
+    for pi_ens in enss:
+        key_list.append([t_project, t_dataset, 'historical', pi_ens, vol_key   ]) # historical volcello
+    
+            
+    for keys in key_list:
+        print("guess_volcello_fn: looking for:", keys)
+    
+        for index, value in dicts.items():
+            intersection = set(index) & set(keys)
+            print('iterating: index:',index, 'keys:',keys, 'intersection:', intersection, 'file:',value)
+            if sorted([i for i in intersection]) == sorted([i for i in keys]):
+                print("guess_volcello_fn: full match", index, value)
+                return value
+
+
+    # for index, value in dicts.items():
+    #     for option in optional:
+    #         both = (keys+[option, ])
+    #         intersection = set(index) & set(both)
+    #         if len(intersection) == len(both):
+    #             print("guess_volcello_fn: partial match", index, keys, option, value)
+    #             return value
+    # 
+    # for index, value in dicts.items():
+    #     intersection = set(index) & set(keys)
+    #     if len(intersection) == len(keys):
+    #         print("guess_volcello_fn: minimal match", index, keys, value)
+    #         return value
+    print('Did Not find Volcello:', keys)
+    assert 0
+
+
 
 
 def guess_vol_exp(exp):
@@ -3455,7 +3849,13 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    bad_models = ['NorESM2-LM', 'NorESM2-MM',]
+    bad_models = ['NorESM2-LM', 'NorESM2-MM',
+                  'FGOALS-f3-L', 'FGOALS-g3', 
+                  #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2' 
+                 ]
+    # NorESM2 doesn't include depth data. z axis is werid.
+    # FGOALS are missing longitude and lattitide boundaries (but have irregular grids)
+    # CESM2-FV2 still has depth in cm.
 
 
     print('\n\n\ncreation loop')
@@ -3477,14 +3877,14 @@ def main(cfg):
         print('iterating', project, dataset, exp, ensemble, short_name, filename)
         if exp != 'piControl':
             continue
-        if short_name in ['volcello', 'areacello']:
+        if short_name in ['volcello', 'areacello', 'thkcello' ]:
             continue
         trend_shelves[(project, dataset, exp, ensemble, short_name)] = calc_pi_trend(cfg, metadatas, filename)
 
     print('\nDetrend from PI.')
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
         print('detrending:', project, dataset, exp, ensemble, short_name, filename)
-        if short_name in ['volcello', 'areacello']:
+        if short_name in ['volcello', 'areacello', 'thkcello']:
               continue
         pi_ensemble = guess_PI_ensemble(trend_shelves, [project, dataset, short_name], ens_pos = 3)
         trend_shelve = trend_shelves[(project, dataset, 'piControl', pi_ensemble, short_name)]
@@ -3492,32 +3892,44 @@ def main(cfg):
         detrended_ncs[(project, dataset, exp, ensemble, short_name)] = detrended_fn
         metadatas[detrended_fn] = metadatas[filename].copy()
 
-    calculate_multi_model_mean(cfg, metadatas, detrended_ncs,)
-
+    # Make a plot for the
+    do_multimean = True  
+    for master_short_name, time_range in itertools.product(['so', 'thetao'],  ['1950', '2000', '1950-2000']):
+        if not do_multimean: continue
+        calculate_multi_model_mean(cfg, metadatas, detrended_ncs, 
+            master_project = 'CMIP6',
+            master_short_name = master_short_name, 
+            master_exp = 'historical',
+            time_range = time_range)
+    # if do_multimean: assert 0
 
     print('Make time series plots')
     volume_weighted_means={}
     for (project, dataset, exp, ensemble, short_name), filename in file_dict.items():
-        if short_name in ['volcello', 'areacello']:
+        if short_name in ['volcello', 'areacello', 'thkcello']:
             continue
-        vol_exp = guess_vol_exp(exp)
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        # vol_exp = guess_vol_exp(exp)
+        # volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        volcello_fn = guess_volcello_fn(file_dict,  (project, dataset, exp, ensemble, short_name))
+
         vwts = calculate_volume_weighted_mean(cfg, metadatas[filename], filename, volcello_fn, trend = 'intact')
         volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'intact')] = vwts
         metadatas[vwts] = metadatas[filename]
 
     for (project, dataset, exp, ensemble, short_name), detrended_fn  in detrended_ncs.items():
-        if short_name in ['volcello', 'areacello']:
+        if short_name in ['volcello', 'areacello', 'thkcello']:
             continue
-        vol_exp = guess_vol_exp(exp)
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        # vol_exp = guess_vol_exp(exp)
+        # volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        volcello_fn = guess_volcello_fn(file_dict,  (project, dataset, exp, ensemble, short_name))
+
         vwts = calculate_volume_weighted_mean(cfg, metadatas[detrended_fn], detrended_fn, volcello_fn, trend = 'detrended')
         volume_weighted_means[(project, dataset, exp, ensemble, short_name, 'detrended')] = vwts
         metadatas[vwts] = metadatas[detrended_fn]
 
     for (project, dataset, exp, ensemble, short_name, trend), fn in volume_weighted_means.items():
         print('iterating VWM files:',(project, dataset, exp, ensemble, short_name, trend), fn)
-        if short_name in ['volcello', 'areacello']:
+        if short_name in ['volcello', 'areacello', 'thkcello']:
             continue
         if exp in 'piControl': continue
         if trend == 'intact': continue
@@ -3547,9 +3959,9 @@ def main(cfg):
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
     slr_fns = {}
-    do_SLR = True
+    do_SLR = False
     method = 'Landerer'
-    bad_models = ['NorESM2-LM',]
+    # bad_models = ['NorESM2-LM','CESM2-FV2',]
     trends = ['detrended', ] #'intact']
     for (project, dataset, exp, ensemble, short_name)  in sorted(detrended_ncs.keys()):
         for trend in trends:
@@ -3693,10 +4105,21 @@ def main(cfg):
                 time_range = time_range,
                 method = method,
             )
+            continue
+            plot_halo_obs_mean(cfg, metadatas,slr_fns,
+                plot_trend = trend,
+                plot_dyn = plot_dyn,
+                plot_exp = plot_exp,
+                plot_clim = plot_clim,
+                plot_region = plot_region,
+                time_range = time_range,
+                method = method,
+            )
 #           slr_fns[(trend, plot_dyn, plot_exp, plot_clim, time_range[0], time_range[1],)] = multimodel_mean_fn
 
     if do_SLR and method == 'dyn_height':
         assert 0
+        """ 
         plot_dyn = 'halo'
         plot_exp = 'historical'
         plot_clim = '1850-1900_ts'
@@ -3738,7 +4161,8 @@ def main(cfg):
                 plot_region = plot_region,
                 time_range = time_range,
             )
-    #        slr_fns[(trend, plot_dyn, plot_exp, plot_clim, time_range[0], time_range[1],)] = multimodel_mean_fn
+        #    slr_fns[(trend, plot_dyn, plot_exp, plot_clim, time_range[0], time_range[1],)] = multimodel_mean_fn
+        """
     # END of SLR calculation
 
     print('\nCalculate ocean heat content - trend intact')
@@ -3748,8 +4172,10 @@ def main(cfg):
         #if exp ==  'piControl': # no need to calculate this.
         #    continue
         # volcello is in same ensemble, same exp.
-        vol_exp = guess_vol_exp(exp)
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        #vol_exp = guess_vol_exp(exp)
+        #volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        volcello_fn = guess_volcello_fn(file_dict,  (project, dataset, exp, ensemble, short_name))
+
         if not volcello_fn:
             #(project, dataset, exp, ensemble, 'volcello') in file_dict:
             #volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello'],optional=[ensemble, exp])
@@ -3784,8 +4210,9 @@ def main(cfg):
         # Only calculate once for each dataset, exp, ensemble.
         if short_name != 'thetao':
             continue
-        vol_exp = guess_vol_exp(exp)
-        volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,])
+        # vol_exp = guess_vol_exp(exp)
+        # volcello_fn = guess_volcello_fn(file_dict, [project, dataset, 'volcello', vol_exp], optional=[ensemble,]) # old
+        volcello_fn = guess_volcello_fn(file_dict,  (project, dataset, exp, ensemble, short_name))
         if not volcello_fn:
             print('ocean heat content calculation: no volcello', (project, dataset, exp, ensemble, short_name))
             assert 0
@@ -3874,7 +4301,7 @@ def main(cfg):
             assert 0
         if detrended_piC.find('piControl')==-1:
             assert 0
-        detrending_fig(cfg, metadatas, detrended_hist, trend_intact_hist, detrended_piC, trend_intact_piC, depth_range, 'OHC')
+        detrending_fig(cfg, metadatas, detrended_hist, trend_intact_hist, detrended_piC, trend_intact_piC, depth_range, 'OHC', native_time=True)
 
     # Multi model time series plotx for each time series
     # Figure based on 2.25.
@@ -3885,7 +4312,9 @@ def main(cfg):
         except: continue
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
-    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries)
+    for plot_style, plot_type  in itertools.product(['viridis', 'mono','all_one'],['7_panes', '4_panes']):
+        multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type =plot_type , plot_style=plot_style)
+
 
     logger.info('Success')
 
