@@ -3959,7 +3959,9 @@ def main(cfg):
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
     slr_fns = {}
-    do_SLR = False
+    do_SLR = True 
+    do_OHC = False
+
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
     trends = ['detrended', ] #'intact']
@@ -4164,6 +4166,7 @@ def main(cfg):
         #    slr_fns[(trend, plot_dyn, plot_exp, plot_clim, time_range[0], time_range[1],)] = multimodel_mean_fn
         """
     # END of SLR calculation
+    if not do_OHC: return
 
     print('\nCalculate ocean heat content - trend intact')
     for (project, dataset, exp, ensemble, short_name), fn in file_dict.items():
