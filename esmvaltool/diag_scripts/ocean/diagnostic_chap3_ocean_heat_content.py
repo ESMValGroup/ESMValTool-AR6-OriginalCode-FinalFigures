@@ -43,6 +43,7 @@ from dask import array as da
 from shelve import open as shopen
 
 from matplotlib.colors import LogNorm
+import cartopy.crs as ccrs
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 from esmvaltool.diag_scripts.shared import run_diagnostic
@@ -2346,7 +2347,7 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
 
 
 
-def plot_slr_regional(cfg, metadatas, dyn_fns,
+def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         plot_exp = 'historical',
         plot_clim = '1850-1900_ts',
         plot_dyn = 'halo_ts',
@@ -2381,7 +2382,7 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
         times = np.ma.masked_outside(times, time_range[0], time_range[1])
         data = np.ma.masked_where(times.mask, data)
         linreg = linregress(times.compressed(), data.compressed())
-        trends[(dataset, exp, ensemble, region)] = linreg[0]
+        trends[(dataset, exp, ensemble, region)] = linreg.slope
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -2410,7 +2411,8 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
         for obs_type in ['141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc',
                          '141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc']:
             aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type #141013_DurackandWijffels10_V1.0_50yr_steric_1980-2000_0-2000db.nc'
-            obs_cubes = iris.load_raw(fn)
+            obs_cubes = iris.load_raw(aux_file)
+            print(obs_type, ':', obs_cubes)
             if plot_dyn in ['halo_ts']:
                 cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
             if plot_dyn in ['thermo_ts']:
@@ -2418,19 +2420,17 @@ def plot_slr_regional(cfg, metadatas, dyn_fns,
 
             # extract integral of surface to 2000m:
             cube = cube[17, :, :]
-            areas = iris.analysis.cartography.area_weights(cube)
             obs_dat = {}
             for region in ['Pacific', 'Atlantic']:
                 shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/IPCC_WGI/IPCC-WGI-reference-'+region+'-v4.shp'
+                 
                 region_cube = extract_shape(
                         cube.copy(),
                         shapefile,
                         )
-                area_cube = extract_shape(
-                        areas.copy(),
-                        shapefile,
-                        )
-                mean = region_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=area_cube)
+                areas = iris.analysis.cartography.area_weights(region_cube)
+  
+                mean = region_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=areas)
 
                 obs_dat[region] = mean.data
             label = 'Observations'
@@ -2482,8 +2482,8 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
     Make a multimodel mean halosteric plot.
     """
 
-    time_range_str = '-'.join([str(t) for t in time_range]
-    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str)]
+    time_range_str = '-'.join([str(t) for t in time_range])
+    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
     multimodel_mean_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
     multimodel_mean_fn += '_'.join(unique_id)+'.nc'
 
@@ -2524,11 +2524,14 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
                 # need to calculate the linear regression here:
                 times = diagtools.cube_time_to_float(cube_list[dataset][exp])
                 time_arange = np.arange(len(times))
-                ndenum = np.ndenumerate((cube_list[dataset][exp][0])
                 slopes = {}
+                count = 0
+                cube_data = cube_list[dataset][exp][0].data
+                ndenum = np.ndenumerate(cube_list[dataset][exp][0].data)
+
                 with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
                     print('ProcessPoolExecutor: executing')
-                    for linreg, index in executor.map(mpi_fit,
+                    for linreg, index in executor.map(mpi_fit_2D,
                                                       ndenum,
                                                       itertools.repeat(cube_list[dataset][exp].data),
                                                       itertools.repeat(time_arange),
@@ -2549,9 +2552,10 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
                 cube_list[dataset][exp] = cube_list[dataset][exp].collapsed('time', iris.analysis.MEAN)
 
                 for index, slope in slopes.items():
-                    print(index, slope)
-                    cube_list[dataset][exp][index[0], index[1]] = slope
-
+                    #print(index, slope)
+                    cube_data[index[0], index[1]] = slope 
+                cube_list[dataset][exp].data = cube_data
+        
                 print('saving trend file:', trend_fn)
                 iris.save(cube_list[dataset][exp], trend_fn)
                 if np.ma.is_masked(cube_list[dataset][exp].data.max()):
@@ -3666,6 +3670,26 @@ def mpi_fit(iter_pack, cubedata, time_itr):#, tmin):
     return linreg, index
 
 
+def mpi_fit_2D(iter_pack, cubedata, time_itr):#, tmin):
+    index, _ = iter_pack
+    data = cubedata[:, index[0], index[1]]
+    if np.ma.is_masked(data.max()):
+        return [], index
+
+    if data.mask.sum() ==  len(data):
+        # No masked values
+        data = data - np.ma.mean(data) #[tmin-1:tmin+2])
+        linreg = linregress(time_itr, data)
+        return linreg, index
+
+    times = np.ma.array(time_itr)
+    times = np.ma.masked_where(data.mask, times).compressed()
+    data = data.compressed()
+    data = data - np.ma.mean(data) #in-1:tmin+2])
+
+    linreg = linregress(times, data)
+    return linreg, index
+
 
 def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrite=False):
     """
@@ -3766,7 +3790,7 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
     else:
         print('Performing parrallel calculation:')
         time_arange = np.arange(len(times.points))
-        ndenum = np.ndenumerate(dummy)
+        NDenum = np.ndenumerate(dummy)
 
 #        tmin = np.argmin(np.abs(np.array(decimal_time) - pi_year))
         print('ProcessPoolExecutor: starting')
@@ -4024,8 +4048,8 @@ def main(cfg):
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
     slr_fns = {}
-    do_SLR = True
-    do_OHC = False
+    do_SLR = True 
+    do_OHC = True 
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
@@ -4137,11 +4161,13 @@ def main(cfg):
         plot_region = 'Global'
 
         for plot_dyn in ['halo_ts', 'thermo_ts']:
-            plot_slr_regional(cfg, metadatas, slr_fns,
-                plot_exp = plot_exp,
-                plot_clim = plot_clim,
-                plot_dyn = plot_dyn,
-                method=method
+            for time_range in [[1950, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]:
+                plot_slr_regional_scatter(cfg, metadatas, slr_fns,
+                    plot_exp = plot_exp,
+                    plot_clim = plot_clim,
+                    plot_dyn = plot_dyn,
+                    method=method,
+                    time_range=time_range,
                 )
         regions = ['Global', 'Atlantic', 'Pacific']
         for region in regions:
