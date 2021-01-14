@@ -2349,11 +2349,13 @@ def plot_slr_full_ts_all(cfg, metadatas, dyn_fns, plot_region, clim_range = '185
 
 def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         plot_exp = 'historical',
-        plot_clim = '1850-1900_ts',
+        #plot_clim = '1850-1900_ts',
         plot_dyn = 'halo_ts',
         plot_trend = 'detrended',
         method='dyn_height',
-        time_range = [1970, 2020]
+        time_range = [1970, 2020],
+        fig=None,
+        subplot = 111,
     ):
     """
     Add a interannual trend plot for each model and for the
@@ -2383,9 +2385,9 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         data = np.ma.masked_where(times.mask, data)
         linreg = linregress(times.compressed(), data.compressed())
         trends[(dataset, exp, ensemble, region)] = linreg.slope
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+    if subplot==111:
+        fig = plt.figure()
+    ax = fig.add_subplot(subplot)
     count = 0
     colours = {'observations':'black', 'historical': CMIP6_red, 'hist-nat':'green'}
     labels = []
@@ -2423,13 +2425,13 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
             obs_dat = {}
             for region in ['Pacific', 'Atlantic']:
                 shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/IPCC_WGI/IPCC-WGI-reference-'+region+'-v4.shp'
-                 
+
                 region_cube = extract_shape(
                         cube.copy(),
                         shapefile,
                         )
                 areas = iris.analysis.cartography.area_weights(region_cube)
-  
+
                 mean = region_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=areas)
 
                 obs_dat[region] = mean.data
@@ -2455,21 +2457,23 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         plt.ylabel('Atlantic Thermosteric Trend (mm yr'+r'$^{-1}$'+')')
 
     # Saving files:
-    path = diagtools.folder([cfg['plot_dir'], 'SLR_Regional_trend_scatter'])
-    path += '_'.join([plot_exp, plot_clim, plot_dyn, plot_trend,
-                      str(int(time_range[0]))+'-'+ str(int(time_range[1])),
-                      'SLR_Regional_trend_scatter'])+diagtools.get_image_format(cfg)
+    if subplot==111:
+        path = diagtools.folder([cfg['plot_dir'], 'SLR_Regional_trend_scatter'])
+        path += '_'.join([plot_exp, plot_dyn, plot_trend,
+                          str(int(time_range[0]))+'-'+ str(int(time_range[1])),
+                          'SLR_Regional_trend_scatter'])+diagtools.get_image_format(cfg)
 
-    if cfg['write_plots']:
-        logger.info('Saving plots to %s', path)
-        plt.savefig(path, dpi=200)
-    plt.close()
+        if cfg['write_plots']:
+            logger.info('Saving plots to %s', path)
+            plt.savefig(path, dpi=200)
+        plt.close()
+    else:
+        return fig, ax
 
 
 
 
-
-def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
+def calc_halo_multimodel_mean(cfg, metadatas, dyn_fns,
         plot_trend = 'detrended',
         plot_dyn = 'halo',
         plot_exp = 'historical',
@@ -2547,9 +2551,9 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
 
                 for index, slope in slopes.items():
                     #print(index, slope)
-                    cube_data[index[0], index[1]] = slope 
+                    cube_data[index[0], index[1]] = slope
                 cube_list[dataset][exp].data = cube_data
-        
+
                 print('saving trend file:', trend_fn)
                 iris.save(cube_list[dataset][exp], trend_fn)
                 if np.ma.is_masked(cube_list[dataset][exp].data.max()):
@@ -2574,7 +2578,7 @@ def plot_halo_multimodel_mean(cfg, metadatas, dyn_fns,
     return multimodel_mean_fn
 
 
-def make_multimodel_halosteric_salinity_trend(cfg, metadatas, 
+def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         multimodel_mean_fn,
         plot_trend = 'detrended',
         plot_dyn = 'halo',
@@ -2583,9 +2587,12 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         time_range=[1950, 2000],
         method = 'Landerer',
         subplot=111,
+        fig = None,
     ):
     """
     Make a multimodel mean halosteric plot.
+
+    To make a stand-alone plot, provide no figure and subplot = 111.
     """
     time_range_str = '-'.join([str(t) for t in time_range])
     mean_cube = iris.load_cube(multimodel_mean_fn)
@@ -2594,15 +2601,12 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     # Determine image filename
     unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
 
-    filename = '_'.join(unique_id).replace('/', '_')
-    path = diagtools.folder([cfg['plot_dir'], 'multimodel_halosteric_map']) + filename
-    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
-
     cmap='coolwarm'
     nspace = np.linspace(-4., 4., 21, endpoint=True)
- 
+
     if subplot==111:
-        title = ' '.join(['CMIP6 Multimodel mean', time_range_str ]) 
+        fig = plt.figure()
+        title = ' '.join(['CMIP6 Multimodel mean', time_range_str ])
 
     central_longitude=-120.
     square = False
@@ -2610,24 +2614,14 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         proj = ccrs.PlateCarree(central_longitude=central_longitude)
     else:
        proj = ccrs.Robinson(central_longitude=central_longitude)
-    ax = plt.subplot(subplot, projection=proj)
+       mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+    ax = fig.add_subplot(subplot, projection=proj)
 
-#    iris.util.demote_dim_coord_to_aux_coord(mean_cube, 'longitude')
-#    lons = mean_cube.coord('longitude').points.copy()
-#   lons[lons<central_longitude-180.] += 360. # lon[lons<central_longitude-180.]+360.
-#   lons[lons>central_longitude+180.] -= 360. # lon[lons>central_longitude+180.]-360.
-#   mean_cube.coord('longitude').points = lons
+    if square:
+        extent = [central_longitude-180., central_longitude+180., -73, 73]
+        ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-#   lons.bounds[lons.bounds<central_longitude-180.] += 360. # lon[lons<central_longitude-180.]+360.
-#   lons.bounds[lons.bounds>central_longitude+180.] -= 360. # lon[lons>central_longitude+180.]-360.
-
-#    extent = [central_longitude-180., central_longitude+180., -73, 73]
-#    ax.set_extent(extent, crs=ccrs.PlateCarree())
-
-    plt.title(title)
-    
     qplot = iris.plot.contourf(
         mean_cube,
         nspace,
@@ -2637,32 +2631,109 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         zmin=nspace.min(),
         zmax=nspace.max())
 
-#   extent = [central_longitude-180., central_longitude+180., -73, 73]
-#    ax.set_extent(extent, crs=ccrs.PlateCarree())
-
     if subplot==111:
+        plt.title(title)
         cbar = plt.colorbar(orientation='horizontal')
-        #cbar.set_ticks(
-        #    [nspace.min(), (nspace.max() + nspace.min()) / 2.,
-        #     nspace.max()])
-    
+
     try: plt.gca().coastlines()
     except: pass
+
+    # Saving files:
+    if subplot==111:
+        if cfg['write_plots']:
+            filename = '_'.join(unique_id).replace('/', '_')
+            path = diagtools.folder([cfg['plot_dir'], 'multimodel_halosteric_map']) + filename
+            path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+            logger.info('Saving plots to %s', path)
+            plt.savefig(path, dpi=200)
+        plt.close()
+    else:
+        return fig, ax
+
+def plot_halo_multipane(
+        cfg,
+        metadatas,
+        slr_fns,
+        plot_exp = 'historical',
+        #plot_dyn = plot_dyn,
+        method= 'Landerer',
+        time_range=[1950, 2000],
+    ):
+    """
+    Make the halosteric multi pane figure needed for IPCC WG1 chapter 3, fig 3.27
+    """
+    # Create figure
+    fig = plt.figure()
+    fig.set_size_inches(10, 10)
+
+    axes = []
+    # Obs pane 1
+    axes[321] = plt.subplot(321)
+
+    # obs pane 2
+    axes[323]  = plt.subplot(323)
+
+    # model pane ( C3)
+    # Load data
+    multimodel_mean_fn = calc_halo_multimodel_mean(
+        cfg, metadatas, slr_fns,
+        plot_trend = 'detrended',
+        plot_dyn = 'halo',
+        plot_exp = plot_exp,
+        plot_region = 'Global',
+    )
+    # make plot: (c3)
+    fig, axes[325] = make_multimodel_halosteric_salinity_trend(
+        cfg,
+        metadatas,
+        multimodel_mean_fn,
+        plot_trend = 'detrended',
+        plot_dyn =  'halo',
+        plot_exp = plot_exp,
+        plot_region = 'Global',
+        time_range = time_range,
+        method = method,
+        fig=fig,
+        subplot = 325
+    )
+
+    #rhs:
+    # Halosteric trend scatter:
+    fig, axes[222] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
+            plot_exp = plot_exp,
+            plot_dyn = 'halo_ts',
+            method=method,
+            time_range=time_range,
+            fig=fig,
+            subplot = 222
+        )
+    # Thermosteric trend scatter
+    fig, axes[224] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
+            plot_exp = plot_exp,
+            plot_dyn = 'thermo_ts',
+            method=method,
+            time_range=time_range,
+            fig=fig,
+            subplot = 224
+        )
+
+    time_range_str = '-'.join([str(t) for t in time_range])
+
+    # Determine image filename
+    filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
+    path = diagtools.folder([cfg['plot_dir'], 'halosteric_multipane']) + filename
+    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
 
     # Saving files:
     if cfg['write_plots']:
         logger.info('Saving plots to %s', path)
         plt.savefig(path, dpi=200)
     plt.close()
-    return multimodel_mean_fn
-
-
 
 def plot_halo_obs_mean(cfg, metadatas, dyn_fns,
         plot_trend = 'detrended',
         plot_dyn = 'halo',
         plot_exp = 'historical',
-        plot_clim = '1850-1900',
         plot_region = 'Global',
         time_range=[1950, 2000],
         ):
@@ -4078,7 +4149,7 @@ def main(cfg):
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
     slr_fns = {}
-    do_SLR = True 
+    do_SLR = True
     do_OHC = False
 
     method = 'Landerer'
@@ -4184,11 +4255,25 @@ def main(cfg):
 
     mmm_slr = {}
     if do_SLR and method == 'Landerer':
+        do_plot_halo_multipane = True
+        if do_plot_halo_multipane:
+            plot_exp = 'historical'
+            time_ranges = [[1950, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
+            for time_range in time_ranges:
+                plot_halo_multipane(
+                    cfg,
+                    metadatas,
+                    slr_fns,
+                    plot_exp = plot_exp,
+                    method= 'Landerer',
+                    time_range=time_range,
+                )
+
         plot_scatter = False
         if plot_scatter:
             plot_dyn = 'halo'
             plot_exp = 'historical'
-            plot_clim = '1850-1900_ts'
+            #plot_clim = '1850-1900_ts'
             time_ranges = [[1950, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
             plot_region = 'Global'
 
@@ -4196,7 +4281,7 @@ def main(cfg):
                 for time_range in time_ranges:
                     plot_slr_regional_scatter(cfg, metadatas, slr_fns,
                         plot_exp = plot_exp,
-                        plot_clim = plot_clim,
+                        #plot_clim = plot_clim,
                         plot_dyn = plot_dyn,
                         method=method,
                         time_range=time_range,
@@ -4219,15 +4304,15 @@ def main(cfg):
                     if region != 'Global': continue
                     SLR_map_plot(cfg, metadatas[dyn_fn], dyn_fn, clim_fn, time_range, keys =(project, dataset, exp, ensemble, dyn_type, region, trend, method), method=method)
 
-        plot_multimodel_mean = True
+        plot_multimodel_mean = False
         if plot_multimodel_mean:
             plot_dyn = 'halo'
             plot_exp = 'historical'
-            plot_clim = '1850-1900'
+            #plot_clim = '1850-1900'
             time_ranges=[[1950, 2000], [1970, 2015], [1950, 2015]]
             plot_region = 'Global'
             for trend, time_range in itertools.product(trends, time_ranges, ):
-                multimodel_mean_fn = plot_halo_multimodel_mean(cfg, metadatas, slr_fns,
+                multimodel_mean_fn = calc_halo_multimodel_mean(cfg, metadatas, slr_fns,
                     plot_trend = trend,
                     plot_dyn = plot_dyn,
                     plot_exp = plot_exp,
@@ -4251,7 +4336,7 @@ def main(cfg):
                     plot_trend = trend,
                     plot_dyn = plot_dyn,
                     plot_exp = plot_exp,
-                    plot_clim = plot_clim,
+                    #plot_clim = plot_clim,
                     plot_region = plot_region,
                     time_range = time_range,
                     method = method,
