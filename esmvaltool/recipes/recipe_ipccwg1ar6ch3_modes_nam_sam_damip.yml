@@ -1,0 +1,440 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3_modes.yml
+
+# --------------------------------
+# Note: at least 10 models per experiment and 15 years long simulations
+#       - otherwise the diagnostic fails
+#---------------------
+# Last Modified by karmouche_soufiane: 15/9/2020
+---
+documentation:
+
+  description: |
+    Producing "modes" figures with code from Adam Phillips
+  # Compute NAM/SAM DAMIP
+  authors:
+  #  - karmouche_soufiane
+    - bock_lisa
+
+  #references:
+
+  #projects:
+  #  - ipcc_ar6
+
+
+preprocessors:
+
+ temp_tr:
+   regrid:
+      target_grid: 2x2
+      scheme: linear
+
+diagnostics:
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3
+  # Fig 3.3*
+  # **********************************************************************
+  # NAM_SAM DAMIP
+  # **********************************************************************
+
+
+  diag_calc_historical:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_hist: &var_def
+        short_name: psl
+        preprocessor: temp_tr
+        reference_dataset: NOAACires20crv2c
+        mip: Amon
+        project: CMIP6
+        ensemble: r1i1p1f1
+        #exp: historical
+        grid: gn
+        start_year: 1958
+        end_year: 2014
+        additional_datasets:
+          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: historical}
+          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
+          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: historical}
+          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: BCC-CSM2-MR, grid: gn, exp: historical}
+          - {dataset: BCC-CSM2-MR, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
+          - {dataset: BCC-ESM1, grid: gn, exp: historical}
+          - {dataset: BCC-ESM1, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
+          - {dataset: CAMS-CSM1-0, grid: gn, exp: historical}
+          - {dataset: CAMS-CSM1-0, grid: gn, exp: piControl, start_year: 2958, end_year: 3014}
+          - {dataset: CanESM5, exp: historical, ensemble: r1i1p1f1}
+          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
+          - {dataset: CESM2, exp: historical, ensemble: r1i1p1f1}
+          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: historical}
+          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: CIESM, grid: gr, exp: historical}
+          - {dataset: CIESM, grid: gr, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: piControl, ensemble: r1i1p1f2, start_year: 1850, end_year: 1964}
+
+          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+          #- era20c_erai.mon.mean.msl
+          # missing obs:
+          # ersstv5.sst.185401-202004.nc
+          # ersst.v3b.185401-202002.nc
+
+
+    scripts:
+      diag_historical_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_historical_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+      diag_alt_def_historical_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_alt_def_historical_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+
+
+  diag_calc_piC:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_piC:
+        <<: *var_def
+        exp: piControl
+        additional_datasets:
+          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
+          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: BCC-CSM2-MR, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
+          - {dataset: BCC-ESM1, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
+          - {dataset: CAMS-CSM1-0, grid: gn, exp: piControl, start_year: 2958, end_year: 3014}
+          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
+          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: CIESM, grid: gr, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: piControl, ensemble: r1i1p1f2, start_year: 1908, end_year: 1964}
+
+          - {dataset: MPI-ESM-1-2-HAM, grid: gn, institute: HAMMOZ-Consortium, exp: historical}
+          - {dataset: IPSL-CM6A-LR, grid: gr, institute: IPSL, exp: historical}
+          - {dataset: HadGEM3-GC31-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f3, exp: historical}
+          - {dataset: UKESM1-0-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f2, exp: historical}
+          - {dataset: MPI-ESM1-2-HR, grid: gn, institute: MPI-M, exp: historical}
+          - {dataset: MRI-ESM2-0, grid: gn, institute: MRI, exp: historical}
+          - {dataset: GISS-E2-1-G, grid: gn, institute: NASA-GISS, exp: historical}
+          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, exp: historical}
+          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR, exp: historical}
+          - {dataset: NorCPM1, grid: gn, institute: NCC, exp: historical}
+          - {dataset: NorESM2-LM, grid: gn, institute: NCC, exp: historical}
+          - {dataset: NESM3, grid: gn, institute: NUIST, exp: historical}
+          - {dataset: SAM0-UNICON, grid: gn, institute: SNU, exp: historical}
+
+          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+          #- era20c_erai.mon.mean.msl
+
+
+    scripts:
+      diag_piC_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.piControl.ncwrite.ncl
+        ancestors: [diag_calc_historical/diag_historical_jja, psl_piC]
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_piC_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.piControl.ncwrite.ncl
+        ancestors: [diag_calc_historical/diag_historical_djf, psl_piC]
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+      diag_alt_def_piC_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl
+        ancestors: [diag_calc_historical/diag_alt_def_historical_jja, psl_piC]
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_alt_def_piC_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl
+        ancestors: [diag_calc_historical/diag_alt_def_historical_djf, psl_piC]
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+
+
+  diag_calc_hist-aer:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_aer:
+        <<: *var_def
+        exp: hist-aer
+        additional_datasets:
+          - {dataset: CanESM5, grid: gn, exp: hist-aer}
+          - {dataset: MIROC6, grid: gn, exp: hist-aer}
+          - {dataset: MRI-ESM2-0,  grid: gn, exp: hist-aer}
+          - {dataset: CESM2,  grid: gn, exp: hist-aer}
+          - {dataset: GISS-E2-1-G,  grid: gn, exp: hist-aer}
+          - {dataset: NorESM2-LM,  grid: gn, exp: hist-aer}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-aer}
+          - {dataset: HadGEM3-GC31-LL,  grid: gn, exp: hist-aer, ensemble: r3i1p1f3}
+          - {dataset: GFDL-ESM4,  grid: gr1, exp: hist-aer}
+          - {dataset: CNRM-CM6-1,  grid: gr, exp: hist-aer, ensemble: r1i1p1f2}
+          #- {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-aer}
+
+
+
+          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
+          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
+          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: GISS-E2-1-G, exp: piControl, start_year: 4208, end_year: 4264}
+          - {dataset: NorESM2-LM, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: HadGEM3-GC31-LL, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: GFDL-ESM4,  grid: gr1, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: CNRM-CM6-1, grid: gr, exp: piControl, ensemble: r1i1p1f2, start_year: 1958, end_year: 2014}
+
+
+
+
+          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}          # missing
+
+    scripts:
+      diag_hist-aer_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_hist-aer_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+      diag_alt_def_hist-aer_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_1/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_alt_def_hist-aer_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_1/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+
+
+  diag_calc_hist-GHG:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_GHG:
+        <<: *var_def
+        exp: hist-GHG
+        additional_datasets:
+          - {dataset: CanESM5, grid: gn, exp: hist-GHG}
+          - {dataset: MIROC6, grid: gn, exp: hist-GHG}
+          - {dataset: MRI-ESM2-0,  grid: gn, exp: hist-GHG}
+          - {dataset: ACCESS-ESM1-5,  grid: gn, exp: hist-GHG}
+          - {dataset: GISS-E2-1-G,  grid: gn, exp: hist-GHG}
+          - {dataset: NorESM2-LM,  grid: gn, exp: hist-GHG, ensemble: r2i1p1f1}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-GHG}
+          - {dataset: CESM2,  grid: gn, exp: hist-GHG}
+          - {dataset: GFDL-ESM4,  grid: gr1, exp: hist-GHG}
+          - {dataset: HadGEM3-GC31-LL,  grid: gn, exp: hist-GHG, ensemble: r3i1p1f3}
+
+          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
+          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
+          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: ACCESS-ESM1-5, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: GISS-E2-1-G, exp: piControl, start_year: 4208, end_year: 4264}
+          - {dataset: NorESM2-LM, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: GFDL-ESM4,  grid: gr1, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: HadGEM3-GC31-LL, exp: piControl, start_year: 1958, end_year: 2014}
+
+          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}          # missing
+
+    scripts:
+      diag_hist-GHG_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
+        season: 'jja'
+      diag_hist-GHG_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
+        season: 'djf'
+      diag_alt_def_hist-GHG_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_alt_def_hist-GHG_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+
+
+  diag_alt_def_hist-nat:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_nat:
+        <<: *var_def
+        exp: hist-nat
+        additional_datasets:
+          - {dataset: CNRM-CM6-1,  grid: gr, exp: hist-nat, ensemble: r1i1p1f2}
+          - {dataset: CanESM5, grid: gn, exp: hist-nat}
+          - {dataset: CESM2,  grid: gn, exp: hist-nat}
+          - {dataset: MIROC6, grid: gn, exp: hist-nat}
+          - {dataset: GISS-E2-1-G,  grid: gn, exp: hist-nat, ensemble: r1i1p1f3}
+          - {dataset: MRI-ESM2-0,  grid: gn, exp: hist-nat}
+          - {dataset: NorESM2-LM,  grid: gn, exp: hist-nat}
+          - {dataset: FGOALS-g3,  grid: gn, exp: hist-nat}
+          - {dataset: ACCESS-ESM1-5,  grid: gn, exp: hist-nat}
+          - {dataset: BCC-CSM2-MR,  grid: gn, exp: hist-nat}
+
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: piControl, ensemble: r1i1p1f2, start_year: 1908, end_year: 1964}
+          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
+          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
+          - {dataset: GISS-E2-1-G, exp: piControl, start_year: 4208, end_year: 4264}
+          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: NorESM2-LM, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: FGOALS-g3, exp: piControl, start_year: 259, end_year: 315}
+          - {dataset: ACCESS-ESM1-5, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: BCC-CSM2-MR, exp: piControl, start_year: 1908, end_year: 1964}
+
+          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+
+    scripts:
+      diag_hist-nat_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_hist-nat_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+      diag_alt_def_hist-nat_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_3/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_alt_def_hist-nat_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_3/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+
+
+  diag_alt_def_hist-stratO3:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_stratO3:
+        <<: *var_def
+        exp: hist-stratO3
+        #preprocessor: temp_tr
+        additional_datasets:
+          - {dataset: CanESM5, grid: gn, exp: hist-stratO3}
+          - {dataset: MIROC6, grid: gn, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-stratO3}
+          - {dataset: IPSL-CM6A-LR,  grid: gr, exp: hist-stratO3, ensemble: r9i1p1f1}
+          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r2i1p1f1}
+          - {dataset: MIROC6, grid: gn, exp: hist-stratO3, ensemble: r2i1p1f1}
+          - {dataset: MIROC6, grid: gn, exp: hist-stratO3, ensemble: r3i1p1f1}
+          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r3i1p1f1}
+          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r4i1p1f1}
+          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r5i1p1f1}
+
+          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
+          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, ensemble: r1i2p1f1, start_year: 1958, end_year: 2014}
+          - {dataset: CanESM5, exp: piControl, ensemble: r1i1p2f1, start_year: 5659 , end_year: 5715}
+          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 159, end_year: 215}
+          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
+          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
+          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
+          - {dataset: MIROC-ES2L, exp: piControl, ensemble: r1i1p1f2, start_year: 1958, end_year: 2014}
+
+
+          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}          # missing
+
+    scripts:
+      diag_hist-strat03_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_hist-strat03_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+      diag_alt_def_hist-strat03_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_4/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'jja'
+      diag_alt_def_hist-strat03_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        #ancestors: ['diag_alt_def_4/diag_alt_def_*']
+        start_year: 1958
+        end_year: 2014
+        season: 'djf'
+
+
+  diag_sam_nam_plot:
+    description: plotting diagnostic
+    scripts:
+      script_plotting:
+        script: ipccwg1ar6ch3_modes/nam_sam.trends.damip.summary.bar.ncl
+        ancestors: ['*/diag_*']
