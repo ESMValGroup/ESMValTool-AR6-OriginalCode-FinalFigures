@@ -2605,11 +2605,26 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         title = ' '.join(['CMIP6 Multimodel mean', time_range_str ]) 
 
     central_longitude=-120.
-    proj = ccrs.Robinson(central_longitude=central_longitude)
+    square = False
+    if square:
+        proj = ccrs.PlateCarree(central_longitude=central_longitude)
+    else:
+       proj = ccrs.Robinson(central_longitude=central_longitude)
     ax = plt.subplot(subplot, projection=proj)
+
+    mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+
+#    iris.util.demote_dim_coord_to_aux_coord(mean_cube, 'longitude')
+#    lons = mean_cube.coord('longitude').points.copy()
+#   lons[lons<central_longitude-180.] += 360. # lon[lons<central_longitude-180.]+360.
+#   lons[lons>central_longitude+180.] -= 360. # lon[lons>central_longitude+180.]-360.
+#   mean_cube.coord('longitude').points = lons
+
+#   lons.bounds[lons.bounds<central_longitude-180.] += 360. # lon[lons<central_longitude-180.]+360.
+#   lons.bounds[lons.bounds>central_longitude+180.] -= 360. # lon[lons>central_longitude+180.]-360.
+
 #    extent = [central_longitude-180., central_longitude+180., -73, 73]
 #    ax.set_extent(extent, crs=ccrs.PlateCarree())
-    # print('add_map_subplot: ', subplot, title, (cmap, extend, log))
 
     plt.title(title)
     
@@ -2621,6 +2636,9 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         extend='neither',
         zmin=nspace.min(),
         zmax=nspace.max())
+
+#   extent = [central_longitude-180., central_longitude+180., -73, 73]
+#    ax.set_extent(extent, crs=ccrs.PlateCarree())
 
     if subplot==111:
         cbar = plt.colorbar(orientation='horizontal')
@@ -2684,7 +2702,7 @@ def plot_halo_obs_mean(cfg, metadatas, dyn_fns,
         nspace,
         linewidth=0,
         cmap=plt.cm.get_cmap(cmap),
-        extend=extend,
+#        extend=extend,
         zmin=nspace.min(),
         zmax=nspace.max())
     cbar = plt.colorbar(orientation='horizontal')
