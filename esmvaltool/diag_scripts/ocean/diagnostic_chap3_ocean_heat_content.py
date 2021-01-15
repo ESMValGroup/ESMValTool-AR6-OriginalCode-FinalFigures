@@ -2668,8 +2668,17 @@ def plot_halo_multipane(
 
     axes = {}
     # Obs pane 1
-    axes[321] = plt.subplot(321)
-
+    #axes[321] = plt.subplot(321)
+    obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
+    for sbp, obs_file in zip([321, 323], obs_files ):
+        fig, axes[sbp] = plot_halo_obs_mean(
+            cfg,
+            metadatas,
+            plot_dyn = 'halo',
+            subplot=sbp,
+            depth_range='2000',
+            obs_file=obs_file,
+        )
     # obs pane 2
     axes[323]  = plt.subplot(323)
 
@@ -2733,66 +2742,92 @@ def plot_halo_multipane(
     plt.close()
 
 
-def plot_halo_obs_mean(cfg, metadatas, dyn_fns,
-        plot_trend = 'detrended',
+def plot_halo_obs_mean(
+        cfg, metadatas,
         plot_dyn = 'halo',
-        plot_exp = 'historical',
-        plot_region = 'Global',
-        time_range=[1950, 2000],
+        subplot=111,
+        depth_range='2000',
+        obs_file='DurackandWijffels10_V1.0_50yr',
+        ax = None,
+        #time_range=[1950, 2000],
         ):
     """
     make the observational halosteric observation plot.
     """
-    # Make the plot.
-    unique_id = [plot_dyn, plot_exp, plot_region, 'mean', '-'.join([str(t) for t in time_range])]
+    # Load the observational data.
+    if obs_file=='DurackandWijffels10_V1.0_50yr':
+        aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
+        legend_txt = 'D&W 2000m, 1950-2000'
+    if obs_file=='DurackandWijffels10_V1.0_30yr':
+        aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
+        legend_txt = 'D&W 2000m, 1970-2000'
 
-    # Determine image filename
-    filename = '_'.join(unique_id).replace('/', '_')
-    path = diagtools.folder([cfg['plot_dir'], 'obsthalosteric_map']) + filename
-    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+    obs_cubes = iris.load_raw(aux_file)
+    if plot_dyn == 'halo':
+        cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
+    if plot_dyn in ['thermo']:
+        cube = obs_cubes.extract(iris.Constraint(name='steric_height_thermo_anom_depthInterp'))[0]
 
-    aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
-
-#    nc = ncdfView(
+    # extract integral of surface to 2000m:
+    if depth_range=='2000':
+        cube = cube[17, :, :]
+    #(and FYI 14 = 700m and 12 = 300m)
 
     cmap='coolwarm'
-    max_val = np.max(np.abs([mean_cube.data.min(), mean_cube.data.max()]))
-    nspace = np.linspace(
-        -max_val, max_val, 21, endpoint=True)
+    nspace = np.linspace(-4., 4., 21, endpoint=True)
 
-    title = ' '.join(unique_id)
+    if subplot==111:
+        fig = plt.figure()
+        title = ' '.join(['Observational mean', time_range_str ])
 
-    #add_map_subplot(111, mean_cube, nspace, title=title,cmap=cmap)
-    subplot = 111
-    plt.subplot(subplot)
+    central_longitude=-120.
+    square = False
+    if square:
+        proj = ccrs.PlateCarree(central_longitude=central_longitude)
+    else:
+       proj = ccrs.Robinson(central_longitude=central_longitude)
+       cube = cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    # print('add_map_subplot: ', subplot, title, (cmap, extend, log))
-    plt.title(title)
-    cmax = mean_cube.data.max()
-    cmax = np.max([cmax, 100.])
+    if ax is None:
+        ax = fig.add_subplot(subplot, projection=proj)
+
+    if square:
+        extent = [central_longitude-180., central_longitude+180., -73, 73]
+        ax.set_extent(extent, crs=ccrs.PlateCarree())
+
+    ax.text(2, 6, legend_txt, fontsize=10)
 
     qplot = iris.plot.contourf(
-        mean_cube,
+        cube,
         nspace,
         linewidth=0,
         cmap=plt.cm.get_cmap(cmap),
-#        extend=extend,
+        extend='neither',
         zmin=nspace.min(),
         zmax=nspace.max())
-    cbar = plt.colorbar(orientation='horizontal')
-    if subplot!=111:
-        cbar.set_ticks(
-            [nspace.min(), (nspace.max() + nspace.min()) / 2.,
-             nspace.max()])
+
+    if subplot==111:
+        plt.title(title)
+        cbar = plt.colorbar(orientation='horizontal')
 
     try: plt.gca().coastlines()
     except: pass
 
     # Saving files:
-    if cfg['write_plots']:
-        logger.info('Saving plots to %s', path)
-        plt.savefig(path, dpi=200)
-    plt.close()
+    if subplot==111:
+        if cfg['write_plots']:
+            filename = '_'.join(obs_file).replace('/', '_')
+            keys = [obs_file, 'observational', plot_dyn, depth_range, 'map']
+            path = diagtools.folder([cfg['plot_dir'], 'observational_steric_maps']) + '_'.join(keys)
+            path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+            logger.info('Saving plots to %s', path)
+            plt.savefig(path, dpi=200)
+        plt.close()
+    else:
+        return fig, ax
+
+
+
 
 
 
@@ -4333,16 +4368,16 @@ def main(cfg):
                     method = method,
                 )
 
-
-                continue
-                plot_halo_obs_mean(cfg, metadatas,slr_fns,
-                    plot_trend = trend,
-                    plot_dyn = plot_dyn,
-                    plot_exp = plot_exp,
-                    #plot_clim = plot_clim,
-                    plot_region = plot_region,
-                    time_range = time_range,
-                    method = method,
+        plot_halosteric_obs = True
+        if plot_halosteric_obs:
+            for obs_file in ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']:
+                plot_halo_obs_mean(
+                    cfg,
+                    metadatas,
+                    plot_dyn = 'halo',
+                    subplot=111,
+                    depth_range='2000',
+                    obs_file=obs_file,
                 )
 
     if do_SLR and method == 'dyn_height':
