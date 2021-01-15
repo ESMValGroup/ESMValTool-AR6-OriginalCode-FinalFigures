@@ -2443,6 +2443,8 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                 plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s')
 
     plt.legend()
+    ax.set_aspect("equal")
+
     plt.axhline(0, c='k', ls='--')
     plt.axvline(0, c='k', ls='--')
 
@@ -2669,14 +2671,22 @@ def plot_halo_multipane(
     axes = {}
     # Obs pane 1
     #axes[321] = plt.subplot(321)
+    if 1950 in time_range:
+        obs_files = ['DurackandWijffels10_V1.0_50yr', ]#'DurackandWijffels10_V1.0_30yr']
+    if 1970 in time_range:
+        obs_files = ['DurackandWijffels10_V1.0_50yr', ]#'DurackandWijffels10_V1.0_30yr']
+    if 1860 in time_range:
+        obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
+
     obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
+
     for sbp, obs_file in zip([321, 323], obs_files ):
         fig, axes[sbp] = plot_halo_obs_mean(
             cfg,
             metadatas,
             plot_dyn = 'halo',
             subplot=sbp,
-            depth_range='2000',
+            depth_range='2000m',
             obs_file=obs_file,
             fig=fig,
         )
@@ -2745,7 +2755,7 @@ def plot_halo_obs_mean(
         cfg, metadatas,
         plot_dyn = 'halo',
         subplot=111,
-        depth_range='2000',
+        depth_range='2000m',
         obs_file='DurackandWijffels10_V1.0_50yr',
         ax = None,
         fig = None
@@ -2761,6 +2771,11 @@ def plot_halo_obs_mean(
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
         legend_txt = 'D&W 2000m, 1970-2000'
 
+    if obs_file=='DurackandWijffels10_V1.0_30yr':
+        aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
+        legend_txt = 'D&W 2000m, 1970-2000'
+   "auxiliary_data/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc"
+
     obs_cubes = iris.load_raw(aux_file)
     if plot_dyn == 'halo':
         cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
@@ -2768,7 +2783,7 @@ def plot_halo_obs_mean(
         cube = obs_cubes.extract(iris.Constraint(name='steric_height_thermo_anom_depthInterp'))[0]
 
     # extract integral of surface to 2000m:
-    if depth_range=='2000':
+    if depth_range=='2000m':
         cube = cube[17, :, :]
     #(and FYI 14 = 700m and 12 = 300m)
 
@@ -2794,7 +2809,8 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    ax.text(central_longitude, 90, legend_txt, fontsize=10)
+    for n in [0. -100, 100, 1000, 5,]:
+        ax.text(central_longitude, n, str(n), fontsize=10)
 
     qplot = iris.plot.contourf(
         cube,
@@ -4375,7 +4391,7 @@ def main(cfg):
                     metadatas,
                     plot_dyn = 'halo',
                     subplot=111,
-                    depth_range='2000',
+                    depth_range='2000m',
                     obs_file=obs_file,
                 )
 
