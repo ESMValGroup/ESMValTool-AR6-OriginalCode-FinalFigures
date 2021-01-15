@@ -2411,8 +2411,11 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
     add_obs = True
     if add_obs:
         for obs_type in ['141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc',
-                         '141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc']:
-            aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type #141013_DurackandWijffels10_V1.0_50yr_steric_1980-2000_0-2000db.nc'
+                         '141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc',
+                         '151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc', ]:
+            aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type 
+            #141013_DurackandWijffels10_V1.0_50yr_steric_1980-2000_0-2000db.nc'
+
             obs_cubes = iris.load_raw(aux_file)
             print(obs_type, ':', obs_cubes)
             if plot_dyn in ['halo_ts']:
@@ -2624,6 +2627,8 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
+    ax.text(0., 0., 'CMIP6', fontsize=10)
+
     qplot = iris.plot.contourf(
         mean_cube,
         nspace,
@@ -2635,7 +2640,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
 
     if subplot==111:
         plt.title(title)
-    cbar = plt.colorbar(orientation='horizontal')
+        cbar = plt.colorbar(orientation='horizontal')
 
     try: plt.gca().coastlines()
     except: pass
@@ -2666,21 +2671,23 @@ def plot_halo_multipane(
     """
     # Create figure
     fig = plt.figure()
-    fig.set_size_inches(10, 6) 
+    fig.set_size_inches(10, 10)
 
     axes = {}
     # Obs pane 1
-    #axes[321] = plt.subplot(321)
-    if 1950 in time_range:
-        obs_files = ['DurackandWijffels10_V1.0_50yr', ]#'DurackandWijffels10_V1.0_30yr']
-    if 1970 in time_range:
-        obs_files = ['DurackandWijffels10_V1.0_50yr', ]#'DurackandWijffels10_V1.0_30yr']
-    if 1860 in time_range:
-        obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
+#   #axes[321] = plt.subplot(321)
+#   if 1950 in time_range:
+ #      obs_files = ['DurackandWijffels10_V1.0_50yr', ]#'DurackandWijffels10_V1.0_30yr']
+  # if 1970 in time_range:
+   #    obs_files = ['DurackandWijffels10_V1.0_50yr', ]#'DurackandWijffels10_V1.0_30yr']
+    #f 1860 in time_range:
+     #  obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
 
-    obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
+    obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
+    subplots = [421, 423, 425,]
+    cmip_subplots = [427, ]
 
-    for sbp, obs_file in zip([321, 323], obs_files ):
+    for sbp, obs_file in zip(subplots, obs_files ):
         fig, axes[sbp] = plot_halo_obs_mean(
             cfg,
             metadatas,
@@ -2701,7 +2708,7 @@ def plot_halo_multipane(
         plot_region = 'Global',
         time_range = time_range,
     )
-    for pane in [325,]:
+    for pane in cmip_subplots:
         # make plot: (c3)
         fig, axes[pane] = make_multimodel_halosteric_salinity_trend(
             cfg,
@@ -2771,10 +2778,10 @@ def plot_halo_obs_mean(
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
         legend_txt = 'D&W 2000m, 1970-2000'
 
-    if obs_file=='DurackandWijffels10_V1.0_30yr':
-        aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
-        legend_txt = 'D&W 2000m, 1970-2000'
-   "auxiliary_data/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc"
+    if obs_file=='Ishii09_v6.13_annual_steric_1950-2010':
+        aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc'
+        legend_txt = 'Ishii 3000m, 1950-2010'
+
 
     obs_cubes = iris.load_raw(aux_file)
     if plot_dyn == 'halo':
@@ -2809,8 +2816,9 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    for n in [0. -100, 100, 1000, 5,]:
-        ax.text(central_longitude, n, str(n), fontsize=10)
+#    for n in [0. -100, 100, 1000,10000, 5,]:
+#        for j in [0. -100, 100, 1000,10000, 5,]:
+    ax.text(0., 0., legend_txt, fontsize=10)
 
     qplot = iris.plot.contourf(
         cube,
@@ -4385,7 +4393,8 @@ def main(cfg):
 
         plot_halosteric_obs = True
         if plot_halosteric_obs:
-            for obs_file in ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']:
+            obs_keys = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
+            for obs_file in obs_keys:
                 plot_halo_obs_mean(
                     cfg,
                     metadatas,
