@@ -933,7 +933,7 @@ def single_pane_map_plot(
         cmap='coolwarm'
         max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
         nspace = np.linspace(
-            -max_val, max_val, 21, endpoint=True)
+            -max_val, max_val, 15, endpoint=True)
 
     else:
         cmap='viridis'
@@ -2602,7 +2602,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
 
     cmap='coolwarm'
-    nspace = np.linspace(-4., 4., 21, endpoint=True)
+    nspace = np.linspace(-4., 4., 15, endpoint=True)
 
     if subplot==111:
         fig = plt.figure()
@@ -2633,7 +2633,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
 
     if subplot==111:
         plt.title(title)
-        cbar = plt.colorbar(orientation='horizontal')
+    cbar = plt.colorbar(orientation='horizontal')
 
     try: plt.gca().coastlines()
     except: pass
@@ -2664,7 +2664,7 @@ def plot_halo_multipane(
     """
     # Create figure
     fig = plt.figure()
-    fig.set_size_inches(10, 10)
+    fig.set_size_inches(10, 6) 
 
     axes = {}
     # Obs pane 1
@@ -2678,9 +2678,8 @@ def plot_halo_multipane(
             subplot=sbp,
             depth_range='2000',
             obs_file=obs_file,
+            fig=fig,
         )
-    # obs pane 2
-    axes[323]  = plt.subplot(323)
 
     # model pane ( C3)
     # Load data
@@ -2692,7 +2691,7 @@ def plot_halo_multipane(
         plot_region = 'Global',
         time_range = time_range,
     )
-    for pane in [321,323,325]:
+    for pane in [325,]:
         # make plot: (c3)
         fig, axes[pane] = make_multimodel_halosteric_salinity_trend(
             cfg,
@@ -2749,7 +2748,7 @@ def plot_halo_obs_mean(
         depth_range='2000',
         obs_file='DurackandWijffels10_V1.0_50yr',
         ax = None,
-        #time_range=[1950, 2000],
+        fig = None
         ):
     """
     make the observational halosteric observation plot.
@@ -2774,11 +2773,11 @@ def plot_halo_obs_mean(
     #(and FYI 14 = 700m and 12 = 300m)
 
     cmap='coolwarm'
-    nspace = np.linspace(-4., 4., 21, endpoint=True)
+    nspace = np.linspace(-4., 4., 15, endpoint=True)
 
     if subplot==111:
         fig = plt.figure()
-        title = ' '.join(['Observational mean', time_range_str ])
+        title = ' '.join(['Observational mean', legend_txt])
 
     central_longitude=-120.
     square = False
@@ -2795,7 +2794,7 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    ax.text(2, 6, legend_txt, fontsize=10)
+    ax.text(central_longitude, 90, legend_txt, fontsize=10)
 
     qplot = iris.plot.contourf(
         cube,
@@ -3340,7 +3339,7 @@ def SLR_map_plot(cfg, metadata, dyn_fn, clim_fn, time_range, method='dyn_height'
     cmap='coolwarm'
     max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
     nspace = np.linspace(
-        -max_val, max_val, 21, endpoint=True)
+        -max_val, max_val, 15, endpoint=True)
 
     title = ' '.join(keys)
 
@@ -3970,11 +3969,11 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
     if plot_histo:
         fig = plt.figure()
         fig.add_subplot(211)
-        plt.hist(list(slopes.values()), bins=21, color='red', )
+        plt.hist(list(slopes.values()), bins=15, color='red', )
         plt.title('Slopes')
 
         fig.add_subplot(212)
-        plt.hist(list(intercepts.values()), bins=21, color='blue')
+        plt.hist(list(intercepts.values()), bins=15, color='blue')
         plt.title('Intercepts')
 
         path = diagtools.folder([cfg['plot_dir'], 'pi_trend'])
@@ -4296,7 +4295,7 @@ def main(cfg):
         do_plot_halo_multipane = True
         if do_plot_halo_multipane:
             plot_exp = 'historical'
-            time_ranges = [[1950, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
+            time_ranges = [[1950, 2000], [1970, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
             for time_range in time_ranges:
                 plot_halo_multipane(
                     cfg,
