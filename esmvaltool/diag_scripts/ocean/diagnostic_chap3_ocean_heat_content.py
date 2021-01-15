@@ -2666,7 +2666,7 @@ def plot_halo_multipane(
     fig = plt.figure()
     fig.set_size_inches(10, 10)
 
-    axes = []
+    axes = {}
     # Obs pane 1
     axes[321] = plt.subplot(321)
 
@@ -2681,21 +2681,23 @@ def plot_halo_multipane(
         plot_dyn = 'halo',
         plot_exp = plot_exp,
         plot_region = 'Global',
-    )
-    # make plot: (c3)
-    fig, axes[325] = make_multimodel_halosteric_salinity_trend(
-        cfg,
-        metadatas,
-        multimodel_mean_fn,
-        plot_trend = 'detrended',
-        plot_dyn =  'halo',
-        plot_exp = plot_exp,
-        plot_region = 'Global',
         time_range = time_range,
-        method = method,
-        fig=fig,
-        subplot = 325
     )
+    for pane in [321,323,325]:
+        # make plot: (c3)
+        fig, axes[pane] = make_multimodel_halosteric_salinity_trend(
+            cfg,
+            metadatas,
+            multimodel_mean_fn,
+            plot_trend = 'detrended',
+            plot_dyn =  'halo',
+            plot_exp = plot_exp,
+            plot_region = 'Global',
+            time_range = time_range,
+            method = method,
+            fig=fig,
+            subplot = pane,
+        )
 
     #rhs:
     # Halosteric trend scatter:
@@ -2729,6 +2731,7 @@ def plot_halo_multipane(
         logger.info('Saving plots to %s', path)
         plt.savefig(path, dpi=200)
     plt.close()
+
 
 def plot_halo_obs_mean(cfg, metadatas, dyn_fns,
         plot_trend = 'detrended',
