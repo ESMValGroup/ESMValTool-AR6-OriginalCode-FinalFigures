@@ -318,20 +318,29 @@ begin
       var_neg_signif / where((var_pos_signif + var_neg_signif) \
                              .ne. 0., var_pos_signif + \
                              var_neg_signif, diff@_FillValue)
-    signif_and_sign = where(var_pos_signif_tmp .ge. 0.9 .or. \
-                            var_neg_signif_tmp .ge. 0.9, 1., 0.)
+    signif_and_sign = where(var_pos_signif_tmp .ge. 0.8 .or. \
+                            var_neg_signif_tmp .ge. 0.8, 1., 0.)
     signif_and_sign = where(ismissing(signif_and_sign), 0.,\
                             signif_and_sign)
-    sigma_and_sign = where(abs(diff( :, :)) .gt. \
-                           abs(2. * natvar_mmm), 1., 0.)
-    to_plot_not_signif = where(abs(diff( :, :)) .lt. \
-                                        abs(natvar_mmm),\
-                                        1., 0.)
-    to_plot_signif = where(signif_and_sign .eq. 1, \
-                                    sigma_and_sign, 0.)
+    ; variablity threshold: sqrt(2)*1.645=~2.3264
+    var_thres = abs(2.3264 * natvar_mmm) 
+    tmp := new(dimsizes(diff_i), "float")
+    tmp = 0
+    do imod = 0, dim_MOD - 3
+      tmp(imod, :, :) = where(abs(diff_i(imod, :, :)) .gt. var_thres(:, :), 1, 0)
+    end do
+    var_pos_signif := dim_sum_n(tmp, 0)
+    delete(tmp)
+    var_pos_signif_tmp := var_pos_signif / (dim_MOD - 2)
+    sigma_and_sign = where(var_pos_signif_tmp .ge. 0.66 , 1., 0.)
 
-    copy_VarMeta(diff, to_plot_signif)
-    copy_VarMeta(diff, to_plot_not_signif)
+    to_plot_not_robust = where(sigma_and_sign .eq. 0, 1., 0.)
+
+    to_plot_confl_sign = where(signif_and_sign .eq. 0, sigma_and_sign, 0.)
+    ;to_plot_confl_sign = signif_and_sign
+
+    copy_VarMeta(diff, to_plot_confl_sign)
+    copy_VarMeta(diff, to_plot_not_robust)
 
     if (plot_rms_diff) then
       to_plot_not_signif_rmsd = where(rmsdiff( :, :) .lt. \
@@ -649,7 +658,7 @@ begin
 
     ; add significance
     if (stippandhatch) then
-      ; resources dots
+      ; resources cross-hatching
       ress = True
       ress@gsnDraw = False
       ress@gsnFrame = False
@@ -663,7 +672,7 @@ begin
       ress@cnFillOn = True
       ress@cnFillMode = "AreaFill"
       ress@cnMonoFillPattern = False
-      ress@cnFillPatterns = (/-1, 17, 17/)
+      ress@cnFillPatterns = (/-1, 6, 6/)
       ress@cnMonoFillColor = True
       ress@lbLabelBarOn = False
       ress@gsnLeftString = ""
@@ -671,17 +680,14 @@ begin
       ress@cnFillDotSizeF       = 0.001
       ress@cnFillScaleF        = .6        ; add extra density
 
-      ; plot dots
-      if all(to_plot_signif(:, :) .eq. 1) then
-        to_plot_signif(0, 0) = 0
-      end if
-      if (max(to_plot_signif(:, :)) .gt. \
-          min(to_plot_signif(:, :))) then
-        plot1 = gsn_csm_contour(wks, to_plot_signif(:, :), ress)
+      ; plot cross-hatching
+      if (max(to_plot_confl_sign(:, :)) .gt. \
+          min(to_plot_confl_sign(:, :))) then
+        plot1 = gsn_csm_contour(wks, to_plot_confl_sign(:, :), ress)
         overlay(plots(1), plot1)
       end if
 
-      ; resources hatch
+      ; resources hatching
       resb = True
       resb@gsnDraw = False
       resb@gsnFrame = False
@@ -696,22 +702,19 @@ begin
       resb@cnFillMode = "AreaFill"
       resb@cnRasterSmoothingOn = False
       resb@cnMonoFillPattern = False
-      resb@cnFillPatterns = (/-1, 10, 10/)
+      resb@cnFillPatterns = (/-1, 4, 4/)
       resb@cnMonoFillColor = True
       resb@lbLabelBarOn = False
       resb@gsnLeftString = ""
       resb@gsnRightString = ""
       resb@cnFillScaleF = 0.25
 
-      ;; plot hatch
-      ;if all(to_plot_not_signif(:, :) .eq. 1) then
-      ;  to_plot_not_signif(0, 0) = 0
-      ;end if
-      ;if (max(to_plot_not_signif(:, :)) .gt. \
-      ;    min(to_plot_not_signif(:, :))) then
-      ;  plot2 = gsn_csm_contour(wks, to_plot_not_signif(:, :), resb)
-      ;  overlay(plots(1), plot2)
-      ;end if
+      ; plot hatching
+      if (max(to_plot_not_robust(:, :)) .gt. \
+          min(to_plot_not_robust(:, :))) then
+        plot2 = gsn_csm_contour(wks, to_plot_not_robust(:, :), resb)
+        overlay(plots(1), plot2)
+      end if
 
       ;if (plot_rms_diff) then
       ;  ; plot hatch
@@ -779,14 +782,14 @@ begin
     rmsdiff@long_name = var0 + " (multi-model root mean square difference)"
     nc_outfile = ncdf_write(rmsdiff, nc_filename)
 
-    if (plot_rms_diff .and. stippandhatch) then
-      to_plot_not_signif_rmsd@diag_script = (/DIAG_SCRIPT/)
-      to_plot_not_signif_rmsd@var = "not_signif_rmsd"
-      to_plot_not_signif_rmsd@var_long_name = "not significant: rmsd " \
-                                         + "smaller than 1*natvar"
-      to_plot_not_signif@units     = 1
-      ncdf_outfile = ncdf_write(to_plot_not_signif_rmsd, nc_filename)
-    end if
+    ;if (plot_rms_diff .and. stippandhatch) then
+    ;  to_plot_not_signif_rmsd@diag_script = (/DIAG_SCRIPT/)
+    ;  to_plot_not_signif_rmsd@var = "not_signif_rmsd"
+    ;  to_plot_not_signif_rmsd@var_long_name = "not significant: rmsd " \
+    ;                                     + "smaller than 1*natvar"
+    ;  to_plot_not_signif@units     = 1
+    ;  ncdf_outfile = ncdf_write(to_plot_not_signif_rmsd, nc_filename)
+    ;end if
   end if
 
   if (isvar("reldiff")) then
@@ -797,21 +800,34 @@ begin
   end if
 
   if (stippandhatch) then
-    to_plot_signif@diag_script = (/DIAG_SCRIPT/)
-    to_plot_signif@var = "signif"
-    to_plot_signif@var_long_name = "significance: mean change larger than " \
-                                   + "2*natvar and 90% of models have the " \
-                                   + "same sign" 
-    to_plot_signif@units     = 1
-    ncdf_outfile = ncdf_write(to_plot_signif, nc_filename) 
+    to_plot_confl_sign@diag_script = (/DIAG_SCRIPT/)
+    to_plot_confl_sign@var = "confl_sign"
+    to_plot_confl_sign@var_long_name = "more than 66% of models show change " \
+                                       + "greater than variability threshold " \
+                                       + "and <80% agree on sign of change"
+    to_plot_confl_sign@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_confl_sign, nc_filename) 
 
-    to_plot_not_signif@diag_script = (/DIAG_SCRIPT/)
-    to_plot_not_signif@var = "not_signif"
-    to_plot_not_signif@var_long_name = "not significant: mean change " \
-                                       + "smaller than 1*natvar"
-    to_plot_not_signif@units     = 1
-    ncdf_outfile = ncdf_write(to_plot_not_signif, nc_filename)
+    to_plot_not_robust@diag_script = (/DIAG_SCRIPT/)
+    to_plot_not_robust@var = "not_robust"
+    to_plot_not_robust@var_long_name = "more than 66% of models show change " \
+                                       + "greater than variability threshold"
+    to_plot_not_robust@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_not_robust, nc_filename)
+    ;to_plot_signif@diag_script = (/DIAG_SCRIPT/)
+    ;to_plot_signif@var = "signif"
+    ;to_plot_signif@var_long_name = "significance: mean change larger than " \
+    ;                               + "2*natvar and 90% of models have the " \
+    ;                               + "same sign" 
+    ;to_plot_signif@units     = 1
+    ;ncdf_outfile = ncdf_write(to_plot_signif, nc_filename) 
 
+    ;to_plot_not_signif@diag_script = (/DIAG_SCRIPT/)
+    ;to_plot_not_signif@var = "not_signif"
+    ;to_plot_not_signif@var_long_name = "not significant: mean change " \
+    ;                                   + "smaller than 1*natvar"
+    ;to_plot_not_signif@units     = 1
+    ;ncdf_outfile = ncdf_write(to_plot_not_signif, nc_filename)
   end if
 
 
