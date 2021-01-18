@@ -145,7 +145,7 @@ models_cmip6_piControl: &models_cmip6_piControl
   - {dataset: NorESM2-MM, institute: NCC, grid: gn, start_year: 1200, end_year: 1699}
   - {dataset: SAM0-UNICON, grid: gn, start_year: 1, end_year: 700}
   - {dataset: TaiESM1, grid: gn, start_year: 201, end_year: 700}
-  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2709}
+  #- {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2709}
 
 
 models_cmip5_historical_era5: &models_cmip5_historical_era5
@@ -416,33 +416,33 @@ diagnostics:
         stippandhatch: True
 
 
-  fig_3_10_highresmip:
-    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
-    variables:
-      pr:
-        preprocessor: clim_wo_mmm
-        reference_dataset: GPCP-SG
-        mip: Amon
-        project: CMIP6
-        ensemble: r1i1p1f1
-        grid: gr
-        start_year: 1995
-        end_year: 2014
-    additional_datasets: *models_highresmip_hist-1950_era5
-    scripts:
-      fig_3_10: 
-        script: ipcc_ar6/model_bias_diff.ncl
-        ancestors: ['pr', 
-                    'IAV_calc_pr_highresmip_low/calc_IAV_for_stippandhatch_pr',
-                    'IAV_calc_pr_highresmip_high/calc_IAV_for_stippandhatch_pr']
-        projection: Robinson
-        caption: ['HighResMIP (high) bias', 'HighResMIP (low) bias']
-        panel_num: ['e)', 'f)']
-        stippandhatch: True
-        groups: ['highresmip_high', 'highresmip_low']
-        modelgroup_1: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
-                       'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
-        modelgroup_2: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR',
-                       'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
-
+#  fig_3_10_highresmip:
+#    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+#    variables:
+#      pr:
+#        preprocessor: clim_wo_mmm
+#        reference_dataset: GPCP-SG
+#        mip: Amon
+#        project: CMIP6
+#        ensemble: r1i1p1f1
+#        grid: gr
+#        start_year: 1995
+#        end_year: 2014
+#    additional_datasets: *models_highresmip_hist-1950_era5
+#    scripts:
+#      fig_3_10: 
+#        script: ipcc_ar6/model_bias_diff.ncl
+#        ancestors: ['pr', 
+#                    'IAV_calc_pr_highresmip_low/calc_IAV_for_stippandhatch_pr',
+#                    'IAV_calc_pr_highresmip_high/calc_IAV_for_stippandhatch_pr']
+#        projection: Robinson
+#        caption: ['HighResMIP (high) bias', 'HighResMIP (low) bias']
+#        panel_num: ['e)', 'f)']
+#        stippandhatch: True
+#        groups: ['highresmip_high', 'highresmip_low']
+#        modelgroup_1: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
+#                       'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+#        modelgroup_2: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR',
+#                       'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
+#
 
