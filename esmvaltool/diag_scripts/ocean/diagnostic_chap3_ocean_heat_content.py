@@ -375,7 +375,7 @@ def single_timeseries(fn, path, keys):
 
 
 def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
-        plot_style='viridis', 
+        plot_style='viridis',
         plot_type='7_panes',
         show_UKESM=False):
     """
@@ -505,7 +505,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                     if np.ma.is_masked(d): continue
                     if np.isnan(d): continue
                     if np.isinf(d): continue
- 
+
                     try: fill_betweens[subplot][t].append(d)
                     except: fill_betweens[subplot][t]= [d, ]
                     if show_UKESM and dataset.lower().find('ukesm')>-1:
@@ -568,7 +568,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         obs_years = np.ma.masked_where(obs_years < 1960., obs_years)
         hc_data = matdata['hc_global']
         datasets.append('Observations')
-    
+
         def strip_name(array): return str(array[0][0]).strip(' ')
         def zetta_to_joules(dat): return dat * 1.E21
 
@@ -578,7 +578,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             for ii, array in enumerate(matdata['hc_yr_fname']):
                 name = strip_name(array)
                 series = hc_data[ii,z,:]
-                
+
                 series = np.ma.masked_invalid(series)
                 series = zero_around_dat(obs_years, series, 1971)
                 series = zetta_to_joules(series)
@@ -975,7 +975,7 @@ def single_pane_map_plot(
         return
 
     if sym_zero:
-        cmap='coolwarm'
+        cmap=diagtools.misc_div
         max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
         nspace = np.linspace(
             -max_val, max_val, 22, endpoint=True)
@@ -2448,7 +2448,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         max_value = np.max([max_value, abs(pac), abs(alt)])
         if show_UKESM and dataset.lower().find('ukesm')>-1:
             col='purple'
-            label = 'UKESM' 
+            label = 'UKESM'
         if label not in labels:
             plt.scatter(pac, alt, c=col, marker='s', label = label)
         else:
@@ -2464,7 +2464,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         for obs_type in ['141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc',
                          '141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc',
                          '151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc', ]:
-            aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type 
+            aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type
             #141013_DurackandWijffels10_V1.0_50yr_steric_1980-2000_0-2000db.nc'
 
             obs_cubes = iris.load_raw(aux_file)
@@ -2523,7 +2523,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                           'SLR_Regional_trend_scatter'])+imgf
         if show_UKESM:
             path = path.replace(imgf, '_UKESM'+imgf)
- 
+
         if cfg['write_plots']:
             logger.info('Saving plots to %s', path)
             plt.savefig(path, dpi=200)
@@ -2663,7 +2663,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     # Determine image filename
     unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
 
-    cmap='coolwarm'
+    cmap=diagtools.misc_div
     nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
 
     if subplot==111:
@@ -2886,7 +2886,7 @@ def plot_halo_obs_mean(
         cube = cube[17, :, :]
     #(and FYI 14 = 700m and 12 = 300m)
 
-    cmap='coolwarm'
+    cmap=diagtools.misc_div
     nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
 
     if subplot==111:
@@ -3450,7 +3450,7 @@ def SLR_map_plot(cfg, metadata, dyn_fn, clim_fn, time_range, method='dyn_height'
     path = diagtools.folder([cfg['plot_dir'], 'SLR_map_plots']) + '_'.join(keys)
     path = path.replace(' ', '') + diagtools.get_image_format(cfg)
 
-    cmap='coolwarm'
+    cmap=diagtools.misc_div
     max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
     nspace = np.linspace(
         -max_val, max_val, 22, endpoint=True)
