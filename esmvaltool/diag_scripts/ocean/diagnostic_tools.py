@@ -17,6 +17,7 @@ import iris
 
 import numpy as np
 import cftime
+import matplotlib
 import matplotlib.pyplot as plt
 import yaml
 
@@ -989,4 +990,5 @@ misc_div_colors_list = [
     (135, 0, 38),
     (131, 0, 38),
     (128, 0, 38)]
+misc_div_colors_list = np.array(misc_div_colors_list)/256.
 misc_div = matplotlib.colors.ListedColormap(misc_div_colors_list, name='misc_div', N=None)
