@@ -2665,7 +2665,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
 
     cmap=diagtools.misc_div
     nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
-
+    #cmap = plt.cm.get_cmap('coolwarm')
     if subplot==111:
         fig = plt.figure()
         title = ' '.join(['CMIP6 Multimodel mean', time_range_str ])
@@ -2688,7 +2688,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         mean_cube,
         nspace,
         linewidth=0,
-        cmap=plt.cm.get_cmap(cmap),
+        cmap=cmap,
         extend='neither',
         zmin=nspace.min(),
         zmax=nspace.max())
@@ -2887,6 +2887,7 @@ def plot_halo_obs_mean(
     #(and FYI 14 = 700m and 12 = 300m)
 
     cmap=diagtools.misc_div
+    # cmap = plt.cm.get_cmap(cmap)
     nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
 
     if subplot==111:
@@ -2914,7 +2915,7 @@ def plot_halo_obs_mean(
         cube,
         nspace,
         linewidth=0,
-        cmap=plt.cm.get_cmap(cmap),
+        cmap=cmap,
         extend='neither',
         zmin=nspace.min(),
         zmax=nspace.max())
@@ -3202,7 +3203,8 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
         print('Temperature file:', thetao_fn)
         print('Salinity file:', so_fn)
         print(dataset, thetao_cube.shape, 'so:', so_cube.shape, vol_cube.shape, depths.shape)
-        assert 0
+        # l_cube = extract_time_range(thetao_cube
+        return None
     # 2D!
     print(dataset, thetao_cube.shape, 'so:', so_cube.shape, vol_cube.shape, depths.shape)
     for z in np.arange(thetao_cube.data.shape[1]):
@@ -3858,6 +3860,10 @@ def guess_volcello_fn(dicts, t_index, vol_key = 'volcello'):
 
     key_list = [[t_project, t_dataset, t_exp, t_ensemble, vol_key   ],] # everything.
     enss = ['r1i1p1f1', 'r1i1p1f2', 'r1i1p2f1', 'r1i1p1f3']
+    if t_exp == 'hist_nat':
+        for pi_ens in enss:
+            key_list.append([t_project, t_dataset, 'historical', pi_ens, vol_key   ]) # historical volcello
+
     for pi_ens in enss:
         key_list.append([t_project, t_dataset, 'piControl', pi_ens, vol_key   ]) # piControl volcello
 
@@ -4301,7 +4307,7 @@ def main(cfg):
     dyn_fns = {}
     slr_fns = {}
     do_SLR = True
-    do_OHC = True 
+    do_OHC = False #True 
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
@@ -4406,6 +4412,7 @@ def main(cfg):
 
     mmm_slr = {}
     if do_SLR and method == 'Landerer':
+        # this is the multiple pane halosteric plot.
         do_plot_halo_multipane = True
         if do_plot_halo_multipane:
             plot_exp = 'historical'
@@ -4420,7 +4427,7 @@ def main(cfg):
                     time_range=time_range,
                     show_UKESM=ukesm,
                 )
-
+        # below here is inthe individual plots:
         plot_scatter = False
         if plot_scatter:
             plot_dyn = 'halo'
@@ -4532,6 +4539,8 @@ def main(cfg):
         elif detrending_method == 'Full':
             so_fn = file_dict[(project, dataset, exp, ensemble, 'so')]
             ohc_fn = calc_ohc_full(cfg, metadatas, fn, so_fn, volcello_fn, trend='intact')
+            if ohc_fn is None: continue
+
 
         if ohc_fn.find(exp) == -1:
             print('ERROR - ohc_fn',(project, dataset, exp, ensemble, short_name), ohc_fn )
@@ -4566,6 +4575,7 @@ def main(cfg):
             so_fn = detrended_ncs[(project, dataset, exp, ensemble, 'so')]
             print('detrending_method:', detrending_method, so_fn)
             ohc_fn = calc_ohc_full(cfg, metadatas, detrended_fn, so_fn, volcello_fn, trend='detrended')
+            if ohc_fn is None: continue
         else:
             assert 0
 
