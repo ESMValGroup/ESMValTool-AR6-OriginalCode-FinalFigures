@@ -26,6 +26,7 @@ import os
 import iris
 import matplotlib.pyplot as plt
 plt.style.use("./ipcc_ar6_fgd.mplstyle")
+import matplotlib
 
 import numpy as np
 import itertools
@@ -43,6 +44,7 @@ from dask import array as da
 from shelve import open as shopen
 
 from matplotlib.colors import LogNorm
+from matplotlib.offsetbox import AnchoredText
 import cartopy.crs as ccrs
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
@@ -372,7 +374,10 @@ def single_timeseries(fn, path, keys):
 #    return fig, ax
 
 
-def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='viridis', plot_type='7_panes'):
+def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
+        plot_style='viridis', 
+        plot_type='7_panes',
+        show_UKESM=False):
     """
     Multimodel version of the 2.25 plot.
     """
@@ -389,8 +394,19 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
 
     if plot_style=='viridis':
         color_dict = {dataset:c for dataset, c in zip(datasets, plt.cm.viridis(np.linspace(0,1,len(datasets))))}
+        if show_UKESM:
+            for dataset in color_dict.keys():
+                if dataset.lower().find('ukesm')>-1:
+                    color_dict[dataset] = 'purple'
+
     if plot_style=='all_one':
         color_dict = {dataset: CMIP6_red for dataset in datasets}
+
+        if show_UKESM:
+            for dataset in color_dict.keys():
+                if dataset.lower().find('ukesm')>-1:
+                    color_dict[dataset] = 'purple'
+
     if plot_style=='mono':
         color_dict={}
     color_dict['Observations'] = 'black'
@@ -454,7 +470,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
                412: '0-700m',
                413: '700m - 2000m',
                414:  '> 2000m',}
-        fig.set_size_inches(10, 7)
+        fig.set_size_inches(5 , 5)
 
 
     plot_details={}
@@ -478,17 +494,33 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
 
             for subplot, ax in axes.items():
                 key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
+                print(subplot, depth_dict[subplot])
                 fn = ocean_heat_content_timeseries[key]
+
                 times, data = load_convert(fn)
+                if '2000m_plus' ==  depth_dict[subplot]:
+                    print(key, times, data)
                 for t, d in zip(times, data):
                     t = int(t) + 0.5
+                    if np.ma.is_masked(d): continue
+                    if np.isnan(d): continue
+                    if np.isinf(d): continue
+ 
                     try: fill_betweens[subplot][t].append(d)
                     except: fill_betweens[subplot][t]= [d, ]
+                    if show_UKESM and dataset.lower().find('ukesm')>-1:
+                        axes[subplot].plot(times, data, c='purple', alpha=1.0, lw=1.5, zorder=2)
+
 
         for subplot in fill_betweens.keys():
+
             times = sorted(fill_betweens[subplot].keys())
             mins = [np.min(fill_betweens[subplot][t]) for t in times]
             maxs = [np.max(fill_betweens[subplot][t]) for t in times]
+
+            if '2000m_plus' ==  depth_dict[subplot]:
+                    print(key, times, mins, maxs)
+
             axes[subplot].fill_between(times, mins, maxs, color='grey', alpha=0.5)
 
             if xlims_dict[subplot]:
@@ -510,7 +542,10 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
                 fn = ocean_heat_content_timeseries[key]
 
                 times, data = load_convert(fn)
-                ax.plot(times, data, c=color_dict[dataset], alpha=0.5)
+                if show_UKESM and dataset.lower().find('ukesm')>-1:
+                    ax.plot(times, data, c=color_dict[dataset], alpha=1.0, lw=1.5, zorder=2)
+                else:
+                    ax.plot(times, data, c=color_dict[dataset], alpha=0.5)
                 if xlims_dict[subplot]:
                     ax.set_xlim(xlims_dict[subplot])
                 if no_ticks[subplot]:
@@ -533,7 +568,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
         obs_years = np.ma.masked_where(obs_years < 1960., obs_years)
         hc_data = matdata['hc_global']
         datasets.append('Observations')
-
+    
         def strip_name(array): return str(array[0][0]).strip(' ')
         def zetta_to_joules(dat): return dat * 1.E21
 
@@ -543,6 +578,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
             for ii, array in enumerate(matdata['hc_yr_fname']):
                 name = strip_name(array)
                 series = hc_data[ii,z,:]
+                
                 series = np.ma.masked_invalid(series)
                 series = zero_around_dat(obs_years, series, 1971)
                 series = zetta_to_joules(series)
@@ -590,10 +626,15 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
     if plot_style == 'mono':
         axleg.plot([], [], c='grey', lw=5, ls='-', alpha=0.5, label='CMIP6')
         axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
+        if show_UKESM:
+            ax.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
 
     if plot_style == 'all_one':
         axleg.plot([], [], c=CMIP6_red, lw=3, ls='-', label='CMIP6')
         axleg.plot([], [], c='black', lw=3, ls='-', label='Observations')
+        if show_UKESM:
+            ax.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
+
 
     if plot_style == 'viridis':
         # Add emply plots to dummy axis.
@@ -614,7 +655,11 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_style='v
     fig_dir = diagtools.folder([cfg['plot_dir'], 'multimodel_ohc'])
     image_extention = diagtools.get_image_format(cfg)
 
-    fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,
+    if show_UKESM:
+        fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,'UKESM',
+                                     ])+image_extention
+    else:
+        fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,
                                      ])+image_extention
 
     plt.savefig(fig_fn)
@@ -933,7 +978,7 @@ def single_pane_map_plot(
         cmap='coolwarm'
         max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
         nspace = np.linspace(
-            -max_val, max_val, 15, endpoint=True)
+            -max_val, max_val, 22, endpoint=True)
 
     else:
         cmap='viridis'
@@ -2356,6 +2401,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         time_range = [1970, 2020],
         fig=None,
         subplot = 111,
+        show_UKESM=False,
     ):
     """
     Add a interannual trend plot for each model and for the
@@ -2391,6 +2437,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
     count = 0
     colours = {'observations':'black', 'historical': CMIP6_red, 'hist-nat':'green'}
     labels = []
+    max_value = 0.
     for dataset, exp, ensemble in itertools.product(datasets, exps, ensembles):
         pac =  trends.get((dataset, exp, ensemble, 'Pacific'), None)
         alt =  trends.get((dataset, exp, ensemble, 'Atlantic'), None)
@@ -2398,6 +2445,10 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         if None in [pac, alt]: continue
         col=  colours[exp]
         label = exp
+        max_value = np.max([max_value, abs(pac), abs(alt)])
+        if show_UKESM and dataset.lower().find('ukesm')>-1:
+            col='purple'
+            label = 'UKESM' 
         if label not in labels:
             plt.scatter(pac, alt, c=col, marker='s', label = label)
         else:
@@ -2439,6 +2490,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
                 obs_dat[region] = mean.data
             label = 'Observations'
+            print(obs_type, obs_type, ':', obs_dat['Pacific'], obs_dat['Atlantic'])
             if label not in labels:
                 plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s', label = label)
                 labels.append(label)
@@ -2451,8 +2503,9 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
     plt.axhline(0, c='k', ls='--')
     plt.axvline(0, c='k', ls='--')
 
-    ax.set_xlim([-1., 1])
-    ax.set_ylim([-1., 1])
+    max_value = int(max_value)+1.
+    ax.set_xlim([-max_value, max_value])
+    ax.set_ylim([-max_value, max_value])
 
     if plot_dyn == 'halo_ts':
         plt.xlabel('Pacific Halosteric Trend (mm yr'+r'$^{-1}$'+')')
@@ -2463,11 +2516,14 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
     # Saving files:
     if subplot==111:
+        imgf = diagtools.get_image_format(cfg)
         path = diagtools.folder([cfg['plot_dir'], 'SLR_Regional_trend_scatter'])
         path += '_'.join([plot_exp, plot_dyn, plot_trend,
                           str(int(time_range[0]))+'-'+ str(int(time_range[1])),
-                          'SLR_Regional_trend_scatter'])+diagtools.get_image_format(cfg)
-
+                          'SLR_Regional_trend_scatter'])+imgf
+        if show_UKESM:
+            path = path.replace(imgf, '_UKESM'+imgf)
+ 
         if cfg['write_plots']:
             logger.info('Saving plots to %s', path)
             plt.savefig(path, dpi=200)
@@ -2589,6 +2645,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         plot_dyn = 'halo',
         plot_exp = 'historical',
         plot_region = 'Global',
+        plot_range = [-2., 2],
         time_range=[1950, 2000],
         method = 'Landerer',
         subplot=111,
@@ -2607,7 +2664,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
 
     cmap='coolwarm'
-    nspace = np.linspace(-4., 4., 15, endpoint=True)
+    nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
 
     if subplot==111:
         fig = plt.figure()
@@ -2627,8 +2684,6 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    ax.text(0., 0., 'CMIP6', fontsize=10)
-
     qplot = iris.plot.contourf(
         mean_cube,
         nspace,
@@ -2645,6 +2700,8 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     try: plt.gca().coastlines()
     except: pass
 
+    ax = add_map_text(ax, 'CMIP6')
+
     # Saving files:
     if subplot==111:
         if cfg['write_plots']:
@@ -2655,7 +2712,19 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
             plt.savefig(path, dpi=200)
         plt.close()
     else:
-        return fig, ax
+        return fig, ax, qplot
+
+
+def add_map_text(ax, text):
+    """
+    Add a small text to a map.
+    """
+    #ax.text(0., 0., text, fontsize=10)
+    artisttext = AnchoredText(text,
+                        loc=4, prop={'size': 12}, frameon=False)
+    ax.add_artist(artisttext)
+    return ax
+
 
 def plot_halo_multipane(
         cfg,
@@ -2665,13 +2734,14 @@ def plot_halo_multipane(
         #plot_dyn = plot_dyn,
         method= 'Landerer',
         time_range=[1950, 2000],
+        show_UKESM=False,
     ):
     """
     Make the halosteric multi pane figure needed for IPCC WG1 chapter 3, fig 3.27
     """
     # Create figure
     fig = plt.figure()
-    fig.set_size_inches(10, 10)
+    fig.set_size_inches(10, 7)
 
     axes = {}
     # Obs pane 1
@@ -2686,7 +2756,7 @@ def plot_halo_multipane(
     obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
     subplots = [421, 423, 425,]
     cmip_subplots = [427, ]
-
+    plot_range=[-2.05, 2.05]
     for sbp, obs_file in zip(subplots, obs_files ):
         fig, axes[sbp] = plot_halo_obs_mean(
             cfg,
@@ -2694,6 +2764,7 @@ def plot_halo_multipane(
             plot_dyn = 'halo',
             subplot=sbp,
             depth_range='2000m',
+            plot_range=plot_range,
             obs_file=obs_file,
             fig=fig,
         )
@@ -2710,7 +2781,7 @@ def plot_halo_multipane(
     )
     for pane in cmip_subplots:
         # make plot: (c3)
-        fig, axes[pane] = make_multimodel_halosteric_salinity_trend(
+        fig, axes[pane], qplot = make_multimodel_halosteric_salinity_trend(
             cfg,
             metadatas,
             multimodel_mean_fn,
@@ -2719,10 +2790,17 @@ def plot_halo_multipane(
             plot_exp = plot_exp,
             plot_region = 'Global',
             time_range = time_range,
+            plot_range=plot_range,
             method = method,
             fig=fig,
             subplot = pane,
         )
+    #qplot.keys()
+#    cmap='coolwarm'
+#    nspace = np.linspace(-2., 2, 15, endpoint=True)
+#    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
+    print(qplot)
+    fig.colorbar(qplot, ax=list(axes.values()), location='left')
 
     #rhs:
     # Halosteric trend scatter:
@@ -2732,7 +2810,8 @@ def plot_halo_multipane(
             method=method,
             time_range=time_range,
             fig=fig,
-            subplot = 222
+            subplot = 222,
+            show_UKESM=show_UKESM,
         )
     # Thermosteric trend scatter
     fig, axes[224] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
@@ -2741,13 +2820,25 @@ def plot_halo_multipane(
             method=method,
             time_range=time_range,
             fig=fig,
-            subplot = 224
+            subplot = 224,
+            show_UKESM=show_UKESM,
         )
+
+#    plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
+#    cax = plt.axes([0.85, 0.1, 0.075, 0.8])
+#    cmap='coolwarm'
+#    nspace = np.linspace(-2., 2, 15, endpoint=True)
+#    cbar = plt.colorbar(cax=cax,cmap=cmap, )
+#    cbar.set_clim(-2.0, 2.0)
 
     time_range_str = '-'.join([str(t) for t in time_range])
 
+    fig.suptitle('Halosteric Sea Level')
+
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
+    if show_UKESM:
+        filename+='_UKESM'
     path = diagtools.folder([cfg['plot_dir'], 'halosteric_multipane']) + filename
     path = path.replace(' ', '') + diagtools.get_image_format(cfg)
 
@@ -2763,6 +2854,7 @@ def plot_halo_obs_mean(
         plot_dyn = 'halo',
         subplot=111,
         depth_range='2000m',
+        plot_range=[-2., 2],
         obs_file='DurackandWijffels10_V1.0_50yr',
         ax = None,
         fig = None
@@ -2795,7 +2887,7 @@ def plot_halo_obs_mean(
     #(and FYI 14 = 700m and 12 = 300m)
 
     cmap='coolwarm'
-    nspace = np.linspace(-4., 4., 15, endpoint=True)
+    nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
 
     if subplot==111:
         fig = plt.figure()
@@ -2816,9 +2908,7 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-#    for n in [0. -100, 100, 1000,10000, 5,]:
-#        for j in [0. -100, 100, 1000,10000, 5,]:
-    ax.text(0., 0., legend_txt, fontsize=10)
+    ax = add_map_text(ax, legend_txt)
 
     qplot = iris.plot.contourf(
         cube,
@@ -3363,7 +3453,7 @@ def SLR_map_plot(cfg, metadata, dyn_fn, clim_fn, time_range, method='dyn_height'
     cmap='coolwarm'
     max_val = np.max(np.abs([cube.data.min(), cube.data.max()]))
     nspace = np.linspace(
-        -max_val, max_val, 15, endpoint=True)
+        -max_val, max_val, 22, endpoint=True)
 
     title = ' '.join(keys)
 
@@ -4319,8 +4409,8 @@ def main(cfg):
         do_plot_halo_multipane = True
         if do_plot_halo_multipane:
             plot_exp = 'historical'
-            time_ranges = [[1950, 2000], [1970, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
-            for time_range in time_ranges:
+            time_ranges = [[1950, 2015], ] #[1950, 2000], [1970, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
+            for time_range,ukesm in itertools.product(time_ranges, [True, False]):
                 plot_halo_multipane(
                     cfg,
                     metadatas,
@@ -4328,6 +4418,7 @@ def main(cfg):
                     plot_exp = plot_exp,
                     method= 'Landerer',
                     time_range=time_range,
+                    show_UKESM=ukesm,
                 )
 
         plot_scatter = False
@@ -4391,7 +4482,7 @@ def main(cfg):
                     method = method,
                 )
 
-        plot_halosteric_obs = True
+        plot_halosteric_obs = False
         if plot_halosteric_obs:
             obs_keys = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
             for obs_file in obs_keys:
@@ -4557,8 +4648,8 @@ def main(cfg):
         except: continue
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
-    for plot_style, plot_type  in itertools.product(['viridis', 'mono','all_one'],['7_panes', '4_panes']):
-        multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type =plot_type , plot_style=plot_style)
+    for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one'],['7_panes', '4_panes'], [True, False]):
+        multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type =plot_type , plot_style=plot_style, show_UKESM=ukesm)
 
 
     logger.info('Success')
