@@ -2431,9 +2431,12 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         data = np.ma.masked_where(times.mask, data)
         linreg = linregress(times.compressed(), data.compressed())
         trends[(dataset, exp, ensemble, region)] = linreg.slope
-    if subplot==111:
+    if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
-    ax = fig.add_subplot(subplot)
+    if isinstance(subplot, int):
+        ax = fig.add_subplot(subplot)
+    else:
+        ax = subplot
     count = 0
     colours = {'observations':'black', 'historical': CMIP6_red, 'hist-nat':'green'}
     labels = []
@@ -2515,7 +2518,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         plt.ylabel('Atlantic Thermosteric Trend (mm yr'+r'$^{-1}$'+')')
 
     # Saving files:
-    if subplot==111:
+    if isinstance(subplot, int) and subplot==111:
         imgf = diagtools.get_image_format(cfg)
         path = diagtools.folder([cfg['plot_dir'], 'SLR_Regional_trend_scatter'])
         path += '_'.join([plot_exp, plot_dyn, plot_trend,
@@ -2666,7 +2669,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     cmap=diagtools.misc_div
     nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
     #cmap = plt.cm.get_cmap('coolwarm')
-    if subplot==111:
+    if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
         title = ' '.join(['CMIP6 Multimodel mean', time_range_str ])
 
@@ -2678,7 +2681,8 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
        proj = ccrs.Robinson(central_longitude=central_longitude)
        mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    ax = fig.add_subplot(subplot, projection=proj)
+    if isinstance(subplot, int):
+        ax = fig.add_subplot(subplot, projection=proj)
 
     if square:
         extent = [central_longitude-180., central_longitude+180., -73, 73]
@@ -2693,7 +2697,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         zmin=nspace.min(),
         zmax=nspace.max())
 
-    if subplot==111:
+    if isinstance(subplot, int) and subplot==111:
         plt.title(title)
         cbar = plt.colorbar(orientation='horizontal')
 
@@ -2703,7 +2707,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     ax = add_map_text(ax, 'CMIP6')
 
     # Saving files:
-    if subplot==111:
+    if isinstance(subplot, int) and subplot==111:
         if cfg['write_plots']:
             filename = '_'.join(unique_id).replace('/', '_')
             path = diagtools.folder([cfg['plot_dir'], 'multimodel_halosteric_map']) + filename
@@ -2754,8 +2758,24 @@ def plot_halo_multipane(
      #  obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
 
     obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
-    subplots = [421, 423, 425,]
-    cmip_subplots = [427, ]
+    if len(obs_files) == 3:
+        subplots = [421, 423, 425,]
+        cmip_subplots = [427, ]
+        scatter1=222
+        scatter2=224
+    if len(obs_files) == 2:
+        gs = gridspec.GridSpec(1, 2, width_ratios=[2, 1], height_ratios=[1, 1, 1, 1, 1, 1])
+        central_longitude=-120.
+        proj = ccrs.Robinson(central_longitude=central_longitude)
+        ax0 = fig.add_subplot(gs[0, 0:2], projection=proj)
+        ax1 = fig.add_subplot(gs[0, 2:4], projection=proj)
+        ax2 = fig.add_subplot(gs[0, 4:6], projection=proj)
+        subplots = [ax0, ax1]
+        cmip_subplots = [ax2,]
+        scatter1=fig.add_subplot(gs[1, :3])
+        scatter2=fig.add_subplot(gs[1, 3:])
+
+
     plot_range=[-2.05, 2.05]
     for sbp, obs_file in zip(subplots, obs_files ):
         fig, axes[sbp] = plot_halo_obs_mean(
@@ -2767,6 +2787,7 @@ def plot_halo_multipane(
             plot_range=plot_range,
             obs_file=obs_file,
             fig=fig,
+            ax=sbp,
         )
 
     # model pane ( C3)
@@ -2804,23 +2825,23 @@ def plot_halo_multipane(
 
     #rhs:
     # Halosteric trend scatter:
-    fig, axes[222] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
+    fig, axes[scatter1] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
             plot_exp = plot_exp,
             plot_dyn = 'halo_ts',
             method=method,
             time_range=time_range,
             fig=fig,
-            subplot = 222,
+            subplot = scatter1,
             show_UKESM=show_UKESM,
         )
     # Thermosteric trend scatter
-    fig, axes[224] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
+    fig, axes[scatter2] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
             plot_exp = plot_exp,
             plot_dyn = 'thermo_ts',
             method=method,
             time_range=time_range,
             fig=fig,
-            subplot = 224,
+            subplot = scatter2,
             show_UKESM=show_UKESM,
         )
 
@@ -2874,7 +2895,6 @@ def plot_halo_obs_mean(
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc'
         legend_txt = 'Ishii 3000m, 1950-2010'
 
-
     obs_cubes = iris.load_raw(aux_file)
     if plot_dyn == 'halo':
         cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
@@ -2890,7 +2910,7 @@ def plot_halo_obs_mean(
     # cmap = plt.cm.get_cmap(cmap)
     nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
 
-    if subplot==111:
+    if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
         title = ' '.join(['Observational mean', legend_txt])
 
@@ -4307,7 +4327,7 @@ def main(cfg):
     dyn_fns = {}
     slr_fns = {}
     do_SLR = True
-    do_OHC = False #True 
+    do_OHC = False #True
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
