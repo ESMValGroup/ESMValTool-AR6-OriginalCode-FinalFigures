@@ -4301,7 +4301,7 @@ def main(cfg):
     dyn_fns = {}
     slr_fns = {}
     do_SLR = True
-    do_OHC = False
+    do_OHC = True 
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
