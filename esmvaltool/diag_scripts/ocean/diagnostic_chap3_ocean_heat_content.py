@@ -2454,14 +2454,46 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
             col='purple'
             label = 'UKESM'
         if label not in labels:
-            plt.scatter(pac, alt, c=col, marker='s', label = label)
+            plt.scatter(pac, alt, c=col, marker='s', label = label,alpha=0.5)
         else:
-            plt.scatter(pac, alt, c=col, marker='s')
+            plt.scatter(pac, alt, c=col, marker='s', alpha=0.5)
         labels.append(label)
         count +=1
     if not count:
          plt.close()
          return
+
+    add_means=True
+    if add_means=True
+        pac_means = {}
+        alt_means = {}
+        for dataset, exp, ensemble in itertools.product(datasets, exps, ensembles):
+            pac =  trends.get((dataset, exp, ensemble, 'Pacific'), None)
+            alt =  trends.get((dataset, exp, ensemble, 'Atlantic'), None)
+            if None in [pac, alt]:
+                continue
+            if (dataset, exp) in pac_means.keys():
+                pac_means[(dataset, exp)].append(pac)
+                alt_means[(dataset, exp)].append(alt)
+            else:
+                pac_means[(dataset, exp)] = [pac, ]
+                alt_means[(dataset, exp)] = [alt, ]
+        for exp0 in exps:
+            exps_pac = []
+            exps_alt = []
+            # Add each model:
+            for (dataset, exp1), values in pac_means.items():
+                if not len(values): continue
+                if exp1 != exp0: continue
+                exps_pac.append(np.mean(values))
+                exps_alt.append(np.mean(alt_means[(dataset, exp1)]))
+            col=  colours[exp0]
+            label = exp0
+            if label not in labels:
+                plt.scatter(np.mean(exps_pac), np.mean(exps_alt), c=col, markersize=10, marker='D', label = label)
+            else:
+                plt.scatter(np.mean(exps_pac), np.mean(exps_alt), c=col, markersize=10, marker='D')
+
 
     add_obs = True
     if add_obs:
@@ -2503,6 +2535,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
     if show_legend:
         plt.legend()
+
     ax.set_aspect("equal")
 
     plt.axhline(0, c='k', ls='--')
@@ -2826,7 +2859,7 @@ def plot_halo_multipane(
 #    nspace = np.linspace(-2., 2, 15, endpoint=True)
 #    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
     print(qplot)
-    fig.colorbar(qplot, ax=list(axes.values()), location='left',label='trend, mm yr'+r'$^{-1}$')
+    fig.colorbar(qplot, ax=list(axes.values()), location='left',label='trend, mm yr'+r'$^{-1}$'')
 
     #rhs:
     # Halosteric trend scatter:
