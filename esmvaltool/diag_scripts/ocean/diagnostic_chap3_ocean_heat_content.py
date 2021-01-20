@@ -2826,7 +2826,7 @@ def plot_halo_multipane(
 #    nspace = np.linspace(-2., 2, 15, endpoint=True)
 #    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
     print(qplot)
-    fig.colorbar(qplot, ax=list(axes.values()), location='left',label='trend, mm yr'+r'$^{-1}$'')
+    fig.colorbar(qplot, ax=list(axes.values()), location='left',label='trend, mm yr'+r'$^{-1}$')
 
     #rhs:
     # Halosteric trend scatter:
