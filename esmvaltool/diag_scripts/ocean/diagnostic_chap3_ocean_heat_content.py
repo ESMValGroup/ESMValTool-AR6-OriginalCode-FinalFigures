@@ -2402,6 +2402,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         fig=None,
         subplot = 111,
         show_UKESM=False,
+        show_legend=True,
     ):
     """
     Add a interannual trend plot for each model and for the
@@ -2500,7 +2501,8 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
             else:
                 plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s')
 
-    plt.legend()
+    if show_legend:
+        plt.legend()
     ax.set_aspect("equal")
 
     plt.axhline(0, c='k', ls='--')
@@ -2684,7 +2686,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     if isinstance(subplot, int):
         ax = fig.add_subplot(subplot, projection=proj)
     else: ax=subplot
- 
+
     if square:
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
@@ -2758,7 +2760,9 @@ def plot_halo_multipane(
     #f 1860 in time_range:
      #  obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr']
 
-    obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
+    #obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
+    obs_files = ['Ishii09_v6.13_annual_steric_1950-2010', 'DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta']
+
     if len(obs_files) == 3:
         subplots = [421, 423, 425,]
         cmip_subplots = [427, ]
@@ -2822,7 +2826,7 @@ def plot_halo_multipane(
 #    nspace = np.linspace(-2., 2, 15, endpoint=True)
 #    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
     print(qplot)
-    fig.colorbar(qplot, ax=list(axes.values()), location='left')
+    fig.colorbar(qplot, ax=list(axes.values()), location='left',label='trend, mm yr'+r'$^{-1}$'')
 
     #rhs:
     # Halosteric trend scatter:
@@ -2834,6 +2838,7 @@ def plot_halo_multipane(
             fig=fig,
             subplot = scatter1,
             show_UKESM=show_UKESM,
+            show_legend=False
         )
     # Thermosteric trend scatter
     fig, axes[scatter2] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
@@ -2844,6 +2849,7 @@ def plot_halo_multipane(
             fig=fig,
             subplot = scatter2,
             show_UKESM=show_UKESM,
+            show_legend=True,
         )
 
 #    plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
@@ -2887,14 +2893,18 @@ def plot_halo_obs_mean(
     # Load the observational data.
     if obs_file=='DurackandWijffels10_V1.0_50yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
-        legend_txt = 'D&W 2000m, 1950-2000'
+        legend_txt = 'D&W 1950-2000'
     if obs_file=='DurackandWijffels10_V1.0_30yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
-        legend_txt = 'D&W 2000m, 1970-2000'
+        legend_txt = 'D&W 1970-2000'
 
     if obs_file=='Ishii09_v6.13_annual_steric_1950-2010':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc'
-        legend_txt = 'Ishii 3000m, 1950-2010'
+        legend_txt = 'Ishii 1950-2010'
+    if obs_file=='DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta':
+        aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta.nc'
+        legend_txt = 'D&W 1950-2020'
+
 
     obs_cubes = iris.load_raw(aux_file)
     if plot_dyn == 'halo':
@@ -2914,7 +2924,7 @@ def plot_halo_obs_mean(
     if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
         title = ' '.join(['Observational mean', legend_txt])
-    
+
     central_longitude=-120.
     square = False
     if square:
