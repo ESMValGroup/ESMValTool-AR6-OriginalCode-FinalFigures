@@ -2683,7 +2683,8 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
 
     if isinstance(subplot, int):
         ax = fig.add_subplot(subplot, projection=proj)
-
+    else: ax=subplot
+ 
     if square:
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
@@ -2787,7 +2788,7 @@ def plot_halo_multipane(
             plot_range=plot_range,
             obs_file=obs_file,
             fig=fig,
-            ax=sbp,
+#            ax=sbp,
         )
 
     # model pane ( C3)
@@ -2877,7 +2878,7 @@ def plot_halo_obs_mean(
         depth_range='2000m',
         plot_range=[-2., 2],
         obs_file='DurackandWijffels10_V1.0_50yr',
-        ax = None,
+#        ax = None,
         fig = None
         ):
     """
@@ -2913,7 +2914,7 @@ def plot_halo_obs_mean(
     if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
         title = ' '.join(['Observational mean', legend_txt])
-
+    
     central_longitude=-120.
     square = False
     if square:
@@ -2922,8 +2923,9 @@ def plot_halo_obs_mean(
        proj = ccrs.Robinson(central_longitude=central_longitude)
        cube = cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    if ax is None:
+    if isinstance(subplot, int):
         ax = fig.add_subplot(subplot, projection=proj)
+    else: ax = subplot
 
     if square:
         extent = [central_longitude-180., central_longitude+180., -73, 73]
@@ -4327,7 +4329,7 @@ def main(cfg):
     dyn_fns = {}
     slr_fns = {}
     do_SLR = True
-    do_OHC = False #True
+    do_OHC = True
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
