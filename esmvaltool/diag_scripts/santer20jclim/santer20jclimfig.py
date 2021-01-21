@@ -202,13 +202,13 @@ def _plot_extratrends(cfg, extratrends, trends):
     axx.set_ylabel('Probability density')
     axx.set_xlabel('Trend in Water Vapor Path [%/dec]')
     fig.tight_layout()
-    fig.savefig(get_plot_filename('extrabar', cfg), dpi=300)
+    fig.savefig(get_plot_filename('fig2', cfg), dpi=300)
 
     plt.close()
 
 
-def _plot_trends(cfg, trends):
-    """Plot trends."""
+def _plot_trends(cfg, trends, valid_datasets):
+    """Plot probability density function of trends."""
     xhist = np.linspace(0, 4, 41)
     # CMIP5
     if trends['cmip5']:
@@ -251,8 +251,9 @@ def _plot_trends(cfg, trends):
                  linewidth=3,
                  label="CMIP6")
         # maxh = np.max(kde1_c6(xhist))
-
+    obs_str = ''
     if trends['obs']:
+        obs_str = ' The trend for observational data is shown as vertical lines.'
         for iii, obsname in enumerate(trends['obs'].keys()):
             obscoli = float(iii)
             if iii > 4:
@@ -272,66 +273,110 @@ def _plot_trends(cfg, trends):
     axx.set_ylabel('Probability density')
     axx.set_xlabel('Trend in Water Vapor Path [%/dec]')
     fig.tight_layout()
-    fig.savefig(get_plot_filename('bar', cfg), dpi=300)
+    fig.savefig(get_plot_filename('fig1', cfg), dpi=300)
 
     plt.close()
+    
+    caption = 'Probability density function of the decadal trend in ' + \
+        'the Water Vapor Path.' + obs_str 
+
+    provenance_record = get_provenance_record(
+        valid_datasets, caption, ['trend','other'],
+        ['reg'])
+
+    diagnostic_file = get_diagnostic_filename('fig1', cfg)
+
+    logger.info("Saving analysis results to %s", diagnostic_file)
+
+    list_dict = {}
+    list_dict["data"] = [xhist]
+    list_dict["name"] = [{'var_name': 'prw_trends_bins',
+                                  'long_name': 'Water Vapor Path Trend bins',
+                                  'units': 'percent'}]
+    if trends['cmip5']:
+        list_dict["data"].append(artrend_c5)
+        list_dict["name"].append({'var_name': 'prw_trends_cmip5',
+                                  'long_name': 'Water Vapor Path Trends CMIP5',
+                                  'units': 'percent'})
+        list_dict["data"].append(weights_c5)
+        list_dict["name"].append({'var_name': 'data_set_weights',
+                                  'long_name': 'Weights for each data set.',
+                                  'units': '1'})
+        list_dict["data"].append(kde1_c5(xhist))
+        list_dict["name"].append({'var_name': 'prw_trend_distribution_cmip5',
+                                  'long_name': 'Water Vapor Path Trends ' +
+                                  'distribution CMIP5',
+                                  'units': '1'})
+    if trends['cmip6']:
+        list_dict["data"].append(artrend_c6)
+        list_dict["name"].append({'var_name': 'prw_trends_cmip6',
+                                  'long_name': 'Water Vapor Path Trends CMIP6',
+                                  'units': 'percent'})
+        list_dict["data"].append(weights_c6)
+        list_dict["name"].append({'var_name': 'data_set_weights',
+                                  'long_name': 'Weights for each data set.',
+                                  'units': '1'})
+        list_dict["data"].append(kde1_c6(xhist))
+        list_dict["name"].append({'var_name': 'prw_trend_distribution_cmip6',
+                                  'long_name': 'Water Vapor Path Trends ' +
+                                  'distribution CMIP6',
+                                  'units': '1'})
+    
+    if trends['obs']:
+        for obsname in trends['obs'].keys():
+            list_dict["data"].append(trends['obs'][obsname])
+            list_dict["name"].append({'var_name': 'prw_trend_' + obsname,
+                                  'long_name': 'Water Vapor Path Trend ' +
+                                  obsname,
+                                  'units': 'percent'})
+
+    iris.save(cube_to_save_vars(list_dict), target=diagnostic_file)
+
+    logger.info("Recording provenance of %s:\n%s", diagnostic_file,
+                pformat(provenance_record))
+    with ProvenanceLogger(cfg) as provenance_logger:
+        provenance_logger.log(diagnostic_file, provenance_record)
+
+
+def cube_to_save_vars(list_dict):
+    """Create cubes to prepare bar plot data for saving to netCDF."""
+    # cubes = iris.cube.CubeList()
+    for iii, var in enumerate(list_dict["data"]):
+        if iii == 0:
+            cubes = iris.cube.CubeList([
+                iris.cube.Cube(var,
+                               var_name=list_dict["name"][iii]['var_name'],
+                               long_name=list_dict["name"][iii]['long_name'],
+                               units=list_dict["name"][iii]['units'])])
+        else:
+            cubes.append(
+                iris.cube.Cube(var,
+                               var_name=list_dict["name"][iii]['var_name'],
+                               long_name=list_dict["name"][iii]['long_name'],
+                               units=list_dict["name"][iii]['units']))
+
+    return cubes       
 
 
 def get_provenance_record(ancestor_files, caption, statistics,
-                          domains, plot_type='geo'):
+                          domains, plot_type='probability'):
     """Get Provenance record."""
     record = {
         'caption': caption,
         'statistics': statistics,
         'domains': domains,
         'plot_type': plot_type,
-        'themes': ['atmDyn', 'monsoon', 'EC'],
+        'realms':['atmos'],
+        'themes': ['atmDyn'],
         'authors': [
             'weigel_katja',
         ],
         'references': [
-            'li17natcc',
+            'santer20jclim',
         ],
         'ancestors': ancestor_files,
     }
     return record
-
-
-def get_latlon_index(coords, lim1, lim2):
-    """Get index for given 1D vector, e.g. lats or lons between 2 limits."""
-    index = (np.where(
-        np.absolute(coords - (lim2 + lim1) / 2.0) <= (lim2 - lim1) / 2.0))[0]
-    return index
-
-
-def cube_to_save_ploted(var, lats, lons, names):
-    """Create cube to prepare plotted data for saving to netCDF."""
-    new_cube = iris.cube.Cube(var, var_name=names['var_name'],
-                              long_name=names['long_name'],
-                              units=names['units'])
-    new_cube.add_dim_coord(iris.coords.DimCoord(lats,
-                                                var_name='lat',
-                                                long_name='latitude',
-                                                units='degrees_north'), 0)
-    new_cube.add_dim_coord(iris.coords.DimCoord(lons,
-                                                var_name='lon',
-                                                long_name='longitude',
-                                                units='degrees_east'), 1)
-
-    return new_cube
-
-
-def cube_to_save_scatter(var1, var2, names):
-    """Create cubes to prepare scatter plot data for saving to netCDF."""
-    cubes = iris.cube.CubeList([iris.cube.Cube(var1,
-                                               var_name=names['var_name1'],
-                                               long_name=names['long_name1'],
-                                               units=names['units1'])])
-    cubes.append(iris.cube.Cube(var2, var_name=names['var_name2'],
-                                long_name=names['long_name2'],
-                                units=names['units2']))
-
-    return cubes
 
 
 def plot_ts_and_trend(cfg, cube_anom, dataset):
@@ -360,180 +405,6 @@ def plot_ts_and_trend(cfg, cube_anom, dataset):
     plt.close()
 
     return reg_var.slope
-
-
-def plot_reg_li(cfg, data_ar, future_exp):
-    """Plot scatter plot and regression."""
-    # data_ar {"datasets": datasets, "ar_diff_rain": ar_diff_rain,
-    #          "ar_diff_ua": ar_diff_ua, "ar_diff_va": ar_diff_va,
-    #          "ar_hist_rain": ar_hist_rain, "mism_diff_rain": mism_diff_rain,
-    #          "mwp_hist_rain": mwp_hist_rain}
-    reg = stats.linregress(data_ar["mwp_hist_rain"], data_ar["mism_diff_rain"])
-    y_reg = reg.slope * np.linspace(5.5, 8.5, 2) + reg.intercept
-
-    fig, axx = plt.subplots(figsize=(7, 7))
-
-    axx.plot(np.linspace(5.5, 8.8, 2), y_reg, color='k')
-
-    for iii, model in enumerate(data_ar["datasets"]):
-        proj = (select_metadata(cfg['input_data'].values(),
-                                dataset=model))[0]['project']
-        style = plot.get_dataset_style(model, style_file=proj.lower())
-        axx.plot(
-            data_ar["mwp_hist_rain"][iii],
-            data_ar["mism_diff_rain"][iii],
-            marker=style['mark'],
-            color=style['color'],
-            markerfacecolor=style['facecolor'],
-            linestyle='none',
-            markersize=10,
-            markeredgewidth=2.0,
-            label=model)
-
-    axx.set_xlim([5.5, 8.8])
-    axx.set_ylim([-0.01, 0.55])
-    axx.text(8.1, 0.01, 'r = {:.2f}'.format(reg.rvalue))
-    axx.set_xticks(np.linspace(6, 8, 3))
-    axx.set_yticks(np.linspace(0.0, 0.5, 6))
-    axx.vlines(6, 0, 0.5, colors='r', linestyle='solid')
-    axx.set_xlabel('Western Pacific precip.')
-    axx.set_ylabel('ISM rainfall change')
-    axx.legend(ncol=2, loc=0, framealpha=1)
-
-    fig.tight_layout()
-    fig.savefig(get_plot_filename('li17natcc_fig2a', cfg), dpi=300)
-    plt.close()
-
-    caption = ' Scatter plot of the simulated tropical western Pacific ' + \
-        'precipitation (mm d−1 ) versus projected average ISM ' + \
-        '(Indian Summer Monsoon) rainfall changes under the ' + future_exp + \
-        ' scenario. The red line denotes the observed present-day ' + \
-        'western Pacific precipitation and the inter-model ' + \
-        'correlation (r) is shown.'
-
-    provenance_record = get_provenance_record(_get_sel_files_var(cfg,
-                                                                 ['pr', 'ts']),
-                                              caption, ['corr'], ['reg'],
-                                              plot_type='scatter')
-
-    diagnostic_file = get_diagnostic_filename('li17natcc_fig2a', cfg)
-
-    logger.info("Saving analysis results to %s", diagnostic_file)
-
-    iris.save(cube_to_save_scatter(data_ar["mwp_hist_rain"],
-                                   data_ar["mism_diff_rain"],
-                                   {'var_name1': 'm_pr',
-                                    'long_name1': 'Mean Precipitation',
-                                    'units1': 'mm d-1',
-                                    'var_name2': 'd_pr',
-                                    'long_name2': 'Precipitation Change',
-                                    'units2': 'mm d-1'}),
-
-              target=diagnostic_file)
-
-    logger.info("Recording provenance of %s:\n%s", diagnostic_file,
-                pformat(provenance_record))
-    with ProvenanceLogger(cfg) as provenance_logger:
-        provenance_logger.log(diagnostic_file, provenance_record)
-
-
-def plot_reg_li2(cfg, datasets, mdiff_ism, mdiff_ism_cor, hist_ism):
-    """Plot scatter plot and regression."""
-    fig, axx = plt.subplots(figsize=(7, 7))
-
-    axx.plot(np.linspace(-2, 21, 2), 0.5 * np.linspace(-2, 21, 2), color='k')
-
-    axx.plot(
-        np.mean((mdiff_ism / hist_ism) * 100.0),
-        np.mean((mdiff_ism_cor / hist_ism) * 100.0),
-        color='k',
-        marker='v',
-        linestyle='none',
-        markersize=12,
-        markeredgewidth=3.0,
-        label='multi-model mean')
-
-    for iii, model in enumerate(datasets):
-
-        proj = (select_metadata(cfg['input_data'].values(),
-                                dataset=model))[0]['project']
-        style = plot.get_dataset_style(model, style_file=proj.lower())
-        axx.plot(
-            mdiff_ism[iii] / hist_ism[iii] * 100.0,
-            mdiff_ism_cor[iii] / hist_ism[iii] * 100.0,
-            marker=style['mark'],
-            color=style['color'],
-            markerfacecolor=style['facecolor'],
-            linestyle='none',
-            markersize=10,
-            markeredgewidth=2.0,
-            label=model)
-
-    axx.errorbar(
-        np.mean((mdiff_ism / hist_ism) * 100.0),
-        np.mean((mdiff_ism_cor / hist_ism) * 100.0),
-        xerr=np.std((mdiff_ism / hist_ism) * 100.0),
-        yerr=np.std((mdiff_ism_cor / hist_ism) * 100.0),
-        color='k',
-        marker='v',
-        linestyle='-',
-        markersize=10,
-        markeredgewidth=3.0,
-        capsize=10)
-
-    axx.set_xlim([-2, 21])
-    axx.set_ylim([-2, 21])
-    axx.text(
-        15,
-        7.1,
-        'y = {:.1f}x'.format(0.5),
-        rotation=np.rad2deg(np.arctan(0.5)),
-        horizontalalignment='center',
-        verticalalignment='center')
-    axx.set_xticks(np.linspace(0, 20, 5))
-    axx.set_yticks(np.linspace(0, 20, 5))
-    axx.vlines(0, -2, 21, colors='k', linestyle='solid')
-    axx.hlines(0, -2, 21, colors='k', linestyle='solid')
-    axx.set_xlabel('Uncorrected ISM rainfall change ratio')
-    axx.set_ylabel('Corrected ISM rainfall change ratio (% per °C)')
-    axx.legend(ncol=2, loc=2, framealpha=1)
-
-    fig.tight_layout()
-    fig.savefig(get_plot_filename('li17natcc_fig2b', cfg), dpi=300)
-    plt.close()
-
-    caption = ' Scatter plot of the uncorrected versus corrected average ' + \
-        'ISM (Indian Summer Monsoon) rainfall change ratios (% per degree ' + \
-        'Celsius of global SST warming). The error bars for the ' + \
-        'Multi-model mean indicate the standard deviation spread among ' + \
-        'models and the 2:1 line (y = 0.5x) is used to illustrate the ' + \
-        'Multi-model mean reduction in projected rainfall increase.'
-
-    provenance_record = get_provenance_record(_get_sel_files_var(cfg,
-                                                                 ['pr', 'ts']),
-                                              caption, ['corr'], ['reg'],
-                                              plot_type='scatter')
-
-    diagnostic_file = get_diagnostic_filename('li17natcc_fig2b', cfg)
-
-    logger.info("Saving analysis results to %s", diagnostic_file)
-
-    iris.save(cube_to_save_scatter(np.mean((mdiff_ism / hist_ism) * 100.0),
-                                   np.mean((mdiff_ism_cor / hist_ism) * 100.0),
-                                   {'var_name1': 'rd_pr',
-                                    'long_name1': 'Relative Precipitation ' +
-                                                  'Change',
-                                    'units1': 'percent K-1',
-                                    'var_name2': 'corr_pr',
-                                    'long_name2': 'Precipitation Correction',
-                                    'units2': 'percent K-1'}),
-
-              target=diagnostic_file)
-
-    logger.info("Recording provenance of %s:\n%s", diagnostic_file,
-                pformat(provenance_record))
-    with ProvenanceLogger(cfg) as provenance_logger:
-        provenance_logger.log(diagnostic_file, provenance_record)
 
 
 ###############################################################################
@@ -579,9 +450,9 @@ def main(cfg):
     trends['cmip6weights'] = OrderedDict()
     trends['obs'] = {}
     f_c5 = open(cfg['work_dir'] + "cmip5_trends.txt", "a")
-    f_c5.write("Model Alias Trend Weight\n")
+    f_c5.write("Model Alias Trend Weight Mean Median Maximum Mnimum Standard deviation \n")
     f_c6 = open(cfg['work_dir'] + "cmip6_trends.txt", "a")
-    f_c6.write("Model Alias Trend Weight\n")
+    f_c6.write("Model Alias Trend Weight Mean Median Maximum Mnimum Standard deviation \n")
 
     if 'add_model_dist' in cfg:
         extratrends = {}
@@ -601,6 +472,7 @@ def main(cfg):
             if not _check_full_data(dataset_path, cube):
                 number_of_subdata[dataset] = number_of_subdata[dataset] - 1
 
+    valid_datasets = []
     for dataset_path in input_data:
         project = dataset_path['project']
         cube_load = iris.load(dataset_path['filename'])[0]
@@ -616,6 +488,8 @@ def main(cfg):
             continue
         cube_anom = _calculate_anomalies(cube)
 
+        valid_datasets.append(dataset_path)
+
         if project == 'CMIP6':
             trend = plot_ts_and_trend(cfg, cube_anom, alias)
             trends['cmip6'][alias] = trend
@@ -624,7 +498,12 @@ def main(cfg):
             f_c6.write(dataset + ' ' +
                        alias + ' ' +
                        str(round(trend, 4)) + ' ' +
-                       str(round(1. / number_of_subdata[dataset], 4)) + '\n')
+                       str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
+                       str(round(np.mean(cube_anom.data), 4)) + ' ' +
+                       str(round(np.median(cube_anom.data), 4)) + ' ' +
+                       str(round(np.max(cube_anom.data), 4)) + ' ' +
+                       str(round(np.min(cube_anom.data), 4)) + ' ' +
+                       str(round(np.std(cube_anom.data), 4))+ '\n')
         elif project == 'CMIP5':
             trend = plot_ts_and_trend(cfg, cube_anom, alias)
             trends['cmip5'][alias] = trend
@@ -632,7 +511,12 @@ def main(cfg):
             f_c5.write(dataset + ' ' +
                        alias + ' ' +
                        str(round(trend, 4)) + ' ' +
-                       str(round(1. / number_of_subdata[dataset], 4)) + '\n')
+                       str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
+                       str(round(np.mean(cube_anom.data), 4)) + ' ' +
+                       str(round(np.median(cube_anom.data), 4)) + ' ' +
+                       str(round(np.max(cube_anom.data), 4)) + ' ' +
+                       str(round(np.min(cube_anom.data), 4)) + ' ' +
+                       str(round(np.std(cube_anom.data), 4))+ '\n')
         else:
             trend = plot_ts_and_trend(cfg, cube_anom, dataset)
             trends['obs'][dataset] = trend
@@ -645,7 +529,7 @@ def main(cfg):
 
     f_c5.close()
     f_c6.close()
-    _plot_trends(cfg, trends)
+    _plot_trends(cfg, trends, valid_datasets)
     if 'add_model_dist' in cfg:
         if extratrends:
             _plot_extratrends(cfg, extratrends, trends)
