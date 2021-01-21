@@ -3,7 +3,7 @@
 # Authors:       P. Davini (ISAC-CNR, Italy) (author of MiLES)
 # 	         J. von Hardenberg (ISAC-CNR, Italy) (ESMValTool adaptation)
 #                E. Arnone (ISAC-CNR, Italy) (ESMValTool v2.0 adaptation)
-#                R. Kazeroni (DLR) (project grouping for TM90)
+#                R. Kazeroni (DLR) (project grouping for TM90/DA98)
 # #############################################################################
 # Description
 # MiLES is a tool for estimating properties of mid-latitude climate.
@@ -14,7 +14,7 @@
 # ECMWF ERA-Interim reanalysis.
 #
 # Modification history
-#   20201112-kazeroni_remi: modified to average over projects (CMIP5, OBS...)
+#   20210122-kazeroni_remi: modified to average over projects (CMIP5, OBS...)
 #   20181203-vonhardenberg_jost: Completed conversion, rlint compliant
 #
 # ############################################################################
@@ -83,10 +83,11 @@ fig_multimodel_builder <- function(FIGDIR,
 ## Set default parameters
 ##
 color_lines <- c("dodgerblue", "darkred", "black", "green", "orange")
+indice <- "DA98"
 legend_loc <- c(100, 30)
 linewidth <- 4
 obs_legend <- c("OBS", "OBS2", "OBS3", "OBS4", "OBS5")
-plot_title <- "TM90 Instantaneous Blocking"
+plot_title <- "DA98 Instantaneous Blocking"
 transparency <- 0.15 # in [0, 1]
 xlabel <- "Longitude"
 ylabel <- "Blocked Days (%)"
@@ -225,7 +226,7 @@ if (write_plots) {
 ##
 ## Compute mean and std for datasets grouped by project
 ##
-  field <- "TM90"
+  field <- indice
   for (season in seasons) {
 
     # create filenames to handle the provenance

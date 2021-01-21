@@ -107,6 +107,7 @@ diagnostics:
         miles_block:
             script: miles/miles_block_groupby_projects.R
             seasons: DJF # Select season ('DJF','MAM','JJA','SON')
+            indice: 'DA98' # 'TM90'
             color_lines: ['black', 'dodgerblue', 'darkred', 'orange', 'green']
             legend_loc: [0, 30]
             linewidth: 4
