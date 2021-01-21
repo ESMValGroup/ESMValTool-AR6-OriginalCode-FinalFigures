@@ -1139,6 +1139,15 @@ field_details <- function(field) {
     title_name <- "TM90 Instantaneous Blocking"
   }
 
+  if (field == "DA98") {
+    color_field <- c("dodgerblue", "darkred")
+    color_diff <- NULL
+    lev_field <- c(0, 30)
+    lev_diff <- NULL
+    legend_unit <- "Blocked Days (%)"
+    title_name <- "DA98 Instantaneous Blocking"
+  }
+
   if (field == "InstBlock") {
     color_field <- palette1
     color_diff <- palette2

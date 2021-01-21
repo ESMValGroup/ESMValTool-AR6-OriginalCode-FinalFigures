@@ -30,7 +30,8 @@ miles_block_figures <- function(dataset,
     "LongBlockEvents",
     "DurationEvents",
     "NumberEvents",
-    "TM90"
+    "TM90",
+    "DA98"
   )
 
   ##########################################################
@@ -132,8 +133,8 @@ miles_block_figures <- function(dataset,
     print(figname)
     filenames <- c(filenames, figname)
 
-    # special treatment for TM90: it is a 1D field!
-    if (field == "TM90") {
+    # special treatment for TM90 and DA98: these are 1D fields!
+    if (field == "TM90" | field == "DA98") {
       open_plot_device(figname, output_file_type, special = TRUE)
 
       # panels option
