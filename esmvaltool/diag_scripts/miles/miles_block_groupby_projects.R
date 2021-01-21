@@ -89,7 +89,7 @@ linewidth <- 4
 obs_legend <- c("OBS", "OBS2", "OBS3", "OBS4", "OBS5")
 plot_title <- "DA98 Instantaneous Blocking"
 transparency <- 0.15 # in [0, 1]
-xlabel <- "Longitude"
+xlabel <- "Longitude (°)"
 ylabel <- "Blocked Days (%)"
 yrange <- c(0, 30)
 
@@ -306,11 +306,20 @@ if (write_plots) {
             unlist(field_mean2),
             type = "l",
             lwd = lwdline,
+            xlim = c(-90, 270)
             ylim = fp$lev_field,
             main = fp$title_name,
             xlab = fp$x_label,
             ylab = fp$legend_unit,
-            col = tm90cols[1]
+            col = tm90cols[1],
+            xaxt = "none",
+            xaxs = "i",
+            yaxs = "i"
+          )
+          axis(
+            1,
+            seq(-60, 240, 30),
+            labels = c("60W", "30W", "0", "30E", "60E", "90E", "120E", "150E", "180E", "150W", "120W")
           )
           grid()
         }
