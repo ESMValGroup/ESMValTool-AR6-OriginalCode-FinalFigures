@@ -253,8 +253,9 @@ def _plot_trends(cfg, trends, valid_datasets):
         # maxh = np.max(kde1_c6(xhist))
     obs_str = ''
     if trends['obs']:
-        obs_str = ' The trend for observational data is shown as vertical lines.'
+        obs_str = ' Vertical lines show the trend for'
         for iii, obsname in enumerate(trends['obs'].keys()):
+            obs_str = obs_str + ' ' + obsname
             obscoli = float(iii)
             if iii > 4:
                 obscoli = float(iii) - 4.5
@@ -267,6 +268,7 @@ def _plot_trends(cfg, trends, valid_datasets):
                                0.5 + obscoli * 0.1),
                        linewidth=3,
                        label=obsname)
+        obs_str = obs_str + '.'
 
     axx.legend(loc=0)
     axx.set_ylim([0, 2.5])
@@ -276,13 +278,13 @@ def _plot_trends(cfg, trends, valid_datasets):
     fig.savefig(get_plot_filename('fig1', cfg), dpi=300)
 
     plt.close()
-    
-    caption = 'Probability density function of the decadal trend in ' + \
-        'the Water Vapor Path.' + obs_str 
 
-    provenance_record = get_provenance_record(
-        valid_datasets, caption, ['trend','other'],
-        ['reg'])
+    caption = 'Probability density function of the decadal trend in ' + \
+        'the Water Vapor Path.' + obs_str
+
+    provenance_record = get_provenance_record(valid_datasets,
+                                              caption, ['trend', 'other'],
+                                              ['reg'])
 
     diagnostic_file = get_diagnostic_filename('fig1', cfg)
 
@@ -291,8 +293,8 @@ def _plot_trends(cfg, trends, valid_datasets):
     list_dict = {}
     list_dict["data"] = [xhist]
     list_dict["name"] = [{'var_name': 'prw_trends_bins',
-                                  'long_name': 'Water Vapor Path Trend bins',
-                                  'units': 'percent'}]
+                          'long_name': 'Water Vapor Path Trend bins',
+                          'units': 'percent'}]
     if trends['cmip5']:
         list_dict["data"].append(artrend_c5)
         list_dict["name"].append({'var_name': 'prw_trends_cmip5',
@@ -305,7 +307,7 @@ def _plot_trends(cfg, trends, valid_datasets):
         list_dict["data"].append(kde1_c5(xhist))
         list_dict["name"].append({'var_name': 'prw_trend_distribution_cmip5',
                                   'long_name': 'Water Vapor Path Trends ' +
-                                  'distribution CMIP5',
+                                               'distribution CMIP5',
                                   'units': '1'})
     if trends['cmip6']:
         list_dict["data"].append(artrend_c6)
@@ -319,16 +321,16 @@ def _plot_trends(cfg, trends, valid_datasets):
         list_dict["data"].append(kde1_c6(xhist))
         list_dict["name"].append({'var_name': 'prw_trend_distribution_cmip6',
                                   'long_name': 'Water Vapor Path Trends ' +
-                                  'distribution CMIP6',
+                                               'distribution CMIP6',
                                   'units': '1'})
-    
+
     if trends['obs']:
         for obsname in trends['obs'].keys():
             list_dict["data"].append(trends['obs'][obsname])
             list_dict["name"].append({'var_name': 'prw_trend_' + obsname,
-                                  'long_name': 'Water Vapor Path Trend ' +
-                                  obsname,
-                                  'units': 'percent'})
+                                      'long_name': 'Water Vapor Path Trend ' +
+                                                   obsname,
+                                      'units': 'percent'})
 
     iris.save(cube_to_save_vars(list_dict), target=diagnostic_file)
 
@@ -355,7 +357,7 @@ def cube_to_save_vars(list_dict):
                                long_name=list_dict["name"][iii]['long_name'],
                                units=list_dict["name"][iii]['units']))
 
-    return cubes       
+    return cubes
 
 
 def get_provenance_record(ancestor_files, caption, statistics,
@@ -366,7 +368,7 @@ def get_provenance_record(ancestor_files, caption, statistics,
         'statistics': statistics,
         'domains': domains,
         'plot_type': plot_type,
-        'realms':['atmos'],
+        'realms': ['atmos'],
         'themes': ['atmDyn'],
         'authors': [
             'weigel_katja',
@@ -463,6 +465,7 @@ def main(cfg):
 
     number_of_subdata = OrderedDict()
     available_dataset = list(group_metadata(input_data, 'dataset'))
+    valid_datasets = []
     for dataset in available_dataset:
         meta = select_metadata(input_data, dataset=dataset)
         number_of_subdata[dataset] = float(len(meta))
@@ -471,8 +474,9 @@ def main(cfg):
             cat.add_year(cube, 'time', name='year')
             if not _check_full_data(dataset_path, cube):
                 number_of_subdata[dataset] = number_of_subdata[dataset] - 1
-
-    valid_datasets = []
+            else:
+                valid_datasets.append(dataset_path['filename'])
+                
     for dataset_path in input_data:
         project = dataset_path['project']
         cube_load = iris.load(dataset_path['filename'])[0]
@@ -488,7 +492,7 @@ def main(cfg):
             continue
         cube_anom = _calculate_anomalies(cube)
 
-        valid_datasets.append(dataset_path)
+        
 
         if project == 'CMIP6':
             trend = plot_ts_and_trend(cfg, cube_anom, alias)
@@ -503,7 +507,7 @@ def main(cfg):
                        str(round(np.median(cube_anom.data), 4)) + ' ' +
                        str(round(np.max(cube_anom.data), 4)) + ' ' +
                        str(round(np.min(cube_anom.data), 4)) + ' ' +
-                       str(round(np.std(cube_anom.data), 4))+ '\n')
+                       str(round(np.std(cube_anom.data), 4)) + '\n')
         elif project == 'CMIP5':
             trend = plot_ts_and_trend(cfg, cube_anom, alias)
             trends['cmip5'][alias] = trend
@@ -516,7 +520,7 @@ def main(cfg):
                        str(round(np.median(cube_anom.data), 4)) + ' ' +
                        str(round(np.max(cube_anom.data), 4)) + ' ' +
                        str(round(np.min(cube_anom.data), 4)) + ' ' +
-                       str(round(np.std(cube_anom.data), 4))+ '\n')
+                       str(round(np.std(cube_anom.data), 4)) + '\n')
         else:
             trend = plot_ts_and_trend(cfg, cube_anom, dataset)
             trends['obs'][dataset] = trend
