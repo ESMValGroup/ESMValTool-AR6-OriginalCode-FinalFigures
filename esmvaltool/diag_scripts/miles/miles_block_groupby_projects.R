@@ -14,7 +14,7 @@
 # ECMWF ERA-Interim reanalysis.
 #
 # Modification history
-#   20210122-kazeroni_remi: modified to average over projects (CMIP5, OBS...)
+#   20210122-kazeroni_remi: modified to average over projects (CMIP5, CMIP6)
 #   20181203-vonhardenberg_jost: Completed conversion, rlint compliant
 #
 # ############################################################################
@@ -84,14 +84,14 @@ fig_multimodel_builder <- function(FIGDIR,
 ##
 color_lines <- c("dodgerblue", "darkred", "black", "green", "orange")
 indice <- "DA98"
-legend_loc <- c(100, 30)
+legend_loc <- c(-90, 35)
 linewidth <- 4
 obs_legend <- c("OBS", "OBS2", "OBS3", "OBS4", "OBS5")
-plot_title <- "DA98 Instantaneous Blocking"
+plot_title <- "Blocking"
 transparency <- 0.15 # in [0, 1]
 xlabel <- "Longitude (°)"
 ylabel <- "Blocked Days (%)"
-yrange <- c(0, 30)
+yrange <- c(0, 35)
 
 diag_scripts_dir <- Sys.getenv("diag_scripts")
 
@@ -281,19 +281,23 @@ if (write_plots) {
     ics2 <- c(tail(ics, n), head(ics, -n) + 360)
     text_legend <- c() # text of the legendens <- ''
     i_project <- 1
+
     for (project in project_list){
       field_exp_mean <- field_exp_all[models_projects == project]
-      if (length(field_exp_mean) > 0) { # plot mean by CMIP5-6-project or obs data is available
+
+      if (length(field_exp_mean) > 0) { # plot mean by CMIP5-6-project or every obs dataset available
+
         if (project != "OBS") { # mean computed only for CMIP5 and 6 datasets
-          field_mean <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = mean)) # mean over datasets of the project
-          field_std <- list(apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = sd)) # std
+          field_mean <- apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = mean) # mean over datasets of the project
+          field_std <- apply(X=as.data.frame(field_exp_mean), MARGIN = 1, FUN = sd) # std
           n_datasets <- length(field_exp_mean) # number of datasets for the project
           mycol <- rgb(aperm(col2rgb(tm90cols[i_project])), max = 255, alpha = alpha) # adjust color for the shaded area (std)
-          text_legend <- c(text_legend, paste(project, ":", n_datasets, "datasets"))
+          text_legend <- c(text_legend, paste(paste(project, ":", sep=""), n_datasets, "datasets"))
           field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
           field_std2 <- c(tail(field_std, n), head(field_std, -n))
-          field_mean_up2 <- unlist(field_mean2) + unlist(field_std2)
-          field_mean_do2 <- unlist(field_mean2) - unlist(field_std2)
+          field_mean_up2 <- field_mean2 + field_std2
+          field_mean_do2 <- field_mean2 - field_std2
+
         } else { #start with the first obs data
           field_mean <- field_exp_mean[1]
           field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
@@ -303,10 +307,10 @@ if (write_plots) {
         if (i_project == 1){
           plot(
             ics2,
-            unlist(field_mean2),
+            field_mean2,
             type = "l",
             lwd = lwdline,
-            xlim = c(-90, 270)
+            xlim = c(-90, 270),
             ylim = fp$lev_field,
             main = fp$title_name,
             xlab = fp$x_label,
@@ -321,8 +325,12 @@ if (write_plots) {
             seq(-60, 240, 30),
             labels = c("60W", "30W", "0", "30E", "60E", "90E", "120E", "150E", "180E", "150W", "120W")
           )
-          grid()
+          grid(
+            nx = 12,
+            ny = NULL
+          )
         }
+
         else if (project == "OBS" && length(field_exp_mean) > 1) {
           for (idx in c(2, length(field_exp_mean))) {
             field_mean <- field_exp_mean[idx]
@@ -331,7 +339,7 @@ if (write_plots) {
             i_project <- i_project +1
             points(
               ics2,
-              unlist(field_mean2),
+              field_mean2,
               type = "l",
               lwd = lwdline,
               col = tm90cols[i_project]
@@ -341,12 +349,13 @@ if (write_plots) {
         else {
           points(
             ics2,
-            unlist(field_mean2),
+            field_mean2,
             type = "l",
             lwd = lwdline,
             col = tm90cols[i_project]
           )
         }
+        # shaded area
         if (project != "OBS") {
           polygon(c(ics2, rev(ics2)), c(field_mean_do2, rev(field_mean_up2)), col = mycol, border = NA) # shaded area [mean-std; mean+std]
         }

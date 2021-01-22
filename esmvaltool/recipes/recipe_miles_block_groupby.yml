@@ -109,11 +109,11 @@ diagnostics:
             seasons: DJF # Select season ('DJF','MAM','JJA','SON')
             indice: 'DA98' # 'TM90'
             color_lines: ['black', 'dodgerblue', 'darkred', 'orange', 'green']
-            legend_loc: [0, 30]
+            legend_loc: [-90, 35]
             linewidth: 4
             obs_legend: ['ERA5']
             plot_title: 'Blocking'
             transparency: 0.15 # in [0, 1]
-            xlabel: 'Longitude'
+            xlabel: 'Longitude (°)'
             ylabel: 'Blocked Days (%)'
-            yrange: [0, 30]
+            yrange: [0, 35]
