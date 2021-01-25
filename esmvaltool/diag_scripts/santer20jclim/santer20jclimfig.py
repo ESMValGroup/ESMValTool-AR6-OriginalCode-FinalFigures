@@ -49,7 +49,7 @@ def _apply_filter(cfg, cube):
     if 'filter' in cfg:
         filt = iris.load(cfg['filter'])[0]
 
-        for iii, dim_str in ['time', 'latitude', 'longitude']:
+        for iii, dim_str in enumerate(['time', 'latitude', 'longitude']):
             filt = _fit_dim(filt, cube, dim_str, iii)
 
         cube.data = cube.data * filt.data
@@ -135,37 +135,59 @@ def _check_full_data(dataset_path, cube):
     return check
 
 
+def _get_valid_datasets(input_data):
+    """Get valid datasets list and number for each model."""
+    number_of_subdata = OrderedDict()
+    available_dataset = list(group_metadata(input_data, 'dataset'))
+    valid_datasets = []
+    for dataset in available_dataset:
+        meta = select_metadata(input_data, dataset=dataset)
+        number_of_subdata[dataset] = float(len(meta))
+        for dataset_path in meta:
+            cube = iris.load(dataset_path['filename'])[0]
+            cat.add_year(cube, 'time', name='year')
+            if not _check_full_data(dataset_path, cube):
+                number_of_subdata[dataset] = number_of_subdata[dataset] - 1
+            else:
+                valid_datasets.append(dataset_path['filename'])
+
+    return valid_datasets, number_of_subdata
+
+
 def _plot_extratrends(cfg, extratrends, trends):
     """Plot trends for ensembles."""
-    xhist = np.linspace(0, 4, 41)
-    artrend = {}
-    kde1 = {}
+    res_ar = {'xhist': np.linspace(0, 4, 41),
+              'artrend': {},
+              'kde1': {}}
+    # xhist = np.linspace(0, 4, 41)
+    # artrend = {}
+    # kde1 = {}
     fig, axx = plt.subplots(figsize=(8, 6))
 
     valid_datasets = []
-    
-    for extramodel in cfg['add_model_dist']:
-        alias = list(extratrends[extramodel].keys())[0]
+
+    for xtrmdl in cfg['add_model_dist']:
+        alias = list(extratrends[xtrmdl].keys())[0]
         valid_datasets.append(select_metadata(cfg['input_data'].values(),
                                               alias=alias)[0]['filename'])
         if alias in trends['cmip6'].keys():
-            style = plot.get_dataset_style(extramodel, style_file='cmip6')
+            style = plot.get_dataset_style(xtrmdl, style_file='cmip6')
         elif alias in trends['cmip5'].keys():
-            style = plot.get_dataset_style(extramodel, style_file='cmip5')
+            style = plot.get_dataset_style(xtrmdl, style_file='cmip5')
         else:
             style = {'facecolor': (0, 0, 1, 0.1), 'color': (0, 0, 1, 1.0)}
 
-        artrend[extramodel] = np.fromiter(extratrends[extramodel].values(),
-                                          dtype=float)
-        kde1[extramodel] = stats.gaussian_kde(artrend[extramodel],
-                                              bw_method="scott")
-        axx.hist(artrend[extramodel], bins=xhist, density=True,
+        res_ar['artrend'][xtrmdl] = np.fromiter(extratrends[xtrmdl].values(),
+                                                dtype=float)
+        res_ar['kde1'][xtrmdl] = stats.gaussian_kde(res_ar['artrend'][xtrmdl],
+                                                    bw_method="scott")
+        axx.hist(res_ar['artrend'][xtrmdl], bins=res_ar['xhist'], density=True,
                  edgecolor=style['color'],
                  facecolor=style['facecolor'])
-        axx.plot(xhist, kde1[extramodel](xhist),
+        axx.plot(res_ar['xhist'], res_ar['kde1'][xtrmdl](res_ar['xhist']),
                  color=style['color'],
                  linewidth=3,
-                 label=extramodel)
+                 label=xtrmdl)
 
     obs_str = _plot_obs(trends, axx, 2.5)
     _plot_settings(cfg, axx, fig, 'fig2')
@@ -182,9 +204,10 @@ def _plot_extratrends(cfg, extratrends, trends):
 
     logger.info("Saving analysis results to %s", diagnostic_file)
 
-    list_dict = _write_list_dict(cfg, trends, xhist, artrend, kde1)
-
-    iris.save(cube_to_save_vars(list_dict), target=diagnostic_file)
+    iris.save(cube_to_save_vars(_write_list_dict(cfg,
+                                                 trends,
+                                                 res_ar)),
+              target=diagnostic_file)
 
     logger.info("Recording provenance of %s:\n%s", diagnostic_file,
                 pformat(provenance_record))
@@ -216,21 +239,24 @@ def _plot_obs(trends, axx, maxh):
 
 def _plot_trends(cfg, trends, valid_datasets):
     """Plot probability density function of trends."""
-    xhist = np.linspace(0, 4, 41)
+    res_ar = {'xhist': np.linspace(0, 4, 41)}
     fig, axx = plt.subplots(figsize=(8, 6))
 
     # CMIP5
     if trends['cmip5']:
-        artrend_c5 = np.fromiter(trends['cmip5'].values(), dtype=float)
-        weights_c5 = np.fromiter(trends['cmip5weights'].values(), dtype=float)
+        res_ar['artrend_c5'] = np.fromiter(trends['cmip5'].values(),
+                                           dtype=float)
+        res_ar['weights_c5'] = np.fromiter(trends['cmip5weights'].values(),
+                                           dtype=float)
         # yyy_c5, xxx_c5 = np.histogram(artrend_c5, bins=xhist)
-        kde1_c5 = stats.gaussian_kde(artrend_c5, weights=weights_c5,
-                                     bw_method="scott")
-        axx.hist(artrend_c5, bins=xhist, density=True,
-                 weights=weights_c5,
+        res_ar['kde1_c5'] = stats.gaussian_kde(res_ar['artrend_c5'],
+                                               weights=res_ar['weights_c5'],
+                                               bw_method="scott")
+        axx.hist(res_ar['artrend_c5'], bins=res_ar['xhist'], density=True,
+                 weights=res_ar['weights_c5'],
                  edgecolor=(0, 0, 1, 0.6),
                  facecolor=(0, 0, 1, 0.1))
-        axx.plot(xhist, kde1_c5(xhist),
+        axx.plot(res_ar['xhist'], res_ar['kde1_c5'](res_ar['xhist']),
                  color=(0, 0, 1, 1),
                  linewidth=3,
                  label="CMIP5")
@@ -238,16 +264,19 @@ def _plot_trends(cfg, trends, valid_datasets):
 
     # CMIP6
     if trends['cmip6']:
-        artrend_c6 = np.fromiter(trends['cmip6'].values(), dtype=float)
-        weights_c6 = np.fromiter(trends['cmip6weights'].values(), dtype=float)
+        res_ar['artrend_c6'] = np.fromiter(trends['cmip6'].values(),
+                                           dtype=float)
+        res_ar['weights_c6'] = np.fromiter(trends['cmip6weights'].values(),
+                                           dtype=float)
         # yyy_c6, xxx_c6 = np.histogram(artrend_c6, bins=xhist)
-        kde1_c6 = stats.gaussian_kde(artrend_c6, weights=weights_c6,
-                                     bw_method="scott")
-        axx.hist(artrend_c6, bins=xhist, density=True,
-                 weights=weights_c6,
+        res_ar['kde1_c6'] = stats.gaussian_kde(res_ar['artrend_c6'],
+                                               weights=res_ar['weights_c6'],
+                                               bw_method="scott")
+        axx.hist(res_ar['artrend_c6'], bins=res_ar['xhist'], density=True,
+                 weights=res_ar['weights_c6'],
                  edgecolor=(0.8, 0.4, 0.1, 0.6),
                  facecolor=(0.8, 0.4, 0.1, 0.1))
-        axx.plot(xhist, kde1_c6(xhist),
+        axx.plot(res_ar['xhist'], res_ar['kde1_c6'](res_ar['xhist']),
                  color=(0.8, 0.4, 0.1, 1),
                  linewidth=3,
                  label="CMIP6")
@@ -268,34 +297,34 @@ def _plot_trends(cfg, trends, valid_datasets):
     logger.info("Saving analysis results to %s", diagnostic_file)
 
     list_dict = {}
-    list_dict["data"] = [xhist]
+    list_dict["data"] = [res_ar['xhist']]
     list_dict["name"] = [{'var_name': 'prw_trends_bins',
                           'long_name': 'Water Vapor Path Trend bins',
                           'units': 'percent'}]
     if trends['cmip5']:
-        list_dict["data"].append(artrend_c5)
+        list_dict["data"].append(res_ar['artrend_c5'])
         list_dict["name"].append({'var_name': 'prw_trends_cmip5',
                                   'long_name': 'Water Vapor Path Trends CMIP5',
                                   'units': 'percent'})
-        list_dict["data"].append(weights_c5)
+        list_dict["data"].append(res_ar['weights_c5'])
         list_dict["name"].append({'var_name': 'data_set_weights',
                                   'long_name': 'Weights for each data set.',
                                   'units': '1'})
-        list_dict["data"].append(kde1_c5(xhist))
+        list_dict["data"].append(res_ar['kde1_c5'](res_ar['xhist']))
         list_dict["name"].append({'var_name': 'prw_trend_distribution_cmip5',
                                   'long_name': 'Water Vapor Path Trends ' +
                                                'distribution CMIP5',
                                   'units': '1'})
     if trends['cmip6']:
-        list_dict["data"].append(artrend_c6)
+        list_dict["data"].append(res_ar['artrend_c6'])
         list_dict["name"].append({'var_name': 'prw_trends_cmip6',
                                   'long_name': 'Water Vapor Path Trends CMIP6',
                                   'units': 'percent'})
-        list_dict["data"].append(weights_c6)
+        list_dict["data"].append(res_ar['weights_c6'])
         list_dict["name"].append({'var_name': 'data_set_weights',
                                   'long_name': 'Weights for each data set.',
                                   'units': '1'})
-        list_dict["data"].append(kde1_c6(xhist))
+        list_dict["data"].append(res_ar['kde1_c6'](res_ar['xhist']))
         list_dict["name"].append({'var_name': 'prw_trend_distribution_cmip6',
                                   'long_name': 'Water Vapor Path Trends ' +
                                                'distribution CMIP6',
@@ -327,21 +356,29 @@ def _plot_settings(cfg, axx, fig, figname):
     fig.savefig(get_plot_filename(figname, cfg), dpi=300)
 
 
-def _write_list_dict(cfg, trends, xhist, artrend, kde1):
+def _set_extratrends_dict(cfg):
+    """Set dictionary to plot pdf over model ensembles."""
+    extratrends = {}
+    for extramodel in cfg['add_model_dist']:
+        extratrends[extramodel] = OrderedDict()
+    return extratrends
+
+
+def _write_list_dict(cfg, trends, res_ar):
     """Collect data for provenance."""
     list_dict = {}
-    list_dict["data"] = [xhist]
+    list_dict["data"] = [res_ar['xhist']]
     list_dict["name"] = [{'var_name': 'prw_trends_bins',
                           'long_name': 'Water Vapor Path Trend bins',
                           'units': 'percent'}]
 
     for extramodel in cfg['add_model_dist']:
-        list_dict["data"].append(artrend[extramodel])
+        list_dict["data"].append(res_ar['artrend'][extramodel])
         list_dict["name"].append({'var_name': 'prw_trends_' + extramodel,
                                   'long_name': 'Water Vapor Path Trends ' +
                                                extramodel,
                                   'units': 'percent'})
-        list_dict["data"].append(kde1[extramodel](xhist))
+        list_dict["data"].append(res_ar['kde1'][extramodel](res_ar['xhist']))
         list_dict["name"].append({'var_name': 'prw_trend_distribution_' +
                                               extramodel,
                                   'long_name': 'Water Vapor Path Trends ' +
@@ -427,33 +464,17 @@ def main(cfg):
     trends['cmip5weights'] = OrderedDict()
     trends['cmip6weights'] = OrderedDict()
     trends['obs'] = {}
-    f_c5 = open(cfg['work_dir'] + "/cmip5_trends.txt", "a")
-    f_c5.write("Model Alias Trend Weight Mean Median " +
-               "Maximum Mnimum Standard deviation \n")
-    f_c6 = open(cfg['work_dir'] + "/cmip6_trends.txt", "a")
-    f_c6.write("Model Alias Trend Weight Mean Median " +
-               "Maximum Mnimum Standard deviation \n")
+    # f_c5 = open(cfg['work_dir'] + "/cmip5_trends.txt", "a")
+    # f_c5.write("Model Alias Trend Weight Mean Median " +
+    #            "Maximum Mnimum Standard deviation \n")
+    # f_c6 = open(cfg['work_dir'] + "/cmip6_trends.txt", "a")
+    # f_c6.write("Model Alias Trend Weight Mean Median " +
+    #            "Maximum Mnimum Standard deviation \n")
 
     if 'add_model_dist' in cfg:
-        extratrends = {}
-        for extramodel in cfg['add_model_dist']:
-            # wstr = extramodel + 'weights'
-            extratrends[extramodel] = OrderedDict()
-            # extratrends[wstr] = OrderedDict()
+        extratrends = _set_extratrends_dict(cfg)
 
-    number_of_subdata = OrderedDict()
-    available_dataset = list(group_metadata(input_data, 'dataset'))
-    valid_datasets = []
-    for dataset in available_dataset:
-        meta = select_metadata(input_data, dataset=dataset)
-        number_of_subdata[dataset] = float(len(meta))
-        for dataset_path in meta:
-            cube = iris.load(dataset_path['filename'])[0]
-            cat.add_year(cube, 'time', name='year')
-            if not _check_full_data(dataset_path, cube):
-                number_of_subdata[dataset] = number_of_subdata[dataset] - 1
-            else:
-                valid_datasets.append(dataset_path['filename'])
+    valid_datasets, number_of_subdata = _get_valid_datasets(input_data)
 
     for dataset_path in input_data:
         project = dataset_path['project']
@@ -474,45 +495,41 @@ def main(cfg):
             trend = _calc_trend(cube_anom)
             trends['cmip6'][alias] = trend
             trends['cmip6weights'][alias] = 1. / number_of_subdata[dataset]
-            print(dataset, alias, trend, 1. / number_of_subdata[dataset])
-            f_c6.write(dataset + ' ' +
-                       alias + ' ' +
-                       str(round(trend, 4)) + ' ' +
-                       str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
-                       str(round(np.mean(cube_anom.data), 4)) + ' ' +
-                       str(round(np.median(cube_anom.data), 4)) + ' ' +
-                       str(round(np.max(cube_anom.data), 4)) + ' ' +
-                       str(round(np.min(cube_anom.data), 4)) + ' ' +
-                       str(round(np.std(cube_anom.data), 4)) + '\n')
+            # f_c6.write(dataset + ' ' +
+            #            alias + ' ' +
+            #            str(round(trend, 4)) + ' ' +
+            #            str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
+            #            str(round(np.mean(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.median(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.max(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.min(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.std(cube_anom.data), 4)) + '\n')
         elif project == 'CMIP5':
             trend = _calc_trend(cube_anom)
             trends['cmip5'][alias] = trend
             trends['cmip5weights'][alias] = 1. / number_of_subdata[dataset]
-            f_c5.write(dataset + ' ' +
-                       alias + ' ' +
-                       str(round(trend, 4)) + ' ' +
-                       str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
-                       str(round(np.mean(cube_anom.data), 4)) + ' ' +
-                       str(round(np.median(cube_anom.data), 4)) + ' ' +
-                       str(round(np.max(cube_anom.data), 4)) + ' ' +
-                       str(round(np.min(cube_anom.data), 4)) + ' ' +
-                       str(round(np.std(cube_anom.data), 4)) + '\n')
+            # f_c5.write(dataset + ' ' +
+            #            alias + ' ' +
+            #            str(round(trend, 4)) + ' ' +
+            #            str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
+            #            str(round(np.mean(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.median(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.max(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.min(cube_anom.data), 4)) + ' ' +
+            #            str(round(np.std(cube_anom.data), 4)) + '\n')
         else:
             trend = _calc_trend(cube_anom)
             trends['obs'][dataset] = trend
 
         if 'add_model_dist' in cfg:
             if dataset in cfg['add_model_dist']:
-                # wstr = dataset + 'weights'
                 extratrends[dataset][alias] = trend
-                # extratrends[wstr][alias] = 1./float(len(selection))
 
-    f_c5.close()
-    f_c6.close()
+    # f_c5.close()
+    # f_c6.close()
     _plot_trends(cfg, trends, valid_datasets)
     if 'add_model_dist' in cfg:
-        if extratrends:
-            _plot_extratrends(cfg, extratrends, trends)
+        _plot_extratrends(cfg, extratrends, trends)
 
     ###########################################################################
     # Process data
