@@ -112,7 +112,7 @@ diagnostics:
             legend_loc: [-90, 35]
             linewidth: 4
             obs_legend: ['ERA5']
-            plot_title: 'Blocking'
+            plot_title: 'Instantaneous Blocking: DJFM 1979 - 2000'
             transparency: 0.15 # in [0, 1]
             xlabel: 'Longitude (°)'
             ylabel: 'Blocked Days (%)'

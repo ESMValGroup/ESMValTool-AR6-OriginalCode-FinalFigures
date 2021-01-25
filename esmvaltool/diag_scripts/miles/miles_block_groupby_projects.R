@@ -87,7 +87,7 @@ indice <- "DA98"
 legend_loc <- c(-90, 35)
 linewidth <- 4
 obs_legend <- c("OBS", "OBS2", "OBS3", "OBS4", "OBS5")
-plot_title <- "Blocking"
+plot_title <- "Instantaneous Blocking: DJFM 1979 - 2000"
 transparency <- 0.15 # in [0, 1]
 xlabel <- "Longitude (°)"
 ylabel <- "Blocked Days (%)"
@@ -284,7 +284,8 @@ if (write_plots) {
 
     for (project in project_list){
       field_exp_mean <- field_exp_all[models_projects == project]
-
+      print(paste(project, "this project"))
+      print(paste(length(field_exp_mean), "length exp"))
       if (length(field_exp_mean) > 0) { # plot mean by CMIP5-6-project or every obs dataset available
 
         if (project != "OBS") { # mean computed only for CMIP5 and 6 datasets
@@ -297,11 +298,15 @@ if (write_plots) {
           field_std2 <- c(tail(field_std, n), head(field_std, -n))
           field_mean_up2 <- field_mean2 + field_std2
           field_mean_do2 <- field_mean2 - field_std2
+          print(paste(length(field_mean), "length mean"))
+          print(paste(length(field_mean2), "length mean2"))
 
         } else { #start with the first obs data
-          field_mean <- field_exp_mean[1]
+          field_mean <- unlist(field_exp_mean[1])
           field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
           text_legend <- c(text_legend, obs_legend[1])
+          print(paste(length(field_mean), "length mean"))
+          print(paste(length(field_mean2), "length mean2"))
         }
 
         if (i_project == 1){
@@ -313,6 +318,7 @@ if (write_plots) {
             xlim = c(-90, 270),
             ylim = fp$lev_field,
             main = fp$title_name,
+            cex.main = 1.3,
             xlab = fp$x_label,
             ylab = fp$legend_unit,
             col = tm90cols[1],
@@ -333,7 +339,7 @@ if (write_plots) {
 
         else if (project == "OBS" && length(field_exp_mean) > 1) {
           for (idx in c(2, length(field_exp_mean))) {
-            field_mean <- field_exp_mean[idx]
+            field_mean <- unlist(field_exp_mean[idx])
             field_mean2 <- c(tail(field_mean, n), head(field_mean, -n))
             text_legend <- c(text_legend, obs_legend[idx])
             i_project <- i_project +1
