@@ -2438,6 +2438,8 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         ax = fig.add_subplot(subplot)
     else:
         ax = subplot
+        plt.sca(ax) # set current axes
+
     count = 0
     colours = {'observations':'black', 'historical': CMIP6_red, 'hist-nat':'green'}
     labels = []
@@ -2448,15 +2450,19 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         print('Scatter:', dataset, exp, ensemble, 'pac:', pac, 'alt:', alt)
         if None in [pac, alt]: continue
         col=  colours[exp]
-        label = exp
+        if exp == 'historical':
+            label = 'Historical'
+        elif exp == 'hist-nat':
+            label = 'Hist-nat'
+        else:
+            label = exp
         max_value = np.max([max_value, abs(pac), abs(alt)])
         if show_UKESM and dataset.lower().find('ukesm')>-1:
             col='purple'
             label = 'UKESM'
         if label not in labels:
-            plt.scatter(pac, alt, c=col, marker='s', label = label,alpha=0.5)
-        else:
-            plt.scatter(pac, alt, c=col, marker='s', alpha=0.5)
+            plt.scatter([], [], c=col, marker='s', label = label)
+        plt.scatter(pac, alt, c=col, marker='s', alpha=0.5)
         labels.append(label)
         count +=1
     if not count:
@@ -2464,7 +2470,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
          return
 
     add_means=True
-    if add_means=True
+    if add_means==True:
         pac_means = {}
         alt_means = {}
         for dataset, exp, ensemble in itertools.product(datasets, exps, ensembles):
@@ -2488,12 +2494,12 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                 exps_pac.append(np.mean(values))
                 exps_alt.append(np.mean(alt_means[(dataset, exp1)]))
             col=  colours[exp0]
-            label = exp0
-            if label not in labels:
-                plt.scatter(np.mean(exps_pac), np.mean(exps_alt), c=col, markersize=10, marker='D', label = label)
-            else:
-                plt.scatter(np.mean(exps_pac), np.mean(exps_alt), c=col, markersize=10, marker='D')
-
+#            label = 'Ensemblex_mean'
+#            if label not in labels:
+#                plt.scatter(np.mean(exps_pac), np.mean(exps_alt), c=col, s=20, marker='D', label = label)
+#            else:
+            plt.scatter(np.mean(exps_pac), np.mean(exps_alt), facecolor=col,edgecolor='k', s=70, marker='D')
+        plt.scatter([], [], edgecolor='k', facecolor='none',  s=35, marker='D', label='Mean')
 
     add_obs = True
     if add_obs:
@@ -2534,7 +2540,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                 plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s')
 
     if show_legend:
-        plt.legend()
+        plt.legend(loc = 'lower left', framealpha=0., prop={'size': 9})
 
     ax.set_aspect("equal")
 
@@ -2684,6 +2690,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         plot_exp = 'historical',
         plot_region = 'Global',
         plot_range = [-2., 2],
+        nbins=20,
         time_range=[1950, 2000],
         method = 'Landerer',
         subplot=111,
@@ -2702,7 +2709,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
 
     cmap=diagtools.misc_div
-    nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
+    nspace = np.linspace(plot_range[0], plot_range[1], nbins, endpoint=True)
     #cmap = plt.cm.get_cmap('coolwarm')
     if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
@@ -2718,7 +2725,10 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
 
     if isinstance(subplot, int):
         ax = fig.add_subplot(subplot, projection=proj)
-    else: ax=subplot
+    else: 
+        ax=subplot
+        plt.sca(ax) # set current axes
+
 
     if square:
         extent = [central_longitude-180., central_longitude+180., -73, 73]
@@ -2730,8 +2740,8 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         linewidth=0,
         cmap=cmap,
         extend='neither',
-        zmin=nspace.min(),
-        zmax=nspace.max())
+        zmin=plot_range[0], 
+        zmax=plot_range[1])
 
     if isinstance(subplot, int) and subplot==111:
         plt.title(title)
@@ -2760,8 +2770,10 @@ def add_map_text(ax, text):
     Add a small text to a map.
     """
     #ax.text(0., 0., text, fontsize=10)
-    artisttext = AnchoredText(text,
-                        loc=4, prop={'size': 12}, frameon=False)
+    #artisttext = AnchoredText(text+'       ',
+    #                    loc=4, prop={'size': 12}, frameon=False)
+    artisttext = AnchoredText('      '+text, #+'       ',
+                        loc='upper left', prop={'size': 10}, frameon=False)
     ax.add_artist(artisttext)
     return ax
 
@@ -2795,6 +2807,8 @@ def plot_halo_multipane(
 
     #obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
     obs_files = ['Ishii09_v6.13_annual_steric_1950-2010', 'DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta']
+    obs_files = ['DurackandWijffels10_V1.0_50yr', 'Ishii09_v6.13_annual_steric_1950-2010']
+
 
     if len(obs_files) == 3:
         subplots = [421, 423, 425,]
@@ -2802,19 +2816,53 @@ def plot_halo_multipane(
         scatter1=222
         scatter2=224
     if len(obs_files) == 2:
-        gs = gridspec.GridSpec(1, 2, width_ratios=[2, 1], height_ratios=[1, 1, 1, 1, 1, 1])
-        central_longitude=-120.
-        proj = ccrs.Robinson(central_longitude=central_longitude)
-        ax0 = fig.add_subplot(gs[0, 0:2], projection=proj)
-        ax1 = fig.add_subplot(gs[0, 2:4], projection=proj)
-        ax2 = fig.add_subplot(gs[0, 4:6], projection=proj)
-        subplots = [ax0, ax1]
-        cmip_subplots = [ax2,]
-        scatter1=fig.add_subplot(gs[1, :3])
-        scatter2=fig.add_subplot(gs[1, 3:])
+        reverse = True
+        if reverse:
+##s0 = fig10.add_gridspec(1, 2)
+ #           gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[1, 2], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.450, wspace =0.0600)
+            gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06) 
+            gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
+            gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
+			#scatters
+            scatter1=fig.add_subplot(gs0[0,0])
+            scatter2=fig.add_subplot(gs0[1,0])
+			
+            central_longitude=-120.
+            proj = ccrs.Robinson(central_longitude=central_longitude)
+            ax0 = fig.add_subplot(gs1[0, 0], projection=proj)
+            ax1 = fig.add_subplot(gs1[1, 0], projection=proj)
+            ax2 = fig.add_subplot(gs1[2, 0], projection=proj)
+            subplots = [ax0, ax1]
+            cmip_subplots = [ax2,]
 
+#            gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[1, 2], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.450, wspace =0.0600)
+#            central_longitude=-120.
+#            proj = ccrs.Robinson(central_longitude=central_longitude)
+#            ax0 = fig.add_subplot(gs[0:2, 1], projection=proj)
+#            ax1 = fig.add_subplot(gs[2:4, 1], projection=proj)
+#            ax2 = fig.add_subplot(gs[4:6, 1], projection=proj)
+#            subplots = [ax0, ax1]
+#            cmip_subplots = [ax2,]
+#            scatter1=fig.add_subplot(gs[:3, 0])
+#            scatter2=fig.add_subplot(gs[3:, 0])
+        else:
+            gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[2, 1], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.10, wspace =0.25)
+            central_longitude=-120.
+            proj = ccrs.Robinson(central_longitude=central_longitude)
+            ax0 = fig.add_subplot(gs[0:2, 0], projection=proj)
+            ax1 = fig.add_subplot(gs[2:4, 0], projection=proj)
+            ax2 = fig.add_subplot(gs[4:6, 0], projection=proj)
+            subplots = [ax0, ax1]
+            cmip_subplots = [ax2,]
+            scatter1=fig.add_subplot(gs[:3, 1])
+            scatter2=fig.add_subplot(gs[3:, 1])
 
-    plot_range=[-2.05, 2.05]
+    #plot_range=[-1.65, 1.65]
+    plot_range=[-1.625, 1.625]
+    nbins=14
+    cbar_ticks = np.arange(-1.5, 1.75, 0.25)
+#    plot_range=[-2.05, 2.05]
+
     for sbp, obs_file in zip(subplots, obs_files ):
         fig, axes[sbp] = plot_halo_obs_mean(
             cfg,
@@ -2823,6 +2871,7 @@ def plot_halo_multipane(
             subplot=sbp,
             depth_range='2000m',
             plot_range=plot_range,
+            nbins=nbins,
             obs_file=obs_file,
             fig=fig,
 #            ax=sbp,
@@ -2850,6 +2899,7 @@ def plot_halo_multipane(
             plot_region = 'Global',
             time_range = time_range,
             plot_range=plot_range,
+            nbins=nbins,
             method = method,
             fig=fig,
             subplot = pane,
@@ -2858,8 +2908,10 @@ def plot_halo_multipane(
 #    cmap='coolwarm'
 #    nspace = np.linspace(-2., 2, 15, endpoint=True)
 #    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
-    print(qplot)
-    fig.colorbar(qplot, ax=list(axes.values()), location='left',label='trend, mm yr'+r'$^{-1}$'')
+    if reverse:
+        fig.colorbar(qplot, ax=list(axes.values()), location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+    else:
+        fig.colorbar(qplot, ax=list(axes.values()), location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
 
     #rhs:
     # Halosteric trend scatter:
@@ -2895,7 +2947,7 @@ def plot_halo_multipane(
     time_range_str = '-'.join([str(t) for t in time_range])
 
     fig.suptitle('Halosteric Sea Level')
-
+    # plt.tight_layout()
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
     if show_UKESM:
@@ -2916,6 +2968,7 @@ def plot_halo_obs_mean(
         subplot=111,
         depth_range='2000m',
         plot_range=[-2., 2],
+        nbins=20,
         obs_file='DurackandWijffels10_V1.0_50yr',
 #        ax = None,
         fig = None
@@ -2926,19 +2979,23 @@ def plot_halo_obs_mean(
     # Load the observational data.
     if obs_file=='DurackandWijffels10_V1.0_50yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
-        legend_txt = 'D&W 1950-2000'
+#       legend_txt = 'D&W 1950-2000'
+        legend_txt = 'Durack & Wijffels'
+
     if obs_file=='DurackandWijffels10_V1.0_30yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
         legend_txt = 'D&W 1970-2000'
 
     if obs_file=='Ishii09_v6.13_annual_steric_1950-2010':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc'
-        legend_txt = 'Ishii 1950-2010'
+        #legend_txt = 'Ishii 1950-2010'
+        legend_txt = 'Ishii et al.' #1950-2010'
+
     if obs_file=='DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta.nc'
         legend_txt = 'D&W 1950-2020'
 
-
+    print('opening:', aux_file)
     obs_cubes = iris.load_raw(aux_file)
     if plot_dyn == 'halo':
         cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
@@ -2952,7 +3009,7 @@ def plot_halo_obs_mean(
 
     cmap=diagtools.misc_div
     # cmap = plt.cm.get_cmap(cmap)
-    nspace = np.linspace(plot_range[0], plot_range[1], 22, endpoint=True)
+    nspace = np.linspace(plot_range[0], plot_range[1], nbins, endpoint=True)
 
     if isinstance(subplot, int) and subplot==111:
         fig = plt.figure()
@@ -2968,14 +3025,15 @@ def plot_halo_obs_mean(
 
     if isinstance(subplot, int):
         ax = fig.add_subplot(subplot, projection=proj)
-    else: ax = subplot
+    else:
+        ax = subplot
+        plt.sca(ax) # set current axes
 
     if square:
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
     ax = add_map_text(ax, legend_txt)
-
     qplot = iris.plot.contourf(
         cube,
         nspace,
@@ -4372,7 +4430,7 @@ def main(cfg):
     dyn_fns = {}
     slr_fns = {}
     do_SLR = True
-    do_OHC = True
+    do_OHC = False
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
