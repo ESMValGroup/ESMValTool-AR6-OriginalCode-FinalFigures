@@ -213,10 +213,18 @@ begin
   res@gsnMaximize       = True
   res@vpHeightF = 0.4
   res@vpWidthF = 0.8
+
+  res@tmXBMode = "Explicit"
+  d2r  = get_d2r("f")
+  res@tmXBValues = sin(d2r * ispan(-60, 60, 30))
+  res@tmXBLabels = (/"60S", "30S", "0", "30N", "60N"/)
+  res@tmXBMinorValues = sin(d2r * ispan(-90, 90, 10))
+  res@trXMinF = -1.
+  res@trXMaxF = 1.
+
   res@trYMinF  = min(model_arr) - 0.05 * (max(model_arr) - min(model_arr))
   res@trYMaxF  = max(model_arr) + 0.05 * (max(model_arr) - min(model_arr))
 
-  ;restiMainString = "Zonal standard deviation ~C~~Z75~" + variable_info[0]@long_name
   res@tiMainString = "Variability of Near-Surface Air Temperature"
   res@tiXAxisString = "Latitude"
 
@@ -226,6 +234,8 @@ begin
     units = model_arr@units
   end if
   res@tiYAxisString = "(" + units + ")"
+
+  model_arr&lat = sin(d2r * model_arr&lat)
 
   ; Plot
   ;plot = gsn_csm_xy(wks, model_arr&lat, model_arr(::-1, :), res)
