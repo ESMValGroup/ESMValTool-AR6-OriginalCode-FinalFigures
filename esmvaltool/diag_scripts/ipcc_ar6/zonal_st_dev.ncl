@@ -225,7 +225,7 @@ begin
   res@trYMinF  = min(model_arr) - 0.05 * (max(model_arr) - min(model_arr))
   res@trYMaxF  = max(model_arr) + 0.05 * (max(model_arr) - min(model_arr))
 
-  res@tiMainString = "Variability of Near-Surface Air Temperature"
+  res@tiMainString = "Temporal variability of Near-Surface Air Temperature"
   res@tiXAxisString = "Latitude"
 
   if (model_arr@units .eq. "degC") then
@@ -262,32 +262,32 @@ begin
   end if
 
 
-  ; ***********************************************
-  ; legend resources
-  ; ***********************************************
-
-  lgres                    = True
-  lgres@lgItemType         = "Lines"   ; show lines only (default)
-  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
-  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
-  lgres@vpHeightF          = 0.7       ; height of legend (NDC)
-  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
-  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
-
-  lgres@lgLineColors      = colors
-  lgres@lgDashIndexes     = dashes
-  lgres@lgLineThicknesses = thicks + 3
-  labels = annots
-  nitems = dimsizes(labels)
-  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
-
-  ; Create legend
-  lbid = gsn_create_legend(wks, nitems, labels, lgres)
-
-  amres = True
-  amres@amParallelPosF   = 0.65
-  amres@amOrthogonalPosF = 0.0
-  annoid1 = gsn_add_annotation(plot, lbid, amres)
+;  ; ***********************************************
+;  ; legend resources
+;  ; ***********************************************
+;
+;  lgres                    = True
+;  lgres@lgItemType         = "Lines"   ; show lines only (default)
+;  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+;  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+;  lgres@vpHeightF          = 0.7       ; height of legend (NDC)
+;  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+;  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+;
+;  lgres@lgLineColors      = colors
+;  lgres@lgDashIndexes     = dashes
+;  lgres@lgLineThicknesses = thicks + 3
+;  labels = annots
+;  nitems = dimsizes(labels)
+;  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
+;
+;  ; Create legend
+;  lbid = gsn_create_legend(wks, nitems, labels, lgres)
+;
+;  amres = True
+;  amres@amParallelPosF   = 0.65
+;  amres@amOrthogonalPosF = 0.0
+;  annoid1 = gsn_add_annotation(plot, lbid, amres)
 
   resP = True
   resP@gsnMaximize = True
