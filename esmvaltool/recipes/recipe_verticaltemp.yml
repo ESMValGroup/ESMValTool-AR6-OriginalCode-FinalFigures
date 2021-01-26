@@ -20,10 +20,17 @@ datasets:
   # ERA5/5.1
   - {dataset: era5.1, project: ERA_TTL, start_year: 1979, end_year: 2014}
   
-  # raobcore
-  - {dataset: raobcore, project: OBS, mip: Amon, tier: 3, type: atmos, version: raobcore17, start_year: 1979, end_year: 2014}
+  # raobcore v1.7
+  - {dataset: raobcore17, project: RAOB_TTL, start_year: 1979, end_year: 2014}
+  
+  # rich v1.7, no ensemble available
+  - {dataset: rich17obs, project: RICH_TTL, ensemble: mean, start_year: 1979, end_year: 2014}
 
-  # rich-obs ensemble
+  # raobcore v1.5.1
+  # it's named raobcore17 here because it used version 1.7.3 of the software, but with the parameters of version 1.5.1
+  #- {dataset: raobcore, project: OBS, mip: Amon, tier: 3, type: atmos, version: raobcore17, start_year: 1979, end_year: 2014}
+
+  # rich-obs v1.5.1 ensemble
   - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio00, start_year: 1979, end_year: 2014}
   - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio01, start_year: 1979, end_year: 2014}
   - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio02, start_year: 1979, end_year: 2014}
@@ -168,7 +175,7 @@ preprocessors:
       levels: [85000.,70000.,50000.,40000.,30000.,20000.,15000.,10000.,7000.,5000.,3000.,2000.]
       scheme: linear
     regrid:
-      target_grid: raobcore
+      target_grid: raobcore17
       scheme: linear
     extract_region:
       start_longitude: 0.
