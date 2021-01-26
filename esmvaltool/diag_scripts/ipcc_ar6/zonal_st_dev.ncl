@@ -173,7 +173,7 @@ begin
   ; ------------------------------------------------------------------
 
   ; Define workstation
-  outfile = config_user_info@plot_dir + var0 + "_std_dev_zonmean.nc" 
+  outfile = config_user_info@plot_dir + var0 + "_std_dev_zonmean" 
   wks = gsn_open_wks(file_type, outfile)
 
 
