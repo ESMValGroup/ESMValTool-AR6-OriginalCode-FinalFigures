@@ -3863,15 +3863,19 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
     save the netcdf
     make a plot.
     """
+    if isinstance(time_range, list):
+        time_range_str = '-'.join(str(t) for t in time_range_str)
+    else:
+        time_range_str = str(time_range)
     work_dir = diagtools.folder([cfg['work_dir'], 'multi_model_mean'])
-    out_fn = work_dir + '_'.join(['multi_model_mean', master_project, master_short_name, master_exp, trend, time_range])+'.nc'
+    out_fn  = work_dir + '_'.join(['multi_model_mean', master_project, master_short_name, master_exp, trend, time_range_str])+'.nc'
     print('Preparing:', out_fn)
     if os.path.exists(out_fn):
-        return
+        return out_fn
+
     # detrended_ncs.keys (project, dataset, exp, ensemble, short_name): fn
     datasets = {index[1]:True for index in detrended_ncs.keys()}
 
-    #time_ranges = ['1950', '2000', '1950-2000']
     multimodel_cubes = []
     full_depth = False
     included_datasets = ''
@@ -3880,7 +3884,7 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
             continue
         cubes = []
         work_dir = diagtools.folder([cfg['work_dir'], 'regridded_means'])
-        single_fn = work_dir + '_'.join([master_dataset, master_project, master_short_name, master_exp, trend, time_range])+'.nc'
+        single_fn = work_dir + '_'.join([master_dataset, master_project, master_short_name, master_exp, trend, time_range_str])+'.nc'
 
         if os.path.exists(single_fn):
             mean_cube =  iris.load_cube(single_fn)
@@ -3902,12 +3906,12 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
             if master_short_name != short_name: continue
 
             cube =  iris.load_cube(fn)
-            if time_range in ['1950', '2000']:
-               trnage = int(time_range)
-               cube = extract_time(cube, trnage, 1, 1, trnage, 12, 31)
-            elif  time_range == '1950-2000':
-               cube = extract_time(cube, 1950, 1, 1, 2000, 12, 31)
+            if instance(time_range, list):
+               cube = extract_time(cube, time_range[0], 1, 1, time_range[1], 12, 31)
                cube = cube.collapsed('time', iris.analysis.MEAN)
+            else:
+               cube = extract_time(cube, int(time_range), 1, 1, int(time_range), 12, 31)
+
             if not full_depth:
                 cube = fix_depth(cube)
                 cube = extract_levels(cube, [0., ], "nearest_horizontal_extrapolate_vertical")
@@ -3957,11 +3961,64 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
         cfg,
         metadata,
         mean_cube,
-        key='multimodel_mean/'+'_'.join([master_project, master_short_name, master_exp, trend, time_range]),
+        key='multimodel_mean/'+'_'.join([master_project, master_short_name, master_exp, trend, time_range_str]),
         sym_zero=False,
     )
+    return out_fn
 
 
+def sea_surface_salinity_plot(
+        fn,
+        master_short_name,
+        time_range,
+        fig=None,
+        subplot=111,
+        fig_type = 'change'
+    ):
+    """
+    Make a multi-pane plot of the Sea Surface Salininty.
+    """
+    mean_cube = iris.load_cube(fn)
+
+    central_longitude=-160.
+    proj = ccrs.Robinson(central_longitude=central_longitude)
+    mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+
+    if fig is None:
+        fig = plt.figure()
+
+    if isinstance(subplot, int) and subplot==111:
+        ax = fig.add_subplot(subplot, projection=proj)
+    else:
+        ax=subplot
+        plt.sca(ax)
+
+    if fig_type=='change':
+        cmap=diagtools.misc_div
+        plot_max = [mean_cube.data.max(), np.abs(mean_cube.data.min())]
+        nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
+
+    qplot = iris.plot.contourf(
+        mean_cube,
+        nspace,
+        linewidth=0,
+        cmap=cmap,
+        #extend='neither',
+        zmin=plot_range[0],
+        zmax=plot_range[1])
+
+    # Saving files:
+    if isinstance(subplot, int) and subplot==111:
+        if cfg['write_plots']:
+            unique_id = [master_short_name, fig_type, time_range ]
+            filename = '_'.join(unique_id).replace('/', '_')
+            path = diagtools.folder([cfg['plot_dir'], 'sea_surface_salinity_plot']) + filename
+            path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+            logger.info('Saving plots to %s', path)
+            plt.savefig(path, dpi=200)
+        plt.close()
+    else:
+        return fig, ax, qplot
 
 
 def guess_PI_ensemble(dicts, keys, ens_pos = None):
@@ -4381,6 +4438,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
+    do_SLR = True
+    do_OHC = True
+    do_SS = True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4425,15 +4485,21 @@ def main(cfg):
         metadatas[detrended_fn] = metadatas[filename].copy()
 
     # Make a plot for the
-    do_multimean = True
-    for master_short_name, time_range in itertools.product(['so', 'thetao'],  ['1950', '2000', '1950-2000']):
-        if not do_multimean: continue
-        calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
-            master_project = 'CMIP6',
-            master_short_name = master_short_name,
-            master_exp = 'historical',
-            time_range = time_range)
-    # if do_multimean: assert 0
+    if do_SS:
+        short_names = ['so', ] # 'thetao']
+        time_ranges =  [1950, 1970, 2000, 2015, [1950, 2015], [1970, 2015]]
+        for master_short_name, time_range in itertools.product(short_names, time_ranges):
+            fn = calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
+                master_project = 'CMIP6',
+                master_short_name = master_short_name,
+                master_exp = 'historical',
+                time_range = time_range)
+
+            sea_surface_salinity_plot(
+                fn,
+                master_short_name,
+                time_range,
+            )
 
     print('Make time series plots')
     volume_weighted_means={}
@@ -4485,14 +4551,10 @@ def main(cfg):
             draw_zero=False,
             native_time=True,
             )
-    #assert 0
-    #calculate_multi_model_mean()
 
     print('\n-------------\nCalculate Sea Level Rise')
     dyn_fns = {}
     slr_fns = {}
-    do_SLR = True
-    do_OHC = False
 
     method = 'Landerer'
     # bad_models = ['NorESM2-LM','CESM2-FV2',]
@@ -4532,13 +4594,9 @@ def main(cfg):
                     hist_thetao_fn = file_dict[(project, dataset, 'historical', ensemble, short_name)]
                     hist_so_fn =  file_dict[(project, dataset, 'historical', ensemble, 'so')]
 
-
-
-
             check_units(cfg, metadatas[thetao_fn],
                 files = [thetao_fn, so_fn, picontrol_thetao_fn, picontrol_so_fn],
                 keys = [project, dataset, exp, ensemble, short_name])
-
 
             #method = 'dyn_height'
             if method == 'dyn_height':
