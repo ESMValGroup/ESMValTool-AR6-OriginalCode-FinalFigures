@@ -15,9 +15,10 @@ Description
 
 Configuration options
 ---------------------
-filer: optional, filter all data sets (netCDF file with 0 and 1 for used grid).
-       The data must be interpolated to the same lat/lon grid as the filter.
-       The filter must cover at least the time period used for the data.
+sample_obs: optional, filter all data sets (netCDF file with 0 and 1 for
+            used grid). The data sets must be interpolated to the same lat/lon 
+            grid as the filter.
+            The filter must cover at least the time period used for the data.
 
 ###############################################################################
 
@@ -46,8 +47,8 @@ logger = logging.getLogger(os.path.basename(__file__))
 
 def _apply_filter(cfg, cube):
     """Apply filter from RSS Anomalies to all data and calculates mean."""
-    if 'filter' in cfg:
-        filt = iris.load(cfg['filter'])[0]
+    if 'sample_obs' in cfg:
+        filt = iris.load(cfg['sample_obs'])[0]
 
         for iii, dim_str in enumerate(['time', 'latitude', 'longitude']):
             filt = _fit_dim(filt, cube, dim_str, iii)
