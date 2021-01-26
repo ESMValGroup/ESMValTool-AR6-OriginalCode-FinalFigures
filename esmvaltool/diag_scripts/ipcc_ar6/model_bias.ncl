@@ -243,7 +243,7 @@ begin
   elseif (var0 .eq. "pr") then
     diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
   elseif any(var0 .eq. (/"sos", "so"/)) then
-    diff@units = "0.001"
+    diff@units = "PSS-78" ;"0.001"
     diff@res_cnLevels = ispan(-30, 30, 5) * 0.1
     ;diff@res_cnLevels = ispan(-8, 8, 1)
   end if
@@ -337,7 +337,6 @@ begin
     to_plot_not_robust = where(sigma_and_sign .eq. 0, 1., 0.)
 
     to_plot_confl_sign = where(signif_and_sign .eq. 0, sigma_and_sign, 0.)
-    ;to_plot_confl_sign = signif_and_sign
 
     copy_VarMeta(diff, to_plot_confl_sign)
     copy_VarMeta(diff, to_plot_not_robust)
@@ -640,7 +639,7 @@ begin
     end if
 
     wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_" + var0 \
-                  + "_annualclim_" + input_file_info[0]@project)
+                  + "_annualclim_" + input_file_info[1]@project)
 
     plotfile = wks@fullname
 
@@ -678,7 +677,7 @@ begin
       ress@gsnLeftString = ""
       ress@gsnRightString = ""
       ress@cnFillDotSizeF       = 0.001
-      ress@cnFillScaleF        = .6        ; add extra density
+      ress@cnFillScaleF        = 1.        ; add extra density
 
       ; plot cross-hatching
       if (max(to_plot_confl_sign(:, :)) .gt. \
@@ -707,7 +706,7 @@ begin
       resb@lbLabelBarOn = False
       resb@gsnLeftString = ""
       resb@gsnRightString = ""
-      resb@cnFillScaleF = 0.25
+      resb@cnFillScaleF = 0.5
 
       ; plot hatching
       if (max(to_plot_not_robust(:, :)) .gt. \
@@ -753,7 +752,7 @@ begin
   ; ###########################################
 
   nc_filename = work_dir + "model_bias_" + var0 + "_annualclim_" \
-                + input_file_info[0]@project + ".nc"
+                + input_file_info[1]@project + ".nc"
 
   nc_filename@existing = "overwrite"
 
