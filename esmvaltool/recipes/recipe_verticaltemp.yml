@@ -83,6 +83,7 @@ datasets:
   - {dataset: E3SM-1-0, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: historical, ensemble: r2i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: E3SM-1-1, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: EC-Earth3, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r24i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3-Veg-LR, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   # esmvalcore.cmor.check.CMORCheckError: There were errors in variable ta: lat: is not monotonic
@@ -117,7 +118,6 @@ datasets:
   - {dataset: CanESM5-CanOE, institute: CCCma, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p2f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: EC-Earth3-Veg, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
-  - {dataset: EC-Earth3-Veg-LR, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: GFDL-ESM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   #- {dataset: IITM-ESM, institute: CCCR-IITM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: KACE-1-0-G, institute: NIMS-KMA, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
@@ -175,7 +175,7 @@ preprocessors:
       levels: [85000.,70000.,50000.,40000.,30000.,20000.,15000.,10000.,7000.,5000.,3000.,2000.]
       scheme: linear
     regrid:
-      target_grid: raobcore17
+      target_grid: rich17obs
       scheme: linear
     extract_region:
       start_longitude: 0.
