@@ -565,9 +565,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 pc50s.append(pc50)
                 pc95s.append(pc95)
                 print(pc5, pc50, pc95)
-                assert 0
             print('5-95:', pc5s, pc95s)
-            assert 0
             axes[subplot].fill_between(times, pc5s, pc95s, color=CMIP6_red, alpha=0.85)
             axes[subplot].plot(times, pc50s, c=CMIP6_red, lw=1.5, zorder=2)
 
@@ -3987,13 +3985,13 @@ def sea_surface_salinity_plot(
     else:
         time_range_str = str(time_range)
 
+    mean_cube = iris.load_cube(fn)
+
     if fig_type=='trend':
         ref_cube = iris.load_cube(ref_file)
         mean_cube.data = mean_cube.data - ref_cube.data
         years = float(time_range[0]) - float(time_range[1])
         mean_cube.data = mean_cube.data / years
-
-    mean_cube = iris.load_cube(fn)
 
     central_longitude=-160.+3.5
     proj = ccrs.Robinson(central_longitude=central_longitude)
@@ -4462,7 +4460,7 @@ def main(cfg):
 
     do_SLR = True  # True
     do_OHC = True  #True
-    do_SS = False# True
+    do_SS =  True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4517,7 +4515,11 @@ def main(cfg):
                 master_short_name = master_short_name,
                 master_exp = 'historical',
                 time_range = time_range)
-            ss_files[time_range] = fn
+            if isinstance(time_range, list):
+                ss_files[tuple(time_range)] = fn
+            else:
+                ss_files[time_range] = fn
+
             sea_surface_salinity_plot(
                 cfg,
                 fn,
@@ -4530,7 +4532,7 @@ def main(cfg):
             ss_files[2014],
             master_short_name,
             [2014, 1950],
-            fig_type = 'change',
+            fig_type = 'trend',
             ref_file=ss_files[1950]
 
         )
