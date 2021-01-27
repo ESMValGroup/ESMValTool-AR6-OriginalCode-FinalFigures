@@ -563,7 +563,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 pc95 = diagtools.weighted_quantile(fill_betweens[subplot][t], 95, sample_weight=t_weights)
                 pc5s.append(pc5)
                 pc95s.append(pc95)
-
+            print('5-95:', pc5s, pc95s)
+            assert 0
             axes[subplot].fill_between(times, pc5s, pc95s, color=CMIP6_red, alpha=0.85)
 
             if xlims_dict[subplot]:
@@ -2587,7 +2588,8 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                 plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s')
 
     if show_legend:
-        plt.legend(loc = 'lower left', framealpha=0., prop={'size': 9})
+        #plt.legend(loc = 'lower left', framealpha=0., prop={'size': 9})
+        plt.legend(framealpha=0., prop={'size': 9})
 
     ax.set_aspect("equal")
 
@@ -3003,7 +3005,7 @@ def plot_halo_multipane(
 
     time_range_str = '-'.join([str(t) for t in time_range])
 
-    fig.suptitle(''.join(['Halosteric Sea Level trend,', time_range_str]))
+    fig.suptitle(''.join(['Halosteric Sea Level trend, ', time_range_str]))
     # plt.tight_layout()
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
@@ -3037,7 +3039,7 @@ def plot_halo_obs_mean(
     if obs_file=='DurackandWijffels10_V1.0_50yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
 #       legend_txt = 'D&W 1950-2000'
-        legend_txt = 'Durack & Wijffels'
+        legend_txt = 'D&W'
 
     if obs_file=='DurackandWijffels10_V1.0_30yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc'
@@ -3046,7 +3048,7 @@ def plot_halo_obs_mean(
     if obs_file=='Ishii09_v6.13_annual_steric_1950-2010':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc'
         #legend_txt = 'Ishii 1950-2010'
-        legend_txt = 'Ishii et al.' #1950-2010'
+        legend_txt = 'Ishii' #1950-2010'
 
     if obs_file=='DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta.nc'
@@ -3095,7 +3097,7 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    ax = add_map_text(ax, legend_txt)
+    ax = add_map_text(ax, '   '+legend_txt)
     qplot = iris.plot.contourf(
         cube,
         nspace,
@@ -3124,10 +3126,6 @@ def plot_halo_obs_mean(
         plt.close()
     else:
         return fig, ax
-
-
-
-
 
 
 def plot_slr_full3d_ts(cfg, metadata, dyn_files, area_fn, trend):
@@ -3906,7 +3904,7 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
             if master_short_name != short_name: continue
 
             cube =  iris.load_cube(fn)
-            if instance(time_range, list):
+            if isinstance(time_range, list):
                cube = extract_time(cube, time_range[0], 1, 1, time_range[1], 12, 31)
                cube = cube.collapsed('time', iris.analysis.MEAN)
             else:
@@ -3968,6 +3966,7 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
 
 
 def sea_surface_salinity_plot(
+        cfg,
         fn,
         master_short_name,
         time_range,
@@ -3978,6 +3977,11 @@ def sea_surface_salinity_plot(
     """
     Make a multi-pane plot of the Sea Surface Salininty.
     """
+    if isinstance(time_range, list):
+        time_range_str = '-'.join(str(t) for t in time_range_str)
+    else:
+        time_range_str = str(time_range)
+
     mean_cube = iris.load_cube(fn)
 
     central_longitude=-160.
@@ -3995,7 +3999,7 @@ def sea_surface_salinity_plot(
 
     if fig_type=='change':
         cmap=diagtools.misc_div
-        plot_max = [mean_cube.data.max(), np.abs(mean_cube.data.min())]
+        plot_max = np.max([mean_cube.data.max(), np.abs(mean_cube.data.min())])
         nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
 
     qplot = iris.plot.contourf(
@@ -4004,13 +4008,13 @@ def sea_surface_salinity_plot(
         linewidth=0,
         cmap=cmap,
         #extend='neither',
-        zmin=plot_range[0],
-        zmax=plot_range[1])
+        zmin=-plot_max,
+        zmax=plot_max)
 
     # Saving files:
     if isinstance(subplot, int) and subplot==111:
         if cfg['write_plots']:
-            unique_id = [master_short_name, fig_type, time_range ]
+            unique_id = [master_short_name, fig_type, time_range_str ]
             filename = '_'.join(unique_id).replace('/', '_')
             path = diagtools.folder([cfg['plot_dir'], 'sea_surface_salinity_plot']) + filename
             path = path.replace(' ', '') + diagtools.get_image_format(cfg)
@@ -4496,6 +4500,7 @@ def main(cfg):
                 time_range = time_range)
 
             sea_surface_salinity_plot(
+                cfg,
                 fn,
                 master_short_name,
                 time_range,
