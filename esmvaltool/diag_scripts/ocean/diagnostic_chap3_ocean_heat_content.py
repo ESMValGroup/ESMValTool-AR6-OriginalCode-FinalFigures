@@ -518,7 +518,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                     if show_UKESM and dataset.lower().find('ukesm')>-1:
                         axes[subplot].plot(times, data, c='purple', alpha=1.0, lw=1.5, zorder=2)
 
-    if plot_style=='5-95': # plot between 5-95 percentiles, weighted such that each model gets an even vote.
+    elif plot_style=='5-95': # plot between 5-95 percentiles, weighted such that each model gets an even vote.
         fill_betweens = {subplot:{} for subplot in axes.keys()}
         weights = {subplot:{} for subplot in axes.keys()}
 
@@ -2862,8 +2862,8 @@ def plot_halo_multipane(
 
     #obs_files = ['DurackandWijffels10_V1.0_50yr', 'DurackandWijffels10_V1.0_30yr', 'Ishii09_v6.13_annual_steric_1950-2010']
     #obs_files = ['Ishii09_v6.13_annual_steric_1950-2010', 'DurackandWijffels_GlobalOceanChanges_1950-2020_210111_10_18_04_beta']
-    #obs_files = ['DurackandWijffels10_V1.0_50yr', 'Ishii09_v6.13_annual_steric_1950-2010']
-    obs_files = ['Ishii09_v6.13_annual_steric_1950-2010','DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc']
+    obs_files = ['DurackandWijffels10_V1.0_50yr', 'Ishii09_v6.13_annual_steric_1950-2010']
+    #obs_files = ['Ishii09_v6.13_annual_steric_1950-2010','DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc']
 
 
 
@@ -3003,7 +3003,7 @@ def plot_halo_multipane(
 
     time_range_str = '-'.join([str(t) for t in time_range])
 
-    fig.suptitle(''.join(['Halosteric Sea Level trend,', time_range_str])
+    fig.suptitle(''.join(['Halosteric Sea Level trend,', time_range_str]))
     # plt.tight_layout()
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
