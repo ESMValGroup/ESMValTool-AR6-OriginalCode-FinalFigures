@@ -540,12 +540,12 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                     if np.isnan(d): continue
                     if np.isinf(d): continue
 
-                    try:
+                    if t in fill_betweens[subplot]:
                         fill_betweens[subplot][t].append(d)
                         weights[subplot][t].append(dataset)
-                    except:
-                        fill_betweens[subplot][t]= [d, ]
-                        weights[subplot][t]= [dataset, ]
+                    else:
+                        fill_betweens[subplot][t] = [d, ]
+                        weights[subplot][t] = [dataset, ]
 
                     if show_UKESM and dataset.lower().find('ukesm')>-1:
                         axes[subplot].plot(times, data, c='purple', alpha=0.7, lw=1.5, zorder=2)
@@ -555,17 +555,21 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             t_weights = [] # list of datasets.
             pc5s = []
             pc95s = []
+            pc50s = []
             for t in times:
                 counts = Counter(weights[subplot][t])
                 for dset in weights[subplot][t]:
                     t_weights.append(1./float(counts[dset]))
-                pc5 = diagtools.weighted_quantile(fill_betweens[subplot][t], 5, sample_weight=t_weights)
-                pc95 = diagtools.weighted_quantile(fill_betweens[subplot][t], 95, sample_weight=t_weights)
+                [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights)
                 pc5s.append(pc5)
+                pc50s.append(pc50)
                 pc95s.append(pc95)
+                print(pc5, pc50, pc95)
+                assert 0
             print('5-95:', pc5s, pc95s)
             assert 0
             axes[subplot].fill_between(times, pc5s, pc95s, color=CMIP6_red, alpha=0.85)
+            axes[subplot].plot(times, pc50s, c=CMIP6_red, lw=1.5, zorder=2)
 
             if xlims_dict[subplot]:
                 axes[subplot].set_xlim(xlims_dict[subplot])
@@ -2772,7 +2776,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         fig = plt.figure()
         title = ' '.join(['CMIP6 Multimodel mean', time_range_str ])
 
-    central_longitude=-160.
+    central_longitude=-160.+3.5
     square = False
     if square:
         proj = ccrs.PlateCarree(central_longitude=central_longitude)
@@ -2829,7 +2833,7 @@ def add_map_text(ax, text):
     #ax.text(0., 0., text, fontsize=10)
     #artisttext = AnchoredText(text+'       ',
     #                    loc=4, prop={'size': 12}, frameon=False)
-    artisttext = AnchoredText('      '+text, #+'       ',
+    artisttext = AnchoredText('          '+text, #+'       ',
                         loc='upper left', prop={'size': 10}, frameon=False)
     ax.add_artist(artisttext)
     return ax
@@ -2886,7 +2890,7 @@ def plot_halo_multipane(
             scatter1=fig.add_subplot(gs0[0,0])
             scatter2=fig.add_subplot(gs0[1,0])
 
-            central_longitude=-160.
+            central_longitude=-160.+3.5
             proj = ccrs.Robinson(central_longitude=central_longitude)
             ax0 = fig.add_subplot(gs1[0, 0], projection=proj)
             ax1 = fig.add_subplot(gs1[1, 0], projection=proj)
@@ -2906,7 +2910,7 @@ def plot_halo_multipane(
 #            scatter2=fig.add_subplot(gs[3:, 0])
         else:
             gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[2, 1], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.10, wspace =0.25)
-            central_longitude=-160.
+            central_longitude=-160.+3.5
             proj = ccrs.Robinson(central_longitude=central_longitude)
             ax0 = fig.add_subplot(gs[0:2, 0], projection=proj)
             ax1 = fig.add_subplot(gs[2:4, 0], projection=proj)
@@ -3079,7 +3083,7 @@ def plot_halo_obs_mean(
         fig = plt.figure()
         title = ' '.join(['Observational mean', legend_txt])
 
-    central_longitude=-160.
+    central_longitude=-160.+3.5
     square = False
     if square:
         proj = ccrs.PlateCarree(central_longitude=central_longitude)
@@ -3097,7 +3101,7 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
-    ax = add_map_text(ax, '   '+legend_txt)
+    ax = add_map_text(ax, legend_txt)
     qplot = iris.plot.contourf(
         cube,
         nspace,
@@ -3843,7 +3847,7 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
     master_short_name = '',
     master_exp = '',
     trend = 'detrended',
-    time_range = '1950'):
+    time_range = 1950):
     """
     Calculated the multimodel means
 
@@ -3862,7 +3866,7 @@ def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
     make a plot.
     """
     if isinstance(time_range, list):
-        time_range_str = '-'.join(str(t) for t in time_range_str)
+        time_range_str = '-'.join(str(t) for t in time_range)
     else:
         time_range_str = str(time_range)
     work_dir = diagtools.folder([cfg['work_dir'], 'multi_model_mean'])
@@ -3978,13 +3982,13 @@ def sea_surface_salinity_plot(
     Make a multi-pane plot of the Sea Surface Salininty.
     """
     if isinstance(time_range, list):
-        time_range_str = '-'.join(str(t) for t in time_range_str)
+        time_range_str = '-'.join(str(t) for t in time_range)
     else:
         time_range_str = str(time_range)
 
     mean_cube = iris.load_cube(fn)
 
-    central_longitude=-160.
+    central_longitude=-160.+3.5
     proj = ccrs.Robinson(central_longitude=central_longitude)
     mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
@@ -4442,9 +4446,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = True
-    do_OHC = True
-    do_SS = True
+    do_SLR = True  # True
+    do_OHC = True  #True
+    do_SS = False# True 
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4491,7 +4495,7 @@ def main(cfg):
     # Make a plot for the
     if do_SS:
         short_names = ['so', ] # 'thetao']
-        time_ranges =  [1950, 1970, 2000, 2015, [1950, 2015], [1970, 2015]]
+        time_ranges =  [1950, 1970, 2000, 2014, [1950, 2015], [1970, 2015]]
         for master_short_name, time_range in itertools.product(short_names, time_ranges):
             fn = calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
                 master_project = 'CMIP6',
@@ -4908,6 +4912,7 @@ def main(cfg):
         except: continue
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
+    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
     for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one', '5-95'],['7_panes', '4_panes'], [True, False]):
         multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type =plot_type , plot_style=plot_style, show_UKESM=ukesm)
 
