@@ -132,6 +132,7 @@ datasets:
   - {dataset: CESM2-WACCM, institute: NCAR, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: CNRM-CM6-1, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: CNRM-ESM2-1, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: EC-Earth3, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: GFDL-CM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GISS-E2-1-G, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p3f1, start_year: 1979, end_year: 2014, grid: gn}
@@ -152,7 +153,6 @@ datasets:
   - {dataset: CNRM-CM6-1-HR, institute: CNRM-CERFACS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: CanESM5, institute: CCCma, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: E3SM-1-0, institute: E3SM-Project, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
-  - {dataset: EC-Earth3, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: EC-Earth3-Veg, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   #  esmvalcore.cmor.check.CMORCheckError: There were errors in variable ta: lat: is not monotonic
