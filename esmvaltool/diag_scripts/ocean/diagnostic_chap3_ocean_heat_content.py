@@ -3976,7 +3976,8 @@ def sea_surface_salinity_plot(
         time_range,
         fig=None,
         subplot=111,
-        fig_type = 'change'
+        fig_type = 'mean',
+        ref_file = None,
     ):
     """
     Make a multi-pane plot of the Sea Surface Salininty.
@@ -3985,6 +3986,12 @@ def sea_surface_salinity_plot(
         time_range_str = '-'.join(str(t) for t in time_range)
     else:
         time_range_str = str(time_range)
+
+    if fig_type=='trend':
+        ref_cube = iris.load_cube(ref_file)
+        mean_cube.data = mean_cube.data - ref_cube.data
+        years = float(time_range[0]) - float(time_range[1])
+        mean_cube.data = mean_cube.data / years
 
     mean_cube = iris.load_cube(fn)
 
@@ -4001,7 +4008,13 @@ def sea_surface_salinity_plot(
         ax=subplot
         plt.sca(ax)
 
-    if fig_type=='change':
+    if fig_type=='mean':
+        cmap=diagtools.misc_seq
+        nspace = np.linspace(
+            mean_cube.data.min(),
+            mean_cube.data.max(), 22, endpoint=True)
+
+    if fig_type=='trend':
         cmap=diagtools.misc_div
         plot_max = np.max([mean_cube.data.max(), np.abs(mean_cube.data.min())])
         nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
@@ -4012,11 +4025,12 @@ def sea_surface_salinity_plot(
         linewidth=0,
         cmap=cmap,
         #extend='neither',
-        zmin=-plot_max,
-        zmax=plot_max)
+        zmin=np.min(nspace),
+        zmax=np.max(nspace))
 
     # Saving files:
     if isinstance(subplot, int) and subplot==111:
+        plt.colorbar()
         if cfg['write_plots']:
             unique_id = [master_short_name, fig_type, time_range_str ]
             filename = '_'.join(unique_id).replace('/', '_')
@@ -4448,7 +4462,7 @@ def main(cfg):
 
     do_SLR = True  # True
     do_OHC = True  #True
-    do_SS = False# True 
+    do_SS = False# True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4496,19 +4510,30 @@ def main(cfg):
     if do_SS:
         short_names = ['so', ] # 'thetao']
         time_ranges =  [1950, 1970, 2000, 2014, [1950, 2015], [1970, 2015]]
+        ss_files = {}
         for master_short_name, time_range in itertools.product(short_names, time_ranges):
             fn = calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
                 master_project = 'CMIP6',
                 master_short_name = master_short_name,
                 master_exp = 'historical',
                 time_range = time_range)
-
+            ss_files[time_range] = fn
             sea_surface_salinity_plot(
                 cfg,
                 fn,
                 master_short_name,
                 time_range,
+                fig_type = 'mean',
             )
+        sea_surface_salinity_plot(
+            cfg,
+            ss_files[2014],
+            master_short_name,
+            [2014, 1950],
+            fig_type = 'change',
+            ref_file=ss_files[1950]
+
+        )
 
     print('Make time series plots')
     volume_weighted_means={}
@@ -4913,6 +4938,7 @@ def main(cfg):
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
     multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
+
     for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one', '5-95'],['7_panes', '4_panes'], [True, False]):
         multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type =plot_type , plot_style=plot_style, show_UKESM=ukesm)
 
