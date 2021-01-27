@@ -1,0 +1,323 @@
+# ESMValTool
+# recipe_ocean_heat_content.yml
+---
+documentation:
+  description: |
+    Recipe to produce several figures for IPCC WG1 chapter 3,
+    including
+      ohc_timeseries, (figure 3.23)
+      ohu_timeseries, (figure 3.25)
+      halosteric_sea_level, (figure 3.27)
+      thermosteric_sea_level (figure 3.28)
+
+    unfortunately, a lot of the procesing needs to be done in the diagnostic script,
+    so there's only limited preprocessing done here.
+
+  authors:
+    - demora_lee
+
+  references:
+    - demora2018gmd
+
+
+  projects:
+    - ukesm
+
+
+preprocessors:
+
+    prep_annual:
+      annual_statistics:
+        operator: mean
+      regrid_time:
+        frequency: yr
+        #      regrid:
+        # target_grid: 5x5
+        # scheme: linear
+
+
+
+
+
+diagnostics:
+  diag_ohc:
+    variables:
+
+        thetao:
+          short_name: thetao
+          preprocessor: prep_annual
+          additional_datasets: &additional_datasets
+
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2, exp: piControl, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: hist-nat, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: hist-nat, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: piControl, ensemble: r1i1p1f1, start_year: 171, end_year: 325}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: piControl, ensemble: r1i1p1f1, start_year: 171, end_year: 365}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: hist-nat, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: hist-nat, ensemble: r2i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: hist-nat, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r10i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r11i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r2i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r4i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r5i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r6i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r7i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r8i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: historical, ensemble: r9i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: piControl, ensemble: r1i1p1f1, start_year: 511, end_year: 1005}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2, exp: piControl, ensemble: r1i1p1f1, start_year: 511, end_year: 1035}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2-FV2, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2-FV2, exp: piControl, ensemble: r1i1p1f1, start_year: 41, end_year: 195}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2-WACCM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2-WACCM, exp: piControl, ensemble: r1i1p1f1, start_year: 66, end_year: 220}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2-WACCM-FV2, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CESM2-WACCM-FV2, exp: piControl, ensemble: r1i1p1f1, start_year: 41, end_year: 195}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CIESM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CIESM, exp: piControl, ensemble: r1i1p1f1, start_year: 11, end_year: 165}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CMCC-CM2-SR5, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CMCC-CM2-SR5, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r10i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r2i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r4i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r5i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r6i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r7i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r8i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: hist-nat, ensemble: r9i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r10i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r10i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r11i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r12i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r13i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r14i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r15i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r16i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r17i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r18i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r19i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+ #           - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r1i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r20i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r21i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r22i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r23i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r24i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r25i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r2i1p1f1, start_year: 1850, end_year: 2014}
+  #          - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r2i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+   #         - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r3i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r4i1p1f1, start_year: 1850, end_year: 2014}
+    #        - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r4i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r5i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r5i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r6i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r6i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r7i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r7i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r8i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r8i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r9i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: historical, ensemble: r9i1p2f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: piControl, ensemble: r1i1p1f1, start_year: 5211, end_year: 5815}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: CanESM5, exp: piControl, ensemble: r1i1p1f1, start_year: 5211, end_year: 6565}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: FGOALS-f3-L, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: FGOALS-f3-L, exp: piControl, ensemble: r1i1p1f1, start_year: 610, end_year: 764}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: FGOALS-g3, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: FGOALS-g3, exp: piControl, ensemble: r1i1p1f1, start_year: 380, end_year: 534}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-CM4, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-CM4, exp: piControl, ensemble: r1i1p1f1, start_year: 111, end_year: 265}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-ESM4, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-ESM4, exp: piControl, ensemble: r1i1p1f1, start_year: 111, end_year: 265}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r1i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r2i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r3i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r4i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r1i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r2i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r3i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r4i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2134}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r1i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r2i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r3i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r4i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2124}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: MCM-UA-1-0, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: MCM-UA-1-0, exp: piControl, ensemble: r1i1p1f1, start_year: -2340, end_year: -2186}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: MPI-ESM-1-2-HAM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: MPI-ESM-1-2-HAM, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: MPI-ESM1-2-HR, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: MPI-ESM1-2-HR, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: MPI-ESM1-2-LR, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: MPI-ESM1-2-LR, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: hist-nat, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: hist-nat, ensemble: r2i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: hist-nat, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: piControl, ensemble: r1i1p1f1, start_year: 1660, end_year: 1814}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: piControl, ensemble: r1i1p1f1, start_year: 1660, end_year: 1875}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-MM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-MM, exp: piControl, ensemble: r1i1p1f1, start_year: 1261, end_year: 1415}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r10i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r11i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r12i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r16i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r17i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r18i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r19i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r1i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r2i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r3i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r4i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r5i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r6i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r7i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r8i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r9i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: piControl, ensemble: r1i1p1f2, start_year: 1970, end_year: 2979}
+
+
+
+        so:
+          short_name: so
+          preprocessor: prep_annual
+          additional_datasets: *additional_datasets
+
+  
+        volcello_Omon:
+          short_name: volcello
+          preprocessor: prep_annual
+          additional_datasets:
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-CM2, exp: piControl, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: piControl, ensemble: r1i1p1f1, start_year: 171, end_year: 325}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: ACCESS-ESM1-5, exp: piControl, ensemble: r1i1p1f1, start_year: 171, end_year: 365}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-CM4, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-CM4, exp: piControl, ensemble: r1i1p1f1, start_year: 111, end_year: 265}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-ESM4, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: GFDL-ESM4, exp: piControl, ensemble: r1i1p1f1, start_year: 111, end_year: 265}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r1i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r2i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r3i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: historical, ensemble: r4i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2134}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r1i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r2i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r3i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: historical, ensemble: r4i1p1f3, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-MM, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2124}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: hist-nat, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: hist-nat, ensemble: r2i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: hist-nat, ensemble: r3i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: piControl, ensemble: r1i1p1f1, start_year: 1660, end_year: 1814}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-LM, exp: piControl, ensemble: r1i1p1f1, start_year: 1660, end_year: 1875}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-MM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#            - {project: CMIP6, mip: Omon, grid: gn, dataset: NorESM2-MM, exp: piControl, ensemble: r1i1p1f1, start_year: 1261, end_year: 1415}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r10i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r11i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r12i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r16i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r17i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r18i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r19i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r1i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r2i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r3i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r4i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r5i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r6i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r7i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r8i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: historical, ensemble: r9i1p1f2, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: UKESM1-0-LL, exp: piControl, ensemble: r1i1p1f2, start_year: 1970, end_year: 2979}
+         
+
+        thkcello_Omon:
+          short_name: thkcello
+          preprocessor: prep_annual
+          additional_datasets:
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r1i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r2i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r3i1p1f3, start_year: 1850, end_year: 2014}
+            - {project: CMIP6, mip: Omon, grid: gn, dataset: HadGEM3-GC31-LL, exp: hist-nat, ensemble: r4i1p1f3, start_year: 1850, end_year: 2014}
+
+    
+  
+        volcello_fx:
+          short_name: volcello
+          additional_datasets:
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-ESM1-5, exp: hist-nat, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2, exp: hist-nat, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-FV2, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-FV2, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-WACCM, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-WACCM-FV2, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-WACCM-FV2, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CMCC-CM2-SR5, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CMCC-CM2-SR5, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: CanESM5, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: FGOALS-f3-L, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: FGOALS-g3, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+#            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MCM-UA-1-0, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+#            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MCM-UA-1-0, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM-1-2-HAM, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM-1-2-HAM, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-HR, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-HR, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+            - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+
+        areacello:
+         short_name: areacello
+         additional_datasets:
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-CM2, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-CM2, exp: piControl, ensemble: r1i1p1f1, start_year: 960, end_year: 1114}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-ESM1-5, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: ACCESS-ESM1-5, exp: piControl, ensemble: r1i1p1f1, start_year: 171, end_year: 325}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: GFDL-ESM4, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: GFDL-ESM4, exp: piControl, ensemble: r1i1p1f1, start_year: 111, end_year: 265}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: HadGEM3-GC31-LL, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+#           - {project: CMIP6, mip: Ofx, grid: gn, dataset: HadGEM3-GC31-MM, exp: piControl, ensemble: r1i1p1f1, start_year: 1860, end_year: 2014}
+#           - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-LM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#           - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-MM, exp: historical, ensemble: r1i1p1f1, start_year: 1850, end_year: 2014}
+#           - {project: CMIP6, mip: Ofx, grid: gn, dataset: NorESM2-MM, exp: piControl, ensemble: r1i1p1f1, start_year: 1261, end_year: 1415}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: UKESM1-0-LL, exp: piControl, ensemble: r1i1p1f2, start_year: 2350, end_year: 2504}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-FV2, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-WACCM, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CESM2-WACCM-FV2, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CIESM, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CMCC-CM2-SR5, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: CanESM5, exp: piControl, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: FGOALS-f3-L, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM-1-2-HAM, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-HR, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+           - {project: CMIP6, mip: Ofx, grid: gn, dataset: MPI-ESM1-2-LR, exp: historical, ensemble: r1i1p1f1, start_year: 0, end_year: 1}
+
+
+
+# Removed and reason why:
+#     MCM-UA-1-0: Problem with linking hist to pi control.
+#     GFDL-CM4: Missing pi years 150-
+#     HadGEM3-GC31-MM: High resolution 
+#     NorESM2-LM, NorESM2-MM: no depth data.
+#     CanESM5 r?i?p2f? runs. Already have another run in there. 
+#
+    scripts:
+      diagnostic:
+        script: ocean/diagnostic_chap3_ocean_heat_content.py
+        # script: ocean/calculate_hist_time_in_picontrol.py # Useful for calculating the time range.
