@@ -337,6 +337,7 @@ begin
     to_plot_not_robust = where(sigma_and_sign .eq. 0, 1., 0.)
 
     to_plot_confl_sign = where(signif_and_sign .eq. 0, sigma_and_sign, 0.)
+    ;to_plot_confl_sign = var_pos_signif_tmp
 
     copy_VarMeta(diff, to_plot_confl_sign)
     copy_VarMeta(diff, to_plot_not_robust)
@@ -416,7 +417,7 @@ begin
   diff@res_lbTitleFontHeightF  = 0.014
 
   diff@res_lbBoxEndCapStyle = "TriangleBothEnds"
-  diff@res_lbBoxLineColor = "gray70"
+  diff@res_lbBoxLineColor = "gray10"
 
   diff@res_tiMainFontHeightF  = 0.016
 
