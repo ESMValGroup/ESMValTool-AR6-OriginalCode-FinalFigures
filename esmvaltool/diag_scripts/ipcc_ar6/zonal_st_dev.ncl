@@ -55,6 +55,9 @@ begin
     dim_MOD = dim_MOD + dim_MOD1
   end if
 
+  ; Set default values for non-required diag_script_info attributes
+  set_default_att(diag_script_info, "plot_legend", True)
+
   ; Create output plot directory
   plot_dir = config_user_info@plot_dir
   system("mkdir -p " + plot_dir)
@@ -214,10 +217,15 @@ begin
   res@vpHeightF = 0.4
   res@vpWidthF = 0.8
 
+  res@tmYROn       = False
+  res@tmXTOn       = False
+  res@tmYRBorderOn = False
+  res@tmXTBorderOn = False
+
   res@tmXBMode = "Explicit"
   d2r  = get_d2r("f")
   res@tmXBValues = sin(d2r * ispan(-60, 60, 30))
-  res@tmXBLabels = (/"60S", "30S", "0", "30N", "60N"/)
+  res@tmXBLabels = (/"60~F34~0~F~S", "30~F34~0~F~S", "0~F34~0~F~", "30~F34~0~F~N", "60~F34~0~F~N"/)
   res@tmXBMinorValues = sin(d2r * ispan(-90, 90, 10))
   res@trXMinF = -1.
   res@trXMaxF = 1.
@@ -262,32 +270,36 @@ begin
   end if
 
 
-;  ; ***********************************************
-;  ; legend resources
-;  ; ***********************************************
-;
-;  lgres                    = True
-;  lgres@lgItemType         = "Lines"   ; show lines only (default)
-;  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
-;  lgres@vpWidthF           = 0.15      ; width of legend (NDC)
-;  lgres@vpHeightF          = 0.7       ; height of legend (NDC)
-;  lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
-;  lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
-;
-;  lgres@lgLineColors      = colors
-;  lgres@lgDashIndexes     = dashes
-;  lgres@lgLineThicknesses = thicks + 3
-;  labels = annots
-;  nitems = dimsizes(labels)
-;  lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
-;
-;  ; Create legend
-;  lbid = gsn_create_legend(wks, nitems, labels, lgres)
-;
-;  amres = True
-;  amres@amParallelPosF   = 0.65
-;  amres@amOrthogonalPosF = 0.0
-;  annoid1 = gsn_add_annotation(plot, lbid, amres)
+  ; ***********************************************
+  ; legend resources
+  ; ***********************************************
+
+  if (diag_script_info@plot_legend) then
+
+    lgres                    = True
+    lgres@lgItemType         = "Lines"   ; show lines only (default)
+    lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+    lgres@vpWidthF           = 0.15      ; width of legend (NDC)
+    lgres@vpHeightF          = 0.7       ; height of legend (NDC)
+    lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+    lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+
+    lgres@lgLineColors      = colors
+    lgres@lgDashIndexes     = dashes
+    lgres@lgLineThicknesses = thicks + 3
+    labels = annots
+    nitems = dimsizes(labels)
+    lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
+
+    ; Create legend
+    lbid = gsn_create_legend(wks, nitems, labels, lgres)
+
+    amres = True
+    amres@amParallelPosF   = 0.65
+    amres@amOrthogonalPosF = 0.0
+    annoid1 = gsn_add_annotation(plot, lbid, amres)
+
+  end if
 
   resP = True
   resP@gsnMaximize = True
@@ -298,6 +310,23 @@ begin
 
 
   log_info(" wrote " + outfile + "." + file_type)
+
+
+  ; ------------------------------------------------------------------------
+  ; write provenance to netcdf output and plot file(s) (mean)
+  ; ------------------------------------------------------------------------
+
+  authors = (/"bock_lisa"/)
+  statistics = (/"stddev"/)
+  domain = ("global")
+  plottype = ("line")
+  references = (/"flato13ipcc"/)
+  prov_caption = "Temporal variability of Near-Surface Air Temperature"
+  infiles = metadata_att_as_array(info_items, "filename")
+
+  log_provenance(out_path, outfile + "." + file_type, prov_caption, statistics, \
+                 domain, plottype, authors, references, infiles)
+
 
   leave_msg(DIAG_SCRIPT, "")
 
