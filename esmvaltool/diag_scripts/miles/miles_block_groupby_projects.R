@@ -321,6 +321,7 @@ if (write_plots) {
             cex.main = 1.3,
             xlab = fp$x_label,
             ylab = fp$legend_unit,
+            frame.plot = FALSE,
             col = tm90cols[1],
             xaxt = "none",
             xaxs = "i",
@@ -328,8 +329,8 @@ if (write_plots) {
           )
           axis(
             1,
-            seq(-60, 240, 30),
-            labels = c("60°W", "30°W", "0°", "30°E", "60°E", "90°E", "120°E", "150°E", "180°E", "150°W", "120°W")
+            seq(-90, 270, 30),
+            labels = c(" ", "60°W", "30°W", "0°", "30°E", "60°E", "90°E", "120°E", "150°E", "180°E", "150°W", "120°W", " ")
           )
           grid(
             nx = 12,
