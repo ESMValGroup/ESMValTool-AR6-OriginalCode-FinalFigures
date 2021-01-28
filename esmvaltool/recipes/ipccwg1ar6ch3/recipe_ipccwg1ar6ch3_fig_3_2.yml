@@ -34,7 +34,7 @@ preprocessors:
 
 
 
-models_cmip6_historical_era5: &models_cmip6_historical_era5
+models_cmip6_historical: &models_cmip6_historical
   - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
   - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
   - {dataset: AWI-CM-1-1-MR, grid: gn} #start 1851
@@ -87,7 +87,6 @@ models_cmip6_historical_era5: &models_cmip6_historical_era5
   - {dataset: SAM0-UNICON, grid: gn}
   #- {dataset: TaiESM1, grid: gn} #empty folder in latestversion
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
-  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 
 
 models_cmip6_piControl: &models_cmip6_piControl
@@ -148,7 +147,7 @@ models_cmip6_piControl: &models_cmip6_piControl
   #- {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 2709}
 
 
-models_cmip5_historical_era5: &models_cmip5_historical_era5
+models_cmip5_historical: &models_cmip5_historical
   - {dataset: ACCESS1-0}
   - {dataset: ACCESS1-3}
   - {dataset: bcc-csm1-1}
@@ -194,7 +193,6 @@ models_cmip5_historical_era5: &models_cmip5_historical_era5
   - {dataset: MRI-CGCM3}
   - {dataset: NorESM1-M}
   - {dataset: NorESM1-ME}
-  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 
 
 models_cmip5_piControl: &models_cmip5_piControl
@@ -246,49 +244,61 @@ models_cmip5_piControl: &models_cmip5_piControl
 
 
 
-models_highresmip_hist-1950_era5: &models_highresmip_hist-1950_era5
+models_highresmip_hist-1950: &models_highresmip_hist-1950
   # low res models
-  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
+#  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
   - {dataset: CNRM-CM6-1, exp: hist-1950, ensemble: r1i1p1f2}
-  #- {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1}
   - {dataset: ECMWF-IFS-LR, exp: hist-1950}
   - {dataset: HadGEM3-GC31-LL, exp: hist-1950, grid: gn}
-  - {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
+#  - {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
   # high res models
-  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
+#  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
   - {dataset: CNRM-CM6-1-HR, exp: hist-1950, ensemble: r1i1p1f2}
-  #- {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1}
   - {dataset: ECMWF-IFS-HR, exp: hist-1950}
   - {dataset: HadGEM3-GC31-HM, exp: hist-1950, grid: gn}
-  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
-  # reference dataset
-  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+#  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
 
 models_highresmip_low_control-1950: &models_highresmip_low_control-1950
-  - {dataset: CMCC-CM2-HR4, exp: control-1950, grid: gn,
-     start_year: 1950, end_year: 2049}
-  - {dataset: CNRM-CM6-1, exp: control-1950, ensemble: r1i1p1f2,
-     start_year: 1950, end_year: 2049}
-  #- {dataset: EC-Earth3P, exp: control-1950, ensemble: r1i1p2f1}
-  - {dataset: ECMWF-IFS-LR, exp: control-1950,
-     start_year: 1950, end_year: 2049}
-  - {dataset: HadGEM3-GC31-LL, exp: control-1950, grid: gn,
-     start_year: 1950, end_year: 2049}
-  - {dataset: MPI-ESM1-2-HR, exp: control-1950, grid: gn,
-     start_year: 1950, end_year: 2049}
+#  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
+  - {dataset: CNRM-CM6-1, exp: hist-1950, ensemble: r1i1p1f2}
+  - {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-LR, exp: hist-1950}
+  - {dataset: HadGEM3-GC31-LL, exp: hist-1950, grid: gn}
+#  - {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
+##  - {dataset: CMCC-CM2-HR4, exp: control-1950, grid: gn,
+##     start_year: 1950, end_year: 2049}
+#  - {dataset: CNRM-CM6-1, exp: control-1950, ensemble: r1i1p1f2,
+#     start_year: 1950, end_year: 2049}
+#  - {dataset: EC-Earth3P, exp: control-1950, ensemble: r3i1p2f1,
+#     start_year: 1951, end_year: 2062}
+#  - {dataset: ECMWF-IFS-LR, exp: control-1950,
+#     start_year: 1950, end_year: 2049}
+#  - {dataset: HadGEM3-GC31-LL, exp: control-1950, grid: gn,
+#     start_year: 1950, end_year: 2049}
+##  - {dataset: MPI-ESM1-2-HR, exp: control-1950, grid: gn,
+##     start_year: 1950, end_year: 2049}
 
 models_highresmip_high_control-1950: &models_highresmip_high_control-1950
-  - {dataset: CMCC-CM2-VHR4, exp: control-1950, grid: gn,
-     start_year: 1950, end_year: 2049}
-  - {dataset: CNRM-CM6-1-HR, exp: control-1950, ensemble: r1i1p1f2,
-     start_year: 1950, end_year: 2049}
-  #- {dataset: EC-Earth3P-HR, exp: control-1950, ensemble: r1i1p2f1}
-  - {dataset: ECMWF-IFS-HR, exp: control-1950,
-     start_year: 1950, end_year: 2049}
-  - {dataset: HadGEM3-GC31-HM, exp: control-1950, grid: gn,
-     start_year: 1950, end_year: 2049}
-  - {dataset: MPI-ESM1-2-XR, exp: control-1950, grid: gn,
-     start_year: 1950, end_year: 2049}
+#  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
+  - {dataset: CNRM-CM6-1-HR, exp: hist-1950, ensemble: r1i1p1f2}
+  - {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-HR, exp: hist-1950}
+  - {dataset: HadGEM3-GC31-HM, exp: hist-1950, grid: gn}
+#  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
+##  - {dataset: CMCC-CM2-VHR4, exp: control-1950, grid: gn,
+##     start_year: 1950, end_year: 2049}
+#  - {dataset: CNRM-CM6-1-HR, exp: control-1950, ensemble: r1i1p1f2,
+#     start_year: 1950, end_year: 2049}
+#  - {dataset: EC-Earth3P-HR, exp: control-1950, ensemble: r1i1p2f1,
+#     start_year: 1950, end_year: 2049}
+#  - {dataset: ECMWF-IFS-HR, exp: control-1950,
+#     start_year: 1950, end_year: 2049}
+#  - {dataset: HadGEM3-GC31-HM, exp: control-1950, grid: gn,
+#     start_year: 1950, end_year: 2049}
+##  - {dataset: MPI-ESM1-2-XR, exp: control-1950, grid: gn,
+##     start_year: 1950, end_year: 2049}
 
 
 
@@ -306,42 +316,47 @@ diagnostics:
   # (geographical distributions) for CMIP6, CMIP5 and HighResMIP
   # **********************************************************************
 
-  IAV_calc_tas_cmip6: &diag_IAV
-    description: Calculate temperature interannual variability
-                 for stippling significance
-    themes:
-      - varmodes
-    realms:
-      - atmos
-    variables:
-      tas:
-        preprocessor: preproc_map
-        project: CMIP6
-        mip: Amon
-        exp: piControl
-        ensemble: r1i1p1f1
-        grid: gr
-    additional_datasets: *models_cmip6_piControl
-    scripts:
-      calc_IAV_for_stippandhatch_tas: &IAV_script
-        script: ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
-        time_avg: annualclim
-        periodlength: 20.
-        iavmode: mmm
-
-  IAV_calc_tas_cmip5: 
-    <<: *diag_IAV
-    variables:
-      tas:
-        preprocessor: preproc_map
-        project: CMIP5
-        mip: Amon
-        exp: piControl
-        ensemble: r1i1p1
-    additional_datasets: *models_cmip5_piControl
+#  IAV_calc_tas_cmip6: &diag_IAV
+#    description: Calculate temperature interannual variability
+#                 for stippling significance
+#    themes:
+#      - varmodes
+#    realms:
+#      - atmos
+#    variables:
+#      tas:
+#        preprocessor: preproc_map
+#        project: CMIP6
+#        mip: Amon
+#        exp: piControl
+#        ensemble: r1i1p1f1
+#        grid: gr
+#    additional_datasets: *models_cmip6_piControl
+#    scripts:
+#      calc_IAV_for_stippandhatch_tas: &IAV_script
+#        script: ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
+#        time_avg: annualclim
+#        periodlength: 20.
+#        iavmode: mmm
+#
+#  IAV_calc_tas_cmip5: 
+#    <<: *diag_IAV
+#    variables:
+#      tas:
+#        preprocessor: preproc_map
+#        project: CMIP5
+#        mip: Amon
+#        exp: piControl
+#        ensemble: r1i1p1
+#    additional_datasets: *models_cmip5_piControl
 
 #  IAV_calc_tas_highresmip_low:
-#    <<: *diag_IAV
+#    description: Calculate temperature interannual variability
+#                 for stippling significance
+#    themes:
+#      - varmodes
+#    realms:
+#      - atmos
 #    variables:
 #      tas:
 #        preprocessor: preproc_map
@@ -349,100 +364,134 @@ diagnostics:
 #        mip: Amon
 #        grid: gr
 #        ensemble: r1i1p1f1
+#        experiment: hist-1950
+#        start_year: 1950
+#        end_year: 1980
 #    additional_datasets: *models_highresmip_low_control-1950
 #    scripts:
 #      calc_IAV_for_stippandhatch_tas:
-#        <<: *IAV_script
+#        script: ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
+#        time_avg: annualclim
+#        periodlength: 1.
+#        iavmode: mmm
 #        not_cut_100_years: True
 #
 #
 #  IAV_calc_tas_highresmip_high:
-#    <<: *diag_IAV
+#    description: Calculate temperature interannual variability
+#                 for stippling significance
+#    themes:
+#      - varmodes
+#    realms:
+#      - atmos
+#    variables:
+#      tas:
+#        preprocessor: preproc_map
+#        project: CMIP6
+#        mip: Amon
+#        grid: gr
+#        ensemble: r1i1p1f1
+#        experiment: hist-1950
+#        start_year: 1950
+#        end_year: 1980
 #    additional_datasets: *models_highresmip_high_control-1950
 #    scripts:
 #      calc_IAV_for_stippandhatch_tas:
-#        <<: *IAV_script
+#        script: ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
+#        time_avg: annualclim
+#        periodlength: 1.
+#        iavmode: mmm
 #        not_cut_100_years: True
 
 
-  fig_3_2_cmip6:
-    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
-    variables:
-      tas:
-        preprocessor: clim
-        reference_dataset: ERA5
-        mip: Amon
-        project: CMIP6
-        exp: historical
-        ensemble: r1i1p1f1
-        grid: gr
-        start_year: 1995
-        end_year: 2014
-    additional_datasets: *models_cmip6_historical_era5
-    scripts:
-      fig_3_2: 
-        script: ipcc_ar6/model_bias.ncl
-        ancestors: ['tas', 'IAV_calc_tas_cmip6/calc_IAV_for_stippandhatch_tas']
-        projection: Robinson
-        mean_caption: "CMIP6"
-        bias_caption: "CMIP6 bias"
-        plot_rms_diff: True
-        rmsd_caption: "CMIP6 root mean square error"
-        stippandhatch: True
-        panel_title: "Near-Surface Air Temperature"
-
-
-  fig_3_2_cmip5:
-    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
-    variables:
-      tas:
-        preprocessor: clim
-        reference_dataset: ERA5
-        mip: Amon
-        project: CMIP5
-        exp: historical
-        ensemble: r1i1p1
-        start_year: 1985
-        end_year: 2004
-    additional_datasets: *models_cmip5_historical_era5
-    scripts:
-      fig_3_2: 
-        script: ipcc_ar6/model_bias.ncl
-        ancestors: ['tas', 'IAV_calc_tas_cmip5/calc_IAV_for_stippandhatch_tas']
-        projection: Robinson
-        mean_caption: "CMIP5"
-        bias_caption: "CMIP5 bias"
-        panel_num: ['c)', 'd)']
-        stippandhatch: True
-
-
-#  fig_3_2_highresmip:
+#  fig_3_2_cmip6:
 #    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
 #    variables:
 #      tas:
-#        preprocessor: clim_wo_mmm
+#        preprocessor: clim
 #        reference_dataset: ERA5
 #        mip: Amon
 #        project: CMIP6
+#        exp: historical
 #        ensemble: r1i1p1f1
 #        grid: gr
 #        start_year: 1995
 #        end_year: 2014
-#    additional_datasets: *models_highresmip_hist-1950_era5
+#        additional_datasets: *models_cmip6_historical
+#    additional_datasets:
+#      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 #    scripts:
 #      fig_3_2: 
-#        script: ipcc_ar6/model_bias_diff.ncl
-#        ancestors: ['tas', 
-#                    'IAV_calc_tas_highresmip_low/calc_IAV_for_stippandhatch_tas',
-#                    'IAV_calc_tas_highresmip_high/calc_IAV_for_stippandhatch_tas']
+#        script: ipcc_ar6/model_bias.ncl
+#        ancestors: ['tas', 'IAV_calc_tas_cmip6/calc_IAV_for_stippandhatch_tas']
 #        projection: Robinson
-#        caption: ['HighResMIP (high) bias', 'HighResMIP (low) bias']
-#        panel_num: ['e)', 'f)']
+#        mean_caption: "CMIP6"
+#        bias_caption: "CMIP6 bias"
+#        plot_rms_diff: True
+#        rmsd_caption: "CMIP6 root mean square error"
 #        stippandhatch: True
-#        groups: ['highresmip_high', 'highresmip_low']
-#        modelgroup_1: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
-#                       'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
-#        modelgroup_2: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR',
-#                       'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
+#        panel_title: "Near-Surface Air Temperature"
+#
+#
+#  fig_3_2_cmip5:
+#    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim
+#        reference_dataset: ERA5
+#        mip: Amon
+#        project: CMIP5
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1985
+#        end_year: 2004
+#        additional_datasets: *models_cmip5_historical
+#    additional_datasets:
+#      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+#    scripts:
+#      fig_3_2: 
+#        script: ipcc_ar6/model_bias.ncl
+#        ancestors: ['tas', 'IAV_calc_tas_cmip5/calc_IAV_for_stippandhatch_tas']
+#        projection: Robinson
+#        mean_caption: "CMIP5"
+#        bias_caption: "CMIP5 bias"
+#        panel_num: ['c)', 'd)']
+#        stippandhatch: True
+
+
+  fig_3_2_highresmip:
+    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_wo_mmm
+        reference_dataset: ERA5
+        mip: Amon
+        project: CMIP6
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1985
+        end_year: 2014
+        additional_datasets: *models_highresmip_hist-1950
+    additional_datasets:
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+    scripts:
+      fig_3_2: 
+        script: ipcc_ar6/model_bias_diff.ncl
+        #ancestors: ['tas', 
+        #            'IAV_calc_tas_highresmip_low/calc_IAV_for_stippandhatch_tas',
+        #            'IAV_calc_tas_highresmip_high/calc_IAV_for_stippandhatch_tas']
+        projection: Robinson
+        caption: ['HighResMIP (high) bias', 'HighResMIP (low) bias']
+        panel_num: ['e)', 'f)']
+        stippandhatch: True
+        groups: ['highresmip_high', 'highresmip_low']
+        #modelgroup_1: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR',
+        #               'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+        #modelgroup_2: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR',
+        #               'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
+        modelgroup_1: ['CNRM-CM6-1-HR', 'EC-Earth3P-HR', 'ECMWF-IFS-HR',
+                       'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+        modelgroup_2: ['CNRM-CM6-1', 'EC-Earth3P', 'ECMWF-IFS-LR',
+                       'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
 
 

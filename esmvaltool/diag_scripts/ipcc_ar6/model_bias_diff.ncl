@@ -130,6 +130,8 @@ begin
   data2 = new((/dim_MOD2, dim(0), dim(1)/) ,float)
   data_mon1 = new((/dim_MOD1, 12, dim(0), dim(1)/) ,float)
   data_mon2 = new((/dim_MOD2, 12, dim(0), dim(1)/) ,float)
+  data_ivar1 = new((/dim_MOD1, dim(0), dim(1)/) ,float)
+  data_ivar2 = new((/dim_MOD2, dim(0), dim(1)/) ,float)
 
   do imod = 0, dim_MOD - 1
 
@@ -146,8 +148,16 @@ begin
 
         A0 = read_data(info0[imod])
 
-        data1(ii,:,:) = time_operations(A0, -1, -1, "average", "annualclim", True)
+        data1(ii,:,:) = time_operations(A0, 1995, 2014, "average", "annualclim", True)
         data_mon1(ii,:,:,:) = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+
+        if (stippandhatch) then
+          tmp = time_operations(A0, info0[imod]@start_year, \
+                                info0[imod]@start_year + 29, \
+                                "average", "yearly", True)
+          tmp = dtrend_quadratic_msg_n(tmp, False, False, 0)
+          data_ivar1(ii, :, :) = dim_stddev_n(tmp, 0)
+        end if
 
       elseif (any(diag_script_info@modelgroup_2 .eq. names(imod))) 
 
@@ -155,8 +165,16 @@ begin
 
         A0 = read_data(info0[imod])
 
-        data2(ii,:,:) = time_operations(A0, -1, -1, "average", "annualclim", True)
+        data2(ii,:,:) = time_operations(A0, 1995, 2014, "average", "annualclim", True)
         data_mon2(ii,:,:,:) = time_operations(A0, -1, -1, "average", "monthlyclim", True)
+
+        if (stippandhatch) then
+          tmp = time_operations(A0, info0[imod]@start_year, \
+                                info0[imod]@start_year + 29, \
+                                "average", "yearly", True)
+          tmp = dtrend_quadratic_msg_n(tmp, False, False, 0)
+          data_ivar2(ii, :, :) = dim_stddev_n(tmp, 0)
+        end if
 
       else
 
@@ -175,25 +193,25 @@ begin
   ; -----------------------------------------------------------
 
   if (stippandhatch) then
-    log_info("Read precalculated natural variability for multi-model")
-
-    input_dir1 = str_match(diag_script_info@input_files, diag_script_info@groups(0)) 
-    natvar_file1 = addfile(input_dir1 + "/" + "IAV_mmm_piControl_" + \
-                          var0 + "_annualclim.nc", "r")
-    natvar_mmm1 = natvar_file1->iav
-    tmp = natvar_mmm1
-    delete(natvar_mmm1)
-    natvar_mmm1 = rm_single_dims(tmp)
-    delete(tmp)
-
-    input_dir2 = str_match(diag_script_info@input_files, diag_script_info@groups(1)) 
-    natvar_file2 = addfile(input_dir2 + "/" + "IAV_mmm_piControl_" + \
-                          var0 + "_annualclim.nc", "r")
-    natvar_mmm2 = natvar_file2->iav
-    tmp = natvar_mmm2
-    delete(natvar_mmm2)
-    natvar_mmm2 = rm_single_dims(tmp)
-    delete(tmp)
+;    log_info("Read precalculated natural variability for multi-model")
+;
+;    input_dir1 = str_match(diag_script_info@input_files, diag_script_info@groups(0)) 
+;    natvar_file1 = addfile(input_dir1 + "/" + "IAV_mmm_piControl_" + \
+;                          var0 + "_annualclim.nc", "r")
+;    natvar_mmm1 = natvar_file1->iav
+;    tmp = natvar_mmm1
+;    delete(natvar_mmm1)
+;    natvar_mmm1 = rm_single_dims(tmp)
+;    delete(tmp)
+;
+;    input_dir2 = str_match(diag_script_info@input_files, diag_script_info@groups(1)) 
+;    natvar_file2 = addfile(input_dir2 + "/" + "IAV_mmm_piControl_" + \
+;                          var0 + "_annualclim.nc", "r")
+;    natvar_mmm2 = natvar_file2->iav
+;    tmp = natvar_mmm2
+;    delete(natvar_mmm2)
+;    natvar_mmm2 = rm_single_dims(tmp)
+;    delete(tmp)
   end if
 
   ; -----------------------------------------------------------
@@ -260,6 +278,8 @@ begin
 
   diff1_i    = new((/dim_MOD1, dim(0), dim(1)/) ,float)
   diff2_i    = new((/dim_MOD2, dim(0), dim(1)/) ,float)
+  ivar1_i    = new((/dim_MOD1, dim(0), dim(1)/) ,float)
+  ivar2_i    = new((/dim_MOD2, dim(0), dim(1)/) ,float)
   ;absdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   ;rmsdiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
   ;reldiff_i = new((/dim_MOD-2, dim(0), dim(1)/) ,float)
@@ -275,14 +295,14 @@ begin
        
           ii = ind(diag_script_info@modelgroup_1 .eq. names(imod))
 
-          ;difference
+          ; difference
           diff1_i(ii,:,:) = data1(ii,:,:) - refdata
 
         elseif (any(diag_script_info@modelgroup_2 .eq. names(imod)))
 
           ii = ind(diag_script_info@modelgroup_2 .eq. names(imod))
 
-          ;difference
+          ; difference
           diff2_i(ii,:,:) = data2(ii,:,:) - refdata
 
         end if
@@ -304,6 +324,8 @@ begin
 
   end if
 
+  
+
   ;; multi-model mean of absolute difference between models and reference
   ;; data set 
 
@@ -324,6 +346,7 @@ begin
   ; Determine sigma and sign for significance
   ; ----------------------------------------------
   if (stippandhatch) then
+    ; first panel
     var_pos_signif = dim_num_n(where(diff1_i .gt. 0., 1., \
                                      diff1@_FillValue) .eq. 1., 0)
     var_neg_signif = dim_num_n(where(diff1_i .lt. 0., 1., \
@@ -336,47 +359,70 @@ begin
       var_neg_signif / where((var_pos_signif + var_neg_signif) \
                              .ne. 0., var_pos_signif + \
                              var_neg_signif, diff1@_FillValue)
-    signif_and_sign = where(var_pos_signif_tmp .ge. 0.9 .or. \
-                            var_neg_signif_tmp .ge. 0.9, 1., 0.)
-    signif_and_sign = where(ismissing(signif_and_sign), 0.,\
-                            signif_and_sign)
-    sigma_and_sign = where(abs(diff1( :, :)) .gt. \
-                           abs(2. * natvar_mmm1), 1., 0.)
-    to_plot_not_signif1 = where(abs(diff1( :, :)) .lt. \
-                                        abs(natvar_mmm1),\
-                                        1., 0.)
-    to_plot_signif1 = where(signif_and_sign .eq. 1, \
-                                    sigma_and_sign, 0.)
+    signif_and_sign = where(var_pos_signif_tmp .ge. 0.75 .or. \
+                            var_neg_signif_tmp .ge. 0.75, 1., 0.)
+;    signif_and_sign = where(ismissing(signif_and_sign), 0.,\
+;                            signif_and_sign)
+    ; variablity threshold: sqrt(2)*1.645
+    natvar_mmm1 = rm_single_dims(dim_avg_n(data_ivar1(:, :, :), 0) * sqrt(2.))
+    var_thres = abs(1.645 * natvar_mmm1) 
+    tmp := new(dimsizes(diff1_i), "float")
+    tmp = 0
+    do imod = 0, dim_MOD1 - 1
+      tmp(imod, :, :) = where(abs(diff1_i(imod, :, :)) .gt. var_thres(:, :), 1, 0)
+    end do
+    var_pos_signif := dim_sum_n(tmp, 0)
+    delete(tmp)
+    var_pos_signif_tmp := var_pos_signif / (dim_MOD1 - 2)
+    sigma_and_sign = where(var_pos_signif_tmp .ge. 0.66 , 1., 0.)
 
-    copy_VarMeta(diff1, to_plot_signif1)
-    copy_VarMeta(diff1, to_plot_not_signif1)
+    to_plot_not_robust_1 = where(sigma_and_sign .eq. 0, 1., 0.)
+    ;to_plot_not_robust_1 = var_pos_signif_tmp
 
-    var_pos_signif = dim_num_n(where(diff2_i .gt. 0., 1., \
-                                     diff2@_FillValue) .eq. 1., 0)
-    var_neg_signif = dim_num_n(where(diff2_i .lt. 0., 1., \
-                                     diff2@_FillValue) .eq. 1., 0)
+    to_plot_confl_sign_1 = where(signif_and_sign .eq. 0, sigma_and_sign, 0.)
+    ;to_plot_confl_sign_1 = signif_and_sign
+
+    copy_VarMeta(diff1, natvar_mmm1)
+    copy_VarMeta(diff1, to_plot_confl_sign_1)
+    copy_VarMeta(diff1, to_plot_not_robust_1)
+
+    ; second panel
+    var_pos_signif = dim_num_n(where(diff1_i .gt. 0., 1., \
+                                     diff1@_FillValue) .eq. 1., 0)
+    var_neg_signif = dim_num_n(where(diff1_i .lt. 0., 1., \
+                                     diff1@_FillValue) .eq. 1., 0)
     var_pos_signif_tmp = \
       var_pos_signif / where((var_pos_signif + var_neg_signif) \
                              .ne. 0., var_pos_signif + \
-                             var_neg_signif, diff2@_FillValue)
+                             var_neg_signif, diff1@_FillValue)
     var_neg_signif_tmp = \
       var_neg_signif / where((var_pos_signif + var_neg_signif) \
                              .ne. 0., var_pos_signif + \
-                             var_neg_signif, diff2@_FillValue)
-    signif_and_sign = where(var_pos_signif_tmp .ge. 0.9 .or. \
-                            var_neg_signif_tmp .ge. 0.9, 1., 0.)
+                             var_neg_signif, diff1@_FillValue)
+    signif_and_sign = where(var_pos_signif_tmp .ge. 0.75 .or. \
+                            var_neg_signif_tmp .ge. 0.75, 1., 0.)
     signif_and_sign = where(ismissing(signif_and_sign), 0.,\
                             signif_and_sign)
-    sigma_and_sign = where(abs(diff2( :, :)) .gt. \
-                           abs(2. * natvar_mmm2), 1., 0.)
-    to_plot_not_signif2 = where(abs(diff2( :, :)) .lt. \
-                                        abs(natvar_mmm2),\
-                                        1., 0.)
-    to_plot_signif2 = where(signif_and_sign .eq. 1, \
-                                    sigma_and_sign, 0.)
+    ; variablity threshold: sqrt(2)*1.645
+    natvar_mmm2 = rm_single_dims(dim_avg_n(data_ivar2(:, :, :), 0) * sqrt(2.))
+    var_thres = abs(1.645 * natvar_mmm2) 
+    tmp := new(dimsizes(diff1_i), "float")
+    tmp = 0
+    do imod = 0, dim_MOD2 - 1
+      tmp(imod, :, :) = where(abs(diff1_i(imod, :, :)) .gt. var_thres(:, :), 1, 0)
+    end do
+    var_pos_signif := dim_sum_n(tmp, 0)
+    delete(tmp)
+    var_pos_signif_tmp := var_pos_signif / (dim_MOD2 - 2)
+    sigma_and_sign = where(var_pos_signif_tmp .ge. 0.66 , 1., 0.)
 
-    copy_VarMeta(diff2, to_plot_signif2)
-    copy_VarMeta(diff2, to_plot_not_signif2)
+    to_plot_not_robust_2 = where(sigma_and_sign .eq. 0, 1., 0.)
+
+    to_plot_confl_sign_2 = where(signif_and_sign .eq. 0, sigma_and_sign, 0.)
+
+    copy_VarMeta(diff1, natvar_mmm2)
+    copy_VarMeta(diff2, to_plot_confl_sign_2)
+    copy_VarMeta(diff2, to_plot_not_robust_2)
 
     ; improvement
     diff1_i = abs(diff1_i) - abs(diff2_i)    
@@ -389,17 +435,11 @@ begin
       improve_signif / where((improve_signif + not_improve_signif) \
                              .ne. 0., improve_signif + \
                              not_improve_signif, diff1@_FillValue)
-    to_plot_improve = where(improve_signif_tmp .ge. 0.8 .or. \
-                            improve_signif_tmp .ge. 0.8, 1., 0.)
+    to_plot_improve = where(improve_signif_tmp .ge. 0.75 .or. \
+                            improve_signif_tmp .ge. 0.75, 0., 1.)
 
     copy_VarMeta(diff1, to_plot_improve)
 
-    ;if (plot_rms_diff) then
-    ;  to_plot_not_signif_rmsd = where(rmsdiff( :, :) .lt. \
-    ;                                    abs(natvar_mmm),\
-    ;                                    1., 0.)
-    ;  copy_VarMeta(diff, to_plot_not_signif_rmsd)
-    ;end if
   end if
 
 
@@ -700,33 +740,27 @@ begin
       ress@cnFillOn = True
       ress@cnFillMode = "AreaFill"
       ress@cnMonoFillPattern = False
-      ress@cnFillPatterns = (/-1, 17, 17/)
+      ress@cnFillPatterns = (/-1, 6, 6/)
       ress@cnMonoFillColor = True
       ress@lbLabelBarOn = False
       ress@gsnLeftString = ""
       ress@gsnRightString = ""
       ress@cnFillDotSizeF       = 0.001
-      ress@cnFillScaleF        = .6        ; add extra density
+      ress@cnFillScaleF        = 1.        ; add extra density
 
-      ; plot dots
-      if all(to_plot_signif1(:, :) .eq. 1) then
-        to_plot_signif1(0, 0) = 0
-      end if
-      if (max(to_plot_signif1(:, :)) .gt. \
-          min(to_plot_signif1(:, :))) then
-        plot1 = gsn_csm_contour(wks, to_plot_signif1(:, :), ress)
+      ; plot cross-hatching
+      if (max(to_plot_confl_sign_1(:, :)) .gt. \
+          min(to_plot_confl_sign_1(:, :))) then
+        plot1 = gsn_csm_contour(wks, to_plot_confl_sign_1(:, :), ress)
         overlay(plots(0), plot1)
       end if
-      if all(to_plot_signif2(:, :) .eq. 1) then
-        to_plot_signif2(0, 0) = 0
-      end if
-      if (max(to_plot_signif2(:, :)) .gt. \
-          min(to_plot_signif2(:, :))) then
-        plot2 = gsn_csm_contour(wks, to_plot_signif2(:, :), ress)
+      if (max(to_plot_confl_sign_2(:, :)) .gt. \
+          min(to_plot_confl_sign_2(:, :))) then
+        plot2 = gsn_csm_contour(wks, to_plot_confl_sign_2(:, :), ress)
         overlay(plots(1), plot2)
       end if
 
-      ; resources hatch
+      ; resources hatching
       resb = True
       resb@gsnDraw = False
       resb@gsnFrame = False
@@ -741,55 +775,38 @@ begin
       resb@cnFillMode = "AreaFill"
       resb@cnRasterSmoothingOn = False
       resb@cnMonoFillPattern = False
-      resb@cnFillPatterns = (/-1, 10, 10/)
+      resb@cnFillPatterns = (/-1, 4, 4/)
       resb@cnMonoFillColor = True
       resb@lbLabelBarOn = False
       resb@gsnLeftString = ""
       resb@gsnRightString = ""
-      resb@cnFillScaleF = 0.25
+      resb@cnFillScaleF = 0.5
 
-      ;; plot hatch
-      ;if all(to_plot_not_signif1(:, :) .eq. 1) then
-      ;  to_plot_not_signif1(0, 0) = 0
-      ;end if
-      ;if (max(to_plot_not_signif1(:, :)) .gt. \
-      ;    min(to_plot_not_signif1(:, :))) then
-      ;  plot3 = gsn_csm_contour(wks, to_plot_not_signif1(:, :), resb)
-      ;  overlay(plots(0), plot3)
-      ;end if
-      ;if all(to_plot_not_signif2(:, :) .eq. 1) then
-      ;  to_plot_not_signif2(0, 0) = 0
-      ;end if
-      ;if (max(to_plot_not_signif2(:, :)) .gt. \
-      ;    min(to_plot_not_signif2(:, :))) then
-      ;  plot4 = gsn_csm_contour(wks, to_plot_not_signif2(:, :), resb)
-      ;  overlay(plots(1), plot4)
-      ;end if
+      ; plot hatching
+      if (max(to_plot_not_robust_1(:, :)) .gt. \
+          min(to_plot_not_robust_1(:, :))) then
+        plot3 = gsn_csm_contour(wks, to_plot_not_robust_1(:, :), resb)
+        overlay(plots(0), plot3)
+      end if
+      if (max(to_plot_not_robust_2(:, :)) .gt. \
+          min(to_plot_not_robust_2(:, :))) then
+        plot4 = gsn_csm_contour(wks, to_plot_not_robust_2(:, :), resb)
+        overlay(plots(1), plot4)
+      end if
 
       ; mark improvements in panel 0
-      ress@cnFillPatterns = (/-1, 6, 6/)
+      ;resb@cnFillPatterns = (/-1, 3, 3/)
+      resb@cnFillPatterns = (/-1, 17, 17/)
       ; plot diamonds
       if all(to_plot_improve(:, :) .eq. 1) then
         to_plot_improve(0, 0) = 0
       end if
       if (max(to_plot_improve(:, :)) .gt. \
           min(to_plot_improve(:, :))) then
-        plot5 = gsn_csm_contour(wks, to_plot_improve(:, :), ress)
+        plot5 = gsn_csm_contour(wks, to_plot_improve(:, :), resb)
         overlay(plots(0), plot5)
       end if
 
-
-      ;if (plot_rms_diff) then
-      ;  ; plot hatch
-      ;  if all(to_plot_not_signif_rmsd(:, :) .eq. 1) then
-      ;    to_plot_not_signif_rmsd(0, 0) = 0
-      ;  end if
-      ;  if (max(to_plot_not_signif_rmsd(:, :)) .gt. \
-      ;      min(to_plot_not_signif_rmsd(:, :))) then
-      ;    plot3 = gsn_csm_contour(wks, to_plot_not_signif_rmsd(:, :), resb)
-      ;    overlay(plots(3), plot3)
-      ;  end if
-      ;end if
 
     end if
 
@@ -885,6 +902,55 @@ begin
 
   ;end if
 
+  if (stippandhatch) then
+    natvar_mmm1@diag_script = (/DIAG_SCRIPT/)
+    natvar_mmm1@var = "natvar_mmm_1"
+    natvar_mmm1@var_long_name = "natural variability"
+    natvar_mmm1@units     = 1
+    ncdf_outfile = ncdf_write(natvar_mmm1, nc_filename) 
+
+    to_plot_confl_sign_1@diag_script = (/DIAG_SCRIPT/)
+    to_plot_confl_sign_1@var = "confl_sign_1"
+    to_plot_confl_sign_1@var_long_name = "more than 66% of models show change " \
+                                       + "greater than variability threshold " \
+                                       + "and <80% agree on sign of change"
+    to_plot_confl_sign_1@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_confl_sign_1, nc_filename) 
+
+    to_plot_not_robust_1@diag_script = (/DIAG_SCRIPT/)
+    to_plot_not_robust_1@var = "not_robust_1"
+    to_plot_not_robust_1@var_long_name = "more than 66% of models show change " \
+                                       + "greater than variability threshold"
+    to_plot_not_robust_1@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_not_robust_1, nc_filename)
+
+    natvar_mmm2@diag_script = (/DIAG_SCRIPT/)
+    natvar_mmm2@var = "natvar_mmm_2"
+    natvar_mmm2@var_long_name = "natural variability"
+    natvar_mmm2@units     = 1
+    ncdf_outfile = ncdf_write(natvar_mmm2, nc_filename) 
+
+    to_plot_confl_sign_2@diag_script = (/DIAG_SCRIPT/)
+    to_plot_confl_sign_2@var = "confl_sign_2"
+    to_plot_confl_sign_2@var_long_name = "more than 66% of models show change " \
+                                       + "greater than variability threshold " \
+                                       + "and <80% agree on sign of change"
+    to_plot_confl_sign_2@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_confl_sign_2, nc_filename) 
+
+    to_plot_not_robust_2@diag_script = (/DIAG_SCRIPT/)
+    to_plot_not_robust_2@var = "not_robust_2"
+    to_plot_not_robust_2@var_long_name = "more than 66% of models show change " \
+                                       + "greater than variability threshold"
+    to_plot_not_robust_2@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_not_robust_2, nc_filename)
+
+    to_plot_improve@diag_script = (/DIAG_SCRIPT/)
+    to_plot_improve@var = "improve"
+    to_plot_improve@var_long_name = "improvement"
+    to_plot_improve@units     = 1
+    ncdf_outfile = ncdf_write(to_plot_improve, nc_filename) 
+  end if
 
   ; ------------------------------------------------------------------------
   ; write provenance to netcdf output and plot file(s) (mean)
