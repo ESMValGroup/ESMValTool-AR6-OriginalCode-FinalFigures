@@ -792,8 +792,8 @@ def make_pane_a(
 
         add_obs_lines = True
         if add_obs_lines:
-            plt.axhline(obs_cube.coord('depth').points[max_index], c='k', lw=8, alpha=0.2, zorder = 0) 
-            plt.axvline(obs_cube.data[max_index], c='k', lw=8, alpha=0.2, zorder = 0) 
+            plt.axhline(obs_cube.coord('depth').points[max_index], c='k', lw=3, alpha=0.3, zorder = 0) 
+            plt.axvline(obs_cube.data[max_index], c='k', lw=3, alpha=0.3, zorder = 0) 
 
         else:
             qplt.plot(obs_cube, obs_cube.coord('depth'),
@@ -817,7 +817,8 @@ def make_pane_a(
     #     metadata['long_name'],
     # ])
     # plt.title(title)
-    plt.title('(a) AMOC streamfunction profiles')# at 26.5N')
+    plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC mean state\r}'+'(a) AMOC streamfunction profiles')# at 26.5N')
+    # plt.title('(a) AMOC streamfunction profiles')# at 26.5N')
 
     # Add Legend outside right.
     # diagtools.add_legend_outside_right(plot_details, plt.gca())
@@ -1058,19 +1059,20 @@ def make_pane_bc(
 
     # pane specific stuff
     if pane == 'b':
-        plt.title('(b) Distribution of 8 year AMOC trends')
+        plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC variability\r}'+'(b) Distribution of 8 year AMOC trends')
+        #plt.title('(b) Distribution of 8 year AMOC trends')
         if decadal:
             ax.set_ylabel('Sv/decade')
-            plt.axhline(-5.3, c='k', lw=4, alpha=0.1, zorder = 0) # Wrong numbers!
+            plt.axhline(-5.3, c='k', lw=1, alpha=0.3, zorder = 0) # numbers taken from paper, not calculated here!
         else:
-            plt.axhline(-0.53, c='k', lw=4, alpha=0.1, zorder = 0) # Wrong numbers!
+            plt.axhline(-0.53, c='k', lw=1, alpha=0.3, zorder = 0) # values from paper!
             plt.ylabel('Sv yr'+r'$^{-1}$')
         #if not savefig:
         #    plt.setp( ax.get_xticklabels(), visible=False)
 
     if pane == 'c':
         plt.title('(c) Distribution of interannual AMOC changes')
-        plt.axhline(-4.4, c='k', lw=4, alpha=0.1, zorder = 0) # wrong numbers!
+        plt.axhline(-4.4, c='k', lw=1, alpha=0.3, zorder = 0) # wrong numbers!
         plt.ylabel('Sv')
 
     
@@ -1279,7 +1281,11 @@ def make_amoc_trends(
         # plt.xticks(rotation=30, ha="right", fontsize=8)
         # plt.setp(box['fliers'], markersize=1.0)
         print(time_range, time_ranges_panes[time_range])
-        ax.set_title(' '.join([time_ranges_panes[time_range], time_range]))
+        title = ' '.join([time_ranges_panes[time_range], time_range])
+        if time_ranges_panes[time_range] == '(e)':
+            title = r'\fontsize{24}{3em}\selectfont{}{CMIP6 Modelled longer term AMOC trends\r}' + title
+        ax.set_title(title)
+        #' '.join([time_ranges_panes[time_range], time_range]))
 
         for box_label, patch in zip(box_order,box['boxes']):
             patch.set_facecolor(box_colours[box_label])
