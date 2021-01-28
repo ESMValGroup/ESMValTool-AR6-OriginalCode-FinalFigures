@@ -474,7 +474,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                412: '0-700m',
                413: '700m - 2000m',
                414:  '> 2000m',}
-        fig.set_size_inches(5 , 5)
+        fig.set_size_inches(6 , 5)
 
 
     plot_details={}
@@ -700,7 +700,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
 
     legd.draw_frame(False)
     legd.get_frame().set_alpha(0.)
-    plt.tight_layout()
+    #plt.tight_layout()
 
     fig_dir = diagtools.folder([cfg['plot_dir'], 'multimodel_ohc'])
     image_extention = diagtools.get_image_format(cfg)
