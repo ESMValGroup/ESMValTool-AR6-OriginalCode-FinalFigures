@@ -114,6 +114,6 @@ diagnostics:
             obs_legend: ['ERA5']
             plot_title: 'Instantaneous Blocking: DJFM 1979 - 2000'
             transparency: 0.15 # in [0, 1]
-            xlabel: 'Longitude (°)'
+            xlabel: 'Longitude'
             ylabel: 'Blocked Days (%)'
             yrange: [0, 35]

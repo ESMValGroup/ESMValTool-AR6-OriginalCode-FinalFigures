@@ -89,7 +89,7 @@ linewidth <- 4
 obs_legend <- c("OBS", "OBS2", "OBS3", "OBS4", "OBS5")
 plot_title <- "Instantaneous Blocking: DJFM 1979 - 2000"
 transparency <- 0.15 # in [0, 1]
-xlabel <- "Longitude (°)"
+xlabel <- "Longitude"
 ylabel <- "Blocked Days (%)"
 yrange <- c(0, 35)
 
@@ -329,7 +329,7 @@ if (write_plots) {
           axis(
             1,
             seq(-60, 240, 30),
-            labels = c("60W", "30W", "0", "30E", "60E", "90E", "120E", "150E", "180E", "150W", "120W")
+            labels = c("60°W", "30°W", "0°", "30°E", "60°E", "90°E", "120°E", "150°E", "180°E", "150°W", "120°W")
           )
           grid(
             nx = 12,
