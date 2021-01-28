@@ -517,6 +517,11 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                     except: fill_betweens[subplot][t]= [d, ]
                     if show_UKESM and dataset.lower().find('ukesm')>-1:
                         axes[subplot].plot(times, data, c='purple', alpha=1.0, lw=1.5, zorder=2)
+        for subplot in fill_betweens.keys():
+            times = sorted(fill_betweens[subplot].keys())
+            mins = [np.min(fill_betweens[subplot][t]) for t in times]
+            maxs = [np.max(fill_betweens[subplot][t]) for t in times]
+            axes[subplot].fill_between(times, mins, maxs, color='grey', alpha=0.5)
 
     elif plot_style=='5-95': # plot between 5-95 percentiles, weighted such that each model gets an even vote.
         fill_betweens = {subplot:{} for subplot in axes.keys()}
@@ -548,7 +553,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                         weights[subplot][t] = [dataset, ]
 
                     if show_UKESM and dataset.lower().find('ukesm')>-1:
-                        axes[subplot].plot(times, data, c='purple', alpha=0.7, lw=1.5, zorder=2)
+                        axes[subplot].plot(times, data, c='purple', alpha=0.7, lw=0.7, zorder=2)
 
         for subplot in fill_betweens.keys():
             times = sorted(fill_betweens[subplot].keys())
@@ -566,7 +571,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 pc95s.append(pc95)
                 print(pc5, pc50, pc95)
             print('5-95:', pc5s, pc95s)
-            axes[subplot].fill_between(times, pc5s, pc95s, color=CMIP6_red, alpha=0.85)
+            axes[subplot].fill_between(times, pc5s, pc95s, color=CMIP6_red, alpha=0.35, edgecolor=None)
             axes[subplot].plot(times, pc50s, c=CMIP6_red, lw=1.5, zorder=2)
 
             if xlims_dict[subplot]:
@@ -2591,7 +2596,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
     if show_legend:
         #plt.legend(loc = 'lower left', framealpha=0., prop={'size': 9})
-        plt.legend(framealpha=0., prop={'size': 9})
+        plt.legend(loc = 'lower right', framealpha=0., prop={'size': 9}, markerfirst=False )
 
     ax.set_aspect("equal")
 
@@ -3999,6 +4004,7 @@ def sea_surface_salinity_plot(
 
     if fig is None:
         fig = plt.figure()
+        fig.set_size_inches(10, 7)
 
     if isinstance(subplot, int) and subplot==111:
         ax = fig.add_subplot(subplot, projection=proj)
@@ -4008,9 +4014,10 @@ def sea_surface_salinity_plot(
 
     if fig_type=='mean':
         cmap=diagtools.misc_seq
-        nspace = np.linspace(
-            mean_cube.data.min(),
-            mean_cube.data.max(), 22, endpoint=True)
+        nspace = np.linspace(30., 36.,
+            # mean_cube.data.min(),
+            #mean_cube.data.max(), 
+            22, endpoint=True)
 
     if fig_type=='trend':
         cmap=diagtools.misc_div
@@ -4026,8 +4033,13 @@ def sea_surface_salinity_plot(
         zmin=np.min(nspace),
         zmax=np.max(nspace))
 
+    try: plt.gca().coastlines()
+    except: pass
+
+    
     # Saving files:
     if isinstance(subplot, int) and subplot==111:
+        plt.title('Surface Salinity ' +fig_type.title()+' '+time_range_str)
         plt.colorbar()
         if cfg['write_plots']:
             unique_id = [master_short_name, fig_type, time_range_str ]
@@ -4527,15 +4539,15 @@ def main(cfg):
                 time_range,
                 fig_type = 'mean',
             )
-        sea_surface_salinity_plot(
-            cfg,
-            ss_files[2014],
-            master_short_name,
-            [2014, 1950],
-            fig_type = 'trend',
-            ref_file=ss_files[1950]
-
-        )
+        for ref_year in [1950, 1970, 2000]:
+            sea_surface_salinity_plot(
+                cfg,
+                ss_files[2014],
+                master_short_name,
+                [2014, ref_year],
+                fig_type = 'trend',
+                ref_file=ss_files[ref_year]
+            )
 
     print('Make time series plots')
     volume_weighted_means={}
