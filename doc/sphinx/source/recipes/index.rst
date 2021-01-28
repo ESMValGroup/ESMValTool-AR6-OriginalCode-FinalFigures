@@ -24,6 +24,7 @@ Atmosphere
    recipe_eyring13jgr
    recipe_heatwaves_coldwaves
    recipe_hyint
+   recipe_ipccwg1ar6ch3_santer20jclim
    recipe_modes_of_variability
    recipe_quantilebias
    recipe_spei

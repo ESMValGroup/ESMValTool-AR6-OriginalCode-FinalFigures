@@ -11,12 +11,12 @@ EVal4CMIP ans 4C project
 
 Description
 -----------
-    Total column water vapour trends following Santer et al. (2020).
+    Water Vapor Path trends following Santer et al. (2020).
 
 Configuration options
 ---------------------
 sample_obs: optional, filter all data sets (netCDF file with 0 and 1 for
-            used grid). The data sets must be interpolated to the same lat/lon 
+            used grid). The data sets must be interpolated to the same lat/lon
             grid as the filter.
             The filter must cover at least the time period used for the data.
 
@@ -48,7 +48,8 @@ logger = logging.getLogger(os.path.basename(__file__))
 def _apply_filter(cfg, cube):
     """Apply filter from RSS Anomalies to all data and calculates mean."""
     if 'sample_obs' in cfg:
-        filt = iris.load(cfg['sample_obs'])[0]
+        filt = iris.load(os.path.join(cfg['auxiliary_data_dir'],
+                                      cfg['sample_obs']))[0]
 
         for iii, dim_str in enumerate(['time', 'latitude', 'longitude']):
             filt = _fit_dim(filt, cube, dim_str, iii)
@@ -136,11 +137,28 @@ def _check_full_data(dataset_path, cube):
     return check
 
 
+def _get_hem_letter(lat):
+    """Get S or N from Latitude."""
+    shem = ''
+    if lat < 0:
+        shem = 'S'
+    if lat > 0:
+        shem = 'N'
+
+    return shem
+
+
 def _get_valid_datasets(input_data):
     """Get valid datasets list and number for each model."""
     number_of_subdata = OrderedDict()
     available_dataset = list(group_metadata(input_data, 'dataset'))
     valid_datasets = []
+    period = {}
+    period['start_year'] = []
+    period['end_year'] = []
+    period['span'] = []
+    period['slat'] = []
+    period['elat'] = []
     for dataset in available_dataset:
         meta = select_metadata(input_data, dataset=dataset)
         number_of_subdata[dataset] = float(len(meta))
@@ -151,11 +169,31 @@ def _get_valid_datasets(input_data):
                 number_of_subdata[dataset] = number_of_subdata[dataset] - 1
             else:
                 valid_datasets.append(dataset_path['filename'])
+                period['start_year'].append(int(dataset_path['start_year']))
+                period['end_year'].append(int(dataset_path['end_year']))
+                period['span'].append(int(dataset_path['end_year']) -
+                                      int(dataset_path['start_year']) + 1)
+                period['slat'].append(round(cube.coord('latitude').points[0]))
+                period['elat'].append(round(cube.coord('latitude').points[-1]))
+    if min(period['span']) == max(period['span']):
+        period['common_span'] = str(min(period['span']))
+    if min(period['start_year']) == max(period['start_year']) and\
+       min(period['end_year']) == max(period['end_year']):
+        period['common_period'] = str(min(period['start_year'])) + ' - ' +\
+            str(min(period['end_year']))
 
-    return valid_datasets, number_of_subdata
+    if min(period['slat']) == max(period['slat']) and\
+       min(period['elat']) == max(period['elat']):
+        shem = _get_hem_letter(min(period['slat']))
+        ehem = _get_hem_letter(min(period['elat']))
+
+        period['common_lats'] = str(abs(min(period['slat']))) + '°' + shem +\
+            ' - ' + str(abs(min(period['elat']))) + '°' + ehem
+
+    return valid_datasets, number_of_subdata, period
 
 
-def _plot_extratrends(cfg, extratrends, trends):
+def _plot_extratrends(cfg, extratrends, trends, period):
     """Plot trends for ensembles."""
     res_ar = {'xhist': np.linspace(0, 4, 41),
               'artrend': {},
@@ -176,7 +214,8 @@ def _plot_extratrends(cfg, extratrends, trends):
         elif alias in trends['cmip5'].keys():
             style = plot.get_dataset_style(xtrmdl, style_file='cmip5')
         else:
-            style = {'facecolor': (0, 0, 1, 0.1), 'color': (0, 0, 1, 1.0)}
+            style = {'facecolor': (0, 0, 1, 0.2),
+                     'color': (0, 0, 1, 1.0)}
 
         res_ar['artrend'][xtrmdl] = np.fromiter(extratrends[xtrmdl].values(),
                                                 dtype=float)
@@ -190,12 +229,12 @@ def _plot_extratrends(cfg, extratrends, trends):
                  linewidth=3,
                  label=xtrmdl)
 
-    obs_str = _plot_obs(trends, axx, 2.5)
-    _plot_settings(cfg, axx, fig, 'fig2')
+    caption = _plot_obs(trends, axx, 2.5)
+    caption = _plot_settings(cfg, axx, fig, 'fig2', period) + caption
     plt.close()
 
     caption = 'Probability density function of the decadal trend in ' + \
-        'the Water Vapor Path.' + obs_str
+        'the Water Vapor Path' + caption
 
     provenance_record = get_provenance_record(valid_datasets,
                                               caption, ['trend', 'other'],
@@ -219,6 +258,9 @@ def _plot_extratrends(cfg, extratrends, trends):
 def _plot_obs(trends, axx, maxh):
     """Plot observational or reanalysis data as vertical line."""
     obs_str = ''
+    # IPCC colors for obs from
+    # https://github.com/IPCC-WG1/colormaps/blob/master/
+    # categorical_colors_rgb_0-255/dark_cat.txt 
     if trends['obs']:
         obs_str = ' Vertical lines show the trend for'
         for iii, obsname in enumerate(trends['obs'].keys()):
@@ -229,20 +271,28 @@ def _plot_obs(trends, axx, maxh):
                 obscoli = float(iii) - 8.75
             if iii > 12:
                 obscoli = float(iii) - 12.25
+            plotobscol = (1.0 - 0.25 * obscoli, 0.25 * obscoli,
+                          0.5 + obscoli * 0.1)
+            if obsname == 'RSS':
+                plotobscol = (221 / 255.0, 84 / 255.0, 46 / 255.0,)
+            if obsname == 'ERA5':
+                plotobscol = (128 / 255.0, 54 / 255.0, 168 / 255.0,)
             axx.vlines(trends['obs'][obsname], 0, maxh,
-                       colors=(1.0 - 0.25 * obscoli, 0.25 * obscoli,
-                               0.5 + obscoli * 0.1),
+                       colors=plotobscol,
                        linewidth=3,
                        label=obsname)
         obs_str = obs_str + '.'
     return obs_str
 
 
-def _plot_trends(cfg, trends, valid_datasets):
+def _plot_trends(cfg, trends, valid_datasets, period):
     """Plot probability density function of trends."""
     res_ar = {'xhist': np.linspace(0, 4, 41)}
     fig, axx = plt.subplots(figsize=(8, 6))
 
+    # IPCC colors for CMIP5 and CMIP6 from
+    # https://github.com/IPCC-WG1/colormaps/blob/master/
+    # categorical_colors_rgb_0-255/cmip_cat.txt 
     # CMIP5
     if trends['cmip5']:
         res_ar['artrend_c5'] = np.fromiter(trends['cmip5'].values(),
@@ -255,10 +305,10 @@ def _plot_trends(cfg, trends, valid_datasets):
                                                bw_method="scott")
         axx.hist(res_ar['artrend_c5'], bins=res_ar['xhist'], density=True,
                  weights=res_ar['weights_c5'],
-                 edgecolor=(0, 0, 1, 0.6),
-                 facecolor=(0, 0, 1, 0.1))
+                 edgecolor=(37 / 250.0, 81 / 255.0, 204 / 255.0, 1.0),
+                 facecolor=(37 / 250.0, 81 / 255.0, 204 / 255.0, 0.2))
         axx.plot(res_ar['xhist'], res_ar['kde1_c5'](res_ar['xhist']),
-                 color=(0, 0, 1, 1),
+                 color=(37 / 250.0, 81 / 255.0, 204 / 255.0, 1),
                  linewidth=3,
                  label="CMIP5")
         # maxh = np.max(kde1_c5(xhist))
@@ -275,19 +325,19 @@ def _plot_trends(cfg, trends, valid_datasets):
                                                bw_method="scott")
         axx.hist(res_ar['artrend_c6'], bins=res_ar['xhist'], density=True,
                  weights=res_ar['weights_c6'],
-                 edgecolor=(0.8, 0.4, 0.1, 0.6),
-                 facecolor=(0.8, 0.4, 0.1, 0.1))
+                 edgecolor=(204 / 250.0, 35 / 255.0, 35 / 255.0, 1.0),
+                 facecolor=(204 / 250.0, 35 / 255.0, 35 / 255.0, 0.2))
         axx.plot(res_ar['xhist'], res_ar['kde1_c6'](res_ar['xhist']),
-                 color=(0.8, 0.4, 0.1, 1),
+                 color=(204 / 250.0, 35 / 255.0, 35 / 255.0, 1),
                  linewidth=3,
                  label="CMIP6")
         # maxh = np.max(kde1_c6(xhist))
-    obs_str = _plot_obs(trends, axx, 2.5)
-    _plot_settings(cfg, axx, fig, 'fig1')
+    caption = _plot_obs(trends, axx, 2.5)
+    caption = _plot_settings(cfg, axx, fig, 'fig1', period) + caption
     plt.close()
 
     caption = 'Probability density function of the decadal trend in ' + \
-        'the Water Vapor Path.' + obs_str
+        'the Water Vapor Path' + caption
 
     provenance_record = get_provenance_record(valid_datasets,
                                               caption, ['trend', 'other'],
@@ -347,14 +397,27 @@ def _plot_trends(cfg, trends, valid_datasets):
         provenance_logger.log(diagnostic_file, provenance_record)
 
 
-def _plot_settings(cfg, axx, fig, figname):
+def _plot_settings(cfg, axx, fig, figname, period):
     """Define Settings for pdf figures."""
-    axx.legend(loc=0)
+    for spine in ["top", "right"]:
+        axx.spines[spine].set_visible(False)
+    axx.legend(loc=1)
     axx.set_ylim([0, 2.5])
     axx.set_ylabel('Probability density')
-    axx.set_xlabel('Trend in Water Vapor Path [%/dec]')
+    add = '.'
+    if 'common_period' in period.keys():
+        add = ' for ' + period['common_period'] + '.'
+    elif 'common_span' in period.keys():
+        add = ' for ' + period['common_span'] + ' years.'
+    if 'common_lats' in period.keys():
+        add = ' between ' + period['common_lats'] + add
+
+    axx.set_title('Probability density function of the decadal trend' + add)
+    axx.set_xlabel('Trend in Water Vapor Path (%/dec)')
     fig.tight_layout()
     fig.savefig(get_plot_filename(figname, cfg), dpi=300)
+
+    return add
 
 
 def _set_extratrends_dict(cfg):
@@ -475,7 +538,7 @@ def main(cfg):
     if 'add_model_dist' in cfg:
         extratrends = _set_extratrends_dict(cfg)
 
-    valid_datasets, number_of_subdata = _get_valid_datasets(input_data)
+    valid_datasets, number_of_subdata, period = _get_valid_datasets(input_data)
 
     for dataset_path in input_data:
         project = dataset_path['project']
@@ -528,9 +591,9 @@ def main(cfg):
 
     # f_c5.close()
     # f_c6.close()
-    _plot_trends(cfg, trends, valid_datasets)
+    _plot_trends(cfg, trends, valid_datasets, period)
     if 'add_model_dist' in cfg:
-        _plot_extratrends(cfg, extratrends, trends)
+        _plot_extratrends(cfg, extratrends, trends, period)
 
     ###########################################################################
     # Process data
