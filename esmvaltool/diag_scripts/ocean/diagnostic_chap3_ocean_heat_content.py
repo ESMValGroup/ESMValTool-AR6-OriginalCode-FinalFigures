@@ -474,7 +474,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                412: '0-700m',
                413: '700m - 2000m',
                414:  '> 2000m',}
-        fig.set_size_inches(5 , 5)
+        fig.set_size_inches(6 , 5)
 
 
     plot_details={}
@@ -656,7 +656,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                            zorder=2,
                            )
     legend_fs = 12
-    if plot_style in ['all_one', 'mono']:leg_size=2
+    if plot_style in ['all_one', 'mono', '5-95']:leg_size=2
     else:
         leg_size = len(datasets)
 
@@ -705,7 +705,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
 
     legd.draw_frame(False)
     legd.get_frame().set_alpha(0.)
-    plt.tight_layout()
+    #plt.tight_layout()
 
     fig_dir = diagtools.folder([cfg['plot_dir'], 'multimodel_ohc'])
     image_extention = diagtools.get_image_format(cfg)
@@ -2889,7 +2889,7 @@ def plot_halo_multipane(
             gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
             gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
             gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
-			#scatters
+            #scatters
             scatter1=fig.add_subplot(gs0[0,0])
             scatter2=fig.add_subplot(gs0[1,0])
 
@@ -3978,9 +3978,11 @@ def sea_surface_salinity_plot(
         master_short_name,
         time_range,
         fig=None,
+        ax=None,
         subplot=111,
         fig_type = 'mean',
         ref_file = None,
+        obs_key='DW1970',
     ):
     """
     Make a multi-pane plot of the Sea Surface Salininty.
@@ -3989,18 +3991,75 @@ def sea_surface_salinity_plot(
         time_range_str = '-'.join(str(t) for t in time_range)
     else:
         time_range_str = str(time_range)
-
-    mean_cube = iris.load_cube(fn)
-
-    if fig_type=='trend':
-        ref_cube = iris.load_cube(ref_file)
-        mean_cube.data = mean_cube.data - ref_cube.data
-        years = float(time_range[0]) - float(time_range[1])
-        mean_cube.data = mean_cube.data / years
-
     central_longitude=-160.+3.5
+
+    if fn:
+        mean_cube = iris.load_cube(fn)
+        mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+
+    thresholds =[33., 33.5, 34., 34.5, 35., 35.5, 36., 36.5, 37.]
+    levels =[33., 34., 35., 36., 37.]
+    linestyles = ['-' for thres in thresholds]
+    colours = ['k' for thres in thresholds]
+    linewidths = [1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5, 1.,]
+
+    thresholds_white = np.arange(-2, 2.25, 0.25)
+    change_ticks = [-0.2, -0.1, 0., 0.1, 0.2]
+    linestyles_white = ['-' for thres in thresholds_white]
+    colours_white = ['w' for thres in thresholds_white]
+    linewidths_white = [0.5 for thres in thresholds_white]
+
+
+
+    if obs_key=='DW1950':
+        obs_file = cfg['auxiliary_data_dir']+'/DurackFiles/DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc'
+
+    if obs_key=='DW1970':
+        obs_file = cfg['auxiliary_data_dir']+'/DurackFiles/DurackandWijffels_GlobalOceanChanges_19700101-20191231__210122-205355_beta.nc'
+
+    obs_cubes = iris.load_raw(obs_file)
+    obs_change_cube = obs_cubes.extract(iris.Constraint(name='salinity_change'))[0]
+    obs_change_cube = regrid_to_1x1(obs_change_cube[0]) # surface
+    obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+
+    obs_mean_cube = obs_cubes.extract(iris.Constraint(name='salinity_mean'))[0]
+    obs_mean_cube = regrid_to_1x1(obs_mean_cube[0]) # surface
+    obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+
+    if obs_change_cube.data.ndim == 3:
+        obs_change_cube = obs_change_cube[0]
+    if obs_mean_cube.data.ndim == 3:
+        obs_mean_cube = obs_mean_cube[0]
+
+    if fig_type=='obs_change': # pane a (221, 211, also white contours)
+        cube = obs_change_cube
+        nspace = np.linspace(-0.2, 0.2, 22, endpoint=True)
+        cmap=diagtools.misc_div
+        label= 'Obs change'
+
+    elif fig_type=='obs_mean': # pane b (222, also contours)
+        cube = obs_mean_cube
+        nspace = np.linspace(30., 40, 22, endpoint=True)
+        cmap=diagtools.misc_seq
+        label= 'Obs mean'
+
+    elif fig_type=='model-obs': # pane c (212,223)
+        cube = mean_cube
+        cube.data = mean_cube.data - obs_mean_cube.data
+        nspace = np.linspace(-0.2, 0.2, 22, endpoint=True)
+        cmap=diagtools.misc_div
+        label= 'CMIP6 - Obs'
+
+    elif fig_type=='model-mean': # pane 4 (224)
+        cube = mean_cube
+        nspace = np.linspace(30., 40, 22, endpoint=True)
+        cmap=diagtools.misc_seq
+        label= 'CMIP6 mean'
+    else:
+        print("Fig type not recognised", fig_type)
+        assert 0
+
     proj = ccrs.Robinson(central_longitude=central_longitude)
-    mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
     if fig is None:
         fig = plt.figure()
@@ -4009,34 +4068,54 @@ def sea_surface_salinity_plot(
     if isinstance(subplot, int) and subplot==111:
         ax = fig.add_subplot(subplot, projection=proj)
     else:
-        ax=subplot
+        # ax=subplot
         plt.sca(ax)
 
-    if fig_type=='mean':
-        cmap=diagtools.misc_seq
-        nspace = np.linspace(30., 36.,
-            # mean_cube.data.min(),
-            #mean_cube.data.max(), 
-            22, endpoint=True)
-
-    if fig_type=='trend':
-        cmap=diagtools.misc_div
-        plot_max = np.max([mean_cube.data.max(), np.abs(mean_cube.data.min())])
-        nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
-
+    #if fig_type=='mean':
+    #    cmap=diagtools.misc_seq
+    #    nspace = np.linspace(
+    #        cube.data.min(),
+    #        cube.data.max(), 22, endpoint=True)
+    
+    #if fig_type=='trend':
+    #    cmap=diagtools.misc_div
+    #    plot_max = np.max([cube.data.max(), np.abs(cube.data.min())])
+    #    nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
+    print(fig_type, subplot, cube.data.shape, ) 
     qplot = iris.plot.contourf(
-        mean_cube,
+        cube,
         nspace,
         linewidth=0,
         cmap=cmap,
-        #extend='neither',
         zmin=np.min(nspace),
         zmax=np.max(nspace))
 
     try: plt.gca().coastlines()
     except: pass
 
-    
+    black_contours = True
+    if black_contours:
+        black_con = iris.plot.contour(obs_mean_cube,
+                 thresholds,
+                 colors=colours,
+                 linewidths=linewidths,
+                 linestyles=linestyles,
+                 rasterized=True,
+                 extend='both',
+                 )
+        ax.clabel(black_con, levels, inline=True, fontsize=8, fmt = '%1.0f')
+    white_contours = True
+    if white_contours:
+        white_con = iris.plot.contour(obs_change_cube,
+                 thresholds_white,
+                 colors=colours_white,
+                 linewidths=linewidths_white,
+                 linestyles=linestyles_white,
+                 rasterized=True,
+                 extend='both',
+                 )
+        #ax.clabel(white_con, change_ticks, inline=True, fontsize=8, fmt = '%1.0f')
+
     # Saving files:
     if isinstance(subplot, int) and subplot==111:
         plt.title('Surface Salinity ' +fig_type.title()+' '+time_range_str)
@@ -4051,6 +4130,67 @@ def sea_surface_salinity_plot(
         plt.close()
     else:
         return fig, ax, qplot
+
+def sea_surface_salinity_multipane(
+    cfg,
+    ss_files,
+    plot_type = '2_pane',
+    start_year = 1970,
+    end_year = 2014,
+    obs_key='DW1970'
+    ):
+    """
+    Plot the multipane sea surface salininty plot.
+    """
+    time_range_str = '-'.join([str(t) for t in [start_year, end_year]])
+
+    central_longitude=-160.+3.5
+    proj = ccrs.Robinson(central_longitude=central_longitude)
+    fig = plt.figure()
+
+    if plot_type == '2_pane':
+        subplots = [211, 212]
+        fig_types = ['obs_change', 'model-obs']
+        # keys = ['
+    if plot_type == '4_pane':
+        subplots = [221, 222, 223, 224]
+        fig_types = ['obs_change', 'obs_mean', 'model-obs', 'model-mean']
+
+    axes = {}
+    qplots = {}
+    for subplot, fig_type in zip(subplots, fig_types):
+        axes[subplot] = fig.add_subplot(subplot, projection=proj)
+
+        if fig_type in ['obs_change', 'obs_mean']:
+            fn = None
+        if fig_type in ['model-obs', 'model-mean']:
+            fn = ss_files[(start_year, end_year)]
+
+        fig, axes[subplot], qplots[subplot] = sea_surface_salinity_plot(
+                cfg,
+                fn,
+                'so',
+                [start_year, end_year],
+                fig_type = fig_type,
+                fig=fig,
+                ax=axes[subplot],
+                subplot=subplot,
+                obs_key=obs_key,
+           )
+    
+    if plot_type == '2_pane':
+        fig.colorbar(qplots[211], ax=[axes[211], axes[212]], location='right',label='Change in PSU') #, ticks=cbar_ticks)
+    if plot_type == '4_pane':
+        fig.colorbar(qplots[221], ax=[axes[221], axes[223]], location='right',label='Change in PSU') #, ticks=cbar_ticks)
+        fig.colorbar(qplots[222], ax=[axes[222], axes[224]], location='right',label='PSU') #, ticks=cbar_ticks)
+
+    unique_id = ['salinity', plot_type, time_range_str, obs_key]
+    filename = '_'.join(unique_id).replace('/', '_')
+    path = diagtools.folder([cfg['plot_dir'], 'sea_surface_salinity_plot']) + filename
+    path = path.replace(' ', '') + diagtools.get_image_format(cfg)
+    logger.info('Saving plots to %s', path)
+    plt.savefig(path, dpi=200)
+    plt.close()
 
 
 def guess_PI_ensemble(dicts, keys, ens_pos = None):
@@ -4470,9 +4610,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = True  # True
+    do_SLR = False # True
     do_OHC = True  #True
-    do_SS =  True
+    do_SS =  True 
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4519,7 +4659,7 @@ def main(cfg):
     # Make a plot for the
     if do_SS:
         short_names = ['so', ] # 'thetao']
-        time_ranges =  [1950, 1970, 2000, 2014, [1950, 2015], [1970, 2015]]
+        time_ranges =  [1950, 1970, 2014, [1950, 2014], [1970, 2014]]
         ss_files = {}
         for master_short_name, time_range in itertools.product(short_names, time_ranges):
             fn = calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
@@ -4532,21 +4672,35 @@ def main(cfg):
             else:
                 ss_files[time_range] = fn
 
-            sea_surface_salinity_plot(
+            #sea_surface_salinity_plot(
+            #    cfg,
+            #    fn,
+            #    master_short_name,
+            #    time_range,
+            #    fig_type = 'mean',
+            #)
+        #sea_surface_salinity_plot(
+        #    cfg,
+        #    ss_files[2014],
+        #    master_short_name,
+        #    [2014, 1950],
+        #    fig_type = 'trend',
+        #    ref_file=ss_files[1950]
+        #)
+
+        for plot_type,start_year in itertools.product(['2_pane', '4_pane'], [1950, 1970]):
+            if start_year == 1950:
+                obs_key='DW1950'
+            if start_year == 1970:
+                continue
+                obs_key='DW1970'            
+            sea_surface_salinity_multipane(
                 cfg,
-                fn,
-                master_short_name,
-                time_range,
-                fig_type = 'mean',
-            )
-        for ref_year in [1950, 1970, 2000]:
-            sea_surface_salinity_plot(
-                cfg,
-                ss_files[2014],
-                master_short_name,
-                [2014, ref_year],
-                fig_type = 'trend',
-                ref_file=ss_files[ref_year]
+                ss_files,
+                plot_type = plot_type,
+                start_year = start_year,
+                end_year = 2014,
+                obs_key=obs_key,
             )
 
     print('Make time series plots')
