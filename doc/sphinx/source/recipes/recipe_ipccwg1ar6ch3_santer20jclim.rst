@@ -1,12 +1,12 @@
 .. _ipccwg1ar6ch3_santer20jclim:
 
-Trends in water vapour path
+Trends in Water Vapour Path
 ===========================
 
 Overview
 --------
 
-This recipe plots the probability density function (PDF) is for the linear trend of the water vapour path. It displays the result seperatly for CMIP5 and CMI6 model results and ensemble members of single models compared to observation and reanalysis data. A filter to use the sampling of observational data on the model results can be applied. It is based on the methods used in Santer et al. 2021.
+This recipe plots the probability density function (PDF) for the linear trend of the Water Vapour Path. It displays the result separately for CMIP5 and CMI6 model results and ensemble members of single models compared to observation and reanalysis data. A filter to use the sampling of observational data on the model results can be applied. It is based on the methods used in Santer et al. 2021.
 
 The following plots are reproduced:
 
@@ -46,7 +46,7 @@ User settings in recipe
 
    *Required settings for variables*
 
-   * ``preprocessor``: tropical_ocean, with the optional setting "sample_obs" the regridding to a grid fitting the mask is require, the other preprocessor settings are choosen to match the methods of Santer et al. 2021 but the recipe would accept other settings.
+   * ``preprocessor``: tropical_ocean, with the optional setting "sample_obs" the regridding to a grid fitting the mask is require, the other preprocessor settings are chosen to match the methods of Santer et al. 2021 but the recipe would accept other settings.
    * ``reference_dataset``: name of the reference data set for regridding, this must be RSS if a mask based on RSS should be applied (given at "sample_obs").
 
 Variables
@@ -74,4 +74,4 @@ Example plots
 .. figure::  /recipes/figures/santer20jclim/fig1.png
    :align:   center
 
-   PDF of the linear trends (1988-2019) of the water vapour path for CMIP5 and CMIP6 compared to RSS and ERA5. For model data historical and future scenario (RCP8.5 for CMIP5 and SSP585 for CMIP6 are combined). A masked derrived from the RSS anomalies and climatology is applied to all data sets. The fit is calculated as kernel-density estimate with Gaussian kernels using Scott’s Rule. If several ensemble members are included for one model they are weighted with the inverse of the number of ensemble members.
+   PDF of the linear trends (1988-2019) of the water vapour path for CMIP5 and CMIP6 compared to RSS and ERA5. For model data historical and future scenario (RCP8.5 for CMIP5 and SSP585 for CMIP6 are combined). A masked derived from the RSS anomalies and climatology is applied to all data sets. The fit is calculated as kernel-density estimate with Gaussian kernels using Scott’s Rule. If several ensemble members are included for one model they are weighted with the inverse of the number of ensemble members.
