@@ -654,9 +654,9 @@ diagnostics:
         end_year: 2014
         additional_datasets:
           - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3,
-             start_year: 1979, end_year: 2018}
-          - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1, tier: 3,
-             start_year: 1958, end_year: 2013}
+             start_year: 1950, end_year: 2018}
+          - {dataset: JRA-55, project: OBS, type: reanaly, version: 1, tier: 3,
+             start_year: 1958, end_year: 2018}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1, tier: 3,
              start_year: 1980, end_year: 2014}
           - {dataset: 20CRv3, project: OBS, type: reanaly, version: "001", tier: 2,
@@ -829,7 +829,7 @@ diagnostics:
         end_year: 2014
         additional_datasets:
           - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3,
-             start_year: 1979, end_year: 2018}
+             start_year: 1979, end_year: 2014}
     scripts:
       monsoon_domain_intensity: &monsoon_domain_intensity
         script: ar6ch3_monsoon/monsoon_domain_intensity.ncl
