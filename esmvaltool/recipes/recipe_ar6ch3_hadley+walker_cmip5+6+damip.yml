@@ -703,10 +703,8 @@ diagnostics:
         additional_datasets:
           - {dataset: ERA5, project: OBS, type: reanaly, version: 1, 
              tier: 3}
-          - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
+          - {dataset: JRA-55, project: OBS, type: reanaly, version: 1,
              tier: 3}
-#          - {dataset: CFSR, project: ana4mips, type: reanalysis, version: 1,
-#             tier: 3, end_year: 2013}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1,
              tier: 3}
           - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, 
@@ -1192,10 +1190,8 @@ diagnostics:
              tier: 3, start_year: 1901, end_year: 2010}
           - {dataset: ERA5, project: OBS, type: reanaly, version: 1, 
              tier: 3, start_year: 1979, end_year: 2014}
-          - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
+          - {dataset: JRA-55, project: OBS, type: reanaly, version: 1,
              tier: 3, start_year: 1979, end_year: 2014}
-#          - {dataset: CFSR, project: ana4mips, type: reanalysis, version: 1,
-#             tier: 2, start_year: 1979, end_year: 2013}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1,
              tier: 2, start_year: 1980, end_year: 2014}
           - {dataset: ERA-Interim, project: OBS, type: reanaly, version: 1, 

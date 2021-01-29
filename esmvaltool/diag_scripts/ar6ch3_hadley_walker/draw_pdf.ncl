@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210129 kosaka_yu: minor change in legends.
 ;    20201024 kosaka_yu: added ERA-Interim..
 ;    20201019 kosaka_yu: modified the legend format.
 ;    20200930 kosaka_yu: enabled ensemble obs/reanalysis datasets.
@@ -776,7 +777,7 @@ begin
           if (.not.isdefined("legend")) then
             legend = NewList("fifo")
           end if
-          dataset = "AMIP" ; "CMIP6 AMIP"
+          dataset = "            ~S~ ~N~AMIP" ; "CMIP6 AMIP"
           dataset@name = "cmip6amip"
           dataset@type = "ensemble"
           dataset@nmodels = cmip6amip@nmodels
@@ -807,7 +808,7 @@ begin
           if (.not.isdefined("legend")) then
             legend = NewList("fifo")
           end if
-          dataset = "piControl"  ; "CMIP6 piControl"
+          dataset = "            ~S~ ~N~piControl"  ; "CMIP6 piControl"
           dataset@name = "cmip6pi"
           dataset@type = "ensemble"
           dataset@nmodels = cmip6pi@nmodels
@@ -839,7 +840,7 @@ begin
           if (.not.isdefined("legend")) then
             legend = NewList("fifo")
           end if
-          dataset = "historical"  ; "CMIP6 historical"
+          dataset = "CMIP6 historical" ; "historical"
           dataset@name = "cmip6hist"
           dataset@type = "ensemble"
           dataset@nmodels = cmip6hist@nmodels
@@ -1103,7 +1104,7 @@ begin
        gsn_text_ndc(wks, "Ensemble range", x0-w/2.-0.014, y0, txres)
        gsn_text_ndc(wks, "(all members)", x0-w/2.-0.002, y0, txres)
        
-       x = x0 + w*3.7
+       x = x0 + w*3.3
        plres@gsFillColor = lres@gsLineColor
        gsn_polygon_ndc(wks, (/x-w/2., x-w/2., x+w/2., x+w/2./), \
                             (/y0-h1/1.5, y0+h1/1.5, y0+h1/1.5, y0-h1/1.5/), plres)
@@ -1140,45 +1141,57 @@ begin
        lres@gsLineThicknessF = 1.
        txres@txFontHeightF = fontHeightL
        txres@txJust = "TopLeft"
-       m = 0
+       m = 1
        do n = 0, ListCount(legend)-1
          if (legend[n]@type .eq. "ensemble") then
-           x = x0 + 0.14 + m/5 * 0.32
-           y = y0 + h*1.2 - mod(m, 5)*h*0.55
-           txres@txFontColor := legend[n]@color
-           if (isStrSubset(legend[n], "piControl").and.count_unique_values(legend[n]@nruns).gt.1) then
-             name = legend[n]+" ("+legend[n]@nmodels+" models, "
-             do j = 0, dimsizes(legend[n]@nruns)-1
-               if (legend[n]@nruns(j).gt.0) then
-                 if (j.gt.0) then
-                   name = name + ", "
-                 end if
-                 if (strlen(name).gt.38.and..not.isStrSubset(name, "~C~")) then
-                   name = name+"~C~                 "
-                 end if
-                 name = name + alphabet(j)
-                 do i = j+1, dimsizes(legend[n]@nruns)-1
-                   if (legend[n]@nruns(i).eq.legend[n]@nruns(j)) then
-                     name = name + ","+alphabet(i)
-                     legend[n]@nruns(i) = -1
-                   end if
-                 end do
-                 name = name + ": "+legend[n]@nruns(j)
-               end if
-             end do
-             name = name + " segments)"
-           elseif (isatt(legend[n], "nmodels2")) then
-             name = legend[n]+" (a-c: "+legend[n]@nmodels+" models, "+legend[n]@nruns+" runs,~C~"\
-                    +"           e-f: "+legend[n]@nmodels2+" models, "+legend[n]@nruns2+" runs)"
+           if (isStrSubset(legend[n], "CMIP5 historical-")) then
+             x = x0 + 0.13
+             y = y0 + h*1. +h*0.55
+             txres@txFontColor := legend[n]@color
+             name = legend[n]+" ("+legend[n]@nmodels+" models, "+legend[n]@nruns+" runs)"
+           elseif (isStrSubset(legend[n], "CMIP6 historical")) then
+             x = x0 + 0.13 
+             y = y0 + h*1. 
+             txres@txFontColor := legend[n]@color
+             name = legend[n]+" ("+legend[n]@nmodels+" models, "+legend[n]@nruns+" runs)"
            else
-             if (isStrSubset(legend[n], "piControl")) then
-               name = legend[n]+" ("+legend[n]@nmodels+" models, "+legend[n]@nruns+" segments)"
+             x = x0 + 0.13 + m/5 * 0.33
+             y = y0 + h*1. - mod(m, 5)*h*0.55
+             txres@txFontColor := legend[n]@color
+             if (isStrSubset(legend[n], "piControl").and.count_unique_values(legend[n]@nruns).gt.1) then
+               name = legend[n]+" ("+legend[n]@nmodels+" models, "
+               do j = 0, dimsizes(legend[n]@nruns)-1
+                 if (legend[n]@nruns(j).gt.0) then
+                   if (j.gt.0) then
+                     name = name + ", "
+                   end if
+                   if (strlen(name).gt.54.and..not.isStrSubset(name, "~C~")) then
+                     name = name+"~C~                              "
+                   end if
+                   name = name + alphabet(j)
+                   do i = j+1, dimsizes(legend[n]@nruns)-1
+                     if (legend[n]@nruns(i).eq.legend[n]@nruns(j)) then
+                       name = name + ","+alphabet(i)
+                       legend[n]@nruns(i) = -1
+                     end if
+                   end do
+                   name = name + ": "+legend[n]@nruns(j)
+                 end if
+               end do
+               name = name + " segments)"
+             elseif (isatt(legend[n], "nmodels2")) then
+               name = legend[n]+" (a-c: "+legend[n]@nmodels+" models, "+legend[n]@nruns+" runs,~C~"\
+                      +"                        e-f: "+legend[n]@nmodels2+" models, "+legend[n]@nruns2+" runs)"
              else
-               name = legend[n]+" ("+legend[n]@nmodels+" models, "+legend[n]@nruns+" runs)"
+               if (isStrSubset(legend[n], "piControl")) then
+                 name = legend[n]+" ("+legend[n]@nmodels+" models, "+legend[n]@nruns+" segments)"
+               else
+                 name = legend[n]+" ("+legend[n]@nmodels+" models, "+legend[n]@nruns+" runs)"
+               end if
              end if
+             m = m + 1
            end if
            gsn_text_ndc(wks, name, x, y, txres)
-           m = m + 1
            if (isStrSubset(name, "~C~")) then
              m = m + 1
            end if
