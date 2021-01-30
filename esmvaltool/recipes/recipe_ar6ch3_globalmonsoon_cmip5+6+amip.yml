@@ -654,9 +654,9 @@ diagnostics:
         end_year: 2014
         additional_datasets:
           - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3,
-             start_year: 1950, end_year: 2018}
+             start_year: 1979, end_year: 2018}
           - {dataset: JRA-55, project: OBS, type: reanaly, version: 1, tier: 3,
-             start_year: 1958, end_year: 2018}
+             start_year: 1958, end_year: 2019}
           - {dataset: MERRA2, project: ana4mips, type: reanalysis, version: 1, tier: 3,
              start_year: 1980, end_year: 2014}
           - {dataset: 20CRv3, project: OBS, type: reanaly, version: "001", tier: 2,
@@ -979,7 +979,7 @@ diagnostics:
   draw_global_monsoon_cmip5+6:
     description: Wrapper to collect and plot figures
     scripts:
-      plot_global_monsoon: &plot
+      plot_global_monsoon_runmean5yr:
         script: ar6ch3_monsoon/draw_global_monsoon.ncl
         diagnostic_map: [global_monsoon_obs/monsoon_domain_intensity,
                          global_monsoon_cmip6/monsoon_domain_intensity]
@@ -987,7 +987,7 @@ diagnostics:
         dataset_obs_pr_map: GPCP-SG
         dataset_obs_uv_map: ERA5
         project_map: CMIP6
-        moving_ave: 1
+        moving_ave: 5
         diagnostic_precip: [global_landmonsoon_obs/monsoon_domain_intensity,
                             global_landmonsoon_cmip5/monsoon_domain_intensity,
                             global_landmonsoon_cmip6/monsoon_domain_intensity,
@@ -1004,6 +1004,4 @@ diagnostics:
                     'global_landmonsoon_cmip5/monsoon_domain_intensity',
                     'global_landmonsoon_cmip6/monsoon_domain_intensity',
                     'global_landmonsoon_amip/monsoon_domain_intensity']
-      plot_global_monsoon_runmean5yr:
-        <<: *plot
-        moving_ave: 5
+
