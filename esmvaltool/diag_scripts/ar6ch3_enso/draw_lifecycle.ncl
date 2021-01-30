@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210130 kosaka_yu: minor revision on figure format
 ;    20200907 kosaka_yu: refined the details of figure
 ;    20200905 kosaka_yu: revised for consistency with CLIVAR ENSO metric package
 ;    20200814 kosaka_yu: merge find_ensoevents.ncl
@@ -435,6 +436,8 @@ begin
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                 "enso_lifecycle")
   panel_width = 0.4
+;  panel_width = 0.4*54./(tofloat(count_unique_values(models_cmip6)))
+;  print(panel_width)
   dummy   = new(1000, "graphic")
   idummy = 0
   
@@ -444,7 +447,7 @@ begin
   vpX0 = 0.55 - panel_width
   vpX1 = 0.58
   vpY  = 0.95
-  panel_height = panel_width * 0.56
+  panel_height = panel_width * 0.56 * 52./tofloat(count_unique_values(models_cmip6)+2)
   
   lag = ts_el_obs&$ts_el_obs!1$
   lagpoly = array_append_record(lag, lag(::-1), 0)
@@ -600,7 +603,7 @@ begin
   txres@txJust = "BottomCenter"
   if (nruns_cmip5.gt.0) then
     resp@gsFillColor := color_cmip5
-    y1 = vpY - 0.228
+    y1 = vpY - 0.218 ;0.228
     y2 = y1 - 0.03
     gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), resp)
     y = (y1 + y2)/2.
@@ -611,7 +614,7 @@ begin
   end if
   if (nruns_cmip6.gt.0) then
     resp@gsFillColor := color_cmip6
-    y1 = vpY - 0.09
+    y1 = vpY - 0.08 ;0.09
     y2 = y1 - 0.03
     gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), resp)
     y = (y1 + y2)/2.
@@ -644,7 +647,7 @@ begin
                                      lag, ts_la_obs(ii, :), lres)
     idummy = idummy + 1
 
-    y = vpY - ii*0.03
+    y = vpY + 0.01 - ii*0.03
     gsn_polyline_ndc(wks, (/x1, x2/), (/y, y/), lres)
     y = y - 0.006
     txres@txFontColor := get_color(res_obs)
@@ -702,7 +705,7 @@ begin
   res@trYMaxF = row(nrows-1) + 0.6
   res@trYReverse = True
   res@vpWidthF = panel_width
-  res@vpHeightF = nrows * 0.0115
+  res@vpHeightF = 0.95 - panel_height - 0.065 - 0.05; 0.598 + 0.224 - panel_height   ;panel_width/0.4*0.598   ;nrows * 0.0115
   res@vpYF = vpY - panel_height - 0.065
 
   res@tmXMajorGrid = True
@@ -974,7 +977,7 @@ begin
 
   x1 = 0.03
   x2 = 0.065
-  y1 = vpY-0.13
+  y1 = vpY - 0.12;-0.13
   y2 = y1 - 0.011
   polyres@gsFillColor := color_cmip6
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), polyres)
@@ -1002,7 +1005,7 @@ begin
   lnres@gsLineColor := "black"
   gsn_polyline_ndc(wks, (/x, x/), (/y+0.005, y2/), lnres)
 
-  y1 = vpY-0.268
+  y1 = vpY - 0.258 ;-0.268
   y2 = y1 - 0.011
   polyres@gsFillColor := color_cmip5
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), polyres)
@@ -1017,7 +1020,7 @@ begin
   gsn_polyline_ndc(wks, (/x, x/), (/y1, y2/), lnres)
   
   x = 0.015
-  y = vpY - 0.175
+  y = vpY - 0.165 ;- 0.175
   gsn_polymarker_ndc(wks, x, y, mkres)
   txres@txJust = "CenterLeft"
   txres@txFontColor = color_cmip6
@@ -1026,8 +1029,8 @@ begin
 
   x1 = 0.001
   x2 = 0.094
-  y1 = vpY + 0.015
-  y2 = vpY - 0.285
+  y1 = vpY + 0.025 ;+ 0.015
+  y2 = vpY - 0.275 ;- 0.285
   lnres@gsLineThicknessF = 0.5
   lnres@gsLineColor := "black"
   gsn_polyline_ndc(wks, (/x1, x1, x2, x2, x1/), (/y1, y2, y2, y1, y1/), lnres)

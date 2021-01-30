@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210130 kosaka_yu: minor revision on figure format
 ;    20200907 kosaka_yu: refined the details of figure
 ;    20200905 kosaka_yu: refined the drawing part
 ;    20200811 kosaka_yu: (b): show individual ensemble members instead of compositing all members
@@ -229,6 +230,9 @@ begin
     seasonality_cmip6_95th = weighted_percentile(seasonality_cmip6, 1./tofloat(esize_cmip6), 0.95)
   end if
 
+  models_cmip5 = get_unique_values(models(ind(projects.eq."CMIP5")))
+  models_cmip6 = get_unique_values(models(ind(projects.eq."CMIP6")))
+
 ; ==========================================================================
 ;                               Draw figure
 ; ==========================================================================
@@ -254,7 +258,7 @@ begin
   vpY = 0.94 ; rests@vpYF
   xLegend1 = vpX - 0.155 ;rests@vpXF - 0.155
   xLegend2 = xLegend1 + 0.093 ;0.094
-  yLegend1 = vpY + 0.015
+  yLegend1 = vpY + 0.025 ;0.015
   yLegend2 = yLegend1 - 0.3 ;vpY - 0.285
   lnres = True
   lnres@gsLineThicknessF = 0.5
@@ -272,13 +276,14 @@ begin
 ;  x3 = 8.35
 ;  y0 = 1.57
 ;  y3 = 2.
-  
+
+  panel_height = panel_width * 0.525 * 52./tofloat(count_unique_values(models_cmip6)+2)  ;0.2
   rests := True
   rests@gsnDraw = False
   rests@gsnFrame = False
   rests@xyCurveDrawOrder = "PreDraw"
   rests@vpWidthF = panel_width
-  rests@vpHeightF = 0.2
+  rests@vpHeightF = panel_height
   rests@vpXF = vpX ; 0.5 - panel_width / 2.
   rests@vpYF = vpY ; 0.94
   
@@ -380,7 +385,7 @@ begin
     idummy = idummy + 1
 
     ; Legend
-    y = vpY - i*0.03
+    y = vpY + 0.01 - i*0.03
     gsn_polyline_ndc(wks, (/x1, x2/), (/y, y/), lres)
     y = y - 0.006
     txres@txFontColor := get_color(res_obs)
@@ -394,7 +399,7 @@ begin
   txres@txJust = "BottomCenter"
   resp@gsFillColor := color_cmip5
 
-  y1 = vpY - 0.228
+  y1 = vpY - 0.218 ;- 0.228
   y2 = y1 - 0.03
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), resp)
   y = (y1 + y2)/2.
@@ -404,7 +409,7 @@ begin
   gsn_text_ndc(wks, "CMIP5", x, y1+0.005, txres)
 
   resp@gsFillColor := color_cmip6
-  y1 = vpY - 0.09
+  y1 = vpY - 0.08 ;- 0.09
   y2 = y1 - 0.03
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), resp)
   y = (y1 + y2)/2.
@@ -422,9 +427,6 @@ begin
   draw(seasonality_plot)
 
 ; ============================ Individual Models =============================
-
-  models_cmip5 = get_unique_values(models(ind(projects.eq."CMIP5")))
-  models_cmip6 = get_unique_values(models(ind(projects.eq."CMIP6")))
   
   nraws = 0
   if (isvar("seasonality_cmip6_mean")) then
@@ -470,9 +472,9 @@ begin
   res@trYMaxF = raw(nraws-1) + 0.6
   res@trYReverse = True
   res@vpWidthF = panel_width
-  res@vpHeightF = nraws * 0.0115
-  res@vpXF = 0.5 - panel_width / 2.
-  res@vpYF = rests@vpYF - rests@vpHeightF - 0.08
+  res@vpHeightF = 0.95 - panel_height - 0.079 - 0.05 ;nraws * 0.0115
+  res@vpXF = vpX  ;0.5 - panel_width / 2.
+  res@vpYF = vpY - panel_height - 0.079 ;rests@vpYF - rests@vpHeightF - 0.08
 
   res@tmXMajorGrid = True
   res@tmYMajorGrid = True
@@ -650,7 +652,7 @@ begin
   
   x1 = xLegend1 + 0.03
   x2 = x1 + 0.035
-  y1 = vpY-0.13
+  y1 = vpY - 0.12 ;-0.13
   y2 = y1 - 0.011
   polyres@gsFillColor := color_cmip6
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), polyres)
@@ -678,7 +680,7 @@ begin
   lnres@gsLineColor := "black"
   gsn_polyline_ndc(wks, (/x, x/), (/y+0.005, y2/), lnres)
 
-  y1 = vpY-0.268
+  y1 = vpY-0.258;-0.268
   y2 = y1 - 0.011
   polyres@gsFillColor := color_cmip5
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), polyres)
@@ -693,7 +695,7 @@ begin
   gsn_polyline_ndc(wks, (/x, x/), (/y1, y2/), lnres)
   
   x = x1 - 0.015
-  y = vpY - 0.175
+  y = vpY - 0.165 ;- 0.175
   gsn_polymarker_ndc(wks, x, y, mkres)
   txres@txJust = "CenterLeft"
   txres@txFontColor = color_cmip6
