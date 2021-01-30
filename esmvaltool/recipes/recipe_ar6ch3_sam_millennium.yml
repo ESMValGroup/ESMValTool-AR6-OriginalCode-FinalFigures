@@ -77,9 +77,9 @@ datasets:
   
 preprocessors:
 
-  pp_5deg:
+  pp_2deg:
     regrid:
-      target_grid: 5x5
+      target_grid: 2x2
       scheme: linear
     zonal_statistics:
       operator: mean
@@ -92,7 +92,7 @@ diagnostics:
     description: draw time series of the SAM index
     variables:
       psl:
-        preprocessor: pp_5deg
+        preprocessor: pp_2deg
         mip: Amon
         field: T2MS
         frequency: mon
