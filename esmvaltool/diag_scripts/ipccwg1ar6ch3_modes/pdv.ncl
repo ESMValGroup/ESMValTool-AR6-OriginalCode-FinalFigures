@@ -18,6 +18,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210131-Yu Kosaka: revised from monthly to annual mean data
 ;   20210117-Yu Kosaka: adapt Adam's updates script to the ESMValTool
 ;   20200715-bock_lisa: adapt Adam's scipt to the ESMValTool
 ;
@@ -28,6 +29,17 @@ load "$diag_scripts/../interface_scripts/interface.ncl"
 load "$diag_scripts/shared/plot/mder.ncl"
 
 load "$diag_scripts/ipccwg1ar6ch3_modes/functions.ncl"
+
+function monthly2annual(x)
+local x, y, ii
+begin
+  y = x(::12, :, :)
+  dims = dimsizes(y)
+  do ii = 0, dims(0)-1
+    y(ii, :, :) = dim_avg_n(x(12*ii:12*(ii+1)-1, :, :), 0)
+  end do
+  return(y)
+end
 
 begin
 
@@ -48,13 +60,7 @@ begin
   end if
   obs_datasets = metadata_att_as_array(obs,  "dataset")
   dim_obs = dimsizes(obs_datasets)
-;  print("obs_datasets")
-;  print(obs_datasets)
-;  print("dim_obs")
-;  print(dim_obs)
-;  dimensiohh= dimsizes(dim_obs)
-;  print("dimensiohh")
-;  print(dimensiohh)
+
   ;--------------------------
   ; CMIP5 datasets
   ;--------------------------
@@ -107,7 +113,7 @@ begin
   ; set start and end year
   syearA = diag_script_info@start_year
   eyearA = diag_script_info@end_year
-  ntime = (eyearA - syearA + 1) * 12
+  ntime = eyearA - syearA + 1
 
   ; Create work directory
   out_path = config_user_info@work_dir
@@ -124,12 +130,11 @@ begin
   end if
 
   ; setting constants
-  ;fca = 1./ 157.       ; 13yr low pass
-  fca = 1./ 121.       ; 10 year low pass
+  fca = 1./ 10.       ; 10 year low pass
   fcb = 0.
   ihp = 0
   nsigma = 1
-  nwgt = min((/217, ntime - 1/))
+  nwgt = min((/11, ntime - 1/))
   pi=4.*atan(1.0)
   rad=(pi/ 180.)
 
@@ -154,25 +159,28 @@ begin
     arr = read_data(obs[iobs])
     arr = where(arr.le.-1.8, -1.8, arr)    ; set all values below -1.8 to -1.8
 
-;    arr = lonFlip(arr)
+    arr = rmMonAnnCycTLL(arr)
+    tmp := monthly2annual(arr)
+    delete(arr)
+    arr = tmp
+    delete(tmp)
+        
+    coswgt  := cos(rad*arr&lat)
+    coswgt!0 = "lat"
+    coswgt&lat= arr&lat
+    tpi := (/wgt_areaave(arr(:,{-10:10},{170:270}),coswgt({-10.:10.}),1.0,0) - \
+             (0.5*(wgt_areaave(arr(:,{25:45},{140:215}),coswgt({25.:45.}),1.0,0)+wgt_areaave(arr(:,{-50:-15},{150:200}),coswgt({-50.:-15.}),1.0,0))) /)
+    tpi!0 = "time"
+    tpi&time = arr&time
+    tpi_lp := wgt_runave_n_Wrap(tpi,wgt,1,0)   ; create tpi-low pass
 
-        arr = rmMonAnnCycTLL(arr)
-        coswgt  := cos(rad*arr&lat)
-        coswgt!0 = "lat"
-        coswgt&lat= arr&lat
-        tpi := (/  wgt_areaave(arr(:,{-10:10},{170:270}),coswgt({-10.:10.}),1.0,0) - \
-                  (0.5*(wgt_areaave(arr(:,{25:45},{140:215}),coswgt({25.:45.}),1.0,0)+wgt_areaave(arr(:,{-50:-15},{150:200}),coswgt({-50.:-15.}),1.0,0))) /)
-        tpi!0 = "time"
-        tpi&time = arr&time
-        tpi_lp := wgt_runave_n_Wrap(tpi,wgt,1,0)   ; create tpi-low pass
+    arr = lonFlip(arr)
+    arr_lp := wgt_runave_n_Wrap(arr,wgt,1,0)
 
-        arr = lonFlip(arr)
-        arr_lp := wgt_runave_n_Wrap(arr,wgt,1,0)
+    ipo := (/ regCoef(dim_standardize(tpi_lp,0),arr_lp(lat|:,lon|:,time|:)) /)
+    copy_VarMeta(arr_lp(0,:,:),ipo)
 
-        ipo := (/ regCoef(dim_standardize(tpi_lp,0),arr_lp(lat|:,lon|:,time|:)) /)
-        copy_VarMeta(arr_lp(0,:,:),ipo)
-
-        if (ii.eq.0) then
+    if (ii.eq.0) then
 ; Method 1
 ;           BootStrap   := bootstrap_regcoef(dim_standardize(tpi_lp,0),arr_lp, 1000, 0, opt)
 ;           rcBoot      := BootStrap[0]
@@ -193,26 +201,23 @@ begin
 ;           sig = (/ (1.-betainc(df/(df+tval^2), df/2.0, beta_b))*100. /)  ; probability in %
 ;           copy_VarMeta(ipo,sig)
 
-           reg_fld=arr_lp(0,:,:)
-           reg_fld=(/regCoef_n(dim_standardize(tpi_lp,0),arr_lp,0,0)/)
-           cor_fld=reg_fld
-           cor_fld=(/escorc(dim_standardize(tpi_lp,0),arr_lp(lat|:,lon|:,time|:))/)
+      reg_fld=arr_lp(0,:,:)
+      reg_fld=(/regCoef_n(dim_standardize(tpi_lp,0),arr_lp,0,0)/)
+      cor_fld=reg_fld
+      cor_fld=(/escorc(dim_standardize(tpi_lp,0),arr_lp(lat|:,lon|:,time|:))/)
 
 ;           print("Significance by rtest plus false rate detection")
 
-           prob_rtest=cor_fld
-;           prob_rtest=(/ rtest(cor_fld,dimsizes(tpi_lp)/10,0) /)
-           prob_rtest=(/ rtest(cor_fld,dimsizes(tpi_lp)/(10*12),0) /)
-           print("N/120 = "+dimsizes(tpi_lp)/(10*12))
-           prob_rtest=where(arr_lp(0,:,:).eq.arr_lp@_FillValue,prob_rtest@_FillValue,prob_rtest)
+      prob_rtest=cor_fld
+      prob_rtest=(/ rtest(cor_fld,dimsizes(tpi_lp)/10,0) /)
+      prob_rtest=where(arr_lp(0,:,:).eq.arr_lp@_FillValue,prob_rtest@_FillValue,prob_rtest)
+
+      siglev = 0.10
+
+      sig = where(prob_rtest.gt.siglev, 0., 1.)
 
 ;           npts=num(.not.ismissing(ndtooned(arr_lp(0,:,:))))
- 
-;           siglev = 0.05
-           siglev = 0.10
-
-           sig = where(prob_rtest.gt.siglev, 0., 1.)
-           
+;           
 ;           frac = fspan(1, npts, npts)
 ;           scale=1
 ;           frac = (/ (frac/npts)* scale * siglev /)
@@ -232,54 +237,52 @@ begin
 ;           prob_rtest_fdr=  (/ where(prob_rtest.gt. pval_fdr, 0, 1.) /) 
 ;           sig = prob_rtest_fdr
 ;           delete(prob_rtest_fdr)
+           
+      fn = out_path + "pdv.obs."+syearA+"-"+eyearA+".nc"
+      print("fn = " + fn)
+      system("rm -f " + fn)
+      z = addfile(fn,"c")
+      z@source = systemfunc("pwd")+"/"+get_script_name()
+      z->ipo_pattern_obs0 = ipo    ; write ersstv5 pattern to file
 
+      ipo_pattern_obs = arr(:dimsizes(obs_datasets)-1,:,:)
+      ipo_pattern_obs = ipo_pattern_obs@_FillValue
+      delete(ipo_pattern_obs&time)
+      ipo_pattern_obs!0 = "E"
+      ipo_pattern_obs&E = ispan(1,dimsizes(obs_datasets),1)
+      ipo_pattern_sig_obs = ipo_pattern_obs
+      ipo_pattern_obs(ii,:,:) = (/ ipo /)
+      ipo_pattern_sig_obs(ii,:,:) = (/ sig /)
+      delete(sig)
            
-           fn = out_path + "pdv.obs."+syearA+"-"+eyearA+".nc"
-           print("fn = " + fn)
-           system("rm -f " + fn)
-           z = addfile(fn,"c")
-           z@source = systemfunc("pwd")+"/"+get_script_name()
-           z->ipo_pattern_obs0 = ipo    ; write ersstv5 pattern to file
-
-           ipo_pattern_obs = arr(:dimsizes(obs_datasets)-1,:,:)
-           ipo_pattern_obs = ipo_pattern_obs@_FillValue
-           delete(ipo_pattern_obs&time)
-           ipo_pattern_obs!0 = "E"
-           ipo_pattern_obs&E = ispan(1,dimsizes(obs_datasets),1)
-           ipo_pattern_sig_obs = ipo_pattern_obs
-           ipo_pattern_obs(ii,:,:) = (/ ipo /)
-           ipo_pattern_sig_obs(ii,:,:) = (/ sig /)
-           delete(sig)
+      ipo_obs_flip = ipo   ; for taylor stats
+      ipo_obs_flip = lonFlip(ipo)
            
-           ipo_obs_flip = ipo   ; for taylor stats
-           ipo_obs_flip = lonFlip(ipo)
-           
-           tpi_write = new((/dimsizes(obs_datasets),(eyearA-syearA+1)*12/),typeof(ipo))
-           tpi_write!0 = "E"
-           tpi_write&E = ispan(1,dimsizes(obs_datasets),1)
-           tpi_write!1 = "time"
-           tpi_write&time = tpi&time
-           tpi_lp_write = tpi_write
-           tay_stat = new((/dimsizes(obs_datasets),3/),double)
-           tay_stat!0 = "E"
-           tay_stat&E = ispan(1,dimsizes(obs_datasets),1)
-           tay_stat!1 = "stat"
-           tay_stat&stat = ispan(0,2,1)
-           lat := ipo&lat
-           lat!0 = "lat"
-           lat&lat = lat
-           w = cos(rad*lat({-40:60}))  ; weights for Taylor diagram
-        else
-;           ipo_rg := linint2_Wrap(ipo&lon,ipo&lat,ipo,True,ipo_obs&lon,ipo_obs&lat,0)
-           ipo_flip := ipo
-           ipo_flip = lonFlip(ipo_flip)
-           tay_stat(ii,:) = (/ taylor_stats(ipo_flip({-40:60},{110:290}), ipo_obs_flip({-40:60},{110:290}), w, 0) /)
-           delete(ipo_flip)
-           ipo_pattern_obs(ii,:,:) = (/ ipo /)
-        end if
-        tpi_write(ii,:)      = (/ tpi /)
-        tpi_lp_write(ii,:)   = (/ tpi_lp /)
-        ;delete(arr)
+      tpi_write = new((/dimsizes(obs_datasets),(eyearA-syearA+1)/),typeof(ipo))
+      tpi_write!0 = "E"
+      tpi_write&E = ispan(1,dimsizes(obs_datasets),1)
+      tpi_write!1 = "time"
+      tpi_write&time = tpi&time
+      tpi_lp_write = tpi_write
+      tay_stat = new((/dimsizes(obs_datasets),3/),double)
+      tay_stat!0 = "E"
+      tay_stat&E = ispan(1,dimsizes(obs_datasets),1)
+      tay_stat!1 = "stat"
+      tay_stat&stat = ispan(0,2,1)
+      lat := ipo&lat
+      lat!0 = "lat"
+      lat&lat = lat
+      w = cos(rad*lat({-40:60}))  ; weights for Taylor diagram
+    else
+      ipo_flip := ipo
+      ipo_flip = lonFlip(ipo_flip)
+      tay_stat(ii,:) = (/ taylor_stats(ipo_flip({-40:60},{110:290}), ipo_obs_flip({-40:60},{110:290}), w, 0) /)
+      delete(ipo_flip)
+      ipo_pattern_obs(ii,:,:) = (/ ipo /)
+    end if
+    tpi_write(ii,:)      = (/ tpi /)
+    tpi_lp_write(ii,:)   = (/ tpi_lp /)
+    delete(arr)
   end do
 
   z->tpi_lp = tpi_lp_write
@@ -328,7 +331,6 @@ begin
         temp = model(gg)
      end if
   end do
-  ;ensemble_assign@model = model
   delete(temp)
   ensemble_assign@models = str_join(model+"/"+emem,",")
 
@@ -342,6 +344,11 @@ begin
      arr = mask(arr,conform(arr,lsm,(/1,2/)).ge.1,False)
      
      arr = rmMonAnnCycTLL(arr)
+     tmp := monthly2annual(arr)
+     delete(arr)
+     arr = tmp
+     delete(tmp)
+
      coswgt  := cos(rad*arr&lat)
      coswgt!0 = "lat"
      coswgt&lat= arr&lat
@@ -365,16 +372,16 @@ begin
        finarr!2 = "lon"
        finarr&lon = ipo_obs&lon
 
-       tpi_write := new((/nens,(eyearA-syearA+1)*12/),typeof(ipo))
+       tpi_write := new((/nens,(eyearA-syearA+1)/),typeof(ipo))
        tpi_write!0 = "nens"
        tpi_write&nens = finarr&nens
        tpi_write!1 = "time"
        tpi_write&time = arr_lp&time
 
-       print(getvardimnames(tpi) + " : tpi : " + dimsizes(tpi))
-       print(getvardimnames(ipo) + " : ipo : " + dimsizes(ipo))
-       print(getvardimnames(tpi_write) + " : tpi_write : " + dimsizes(tpi_write))
-       print(getvardimnames(tpi_lp) + " : tpi_lp : " + dimsizes(tpi_lp))
+       ;print(getvardimnames(tpi) + " : tpi : " + dimsizes(tpi))
+       ;print(getvardimnames(ipo) + " : ipo : " + dimsizes(ipo))
+       ;print(getvardimnames(tpi_write) + " : tpi_write : " + dimsizes(tpi_write))
+       ;print(getvardimnames(tpi_lp) + " : tpi_lp : " + dimsizes(tpi_lp))
        ;print(getvardimnames(tpi_lp_write) + " : tpi_lp_write : " + dimsizes(tpi_lp_write))
 
        tpi_lp_write := tpi_write
@@ -387,15 +394,14 @@ begin
        ensemble_assign!0 = "nens"
        ensemble_assign&nens = finarr&nens
      end if
-;     finarr(gg,:,:) = (/ linint2(ipo&lon,ipo&lat,ipo,True,ipo_obs&lon,ipo_obs&lat,0) /)
      finarr(gg,:,:) = (/ipo/)
      finarr_flip = ipo
      finarr_flip = lonFlip(finarr_flip)
      tay_stat(gg,:) = (/ taylor_stats(finarr_flip({-40:60},{110:290}), ipo_obs_flip({-40:60},{110:290}), w, 0) /)
      delete(finarr_flip)
-;     tay_stat(gg,:) = (/ taylor_stats(finarr(gg,{-40:60},{110:290}), ipo_obs({-40:60},{110:290}), w, 0) /)
      tpi_write(gg,:) = (/ tpi /)
      tpi_lp_write(gg,:) = (/ tpi_lp /)
+     delete(arr)
      print("Done with "+gg+" out of "+nens+", "+model(gg))
   end do
 
@@ -451,6 +457,11 @@ begin
      arr = mask(arr,conform(arr,lsm,(/1,2/)).ge.1,False)
      
      arr = rmMonAnnCycTLL(arr)
+     tmp := monthly2annual(arr)
+     delete(arr)
+     arr = tmp
+     delete(tmp)
+     
      coswgt  := cos(rad*arr&lat)
      coswgt!0 = "lat"
      coswgt&lat= arr&lat
@@ -474,7 +485,7 @@ begin
         finarr!2 = "lon"
         finarr&lon = ipo_obs&lon
 
-        tpi_write := new((/dim_cmip6_piControl, (eyearA-syearA+1)*12/),typeof(ipo))
+        tpi_write := new((/dim_cmip6_piControl, (eyearA-syearA+1)/),typeof(ipo))
         tpi_write!0 = "nens"
         tpi_write&nens = finarr&nens
         tpi_write!1 = "time"
@@ -487,15 +498,14 @@ begin
         tay_stat!1 = "stat"
         tay_stat&stat = ispan(0,2,1)
      end if
-;     finarr(gg, :, :) = (/ linint2(ipo&lon,ipo&lat,ipo,True,ipo_obs&lon,ipo_obs&lat,0) /)
      finarr(gg,:,:) = (/ipo/)
      finarr_flip = ipo
      finarr_flip = lonFlip(finarr_flip)
      tay_stat(gg,:) = (/ taylor_stats(finarr_flip({-40:60},{110:290}), ipo_obs_flip({-40:60},{110:290}), w, 0) /)
      delete(finarr_flip)
-;     tay_stat(gg,:) = (/ taylor_stats(finarr(gg,{-40:60},{110:290}), ipo_obs({-40:60},{110:290}), w, 0) /)
      tpi_write(gg,:) = (/ tpi /)
      tpi_lp_write(gg,:) = (/ tpi_lp /)
+     delete(arr)
      print("Done with "+gg+" out of "+(dim_cmip6_piControl-1))
   end do
 
@@ -515,10 +525,8 @@ begin
   delete([/tpi_write,finarr,tpi_lp_write,tay_stat/])
 
   z = addfile(fn,"r")
-;  ipo_piControl = z->ipo_model_pattern
   tpi_piControl = z->tpi
   tpi_lp_piControl = z->tpi_lp
-;  tay_stats_piControl = z->tay_stats
   
   ;--------------------------------------------------------
   ; process CMIP5 historical data
@@ -560,6 +568,11 @@ begin
     arr = mask(arr,conform(arr,lsm,(/1,2/)).ge.1,False)
     
     arr = rmMonAnnCycTLL(arr)
+    tmp := monthly2annual(arr)
+    delete(arr)
+    arr = tmp
+    delete(tmp)
+
     coswgt  := cos(rad*arr&lat)
     coswgt!0 = "lat"
     coswgt&lat= arr&lat
@@ -582,7 +595,6 @@ begin
       finarr!2 = "lon"
       finarr&lon = ipo_obs&lon
 
-;      tpi_write := new((/dim_cmip5_hist,(eyearA-syearA+1)*12/),typeof(ipo))
       tpi_write := new((/dim_cmip5_hist,dimsizes(arr&time)/),typeof(ipo))
       tpi_write!0 = "dim_cmip5_hist"
       tpi_write&dim_cmip5_hist = finarr&dim_cmip5_hist
@@ -595,18 +607,15 @@ begin
       tay_stat!1 = "stat"
       tay_stat&stat = ispan(0,2,1)
 
-      ;ensemble_assign!0 = "dim_cmip5_hist"
-      ;ensemble_assign&dim_cmip5_hist = finarr&dim_cmip5_hist
     end if
-;    finarr(gg,:,:) = (/ linint2(ipo&lon,ipo&lat,ipo,True,ipo_obs&lon,ipo_obs&lat,0) /)
     finarr(gg,:,:) = (/ipo/)
     finarr_flip = ipo
     finarr_flip = lonFlip(finarr_flip)
     tay_stat(gg,:) = (/ taylor_stats(finarr_flip({-40:60},{110:290}), ipo_obs_flip({-40:60},{110:290}), w, 0) /)
     delete(finarr_flip)
-;    tay_stat(gg,:) = (/ taylor_stats(finarr(gg,{-40:60},{110:290}), ipo_obs({-40:60},{110:290}), w, 0) /)
     tpi_write(gg,:) = (/ tpi /)
     tpi_lp_write(gg,:) = (/ tpi_lp /)
+    delete(arr)
     print("Done with "+gg+" out of "+dim_cmip5_hist+", "+model(gg))
   end do
 
@@ -646,6 +655,11 @@ begin
      arr = mask(arr,conform(arr,lsm,(/1,2/)).ge.1,False)
      
      arr = rmMonAnnCycTLL(arr)
+     tmp := monthly2annual(arr)
+     delete(arr)
+     arr = tmp
+     delete(tmp)
+     
      coswgt  := cos(rad*arr&lat)
      coswgt!0 = "lat"
      coswgt&lat= arr&lat
@@ -668,12 +682,8 @@ begin
         finarr!1 = "lat"
         finarr&lat = ipo_obs&lat
         finarr!2 = "lon"
-;        print(ipo_obs&lon)
         finarr&lon = ipo_obs&lon
-;        print(finarr&lon)
 
-
-;        tpi_write := new((/dim_cmip5_piControl,(eyearA-syearA+1)*12/),typeof(ipo))
         tpi_write := new((/dim_cmip5_piControl,dimsizes(arr_lp&time)/),typeof(ipo))
         tpi_write!0 = "nens"
         tpi_write&nens = finarr&nens
@@ -687,15 +697,14 @@ begin
         tay_stat&stat = ispan(0,2,1)
      end if
 
-;     finarr(gg, :, :) = (/ linint2(ipo&lon,ipo&lat,ipo,True,ipo_obs&lon,ipo_obs&lat,0) /)
      finarr(gg,:,:) = (/ipo/)
-;    tay_stat(gg,:) = (/ taylor_stats(finarr(gg,{-40:60},{110:290}), ipo_obs({-40:60},{110:290}), w, 0) /)
      finarr_flip = ipo
      finarr_flip = lonFlip(finarr_flip)
      tay_stat(gg,:) = (/ taylor_stats(finarr_flip({-40:60},{110:290}), ipo_obs_flip({-40:60},{110:290}), w, 0) /)
      delete(finarr_flip)
      tpi_write(gg,:) = (/ tpi /)
      tpi_lp_write(gg,:) = (/ tpi_lp /)
+     delete(arr)
      print("Done with "+gg+" out of "+(dim_cmip5_piControl-1))
   end do
 
@@ -708,10 +717,6 @@ begin
   z->tpi      = tpi_write
   z->tpi_lp   = tpi_lp_write
   z->tay_stats = tay_stat
-;  ipo_piControl = finarr
-;  tpi_piControl = tpi_write
-;  tpi_lp_piControl = tpi_lp_write
-;  tay_stats_piControl = tay_stat
   delete([/z/])
   
   z = addfile(fn,"r")
@@ -732,7 +737,6 @@ begin
   tay_patcor_C5 = taylor_ipo_patcor_C5(:max(ea_c5)-1,0)
   tay_patcor_C5 = tay_patcor_C5@_FillValue
 
-;  weights_C5  = new(max(ea_c5),float)  ;new(dimsizes(ipo_hist_C5&nens),float)
   weights_C5  = new(dim_cmip5_hist,float)
   do gg = 1,max(ea_c5)         ; calculate CMIP5 ensemble means
      wind := ind(ea_c5.eq.gg)
@@ -749,14 +753,12 @@ begin
      end if
      weights_C5(wind) = 1./dimsizes(wind)
   end do
-;  print(ea_c5+" "+weights_C5)
     
   mme_ipo_C5 = dim_avg_n_Wrap(ipo_hist_em5,0)
   mme_tpi_lp_hist_C5 = dim_avg_n_Wrap(tpi_lp_hist_em5,0)
   delete([/ipo_hist_em5,tpi_lp_hist_em5/])
 
   tay_stats_hist_cmip5EM = new((/1,3/),double)
-;  tay_stats_hist_cmip5EM = (/ taylor_stats(mme_ipo_C5({-40:60},{110:290}), ipo_obs({-40:60},{110:290}), w, 0) /)
   delete([/mme_ipo_C5/])
   tay_stats_hist_cmip5EM(0,0) = (/ ((2.71828^(2*dim_avg(tay_patcor_C5))-1)/ ((2.71828^(2*dim_avg(tay_patcor_C5))+1))) /)   ; convert back from z-space
   tay_stats_hist_cmip5EM(0,1) = (/ dim_avg(tay_ratio_C5) /)
@@ -810,8 +812,6 @@ begin
      nensmem(gg-1) = dimsizes(wind)
   end do
   tpi_lp_hist_em@num_ensemble_members = nensmem
-;  print(ensemble_assign+" "+weights)
-;  print(nensmem+" "+tay_patcor)
 
   mme_ipo = dim_avg_n_Wrap(ipo_hist_em,0)
   mme_ipo_sign = mme_ipo
@@ -821,7 +821,6 @@ begin
      do dd = 0,dimsizes(mme_ipo&lon)-1     ; otherwise assign a value of 0.
         if (.not.ismissing(mme_ipo(cc,dd))) then
            tnum = toint(num(.not.ismissing(ipo_hist(:,cc,dd)))*.8)
-;           tnum = toint(num(.not.ismissing(ipo_hist(:,cc,dd)))*.9)
            if (mme_ipo(cc,dd).ge.0) then   ; MME >= 0
               count = num(ipo_hist(:,cc,dd).ge.0)
               if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
@@ -833,9 +832,6 @@ begin
               count = num(ipo_hist(:,cc,dd).lt.0)  
               if (count.ge.tnum) then      ; if more than 80% of EM are < 0
                  mme_ipo_sign(cc,dd) = 1   ; assign value of 1
-;                 print(ipo_hist(:,cc,dd))
-;                 print(mme_ipo(cc,dd)+" "+count+" "+tnum)
-;                 print(mme_ipo&lat(cc)+"N, "+mme_ipo&lon(dd)+"E")
               else
                  mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
               end if
@@ -847,7 +843,6 @@ begin
   mme_tpi_lp_hist = dim_avg_n_Wrap(tpi_lp_hist_em,0)
 
   tay_stats_hist_cmip6EM = new((/1,3/),double)
-  ; tay_stats_hist_cmip6EM = (/ taylor_stats(mme_ipo({-40:60},{110:290}), ipo_obs({-40:60},{110:290}), w, 0) /)
   tay_stats_hist_cmip6EM(0,0) = (/ ((2.71828^(2*dim_avg(tay_patcor))-1)/ ((2.71828^(2*dim_avg(tay_patcor))+1))) /)   ; convert back from z-space
   tay_stats_hist_cmip6EM(0,1) = (/ dim_avg(tay_ratio) /)
 
@@ -856,31 +851,31 @@ begin
   ; Observations box plot statistics
   ;--------------------------------------------------------
 
-  autocor_tpi_lp_obs = esacr(tpi_lp_obs,10*12)
-  lag1_tpi_lp_obs = autocor_tpi_lp_obs(:,12)
-  lag10_tpi_lp_obs = autocor_tpi_lp_obs(:,12*10-1)
+  autocor_tpi_lp_obs = esacr(tpi_lp_obs,10)
+  lag1_tpi_lp_obs = autocor_tpi_lp_obs(:,1)
+  lag10_tpi_lp_obs = autocor_tpi_lp_obs(:,10)
   delete(autocor_tpi_lp_obs)
 
-  autocor_tpi_obs = esacr(tpi_obs,10*12)
-  lag1_tpi_obs = autocor_tpi_obs(:,12)
-  lag10_tpi_obs = autocor_tpi_obs(:,12*10-1)
+  autocor_tpi_obs = esacr(tpi_obs,10)
+  lag1_tpi_obs = autocor_tpi_obs(:,1)
+  lag10_tpi_obs = autocor_tpi_obs(:,10)
   delete(autocor_tpi_obs)
 
   ;--------------------------------------------------------
   ; CMIP6 historical autocorrelation box plot statistics
   ;--------------------------------------------------------
 
-  temp_ac := esacr(tpi_lp_hist,10*12)
-;  lag10_tpi_lp_hist_B = (/weighted_percentile(temp_ac(:,12*10-1),weights,.05),weighted_percentile(temp_ac(:,12*10-1),weights,.25),weighted_percentile(temp_ac(:,12*10-1),weights,.5),weighted_percentile(temp_ac(:,12*10-1),weights,.75),weighted_percentile(temp_ac(:,12*10-1),weights,.95)/)
-  lag10_tpi_lp_hist_B = (/weighted_percentile(temp_ac(:,12*10-1),weights,.05),weighted_percentile(temp_ac(:,12*10-1),weights,.25),weighted_mean(temp_ac(:,12*10-1),weights),weighted_percentile(temp_ac(:,12*10-1),weights,.75),weighted_percentile(temp_ac(:,12*10-1),weights,.95)/)
-  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 12*10-1)) / (1.-temp_ac(:, 12*10-1)))), weights)   ; convert to Z-space
+  temp_ac := esacr(tpi_lp_hist,10)
+  lag10_tpi_lp_hist_B = (/weighted_percentile(temp_ac(:,10),weights,.05),weighted_percentile(temp_ac(:,10),weights,.25),weighted_mean(temp_ac(:,10),weights),weighted_percentile(temp_ac(:,10),weights,.75),weighted_percentile(temp_ac(:,10),weights,.95)/)
+  
+  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 10)) / (1.-temp_ac(:, 10)))), weights)   ; convert to Z-space
   lag10_tpi_lp_hist_B(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
   
-  temp_ac := esacr(tpi_hist,10*12)
-;  lag1_tpi_hist_B = (/weighted_percentile(temp_ac(:,12),weights,.05),weighted_percentile(temp_ac(:,12),weights,.25),weighted_percentile(temp_ac(:,12),weights,.5),weighted_percentile(temp_ac(:,12),weights,.75),weighted_percentile(temp_ac(:,12),weights,.95)/)
-  lag1_tpi_hist_B = (/weighted_percentile(temp_ac(:,12),weights,.05),weighted_percentile(temp_ac(:,12),weights,.25),weighted_mean(temp_ac(:,12),weights),weighted_percentile(temp_ac(:,12),weights,.75),weighted_percentile(temp_ac(:,12),weights,.95)/)
-  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 12)) / (1.-temp_ac(:, 12)))), weights)   ; convert to Z-space
+  temp_ac := esacr(tpi_hist,10)
+  lag1_tpi_hist_B = (/weighted_percentile(temp_ac(:,1),weights,.05),weighted_percentile(temp_ac(:,1),weights,.25),weighted_mean(temp_ac(:,1),weights),weighted_percentile(temp_ac(:,1),weights,.75),weighted_percentile(temp_ac(:,1),weights,.95)/)
+
+  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 1)) / (1.-temp_ac(:, 1)))), weights)   ; convert to Z-space
   lag1_tpi_hist_B(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
 
@@ -889,15 +884,15 @@ begin
   ; CMIP6 piControl autocorrelation box plot statistics (no need to do weighting for statistics, 1 piControl per model)
   ;--------------------------------------------------------
 
-  temp_ac := esacr(tpi_lp_piControl,10*12)
-  lag10_tpi_lp_piControl_B = boxplot_stat2(temp_ac(:,12*10-1))
-  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 12*10-1)) / (1.-temp_ac(:, 12*10-1)))))   ; convert to Z-space
+  temp_ac := esacr(tpi_lp_piControl,10)
+  lag10_tpi_lp_piControl_B = boxplot_stat2(temp_ac(:,10))
+  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 10)) / (1.-temp_ac(:, 10)))))   ; convert to Z-space
   lag10_tpi_lp_piControl_B(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
 
-  temp_ac := esacr(tpi_piControl,10*12)
-  lag1_tpi_piControl_B = boxplot_stat2(temp_ac(:,12))
-  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 12)) / (1.-temp_ac(:, 12)))))   ; convert to Z-space
+  temp_ac := esacr(tpi_piControl,10)
+  lag1_tpi_piControl_B = boxplot_stat2(temp_ac(:,1))
+  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 1)) / (1.-temp_ac(:, 1)))))   ; convert to Z-space
   lag1_tpi_piControl_B(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
 
@@ -908,14 +903,12 @@ begin
 
   stddev_tpi_lp_obs         = dim_stddev(tpi_lp_obs)
   temp_sd := dim_stddev(tpi_lp_hist)
-;  stddev_tpi_lp_hist_B = (/weighted_percentile(temp_sd,weights,.05),weighted_percentile(temp_sd,weights,.25),weighted_percentile(temp_sd,weights,.5),weighted_percentile(temp_sd,weights,.75),weighted_percentile(temp_sd,weights,.95)/)
   stddev_tpi_lp_hist_B = (/weighted_percentile(temp_sd,weights,.05),weighted_percentile(temp_sd,weights,.25),weighted_mean(temp_sd,weights),weighted_percentile(temp_sd,weights,.75),weighted_percentile(temp_sd,weights,.95)/)
   stddev_tpi_lp_piControl_B = boxplot_stat2(dim_stddev(tpi_lp_piControl))
   stddev_tpi_lp_piControl_B(2) = avg(dim_stddev(tpi_lp_piControl))
   
   stddev_tpi_obs            = dim_stddev(tpi_obs)
   temp_sd := dim_stddev(tpi_hist)
-;  stddev_tpi_hist_B         = (/weighted_percentile(temp_sd,weights,.05),weighted_percentile(temp_sd,weights,.25),weighted_percentile(temp_sd,weights,.5),weighted_percentile(temp_sd,weights,.75),weighted_percentile(temp_sd,weights,.95)/)
   stddev_tpi_hist_B         = (/weighted_percentile(temp_sd,weights,.05),weighted_percentile(temp_sd,weights,.25),weighted_mean(temp_sd,weights),weighted_percentile(temp_sd,weights,.75),weighted_percentile(temp_sd,weights,.95)/)
   stddev_tpi_piControl_B    = boxplot_stat2(dim_stddev(tpi_piControl))
   stddev_tpi_piControl_B(2) = avg(dim_stddev(tpi_piControl))
@@ -924,17 +917,17 @@ begin
   ; CMIP5 historical autocorrelation box plot statistics
   ;--------------------------------------------------------
 
-  temp_ac := esacr(tpi_lp_hist_C5,10*12)
-;  lag10_tpi_lp_hist_B_C5 = (/weighted_percentile(temp_ac(:,12*10-1),weights_C5,.05),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.25),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.5),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.75),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.95)/)
-  lag10_tpi_lp_hist_B_C5 = (/weighted_percentile(temp_ac(:,12*10-1),weights_C5,.05),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.25),weighted_mean(temp_ac(:,12*10-1),weights_C5),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.75),weighted_percentile(temp_ac(:,12*10-1),weights_C5,.95)/)
-  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 12*10-1)) / (1.-temp_ac(:, 12*10-1)))), weights_C5)   ; convert to Z-space
+  temp_ac := esacr(tpi_lp_hist_C5,10)
+  lag10_tpi_lp_hist_B_C5 = (/weighted_percentile(temp_ac(:,10),weights_C5,.05),weighted_percentile(temp_ac(:,10),weights_C5,.25),weighted_mean(temp_ac(:,10),weights_C5),weighted_percentile(temp_ac(:,10),weights_C5,.75),weighted_percentile(temp_ac(:,10),weights_C5,.95)/)
+
+  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 10)) / (1.-temp_ac(:, 10)))), weights_C5)   ; convert to Z-space
   lag10_tpi_lp_hist_B_C5(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
   
-  temp_ac := esacr(tpi_hist_C5,10*12)
-;  lag1_tpi_hist_B_C5 = (/weighted_percentile(temp_ac(:,12),weights_C5,.05),weighted_percentile(temp_ac(:,12),weights_C5,.25),weighted_percentile(temp_ac(:,12),weights_C5,.5),weighted_percentile(temp_ac(:,12),weights_C5,.75),weighted_percentile(temp_ac(:,12),weights_C5,.95)/)
-  lag1_tpi_hist_B_C5 = (/weighted_percentile(temp_ac(:,12),weights_C5,.05),weighted_percentile(temp_ac(:,12),weights_C5,.25),weighted_mean(temp_ac(:,12),weights_C5),weighted_percentile(temp_ac(:,12),weights_C5,.75),weighted_percentile(temp_ac(:,12),weights_C5,.95)/)
-  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 12)) / (1.-temp_ac(:, 12)))), weights_C5)   ; convert to Z-space
+  temp_ac := esacr(tpi_hist_C5,10)
+  lag1_tpi_hist_B_C5 = (/weighted_percentile(temp_ac(:,1),weights_C5,.05),weighted_percentile(temp_ac(:,1),weights_C5,.25),weighted_mean(temp_ac(:,1),weights_C5),weighted_percentile(temp_ac(:,1),weights_C5,.75),weighted_percentile(temp_ac(:,1),weights_C5,.95)/)
+
+  temp_acZ := weighted_mean(0.5*(log( (1.+temp_ac(:, 1)) / (1.-temp_ac(:, 1)))), weights_C5)   ; convert to Z-space
   lag1_tpi_hist_B_C5(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
   
@@ -942,15 +935,15 @@ begin
   ; CMIP5 piControl autocorrelation box plot statistics
   ;--------------------------------------------------------
 
-  temp_ac := esacr(tpi_lp_piControl_C5,10*12)
-  lag10_tpi_lp_piControl_B_C5 = boxplot_stat2(temp_ac(:,12*10-1))
-  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 12*10-1)) / (1.-temp_ac(:, 12*10-1)))))   ; convert to Z-space
+  temp_ac := esacr(tpi_lp_piControl_C5,10)
+  lag10_tpi_lp_piControl_B_C5 = boxplot_stat2(temp_ac(:,10))
+  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 10)) / (1.-temp_ac(:, 10)))))   ; convert to Z-space
   lag10_tpi_lp_piControl_B_C5(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
   
-  temp_ac := esacr(tpi_piControl_C5,10*12)
-  lag1_tpi_piControl_B_C5 = boxplot_stat2(temp_ac(:,12))
-  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 12)) / (1.-temp_ac(:, 12)))))   ; convert to Z-space
+  temp_ac := esacr(tpi_piControl_C5,10)
+  lag1_tpi_piControl_B_C5 = boxplot_stat2(temp_ac(:,1))
+  temp_acZ := avg(0.5*(log( (1.+temp_ac(:, 1)) / (1.-temp_ac(:, 1)))))   ; convert to Z-space
   lag1_tpi_piControl_B_C5(2) = (/ ((2.71828^(2*temp_acZ)-1)/ ((2.71828^(2*temp_acZ)+1))) /)   ; convert back from z-space
   delete(temp_acZ)
 
@@ -960,13 +953,11 @@ begin
   ;--------------------------------------------------------
 
   temp_sd := dim_stddev(tpi_lp_hist_C5)
-;  stddev_tpi_lp_hist_B_C5 = (/weighted_percentile(temp_sd,weights_C5,.05),weighted_percentile(temp_sd,weights_C5,.25),weighted_percentile(temp_sd,weights_C5,.5),weighted_percentile(temp_sd,weights_C5,.75),weighted_percentile(temp_sd,weights_C5,.95)/)
   stddev_tpi_lp_hist_B_C5 = (/weighted_percentile(temp_sd,weights_C5,.05),weighted_percentile(temp_sd,weights_C5,.25),weighted_mean(temp_sd,weights_C5),weighted_percentile(temp_sd,weights_C5,.75),weighted_percentile(temp_sd,weights_C5,.95)/)
   stddev_tpi_lp_piControl_B_C5 =  boxplot_stat2(dim_stddev(tpi_lp_piControl_C5))
   stddev_tpi_lp_piControl_B_C5(2) =  avg(dim_stddev(tpi_lp_piControl_C5))
 
   temp_sd := dim_stddev(tpi_hist_C5)
-;  stddev_tpi_hist_B_C5 =(/weighted_percentile(temp_sd,weights_C5,.05),weighted_percentile(temp_sd,weights_C5,.25),weighted_percentile(temp_sd,weights_C5,.5),weighted_percentile(temp_sd,weights_C5,.75),weighted_percentile(temp_sd,weights_C5,.95)/)
   stddev_tpi_hist_B_C5 =(/weighted_percentile(temp_sd,weights_C5,.05),weighted_percentile(temp_sd,weights_C5,.25),weighted_mean(temp_sd,weights_C5),weighted_percentile(temp_sd,weights_C5,.75),weighted_percentile(temp_sd,weights_C5,.95)/)
   stddev_tpi_piControl_B_C5 =  boxplot_stat2(dim_stddev(tpi_piControl_C5))
   stddev_tpi_piControl_B_C5(2) =  avg(dim_stddev(tpi_piControl_C5))
@@ -1008,12 +999,7 @@ begin
   hist_range = hist_range@_FillValue
   mme_range = tpi_lp_hist(:2,:)
   mme_range = mme_range@_FillValue
-  do gg = 60,dimsizes(tpi_lp_hist&time)-61
-;     temp = dim_stddev_n(tpi_lp_hist(:,gg),0)
-;     hist_range(0,gg) = (/ mme_tpi_lp_hist(gg)+(temp*2.) /)
-;     hist_range(1,gg) = (/ mme_tpi_lp_hist(gg)-(temp*2.) /)
-;     delete(temp)
-
+  do gg = 5,dimsizes(tpi_lp_hist&time)-6
      hist_range(0,gg) = (/weighted_percentile(tpi_lp_hist(:,gg),weights,.95) /)  ; individual members 5%
      hist_range(1,gg) = (/weighted_percentile(tpi_lp_hist(:,gg),weights,.05) /)   ; individual members 95%
 
@@ -1021,43 +1007,29 @@ begin
      mme_range(0,gg) = (/ temparr(2) /)    ; ensemble mme median with nmod_crit applied (and thus different from mme_tpi_lp_hist which has no criteria and is a mean)
      mme_range(1,gg) = (/ temparr(1) /)    ; ensemble 5%
      mme_range(2,gg) = (/ temparr(3) /)    ; ensemble 95%
-;     print(" "+mme_range(0,gg)+" "+mme_tpi_lp_hist(gg)+"/"+temparr(2)+" "+mme_range(1,gg))
   end do
 
   hist_range_C5 = tpi_lp_hist_C5(:1,:)
   hist_range_C5 = hist_range_C5@_FillValue
-  do gg = 60,dimsizes(tpi_lp_hist_C5&time)-61
-;     temp = dim_stddev_n(tpi_lp_hist_C5(:,gg),0)
-;     hist_range_C5(0,gg) = (/ mme_tpi_lp_hist_C5(gg)+(temp*2.) /)
-;     hist_range_C5(1,gg) = (/ mme_tpi_lp_hist_C5(gg)-(temp*2.) /)
-;     delete(temp)
-;     temp := dim_stddev_n(tpi_lp_hist_C5(:,gg),0)
-;     hist_range_C5(0,gg) = (/ mme_tpi_lp_hist_C5(gg)+(temp*2.) /)
-;     hist_range_C5(1,gg) = (/ mme_tpi_lp_hist_C5(gg)-(temp*2.) /)
-;     hist_range_C5(0,gg) = (/mme_tpi_lp_hist_C5(gg)+weighted_percentile(tpi_lp_hist_C5(:,gg),weights_C5,.95) /)
-;     hist_range_C5(1,gg) = (/mme_tpi_lp_hist_C5(gg)+weighted_percentile(tpi_lp_hist_C5(:,gg),weights_C5,.05) /)   
+  do gg = 5,dimsizes(tpi_lp_hist_C5&time)-6
      hist_range_C5(0,gg) = (/weighted_percentile(tpi_lp_hist_C5(:,gg),weights_C5,.95) /)
      hist_range_C5(1,gg) = (/weighted_percentile(tpi_lp_hist_C5(:,gg),weights_C5,.05) /)  
   end do
 
   timeseries = new((/8,dimsizes(tpi_hist&time)/),float)
   timeseries(:2,:) = (/ tpi_lp_obs(:2,:) /)
-;  printVarSummary(tpi_lp_hist_C5)
-;  printVarSummary(mme_tpi_lp_hist_C5)
 
-  timeseries(3,:dimsizes(mme_tpi_lp_hist_C5)-61) = (/ mme_tpi_lp_hist_C5(:dimsizes(mme_tpi_lp_hist_C5)-61) /)
+  timeseries(3,:dimsizes(mme_tpi_lp_hist_C5)-6) = (/ mme_tpi_lp_hist_C5(:dimsizes(mme_tpi_lp_hist_C5)-6) /)
   timeseries(4,:) = (/ mme_tpi_lp_hist /)
-;  timeseries(4,:) = (/ mme_range(0,:)   /)
 
-  timeseries(:,:59) = timeseries@_FillValue
-  timeseries(:,dimsizes(tpi_hist&time)-60:) = timeseries@_FillValue
+  timeseries(:,:4) = timeseries@_FillValue
+  timeseries(:,dimsizes(tpi_hist&time)-5:) = timeseries@_FillValue
 
   timeseries(5,:) = 0.
 
   timeseries(6:,:) = (/ mme_range(1:,:) /)    ; mme_tpi_lp_hist 5% / 95%
   delete(temparr)
   
-;  tpis_lp_piControl_mme = dim_avg_n_Wrap(tpi_lp_piControl,0)
 ;-----------------------------------------------------
   cor = escorc(dim_avg_n(timeseries(:2,:),0),timeseries(4,:))
   corval = decimalPlaces(cor,2,True)   ;+"%"
@@ -1128,9 +1100,7 @@ begin
   res@gsnRightStringFontHeightF = 0.018
   res@gsnAddCyclic = True
   
-;  res@cnLevels = fspan(-.5,.5,21)
   res@cnLevels = fspan(-.4,.4,11)
-;  cmap = read_colormap_file("AR6_colormaps_NCL/AR6_Temp_10.rgb")
   cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_temperature_div_12.rgb")
   res@cnFillColors = cmap
 
@@ -1160,13 +1130,9 @@ begin
   res2@cnLevels = 0.5
   oplot = gsn_csm_contour(wks,sig(0,:,:),res2)
   overlay(plot(0),oplot)
-;  res2@cnFillPatterns = (/11,0/)
   res2@cnFillPatterns = (/3,0/)
   res2@cnLevels = 0.5
   res2@cnFillScaleF        = 0.7
-;  res2@cnLinesOn = True
-;  res2@cnLineThicknessF = 1.5
-;  res2@cnLineColors = "gray10"
   oplot1 = gsn_csm_contour(wks,mme_ipo_sign,res2)
   overlay(plot(1),oplot1)
   
@@ -1184,7 +1150,7 @@ begin
   panres@gsnFrame = False
   panres@pmLabelBarOrthogonalPosF = 0.017
   panres@lbTitleOn = True
-  panres@lbTitleString = "~S~o~N~C"
+  panres@lbTitleString = "(~S~o~N~C)"
   panres@lbTitlePosition  = "Top"              ; title position
   panres@lbTitleFontHeightF= .010                ; make title smaller
   gsn_panel(wks,plot,(/1,2/),panres)
@@ -1210,7 +1176,6 @@ begin
   gsn_define_colormap(wks,cmap)
   
   tres                 = True                     ; diagram mods desired
-;  colors = new(dimsizes(models),integer) ;new(dimsizes(tpi_hist&nens),integer)???
   colors = new(dimsizes(tpi_hist&nens),integer)
   colors = 3
   tres@Colors          = colors       ; marker colors
@@ -1235,8 +1200,6 @@ begin
   ratio  = tay_stats_hist(:,1:1)
 
   ; mask the few values off of the Taylor plot
-  ;ratio = where(ratio.ge.3.5,ratio@_FillValue,ratio)
-  ;taylor_ipo_ratio_C5 = where(taylor_ipo_ratio_C5.ge.3.5,taylor_ipo_ratio_C5@_FillValue,taylor_ipo_ratio_C5)
   tres@txFontHeightF   = 0.028
   tplot = taylor_diagram(wks, ratio, patcor, tres)
 
@@ -1265,7 +1228,6 @@ begin
   tres@gsMarkerSizeF   = 0.008
   tres@Colors := 8
   tres@Markers:= 16
-;  tres@gsMarkerThicknessF = 2.0
   tplot3b = taylor_diagram(wks, tay_stats_hist_cmip5EM(0:0,1:1),tay_stats_hist_cmip5EM(0:0,0:0), tres)
   overlay(tplot_C5,tplot3b)
 
@@ -1278,7 +1240,6 @@ begin
   overlay(tplot_C5,tplot2)
   panres@gsnPanelLabelBar = False
   panres@gsnPanelLeft = 0.665
-;  delete(panres@gsnPanelRight)
   panres@gsnPanelRight = 0.995
   panres@gsnPanelTop = 0.81
   panres@gsnPanelBottom = 0.60
@@ -1473,12 +1434,11 @@ begin
   mres2@tiYAxisFontHeightF = 0.02
   mres2@tiYAxisOffsetYF = -0.005
 
-  bot_plot = gsn_csm_xy(wks,fspan(syearA,2005.91666,dimsizes(hist_range_C5&time)),hist_range_C5,mres2)
+  bot_plot = gsn_csm_xy(wks,ispan(syearA,2005,1),hist_range_C5,mres2)
   delete(mres2@gsnXYFillColors)
   mres2@gsnXYFillColors = (/.7,0,0,.3/)  ;"LightPink"
-  mid_plot = gsn_csm_xy(wks,fspan(syearA,eyearA+.91666,dimsizes(hist_range&time)),hist_range,mres2)
-
-  tplot = gsn_csm_xy(wks,fspan(syearA,eyearA+.91666,dimsizes(hist_range&time)),timeseries,mres)
+  mid_plot = gsn_csm_xy(wks,ispan(syearA,eyearA,1),hist_range,mres2)
+  tplot = gsn_csm_xy(wks,ispan(syearA,eyearA,1),timeseries,mres)
   overlay(bot_plot,mid_plot)
   overlay(bot_plot,tplot)
 
@@ -1487,7 +1447,6 @@ begin
   panres@gsnPanelLeft = 0.37
   delete(panres@gsnPanelXWhiteSpacePercent)
   delete(panres@gsnPanelRight)
-;  panres@gsnPanelRight = 0.999
   gsn_panel(wks,bot_plot,(/1,1/),panres)
   ;--------------------------------------------------------
   ; Set titles for panels 3-6
@@ -1514,20 +1473,6 @@ begin
   lineres@LineLengthPercent = 2.5                        ; expressed as %, 0->100, length of line
   lineres@lgDashIndexes = 0
 
-;  textres = True
-;  textres@lgLabels = (/"CMIP5 Hist","CMIP6 Hist"/)  ; legend labels (required)
-;  textres@lgLabelFontHeights = 0.007 ;0.006
-;  gres@XPosPercent = 13.
-;  lineres@lgLineColors := (/5,3/)
-;  simple_legend_ndc(wks,gres,lineres,textres)
-
-;  gres@YPosPercent = 40.25
-;  gres@XPosPercent = 8., ;5.
-;  lineres@lgLineColors := (/plres3@gsLineColor,plres3@gsLineColor,plres3@gsLineColor/)
-;  lineres@lgDashIndexes := dpl
-;  textres@lgLabels := obs_datasets ;(/"ERSST v5","HadISST1","ERSST v3b"/)
-;  simple_legend_ndc(wks,gres,lineres,textres)
-
   x1 = 0.08
   y1 = 0.403
   lres = True
@@ -1545,14 +1490,6 @@ begin
   ; Timeseries legend
   ;--------------------------------------------------------
 
-;  lineres@LineLengthPercent = 2.5
-;  lineres@lgLineThicknesses = 1.5
-;  gres@YPosPercent = 39.2
-;  gres@XPosPercent = 50
-;  lineres@lgDashIndexes := (/0,2,3/)
-;  textres@lgLabels := obs_datasets ; (/"ERSST v5","HadISST1","ERSST v3b"/)
-;  simple_legend_ndc(wks,gres,lineres,textres)
-
   x1 = 0.52
   y1 = 0.393
   lres = True
@@ -1568,13 +1505,6 @@ begin
   end do
 
   x1 = 0.64
-;  lineres@lgLineThicknessF = 2.5
-;  lineres@LineLengthPercent = 1.5
-;  lineres@lgDashIndexes := 0
-;  lineres@lgLineColors := 5
-;  textres@lgLabels := "CMIP5 Hist MME"
-;  gres@XPosPercent = 58.
-;  simple_legend_ndc(wks,gres,lineres,textres)
   lres@gsLineDashPattern = 0
   lres@gsLineColor = 5
   lres@gsLineThicknessF = 2.5
@@ -1585,21 +1515,11 @@ begin
   lres = True   ; draw box showing observational range
   lres@gsFillColor := 5
   lres@gsFillOpacityF = 0.6
-  ;  gsn_polygon_ndc(wks,(/.774,.792,.792,.774,.774/),(/.389,.389,.397,.397,.389/),lres)
   gsn_polygon_ndc(wks,(/x1,x1+0.03,x1+0.03,x1,x1/),(/y1-0.01,y1-0.01,y1-0.02,y1-0.02,y1-0.01/),lres)
   gsn_polygon_ndc(wks,(/x1,x1+0.03,x1+0.03,x1,x1/),(/y1-0.01,y1-0.01,y1-0.02,y1-0.02,y1-0.01/),lres)
-;  lineres@lgLineThicknesses = 1.5
-;  gres@XPosPercent = 77.5
-;  lineres@lgLineColors :=  5
-;  textres@lgLabels = " CMIP5 Range"
-;  simple_legend_ndc(wks,gres,lineres,textres)
   gsn_text_ndc(wks, "CMIP5 Hist Range", x1+0.035, y1-0.016, txres)
 
   x1 = 0.78
-;  gres@XPosPercent = 67.75
-;  lineres@lgLineColors = 3
-;  textres@lgLabels = "CMIP6 Hist MME"
-;  simple_legend_ndc(wks,gres,lineres,textres)
   lres@gsLineColor = 3
   gsn_polyline_ndc(wks, (/x1,x1+0.03/),(/y1,y1/), lres)
   gsn_text_ndc(wks, "CMIP6 Hist MME", x1+0.035, y1, txres)
@@ -1614,21 +1534,6 @@ begin
   gsn_text_ndc(wks, "CMIP6 Hist Range", x1+0.035, y1-0.026, txres)
   delete(lres@gsLineColor)
   delete(lres@gsLineThicknessF)
-;  gres@XPosPercent = 85.5
-;  lineres@lgLineColors :=  3    ;(/.7,0,0,.3/)
-;  textres@lgLabels = " CMIP6 Range"
-;  simple_legend_ndc(wks,gres,lineres,textres)
-;
-;  lres@gsFillColor = 3
-;  gsn_polygon_ndc(wks,(/.854,.872,.872,.854,.854/),(/.389,.389,.397,.397,.389/),lres)
- ;   
- ; gres@XPosPercent = 67.75
- ; gres@YPosPercent = 37.7
- ; lineres@lgLineThicknesses = 1.    
- ; lineres@lgLineColors = 3
- ; lineres@lgDashIndexes = 5
- ; textres@lgLabels = "CMIP6 Hist MME 5-95% CI"
- ; simple_legend_ndc(wks,gres,lineres,textres)
 
   ;--------------------------------------------------------
   ; Taylor legend
@@ -1642,35 +1547,25 @@ begin
   tlres@txJust = "CenterLeft"
 
   mares@gsMarkerColor = "Black"
-;  gsn_polymarker_ndc(wks,.81,.806,mares)
-;  gsn_text_ndc(wks,"Observations",.815,.806,tlres)
   gsn_polymarker_ndc(wks,.788,.808,mares)
   gsn_text_ndc(wks,"Observations",.793,.808,tlres)
 
   mares@gsMarkerIndex = 2
   mares@gsMarkerSizeF   = 0.006
   mares@gsMarkerColor = 5
-;  gsn_polymarker_ndc(wks,.875,.807,mares)
-;  gsn_text_ndc(wks,"CMIP5 Hist member",.88,.806,tlres)
   gsn_polymarker_ndc(wks,.858,.808,mares)
   gsn_text_ndc(wks,"CMIP5 Hist member",.863,.808,tlres)
   
   mares@gsMarkerColor = 3
-;  gsn_polymarker_ndc(wks,.875,.797,mares)
-;  gsn_text_ndc(wks,"CMIP6 Hist member",.88,.796,tlres)
   gsn_polymarker_ndc(wks,.858,.798,mares)
   gsn_text_ndc(wks,"CMIP6 Hist member",.863,.798,tlres)
 
   mares@gsMarkerIndex = 1
   mares@gsMarkerColor = 8
   mares@gsMarkerSizeF = 0.018
-;  gsn_polymarker_ndc(wks,.875,.787,mares)
-;  gsn_text_ndc(wks,"CMIP5 Hist MME",.88,.786,tlres)
   gsn_polymarker_ndc(wks,.858,.788,mares)
   gsn_text_ndc(wks,"CMIP5 Hist MME",.863,.788,tlres)
   mares@gsMarkerColor = 9
-;  gsn_polymarker_ndc(wks,.875,.777,mares)
-;  gsn_text_ndc(wks,"CMIP6 Hist MME",.88,.776,tlres)
   gsn_polymarker_ndc(wks,.858,.778,mares)
   gsn_text_ndc(wks,"CMIP6 Hist MME",.863,.778,tlres)
 
@@ -1678,28 +1573,17 @@ begin
 ; Boxplot legend, additional text
 ;
   gsn_text_ndc(wks,"r="+corval+",  S/N="+snval,.825,.44,tlres)
-;  gsn_text_ndc(wks,"piControl  Historical",0.224,0.365,tlres)
-;  gsn_text_ndc(wks,"- 95%",.275,.417,tlres)
-;  gsn_text_ndc(wks,"- 75%",.285,.408,tlres)
-;  gsn_text_ndc(wks,"- Median",.285,.398,tlres)
-;  gsn_text_ndc(wks,"- 25%",.285,.388,tlres)
-;  gsn_text_ndc(wks,"- 5%",.275,.379,tlres)
   gsn_text_ndc(wks,"piControl  Historical",0.174,0.365,tlres)
   gsn_text_ndc(wks,"- 95%",.225,.417,tlres)
   gsn_text_ndc(wks,"- 75%",.235,.408,tlres)
-;  gsn_text_ndc(wks,"- Median",.235,.398,tlres)
   gsn_text_ndc(wks,"- Mean",.235,.398,tlres)
   gsn_text_ndc(wks,"- 25%",.235,.388,tlres)
   gsn_text_ndc(wks,"- 5%",.225,.379,tlres)
 
   tlres@txFontColor = 5
-;  gsn_text_ndc(wks,"CMIP5 (Hist, "+count_unique_values(ea_c5)+"M,"+num(.not.ismissing(dim_stddev(tpi_lp_hist_C5)))+"R)",0.33,.412,tlres)
-;  gsn_text_ndc(wks,"CMIP5 (piControl, "+num(.not.ismissing(dim_stddev(tpi_lp_piControl_C5)))+"M)",0.33,0.402,tlres)
   gsn_text_ndc(wks,"CMIP5 (Hist, "+count_unique_values(ea_c5)+" models, "+num(.not.ismissing(dim_stddev(tpi_lp_hist_C5)))+" runs)",0.28,.412,tlres)
   gsn_text_ndc(wks,"CMIP5 (piControl, "+num(.not.ismissing(dim_stddev(tpi_lp_piControl_C5)))+" models)",0.28,0.400,tlres)
   tlres@txFontColor = 3
-;  gsn_text_ndc(wks,"CMIP6 (Hist, "+count_unique_values(ensemble_assign)+"M,"+num(.not.ismissing(dim_stddev(tpi_lp_hist)))+"R)",0.33,0.392,tlres)
-;  gsn_text_ndc(wks,"CMIP6 (piControl, "+num(.not.ismissing(dim_stddev(tpi_lp_piControl)))+"M)",0.33,0.382,tlres)
   gsn_text_ndc(wks,"CMIP6 (Hist, "+count_unique_values(ensemble_assign)+" models, "+num(.not.ismissing(dim_stddev(tpi_lp_hist)))+" runs)",0.28,0.388,tlres)
   gsn_text_ndc(wks,"CMIP6 (piControl, "+num(.not.ismissing(dim_stddev(tpi_lp_piControl)))+" models)",0.28,0.376,tlres)
   delete(tlres@txFontColor)
@@ -1719,12 +1603,6 @@ begin
 
   tlres@txFontHeightF = 0.008
   pmres0 = True
-;  pmres0@gsLineThicknessF     = 1.          ; polymarker size
-;  pmres0@gsLineColor = "gray25"
-;  gsn_polyline_ndc(wks,(/.5558,.5708/),(/.6175,.623/),pmres0)
-;  gsn_polyline_ndc(wks,(/.5473,.5623/),(/.6175,.623/),pmres0)
-;  gsn_polyline_ndc(wks,(/.5598,.5653/),(/.623,.6175/),pmres0)
-;  gsn_polyline_ndc(wks,(/.553,.5585/),(/.623,.6175/),pmres0)
   pmres0@gsFillColor = "gray25"
   pmres0@gsFillScaleF = 0.7
 ;  pmres0@gsFillIndex = 11
@@ -1739,30 +1617,15 @@ begin
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres0)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
   gsn_text_ndc(wks," < 80% of runs~C~ match MME sign",x2+0.004,0.62,tlres)
-;  gsn_text_ndc(wks," < 90% of runs~C~ match MME sign",x2+0.004,0.62,tlres)
-  
-;  pmres = True
-;  pmres@gsMarkerIndex     = 16          ; polymarker style
-;  pmres@gsMarkerSizeF     = 2.          ; polymarker size
-;  pmres@gsMarkerColor = pmres0@gsLineColor
-;  gsn_polymarker_ndc(wks,.0725,.622,pmres)
-;  gsn_polymarker_ndc(wks,.0725,.612,pmres)
-;  gsn_polymarker_ndc(wks,.0675,.617,pmres)
-;  gsn_polymarker_ndc(wks,.0775,.617,pmres)
+
   pmres = pmres0
   pmres@gsFillScaleF = 0.55
   pmres@gsFillIndex = 17
   x1 = 0.047
   x2 = 0.071
-;  y1 = 0.612
-;  y2 = 0.623
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
-;  gsn_text_ndc(wks," not significant~C~ at 5% level",x2+0.004,0.62,tlres)
   gsn_text_ndc(wks," not significant~C~ at 10% level",x2+0.004,0.62,tlres)
-
-;  gsn_text_ndc(wks," not significant at~C~ 5% level",0.085,0.62,tlres)
-;  gsn_text_ndc(wks,"< 80% of runs match MME sign",0.575,0.6195,tlres)
 
   frame(wks)
   delete(wks)

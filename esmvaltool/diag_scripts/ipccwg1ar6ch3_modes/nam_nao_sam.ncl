@@ -265,34 +265,38 @@ begin
               cor_fld := finarr_samC 
            end if
 
-           print("Significance by rtest plus false rate detection")
+;           print("Significance by rtest plus false rate detection")
            prob_rtest=(/ rtest(cor_fld,dimsizes(arr_seas&time),0) /)
            copy_VarMeta(arr_seas(0,:,:),prob_rtest)
            prob_rtest=where(arr_seas(0,:,:).eq.arr_seas@_FillValue,prob_rtest@_FillValue,prob_rtest)
 
-           npts=num(.not.ismissing(ndtooned(arr_seas(0,:,:))))
- 
-           siglev = 0.05
+;           npts=num(.not.ismissing(ndtooned(arr_seas(0,:,:))))
+; 
+;           siglev = 0.05
+;
+;           frac = fspan(1, npts, npts)
+;           scale=1
+;           frac = (/ (frac/npts)* scale * siglev /)
+;           prob_rtest_fdr=prob_rtest
+;
+;           prob_rtest_1d=ndtooned(prob_rtest)
+;           prob_rtest_1d_nomiss=prob_rtest_1d(ind(.not.ismissing(prob_rtest_1d)))
+; 
+;           sig_fdr = prob_rtest_1d_nomiss
+;           ip = dim_pqsort(sig_fdr, 2)
+;           sig_fdr = where(sig_fdr .gt. frac, sig_fdr@_FillValue, sig_fdr)
+;           if (all(ismissing(sig_fdr))) then
+;             pval_fdr = 0.
+;           else
+;             pval_fdr = (/ max(sig_fdr) /)
+;           end if
+;           prob_rtest_fdr =  (/ where(prob_rtest.gt. pval_fdr, 0, 1.) /) 
+;           sig(hh,:,:) = (/ prob_rtest_fdr /)
+;           delete([/prob_rtest_fdr,pval_fdr,sig_fdr,ip,prob_rtest_1d,frac,scale,siglev,npts,prob_rtest,reg_fld,cor_fld,prob_rtest_1d_nomiss/])
 
-           frac = fspan(1, npts, npts)
-           scale=1
-           frac = (/ (frac/npts)* scale * siglev /)
-           prob_rtest_fdr=prob_rtest
-
-           prob_rtest_1d=ndtooned(prob_rtest)
-           prob_rtest_1d_nomiss=prob_rtest_1d(ind(.not.ismissing(prob_rtest_1d)))
- 
-           sig_fdr = prob_rtest_1d_nomiss
-           ip = dim_pqsort(sig_fdr, 2)
-           sig_fdr = where(sig_fdr .gt. frac, sig_fdr@_FillValue, sig_fdr)
-           if (all(ismissing(sig_fdr))) then
-             pval_fdr = 0.
-           else
-             pval_fdr = (/ max(sig_fdr) /)
-           end if
-           prob_rtest_fdr =  (/ where(prob_rtest.gt. pval_fdr, 0, 1.) /) 
-           sig(hh,:,:) = (/ prob_rtest_fdr /)
-           delete([/prob_rtest_fdr,pval_fdr,sig_fdr,ip,prob_rtest_1d,frac,scale,siglev,npts,prob_rtest,reg_fld,cor_fld,prob_rtest_1d_nomiss/])
+           siglev = 0.10
+           sig(hh,:,:) = where(prob_rtest.gt.siglev, 0., 1.)
+           delete([/siglev,prob_rtest,reg_fld,cor_fld/])
         end do
 
         if (ii.eq.0) then
@@ -1497,7 +1501,7 @@ begin
      overlay(plot(gg),oplot(gg))
   end do
 
-  res2@cnFillPatterns = (/11,0/)
+  res2@cnFillPatterns = (/3,0/) ;(/11,0/)
   res2@cnLevels = 0.5
   res2@cnFillScaleF        = 0.7
   oplot3 = gsn_csm_contour(wks,mme_nam_sign_C6,res2)
@@ -1515,13 +1519,13 @@ begin
   panres@gsnPanelXWhiteSpacePercent = 3.0
   panres@pmLabelBarHeightF = 0.05
   panres@pmLabelBarWidthF = 0.38
-  panres@pmLabelBarOrthogonalPosF = 0.01
+  panres@pmLabelBarOrthogonalPosF = 0.005  ;0.01
   panres@lbTitleOn = False
   panres@lbBoxLineColor = "gray70"
   panres@lbLabelFontHeightF = 0.010
   panres@lbBoxEndCapStyle = "TriangleBothEnds"
   panres@lbTitleOn = True
-  panres@lbTitleString = "hPa"
+  panres@lbTitleString = "(hPa)"
   panres@lbTitlePosition  = "Bottom"              ; title position
   panres@lbTitleFontHeightF= .010                ; make title smaller
   panres@txFontHeightF = 0.018;0.022
@@ -1916,7 +1920,8 @@ begin
 
   textres@txFont = 22
   textres@txFontHeightF = 0.018
-  gsn_text_ndc(wks,"Model Evaluation of NAM, NAO and SAM in boreal winter",0.5,0.98,textres)
+;  gsn_text_ndc(wks,"Model Evaluation of NAM, NAO and SAM in boreal winter",0.5,0.98,textres)
+  gsn_text_ndc(wks,"Model Evaluation of NAM, NAO and SAM in boreal winter",0.5,0.96,textres)
 
   textres@txFont = 21
   textres@txFontHeightF = 0.015
@@ -1950,8 +1955,10 @@ begin
   mares@gsMarkerColor = 1
 ;  gsn_polymarker_ndc(wks,.225,yval,mares)
 ;  gsn_text_ndc(wks,"Observations",.2325,yval,tlres)
-  gsn_polymarker_ndc(wks,.19,yval,mares)
-  gsn_text_ndc(wks,"Observations",.197,yval,tlres)
+;  gsn_polymarker_ndc(wks,.19,yval,mares)
+;  gsn_text_ndc(wks,"Observations",.197,yval,tlres)
+  gsn_polymarker_ndc(wks,.18,yval,mares)
+  gsn_text_ndc(wks,"Observations",.187,yval,tlres)
   mares@gsMarkerIndex = 2
   mares@gsMarkerSizeF   = 0.006
   mares@gsMarkerColor = 5
@@ -1991,14 +1998,14 @@ begin
 ;  gsn_polyline_ndc(wks,(/.7045,.7065/),(/.4815,.476/),pmres0)
   pmres0@gsFillColor = "gray25"
   pmres0@gsFillScaleF = 0.7
-  pmres0@gsFillIndex = 11
+  pmres0@gsFillIndex = 3 ;11
   lres = True
   lres@gsLineDashPattern = 0
   lres@gsLineThicknessF = 1.
   x1 = 0.695
   x2 = 0.715
-  y1 = 0.475
-  y2 = 0.485
+  y1 = 0.47 ; 0.475
+  y2 = 0.49 ; 0.485
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres0)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
   gsn_text_ndc(wks," < 80% of runs~C~ match MME sign",x2+0.005,0.48,tlres)
@@ -2015,11 +2022,12 @@ begin
   pmres@gsFillIndex = 17
   x1 = 0.20
   x2 = 0.22
-  y1 = 0.475
-  y2 = 0.485
+  y1 = 0.47 ; 0.475
+  y2 = 0.49 ; 0.485
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
-  gsn_text_ndc(wks," not significant~C~ at 5% level",x2+0.005,0.48,tlres)
+;  gsn_text_ndc(wks," not significant~C~ at 5% level",x2+0.005,0.48,tlres)
+  gsn_text_ndc(wks," not significant~C~ at 10% level",x2+0.005,0.48,tlres)
 
 
 ;  gsn_polymarker_ndc(wks,.6575,.365,mares)
