@@ -32,18 +32,26 @@ preprocessors:
       target_grid: 1x1
       scheme: linear
 
-  clim_5x5:
+  regrid_5_5:
     regrid:
       target_grid: 5x5
       scheme: linear
 
+  regrid_5_5_mmm:
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    multi_model_statistics:
+      span: full
+      statistics: [mean]
+    
 
 
 models_cmip6_historical: &models_cmip6_historical #historical, Amon, tas+pr
   - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS}
   - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
   - {dataset: AWI-CM-1-1-MR, grid: gn}
-  #- {dataset: AWI-ESM-1-1-LR, grid: gn} #error: zero as reference year
+  - {dataset: AWI-ESM-1-1-LR, grid: gn} #error: zero as reference year
   - {dataset: BCC-CSM2-MR, grid: gn}
   - {dataset: BCC-ESM1, grid: gn}
   - {dataset: CAMS-CSM1-0, grid: gn}
@@ -94,6 +102,65 @@ models_cmip6_historical: &models_cmip6_historical #historical, Amon, tas+pr
   - {dataset: TaiESM1, grid: gn}
   - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
 
+datasets_cmip6: &cmip6_models #historical+ssp245, all ensemble members, Amon, tas
+  - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, ensemble: r(1:3)i1p1f1}
+  - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, ensemble: r(1:3)i1p1f1}
+  - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1} #concatinate error
+  - {dataset: AWI-ESM-1-1-LR, grid: gn, end_year: 2014} #no ssp245
+  - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r1i1p1f1}
+  - {dataset: BCC-ESM1, grid: gn, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: CAMS-CSM1-0, grid: gn, ensemble: r(1:2)i1p1f1}
+  - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p1f1}
+  - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p2f1}
+  #- {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
+  - {dataset: CAS-ESM2-0, institute: CAS, grid: gn, ensemble: r(1:4)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: CESM2, grid: gn, ensemble: r(1:11)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: CESM2-FV2, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1}
+  - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: CIESM, ensemble: r1i1p1f1}
+  - {dataset: CMCC-CM2-SR5, grid: gn}
+  - {dataset: CMCC-CM2-HR4, grid: gn, end_year: 2014} #no ssp245
+  - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2}
+  - {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: E3SM-1-1, institute: E3SM-Project, end_year: 2014} #no ssp245
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, end_year: 2014} #no ssp245
+  #- {dataset: EC-Earth3} #not all years available
+  - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1}
+  - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1}
+  - {dataset: FGOALS-g3, grid: gn, ensemble: r1i1p1f1}
+  - {dataset: FIO-ESM-2-0, grid: gn, ensemble: r(1:3)i1p1f1}
+  - {dataset: GFDL-CM4, grid: gr1, end_year: 2014} #permission denied tas
+  - {dataset: GFDL-ESM4, grid: gr1, ensemble: r1i1p1f1}
+  - {dataset: GFDL-ESM4, grid: gr1, ensemble: r3i1p1f1}
+  - {dataset: GISS-E2-1-G, grid: gn, ensemble: r(1:5)i1p1f2}
+  - {dataset: GISS-E2-1-G, grid: gn, ensemble: r(1:5)i1p3f1}
+  - {dataset: GISS-E2-1-H, grid: gn, ensemble: r(1:10)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r(1:4)i1p1f3, grid: gn, end_year: 2014} #no sp245
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1}
+  - {dataset: IPSL-CM6A-LR, ensemble: r(1:6)i1p1f1}
+  - {dataset: KACE-1-0-G, ensemble: r(1:2)i1p1f1}
+  - {dataset: KIOST-ESM, grid: gr1} #missing height coordinate
+  - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f2}
+  - {dataset: MIROC6, grid: gn, ensemble: r(1:3)i1p1f1}
+  - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn, ensemble: r(1:2)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: MPI-ESM1-2-HR, grid: gn, ensemble: r(1:2)i1p1f1}
+  - {dataset: MPI-ESM1-2-LR, grid: gn, ensemble: r(1:10)i1p1f1}
+  - {dataset: MRI-ESM2-0, grid: gn, ensemble: r(1:5)i1p1f1}
+  - {dataset: NESM3, grid: gn, ensemble: r(1:2)i1p1f1}
+  - {dataset: NorCPM1, grid: gn, institute: NCC, ensemble: r(1:30)i1p1f1, end_year: 2014} #no ssp245
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC, ensemble: r(1:3)i1p1f1} #concatinate error with ssp245
+  - {dataset: NorESM2-MM, grid: gn, institute: NCC, ensemble: r1i1p1f1} 
+  - {dataset: SAM0-UNICON, grid: gn, end_year: 2014} #no ssp245
+  - {dataset: TaiESM1, grid: gn, end_year: 2014} #no ssp245
+  - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
+ 
 
 models_cmip6_piControl: &models_cmip6_piControl #piControl, Amon, tas+pr
   - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, start_year: 950, end_year: 1149}
@@ -199,6 +266,64 @@ models_cmip5_historical: &models_cmip5_historical
   - {dataset: MRI-CGCM3}
   - {dataset: NorESM1-M}
   - {dataset: NorESM1-ME}
+
+
+datasets_cmip5: &cmip5_models  #historical+ssp245, all ensemble members, Amon, tas 
+  - {dataset: ACCESS1-0, ensemble: r1i1p1}
+  - {dataset: ACCESS1-3, ensemble: r1i1p1}
+  - {dataset: bcc-csm1-1, ensemble: r1i1p1}
+  - {dataset: bcc-csm1-1-m, ensemble: r1i1p1}
+  - {dataset: BNU-ESM}
+  #- {dataset: CanCM4, ensemble: r(1:10)i1p1, start_year: 1961} #start year 1961
+  - {dataset: CanESM2, ensemble: r(1:5)i1p1}
+  - {dataset: CCSM4, ensemble: r(1:5)i1p1}
+  - {dataset: CESM1-BGC}
+  - {dataset: CESM1-CAM5, ensemble: r(1:3)i1p1}
+  #- {dataset: CESM1-CAM5-1-FV2} #no tas data
+  - {dataset: CESM1-FASTCHEM, ensemble: r(1:3)i1p1, end_year: 2004} #no rcp45
+  - {dataset: CESM1-WACCM, ensemble: r1i1p1, end_year: 2004} #no rcp45
+  - {dataset: CMCC-CESM, end_year: 2004} #no rcp45
+  - {dataset: CMCC-CM}
+  - {dataset: CMCC-CMS}
+  - {dataset: CNRM-CM5, ensemble: r1i1p1}
+  - {dataset: CNRM-CM5-2, ensemble: r1i1p1, end_year: 2004} #no rcp45
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r(1:10)i1p1}
+  - {dataset: EC-EARTH, ensemble: r5i1p1}
+  - {dataset: FGOALS-g2, ensemble: r1i1p1}
+  - {dataset: FGOALS-s2, ensemble: r(2:3)i1p1, end_year: 2004} #no rcp45
+  - {dataset: FIO-ESM, ensemble: r(1:3)i1p1}
+  - {dataset: GFDL-CM2p1, ensemble: r(1:10)i1p1, start_year: 1861}
+  - {dataset: GFDL-CM3, ensemble: r1i1p1, start_year: 1860}
+  - {dataset: GFDL-ESM2G, start_year: 1861}
+  - {dataset: GFDL-ESM2M, start_year: 1861}
+  - {dataset: GISS-E2-H, ensemble: r(1:5)i1p1}
+  - {dataset: GISS-E2-H, ensemble: r(1:5)i1p2}
+  - {dataset: GISS-E2-H, ensemble: r(1:6)i1p3}
+  - {dataset: GISS-E2-H-CC}
+  - {dataset: GISS-E2-R, ensemble: r(1:6)i1p1}
+  - {dataset: GISS-E2-R, ensemble: r(1:5)i1p2}
+  - {dataset: GISS-E2-R, ensemble: r(1:6)i1p3}
+  - {dataset: GISS-E2-R-CC}
+  - {dataset: HadCM3, ensemble: r(1:10)i1p1, start_year: 1860}
+  - {dataset: HadGEM2-AO, start_year: 1860}
+  - {dataset: HadGEM2-CC, ensemble: r1i1p1, start_year: 1860, end_year: 2004}
+  - {dataset: HadGEM2-ES, ensemble: r(1:4)i1p1, start_year: 1860, end_year: 2004}
+  - {dataset: inmcm4}
+  - {dataset: IPSL-CM5A-LR, ensemble: r(1:4)i1p1}
+  - {dataset: IPSL-CM5A-MR, ensemble: r1i1p1}
+  - {dataset: IPSL-CM5B-LR}
+  #- {dataset: MIROC4h, ensemble: r(1:3)i1p1} #data available after 1950
+  - {dataset: MIROC5, ensemble: r(1:5)i1p1}
+  - {dataset: MIROC-ESM, ensemble: r1i1p1}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MPI-ESM-LR, ensemble: r(1:3)i1p1}
+  - {dataset: MPI-ESM-MR, ensemble: r(1:3)i1p1}
+  - {dataset: MPI-ESM-P, ensemble: r(1:2)i1p1, end_year: 2004} #no rcp45
+  - {dataset: MRI-CGCM3, ensemble: r1i1p1}
+  - {dataset: MRI-ESM1, start_year: 1851, end_year: 2004} #no rcp45
+  - {dataset: NorESM1-M, ensemble: r1i1p1}
+  - {dataset: NorESM1-ME, ensemble: r1i1p1}
+
 
 
 models_cmip5_piControl: &models_cmip5_piControl
@@ -466,48 +591,140 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig 3.4
+  # Fig 3.3
   # **********************************************************************
-  # Global climate variability - surface temperature
-  # **********************************************************************
+  # Timeseries of Global Near-Surface Air Temperature Anomaly
+  # ***********************************************************************
 
-  fig_3_4:
-    description: IPCC AR6 Ch. 3, Fig. 3.4 (near-surface temperature)
+  fig_3_3_cmip6:
+    description: Timeseries of Global Near-Surface Air Temperature Anomaly
     variables:
-      tas:
-        preprocessor: clim_5x5
+      tas: &tas_settings_cmip6
+        preprocessor: regrid_5_5_mmm
         mip: Amon
         project: CMIP6
-        exp: piControl
-        ensemble: r1i1p1f1
+        exp: [historical, ssp245]
         grid: gr
-        additional_datasets: *models_cmip6_piControl
+        ensemble: r1i1p1f1
+        start_year: 1850
+        end_year: 2018
+        additional_datasets: *cmip6_models
       tasa:
-        preprocessor: clim_5x5
-        mip: Amon
-        project: CMIP6
-        exp: piControl
-        ensemble: r1i1p1f1
-        grid: gr
-        start_year: 1995 #1850
-        end_year: 2014 #1900
+        <<: *tas_settings_cmip6
+        preprocessor: regrid_5_5
         additional_datasets:
-          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, start_year: 1880, tier: 2}
-          - {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2}
-          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
+             tier: 2}
     scripts:
-      fig_3_4:
-        script: ipcc_ar6/zonal_st_dev.ncl
-        multi_model_mean: True
-        time_avg: "yearly"
+      fig-3-3: &tsline_settings
+        script: ipcc_ar6/tas_anom.ncl
+        ref_start: 1850
+        ref_end: 1900
         plot_units: "degC"
-        plot_legend: False
+        y_min: -0.7
+        y_max: 2.1
+        volcanoes: true
+        blending: False
+        ref_mask: True
+        write_stat: True
         styleset: CMIP6
 
 
+  fig_3_3_cmip5:
+    description: Blended surface temperature.
+    variables:
+      tas: &tas_settings_cmip5
+        preprocessor: regrid_5_5_mmm
+        mip: Amon
+        project: CMIP5
+        exp: [historical, rcp45]
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2018
+        additional_datasets: *cmip5_models
+      tasa:
+        <<: *tas_settings_cmip5
+        preprocessor: regrid_5_5
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
+             tier: 2}
+    scripts:
+      fig-3-3:
+        <<: *tsline_settings
+        styleset: CMIP5
 
+
+  fig_3_3_collect:
+    description: Collect all timeseries of blended surface temperature.
+    variables:
+      tasa: 
+        <<: *tas_settings_cmip6
+        end_year: 2018
+        preprocessor: regrid_5_5
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2,
+             start_year: 1880}
+          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_blend_collect.ncl
+        ancestors: [tasa, 'fig_3_3_*/fig-3-3']
+        start_year: 1850
+        end_year: 2018
+        ref: ["HadCRUT5"]
+        order: ["CMIP6_historical-ssp245", "CMIP5_historical-rcp45"]
+        stat_shading: True
+        ref_shading: True
+        ref_stderr: True
+
+#  # **********************************************************************
+#  # IPCC WGI AR6, chap. 3
+#  # Sect. 3.3 
+#  # Fig 3.4
+#  # **********************************************************************
+#  # Global climate variability - surface temperature
+#  # **********************************************************************
+#
+#  fig_3_4:
+#    description: IPCC AR6 Ch. 3, Fig. 3.4 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: regrid_5_5
+#        mip: Amon
+#        project: CMIP6
+#        exp: piControl
+#        ensemble: r1i1p1f1
+#        grid: gr
+#        additional_datasets: *models_cmip6_piControl
+#      tasa:
+#        preprocessor: regrid_5_5
+#        mip: Amon
+#        project: CMIP6
+#        exp: piControl
+#        ensemble: r1i1p1f1
+#        grid: gr
+#        start_year: 1950 #1850
+#        end_year: 2014 #1900
+#        additional_datasets:
+#          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, start_year: 1880, tier: 2}
+#          - {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2}
+#          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
+#          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+#    scripts:
+#      fig_3_4:
+#        script: ipcc_ar6/zonal_st_dev.ncl
+#        multi_model_mean: True
+#        time_avg: "yearly"
+#        plot_units: "degC"
+#        plot_legend: False
+#        styleset: CMIP6
+#
+#
+#
 #   # **********************************************************************
 #   # IPCC WGI AR6, chap. 3
 #   # Sect. 3.3
