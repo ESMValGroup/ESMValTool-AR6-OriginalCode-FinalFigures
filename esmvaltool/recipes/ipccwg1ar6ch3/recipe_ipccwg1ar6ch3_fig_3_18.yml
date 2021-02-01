@@ -114,11 +114,10 @@ diagnostics:
         exp: historical
         grid: gr
         ensemble: r1i1p1f1
-        start_year: 1995
+        start_year: 1979
         end_year: 2014
     additional_datasets:
-      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1,
-         start_year: 1995, end_year: 2014, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
     scripts:
       clim: &clim_settings
         script:  ipcc_ar6/zonal_westerly_winds.ncl
