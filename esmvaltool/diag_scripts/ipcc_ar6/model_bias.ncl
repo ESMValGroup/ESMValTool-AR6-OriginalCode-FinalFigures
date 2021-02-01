@@ -388,6 +388,10 @@ begin
   diff@res_cnInfoLabelOn  = False  ; turn off cn info label
   diff@res_mpProjection  = diag_script_info@projection
 
+  if( var0 .eq. "tos" .or. var0 .eq. "sos") then
+    diff@res_mpCenterLonF = 180
+  end if
+
   diff@var = var0  ; Overwrite existing entry
   if (isatt(variable_info[0], "long_name")) then
     diff@var_long_name = variable_info[0]@long_name
