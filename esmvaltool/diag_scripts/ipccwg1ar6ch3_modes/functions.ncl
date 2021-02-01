@@ -11,9 +11,9 @@ begin
   end if
   timeT =  yyyymm_time(yS, yE, "integer")
   time = timeT({yS*100+mS:yE*100+mE})
-  if (opttype.eq."time_lat_lon") then
+  if (opttype.eq."time_lat_lon") then  
      blankarr = new((/dimsizes(time),90,180/),"float",1.e20)
-     blankarr!0 = "time"    ; time coordinate variable assigned below
+     blankarr!0 = "time"    ; time coordinate variable assigned below  
      blankarr&time = time
      blankarr!1 = "lat"
      blankarr&lat = fspan(-89,89,90)
@@ -22,9 +22,9 @@ begin
      blankarr&lat@units = "degrees_north"
      blankarr&lon@units = "degrees_east"
   end if
-  if (opttype.eq."time_lev_lat") then
+  if (opttype.eq."time_lev_lat") then  
      blankarr = new((/dimsizes(time),41,90/),"float",1.e20)
-     blankarr!0 = "time"    ; time coordinate variable assigned below
+     blankarr!0 = "time"    ; time coordinate variable assigned below  
      blankarr&time = time
      blankarr!1 = "lev"
      blankarr&lev =fspan(0,5000,41)
@@ -72,30 +72,34 @@ begin
      vname = (/"SNOWDP","snd"/)
   end if
 
-  if (ismissing(zpath) ) then
+  if (ismissing(zpath(0)) ) then
      print("File missing, creating blank array of data. View "+vn+" namelist for details.")
      arr = create_empty_array(yearS,yearE,1,12,"time_lat_lon")
-     sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter
-     eydata = yearE     ; as data array is totally missing..
+     sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter 
+     eydata = yearE     ; as data array is totally missing..  
      smdata = 1
      emdata = 12
   else
      cpath0 = stringtochar(zpath)
      ta = stringtochar("*")
-     if (any(cpath0.eq.ta(0)).or.any(cpath0.eq."{")) then   ; check for "*" and "{" denoting multiple files
-        tfiles = systemfunc("ls "+zpath+" 2> /dev/null")   ; /dev/null suppresses all standard error output
+     if (any(cpath0.eq.ta(0)).or.any(cpath0.eq."{").or.dimsizes(zpath).gt.1) then   ; check for "*" and "{" denoting multiple files
+        if (dimsizes(zpath).gt.1) then
+           tfiles = zpath
+        else
+           tfiles = systemfunc("ls "+zpath+" 2> /dev/null")   ; /dev/null suppresses all standard error output
+        end if
         if (vn.eq."PRECT") then   ; special section for precip, as might need to do PRECC+PRECL
            b = addfile(tfiles(0),"r")   ; check for PRECC
            if (isfilevar(b,"PRECC").or.isfilevar(b,"PRECL")) then  ; PRECC/PRECL section
-              fils_precc = str_match(tfiles,"PRECC")
-              fils_precl = str_match(tfiles,"PRECL")
+              fils_precc = str_match(tfiles,"PRECC") 
+              fils_precl = str_match(tfiles,"PRECL") 
               if (any(ismissing(fils_precc)).or.any(ismissing(fils_precl))) then
                  print("Fatal: Need both PRECC and PRECL file(s), creating blank array")
                  print(fils_precc)
                  print(fils_precl)
                  arr = create_empty_array(yearS,yearE,1,12,"time_lat_lon")
-                 sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter
-                 eydata = yearE     ; as data array is totally missing..
+                 sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter 
+                 eydata = yearE     ; as data array is totally missing..  
                  smdata = 1
                  emdata = 12
                  break
@@ -105,7 +109,7 @@ begin
               c2  = addfiles(fils_precl,"r")
               arr = (/ arr+c2[:]->PRECL  /)
               arr@long_name = "Large-scale (stable) + convective precipitation rate (liq + ice)"
-              delete([/c2,fils_precc,fils_precl/])
+              delete([/c2,fils_precc,fils_precl/])            
            else    ; pr, ppt, PPT, PRECT multiple/single file read-in here..
               c = addfiles(tfiles,"r")
               do ii=0,dimsizes(vname)-1
@@ -124,39 +128,39 @@ begin
                  break
               end if
            end do
-        end if
+        end if  
 
         nfil = dimsizes(tfiles)
         cpathS = stringtochar(tfiles(0))      ; this section will work for PRECC/PRECL, as it will read the first
-        cpathE = stringtochar(tfiles(nfil-1)) ; PRECC file and the last PRECL file.
+        cpathE = stringtochar(tfiles(nfil-1)) ; PRECC file and the last PRECL file.  
         ncharS = dimsizes(cpathS)
         ncharE = dimsizes(cpathE)
         sydata = stringtointeger(charactertostring(cpathS(ncharS-17:ncharS-14)))
         smdata = stringtointeger(charactertostring(cpathS(ncharS-13:ncharS-12)))
         eydata = stringtointeger(charactertostring(cpathE(ncharE-10:ncharE-7)))
-        emdata = stringtointeger(charactertostring(cpathE(ncharE-6:ncharE-5)))
+        emdata = stringtointeger(charactertostring(cpathE(ncharE-6:ncharE-5)))      
         delete([/cpathS,cpathE,ncharS,ncharE,nfil/])
 ;        delete(c)
      else
-        c = addfile(zpath,"r")
+        c = addfiles(zpath,"r")
         do i=0,dimsizes(vname)-1
-           if (isfilevar(c,vname(i))) then
-              arr = c->$vname(i)$
+           if (isfilevar(c[0],vname(i))) then
+              arr = c[:]->$vname(i)$
               break
            end if
         end do
-        cpath = stringtochar(zpath)
+        cpath = stringtochar(zpath)     
         nchar = dimsizes(cpath)
         sydata = stringtointeger(charactertostring(cpath(nchar-17:nchar-14)))
         smdata = stringtointeger(charactertostring(cpath(nchar-13:nchar-12)))
         eydata = stringtointeger(charactertostring(cpath(nchar-10:nchar-7)))
-        emdata = stringtointeger(charactertostring(cpath(nchar-6:nchar-5)))
+        emdata = stringtointeger(charactertostring(cpath(nchar-6:nchar-5))) 
         delete([/cpath,nchar/])
-;        delete(c)
+;        delete(c)     
      end if
      delete([/ta,cpath0/])
   end if
-
+  
   if (isvar("arr").eq.False) then
      print("Variable ("+vn+") not found. Examine input file "+zpath+". Creating empty array and continuing")
      arr = create_empty_array(yearS,yearE,1,12,"time_lat_lon")
@@ -168,15 +172,15 @@ begin
      arr = arrT
      delete(arrT)
   end if
-
+  
   if (.not.isatt(arr,"_FillValue")) then     ; assign _FillValue if one is not present
      if (isatt(arr,"missing_value")) then
         arr@_FillValue = arr@missing_value
      else
-        arr@_FillValue = default_fillvalue(typeof(arr))
+        arr@_FillValue = default_fillvalue(typeof(arr)) 
      end if
   end if
-
+  
   dimz = dimsizes(arr)
   if (any(dimz.eq.1)) then
      arrT = rm_single_dims(arr)
@@ -185,33 +189,33 @@ begin
      delete(arrT)
   end if
   if (dimsizes(dimz).le.2) then
-     print("Possible curvilinear (or unstructured) grid detected. The CVDP cannot analyze curvilinear data. Please regrid to a rectilinear grid for inclusion in CVDP comparisons.")
+     print("Possible curvilinear (or unstructured) grid detected. The CVDP cannot analyze curvilinear data. Please regrid to a rectilinear grid for inclusion in CVDP comparisons.") 
      print("Input file: "+zpath)
      print("Setting array to all missing")
      delete(arr)
      arr = create_empty_array(yearS,yearE,smdata,emdata,"time_lat_lon")
-     sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter
-     eydata = yearE     ; as data array is totally missing..
+     sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter 
+     eydata = yearE     ; as data array is totally missing..  
      smdata = 1
-     emdata = 12
+     emdata = 12 
   end if
   delete(dimz)
-
+  
   arr!0 = "time"
   arr!1 = "lat"
   arr!2 = "lon"
-
+  
   if (isatt(arr,"valid_range")) then    ; check to make sure data is in valid range. Reset to stay within the valid range if needed.
 ;     print("Data outside valid_range in "+zpath+", resetting data to be within valid_range")
      arr = where(arr.lt.arr@valid_range(0),arr@valid_range(0),arr)
      arr = where(arr.gt.arr@valid_range(1),arr@valid_range(1),arr)
   end if
-
+  
   if (any(abs(arr).ge.1.e20)) then   ; check for inf values or values way out of range, reset to _FillValue.
      print("Values greater than 1.e20 or less than -1.e20 detected in "+zpath+", resetting to _FillValue")
      arr = where(abs(arr).ge.1.e20,arr@_FillValue,arr)
   end if
-
+       
 ;  if (.not.iscoord(arr,"lat")) then
 ;     print("The data might have 2D latitudes. The functions.ncl coding is not set up to handle this, exiting from data_read_in.ncl")
 ;     print("zpath")
@@ -222,19 +226,19 @@ begin
 ;     print("zpath")
 ;  exit
 ;  end if
-
+     
   if (yearS.lt.sydata.or.yearE.gt.eydata) then
      print("Requested "+yearS+"-"+yearE+" time span is outside the input file "+zpath+" time span of "+sydata+"-"+eydata+"")
      print("Setting array to all missing")
      delete(arr)
      arr = create_empty_array(yearS,yearE,smdata,emdata,"time_lat_lon")
-     sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter
-     eydata = yearE     ; as data array is totally missing..
+     sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter 
+     eydata = yearE     ; as data array is totally missing..  
      smdata = 1
-     emdata = 12
+     emdata = 12          
   else
      timeT =  yyyymm_time(sydata, eydata, "integer")
-     time = timeT({sydata*100+smdata:eydata*100+emdata})
+     time = timeT({sydata*100+smdata:eydata*100+emdata})  
      if (iscoord(arr,"time")) then
         delete(arr&time)
      end if
@@ -244,19 +248,19 @@ begin
      else
         print("Possible mismatch detected between time specified in file name and file variables, setting array to missing")
         print("File = "+zpath)
-        print("Read from file name: "+min(time)+"-"+max(time))
+        print("Read from file name: "+min(time)+"-"+max(time))        
         delete(arr)
         arr = create_empty_array(yearS,yearE,smdata,emdata,"time_lat_lon")
-        sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter
-        eydata = yearE     ; as data array is totally missing..
+        sydata = yearS     ; assign these variables based on yearS/yearE provided in namelist. Doesn't matter 
+        eydata = yearE     ; as data array is totally missing..  
         smdata = 1
-        emdata = 12
+        emdata = 12 
      end if
      delete(dimz)
      delete([/time,timeT/])
   end if
   delete([/sydata,smdata,eydata,emdata/])
-
+    
 ;  printVarSummary(arr)
 ;  printVarSummary(arr({sy*100+1:ey*100+12},:,:))
   if (arr&lat(0).ge.0) then
@@ -265,8 +269,8 @@ begin
      farr = arr({yearS*100+1:yearE*100+12},:,:)
   end if
 ;  printVarSummary(farr)
-  delete(arr)
-
+  delete(arr)     
+  
   mocheck = (/(yearS*100+1)-min(farr&time),(yearE*100+12) - max(farr&time)/)
   if (any(mocheck.ne.0)) then    ; previously: if (mod(dimsizes(farr&time),12).ne.0) then
      if (mocheck(0).ne.0) then
@@ -282,10 +286,10 @@ begin
      farr = create_empty_array(yearS,yearE,1,12,"time_lat_lon")
   end if
   delete(mocheck)
-
+  
   if (farr&lon(0).lt.0) then
      farr = lonFlip(farr)     ; lon flip
-  end if
+  end if     
   if (min(farr&lon).lt.0.or.max(farr&lon).gt.360) then
      print(farr&lon)
      print("path = "+zpath)
@@ -293,9 +297,9 @@ begin
      delete(farr)
      farr = create_empty_array(yearS,yearE,1,12,"time_lat_lon")
   end if
-
+  
   if (vn.eq."TREFHT".or.vn.eq."TS") then      ; units check
-     if (farr@units.eq."K".or.farr@units.eq."Kelvin".or.farr@units.eq."deg_k".or.farr@units.eq."deg_K") then
+     if (farr@units.eq."K".or.farr@units.eq."Kelvin".or.farr@units.eq."deg_k".or.farr@units.eq."deg_K") then   
         if (max(farr).ge.100) then    ; data sets can be anomalies with units of K, so check for range before subtracting
            farr = farr-273.15
         end if
@@ -318,7 +322,7 @@ begin
      if (farr@units.eq."kg m-2 s-1".or.farr@units.eq."kg/m2/s".or.farr@units.eq."kg/m^2/s".or.farr@units.eq."kg/(s*m2)".or.farr@units.eq."mm/s") then
         farr = farr*86400.
      end if
-     if (farr@units.eq."m".or.farr@units.eq."m/month".or.farr@units.eq."cm".or.farr@units.eq."cm/month".or.farr@units.eq."mm".or.farr@units.eq."mm/month") then
+     if (farr@units.eq."m".or.farr@units.eq."m/month".or.farr@units.eq."cm".or.farr@units.eq."cm/month".or.farr@units.eq."mm".or.farr@units.eq."mm/month") then    
         yr = toint(farr&time)/100
         mo = toint(farr&time - (yr*100))
         days = days_in_month(yr,mo)
@@ -327,16 +331,16 @@ begin
 	       end do
         if (farr@units.eq."cm".or.farr@units.eq."cm/month") then
            farr = farr*10.   ; convert from cm/day to mm/day
-        end if
+        end if        
         if (farr@units.eq."m".or.farr@units.eq."m/month") then
            farr = farr*1000.   ; convert from m/day to mm/day
-        end if
-     end if
+        end if   
+     end if  
      if (farr@units.eq."m/day".or.farr@units.eq."m day-1") then
         farr = farr*1000.
      end if
-     farr@units = "mm/day"
-  end if
+     farr@units = "mm/day" 
+  end if    
   if (vn.eq."SNOWDP") then
      if (.not.isatt(farr,"is_all_missing")) then
         if (farr@units.ne."m".and.farr@units.ne."meters") then
@@ -344,7 +348,7 @@ begin
         end if
      end if
   end if
-
+  
   date = farr&time         ; switch time to be CF-conforming
   delete(farr&time)
   yyyy = date/100
@@ -370,7 +374,7 @@ function eofunc_north2(eval[*]:numeric, N[1]:integer, prinfo[1]:logical)
 ; Mon. Wea. Rev., 110, 699–706.
 ; doi: http://dx.doi.org/10.1175/1520-0493(1982)110<0699:SEITEO>2.0.CO;2
 ;
-; Usage after 'eofunc'. Here ntim was used,
+; Usage after 'eofunc'. Here ntim was used,  
 ;             prinfo = True
 ;             sig    = eval_north(eof@eval, ntim, prinfo)
 ;
@@ -381,7 +385,7 @@ begin
   neval   = dimsizes(eval)
   if (neval.eq.1)
       print("eofunc_north: neval=1, no testing can be performed")
-      sig = True
+      sig = True 
       sig@long_name = "EOF separation is not testable N=1"
       sig@N         =  N
       return(sig)
@@ -432,7 +436,7 @@ function piControl_list_setup(ipath:string,yrlength[1]:integer,N[1]:integer,optA
 
 local ipath,yrlength,N,models,modelsT,findir,finyr,cntr,tfiles,cpath,nchar,sydata,smdata,eydata,emdata,cpathS,cpathE,ncharS,ncharE,npossible,findirF,optA,ttx
 begin
-  models = systemfunc("ls "+ipath)     ; ipath directory structure looks like this: /project/data/cmip6/piControl/Amon/ts/
+  models = systemfunc("ls "+ipath)     ; ipath directory structure looks like this: /project/data/cmip6/piControl/Amon/ts/ 
   findir = new(dimsizes(models)*N,string)                                ; or this: /project/data/cmip5/ETH/cmip5/piControl/Amon/ts/
   finyr = new(dimsizes(models)*N,integer)
   cntr = 0
@@ -441,30 +445,31 @@ begin
   else
      ttx = "/*/" ; for CMIP6 repository with example structure /project/data/cmip6/piControl/Amon/ts/BCC-CSM2-MR/r1i1p1f1/gn/
   end if
-
+     
   do gg = 0,dimsizes(models)-1
      modelsT := systemfunc("ls "+ipath+models(gg))
      if (.not.ismissing(modelsT(0))) then
-        tfiles := systemfunc("ls "+ipath+models(gg)+"/"+modelsT(0)+ttx)
+        tfiles := systemfunc("ls "+ipath+models(gg)+"/"+modelsT(0)+ttx+"*.nc")
         if (.not.ismissing(tfiles(0))) then
            if (dimsizes(tfiles).eq.1) then
-              cpath := stringtochar(tfiles)
+              cpath := stringtochar(tfiles)     
               nchar := dimsizes(cpath)
               sydata = stringtointeger(charactertostring(cpath(nchar-17:nchar-14)))
               smdata = stringtointeger(charactertostring(cpath(nchar-13:nchar-12)))
               eydata = stringtointeger(charactertostring(cpath(nchar-10:nchar-7)))
-              emdata = stringtointeger(charactertostring(cpath(nchar-6:nchar-5)))
+              emdata = stringtointeger(charactertostring(cpath(nchar-6:nchar-5))) 
            else
-              cpathS := stringtochar(tfiles(0))
-              cpathE := stringtochar(tfiles(dimsizes(tfiles)-1))
+              cpathS := stringtochar(tfiles(0))      
+              cpathE := stringtochar(tfiles(dimsizes(tfiles)-1))  
               ncharS := dimsizes(cpathS)
               ncharE := dimsizes(cpathE)
               sydata = stringtointeger(charactertostring(cpathS(ncharS-17:ncharS-14)))
               smdata = stringtointeger(charactertostring(cpathS(ncharS-13:ncharS-12)))
               eydata = stringtointeger(charactertostring(cpathE(ncharE-10:ncharE-7)))
-              emdata = stringtointeger(charactertostring(cpathE(ncharE-6:ncharE-5)))
+              emdata = stringtointeger(charactertostring(cpathE(ncharE-6:ncharE-5)))   
            end if
-           npossible = (eydata-sydata)/yrlength
+           npossible = (eydata-sydata+1)/yrlength
+;          print(models(gg)+": "+sydata+" "+eydata+" "+npossible)
            if (npossible.ge.1) then
               if (npossible.eq.1) then
                  findir(cntr) = ipath+models(gg)+"/"+modelsT(0)+ttx
@@ -474,7 +479,7 @@ begin
                  do hh = 0,min((/N,npossible/))-1
                     findir(cntr) = ipath+models(gg)+"/"+modelsT(0)+ttx
                     finyr(cntr) = sydata+(hh*yrlength)
-                    cntr = cntr+1
+                    cntr = cntr+1                
                  end do
               end if
            end if
@@ -488,6 +493,65 @@ begin
   delete([/ipath,yrlength,N,findir,findirF,finyr/])
 end
 ;=================================================================================================
+undef("scenario_list_setup")
+function scenario_list_setup(ipath:string,optA[1]:integer)
+; Given a directory and the option as to whether the CMIP5 (optA=0) or CMIP6 (optA=1) repositories
+; return a list of paths and start/end years of scenario (returned as an attribute)
+;
+; Note: This function will only identify data from the first control member from each center.
+
+local ipath,models,modelsT,findir,finyr0,finyr1,cntr,tfiles,cpath,nchar,sydata,smdata,eydata,emdata,cpathS,cpathE,ncharS,ncharE,findirF,optA,ttx
+begin
+  models = systemfunc("ls "+ipath)     ; ipath directory structure looks like this: /project/data/cmip6/ssp245/Amon/ts/ 
+  findir = new(1000,string)                                ; or this: /project/data/cmip5/ETH/cmip5/rcp585/Amon/ts/
+  finyr0 = new(1000,integer)
+  finyr1 = finyr0
+  cntr = 0
+  if (optA.eq.0) then
+     ttx = "/"   ; for CMIP5 repository with example structure /project/data/cmip5/ETH/cmip5/piControl/Amon/ts/ACCESS1-3/r1i1p1/
+  else
+     ttx = "/*/" ; for CMIP6 repository with example structure /project/data/cmip6/piControl/Amon/ts/BCC-CSM2-MR/r1i1p1f1/gn/
+  end if
+     
+  do gg = 0,dimsizes(models)-1
+     modelsT := systemfunc("ls "+ipath+models(gg))
+     if (.not.ismissing(modelsT(0))) then
+        do hh = 0,dimsizes(modelsT)-1
+           tfiles := systemfunc("ls "+ipath+models(gg)+"/"+modelsT(hh)+ttx)
+           if (.not.ismissing(tfiles(0))) then
+              if (dimsizes(tfiles).eq.1) then
+                 cpath := stringtochar(tfiles)     
+                 nchar := dimsizes(cpath)
+                 sydata = stringtointeger(charactertostring(cpath(nchar-17:nchar-14)))
+                 smdata = stringtointeger(charactertostring(cpath(nchar-13:nchar-12)))
+                 eydata = stringtointeger(charactertostring(cpath(nchar-10:nchar-7)))
+                 emdata = stringtointeger(charactertostring(cpath(nchar-6:nchar-5))) 
+              else
+                 cpathS := stringtochar(tfiles(0))      
+                 cpathE := stringtochar(tfiles(dimsizes(tfiles)-1))  
+                 ncharS := dimsizes(cpathS)
+                 ncharE := dimsizes(cpathE)
+                 sydata = stringtointeger(charactertostring(cpathS(ncharS-17:ncharS-14)))
+                 smdata = stringtointeger(charactertostring(cpathS(ncharS-13:ncharS-12)))
+                 eydata = stringtointeger(charactertostring(cpathE(ncharE-10:ncharE-7)))
+                 emdata = stringtointeger(charactertostring(cpathE(ncharE-6:ncharE-5)))   
+              end if
+              findir(cntr) = ipath+models(gg)+"/"+modelsT(hh)+ttx
+              finyr0(cntr) = sydata
+              finyr1(cntr) = eydata
+              cntr = cntr+1
+           end if
+        end do
+     end if
+  end do
+  findirF = findir(:cntr-1)
+  findirF@start_year = finyr0(:cntr-1)
+  findirF@end_year = finyr1(:cntr-1)
+  return(findirF)
+  delete([/ipath,yrlength,N,findir,findirF,finyr/])
+end
+
+;=================================================================================================
 undef("boxplot_stat")
 function boxplot_stat(bparrT:numeric)
 local bparrT,bparr,bpcalcarr,x05,x25,x75,x95,dimBP
@@ -497,15 +561,38 @@ begin
   dimBP = dimsizes(bparr)
   x05  = round(.05*dimBP,3)-1     ; -1 to account for NCL indexing starting
   x25  = round(.25*dimBP,3)-1     ; -1 to account for NCL indexing starting
-  x75  = round(.75*dimBP,3)-1
-  x95  = round(.95*dimBP,3)-1
+  x75  = round(.75*dimBP,3)-1 
+  x95  = round(.95*dimBP,3)-1 
 
   bpcalcarr = new(5,float)
-  bpcalcarr(0) = bparr(x05)   ;min(bparr)
+  bpcalcarr(0) = min(bparr)  ;bparr(x05)
+  bpcalcarr(1) = bparr(x05)   ; bparr(x25)
+  bpcalcarr(2) = dim_median(bparr)
+  bpcalcarr(3) = bparr(x95)   ;bparr(x75)
+  bpcalcarr(4) = max(bparr)  ; bparr(x95)
+  return(bpcalcarr)
+end
+;=================================================================================================
+; Different from boxplot_stat in that this one shows 5/25/median/75/95%
+;
+undef("boxplot_stat2")
+function boxplot_stat2(bparrT:numeric)
+local bparrT,bparr,bpcalcarr,x05,x25,x75,x95,dimBP
+begin
+  bparr = bparrT(ind(.not.ismissing(bparrT)))
+  qsort(bparr)
+  dimBP = dimsizes(bparr)
+  x05  = round(.05*dimBP,3)-1     ; -1 to account for NCL indexing starting
+  x25  = round(.25*dimBP,3)-1     ; -1 to account for NCL indexing starting
+  x75  = round(.75*dimBP,3)-1 
+  x95  = round(.95*dimBP,3)-1 
+
+  bpcalcarr = new(5,float)
+  bpcalcarr(0) = bparr(x05)
   bpcalcarr(1) = bparr(x25)
   bpcalcarr(2) = dim_median(bparr)
   bpcalcarr(3) = bparr(x75)
-  bpcalcarr(4) = bparr(x95)    ;max(bparr)
+  bpcalcarr(4) = bparr(x95)
   return(bpcalcarr)
 end
 
@@ -532,11 +619,11 @@ function boxplot2 (wks:graphic,x[*]:numeric,y[*][*]:numeric,boxOpts:logical,plot
 ;               boxColors ---- Scalar or array that contains the colors that the boxes will be drawn in.
 ;                           Ex. boxOpts@boxColors =  (/"green","blue"/)
 ;                        If the number of colors specified does not equal the number of
-;                        boxes drawn, only the first color specified will be used. Also used to set the
+;                        boxes drawn, only the first color specified will be used. Also used to set the 
 ;                        boxFill color if boxFill = True.
 ;                boxFill_Colors ---- Scalar or array that contains the colors that the boxes will be filled in.
 ;                                    If not set the boxes will not be filled.
-;                boxFill_midColor ---- Scalar or array that contains the colors that the center box
+;                boxFill_midColor ---- Scalar or array that contains the colors that the center box 
 ;                                      polyline will be drawn in. Only activated when boxFill = True.
 ;    plotres ----- An optional xy-plot resource list. Will override defaults where applicable.
 ;    lineres ----- An optional resource list pertaining to the lines used to draw the boxes/lines.
@@ -645,7 +732,7 @@ begin
         end do
      end if
 
-     polygres = True     ; box fill resources
+     polygres = True     ; box fill resources 
      polygres@gsLineColor = "white"
      polygres@gsFillColor = "white"
      polygres@gsLineThicknessF  = 0.5
@@ -686,7 +773,7 @@ begin
               else
                  cmflag = 2
               end if
-           end if
+           end if              
         end if
      end if
 
@@ -806,10 +893,10 @@ function taylor_diagram (wks:graphic ,RATIO[*][*]:numeric, CC[*][*]:numeric \
 ; An example:
 ; http://www.grida.no/climate/ipcc_tar/wg1/fig8-4.htm
 ;
-; This expects one or more datasets. The left dimension
+; This expects one or more datasets. The left dimension 
 ; is the number of datasets. The rightmost is the number of pts.
 ;
-; Markers are at:
+; Markers are at: 
 ; http://www.ncl.ucar.edu/Document/Graphics/Resources/gs.shtml
 ;
 ; By default, the function can handle up to 10 variable comparisons..
@@ -818,14 +905,14 @@ function taylor_diagram (wks:graphic ,RATIO[*][*]:numeric, CC[*][*]:numeric \
 ;
 ; The defaults that the user can modify:
 ;
-; rOpts                 = True
+; rOpts                 = True 
 ;                                  ; 'made-up' resources
 ; rOpts@Colors          =  (/ "blue" , "red", "green", "cyan", "black" \
 ;                           , "turquoise", "brown", "yellow"/)
 ; rOpts@Markers         =  (/ 2, 3, 6, 14, 9, 12, 7, 4/) ; Marker Indices
 ; rOpts@markerTxOffset  = 0.0175   ; offset for text above marker
-; rOpts@stnRad          = (/ 1. /) ;  (/ 0.50, 0.75, 1.5 /)
-; rOpts@centerDiffRMS   = False    ;  True mean draw additional radii from REF
+; rOpts@stnRad          = (/ 1. /) ;  (/ 0.50, 0.75, 1.5 /) 
+; rOpts@centerDiffRMS   = False    ;  True mean draw additional radii from REF 
 ; rOpts@caseLabelsFontHeightF = 0.05
 ; rOpts@varLabelsFontHeightF  = 0.013
 ; rOpts@varLabelsYloc         = 0.65
@@ -836,23 +923,23 @@ function taylor_diagram (wks:graphic ,RATIO[*][*]:numeric, CC[*][*]:numeric \
 ;
 ;                                  ; standard NCL resources
 ; rOpts@tiMainString    = "Taylor" ; not using title makes plot bigger
-; rOpts@gsMarkerSizeF   = 0.0085   ; marker size
+; rOpts@gsMarkerSizeF   = 0.0085   ; marker size   
 ; rOpts@gsMarkerThicknessF = 1.0
-; rOpts@txFontHeightF   = 0.0125   ; text size
+; rOpts@txFontHeightF   = 0.0125   ; text size 
 ; rOpts@tiMainFontHeightF = 0.0225 ; tiMainString size
 ;
-; It returns to the user a graphic object containing the
+; It returns to the user a graphic object containing the 
 ; Taylor background and plotted x/y pts.
 ; This graphic object contains a simple Taylor background appropriate
 ; for standardized data and the markers for the datasets.
 ; ==================================================================
 ; This version allows paneling:
-;      The 'cumbersome' "dum" variables were added by
+;      The 'cumbersome' "dum" variables were added by 
 ;      Adam Phillips to allow paneling via "gsn_add_?".
 ; ==================================================================
 begin
   dimR                  = dimsizes(RATIO)
-  nCase                 = dimR(0)    ; # of cases [models]
+  nCase                 = dimR(0)    ; # of cases [models] 
   nVar                  = dimR(1)    ; # of variables
 
                                      ; x/y coordinates for plotting
@@ -860,29 +947,29 @@ begin
   Y    = new ( (/nCase,nVar/) , typeof(RATIO) )
 
   do nc=0,nCase-1
-     angle      = acos( CC(nc,:) )   ; array operation
-     X(nc,:)    = RATIO(nc,:)*cos( angle )
-     Y(nc,:)    = RATIO(nc,:)*sin( angle )
+     angle      = acos( CC(nc,:) )   ; array operation                                    
+     X(nc,:)    = RATIO(nc,:)*cos( angle )     
+     Y(nc,:)    = RATIO(nc,:)*sin( angle )    
   end do
 
-  xyMin                 = 0.
+  xyMin                 = 0.  
   xyOne                 = 1.00
   xyMax                 = 1.65
   xyMax_Panel           = xyMax+ 0.10            ; paneling purposes
-
-  if (rOpts .and. isatt(rOpts,"txFontHeightF"))  then
+ 
+  if (rOpts .and. isatt(rOpts,"txFontHeightF"))  then 
       FontHeightF       = rOpts@txFontHeightF    ; user wants to specify size
   else
       FontHeightF       = 0.0175
   end if
-
+ 
 ; ----------------------------------------------------------------
 ; Part 1:
 ; base plot: Based upon request of Mark Stevens
 ; basic x-y and draw the 1.0 observed and the outer curve at 1.65
 ; ----------------------------------------------------------------
-
-  rxy                   = True
+  
+  rxy                   = True       
   rxy@gsnDraw           = False
   rxy@gsnFrame          = False
   rxy@vpHeightF         = 0.65
@@ -890,15 +977,19 @@ begin
 ;  rxy@tmYLBorderOn      = False
 ;  rxy@tmXBBorderOn      = False
 
-  rxy@tiYAxisString     = "Standardized Deviations (Normalized)"
-  rxy@tiYAxisFontHeightF= FontHeightF                        ; default=0.025
-
-  rxy@tmXBMode          = "Explicit"
+  if (rOpts .and. isatt(rOpts,"tiYAxisString"))  then 
+    rxy@tiYAxisString     = rOpts@tiYAxisString
+  else
+    rxy@tiYAxisString     = "Standardized Deviations (Normalized)"
+  end if
+  rxy@tiYAxisFontHeightF= FontHeightF                        ; default=0.025 
+  
+  rxy@tmXBMode          = "Explicit" 
   rxy@tmXBValues        = (/0.0,0.25,0.50,0.75,1.00,1.25,1.5/)    ; major tm
                                                                   ; default  "OBS" or "REF"
  ;rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75","REF" ,"1.25","1.50"/)
   rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75","REF" ,"1.25","1.50"/)
-  if (rOpts .and. isatt(rOpts,"OneX") )  then                     ; eg: rOpts@OneX="1.00"
+  if (rOpts .and. isatt(rOpts,"OneX") )  then                     ; eg: rOpts@OneX="1.00" 
      ;rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50"/)
       rxy@tmXBLabels        = (/"    ","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50"/)
   end if
@@ -912,7 +1003,7 @@ begin
   rxy@tmYLMinorOn       = False
   rxy@tmYLMajorLengthF  = rxy@tmXBMajorLengthF
   rxy@tmYLLabelFontHeightF = FontHeightF
-  rxy@tmYLMode          = "Explicit"
+  rxy@tmYLMode          = "Explicit" 
   rxy@tmYLValues        = (/0.0,0.25,0.50, 0.75, 1.00, 1.25, 1.5/) ; major tm
   rxy@tmYLLabels        = rxy@tmYLValues
   rxy@trYMaxF           = xyMax_Panel
@@ -926,13 +1017,13 @@ begin
   rxy@tmXTOn            = False      ; Turn off right tick marks.
 
   rxy@xyDashPatterns    = (/ 0 /)    ; line characteristics (dash,solid)
-  rxy@xyLineThicknesses = (/ 1./)    ; choose line thickness
+  rxy@xyLineThicknesses = (/ .5/)    ; choose line thickness
 
   rxy@gsnFrame          = False      ; Don't advance the frame.
 
                                             ; create outer 'correlation axis'
   npts    = 200                        ; arbitrary
-  xx      = fspan(xyMin,xyMax,npts)
+  xx      = fspan(xyMin,xyMax,npts) 
   yy      = sqrt(xyMax^2 - xx^2    )   ; outer correlation line (xyMax)
 
   sLabels = (/"0.1","0.2","0.3","0.4","0.5","0.6" \ ; correlation labels
@@ -940,14 +1031,14 @@ begin
   cLabels = stringtofloat(sLabels)
   rad     = 4.*atan(1.0)/180.
   angC    = acos(cLabels)/rad                     ; angles: correlation labels
-
+                                                                       
   if (rOpts .and. isatt(rOpts,"tiMainString")) then
       rxy@tiMainString      = rOpts@tiMainString
      ;rxy@tiMainOffsetYF    = 0.015               ; default  0.0
       if (isatt(rOpts,"tiMainFontHeightF")) then
            rxy@tiMainFontHeightF = rOpts@tiMainFontHeightF
       else
-           rxy@tiMainFontHeightF = 0.0225         ; default  0.025
+           rxy@tiMainFontHeightF = 0.0225         ; default  0.025              
       end if
   end if
 ;;if (rOpts .and. isatt(rOpts,"gsnCenterString")) then
@@ -957,7 +1048,7 @@ begin
   taylor  = gsn_xy(wks,xx,yy,rxy)                 ; Create and draw XY plot.
 
   rsrRes  = True
-  rsrRes@gsLineOpacityF = 0.25
+;  rsrRes@gsLineOpacityF = 0.25
   rsrRes@gsLineThicknessF  = rxy@xyLineThicknesses(0)  ; line thickness
   rsrRes@gsLineDashPattern = 0                    ; solid line pattern
                                                   ; draw x and y to xyMax
@@ -965,23 +1056,23 @@ begin
   dum1 = gsn_add_polyline(wks,taylor,(/0.,xyMax/),(/0.,  0. /), rsrRes)
 
   xx   = fspan(xyMin, xyOne ,npts)                ; draw 1.0 standard radius
-  yy   = sqrt(xyOne - xx^2)
-  rsrRes@gsLineColor = "LightGray"
+  yy   = sqrt(xyOne - xx^2)   
+  rsrRes@gsLineColor = "LightGray" 
   rsrRes@gsLineDashPattern = 1                    ; dashed line pattern
   rsrRes@gsLineThicknessF  = rxy@xyLineThicknesses(0)  ; line thickness
   dum2 = gsn_add_polyline(wks,taylor,xx,yy, rsrRes)
   delete(xx)
   delete(yy)
-
+                                                  
   if (rOpts .and. isatt(rOpts,"stnRad") ) then
-      rsrRes@gsLineThicknessF  = 1   ; rxy@xyLineThicknesses(0)
+      rsrRes@gsLineThicknessF  = .5   ; rxy@xyLineThicknesses(0)  
       nStnRad = dimsizes(rOpts@stnRad)
 
       dum3  = new(nStnRad,graphic)
       do n=0,nStnRad-1
          rr = rOpts@stnRad(n)
-         xx = fspan(xyMin, rr ,npts)
-         yy = sqrt(rr^2   - xx^2)
+         xx = fspan(xyMin, rr ,npts) 
+         yy = sqrt(rr^2   - xx^2)   
          dum3(n) = gsn_add_polyline(wks,taylor,xx,yy, rsrRes)
       end do
       taylor@$unique_string("dum")$ = dum3
@@ -1010,27 +1101,31 @@ begin
   yC(:5) = yC(:5) + 0.01
 
   txRes               = True                      ; text mods desired
-  txRes@txFontHeightF = FontHeightF               ; match YL
+  txRes@txFontHeightF = FontHeightF               ; match YL 
   txRes@tmYLLabelFont = tmYLLabelFont             ; match YL
-  txRes@txAngleF      = -45.
-  if (.not.isatt(rOpts,"drawCorLabel") .or. rOpts@drawCorLabel) then
-      dum4 = gsn_add_text(wks,taylor,"Correlation",1.30,1.30,txRes)
-	 taylor@$unique_string("dum")$ = dum4
+;  txRes@txAngleF      = -45.
+  txRes@txAngleF      = -50.
+  if (.not.isatt(rOpts,"drawCorLabel") .or. rOpts@drawCorLabel) then 
+;    dum4 = gsn_add_text(wks,taylor,"Correlation",1.30,1.30,txRes)
+;    dum4 = gsn_add_text(wks,taylor,"Correlation",1.35,1.35,txRes)
+;    dum4 = gsn_add_text(wks,taylor,"Correlation",1.39,1.28,txRes)
+    dum4 = gsn_add_text(wks,taylor,"Correlation",xyMax*0.85,xyMax*0.765,txRes)
+    taylor@$unique_string("dum")$ = dum4
   end if
-  txRes@txAngleF      = 0.0
+  txRes@txAngleF      = 0.0 
   txRes@txFontHeightF = FontHeightF*0.50          ; bit smaller
 
 ;;dum0 = gsn_add_text(wks,taylor,"OBSERVED",1.00,0.075,txRes)
 
   plRes               = True
   plRes@gsLineThicknessF = 2.
-
+  
   txRes@txJust        = "CenterLeft"              ; Default="CenterCenter".
-  txRes@txFontHeightF = FontHeightF               ; match YL
+  txRes@txFontHeightF = FontHeightF               ; match YL 
  ;txRes@txBackgroundFillColor = "white"
 
   tmEnd = 0.975
-  radTM = xyMax*tmEnd                             ; radius end: major TM
+  radTM = xyMax*tmEnd                             ; radius end: major TM 
   xTM   = new( 2 , "float")
   yTM   = new( 2 , "float")
 
@@ -1042,22 +1137,22 @@ begin
     dum5(i) = gsn_add_text(wks, taylor, sLabels(i),xC(i),yC(i),txRes) ; cor label
     xTM(0)   = xyMax*cos(angC(i)*rad)             ; major tickmarks at
     yTM(0)   = xyMax*sin(angC(i)*rad)             ; correlation labels
-    xTM(1)   = radTM*cos(angC(i)*rad)
+    xTM(1)   = radTM*cos(angC(i)*rad)             
     yTM(1)   = radTM*sin(angC(i)*rad)
     dum6(i) = gsn_add_polyline(wks,taylor,xTM,yTM,plRes)
   end do
                                                   ; minor tm locations
-  mTM     = (/0.05,0.15,0.25,0.35,0.45,0.55,0.65 \
+  mTM     = (/0.05,0.15,0.25,0.35,0.45,0.55,0.65 \ 
              ,0.75,0.85,0.91,0.92,0.93,0.94,0.96,0.97,0.98  /)
   angmTM  = acos(mTM)/rad                         ; angles: correlation labels
-  radmTM  = xyMax*(1.-(1.-tmEnd)*0.5)             ; radius end: minor TM
+  radmTM  = xyMax*(1.-(1.-tmEnd)*0.5)             ; radius end: minor TM 
 
   dum7 = new(dimsizes(mTM),graphic)
 
   do i=0,dimsizes(mTM)-1                          ; manually add tm
     xTM(0)   = xyMax*cos(angmTM(i)*rad)           ; minor tickmarks
     yTM(0)   = xyMax*sin(angmTM(i)*rad)
-    xTM(1)   = radmTM*cos(angmTM(i)*rad)
+    xTM(1)   = radmTM*cos(angmTM(i)*rad)          
     yTM(1)   = radmTM*sin(angmTM(i)*rad)
     dum7(i)  = gsn_add_polyline(wks,taylor,xTM,yTM,plRes)
   end do
@@ -1067,8 +1162,8 @@ begin
 
       rlRes = True
       rlRes@gsLineDashPattern= 2  ; line pattern
-      rlRes@gsLineThicknessF = 1  ; choose line thickness
-      rlRes@gsLineOpacityF = 0.25
+      rlRes@gsLineThicknessF = 0.5  ; choose line thickness
+;      rlRes@gsLineOpacityF = 0.25
       if (isatt(rOpts,"ccRays_color")) then
           rlRes@gsLineColor    =  "LightGray"
       end if
@@ -1081,7 +1176,7 @@ begin
       end do
       taylor@$unique_string("dum")$ = dum8
   end if
-
+  
 ; ----------------------------------------------------------------
 ; Part 3:
 ; Concentric about 1.0 on XB axis
@@ -1089,16 +1184,16 @@ begin
   if (rOpts .and. isatt(rOpts,"centerDiffRMS") \
             .and. rOpts@centerDiffRMS) then
       respl                    = True                ; polyline mods desired
-      respl@gsLineOpacityF = 0.25
+;      respl@gsLineOpacityF = 0.25
       respl@tfPolyDrawOrder    = "PreDraw"
-      respl@xyLineThicknessF   = 1.0                 ; line thickness
+      respl@xyLineThicknessF   = .5                 ; line thickness
       respl@xyLineDashPattern  = 2                   ; short dash lines
-      respl@gsLineColor        = "Black"             ; line color
+      respl@gsLineColor        = "Black"             ; line color     
       if (isatt(rOpts,"centerDiffRMS_color")) then
           respl@gsLineColor    =  "LightGray"
       end if
 	     respl@tfPolyDrawOrder = "PreDraw"
-
+      
       dx   = 0.25
       ncon = 4                                       ; 0.75, 0.50, 0.25, 0.0
       npts = 100                                     ; arbitrary
@@ -1106,7 +1201,7 @@ begin
 
       dum9 = new(ncon,graphic)
 
-      do n=1,ncon
+      do n=1,ncon 
          rr  = n*dx            ; radius from 1.0 [OBS] abscissa
          xx  = 1. + rr*cos(ang)
          yy  = fabs( rr*sin(ang) )
@@ -1114,11 +1209,11 @@ begin
              dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          end if
          if (n.eq.3) then
-             n3 = floattointeger( 0.77*npts )
+             n3 = floattointeger( 0.77*npts ) 
              dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n3),yy(0:n3),respl)
          end if
          if (n.eq.4) then
-             n4 = floattointeger( 0.61*npts )
+             n4 = floattointeger( 0.61*npts ) 
              dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n4),yy(0:n4),respl)
          end if
       end do
@@ -1131,7 +1226,7 @@ begin
 ; ---------------------------------------------------------------
 ; Part 4:
 ; generic resources that will be applied to all users data points
-; of course, these can be changed
+; of course, these can be changed 
 ; http://www.ncl.ucar.edu/Document/Graphics/Resources/gs.shtml
 ; ---------------------------------------------------------------
   if (rOpts .and. isatt(rOpts,"Markers")) then
@@ -1161,14 +1256,14 @@ begin
 
   gsRes = True
   gsRes@gsMarkerThicknessF = gsMarkerThicknessF      ; default=1.0
-  gsRes@gsMarkerSizeF      = gsMarkerSizeF           ; Default: 0.007
+  gsRes@gsMarkerSizeF      = gsMarkerSizeF           ; Default: 0.007 
 
   ptRes = True                        ; text options for points
   ptRes@txJust             = "BottomCenter"; Default="CenterCenter".
   ptRes@txFontThicknessF   = 1.2      ; default=1.00
   ptRes@txFontHeightF      = 0.0125   ; default=0.05
   if (rOpts .and. isatt(rOpts,"txFontHeightF")) then
-      ptRes@txFontHeightF  = rOpts@txFontHeightF
+      ptRes@txFontHeightF  = rOpts@txFontHeightF  
   end if
 
   markerTxYOffset          = 0.0175   ; default
@@ -1180,11 +1275,12 @@ begin
 ;  dum11 = dum10
 
   do n=0,nCase-1
-     gsRes@gsMarkerIndex   = Markers(n)             ; marker style (+)
+print(n+" "+dimsizes(Colors)+" "+nCase)
+    gsRes@gsMarkerIndex   = Markers(n)             ; marker style (+)
      gsRes@gsMarkerColor   = Colors(n)              ; marker color
      ptRes@txFontColor     = gsRes@gsMarkerColor
     do i=0,nVar-1
-       dum10(n*nVar+i) = gsn_add_polymarker(wks,taylor,X(n,i),Y(n,i),gsRes)
+       dum10(n*nVar+i) = gsn_add_polymarker(wks,taylor,X(n,i),Y(n,i),gsRes) 
 ;       dum11(n*nVar+i) = gsn_add_text(wks,taylor,(i+1),X(n,i),Y(n,i)+markerTxYOffset,ptRes)
     end do
   end do
@@ -1193,17 +1289,17 @@ begin
 ; Part 5: ; add case legend and variable labels
 ; ---------------------------------------------------------------
 
-  if (rOpts .and. isatt(rOpts,"caseLabels")) then
+  if (rOpts .and. isatt(rOpts,"caseLabels")) then 
 
       if (isatt(rOpts,"caseLabelsFontHeightF")) then
           caseLabelsFontHeightF = rOpts@caseLabelsFontHeightF
       else
-          caseLabelsFontHeightF = 0.05
+          caseLabelsFontHeightF = 0.05  
       end if
 
       lgres                    = True
       lgres@lgMarkerColors     = Colors        ; colors of markers
-      lgres@lgMarkerIndexes    = Markers       ; Markers
+      lgres@lgMarkerIndexes    = Markers       ; Markers 
       lgres@lgMarkerSizeF      = gsMarkerSizeF ; Marker size
       lgres@lgItemType         = "Markers"     ; draw markers only
       lgres@lgLabelFontHeightF = caseLabelsFontHeightF  ; font height of legend case labels
@@ -1216,21 +1312,21 @@ begin
 
       if (isatt(rOpts,"legendHeight")) then
           lgres@vpHeightF      = rOpts@legendHeight
-      else
+      else   
           lgres@vpHeightF      = 0.030*nCase   ; height of legend (NDC)
       end if
 
       lgres@lgPerimOn          = False         ; turn off perimeter
       nModel                   = dimsizes( rOpts@caseLabels )
       lbid = gsn_create_legend(wks,nModel,rOpts@caseLabels,lgres)
-
+	 
       amres = True
-      amres@amParallelPosF     =  0.35
-      amres@amOrthogonalPosF   = -0.35
+      amres@amParallelPosF     =  0.35           
+      amres@amOrthogonalPosF   = -0.35             
       annoid1 = gsn_add_annotation(taylor,lbid,amres)	; add legend to plot
   end if
 
-  if (rOpts .and. isatt(rOpts,"varLabels")) then
+  if (rOpts .and. isatt(rOpts,"varLabels")) then 
       nVar    = dimsizes(rOpts@varLabels)
 
       if (isatt(rOpts,"varLabelsFontHeightF")) then
@@ -1243,16 +1339,16 @@ begin
       txres@txFontHeightF = varLabelsFontHeightF
       txres@txJust = "CenterLeft"              ; justify to the center left
 
-     ;delta_y = 0.02
-     delta_y = 0.06
+     ;delta_y = 0.02       
+     delta_y = 0.06   
       if (rOpts .and. isatt(rOpts,"varLabelsYloc")) then
           ys  = rOpts@varLabelsYloc            ; user specified
       else
           ys  = max( (/nVar*delta_y , 0.30/) )
       end if
 
-
-      do i = 1,nVar
+      
+      do i = 1,nVar     
          if (i.eq.1) then
              dum12 = new(nVar,graphic)
 	 end if
@@ -1272,13 +1368,13 @@ begin
   taylor@$unique_string("dum")$ = dum7   ; minor tm
   taylor@$unique_string("dum")$ = dum10  ; markers
 ;  taylor@$unique_string("dum")$ = dum11  ; text
-
+  
   if (.not.isatt(rOpts,"taylorDraw") .or. \
-     (isatt(rOpts,"taylorDraw") .and. rOpts@taylorDraw)) then
+     (isatt(rOpts,"taylorDraw") .and. rOpts@taylorDraw)) then 
 	draw(taylor)
   end if
   if (.not.isatt(rOpts,"taylorFrame") .or. \
-     (isatt(rOpts,"taylorFrame") .and. rOpts@taylorFrame)) then
+     (isatt(rOpts,"taylorFrame") .and. rOpts@taylorFrame)) then 
 	frame(wks)
   end if
   return(taylor)
@@ -1300,10 +1396,10 @@ function taylor_diagram3 (wks:graphic ,RATIO[*][*]:numeric, CC[*][*]:numeric \
 ; An example:
 ; http://www.grida.no/climate/ipcc_tar/wg1/fig8-4.htm
 ;
-; This expects one or more datasets. The left dimension
+; This expects one or more datasets. The left dimension 
 ; is the number of datasets. The rightmost is the number of pts.
 ;
-; Markers are at:
+; Markers are at: 
 ; http://www.ncl.ucar.edu/Document/Graphics/Resources/gs.shtml
 ;
 ; By default, the function can handle up to 10 variable comparisons..
@@ -1312,14 +1408,14 @@ function taylor_diagram3 (wks:graphic ,RATIO[*][*]:numeric, CC[*][*]:numeric \
 ;
 ; The defaults that the user can modify:
 ;
-; rOpts                 = True
+; rOpts                 = True 
 ;                                  ; 'made-up' resources
 ; rOpts@Colors          =  (/ "blue" , "red", "green", "cyan", "black" \
 ;                           , "turquoise", "brown", "yellow"/)
 ; rOpts@Markers         =  (/ 2, 3, 6, 14, 9, 12, 7, 4/) ; Marker Indices
 ; rOpts@markerTxOffset  = 0.0175   ; offset for text above marker
-; rOpts@stnRad          = (/ 1. /) ;  (/ 0.50, 0.75, 1.5 /)
-; rOpts@centerDiffRMS   = False    ;  True mean draw additional radii from REF
+; rOpts@stnRad          = (/ 1. /) ;  (/ 0.50, 0.75, 1.5 /) 
+; rOpts@centerDiffRMS   = False    ;  True mean draw additional radii from REF 
 ; rOpts@caseLabelsFontHeightF = 0.05
 ; rOpts@varLabelsFontHeightF  = 0.013
 ; rOpts@varLabelsYloc         = 0.65
@@ -1330,23 +1426,23 @@ function taylor_diagram3 (wks:graphic ,RATIO[*][*]:numeric, CC[*][*]:numeric \
 ;
 ;                                  ; standard NCL resources
 ; rOpts@tiMainString    = "Taylor" ; not using title makes plot bigger
-; rOpts@gsMarkerSizeF   = 0.0085   ; marker size
+; rOpts@gsMarkerSizeF   = 0.0085   ; marker size   
 ; rOpts@gsMarkerThicknessF = 1.0
-; rOpts@txFontHeightF   = 0.0125   ; text size
+; rOpts@txFontHeightF   = 0.0125   ; text size 
 ; rOpts@tiMainFontHeightF = 0.0225 ; tiMainString size
 ;
-; It returns to the user a graphic object containing the
+; It returns to the user a graphic object containing the 
 ; Taylor background and plotted x/y pts.
 ; This graphic object contains a simple Taylor background appropriate
 ; for standardized data and the markers for the datasets.
 ; ==================================================================
 ; This version allows paneling:
-;      The 'cumbersome' "dum" variables were added by
+;      The 'cumbersome' "dum" variables were added by 
 ;      Adam Phillips to allow paneling via "gsn_add_?".
 ; ==================================================================
 begin
   dimR                  = dimsizes(RATIO)
-  nCase                 = dimR(0)    ; # of cases [models]
+  nCase                 = dimR(0)    ; # of cases [models] 
   nVar                  = dimR(1)    ; # of variables
 
                                      ; x/y coordinates for plotting
@@ -1354,29 +1450,29 @@ begin
   Y    = new ( (/nCase,nVar/) , typeof(RATIO) )
 
   do nc=0,nCase-1
-     angle      = acos( CC(nc,:) )   ; array operation
-     X(nc,:)    = RATIO(nc,:)*cos( angle )
-     Y(nc,:)    = RATIO(nc,:)*sin( angle )
+     angle      = acos( CC(nc,:) )   ; array operation                                    
+     X(nc,:)    = RATIO(nc,:)*cos( angle )     
+     Y(nc,:)    = RATIO(nc,:)*sin( angle )    
   end do
 
-  xyMin                 = 0.
+  xyMin                 = 0.  
   xyOne                 = 1.00
   xyMax                 = 3.5   ;1.90  ;1.65
   xyMax_Panel           = xyMax+ 0.16            ; paneling purposes
-
-  if (rOpts .and. isatt(rOpts,"txFontHeightF"))  then
+ 
+  if (rOpts .and. isatt(rOpts,"txFontHeightF"))  then 
       FontHeightF       = rOpts@txFontHeightF    ; user wants to specify size
   else
       FontHeightF       = 0.0175
   end if
-
+ 
 ; ----------------------------------------------------------------
 ; Part 1:
 ; base plot: Based upon request of Mark Stevens
 ; basic x-y and draw the 1.0 observed and the outer curve at 1.65
 ; ----------------------------------------------------------------
-
-  rxy                   = True
+  
+  rxy                   = True       
   rxy@gsnDraw           = False
   rxy@gsnFrame          = False
   rxy@vpHeightF         = 0.65
@@ -1384,14 +1480,18 @@ begin
 ;  rxy@tmYLBorderOn      = False
 ;  rxy@tmXBBorderOn      = False
 
-  rxy@tiYAxisString     = "Standardized Deviations (Normalized)"
-  rxy@tiYAxisFontHeightF= FontHeightF                        ; default=0.025
-
-  rxy@tmXBMode          = "Explicit"
+  if (rOpts .and. isatt(rOpts,"tiYAxisString"))  then 
+    rxy@tiYAxisString     = rOpts@tiYAxisString
+  else
+    rxy@tiYAxisString     = "Standardized Deviations (Normalized)"
+  end if
+  rxy@tiYAxisFontHeightF= FontHeightF                        ; default=0.025 
+  
+  rxy@tmXBMode          = "Explicit" 
   rxy@tmXBValues        = (/0.0, 0.50, 1.00, 1.5,2.0,2.5,3.0,3.50/)    ; major tm
                                                                   ; default  "OBS" or "REF"
   rxy@tmXBLabels        = (/"0","0.5","REF","1.5","2.0","2.5","3.0","3.5"/)
-  if (rOpts .and. isatt(rOpts,"OneX") )  then                     ; eg: rOpts@OneX="1.00"
+  if (rOpts .and. isatt(rOpts,"OneX") )  then                     ; eg: rOpts@OneX="1.00" 
      ;rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50"/)
       rxy@tmXBLabels        = (/"    ","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50","1.75","2.0","2.25","2.5","2.75","3.0","3.25","3.50"/)
   end if
@@ -1405,7 +1505,7 @@ begin
   rxy@tmYLMinorOn       = False
   rxy@tmYLMajorLengthF  = rxy@tmXBMajorLengthF
   rxy@tmYLLabelFontHeightF = FontHeightF
-  rxy@tmYLMode          = "Explicit"
+  rxy@tmYLMode          = "Explicit" 
   rxy@tmYLValues        = (/0.0, 0.50, 1.00, 1.5,2.0,2.5,3.0,3.50/) ; major tm
   rxy@tmYLLabels        = rxy@tmYLValues
   rxy@trYMaxF           = xyMax_Panel
@@ -1417,7 +1517,7 @@ begin
   rxy@tmXTOn            = False      ; Turn off right tick marks.
 
   rxy@xyDashPatterns    = (/ 0 /)    ; line characteristics (dash,solid)
-  rxy@xyLineThicknesses = (/ 1./)    ; choose line thickness
+  rxy@xyLineThicknesses = (/ .5/)    ; choose line thickness
 
   rxy@tmGridDrawOrder  = "PostDraw"
 
@@ -1425,7 +1525,7 @@ begin
 
                                             ; create outer 'correlation axis'
   npts    = 200                        ; arbitrary
-  xx      = fspan(xyMin,xyMax,npts)
+  xx      = fspan(xyMin,xyMax,npts) 
   yy      = sqrt(xyMax^2 - xx^2    )   ; outer correlation line (xyMax)
 
   sLabels = (/"    0.0","0.1","0.2","0.3","0.4","0.5","0.6" \ ; correlation labels
@@ -1433,14 +1533,14 @@ begin
   cLabels = stringtofloat(sLabels)
   rad     = 4.*atan(1.0)/180.
   angC    = acos(cLabels)/rad                     ; angles: correlation labels
-
+                                                                       
   if (rOpts .and. isatt(rOpts,"tiMainString")) then
       rxy@tiMainString      = rOpts@tiMainString
      ;rxy@tiMainOffsetYF    = 0.015               ; default  0.0
       if (isatt(rOpts,"tiMainFontHeightF")) then
            rxy@tiMainFontHeightF = rOpts@tiMainFontHeightF
       else
-           rxy@tiMainFontHeightF = 0.0225         ; default  0.025
+           rxy@tiMainFontHeightF = 0.0225         ; default  0.025              
       end if
   end if
 ;;if (rOpts .and. isatt(rOpts,"gsnCenterString")) then
@@ -1450,7 +1550,7 @@ begin
   taylor  = gsn_xy(wks,xx,yy,rxy)                 ; Create and draw XY plot.
 
   rsrRes  = True
-  rsrRes@gsLineOpacityF = 0.25
+;  rsrRes@gsLineOpacityF = 0.25
   rsrRes@gsLineThicknessF  = rxy@xyLineThicknesses(0)  ; line thickness
   rsrRes@gsLineDashPattern = 0                    ; solid line pattern
                                                   ; draw x and y to xyMax
@@ -1458,24 +1558,24 @@ begin
   dum1 = gsn_add_polyline(wks,taylor,(/0.,xyMax/),(/0.,  0. /), rsrRes)
 
   xx   = fspan(xyMin, xyOne ,npts)                ; draw 1.0 standard radius
-  yy   = sqrt(xyOne - xx^2)
-  rsrRes@gsLineColor = "LightGray"
+  yy   = sqrt(xyOne - xx^2)   
+  rsrRes@gsLineColor = "LightGray" 
   rsrRes@gsLineDashPattern = 1                    ; dashed line pattern
   rsrRes@gsLineThicknessF  = rxy@xyLineThicknesses(0)  ; line thickness
   dum2 = gsn_add_polyline(wks,taylor,xx,yy, rsrRes)
   delete(xx)
   delete(yy)
-
+                                                  
   if (rOpts .and. isatt(rOpts,"stnRad") ) then
-      rsrRes@gsLineThicknessF  = 1   ; rxy@xyLineThicknesses(0)
+      rsrRes@gsLineThicknessF  = .5   ; rxy@xyLineThicknesses(0) 
 
       nStnRad = dimsizes(rOpts@stnRad)
 
       dum3  = new(nStnRad,graphic)
       do n=0,nStnRad-1
          rr = rOpts@stnRad(n)
-         xx = fspan(xyMin, rr ,npts)
-         yy = sqrt(rr^2   - xx^2)
+         xx = fspan(xyMin, rr ,npts) 
+         yy = sqrt(rr^2   - xx^2)   
          dum3(n) = gsn_add_polyline(wks,taylor,xx,yy, rsrRes)
       end do
       taylor@$unique_string("dum")$ = dum3
@@ -1504,26 +1604,30 @@ begin
   yC(:6) = yC(:6) + 0.05
 
   txRes               = True                      ; text mods desired
-  txRes@txFontHeightF = FontHeightF               ; match YL
+  txRes@txFontHeightF = FontHeightF               ; match YL 
   txRes@tmYLLabelFont = tmYLLabelFont             ; match YL
-  txRes@txAngleF      = -45.
-  if (.not.isatt(rOpts,"drawCorLabel") .or. rOpts@drawCorLabel) then
-     dum4 = gsn_add_text(wks,taylor,"Correlation",2.8,2.8,txRes)
-	    taylor@$unique_string("dum")$ = dum4
+;  txRes@txAngleF      = -45.
+  txRes@txAngleF      = -50.
+  if (.not.isatt(rOpts,"drawCorLabel") .or. rOpts@drawCorLabel) then 
+;    dum4 = gsn_add_text(wks,taylor,"Correlation",2.8,2.8,txRes)
+;    dum4 = gsn_add_text(wks,taylor,"Correlation",2.9,2.9,txRes)
+;    dum4 = gsn_add_text(wks,taylor,"Correlation",2.95,2.8,txRes)
+    dum4 = gsn_add_text(wks,taylor,"Correlation",xyMax*0.85,xyMax*0.765,txRes)
+    taylor@$unique_string("dum")$ = dum4
   end if
-  txRes@txAngleF      = 0.0
+  txRes@txAngleF      = 0.0 
 
 ;;dum0 = gsn_add_text(wks,taylor,"OBSERVED",1.00,0.075,txRes)
 
   plRes               = True
   plRes@gsLineThicknessF = 2.
-
+  
   txRes@txJust        = "CenterLeft"              ; Default="CenterCenter".
-  txRes@txFontHeightF = FontHeightF               ; match YL
+  txRes@txFontHeightF = FontHeightF               ; match YL 
  ;txRes@txBackgroundFillColor = "white"
 
   tmEnd = 0.975
-  radTM = xyMax*tmEnd                             ; radius end: major TM
+  radTM = xyMax*tmEnd                             ; radius end: major TM 
   xTM   = new( 2 , "float")
   yTM   = new( 2 , "float")
 
@@ -1536,22 +1640,22 @@ begin
     dum5(i) = gsn_add_text(wks, taylor, sLabels(i),xC(i),yC(i),txRes) ; cor label
     xTM(0)   = xyMax*cos(angC(i)*rad)             ; major tickmarks at
     yTM(0)   = xyMax*sin(angC(i)*rad)             ; correlation labels
-    xTM(1)   = radTM*cos(angC(i)*rad)
+    xTM(1)   = radTM*cos(angC(i)*rad)             
     yTM(1)   = radTM*sin(angC(i)*rad)
     dum6(i) = gsn_add_polyline(wks,taylor,xTM,yTM,plRes)
   end do
                                                   ; minor tm locations
-  mTM     = (/0.05,0.15,0.25,0.35,0.45,0.55,0.65 \
+  mTM     = (/0.05,0.15,0.25,0.35,0.45,0.55,0.65 \ 
              ,0.75,0.85,0.91,0.92,0.93,0.94,0.96,0.97,0.98  /)
   angmTM  = acos(mTM)/rad                         ; angles: correlation labels
-  radmTM  = xyMax*(1.-(1.-tmEnd)*0.5)             ; radius end: minor TM
+  radmTM  = xyMax*(1.-(1.-tmEnd)*0.5)             ; radius end: minor TM 
 
   dum7 = new(dimsizes(mTM),graphic)
 
   do i=0,dimsizes(mTM)-1                          ; manually add tm
     xTM(0)   = xyMax*cos(angmTM(i)*rad)           ; minor tickmarks
     yTM(0)   = xyMax*sin(angmTM(i)*rad)
-    xTM(1)   = radmTM*cos(angmTM(i)*rad)
+    xTM(1)   = radmTM*cos(angmTM(i)*rad)          
     yTM(1)   = radmTM*sin(angmTM(i)*rad)
     dum7(i)  = gsn_add_polyline(wks,taylor,xTM,yTM,plRes)
   end do
@@ -1561,8 +1665,8 @@ begin
 
       rlRes = True
       rlRes@gsLineDashPattern= 2  ; line pattern
-      rlRes@gsLineThicknessF = 1  ; choose line thickness
-      rlRes@gsLineOpacityF = 0.25
+      rlRes@gsLineThicknessF = 0.5  ; choose line thickness
+;      rlRes@gsLineOpacityF = 0.25
       if (isatt(rOpts,"ccRays_color")) then
           rlRes@gsLineColor    =  "LightGray"
       end if
@@ -1575,7 +1679,7 @@ begin
       end do
       taylor@$unique_string("dum")$ = dum8
   end if
-
+  
 ; ----------------------------------------------------------------
 ; Part 3:
 ; Concentric about 1.0 on XB axis
@@ -1584,10 +1688,10 @@ begin
   if (rOpts .and. isatt(rOpts,"centerDiffRMS") \
             .and. rOpts@centerDiffRMS) then
       respl                    = True                ; polyline mods desired
-      respl@gsLineOpacityF = 0.25
-      respl@xyLineThicknessF   = 1.0                 ; line thickness
+;      respl@gsLineOpacityF = 0.25
+      respl@xyLineThicknessF   = .5                 ; line thickness
       respl@xyLineDashPattern  = 2                   ; short dash lines
-      respl@gsLineColor        = "Black"             ; line color
+      respl@gsLineColor        = "Black"             ; line color     
       if (isatt(rOpts,"centerDiffRMS_color")) then
           respl@gsLineColor    =  "LightGray"
       end if
@@ -1599,9 +1703,9 @@ begin
 
       dum9 = new(ncon,graphic)
 	  ;;;; IF YOU DESIRE RMS LABELS
-	  ;rms_labels = (/2.75,2.50,2.25,2.00,1.75,1.5,1.25,1.00,0.75,0.5,0.25,0.0/)
-
-      do n=1,ncon
+	  ;rms_labels = (/2.75,2.50,2.25,2.00,1.75,1.5,1.25,1.00,0.75,0.5,0.25,0.0/) 
+	  
+      do n=1,ncon 
 		 ;respl@gsLineLabelString = rms_labels(n-1)  ;IF YOU DESIRE RMS LABELS
 		 ;respl@gsLineLabelFontColor    =  "LightGray"
          rr  = n*dx            ; radius from 1.0 [OBS] abscissa
@@ -1611,12 +1715,12 @@ begin
          ;              dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          ;          end if
          ; if (n.eq.3) then
-         ;              ;n3 = floattointeger( 0.77*npts )
+         ;              ;n3 = floattointeger( 0.77*npts ) 
          ;              ;dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n3),yy(0:n3),respl)
          ; 			 dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          ;          end if
          ;          if (n.eq.4) then
-         ;              ;n4 = floattointeger( 0.61*npts )
+         ;              ;n4 = floattointeger( 0.61*npts ) 
          ;              ;dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n4),yy(0:n4),respl)
          ; 			 dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          ;          end if
@@ -1626,22 +1730,22 @@ begin
          end if
 
          if (n.eq.9) then
-             n9 = floattointeger( 0.71*npts )
+             n9 = floattointeger( 0.71*npts ) 
              dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n9),yy(0:n9),respl)
 			 ;dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          end if
          if (n.eq.10) then
-             n10 = floattointeger( 0.61*npts )
+             n10 = floattointeger( 0.61*npts ) 
              dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n10),yy(0:n10),respl)
 			 ;dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          end if
          if (n.eq.11) then
-             n11 = floattointeger( 0.53*npts )
+             n11 = floattointeger( 0.53*npts ) 
              dum9(n-1) = gsn_add_polyline(wks,taylor,xx(0:n11),yy(0:n11),respl)
 			 ;dum9(n-1) = gsn_add_polyline(wks,taylor,xx,yy,respl)
          end if
-
-
+		 
+		 
       end do
       delete(ang)
       delete(xx)
@@ -1652,7 +1756,7 @@ begin
 ; ---------------------------------------------------------------
 ; Part 4:
 ; generic resources that will be applied to all users data points
-; of course, these can be changed
+; of course, these can be changed 
 ; http://www.ncl.ucar.edu/Document/Graphics/Resources/gs.shtml
 ; ---------------------------------------------------------------
   if (rOpts .and. isatt(rOpts,"Markers")) then
@@ -1682,14 +1786,14 @@ begin
 
   gsRes = True
   gsRes@gsMarkerThicknessF = gsMarkerThicknessF      ; default=1.0
-  gsRes@gsMarkerSizeF      = gsMarkerSizeF           ; Default: 0.007
+  gsRes@gsMarkerSizeF      = gsMarkerSizeF           ; Default: 0.007 
 
   ptRes = True                        ; text options for points
   ptRes@txJust             = "BottomCenter"; Default="CenterCenter".
   ptRes@txFontThicknessF   = 1.2      ; default=1.00
   ptRes@txFontHeightF      = 0.0125   ; default=0.05
   if (rOpts .and. isatt(rOpts,"txFontHeightF")) then
-      ptRes@txFontHeightF  = rOpts@txFontHeightF
+      ptRes@txFontHeightF  = rOpts@txFontHeightF  
   end if
 
   markerTxYOffset          = 0.0175   ; default
@@ -1705,11 +1809,11 @@ begin
      gsRes@gsMarkerColor   = Colors(n)              ; marker color
      ptRes@txFontColor     = gsRes@gsMarkerColor
     do i=0,nVar-1
-       dum10(n*nVar+i) = gsn_add_polymarker(wks,taylor,X(n,i),Y(n,i),gsRes)
-;;       print("X(n,i) = " + X(n,i) + " " + "Y(n,i) = " + Y(n,i))
+       dum10(n*nVar+i) = gsn_add_polymarker(wks,taylor,X(n,i),Y(n,i),gsRes) 
+;;       print("X(n,i) = " + X(n,i) + " " + "Y(n,i) = " + Y(n,i)) 
        ; changes
 	   ; dum11(n*nVar+i) = gsn_add_text(wks,taylor,(i+1),X(n,i),Y(n,i)+markerTxYOffset,ptRes)
-
+	   
 	   ; if (rOpts .and. isatt(rOpts,"markerLabels")) then
 	   ; 	      dum11(n*nVar+i) = gsn_add_text(wks,taylor,rOpts@markerLabels(i),X(n,i),Y(n,i)+markerTxYOffset,ptRes)
 	   ; 	   else
@@ -1722,17 +1826,17 @@ begin
 ; Part 5: ; add case legend and variable labels
 ; ---------------------------------------------------------------
 
-  if (rOpts .and. isatt(rOpts,"caseLabels")) then
+  if (rOpts .and. isatt(rOpts,"caseLabels")) then 
 
       if (isatt(rOpts,"caseLabelsFontHeightF")) then
           caseLabelsFontHeightF = rOpts@caseLabelsFontHeightF
       else
-          caseLabelsFontHeightF = 0.05
+          caseLabelsFontHeightF = 0.05  
       end if
 
       lgres                    = True
       lgres@lgMarkerColors     = Colors        ; colors of markers
-      lgres@lgMarkerIndexes    = Markers       ; Markers
+      lgres@lgMarkerIndexes    = Markers       ; Markers 
       lgres@lgMarkerSizeF      = gsMarkerSizeF ; Marker size
       lgres@lgItemType         = "Markers"     ; draw markers only
       lgres@lgLabelFontHeightF = caseLabelsFontHeightF  ; font height of legend case labels
@@ -1745,21 +1849,21 @@ begin
 
       if (isatt(rOpts,"legendHeight")) then
           lgres@vpHeightF      = rOpts@legendHeight
-      else
+      else   
           lgres@vpHeightF      = 0.030*nCase   ; height of legend (NDC)
       end if
 
       lgres@lgPerimOn          = False         ; turn off perimeter
       nModel                   = dimsizes( rOpts@caseLabels )
       lbid = gsn_create_legend(wks,nModel,rOpts@caseLabels,lgres)
-
+	 
       amres = True
-      amres@amParallelPosF     =  0.35
-      amres@amOrthogonalPosF   = -0.35
+      amres@amParallelPosF     =  0.35           
+      amres@amOrthogonalPosF   = -0.35             
       annoid1 = gsn_add_annotation(taylor,lbid,amres)	; add legend to plot
   end if
 
-  if (rOpts .and. isatt(rOpts,"varLabels")) then
+  if (rOpts .and. isatt(rOpts,"varLabels")) then 
       nVar    = dimsizes(rOpts@varLabels)
 
       if (isatt(rOpts,"varLabelsFontHeightF")) then
@@ -1772,16 +1876,16 @@ begin
       txres@txFontHeightF = varLabelsFontHeightF
       txres@txJust = "CenterLeft"              ; justify to the center left
 
-     ;delta_y = 0.02
-      delta_y = 0.06
+     ;delta_y = 0.02       
+      delta_y = 0.06   
       if (rOpts .and. isatt(rOpts,"varLabelsYloc")) then
           ys  = rOpts@varLabelsYloc            ; user specified
       else
           ys  = max( (/nVar*delta_y , 0.30/) )
       end if
 
-
-      do i = 1,nVar
+      
+      do i = 1,nVar     
          if (i.eq.1) then
              dum12 = new(nVar,graphic)
 	 end if
@@ -1801,13 +1905,13 @@ begin
   taylor@$unique_string("dum")$ = dum7   ; minor tm
   taylor@$unique_string("dum")$ = dum10  ; markers
   ; taylor@$unique_string("dum")$ = dum11  ; text
-
+  
   if (.not.isatt(rOpts,"taylorDraw") .or. \
-     (isatt(rOpts,"taylorDraw") .and. rOpts@taylorDraw)) then
+     (isatt(rOpts,"taylorDraw") .and. rOpts@taylorDraw)) then 
 	draw(taylor)
   end if
   if (.not.isatt(rOpts,"taylorFrame") .or. \
-     (isatt(rOpts,"taylorFrame") .and. rOpts@taylorFrame)) then
+     (isatt(rOpts,"taylorFrame") .and. rOpts@taylorFrame)) then 
 	frame(wks)
   end if
   return(taylor)
@@ -1847,7 +1951,7 @@ begin
         w_ind := ind(enum.eq.gg)
         factor = 1./dimsizes(w_ind)
         if (dimsizes(w_ind).eq.1) then
-           farr(gg-1) = (/ warr(w_ind) /)
+           farr(gg-1) = (/ warr(w_ind) /)  
         else
            farr(gg-1) = (/ dim_sum_n(warr(w_ind)*factor,0) /)
         end if
@@ -1860,7 +1964,7 @@ begin
         w_ind := ind(enum.eq.gg)
         factor = 1./dimsizes(w_ind)
         if (dimsizes(w_ind).eq.1) then
-           farr(gg-1,:) = (/ warr(w_ind,:) /)
+           farr(gg-1,:) = (/ warr(w_ind,:) /)  
         else
            farr(gg-1,:) = (/ dim_sum_n(warr(w_ind,:)*factor,0) /)
         end if
@@ -1873,14 +1977,14 @@ begin
         w_ind := ind(enum.eq.gg)
         factor = 1./dimsizes(w_ind)
         if (dimsizes(w_ind).eq.1) then
-           farr(gg-1,:,:) = (/ warr(w_ind,:,:) /)
+           farr(gg-1,:,:) = (/ warr(w_ind,:,:) /)  
         else
            farr(gg-1,:,:) = (/ dim_sum_n(warr(w_ind,:,:)*factor,0) /)
         end if
      end do
   end if
   return(farr)
-end
+end 
 ;=================================================================================================
 ; create blank array for use when something may be/is wrong.
 ;
@@ -1901,8 +2005,227 @@ begin
   finchar = tochar(finstring)
   print(prstring+" Observed values (percentiles) = "+tostring(finchar(:dimsizes(finchar)-3)))
 end
+;=================================================================================================
+; create weighted pdf
+; Author: Yu Kosaka
+;
+function weighted_pdfx(x, w, res)
+local x, w, res, nbins, pdf, bounds, i, n
+begin
+  nbins = dimsizes(res@bin_center)
+  pdf = new(nbins, "double")
+  bounds = res@bin_bounds
+  pdf@nbins = nbins
+  pdf@bin_spacing = res@bin_spacing
+  pdf@bin_bound_min = res@bin_min
+  pdf@bin_bound_max = res@bin_max
+  pdf@bin_center = res@bin_center
+  pdf@bin_bounds = bounds
+  pdf = 0.
 
+  if (min(x).le.pdf@bin_bound_min.or.max(x).gt.pdf@bin_bound_max) then
+     print("1 or more trend values are outside the histogram bin range, adjust bin range/bin_bounds")
+     printMinMax(x,0)
+     print("Histogram bin bounds = "+pdf@bin_bound_min+"-"+pdf@bin_bound_max)
+     exit
+  end if
 
+  do i = 0, dimsizes(x)-1
+    if (ismissing(x(i))) then
+      continue
+    end if
+    do n = 0, nbins-1
+      if (bounds(n).le.x(i).and.x(i).lt.bounds(n+1)) then
+        pdf(n) = pdf(n) + w(i)
+        break
+      end if
+    end do
+  end do
+  pdf = pdf / sum(where(ismissing(x), 0., w)) * 100.
+  pdf!0 = "time"
+  pdf&time = pdf@bin_center
+  return(pdf)
+end
+;=================================================================================================
+; create weighted mean
+; Author: Yu Kosaka
+function weighted_mean(x, w)
+local x, w, y
+begin
+  y = dim_sum_n(x*conform(x, w, 0), 0)
+  y = y / dim_sum_n(where(ismissing(x), w@_FillValue, conform(x, w, 0)), 0)
+  return(y)
+end
 
+;=================================================================================================
+; create weighted percentile plot
+; Author: Yu Kosaka
+; Notes from Yu: x and w are the same as above, and t is a scalar percentile value in [0, 1]. 
+; Namely, t = 0.5 will give the median. Actually, 2D x like x({ensemble}, {time}), with w again in a 1D array.
+;
+function weighted_percentile(x, w, t)
+local x, w, xx, ww, wsum, j, k, dims, idx
+begin
+  xx = x
+  dims = dimsizes(xx)
+  if (dimsizes(dims).eq.1) then
+    y = new(1,typeof(x))
+    idx = dim_pqsort(xx, 2)
+;    print(x+" "+xx+" "+idx)
+    wsum = sum(where(ismissing(x), w@_FillValue, w))
+    ww = 0.
+    do j = 0, dims(0)-1
+      if (.not.ismissing(xx(j))) then
+        ww = ww + w(idx(j))
+;        print("wsum = "+wsum+", ww = "+ww+", w(idx(j))="+w(idx(j))+", t = "+t+", j = "+j)
+        if (ww/wsum.eq.t) then
+          y = xx(j)
+          break
+        elseif (ww/wsum.gt.t) then
+          if (j.eq.0) then    ; AP modification req'd when ensemble size < 50 when t = 0.05
+             y = xx(j)
+          else
+             y = (xx(j) + xx(j-1))/2.
+          end if
+          break
+        end if
+      end if
+    end do
+  else
+    y = new(dims(1), typeof(x))
+    idx = dim_pqsort_n(xx, 2, 0)
+    do k = 0, dims(1)-1
+      wsum = sum(where(ismissing(x(:, k)), w@_FillValue, w))
+      ww = 0.
+      do j = 0, dims(0)-1
+        if (.not.ismissing(xx(j, k))) then
+          ww = ww + w(idx(j, k))
+          if (ww/wsum.eq.t) then
+            y(k) = xx(j, k)
+            break
+          elseif (ww/wsum.gt.t) then
+            y(k) = (xx(j, k) + xx(j-1, k))/2.
+            break
+          end if
+        end if
+      end do
+    end do
+  end if
+  return(y)
+end
+;-------------------------------------
+; calc_weights_by_ens_size
+;
+; Given an array where ensemble members are assigned the same integer (starting at 1), 
+; calculate the appropriate weight based on ensemble size 
+;
+; Ex. A 3-member ensemble will have each member be given a weight of 1/3.
+;
+function calc_weights_by_ens_size(x)
+local x,weights,gg,wind
+begin
+  weights = new(dimsizes(x),float)
+  do gg = 1,max(x)         
+     wind := ind(x.eq.gg)
+     if (.not.ismissing(wind(0))) then
+        weights(wind) = 1./dimsizes(wind)
+     end if
+  end do
+  return(weights)
+end
+;-------------------------------------
+; calc_ensmean_1d
+; 
+; Calculate MME for 1D timeseries
+; x = 1D array dimensioned Model 
+; ea = array containing integers (1->) assigned for each array, same size as Model dimensions of x
 
+function calc_ensmean_1d(x,ea)
+local x,ea,x_em,gg,wind,nensmem
+begin
+  x_em = x(:max(ea)-1)
+  x_em = x_em@_FillValue
+  nensmem = x_em
+  do gg = 1,max(ea)         ; calculate ensemble means
+     wind := ind(ea.eq.gg)
+     if (.not.ismissing(wind(0))) then
+        x_em(gg-1) = (/ dim_avg(x(wind)) /)
+        nensmem(gg-1) = dimsizes(wind)
+     end if
+  end do
+  x_em@num_ensemble_members = nensmem
+  return(x_em)
+end
+;--------------------
+; set_min_numEMsize
+;
+; given an array that contains ensemble means and the number of members per ensemble
+; along with a criteria for the minimum number of members, set all ensemble means
+; to _FillValue that fall below the minimum number of members.
+;
+; x = input array 1D, containing attribute num_ensemble_members (array returned from calc_ensmean_1d)
+; crit = minimum number of ensemble members required
+;
+function set_min_numEMsize(z,crit)
+local z,crit
+begin
+  z = where(z@num_ensemble_members.ge.crit,z,z@_FillValue)
+  z@num_ensemble_members = where(z@num_ensemble_members.ge.crit,z@num_ensemble_members,z@_FillValue)  ; mask num_ensemble_members by same critera
+  return(z)
+end
+;---------------------------------------
+; box_whisker_1
+;
+; calculate min/5%/mean/95%/max with weighting
+; x = input array 1D, w = weights (same size as x)
+;
+function box_whisker_1(x,w)
+local x,w,xarr
+begin
+  xarr = new(5,typeof(x))
+;  xarr = (/min(x),weighted_percentile(x,w,.05),weighted_percentile(x,w,.5),weighted_percentile(x,w,.95),max(x)/)
+  xarr = (/min(x),weighted_percentile(x,w,.05),weighted_mean(x,w),weighted_percentile(x,w,.95),max(x)/)  
+  return(xarr)
+end
+;---------------------------------------
+; box_whisker_1b
+;
+; calculate 5%/25%/mean/75%/95% with weighting
+; x = input array 1D, w = weights (same size as x)
+;
+function box_whisker_1b(x,w)
+local x,w,xarr
+begin
+  xarr = new(5,typeof(x))
+;  xarr = (/weighted_percentile(x,w,.05),weighted_percentile(x,w,.25),weighted_percentile(x,w,.5),weighted_percentile(x,w,.75),weighted_percentile(x,w,.95)/)
+  xarr = (/weighted_percentile(x,w,.05),weighted_percentile(x,w,.25),weighted_mean(x,w),weighted_percentile(x,w,.75),weighted_percentile(x,w,.95)/)  
+  return(xarr)
+end
+;---------------------------------------
+; box_whisker_2
+;
+; calculate 5-95 confidence interval w/t-statistic. 
+; Set the whiskers to the same values as 5-95% (as they will not be shown)
+; and use weighted percentile for the middle value
+; x = input array 1D with attributes num_ensemble_members, 
+; w = weights (same size as x), crit = scalar
+;
+function box_whisker_2(x,criteria)
+local x,xarr,criteria,w
+begin
+  x = set_min_numEMsize(x,criteria)
+  nmodels_ens = num(.not.ismissing(x))
+;  print(x+" "+x@num_ensemble_members)  
+;  print(nmodels_ens)
+
+  w = new(dimsizes(x),float)
+  w = 1
+
+  xarr = new(5,typeof(x))
+  val5  = avg(x)+cdft_t(0.05, nmodels_ens-1)*stddev(x)/sqrt(tofloat(nmodels_ens))
+  val95 = avg(x)+cdft_t(0.95, nmodels_ens-1)*stddev(x)/sqrt(tofloat(nmodels_ens))
+;  xarr = (/val5,val5,weighted_percentile(x,w,.5),val95,val95/)
+  xarr = (/val5,val5,weighted_mean(x,w),val95,val95/)  
+  return(xarr)
+end
 

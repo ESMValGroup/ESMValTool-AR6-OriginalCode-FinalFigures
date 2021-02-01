@@ -6,7 +6,6 @@ load "$diag_scripts/ipccwg1ar6ch3_modes/functions.ncl"
 
 begin
 
-
   enter_msg(DIAG_SCRIPT, "")
 
   ; Create work directory
@@ -17,27 +16,37 @@ begin
   info_items = select_metadata_by_name(input_file_info, var0)
   datasetnames = metadata_att_as_array(info_items, "dataset")
   dim_MOD = ListCount(info_items)
-
-  scenario = "hist-GHG"
-  if (isatt(diag_script_info, "scenario")) then
-    scenario = diag_script_info@scenario
-  end if
   
+  ;--------------------------
+  ; historical-ssp245 datasets
+  ;--------------------------
+  atts := True
+  atts@exp = "historical-ssp245"
+  if (dim_MOD.ne.ListCount(select_metadata_by_atts(info_items, atts))) then
+    error_msg("f", DIAG_SCRIPT, "", "this diagnostic can only handle historical-ssp245" + \
+              " experiment")
+  end if
+
+  if (ListCount(info_items) .lt. 1) then
+    error_msg("f", DIAG_SCRIPT, "", "this diagnostic needs at least one " + \
+              "run")
+  end if
+
   seas = "djf"
   if (isatt(diag_script_info, "season")) then
     seas = diag_script_info@season
   end if
   seas = str_lower(seas)
-
+  
   eyear = 2019
 ;----------------------------------------------------------
   pi=4.*atan(1.0)
   rad=(pi/180.)
-
+  
 ;-------------------------------------------------------------
-; NAM/SAM for DAMIP simulations
+; NAM/SAM for historical-ssp245 simulations
 ;-------------------------------------------------------------
-;
+;  
 ;  lat := nam_patterns_obs&lat
 ;  lat!0 = "lat"
 ;  lat&lat = lat
@@ -45,25 +54,27 @@ begin
 ;  w!0 = "lat"
 ;  w&lat = lat
 
+
   nens = dim_MOD
+
+  model = metadata_att_as_array(info_items, "dataset")
+  emem  = metadata_att_as_array(info_items, "ensemble")
+  ensemble_assign = new(nens, integer)
   
-  models = metadata_att_as_array(info_items, "dataset")
-  emem = metadata_att_as_array(info_items, "ensemble")
-  ensemble_assign = new(nens,integer)
-
   enum = 1
-  temp = models(0)
-  do gg = 0,dimsizes(models)-1
-     if (temp.eq.models(gg)) then   ; does the model name match what's in temp?
-        ensemble_assign(gg) = enum ; if so, assign it the same number
-     else
-        enum = enum+1              ; if not, assign it the next number
-        ensemble_assign(gg) = enum
-        temp = models(gg)
-     end if
+  temp = model(0)
+  do gg = 0,nens-1
+    if (temp.eq.model(gg)) then   ; does the model name match what's in temp?
+      ensemble_assign(gg) = enum ; if so, assign it the same number
+    else
+      enum = enum+1              ; if not, assign it the next number
+      ensemble_assign(gg) = enum
+      temp = model(gg)
+    end if
   end do
-  ensemble_assign@models = str_join(models+"/"+emem,",")
-
+  delete(temp)
+  ensemble_assign@models = str_join(model+"/"+emem,",")
+  
   do gg = 0, nens-1
     arrF := read_data(info_items[gg])
     arrF&time = cd_calendar(arrF&time,1)
@@ -83,7 +94,7 @@ begin
         arr := arrF({200001:},:,:)
       end if
       arr = rmMonAnnCycTLL(arr)
-      
+
       temp := runave_n_Wrap(arr,3,0,0)
       temp(0,:,:) = (/ dim_avg_n(arr(:1,:,:),0) /)
       if (seas.eq."djf") then
@@ -113,7 +124,7 @@ begin
     if (gg.eq.0) then
       nam_patterns := new((/nens,dimsizes(finarr_nam&lat),dimsizes(finarr_nam&lon)/),typeof(finarr_nam))
       nam_patterns!0 = "E"
-      nam_patterns&E = ispan(0,nens-1,1)
+      nam_patterns&E = ispan(0, nens-1,1)
       nam_patterns!1 = "lat"
       nam_patterns&lat = finarr_nam&lat
       nam_patterns!2 = "lon"
@@ -136,9 +147,9 @@ begin
       nam_pc_trends := nam_timeseries(:,0)
       sam_pc_trends0 := nam_timeseries(:,0)
       sam_pc_trends1 := nam_timeseries(:,0)
-
+      
       ensemble_assign!0 = "E"
-      ensemble_assign&E = nam_patterns&E
+      ensemble_assign&E = nam_timeseries&E
     end if
 
     nam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0) /)
@@ -153,14 +164,14 @@ begin
     sam_pc_trends0(gg) = (/ tttt@slope*dimsizes(finarr_sam_pc0)  /)  
     tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc1)-1,1),finarr_sam_pc1,False,True,0)
     sam_pc_trends1(gg) = (/ tttt@slope*dimsizes(finarr_sam_pc1)  /)  
-
+    
     nam_timeseries(gg,:) = (/ finarr_nam_pc /)
     sam_timeseries0(gg,:) = (/ finarr_sam_pc0 /)
     sam_timeseries1(gg,:) = (/ finarr_sam_pc1 /)
     print("Done with "+gg+" out of "+nens)
   end do
 
-  fn = out_path + "nam_sam.alt_def.damip_"+scenario+"."+seas+".1958_1979_2000-2019.nc"
+  fn = out_path + "nam_sam.alt_def.hist."+seas+".1958_1979_2000-2019.nc"
   system("rm -f " + fn)
   z = addfile(fn,"c")
   z@source = systemfunc("pwd")+"/"+get_script_name()
@@ -175,6 +186,6 @@ begin
   z->sam_trends0 = sam_pc_trends0
   z->sam_trends1 = sam_pc_trends1
   delete(z)
-  
+
 end
 

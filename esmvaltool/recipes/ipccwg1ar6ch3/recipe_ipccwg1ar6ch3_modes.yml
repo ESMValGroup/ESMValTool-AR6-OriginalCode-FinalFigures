@@ -11,7 +11,8 @@ documentation:
   authors:
     - karmouche_soufiane
     - bock_lisa
-
+    - kosaka_yu
+    
   #references:
 
   projects:
@@ -55,88 +56,153 @@ diagnostics:
     variables:
       psl_cmip6: &var_def_1
         short_name: psl
-        reference_dataset: NOAACires20crv2c
+        reference_dataset: JRA-55
         mip: Amon
         project: CMIP6
+        exp: historical
         ensemble: r1i1p1f1
         grid: gn
         start_year: 1958
         end_year: 2014
         additional_datasets:
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: historical}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: historical}
-          - {dataset: BCC-CSM2-MR, grid: gn, exp: historical}
-          - {dataset: BCC-ESM1, grid: gn, exp: historical}
-          - {dataset: CAMS-CSM1-0, grid: gn, exp: historical}
-          - {dataset: CanESM5, exp: historical, ensemble: r(1:5)i1p1f1}
-          - {dataset: CESM2, exp: historical, ensemble: r(1:5)i1p1f1}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: CIESM, grid: gr, exp: historical}
-          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
-          - {dataset: MIROC6, grid: gn, ensemble: r1i1p1f1, exp: historical}
-          - {dataset: AWI-CM-1-1-MR, grid: gn, institute: AWI, exp: historical}
-          - {dataset: FGOALS-f3-L, grid: gr, institute: CAS, exp: historical}
-          - {dataset: FGOALS-g3, grid: gn, institute: CAS, exp: historical}
-          - {dataset: CMCC-CM2-SR5, grid: gn, institute: CMCC, exp: historical}
-          - {dataset: CNRM-ESM2-1, grid: gr, institute: CNRM-CERFACS, ensemble: r1i1p1f2, exp: historical}
-          - {dataset: MPI-ESM-1-2-HAM, grid: gn, institute: HAMMOZ-Consortium, exp: historical}
-          - {dataset: IPSL-CM6A-LR, grid: gr, institute: IPSL, exp: historical}
-          - {dataset: HadGEM3-GC31-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f3, exp: historical}
-          - {dataset: UKESM1-0-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f2, exp: historical}
-          - {dataset: MPI-ESM1-2-HR, grid: gn, institute: MPI-M, exp: historical}
-          - {dataset: MRI-ESM2-0, grid: gn, institute: MRI, exp: historical}
-          - {dataset: GISS-E2-1-G, grid: gn, institute: NASA-GISS, exp: historical}
-          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: NorCPM1, ensemble: r10i1p1f1, grid: gn, institute: NCC, exp: historical}
-          - {dataset: NorESM2-LM, grid: gn, institute: NCC, exp: historical}
-          - {dataset: NESM3, grid: gn, institute: NUIST, exp: historical}
-          - {dataset: SAM0-UNICON, grid: gn, institute: SNU, exp: historical}
+          - {dataset: ACCESS-CM2, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: AWI-CM-1-1-MR, ensemble: r(1:5)i1p1f1, grid: gn}
+          - {dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn} # fix metadata failure
+          - {dataset: BCC-CSM2-MR, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: CAS-ESM2-0, ensemble: r(1:4)i1p1f1, grid: gn}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:20)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r(7:10)i1p1f2, grid: gr}
+          - {dataset: CanESM5, ensemble: r(1:25)i1p1f1, grid: gn}
+          - {dataset: E3SM-1-0, ensemble: r(1:3)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(1:4)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(6:7)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r9i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(11:22)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r(1:5)i1p1f1, grid: gr}
+          - {dataset: FGOALS-f3-L, ensemble: r(1:3)i1p1f1, grid: gr} # preprocessor failure
+          - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: GISS-E2-1-H, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
+          - {dataset: HadGEM3-GC31-MM, ensemble: r(1:2)i1p1f3, grid: gn}
+          - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: INM-CM5-0, ensemble: r(1:2)i1p1f1, grid: gr1}
+          - {dataset: INM-CM5-0, ensemble: r(5:10)i1p1f1, grid: gr1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1, grid: gr}
+          - {dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn} #preprocessor failure
+          - {dataset: MIROC-ES2L, ensemble: r(1:3)i1p1f2, grid: gn}
+          - {dataset: MIROC6, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
+          - {dataset: NESM3, ensemble: r(1:5)i1p1f1, grid: gn}
+          - {dataset: NorCPM1, ensemble: r(1:30)i1p1f1, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r(8:13)i1p1f2, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r(16:19)i1p1f2, grid: gn}
           # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
-          #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3, start_year:  1979, end_year:  2014}
-          # missing obs:
-          # ersstv5.sst.185401-202004.nc
-          # ersst.v3b.185401-202002.nc
+          - {dataset: 20CRv3, project: OBS, type: reanaly, version: mean, tier: 2, start_year:  1958, end_year:  2014}
+          - {dataset: JRA-55, project: OBS, type: reanaly, version: 1, tier: 3, start_year:  1958, end_year:  2014}
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3, start_year:  1958, end_year:  2014}
+      psl_amip6:
+        <<: *var_def_1
+        exp: amip-hist
+        additional_datasets:
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: CAMS-CSM1-0, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: CESM2, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+          - {dataset: CanESM5, ensemble: r(1:3)i1p2f1, grid: gn}
+          - {dataset: CanESM5, ensemble: r5i1p2f1, grid: gn}
+          - {dataset: CanESM5, ensemble: r(7:10)i1p2f1, grid: gn}
+          - {dataset: FGOALS-f3-L, ensemble: r(1:3)i1p1f1, grid: gr}
+          - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: GFDL-CM4, ensemble: r(2:3)i1p1f1, grid: gr1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(1:3)i1p1f1, grid: gr}
+          - {dataset: MIROC6, ensemble: r(1:5)i1p1f1, grid: gn}
+          - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
       psl_cmip5:
         <<: *var_def_1
         project: CMIP5
         ensemble: r1i1p1
         start_year: 1958
         end_year: 2005
-        exp: [historical, rcp45]
+        exp: historical
         additional_datasets:
-          - {dataset: ACCESS1-0}
-          - {dataset: bcc-csm1-1}
-          - {dataset: bcc-csm1-1-m}
-          - {dataset: CanESM2}
-          - {dataset: CCSM4, ensemble: r(1:5)i1p1}
-          - {dataset: CNRM-CM5}
-          - {dataset: CSIRO-Mk3-6-0}
-          - {dataset: GFDL-CM3}
-          - {dataset: GFDL-ESM2G}
-          - {dataset: GFDL-ESM2M}
-
-
-          - {dataset: BNU-ESM}
-          - {dataset: CMCC-CESM}
-          - {dataset: CMCC-CM}
-          - {dataset: CNRM-CM5-2}
-          - {dataset: FIO-ESM}
-          - {dataset: IPSL-CM5A-MR}
-          - {dataset: MIROC5}
-          - {dataset: HadGEM2-CC}
-          - {dataset: MPI-ESM-LR}
-          - {dataset: MRI-CGCM3}
-          - {dataset: GISS-E2-H-CC}
-          - {dataset: GISS-E2-H}
+          - {dataset: ACCESS1-0, ensemble: r1i1p1}
+          - {dataset: ACCESS1-3, ensemble: r(1:3)i1p1}
+          - {dataset: BNU-ESM, ensemble: r1i1p1}
+          - {dataset: CCSM4, ensemble: r(1:6)i1p1}
+          - {dataset: CESM1-BGC, ensemble: r1i1p1}
+          - {dataset: CESM1-CAM5, ensemble: r(1:3)i1p1}
+          - {dataset: CESM1-CAM5-1-FV2, ensemble: r(1:4)i1p1}
+          - {dataset: CESM1-FASTCHEM, ensemble: r(1:3)i1p1}
+          - {dataset: CESM1-WACCM, ensemble: r(1:4)i1p1}
+          - {dataset: CMCC-CM, ensemble: r1i1p1}
+          - {dataset: CMCC-CMS, ensemble: r1i1p1}
+          - {dataset: CNRM-CM5, ensemble: r(1:10)i1p1}
+          - {dataset: CNRM-CM5-2, ensemble: r1i1p1}
+          - {dataset: CSIRO-Mk3-6-0, ensemble: r(1:10)i1p1}
+          - {dataset: CSIRO-Mk3L-1-2, ensemble: r(1:3)i2p1}
+          - {dataset: CanESM2, ensemble: r(1:5)i1p1}
+          - {dataset: EC-EARTH, ensemble: r(1:2)i1p1}
+          - {dataset: EC-EARTH, ensemble: r6i1p1}
+          - {dataset: EC-EARTH, ensemble: r(8:9)i1p1}
+          - {dataset: EC-EARTH, ensemble: r(11:14)i1p1}
+          - {dataset: FGOALS-g2, ensemble: r(1:5)i1p1}
+          - {dataset: FGOALS-s2, ensemble: r(1:3)i1p1}
+          - {dataset: FIO-ESM, ensemble: r(1:3)i1p1}
+          - {dataset: GFDL-CM2p1, ensemble: r(1:10)i1p1}
+          - {dataset: GFDL-CM3, ensemble: r(1:3)i1p1}
+          - {dataset: GFDL-ESM2G, ensemble: r1i1p1}
+          - {dataset: GFDL-ESM2M, ensemble: r1i1p1}
+          - {dataset: GISS-E2-H, ensemble: r(1:6)i1p1}
+          - {dataset: GISS-E2-H, ensemble: r(1:6)i1p2}
+          - {dataset: GISS-E2-H, ensemble: r(1:6)i1p3}
+          - {dataset: GISS-E2-H-CC, ensemble: r1i1p1}
+          - {dataset: GISS-E2-R, ensemble: r(1:6)i1p1}
+          - {dataset: GISS-E2-R, ensemble: r(1:5)i1p2}
+          - {dataset: GISS-E2-R, ensemble: r(1:6)i1p3}
+          - {dataset: GISS-E2-R-CC, ensemble: r1i1p1}
+          - {dataset: HadCM3, ensemble: r(1:10)i1p1}
+          - {dataset: HadGEM2-AO, ensemble: r1i1p1}
+          - {dataset: HadGEM2-CC, ensemble: r1i1p1, exp: [historical, rcp45]}
+          - {dataset: HadGEM2-ES, ensemble: r1i1p1, exp: [historical, rcp45]}
+          - {dataset: HadGEM2-ES, ensemble: r(2:3)i1p1}
+          - {dataset: HadGEM2-ES, ensemble: r4i1p1, exp: [historical, rcp45]}
+          - {dataset: HadGEM2-ES, ensemble: r5i1p1}
+          - {dataset: IPSL-CM5A-LR, ensemble: r(1:6)i1p1}
+          - {dataset: IPSL-CM5A-MR, ensemble: r(1:3)i1p1}
+          - {dataset: IPSL-CM5B-LR, ensemble: r1i1p1}
+          - {dataset: MIROC-ESM, ensemble: r(1:3)i1p1}
+          - {dataset: MIROC-ESM-CHEM, ensemble: r1i1p1}
+          - {dataset: MIROC4h, ensemble: r(1:3)i1p1}
+          - {dataset: MIROC5, ensemble: r(1:5)i1p1}
+          - {dataset: MPI-ESM-LR, ensemble: r(1:3)i1p1}
+          - {dataset: MPI-ESM-MR, ensemble: r(1:3)i1p1}
+          - {dataset: MPI-ESM-P, ensemble: r(1:2)i1p1}
+          - {dataset: MRI-CGCM3, ensemble: r(1:3)i1p1}
+          - {dataset: MRI-CGCM3, ensemble: r(4:5)i1p2}
+          - {dataset: NorESM1-M, ensemble: r(1:3)i1p1}
+          - {dataset: NorESM1-ME, ensemble: r1i1p1}
+          - {dataset: bcc-csm1-1, ensemble: r(1:3)i1p1}
+          - {dataset: bcc-csm1-1-m, ensemble: r(1:3)i1p1}
+          - {dataset: inmcm4, ensemble: r1i1p1}
     scripts:
       nam_nao_sam:
         script: ipccwg1ar6ch3_modes/nam_nao_sam.ncl
         start_year: 1958
         end_year: 2014
-
+        reference_dataset: JRA-55
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
@@ -145,6 +211,33 @@ diagnostics:
   # **********************************************************************
   # NAM_SAM DAMIP
   # **********************************************************************
+
+  diag_calc_obs:
+    description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      psl_obs:
+        short_name: psl
+        preprocessor: temp_tr
+        reference_dataset: ERA5
+        mip: Amon
+        start_year: 1958
+        end_year: 2019
+        additional_datasets:
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3, start_year:  1958, end_year:  2019}
+          - {dataset: JRA-55, project: OBS, type: reanaly, version: 1, tier: 3, start_year:  1958, end_year:  2019}
+          - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2, start_year:  1958, end_year:  2019}
+
+    scripts:
+      diag_obs_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl
+        season: 'djf'
+      diag_obs_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl
+        season: 'jja'
 
   diag_calc_historical:
     description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
@@ -156,114 +249,136 @@ diagnostics:
       psl_hist: &var_def_2
         short_name: psl
         preprocessor: temp_tr
-        reference_dataset: NOAACires20crv2c
+        reference_dataset: ERA5
         mip: Amon
         project: CMIP6
-        ensemble: r1i1p1f1
         grid: gn
+        exp: [historical, ssp245]
         start_year: 1958
-        end_year: 2014
+        end_year: 2019
         additional_datasets:
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: historical}
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: historical}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 159, end_year: 215}
-          - {dataset: BCC-CSM2-MR, grid: gn, exp: historical}
-          - {dataset: BCC-CSM2-MR, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
-          - {dataset: BCC-ESM1, grid: gn, exp: historical}
-          - {dataset: BCC-ESM1, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
-          - {dataset: CAMS-CSM1-0, grid: gn, exp: historical}
-          - {dataset: CAMS-CSM1-0, grid: gn, exp: piControl, start_year: 2958, end_year: 3014}
-          - {dataset: CanESM5, exp: historical, ensemble: r1i1p1f1}
-          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
-          - {dataset: CESM2, exp: historical, ensemble: r1i1p1f1}
-          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: CIESM, grid: gr, exp: historical}
-          - {dataset: CIESM, grid: gr, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: historical}
-          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: piControl, ensemble: r1i1p1f2, start_year: 1850, end_year: 1964}
-          # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
-          #- era20c_erai.mon.mean.msl
-          # missing obs:
-          # ersstv5.sst.185401-202004.nc
-          # ersst.v3b.185401-202002.nc
+          - {dataset: ACCESS-CM2, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r(7:10)i1p1f2, grid: gr}
+          - {dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn}
+          - {dataset: EC-Earth3, ensemble: r(1:2)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r4i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(6:7)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r9i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(11:22)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r(1:5)i1p1f1, grid: gr}
+          - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+          - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f2, grid: gn}
+          - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
+          - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(1:6)i1p1f1, grid: gr}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(10:11)i1p1f1, grid: gr}
+          - {dataset: IPSL-CM6A-LR, ensemble: r14i1p1f1, grid: gr}
+          - {dataset: IPSL-CM6A-LR, ensemble: r22i1p1f1, grid: gr}
+          - {dataset: IPSL-CM6A-LR, ensemble: r25i1p1f1, grid: gr}
+          - {dataset: MCM-UA-1-0, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MIROC6, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-HR, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
+          - {dataset: NESM3, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
     scripts:
-      diag_historical_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
-      diag_historical_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
+      diag_hist_djf:
+        script: ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl
         season: 'djf'
-      diag_alt_def_historical_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
+      diag_hist_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl
         season: 'jja'
-      diag_alt_def_historical_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
 
-  diag_calc_piC:
+  diag_calc_pi:
     description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
     themes:
       - phys
     realms:
       - atmos
     variables:
-      psl_piC:
+      psl_pi:
         <<: *var_def_2
         exp: piControl
         additional_datasets:
-          #historical
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 159, end_year: 215}
-          - {dataset: BCC-CSM2-MR, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
-          - {dataset: BCC-ESM1, grid: gn, exp: piControl, start_year: 1908, end_year: 1964}
-          - {dataset: CAMS-CSM1-0, grid: gn, exp: piControl, start_year: 2958, end_year: 3014}
-          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
-          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: CIESM, grid: gr, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: piControl, ensemble: r1i1p1f2, start_year: 1908, end_year: 1964}
-         # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
-          #- era20c_erai.mon.mean.msl
+          - {dataset: ACCESS-CM2, grid: gn, ensemble: r1i1p1f1, start_year: 950, end_year: 1011}
+          - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1, start_year: 101, end_year: 162}
+          - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, start_year: 2401, end_year: 2462}
+          #- {dataset: AWI-ESM-1-1-LR, grid: gn, ensemble: r1i1p1f1, start_year: 1855, end_year: 1916} # fix_metadata failure
+          - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: BCC-ESM1, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: CAMS-CSM1-0, grid: gn, ensemble: r1i1p1f1, start_year: 2900, end_year: 2961}
+          - {dataset: CAS-ESM2-0, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: CESM2, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: CESM2-FV2, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: CESM2-WACCM, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: CESM2-WACCM-FV2, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: CMCC-CM2-SR5, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, start_year: 1850, end_year: 1911}
+          - {dataset: CNRM-CM6-1-HR, grid: gr, ensemble: r1i1p1f2, start_year: 1850, end_year: 1911}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, start_year: 1850, end_year: 1911}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5611}
+          - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5611}
+          - {dataset: E3SM-1-0, grid: gr, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: E3SM-1-1, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: E3SM-1-1-ECA, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: EC-Earth3, grid: gr, ensemble: r1i1p1f1, start_year: 2259, end_year: 2320}
+          - {dataset: EC-Earth3-LR, grid: gr, ensemble: r1i1p1f1, start_year: 2219, end_year: 2280}
+          - {dataset: EC-Earth3-Veg, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: EC-Earth3-Veg-LR, grid: gr, ensemble: r1i1p1f1, start_year: 2300, end_year: 2361}
+          - {dataset: FGOALS-f3-L, grid: gr, ensemble: r1i1p1f1, start_year: 600, end_year: 661}
+          - {dataset: FGOALS-g3, grid: gn, ensemble: r1i1p1f1, start_year: 200, end_year: 261}
+          - {dataset: FIO-ESM-2-0, grid: gn, ensemble: r1i1p1f1, start_year: 301, end_year: 362}
+          - {dataset: GFDL-CM4, grid: gr1, ensemble: r1i1p1f1, start_year: 151, end_year: 212}
+          - {dataset: GFDL-ESM4, grid: gr1, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: GISS-E2-1-G, grid: gn, ensemble: r1i1p1f1, start_year: 4150, end_year: 4211}
+          - {dataset: GISS-E2-1-G-CC, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: GISS-E2-1-H, grid: gn, ensemble: r1i1p1f1, start_year: 3180, end_year: 3241}
+          - {dataset: GISS-E2-2-G, grid: gn, ensemble: r1i1p1f1, start_year: 2000, end_year: 2061}
+          - {dataset: HadGEM3-GC31-LL, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: HadGEM3-GC31-MM, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: IITM-ESM, grid: gn, ensemble: r1i1p1f1, start_year: 1926, end_year: 1987}
+          - {dataset: INM-CM4-8, grid: gr1, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1, start_year: 1996, end_year: 2057}
+          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: KACE-1-0-G, grid: gr, ensemble: r1i1p1f1, start_year: 2000, end_year: 2061}
+          - {dataset: KIOST-ESM, grid: gr1, ensemble: r1i1p1f1, start_year: 2689, end_year: 2750}
+          - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2, start_year: 1850, end_year: 1911}
+          - {dataset: MIROC6, grid: gn, ensemble: r1i1p1f1, start_year: 3200, end_year: 3261}
+          - {dataset: MPI-ESM-1-2-HAM, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: MPI-ESM1-2-HR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: MPI-ESM1-2-LR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: MRI-ESM2-0, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1911}
+          - {dataset: NESM3, grid: gn, ensemble: r1i1p1f1, start_year: 500, end_year: 561}
+          - {dataset: NorCPM1, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: NorESM1-F, grid: gn, ensemble: r1i1p1f1, start_year: 1501, end_year: 1562}
+          - {dataset: NorESM2-LM, grid: gn, ensemble: r1i1p1f1, start_year: 1600, end_year: 1661}
+          - {dataset: NorESM2-MM, grid: gn, ensemble: r1i1p1f1, start_year: 1200, end_year: 1261}
+          - {dataset: SAM0-UNICON, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 62}
+          - {dataset: TaiESM1, grid: gn, ensemble: r1i1p1f1, start_year: 201, end_year: 262}
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2, start_year: 1960, end_year: 2021}
     scripts:
-      diag_piC_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.piControl.ncwrite.ncl
-        ancestors: [diag_calc_historical/diag_historical_jja, psl_piC]
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
-      diag_piC_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.piControl.ncwrite.ncl
-        ancestors: [diag_calc_historical/diag_historical_djf, psl_piC]
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
-      diag_alt_def_piC_jja:
+      diag_pi_djf:
         script: ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl
-        ancestors: [diag_calc_historical/diag_alt_def_historical_jja, psl_piC]
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
-      diag_alt_def_piC_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl
-        ancestors: [diag_calc_historical/diag_alt_def_historical_djf, psl_piC]
-        start_year: 1958
-        end_year: 2014
         season: 'djf'
+      diag_pi_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl
+        season: 'jja'
 
   diag_calc_hist-aer:
     description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
@@ -276,55 +391,32 @@ diagnostics:
         <<: *var_def_2
         exp: hist-aer
         additional_datasets:
-          #hist-aer
-          - {dataset: CanESM5, grid: gn, exp: hist-aer}
-          - {dataset: MIROC6, grid: gn, exp: hist-aer}
-          - {dataset: MRI-ESM2-0,  grid: gn, exp: hist-aer}
-          - {dataset: CESM2,  grid: gn, exp: hist-aer}
-          - {dataset: GISS-E2-1-G,  grid: gn, exp: hist-aer}
-          - {dataset: NorESM2-LM,  grid: gn, exp: hist-aer}
-          - {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-aer}
-          - {dataset: HadGEM3-GC31-LL,  grid: gn, exp: hist-aer, ensemble: r3i1p1f3}
-          - {dataset: GFDL-ESM4,  grid: gr1, exp: hist-aer}
-          - {dataset: CNRM-CM6-1,  grid: gr, exp: hist-aer, ensemble: r1i1p1f2}
-          #- {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-aer}
-          #piControl
-          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
-          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
-          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: GISS-E2-1-G, exp: piControl, start_year: 4208, end_year: 4264}
-          - {dataset: NorESM2-LM, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: HadGEM3-GC31-LL, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: GFDL-ESM4,  grid: gr1, exp: piControl, start_year: 159, end_year: 215}
-          - {dataset: CNRM-CM6-1, grid: gr, exp: piControl, ensemble: r1i1p1f2, start_year: 1958, end_year: 2014}
-          # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+          - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:2)i1p1f1}
+          #- {dataset: BCC-CSM2-MR, grid: gn, ensemble: r3i1p1f1} # preprocessor error
+          #- {dataset: CESM2, grid: gn, ensemble: r1i1p1f1}
+          #- {dataset: CESM2, grid: gn, ensemble: r3i1p1f1}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r(1:10)i1p1f2}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:11)i1p2f1}
+          - {dataset: FGOALS-g3, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: GFDL-ESM4,  grid: gr1, ensemble: r1i1p1f1}
+          #- {dataset: GISS-E2-1-G,  grid: gn, ensemble: r(1:5)i1p1f2}
+          - {dataset: HadGEM3-GC31-LL, grid: gn, ensemble: r(1:4)i1p1f3}
+          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r(1:10)i1p1f1}
+          - {dataset: MIROC6, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r1i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r3i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r5i1p1f1}
+          - {dataset: NorESM2-LM,  grid: gn, ensemble: r(1:3)i1p1f1}
     scripts:
-      diag_hist-aer_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
       diag_hist-aer_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
-      diag_alt_def_hist-aer_jja:
         script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_1/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
+        scenario: 'hist-aer'
+        season: 'djf'
+      diag_hist-aer_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        scenario: 'hist-aer'
         season: 'jja'
-      diag_alt_def_hist-aer_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_1/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
 
   diag_calc_hist-GHG:
     description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
@@ -337,66 +429,33 @@ diagnostics:
         <<: *var_def_2
         exp: hist-GHG
         additional_datasets:
-          #hist-GHG
-          - {dataset: CanESM5, grid: gn, exp: hist-GHG}
-          - {dataset: MIROC6, grid: gn, exp: hist-GHG}
-          - {dataset: MRI-ESM2-0,  grid: gn, exp: hist-GHG}
-          - {dataset: ACCESS-ESM1-5,  grid: gn, exp: hist-GHG}
-          # - {dataset: GISS-E2-1-G,  grid: gn, exp: hist-GHG}
-          - {dataset: NorESM2-LM,  grid: gn, exp: hist-GHG, ensemble: r2i1p1f1}
-          # - {dataset: IPSL-CM6A-LR, ensemble: r10i1p1f1, grid: gr, exp: hist-GHG}
-          - {dataset: GFDL-ESM4,  grid: gr1, exp: hist-GHG}
-          - {dataset: HadGEM3-GC31-LL,  grid: gn, exp: hist-GHG, ensemble: r3i1p1f3}
-          # - {dataset: CESM2, grid: gn, exp: hist-GHG}
-          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, exp: hist-GHG, start_year: 1958, end_year: 2014}
-          - {dataset: BCC-CSM2-MR, ensemble: r2i1p1f1, exp: hist-GHG, start_year: 1958, end_year: 2014}
-          - {dataset: BCC-CSM2-MR, ensemble: r3i1p1f1, exp: hist-GHG, start_year: 1958, end_year: 2014}
-
-          #piControl
-          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
-          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
-          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: ACCESS-ESM1-5, exp: piControl, start_year: 159, end_year: 215}
-          # - {dataset: GISS-E2-1-G, exp: piControl, start_year: 4208, end_year: 4264}
-          - {dataset: NorESM2-LM, exp: piControl, start_year: 1958, end_year: 2014}
-          # - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: GFDL-ESM4,  grid: gr1, exp: piControl, start_year: 159, end_year: 215}
-          - {dataset: HadGEM3-GC31-LL, exp: piControl, start_year: 1958, end_year: 2014}
-          # - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
-          - {dataset: MIROC-ES2L, exp: piControl, ensemble: r1i1p1f2, start_year: 1958, end_year: 2014}
-
-          # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+          - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:3)i1p1f1}
+          #- {dataset: CESM2, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r(3:10)i1p1f2}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:10)i1p1f1}
+          - {dataset: FGOALS-g3, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: GFDL-ESM4,  grid: gr1, ensemble: r1i1p1f1}
+          #- {dataset: GISS-E2-1-G,  grid: gn, ensemble: r(1:5)i1p1f2}
+          - {dataset: HadGEM3-GC31-LL, grid: gn, ensemble: r(1:4)i1p1f3}
+          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r(1:10)i1p1f1}
+          - {dataset: MIROC6, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r1i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r3i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r5i1p1f1}
+          - {dataset: NorESM2-LM,  grid: gn, ensemble: r(1:3)i1p1f1}
     scripts:
-      diag_hist-GHG_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
-        season: 'jja'
       diag_hist-GHG_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
-        season: 'djf'
-      diag_alt_def_hist-GHG_jja:
         script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
+        scenario: 'hist-GHG'
+        season: 'djf'
+      diag_hist-GHG_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        scenario: 'hist-GHG'
         season: 'jja'
-      diag_alt_def_hist-GHG_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_2/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
 
-  diag_alt_def_hist-nat:
+  diag_calc_hist-nat:
     description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
     themes:
       - phys
@@ -407,57 +466,32 @@ diagnostics:
         <<: *var_def_2
         exp: hist-nat
         additional_datasets:
-          #hist-nat
-          - {dataset: CNRM-CM6-1,  grid: gr, exp: hist-nat, ensemble: r1i1p1f2}
-          - {dataset: CanESM5, grid: gn, exp: hist-nat}
-          - {dataset: CESM2,  grid: gn, exp: hist-nat}
-          - {dataset: MIROC6, grid: gn, exp: hist-nat}
-          - {dataset: GISS-E2-1-G,  grid: gn, exp: hist-nat, ensemble: r1i1p1f3}
-          - {dataset: MRI-ESM2-0,  grid: gn, exp: hist-nat}
-          - {dataset: NorESM2-LM,  grid: gn, exp: hist-nat}
-          - {dataset: FGOALS-g3,  grid: gn, exp: hist-nat}
-          - {dataset: ACCESS-ESM1-5,  grid: gn, exp: hist-nat}
-          - {dataset: BCC-CSM2-MR,  grid: gn, exp: hist-nat}
-          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, exp: piControl, ensemble: r1i1p1f2, start_year: 1908, end_year: 1964}
-          #piControl
-          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
-          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
-          - {dataset: GISS-E2-1-G, exp: piControl, start_year: 4208, end_year: 4264}
-          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: NorESM2-LM, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: FGOALS-g3, exp: piControl, start_year: 259, end_year: 315}
-          - {dataset: ACCESS-ESM1-5, exp: piControl, start_year: 159, end_year: 215}
-          - {dataset: BCC-CSM2-MR, exp: piControl, start_year: 1908, end_year: 1964}
-          # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+          - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:3)i1p1f1}
+          #- {dataset: CESM2, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: CNRM-CM6-1, grid: gr, ensemble: r(1:10)i1p1f2}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:15)i1p2f1}
+          - {dataset: FGOALS-g3, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: GFDL-ESM4,  grid: gr1, ensemble: r(1:3)i1p1f1}
+          #- {dataset: GISS-E2-1-G,  grid: gn, ensemble: r(1:5)i1p1f2}
+          - {dataset: HadGEM3-GC31-LL, grid: gn, ensemble: r(1:4)i1p1f3}
+          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r(1:10)i1p1f1}
+          - {dataset: MIROC6, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r1i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r3i1p1f1}
+          - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r5i1p1f1}
+          - {dataset: NorESM2-LM,  grid: gn, ensemble: r(1:3)i1p1f1}
     scripts:
-      diag_hist-nat_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
       diag_hist-nat_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
-      diag_alt_def_hist-nat_jja:
         script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_3/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
+        scenario: 'hist-nat'
+        season: 'djf'
+      diag_hist-nat_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        scenario: 'hist-nat'
         season: 'jja'
-      diag_alt_def_hist-nat_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_3/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
 
-
-  diag_alt_def_hist-stratO3:
+  diag_calc_hist-stratO3:
     description: IPCC AR6 Ch. 3, Fig. 3.** (sea level pressure)
     themes:
       - phys
@@ -468,61 +502,25 @@ diagnostics:
         <<: *var_def_2
         exp: hist-stratO3
         additional_datasets:
-          #hist-strat03
-          - {dataset: CanESM5, grid: gn, exp: hist-stratO3}
-          - {dataset: MIROC6, grid: gn, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR, grid: gr, exp: hist-stratO3}
-          - {dataset: IPSL-CM6A-LR,  grid: gr, exp: hist-stratO3, ensemble: r9i1p1f1}
-          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r2i1p1f1}
-          - {dataset: MIROC6, grid: gn, exp: hist-stratO3, ensemble: r2i1p1f1}
-          - {dataset: MIROC6, grid: gn, exp: hist-stratO3, ensemble: r3i1p1f1}
-          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r3i1p1f1}
-          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r4i1p1f1}
-          - {dataset: CanESM5, grid: gn, exp: hist-stratO3, ensemble: r5i1p1f1}
-          #piControl
-          - {dataset: CanESM5, exp: piControl, start_year: 5259 , end_year: 5315}
-          - {dataset: MIROC6, exp: piControl, start_year: 3259, end_year: 3315}
-          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: IPSL-CM6A-LR, grid: gr, exp: piControl, ensemble: r1i2p1f1, start_year: 1958, end_year: 2014}
-          - {dataset: CanESM5, exp: piControl, ensemble: r1i1p2f1, start_year: 5659 , end_year: 5715}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 159, end_year: 215}
-          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1958, end_year: 2014}
-          - {dataset: CESM2, exp: piControl, start_year: 59, end_year: 115}
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 1008, end_year: 1064}
-          - {dataset: MIROC-ES2L, exp: piControl, ensemble: r1i1p1f2, start_year: 1958, end_year: 2014}
-          # OBSERVATIONS:
-          - {dataset: NOAACires20crv2c, project: OBS6, type: reanaly, version: v2c, tier: 2, start_year:  1958, end_year:  2014}
-          - {dataset: JRA-55, project: OBS6, type: reanaly, version: 1, tier: 1, start_year:  1958, end_year:  2014}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:10)i1p1f1}
+          - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r(1:10)i1p1f1}
+          - {dataset: MIROC6, grid: gn, ensemble: r(1:3)i1p1f1}
     scripts:
-      diag_hist-strat03_jja:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
-      diag_hist-strat03_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.ncwrite.ncl
-        start_year: 1958
-        end_year: 2014
-        season: 'djf'
-      diag_alt_def_hist-strat03_jja:
+      diag_hist-stratO3_djf:
         script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_4/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
-        season: 'jja'
-      diag_alt_def_hist-strat03_djf:
-        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-        #ancestors: ['diag_alt_def_4/diag_alt_def_*']
-        start_year: 1958
-        end_year: 2014
+        scenario: 'hist-stratO3'
         season: 'djf'
+      diag_hist-stratO3_jja:
+        script: ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
+        scenario: 'hist-stratO3'
+        season: 'jja'
 
-  diag_sam_nam_plot:
+  nam_sam_da:
     description: plotting diagnostic
     scripts:
-      script_plotting:
-        script: ipccwg1ar6ch3_modes/nam_sam.trends.damip.summary.bar.ncl
-        ancestors: ['*/diag_*']
+      nam_sam_trends_damip:
+        script: ipccwg1ar6ch3_modes/nam_sam.trends.summary.bar.ncl
+        ancestors: ['diag_calc_obs/diag_obs*', 'diag_calc_historical/diag_hist_*', 'diag_calc_pi/diag_pi_*', 'diag_calc_hist-aer/diag_hist-aer_*', 'diag_calc_hist-GHG/diag_hist-GHG_*', 'diag_calc_hist-nat/diag_hist-nat_*', 'diag_calc_hist-stratO3/diag_hist-stratO3_*']
 
 
   # **********************************************************************
@@ -532,8 +530,11 @@ diagnostics:
   # **********************************************************************
   # PDV spatio-temporal properties in observations and models
   # **********************************************************************
-  pdv:
-    description: IPCC AR6 Ch. 3, Fig. 3.39 (surface temperature)
+  # Fig 3.40
+  # **********************************************************************
+  # AMV spatio-temporal properties in observations and models
+  pdv-amv:
+    description: IPCC AR6 Ch. 3, Figs. 3.39 and 3.40 (surface temperature)
     themes:
       - phys
     realms:
@@ -542,116 +543,260 @@ diagnostics:
       ts_cmip6: &var_def_3
         short_name: tos
         preprocessor: temp_tr
-        reference_dataset: HadISST
+        reference_dataset: ERSSTv5
         mip: Omon
         project: CMIP6
+        exp: historical
         ensemble: r1i1p1f1
         grid: gn
         start_year: 1900
         end_year: 2014
         additional_datasets:
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: historical}
-          - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, exp: piControl, start_year: 950, end_year: 1064}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: historical}
-          - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, exp: piControl, start_year: 101, end_year: 215}
-          - {dataset: BCC-CSM2-MR, grid: gn, exp: historical}
-          - {dataset: BCC-CSM2-MR, grid: gn, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: BCC-ESM1, grid: gn, exp: historical}
-          - {dataset: BCC-ESM1, grid: gn, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: CAMS-CSM1-0, grid: gn, exp: historical}
-          - {dataset: CAMS-CSM1-0, grid: gn, exp: piControl, start_year: 2900, end_year: 3014}
-          - {dataset: CESM2, exp: historical, ensemble: r1i1p1f1}
+          - {dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1}
+          - {dataset: ACCESS-CM2, exp: piControl, start_year: 950, end_year: 1064}
+          - {dataset: ACCESS-ESM1-5, ensemble: r(1:6)i1p1f1}
+          - {dataset: ACCESS-ESM1-5, ensemble: r(8:10)i1p1f1}
+          - {dataset: ACCESS-ESM1-5, exp: piControl, start_year: 101, end_year: 215}
+          #- {dataset: AWI-CM-1-1-MR, ensemble: r(1:5)i1p1f1} # preprocessor failure; all member?
+          #- {dataset: AWI-CM-1-1-MR, exp: piControl, start_year: 2401, end_year: 2515}
+          #- {dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1} # preprocessor failure
+          #- {dataset: AWI-ESM-1-1-LR, exp: piControl, start_year: 1855, end_year: 1969} # too short
+          - {dataset: BCC-CSM2-MR, ensemble: r(1:3)i1p1f1}
+          - {dataset: BCC-CSM2-MR, exp: piControl, start_year: 1850, end_year: 1964}
+          #- {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1} # preprocessor failure; all member?
+          - {dataset: BCC-ESM1, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
+          - {dataset: CAMS-CSM1-0, exp: piControl, start_year: 2900, end_year: 3014}
+          - {dataset: CAS-ESM2-0, ensemble: r(1:4)i1p1f1}
+          #- {dataset: CAS-ESM2-0, exp: piControl, start_year: 1855, end_year: 1969} # too short
+          - {dataset: CESM2, ensemble: r(1:10)i1p1f1}
           - {dataset: CESM2, exp: piControl, start_year: 1, end_year: 115}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, exp: piControl, start_year: 1, end_year: 115}
-          - {dataset: CIESM, grid: gn, exp: historical}
-          - {dataset: CIESM, grid: gn, exp: piControl, start_year: 1, end_year: 115}
-          - {dataset: MIROC6, grid: gn, ensemble: r1i1p1f1, exp: historical}
-          - {dataset: MIROC6, grid: gn, exp: piControl, ensemble: r1i1p1f1, start_year: 3201, end_year: 3315}
-          - {dataset: CMCC-CM2-SR5, grid: gn, institute: CMCC, exp: historical}
-          - {dataset: CMCC-CM2-SR5, grid: gn, institute: CMCC, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: MPI-ESM-1-2-HAM, grid: gn, institute: HAMMOZ-Consortium, exp: historical}
-          - {dataset: MPI-ESM-1-2-HAM, grid: gn, institute: HAMMOZ-Consortium, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: IPSL-CM6A-LR, grid: gn, institute: IPSL, exp: historical}
-          - {dataset: IPSL-CM6A-LR, grid: gn, institute: IPSL, exp: piControl, start_year: 3050, end_year: 3164}
-          - {dataset: HadGEM3-GC31-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f3, exp: historical}
-          - {dataset: HadGEM3-GC31-LL, grid: gn, institute: MOHC, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: MPI-ESM1-2-HR, grid: gn, institute: MPI-M, exp: historical}
-          - {dataset: MPI-ESM1-2-HR, grid: gn, institute: MPI-M, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: MRI-ESM2-0, grid: gn, institute: MRI, exp: historical}
-          - {dataset: MRI-ESM2-0, grid: gn, institute: MRI, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: GISS-E2-1-G, grid: gn, institute: NASA-GISS, exp: historical}
-          - {dataset: GISS-E2-1-G, grid: gn, institute: NASA-GISS, exp: piControl, start_year: 4150, end_year: 4264}
-          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, exp: piControl, start_year: 150, end_year: 264}
-          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR, exp: historical}
-          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR, exp: piControl, start_year: 150, end_year: 264}
-          #- {dataset: NorCPM1, grid: gn, institute: NCC, exp: historical}
-          #- {dataset: NorCPM1, grid: gn, institute: NCC, exp: piControl, start_year: 150, end_year: 264}
-          #- {dataset: NorESM2-LM, grid: gn, institute: NCC, exp: historical}
-          #- {dataset: NorESM2-LM, grid: gn, institute: NCC, exp: piControl, start_year: 1650, end_year: 1764}
-          #- {dataset: NESM3, grid: gn, institute: NUIST, exp: historical}
-          #- {dataset: NESM3, grid: gn, institute: NUIST, exp: piControl, start_year: 1050, end_year: 1164}
-          #- {dataset: SAM0-UNICON, grid: gn, institute: SNU, exp: historical}
-          #- {dataset: SAM0-UNICON, grid: gn, institute: SNU, exp: piControl, start_year: 150, end_year: 264}
-          #- {dataset: UKESM1-0-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f2, exp: historical}
-          #- {dataset: UKESM1-0-LL, grid: gn, institute: MOHC, ensemble: r1i1p1f2, exp: piControl, start_year: 2050, end_year: 2164}
+          - {dataset: CESM2-FV2, ensemble: r(1:3)i1p1f1}
+          - {dataset: CESM2-FV2, exp: piControl, start_year: 1, end_year: 115}
+          - {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1}
+          - {dataset: CESM2-WACCM, exp: piControl, start_year: 1, end_year: 115} 
+          - {dataset: CESM2-WACCM-FV2, ensemble: r(1:3)i1p1f1}
+          - {dataset: CESM2-WACCM-FV2, exp: piControl, start_year: 1, end_year: 115} 
+          - {dataset: CIESM, ensemble: r(1:3)i1p1f1}
+          - {dataset: CIESM, exp: piControl, start_year: 1, end_year: 115}
+          - {dataset: CMCC-CM2-HR4}
+          #- {dataset: CMCC-CM2-HR4, exp: piControl}
+          - {dataset: CMCC-CM2-SR5}
+          - {dataset: CMCC-CM2-SR5, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:20)i1p1f2}
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964} 
+          - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
+          - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964} 
+          - {dataset: CNRM-ESM2-1, ensemble: r(1:10)i1p1f2}
+          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964} 
+          - {dataset: CanESM5, ensemble: r(1:12)i1p2f1}
+          - {dataset: CanESM5, ensemble: r14i1p2f1}
+          - {dataset: CanESM5, ensemble: r(16:25)i1p2f1}
+          - {dataset: CanESM5, ensemble: r1i1p2f1, exp: piControl, start_year: 5550, end_year: 5664} 
+          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, exp: piControl, start_year: 5550, end_year: 5664} 
+          - {dataset: E3SM-1-0, grid: gr, ensemble: r(1:5)i1p1f1}
+          - {dataset: E3SM-1-0, grid: gr, exp: piControl, start_year: 1, end_year: 115} 
+          - {dataset: E3SM-1-1, grid: gr}
+          - {dataset: E3SM-1-1, grid: gr, exp: piControl, start_year: 1850, end_year: 1964} 
+          - {dataset: E3SM-1-1-ECA, grid: gr}
+          - {dataset: E3SM-1-1-ECA, grid: gr, exp: piControl, start_year: 1850, end_year: 1964} 
+          - {dataset: EC-Earth3, ensemble: r(1:4)i1p1f1}
+          - {dataset: EC-Earth3, ensemble: r6i1p1f1}
+          - {dataset: EC-Earth3, ensemble: r9i1p1f1}
+          - {dataset: EC-Earth3, ensemble: r(11:22)i1p1f1}
+          - {dataset: EC-Earth3, ensemble: r24i1p1f1}
+          - {dataset: EC-Earth3, exp: piControl, start_year: 2259, end_year: 2373}
+          #- {dataset: EC-Earth3-LR} 
+          - {dataset: EC-Earth3-LR, exp: piControl, start_year: 2219, end_year: 2333} 
+          - {dataset: EC-Earth3-Veg, ensemble: r(1:5)i1p1f1}
+          - {dataset: EC-Earth3-Veg, exp: piControl, start_year: 1850, end_year: 1964} 
+          #- {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1}
+          - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1}
+          - {dataset: EC-Earth3-Veg-LR, ensemble: r3i1p1f1}
+          - {dataset: EC-Earth3-Veg-LR, exp: piControl, start_year: 2300, end_year: 2414} 
+          #- {dataset: FGOALS-f3-L, ensemble: r(1:3)i1p1f1} # preprocessor failure; which member?
+          #- {dataset: FGOALS-f3-L, exp: piControl, start_year: 600, end_year: 714} 
+          - {dataset: FGOALS-g3, ensemble: r(1:6)i1p1f1}
+          - {dataset: FGOALS-g3, exp: piControl, start_year: 200, end_year: 314} 
+          - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1}
+          - {dataset: FIO-ESM-2-0, exp: piControl, start_year: 301, end_year: 415} 
+          - {dataset: GFDL-CM4}
+          - {dataset: GFDL-CM4, exp: piControl, start_year: 151, end_year: 265} 
+          - {dataset: GFDL-ESM4, ensemble: r(1:3)i1p1f1}
+          - {dataset: GFDL-ESM4, exp: piControl, start_year: 1, end_year: 115} 
+          - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f2}
+          - {dataset: GISS-E2-1-G, ensemble: r1i1p1f2, exp: piControl, start_year: 7550, end_year: 7664}
+          - {dataset: GISS-E2-1-G-CC}
+          - {dataset: GISS-E2-1-G-CC, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: GISS-E2-1-H, ensemble: r(1:10)i1p1f1}
+          - {dataset: GISS-E2-1-H, exp: piControl, start_year: 3180, end_year: 3294}
+          #- {dataset: GISS-E2-2-G}
+          - {dataset: GISS-E2-2-G, exp: piControl, start_year: 2000, end_year: 2114}
+          - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3}
+          - {dataset: HadGEM3-GC31-LL, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: HadGEM3-GC31-MM, ensemble: r(1:3)i1p1f3}
+          - {dataset: HadGEM3-GC31-MM, exp: piControl, start_year: 1850, end_year: 1964}
+          #- {dataset: IITM-ESM} # preprocessor failure
+          #- {dataset: IITM-ESM, exp: piControl, start_year: 1926, end_year: 2040}
+          - {dataset: INM-CM4-8, grid: gr1}
+          - {dataset: INM-CM4-8, grid: gr1, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: INM-CM5-0, grid: gr1, ensemble: r(1:10)i1p1f1}
+          - {dataset: INM-CM5-0, grid: gr1, exp: piControl, start_year: 1996, end_year: 2110}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1}
+          - {dataset: IPSL-CM6A-LR, exp: piControl, start_year: 3050, end_year: 3164}
+          #- {dataset: KACE-1-0-G, grid: gr, ensemble: r(1:3)i1p1f1} # preprocessor failure
+          #- {dataset: KACE-1-0-G, grid: gr, exp: piControl}
+          #- {dataset: KIOST-ESM, grid: gr1} # somehow the script fails
+          #- {dataset: KIOST-ESM, grid: gr1, exp: piControl}
+          #- {dataset: MCM-UA-1-0, ensemble: r1i1p1f2} # preprocessor failure
+          #- {dataset: MCM-UA-1-0, exp: piControl, start_year: 1, end_year: 115} # preprocessor failure
+          - {dataset: MIROC-ES2L, ensemble: r(1:3)i1p1f2}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: MIROC6, ensemble: r(1:10)i1p1f1}
+          - {dataset: MIROC6, exp: piControl, start_year: 3201, end_year: 3315}
+          - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1}
+          - {dataset: MPI-ESM-1-2-HAM, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1}
+          - {dataset: MPI-ESM1-2-HR, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1}
+          - {dataset: MPI-ESM1-2-LR, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1}
+          - {dataset: MRI-ESM2-0, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: NESM3, ensemble: r(1:5)i1p1f1}
+          - {dataset: NESM3, exp: piControl, start_year: 1050, end_year: 1164}
+          - {dataset: NorCPM1, ensemble: r(1:30)i1p1f1}
+          - {dataset: NorCPM1, exp: piControl, start_year: 150, end_year: 264}
+          - {dataset: NorESM2-LM, ensemble: r(1:3)i1p1f1}
+          - {dataset: NorESM2-LM, exp: piControl, start_year: 1650, end_year: 1764}
+          - {dataset: NorESM2-MM, ensemble: r(1:3)i1p1f1}
+          - {dataset: NorESM2-MM, exp: piControl, start_year: 1200, end_year: 1314}
+          - {dataset: SAM0-UNICON}
+          - {dataset: SAM0-UNICON, exp: piControl, start_year: 150, end_year: 264}
+          - {dataset: TaiESM1}
+          #- {dataset: TaiESM1, exp: piControl}
+          - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2}
+          - {dataset: UKESM1-0-LL, ensemble: r(8:13)i1p1f2}
+          - {dataset: UKESM1-0-LL, ensemble: r(16:19)i1p1f2}
+          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, exp: piControl, start_year: 2050, end_year: 2164}
           # OBSERVATIONS:
+          - {dataset: ERSSTv5, project: OBS, type: reanaly, version: 1, tier: 2}
+          - {dataset: ERSSTv3b, project: OBS, type: reanaly, version: 1, tier: 2}
           - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
-          - {dataset: NOAA-ERSSTv5, project: OBS6, type: reanaly, version: v5, tier: 2}
-          - {dataset: NOAA-ERSSTv3b, project: OBS6, type: reanaly, version: v3b, tier: 2}
       ts_cmip5:
         <<: *var_def_3
         project: CMIP5
         ensemble: r1i1p1
-        exp: [historical, rcp45]
+        exp: historical
+        end_year: 2005
         additional_datasets:
           - {dataset: ACCESS1-0}
           - {dataset: ACCESS1-0,     exp: piControl,   start_year:  300, end_year:  414}
-          - {dataset: ACCESS1-3}
+          - {dataset: ACCESS1-3, ensemble: r(1:2)i1p1}
           - {dataset: ACCESS1-3,     version: 2, exp: piControl,   start_year:  300, end_year:  414}
           - {dataset: bcc-csm1-1}
           - {dataset: bcc-csm1-1,    exp: piControl,   start_year:  160, end_year:  274}
           - {dataset: bcc-csm1-1-m}
           - {dataset: bcc-csm1-1-m,  exp: piControl,   start_year:  240, end_year:  354}
-          - {dataset: CanESM2}
+          - {dataset: CanESM2, ensemble: r(1:5)i1p1}
           - {dataset: CanESM2,       exp: piControl, start_year: 2321, end_year: 2435}
-          - {dataset: CCSM4, ensemble: r1i1p1}
+          - {dataset: CCSM4, ensemble: r(1:6)i1p1}
           - {dataset: CCSM4,         exp: piControl, ensemble: r1i1p1, start_year: 850, end_year: 964}
-          - {dataset: CNRM-CM5}
+          - {dataset: CESM1-BGC}
+          - {dataset: CESM1-BGC,         exp: piControl, ensemble: r1i1p1, start_year: 101, end_year: 215}
+          - {dataset: CESM1-CAM5, ensemble: r(1:4)i1p1}
+          - {dataset: CESM1-CAM5,        exp: piControl, ensemble: r1i1p1, start_year: 1, end_year: 115}
+          - {dataset: CESM1-CAM5-1-FV2, ensemble: r(1:4)i1p1}
+          - {dataset: CESM1-FASTCHEM, ensemble: r(1:3)i1p1}
+          - {dataset: CESM1-FASTCHEM, exp: piControl, ensemble: r1i1p1, start_year: 70, end_year: 184}
+          - {dataset: CESM1-WACCM, ensemble: r1i1p1}
+          - {dataset: CESM1-WACCM,    exp: piControl, ensemble: r1i1p1, start_year: 96, end_year: 210}
+          - {dataset: CMCC-CESM}
+          - {dataset: CMCC-CM}
+          - {dataset: CMCC-CM,    exp: piControl, ensemble: r1i1p1, start_year: 1550, end_year: 1664}
+          - {dataset: CMCC-CMS}
+          - {dataset: CNRM-CM5, ensemble: r(1:10)i1p1}
           - {dataset: CNRM-CM5,      exp: piControl,   start_year: 1850, end_year: 1964}
-          - {dataset: CSIRO-Mk3-6-0}
+          - {dataset: CNRM-CM5-2}
+          - {dataset: CSIRO-Mk3-6-0, ensemble: r(1:10)i1p1}
           - {dataset: CSIRO-Mk3-6-0, exp: piControl,   start_year:  104, end_year:  218}
-          - {dataset: GFDL-CM3}
+          - {dataset: CSIRO-Mk3L-1-2, ensemble: r1i2p1}
+          - {dataset: EC-EARTH, ensemble: r1i1p1}
+          - {dataset: EC-EARTH, ensemble: r8i1p1}
+          - {dataset: EC-EARTH, ensemble: r11i1p1}
+          #- {dataset: EC-EARTH, ensemble: r(2:3)i1p1} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: EC-EARTH, ensemble: r(5:7)i1p1} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: EC-EARTH, ensemble: r(9:10)i1p1} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: EC-EARTH, ensemble: r(12:14)i1p1} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: EC-EARTH, exp: piControl,   start_year: 2100, end_year: 2214} # preprocessor error (tos = 0 everywhere)
+          - {dataset: FGOALS-g2}
+          #- {dataset: FGOALS-s2, ensemble: r(1:2)i1p1}
+          - {dataset: FIO-ESM}
+          - {dataset: FIO-ESM,       exp: piControl, start_year: 450, end_year: 564}
+          - {dataset: GFDL-CM2p1, ensemble: r(1:10)i1p1}
+          - {dataset: GFDL-CM3, ensemble: r(1:5)i1p1}
           - {dataset: GFDL-CM3,      exp: piControl,   start_year:    1, end_year:  115}
           - {dataset: GFDL-ESM2G}
           - {dataset: GFDL-ESM2G,    exp: piControl,   start_year:    1, end_year:  115}
           - {dataset: GFDL-ESM2M}
           - {dataset: GFDL-ESM2M,    exp: piControl,   start_year:    1, end_year:  115}
-          - {dataset: CMCC-CM}
-          - {dataset: CMCC-CM,       exp: piControl, start_year: 1600, end_year: 1714}
-          - {dataset: FIO-ESM}
-          - {dataset: FIO-ESM,       exp: piControl, start_year: 450, end_year: 564}
-          - {dataset: IPSL-CM5A-MR}
-          - {dataset: IPSL-CM5A-MR,       exp: piControl, start_year: 1900, end_year: 2014}
-          - {dataset: MIROC5}
-          - {dataset: MIROC5,       exp: piControl, start_year: 2050, end_year: 2164}
-          - {dataset: HadGEM2-CC}
-          - {dataset: HadGEM2-CC,       exp: piControl, start_year: 1900, end_year: 2014}
-          - {dataset: MPI-ESM-LR}
-          - {dataset: MPI-ESM-LR,       exp: piControl, start_year: 1900, end_year: 2014}
-          - {dataset: MRI-CGCM3}
-          - {dataset: MRI-CGCM3,       exp: piControl, start_year: 1900, end_year: 2014}
-          #- {dataset: GISS-E2-H-CC}
+          - {dataset: GISS-E2-H-CC}
           #- {dataset: GISS-E2-H-CC,       exp: piControl, start_year: 2100, end_year: 2214}
-          #- {dataset: GISS-E2-H}
-          #- {dataset: GISS-E2-H,       exp: piControl, start_year: 2460, end_year: 2474}
+          - {dataset: GISS-E2-H, ensemble: r(1:6)i1p1}
+          - {dataset: GISS-E2-H, ensemble: r(1:5)i1p2}
+          - {dataset: GISS-E2-H, ensemble: r(1:5)i1p3}
+          - {dataset: GISS-E2-H,                   exp: piControl, start_year: 2460, end_year: 2574}
+          - {dataset: GISS-E2-H, ensemble: r1i1p2, exp: piControl, start_year: 2490, end_year: 2604}
+          - {dataset: GISS-E2-H, ensemble: r1i1p3, exp: piControl, start_year: 2490, end_year: 2604}
+          - {dataset: GISS-E2-R-CC}
+          - {dataset: GISS-E2-R, ensemble: r(1:6)i1p1}
+          - {dataset: GISS-E2-R, ensemble: r(1:5)i1p(2:3)}
+          - {dataset: GISS-E2-R,       exp: piControl, start_year: 3331, end_year: 3445}
+          - {dataset: HadCM3, ensemble: r(1:10)i1p1}
+          - {dataset: HadGEM2-AO}
+          - {dataset: HadGEM2-CC, ensemble: r1i1p1, exp: [historical, rcp45]}
+          - {dataset: HadGEM2-CC, exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: HadGEM2-ES, ensemble: r1i1p1, exp: historical}
+          - {dataset: HadGEM2-ES, ensemble: r(2:4)i1p1, exp: [historical, rcp45]}
+          - {dataset: HadGEM2-ES, exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: inmcm4}
+          - {dataset: inmcm4,     exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: IPSL-CM5A-LR, ensemble: r(1:5)i1p1}
+          - {dataset: IPSL-CM5A-LR,       exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: IPSL-CM5A-MR, ensemble: r1i1p1}
+          - {dataset: IPSL-CM5A-MR,       exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: IPSL-CM5B-LR}
+          - {dataset: IPSL-CM5B-LR,       exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: MIROC-ESM, ensemble: r(1:3)i1p1}
+          - {dataset: MIROC-ESM,          exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: MIROC-ESM-CHEM, ensemble: r1i1p1}
+          - {dataset: MIROC-ESM-CHEM,     exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: MIROC5, ensemble: r(1:5)i1p1}
+          - {dataset: MIROC5,       exp: piControl, start_year: 2050, end_year: 2164}
+          - {dataset: MPI-ESM-LR, ensemble: r(1:3)i1p1}
+          - {dataset: MPI-ESM-LR,       exp: piControl, start_year: 1900, end_year: 2014}
+          - {dataset: MPI-ESM-MR, ensemble: r(1:3)i1p1}
+          - {dataset: MPI-ESM-P, ensemble: r(1:2)i1p1}
+          - {dataset: MPI-ESM-P,       exp: piControl, start_year: 1900, end_year: 2014}
+          #- {dataset: MRI-CGCM3, ensemble: r(1:3)i1p1} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: MRI-CGCM3, ensemble: r(4:5)i1p2} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: MRI-CGCM3,       exp: piControl, start_year: 1900, end_year: 2014} # preprocessor error (tos = 0 everywhere)
+          #- {dataset: MRI-ESM1} # preprocessor error (tos = 0 everywhere)
+          - {dataset: NorESM1-M, ensemble: r(1:3)i1p1}
+          - {dataset: NorESM1-M,       exp: piControl, start_year: 901, end_year: 1015}
+          - {dataset: NorESM1-ME}
+          - {dataset: NorESM1-ME,      exp: piControl, start_year: 901, end_year: 1015}
     scripts:
       pdv:
         script: ipccwg1ar6ch3_modes/pdv.ncl
         start_year: 1900
         end_year: 2014
-
+        reference_dataset: ERSSTv5
+      amv:
+        script: ipccwg1ar6ch3_modes/amv.ncl
+        start_year: 1900
+        end_year: 2014
+        reference_dataset: ERSSTv5
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
@@ -725,9 +870,9 @@ diagnostics:
           # - {dataset: SAM0-UNICON, grid: gn, institute: SNU, exp: historical}
           # - {dataset: SAM0-UNICON, grid: gn, institute: SNU, exp: piControl, start_year: 150, end_year: 264}
           # OBSERVATIONS:
+          - {dataset: ERSSTv5, project: OBS, type: reanaly, version: 1, tier: 2}
+          - {dataset: ERSSTv3b, project: OBS, type: reanaly, version: 1, tier: 2}
           - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
-          - {dataset: NOAA-ERSSTv5, project: OBS6, type: reanaly, version: v5, tier: 2}
-          - {dataset: NOAA-ERSSTv3b, project: OBS6, type: reanaly, version: v3b, tier: 2}
       tos_cmip5:
         <<: *var_def_4
         project: CMIP5
@@ -779,6 +924,6 @@ diagnostics:
         script: ipccwg1ar6ch3_modes/amv.ncl
         start_year: 1900
         end_year: 2014
-
+        reference_dataset: ERSSTv5
 
 
