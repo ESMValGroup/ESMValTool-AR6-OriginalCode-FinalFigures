@@ -620,12 +620,23 @@ def make_pane_a(
                  )
 
         # Add a marker at the maximum
-        plt.plot(cubes[dataset].data[max_index],
+        max_marker = 'empty_diamond'
+        if max_marker=='full_diamond':
+            plt.plot(cubes[dataset].data[max_index],
                  cubes[dataset].coord('depth').points[max_index],
                  c =  plot_details[dataset]['c'],
                  marker = 'd',
                  markersize = '10',
                  zorder=plot_details[dataset]['zorder']
+                 )
+        if max_marker=='empty_diamond':
+            plt.plot(cubes[dataset].data[max_index],
+                 cubes[dataset].coord('depth').points[max_index],
+                 mec =  plot_details[dataset]['c'],
+                 mfc = None,
+                 marker = 'd',
+                 markersize = 8,
+                 zorder=10, 
                  )
 
 
@@ -687,12 +698,23 @@ def make_pane_a(
              zorder=plot_details[project]['zorder']
              )
 
-        plt.plot(cube.data[max_index],
+        max_marker = None #'empty_diamond'
+        if max_marker=='full_diamond':
+            plt.plot(cube.data[max_index],
                  cube.coord('depth').points[max_index],
                  c = colour,
                  marker = 'd',
                  markersize = '10',
                  zorder = plot_details[project]['zorder']
+                 )
+        if max_marker=='empty_diamond':
+            plt.plot(cube.data[max_index],
+                 cube.coord('depth').points[max_index],
+                 mec =  colour,
+                 mfc = (0., 0., 0., 0.),
+                 marker = 'o',
+                 markersize = 8,
+                 zorder=100,
                  )
 
     plt.ylim((5050., 0.))
@@ -1368,23 +1390,27 @@ def make_figure(cfg, debug=False, timeseries=False):
 
     plt.tight_layout()
 
+    plt.subplots_adjust(wspace=0.01, hspace=0.015)
+
+    plt.tight_layout()
+
     # above a:
     # Modelled AMOC mean state
-    axa.text(0.5,1.08, 'Modelled AMOC mean state', fontsize=13, fontweight='bold',transform=axa.transAxes, horizontalalignment='center',)
+    axa.text(0.5,1.06, 'Modelled AMOC mean state', fontsize=12, fontweight='bold',transform=axa.transAxes, horizontalalignment='center',)
     # above b:
     # Modelled AMOC variability
-    axb.text(0.5,1.28, 'Modelled AMOC variability', fontsize=13, fontweight='bold',transform=axb.transAxes,horizontalalignment='center',)
+    axb.text(0.5,1.17, 'Modelled AMOC variability', fontsize=12, fontweight='bold',transform=axb.transAxes,horizontalalignment='center',)
 
     # above e:
     # CMIP6 Modelled longer term AMOC trends
-    axe.text(0.5, 1.28, 'CMIP6 Modelled longer term AMOC trends', fontsize=13, fontweight='bold', transform=axe.transAxes,horizontalalignment='center',)
+    axe.text(0.5, 1.18, 'CMIP6 Modelled longer term AMOC trends', fontsize=12, fontweight='bold', transform=axe.transAxes,horizontalalignment='center',)
    
-    plt.subplots_adjust(wspace=0.01, hspace=0.01)
+#    plt.subplots_adjust(wspace=0.01, hspace=0.01)
  
     #xAX.update(wspace = 0.5, hspace = 0.5)
 
     #plt.subplots_adjust(bottom=0.15, wspace=0.2, hspace=0.4)
-    plt.tight_layout() # Needs to be here twice, for som,e reason. 
+    # plt.tight_layout() # Needs to be here twice, for som,e reason. 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
     if timeseries:
