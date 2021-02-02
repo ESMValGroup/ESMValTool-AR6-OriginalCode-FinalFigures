@@ -388,7 +388,7 @@ begin
   diff@res_cnInfoLabelOn  = False  ; turn off cn info label
   diff@res_mpProjection  = diag_script_info@projection
 
-  if( var0 .eq. "tos" .or. var0 .eq. "sos") then
+  if (var0 .eq. "tos" .or. var0 .eq. "sos") then
     diff@res_mpCenterLonF = 180
   end if
 
