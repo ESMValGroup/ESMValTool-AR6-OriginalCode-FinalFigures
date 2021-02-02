@@ -323,7 +323,7 @@ begin
   res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
   res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
   res@tiYAxisOn = True
-  res@tiXAxisString = "Year"
+  res@tiXAxisString = "" ;"Year"
   res@gsnStringFontHeightF = 0.016
 
   xmin = start_year
@@ -471,7 +471,7 @@ begin
     txtres@txFontHeightF = 0.013
     ref_txt = gsn_add_text(wks, plot, "reference period", \
                            0.5*(ref_start + ref_end), \
-                           res@trYMinF + 0.05 * (res@trYMaxF - res@trYMinF), \
+                           res@trYMaxF - 0.05 * (res@trYMaxF - res@trYMinF), \
                            txtres)
 
   end if
@@ -523,7 +523,7 @@ begin
   lbid = gsn_create_legend(wks, nitems, labels, lgres)
 
   amres = True
-  amres@amParallelPosF   = - 0.3 ;-0.38  ;0.81
+  amres@amParallelPosF   = 0.0 ;-0.38  ;0.81
   amres@amOrthogonalPosF = - 0.25 ;-0.3  ;0.0
   annoid1 = gsn_add_annotation(plot(0), lbid, amres)
 
