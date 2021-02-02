@@ -8,6 +8,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210202-Yu Kosaka: revised figure details
 ;   20210131-Yu Kosaka: adapt Adam's script to the ESMValTool
 ;
 ; #############################################################################
@@ -258,6 +259,9 @@ begin
   hres@bin_max  = max(hres@bin_bounds) 
   histssp_h = weighted_pdfx(model_trendHS,weights,hres)
   histssp_h&time = hres@bin_center
+  histssp_mean = weighted_mean(model_trendHS,weights)
+  histssp_5th = weighted_percentile(model_trendHS,weights, 0.05)
+  histssp_95th = weighted_percentile(model_trendHS,weights, 0.95)
   if (min(model_trendHS).lt.min(hres@bin_bounds).or.max(model_trendHS).gt.max(hres@bin_bounds)) then    ; check to make sure values lie within bin_bounds. Can remove if bin_bounds will not change?
      printMinMax(model_trendHS,0)
      print("trends outside of bins, must reset")
@@ -349,7 +353,11 @@ begin
   mres@vpHeightF = 0.35
   mres@trYMinF = -.8000001
   mres@trYMaxF = 1.2
- 
+  mres@tiYAxisFontHeightF = 0.018
+  mres@tiYAxisString = "(~S~o~N~C)"
+  mres@tiYAxisOffsetXF = 0.005
+  mres@tiXAxisOffsetYF = 0.004
+  
   mres@gsnCenterString = ""
   mres@gsnLeftString = ""
   mres@gsnRightString = ""
@@ -359,8 +367,10 @@ begin
   mres@gsnYRefLineColor = 1
 
   mres@xyMonoLineColor    = False            
-  mres@tmXBLabelFontHeightF = 0.02
-  mres@tmYLLabelFontHeightF =   mres@tmXBLabelFontHeightF 
+  mres@tmXBLabelFontHeightF = 0.018
+  mres@tmYLLabelFontHeightF = mres@tmXBLabelFontHeightF 
+  mres@tmXBLabelDeltaF = -0.2
+  mres@tmYLLabelDeltaF = -0.2
   mres@trXMinF = 0.
   mres@trXMaxF = 501
 
@@ -442,25 +452,38 @@ begin
      exit
   end if
 
+  dims = dimsizes(model_runtrend)
+  wtmp = new(dims, "float")
+  do gg = 0, dims(0)-1
+    wtmp(gg, :) = 1./tofloat(num(.not.ismissing(model_runtrend(gg, :))))
+  end do
+  model_runtrend_mean = weighted_mean(ndtooned(model_runtrend), ndtooned(wtmp))
+  model_runtrend_5th = weighted_percentile(ndtooned(model_runtrend), ndtooned(wtmp), 0.05)
+  model_runtrend_95th = weighted_percentile(ndtooned(model_runtrend), ndtooned(wtmp), 0.95)
+  delete(wtmp)
+  delete(dims)
+  
 ;  cmap0 := read_colormap_file("../AR6_colormaps_NCL/temp_div_12.rgb")
   cmap0 := read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_temperature_div_12.rgb")
   bres = True
   bres@gsnDraw = False
   bres@gsnFrame = False
-  bres@gsnYRefLine = 0.0
-  bres@gsnXRefLineColor = "gray50"
-  bres@gsnXRefLineThicknessF = 1.5
+;  bres@gsnYRefLine = 0.0
+;  bres@gsnXRefLineColor = "gray50"
+;  bres@gsnXRefLineThicknessF = 1.5
   bres@vpWidthF = 0.27
   bres@vpHeightF = 0.199674
   bres@vpXF = 0.2718
   bres@vpYF = 0.307954
   bres@gsnXYBarChart = True
-  bres@tmXBLabelFontHeightF = 0.0117
-  bres@tmXTLabelFontHeightF = 0.0117
-  bres@tmYLLabelFontHeightF = 0.0117
+  bres@tmXBLabelFontHeightF = 0.01 ;0.0117
+  bres@tmXTLabelFontHeightF = 0.01 ;0.0117
+  bres@tmYLLabelFontHeightF = 0.01 ;0.0117
+  bres@tmXBLabelDeltaF = -0.2
+  bres@tmYLLabelDeltaF = -0.2
   bres@tiMainOn = False
   bres@xyLineThicknessF = 1.5
-  bres@tiYAxisString = "% of simulations"
+;  bres@tiYAxisString = "% of simulations"
   bres@tiYAxisOffsetXF = 0.005
   bres@tiXAxisOffsetYF = 0.004
   bres@trYMinF = 0.0
@@ -468,6 +491,7 @@ begin
   bres@trXMinF = -.08
   bres@trXMaxF = .16
   bres@gsnXYBarChartColors = cmap(8,:)
+  bres@gsnXYBarChartFillOpacityF = 0.3
   bres@xyLineColor = "transparent"  ;"white"
   bres@gsnLeftString = "" ;syear+"-"+eyear
 
@@ -475,21 +499,43 @@ begin
   bres@tiYAxisString = "% of 120yr segments"
   bres@tiXAxisString = "(~S~o~N~C 10yr~S~-1~N~)"
   bres@gsnXYBarChartWidth = .005
-  bplot_ov = gsn_csm_xy(wks, aa_h&time, aa_h, bres)
-
+  bplot_ov = gsn_csm_xy(wks, aa_h&time, aa_h, bres)  
+  
   bres@gsnXYBarChartColors = cmap(3,:)
   bres@gsnXYBarChartWidth = .005
-  bres@gsnXYBarChartFillOpacityF = 0.5
+  bres@gsnXYBarChartFillOpacityF = 0.3
   bplot = gsn_csm_xy(wks,histssp_h&time,histssp_h,bres)
   overlay(bplot,bplot_ov)
-;- - - - - - - - - - - - - - -  -- - - - - 
-  polyres = True
-  polyres@gsLineThicknessF = 1.5
-  polyres@gsLineColor = 1
-  polyres@gsLineDashPattern = 1
-  dum_refline = gsn_add_polyline(wks,bplot,(/0,0/),(/0,100/),polyres)
 
-  polyres@gsLineColor = 1
+  polyres := True
+  polyres@gsLineThicknessF = 1.
+  polyres@gsLineColor = cmap(8,:)
+  polyres@gsLineDashPattern = 0
+  dum_pimean = gsn_add_polyline(wks,bplot,(/model_runtrend_mean,model_runtrend_mean/),(/0,100/),polyres)
+  polyres@gsLineDashPattern = 2
+;  polyres@gsLineDashSegLenF = 0.08
+  dum_pi5th = gsn_add_polyline(wks,bplot,(/model_runtrend_5th,model_runtrend_5th/),(/0,100/),polyres)
+  dum_pi95th = gsn_add_polyline(wks,bplot,(/model_runtrend_95th,model_runtrend_95th/),(/0,100/),polyres)
+
+  
+  polyres@gsLineColor = cmap(3,:)
+  polyres@gsLineDashPattern = 0
+  dum_histmean = gsn_add_polyline(wks,bplot,(/histssp_mean,histssp_mean/),(/0,100/),polyres)
+  polyres@gsLineDashPattern = 2
+;  polyres@gsLineDashSegLenF = 0.08
+  dum_hist5th = gsn_add_polyline(wks,bplot,(/histssp_5th,histssp_5th/),(/0,100/),polyres)
+  dum_hist95th = gsn_add_polyline(wks,bplot,(/histssp_95th,histssp_95th/),(/0,100/),polyres)
+  
+;- - - - - - - - - - - - - - -  -- - - - - 
+  polyres := True
+  polyres@gsLineThicknessF = 0.5
+  polyres@gsLineColor = "grey50"
+  polyres@gsLineDashPattern = 2
+  polyres@gsLineDashSegLenF = 0.08
+  dum_refline = gsn_add_polyline(wks,bplot,(/0,0/),(/0,100/),polyres)
+  delete(polyres@gsLineDashSegLenF)
+  
+  polyres@gsLineColor := 1
   polyres@gsLineDashPattern = 0
   polyres@tfPolyDrawOrder = "PostDraw"
   polyres@gsLineThicknessF = 1.5    ; add mme and obs reference lines
@@ -503,15 +549,18 @@ begin
 ;---------------------------------------------------------------------
   textres = True 
   textres@txFont = 22
-  textres@txFontHeightF = 0.015
-  gsn_text_ndc(wks,"Internal variabiliy of GSAT versus observed changes",0.5,0.96,textres)
+  textres@txFontHeightF = 0.013
+  gsn_text_ndc(wks,"Internal variabiliy of annual GSAT versus observed changes",0.5,0.94,textres)
 
   textres@txFont = 21
-  textres@txFontHeightF = 0.014
+  textres@txFontHeightF = 0.012
   textres@txFontColor = "gray40"
-  gsn_text_ndc(wks,"Temporal variation of GSAT in piControl ("+nruns_a+" models)",0.5,.92,textres)
-  gsn_text_ndc(wks,"Temporal variation of GSAT in piControl ("+nruns_b+" models)",0.5,0.635,textres)  
-  gsn_text_ndc(wks,"Observed and simulated 120-yr trends~C~        in piControl and historical runs",0.4,0.3375,textres) 
+;  gsn_text_ndc(wks,"Temporal variation of GSAT in piControl ("+nruns_a+" models)",0.5,.92,textres)
+  gsn_text_ndc(wks,"Temporal variation of GSAT in piControl ("+nruns_a+" models)",0.5,.915,textres)
+;  gsn_text_ndc(wks,"Temporal variation of GSAT in piControl ("+nruns_b+" models)",0.5,0.635,textres)
+  gsn_text_ndc(wks,"Temporal variation of GSAT in piControl ("+nruns_b+" models)",0.5,0.63,textres)  
+;  gsn_text_ndc(wks,"Observed and simulated 120-yr trends~C~        in piControl and historical runs",0.4,0.3375,textres)
+  gsn_text_ndc(wks,"      120-yr trends in piControl runs and~C~1900-2019 trends in obs and historical runs",0.4,0.3375,textres) 
   gsn_text_ndc(wks,"     Observed ~C~GMST variation",0.675,0.3375,textres) 
 ;- - - - - - - - - - - - - - - - - - - - - - - 
 ; Timeseries b) legend
@@ -564,23 +613,53 @@ begin
 ; Bar chart legend
 ;
   lres = True   ; draw box showing observational range
+  lres@gsFillOpacityF = bres@gsnXYBarChartFillOpacityF
   lres@gsFillColor := cmap(8,:)
 ;  gsn_polygon_ndc(wks,(/.28,.33,.33,.28,.28/),(/.03,.03,.04,.04,.03/),lres)
-  gsn_polygon_ndc(wks,(/.25,.30,.30,.25,.25/),(/.03,.03,.04,.04,.03/),lres)  
+  gsn_polygon_ndc(wks,(/.25,.30,.30,.25,.25/),(/.04,.04,.06,.06,.04/),lres)
+  gsn_polygon_ndc(wks,(/.25,.30,.30,.25,.25/),(/.04,.04,.06,.06,.04/),lres)  
   textres@txFontHeightF = 0.010
   textres@txFontColor = "black"
   textres@txJust = "CenterLeft"
 ;  gsn_text_ndc(wks,"piControl",.345,.035,textres)
-  gsn_text_ndc(wks,"piControl",.31,.035,textres)
+  gsn_text_ndc(wks,"piControl",.305,.05,textres)
 
+  lres@gsLineColor := cmap(8,:)
+  lres@gsLineDashPattern = 0
+  gsn_polyline_ndc(wks,(/.275,.275/),(/.04,.06/),lres)  
+  lres@gsLineDashPattern = 2
+  gsn_polyline_ndc(wks,(/.255,.255/),(/.04,.06/),lres)
+  gsn_polyline_ndc(wks,(/.295,.295/),(/.04,.06/),lres)  
+  textres2 = textres
+  textres2@txFontHeightF = 0.007
+  textres2@txAngleF = 90.
+  textres2@txJust = "CenterRight"
+  gsn_text_ndc(wks,"mean",.275,.038,textres2)
+  gsn_text_ndc(wks,"5th", .255,.038,textres2)
+  gsn_text_ndc(wks,"95th",.295,.038,textres2)
+
+  
   cmap7 = new(4,float)
   cmap7(:2) = cmap(3,:)
   cmap7(3)  = 0.75 
   lres@gsFillColor := cmap7
 ;  gsn_polygon_ndc(wks,(/.42,.47,.47,.42,.42/),(/.03,.03,.04,.04,.03/),lres)
-  gsn_polygon_ndc(wks,(/.39,.44,.44,.39,.39/),(/.03,.03,.04,.04,.03/),lres)  
+  gsn_polygon_ndc(wks,(/.39,.44,.44,.39,.39/),(/.04,.04,.06,.06,.04/),lres)
+  gsn_polygon_ndc(wks,(/.39,.44,.44,.39,.39/),(/.04,.04,.06,.06,.04/),lres)  
 ;  gsn_text_ndc(wks,"historical-ssp245",.485,.035,textres)
-  gsn_text_ndc(wks,"historical-ssp245",.45,.035,textres)
+  gsn_text_ndc(wks,"historical-ssp245",.445,.05,textres)
+
+  lres@gsLineColor := cmap(3,:)
+  lres@gsLineDashPattern = 0
+  gsn_polyline_ndc(wks,(/.415,.415/),(/.04,.06/),lres)  
+  lres@gsLineDashPattern = 2
+  gsn_polyline_ndc(wks,(/.395,.395/),(/.04,.06/),lres)
+  gsn_polyline_ndc(wks,(/.435,.435/),(/.04,.06/),lres)  
+
+  gsn_text_ndc(wks,"mean",.415,.038,textres2)
+  gsn_text_ndc(wks,"5th", .395,.038,textres2)
+  gsn_text_ndc(wks,"95th",.435,.038,textres2)
+
 ;- - - - - - - - - - - - - - - - - - - - - - - 
 ; Panel numbering
 ; 
