@@ -817,8 +817,10 @@ def make_pane_a(
     #     metadata['long_name'],
     # ])
     # plt.title(title)
-    plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC mean state\r}'+'(a) AMOC streamfunction profiles')# at 26.5N')
-    # plt.title('(a) AMOC streamfunction profiles')# at 26.5N')
+
+    #plt.rc('text', usetex=True)
+    #plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC mean state\r}{\fontsize{18pt}{3em}\selectfont{}(a) AMOC streamfunction profiles}')
+    plt.title('(a) AMOC streamfunction profiles')# at 26.5N')
 
     # Add Legend outside right.
     # diagtools.add_legend_outside_right(plot_details, plt.gca())
@@ -1059,8 +1061,9 @@ def make_pane_bc(
 
     # pane specific stuff
     if pane == 'b':
-        plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC variability\r}'+'(b) Distribution of 8 year AMOC trends')
-        #plt.title('(b) Distribution of 8 year AMOC trends')
+        #plt.rc('text', usetex=True)
+        #plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC variability\r}{\fontsize{18pt}{3em}\selectfont{}(b) Distribution of 8 year AMOC trends}')
+        plt.title('(b) Distribution of 8 year AMOC trends')
         if decadal:
             ax.set_ylabel('Sv/decade')
             plt.axhline(-5.3, c='k', lw=1, alpha=0.3, zorder = 0) # numbers taken from paper, not calculated here!
@@ -1282,8 +1285,10 @@ def make_amoc_trends(
         # plt.setp(box['fliers'], markersize=1.0)
         print(time_range, time_ranges_panes[time_range])
         title = ' '.join([time_ranges_panes[time_range], time_range])
-        if time_ranges_panes[time_range] == '(e)':
-            title = r'\fontsize{24}{3em}\selectfont{}{CMIP6 Modelled longer term AMOC trends\r}' + title
+        #  time_ranges_panes[time_range] == '(e)':
+            #plt.rc('text', usetex=True)
+            #title = r'\fontsize{24}{3em}\selectfont{}{CMIP6 Modelled longer term AMOC trends\r}{\fontsize{18pt}{3em}\selectfont{}'+ title+'}'
+
         ax.set_title(title)
         #' '.join([time_ranges_panes[time_range], time_range]))
 
@@ -1338,7 +1343,6 @@ def make_figure(cfg, debug=False, timeseries=False):
     # fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
     # plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
 
-    #plt.subplots_adjust(bottom=0.2, wspace=0.4, hspace=0.2)
     axd = plt.subplot2grid((3,3), (2,0), colspan=1, rowspan=1)
     axe = plt.subplot2grid((3,3), (2,1), colspan=1, rowspan=1)
     axf = plt.subplot2grid((3,3), (2,2), colspan=1, rowspan=1)
@@ -1362,8 +1366,25 @@ def make_figure(cfg, debug=False, timeseries=False):
     fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
     #fig, axc = make_pane_bc(cfg, pane='c', fig=fig, ax=axc, timeseries=timeseries)
 
-    #plt.subplots_adjust(bottom=0.15, wspace=0.2, hspace=0.4)
     plt.tight_layout()
+
+    # above a:
+    # Modelled AMOC mean state
+    axa.text(0.5,1.08, 'Modelled AMOC mean state', fontsize=13, fontweight='bold',transform=axa.transAxes, horizontalalignment='center',)
+    # above b:
+    # Modelled AMOC variability
+    axb.text(0.5,1.28, 'Modelled AMOC variability', fontsize=13, fontweight='bold',transform=axb.transAxes,horizontalalignment='center',)
+
+    # above e:
+    # CMIP6 Modelled longer term AMOC trends
+    axe.text(0.5, 1.28, 'CMIP6 Modelled longer term AMOC trends', fontsize=13, fontweight='bold', transform=axe.transAxes,horizontalalignment='center',)
+   
+    plt.subplots_adjust(wspace=0.01, hspace=0.01)
+ 
+    #xAX.update(wspace = 0.5, hspace = 0.5)
+
+    #plt.subplots_adjust(bottom=0.15, wspace=0.2, hspace=0.4)
+    plt.tight_layout() # Needs to be here twice, for som,e reason. 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
     if timeseries:
@@ -1395,13 +1416,13 @@ def main(cfg):
     # individual plots:
     # make_timeseriespane_bc(cfg, pane='c')
     #make_pane_bc(cfg, pane='b', timeseries=False)
-    make_pane_bc(cfg, pane='c', timeseries=False)
+    #make_pane_bc(cfg, pane='c', timeseries=False)
 
-    make_pane_a(cfg)
+    #make_pane_a(cfg)
 
 
     make_figure(cfg, timeseries= False)
-    make_amoc_trends(cfg, savefig=True)
+    #make_amoc_trends(cfg, savefig=True)
 
     #make_pane_a(cfg)
 
