@@ -72,6 +72,8 @@ from esmvalcore.preprocessor._regrid import extract_levels
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+CMIP5_blue = '#2551cc'
+CMIP6_red = '#cc2323'
 
 def calculate_trend(cube, window = '8 years', tails=False, intersect_wanted=False):
     """
@@ -586,10 +588,10 @@ def make_pane_a(
         print(label)
         colour = cmap(value)
         if project == 'CMIP5':
-            colour = 'dodgerblue'
+            colour = CMIP5_blue  
             label = 'Individual CMIP5 models'
         elif project == 'CMIP6':
-            colour = 'red'
+            colour = CMIP6_red
             label = 'Individual CMIP6 models'
 
         if filename == obs_filename:
@@ -620,12 +622,23 @@ def make_pane_a(
                  )
 
         # Add a marker at the maximum
-        plt.plot(cubes[dataset].data[max_index],
+        max_marker = 'empty_diamond'
+        if max_marker=='full_diamond':
+            plt.plot(cubes[dataset].data[max_index],
                  cubes[dataset].coord('depth').points[max_index],
                  c =  plot_details[dataset]['c'],
                  marker = 'd',
                  markersize = '10',
                  zorder=plot_details[dataset]['zorder']
+                 )
+        if max_marker=='empty_diamond':
+            plt.plot(cubes[dataset].data[max_index],
+                 cubes[dataset].coord('depth').points[max_index],
+                 mec =  plot_details[dataset]['c'],
+                 mfc = None,
+                 marker = 'd',
+                 markersize = 8,
+                 zorder=10, 
                  )
 
 
@@ -633,9 +646,9 @@ def make_pane_a(
     # Add min/max boundaries for projects.
     for project in projects:
         if project == 'CMIP5':
-            colour = 'dodgerblue'
+            colour = CMIP5_blue  
         if project == 'CMIP6':
-            colour = 'red'
+            colour = CMIP6_red
 
         depths, minimums, maximums = make_range_of_cube_list(projects[project])
 
@@ -655,9 +668,12 @@ def make_pane_a(
     # Add project mean lines.
     for project in projects:
         if project == 'CMIP5':
-            colour = 'darkblue'
+#            colour = 'darkblue'
+            colour = CMIP5_blue
+
         if project == 'CMIP6':
-            colour = 'darkred'
+#           colour = 'darkred'
+            colour = CMIP6_red
 
         cube = make_mean_of_cube_list(projects[project])
 
@@ -687,12 +703,23 @@ def make_pane_a(
              zorder=plot_details[project]['zorder']
              )
 
-        plt.plot(cube.data[max_index],
+        max_marker = None #'empty_diamond'
+        if max_marker=='full_diamond':
+            plt.plot(cube.data[max_index],
                  cube.coord('depth').points[max_index],
                  c = colour,
                  marker = 'd',
                  markersize = '10',
                  zorder = plot_details[project]['zorder']
+                 )
+        if max_marker=='empty_diamond':
+            plt.plot(cube.data[max_index],
+                 cube.coord('depth').points[max_index],
+                 mec =  colour,
+                 mfc = (0., 0., 0., 0.),
+                 marker = 'o',
+                 markersize = 8,
+                 zorder=100,
                  )
 
     plt.ylim((5050., 0.))
@@ -708,10 +735,9 @@ def make_pane_a(
     for project in projects:
         if not add_box_whisker: continue
         if project == 'CMIP5':
-            colour = 'dodgerblue'
+            colour = CMIP5_blue #'dodgerblue'
         if project == 'CMIP6':
-            colour = 'red'
-
+            colour = CMIP6_red  # 'red'
         ax.text(label_x[project], label_y[project], project,
             horizontalalignment='center',
             color = colour,
@@ -1047,7 +1073,9 @@ def make_pane_bc(
         for element in ['medians',]: #'whiskers', 'fliers', 'means', 'medians', 'caps']:
              plt.setp(box[element], color='black', lw=1.2)
 
-        box_colours = {'CMIP5': 'dodgerblue', 'CMIP6': 'red'}
+        #box_colours = {'CMIP5': 'dodgerblue', 'CMIP6': 'red'}
+        box_colours = {'CMIP5': CMIP5_blue  , 'CMIP6': CMIP6_red}
+
         for box_label, patch in zip(box_order,box['boxes']):
             for proj in ['CMIP5', 'CMIP6']:
                 if box_label == proj:
@@ -1266,7 +1294,12 @@ def make_amoc_trends(
 
         box_order =  ['GHG', 'NAT', 'AER', 'HIST']
         #box_colours =  {'GHG': 'red', 'NAT':'green', 'AER':'blue', 'HIST':'purple'}
-        box_colours =  {'GHG': 'tomato', 'NAT':'yellowgreen', 'AER':'cornflowerblue', 'HIST':'plum'}
+        # experiments=['historical-ssp245','hist-GHG','hist-aer','hist-nat']
+        #cols=numpy.array([[196,121,0],[178,178,178],[0,52,102],[0,79,0]])/256.
+
+        #box_colours =  {'GHG': 'tomato', 'NAT':'yellowgreen', 'AER':'cornflowerblue', 'HIST':'plum'}
+        box_colours =  {'GHG': [178,178,178], 'NAT':[0,79,0], 'AER':[0,52,102], 'HIST':[196,121,0]}
+        box_colours = {exp:np.array(rgb)/256. for exp,rgb in box_colours.items()}
 
         box_data = [trends[experiment][time_range] for experiment in box_order]
         ax.axhline(0., ls='--', color='k', lw=0.5)
@@ -1368,23 +1401,27 @@ def make_figure(cfg, debug=False, timeseries=False):
 
     plt.tight_layout()
 
+    plt.subplots_adjust(wspace=0.01, hspace=0.015)
+
+    plt.tight_layout()
+
     # above a:
     # Modelled AMOC mean state
-    axa.text(0.5,1.08, 'Modelled AMOC mean state', fontsize=13, fontweight='bold',transform=axa.transAxes, horizontalalignment='center',)
+    axa.text(0.5,1.06, 'Modelled AMOC mean state', fontsize=12, fontweight='bold',transform=axa.transAxes, horizontalalignment='center',)
     # above b:
     # Modelled AMOC variability
-    axb.text(0.5,1.28, 'Modelled AMOC variability', fontsize=13, fontweight='bold',transform=axb.transAxes,horizontalalignment='center',)
+    axb.text(0.5,1.17, 'Modelled AMOC variability', fontsize=12, fontweight='bold',transform=axb.transAxes,horizontalalignment='center',)
 
     # above e:
     # CMIP6 Modelled longer term AMOC trends
-    axe.text(0.5, 1.28, 'CMIP6 Modelled longer term AMOC trends', fontsize=13, fontweight='bold', transform=axe.transAxes,horizontalalignment='center',)
+    axe.text(0.5, 1.18, 'CMIP6 Modelled longer term AMOC trends', fontsize=12, fontweight='bold', transform=axe.transAxes,horizontalalignment='center',)
    
-    plt.subplots_adjust(wspace=0.01, hspace=0.01)
+#    plt.subplots_adjust(wspace=0.01, hspace=0.01)
  
     #xAX.update(wspace = 0.5, hspace = 0.5)
 
     #plt.subplots_adjust(bottom=0.15, wspace=0.2, hspace=0.4)
-    plt.tight_layout() # Needs to be here twice, for som,e reason. 
+    # plt.tight_layout() # Needs to be here twice, for som,e reason. 
     # Load image format extention and path
     image_extention = diagtools.get_image_format(cfg)
     if timeseries:
