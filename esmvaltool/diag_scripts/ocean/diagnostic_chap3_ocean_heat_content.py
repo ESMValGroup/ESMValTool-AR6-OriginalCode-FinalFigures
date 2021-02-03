@@ -501,16 +501,16 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
         #scatters
         axes['full'] = fig.add_subplot(gs[0,0]) # LHS
-        axes['0-700'] = fig.add_subplot(gs1[0,0]) # RHS top
-        axes['7-20'] = fig.add_subplot(gs1[0,1]) # LHS
-        axes['2plus'] = fig.add_subplot(gs1[0,2]) # LHS
+        axes['0-700'] = fig.add_subplot(gs1[0]) # RHS top
+        axes['7-20'] = fig.add_subplot(gs1[1]) # LHS
+        axes['2plus'] = fig.add_subplot(gs1[2]) # LHS
 
 
 
     for subplot in depth_dict.keys():
         if isinstance(subplot, int):
             axes[subplot] =  plt.subplot(subplot)
-        else:
+        elif isinstance(subplot, tuple):
             axes[subplot] =  plt.subplot(subplot[0], subplot[1], subplot[2])
 #        if subplot in [413, 323]:
 #            plt.ylabel('OHC (ZJ)', fontsize=16)
@@ -4046,7 +4046,8 @@ def sea_surface_salinity_plot(
         mean_cube = iris.load_cube(fn)
         mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    if ref_file:
+    if ref_file not in [None, (None,)]: 
+        print('loading ref file:', fig_type, obs_key, ref_file)
         ref_cube = iris.load_cube(ref_file)
         ref_cube = ref_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
@@ -4095,9 +4096,13 @@ def sea_surface_salinity_plot(
     if fig_type=='obs_change': # pane a (221, 211, also white contours)
         cube = obs_change_cube
         #nspace = np.linspace(-0.2, 0.2 , 22, endpoint=True)
-        nspace = np.linspace(-13, 13 , 22, endpoint=True)
+        if obs_key=='DW1950':
+            nspace = np.linspace(-10, 10 , 16, endpoint=True)
+        if obs_key=='DW1970':
+            nspace = np.linspace(-13, 13 , 16, endpoint=True)
+
         cmap=diagtools.misc_div
-        label= obs_key+' change ('+obs_time_str+')'
+        label= obs_key+' trend ('+obs_time_str+')'
 
     elif fig_type=='obs_mean': # pane b (222, also contours)
         cube = obs_mean_cube
@@ -4119,12 +4124,16 @@ def sea_surface_salinity_plot(
         label= 'CMIP6 ('+time_range_str+') mean'
 
     elif fig_type=='model_change': # pane 4 (224)
-        cube = mean_cube.data - ref_cube.data
-        denom = time_range[1]-time_range[0] +1
-        cube.data = (cube.data/denom)*1000.
-        nspace = np.linspace(-13, 13 , 22, endpoint=True)
+        cube = mean_cube
+        cube.data = mean_cube.data - ref_cube.data
+        denom = 1000./(time_range[1]-time_range[0] +1.)
+        cube.data = cube.data * denom
+        if obs_key=='DW1950':
+            nspace = np.linspace(-10, 10 , 16, endpoint=True)
+        if obs_key=='DW1970':
+            nspace = np.linspace(-13, 13 , 16, endpoint=True)
         cmap=diagtools.misc_div
-        label= 'CMIP6 ('+time_range_str+') trend'
+        label= 'CMIP6 trend ('+time_range_str+')'
     else:
         print("Fig type not recognised", fig_type)
         assert 0
@@ -4257,7 +4266,9 @@ def sea_surface_salinity_multipane(
         if fig_type in ['model_change',]:
             fn = ss_files[end_year]
             ref_file = ss_files[start_year]
-
+            if ref_file is None:
+                print('cant find:', ref_file)
+                assert 0
 
 
         fig, axes[subplot], qplots[subplot] = sea_surface_salinity_plot(
@@ -4290,6 +4301,10 @@ def sea_surface_salinity_multipane(
     if plot_type == 'CMIP_only':
         fig.colorbar(qplots[211], ax=[axes[211], ], location='right',label='PSU') #, ticks=cbar_ticks)
         fig.colorbar(qplots[212], ax=[axes[212], ], location='right',label='Error in PSU') #, ticks=cbar_ticks)
+
+    if plot_type == 'trends_only':
+        fig.suptitle('Sea Surface Salinity trends '+obs_key)
+        fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='mPSS-78/yr') #, ticks=cbar_ticks)
 
 
 
@@ -4719,9 +4734,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = 0 #ue  # True
-    do_OHC = True  #True
-    do_SS =  0 #ue
+    do_SLR = True 
+    do_OHC =  True  #True
+    do_SS =  0 #True 
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4797,7 +4812,7 @@ def main(cfg):
         #    ref_file=ss_files[1950]
         #)
 
-        for plot_type,start_year in itertools.product(['2_pane', '4_pane', 'CMIP_only'], [1950, 1970]):
+        for plot_type,start_year in itertools.product(['trends_only', '2_pane', '4_pane', 'CMIP_only'], [1950, 1970]):
             if start_year == 1950:
                 obs_key='DW1950'
             if start_year == 1970:
