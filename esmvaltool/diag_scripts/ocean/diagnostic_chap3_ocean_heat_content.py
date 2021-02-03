@@ -4734,7 +4734,7 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = True 
+    do_SLR = 0 #True 
     do_OHC =  True  #True
     do_SS =  0 #True 
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
