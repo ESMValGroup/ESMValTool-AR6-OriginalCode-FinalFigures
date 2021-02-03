@@ -487,7 +487,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         xlims_dict = { 'full': LHS_xlim,
                    '0-700': LHS_xlim,
                    '7-20': LHS_xlim,
-                   414: LHS_xlim }
+                   '2plus': LHS_xlim }
         no_ticks= {'full': True,
                '0-700': True,
                '7-20': True,
@@ -3394,6 +3394,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
     print('output_ohc_fn:', output_ohc_fn)
 
     if os.path.exists(output_ohc_fn):
+        return output_ohc_fn
         cube1 = iris.load_cube(output_ohc_fn)
         for t in [0, -1]:
             single_pane_map_plot(
@@ -4046,7 +4047,7 @@ def sea_surface_salinity_plot(
         mean_cube = iris.load_cube(fn)
         mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    if ref_file not in [None, (None,)]: 
+    if ref_file not in [None, (None,)]:
         print('loading ref file:', fig_type, obs_key, ref_file)
         ref_cube = iris.load_cube(ref_file)
         ref_cube = ref_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
@@ -4079,10 +4080,12 @@ def sea_surface_salinity_plot(
     obs_change_cube = obs_cubes.extract(iris.Constraint(name='salinity_change'))[0]
     obs_change_cube = regrid_to_1x1(obs_change_cube[0]) # surface
     obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+    obs_change_cube.cube.coord('longitude').attributes['circular'] = True
 
     obs_mean_cube = obs_cubes.extract(iris.Constraint(name='salinity_mean'))[0]
     obs_mean_cube = regrid_to_1x1(obs_mean_cube[0]) # surface
     obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+    obs_mean_cube.cube.coord('longitude').attributes['circular'] = True
 
     if obs_change_cube.data.ndim == 3:
         obs_change_cube = obs_change_cube[0]
@@ -4736,7 +4739,7 @@ def main(cfg):
 
     do_SLR = 0 #True 
     do_OHC =  True  #True
-    do_SS =  0 #True 
+    do_SS =  True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
