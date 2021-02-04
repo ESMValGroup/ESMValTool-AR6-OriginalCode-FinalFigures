@@ -246,19 +246,19 @@ models_cmip5_piControl: &models_cmip5_piControl
 
 models_highresmip_hist-1950: &models_highresmip_hist-1950
   # low res models
-#  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
+  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
   - {dataset: CNRM-CM6-1, exp: hist-1950, ensemble: r1i1p1f2}
   - {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1}
   - {dataset: ECMWF-IFS-LR, exp: hist-1950}
   - {dataset: HadGEM3-GC31-LL, exp: hist-1950, grid: gn}
-#  - {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
   # high res models
-#  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
+  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
   - {dataset: CNRM-CM6-1-HR, exp: hist-1950, ensemble: r1i1p1f2}
   - {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1}
   - {dataset: ECMWF-IFS-HR, exp: hist-1950}
   - {dataset: HadGEM3-GC31-HM, exp: hist-1950, grid: gn}
-#  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
+  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
 
 models_highresmip_low_control-1950: &models_highresmip_low_control-1950
 #  - {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}

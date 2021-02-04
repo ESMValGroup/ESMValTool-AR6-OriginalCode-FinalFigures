@@ -742,6 +742,8 @@ begin
   ; add meta data to plot (for reporting)
   ; ***************************************
 
+  out_path1 = out_path + "precip_" + anom + "_0" + ".nc"
+
   domain = "reg"
   statistics = (/"anomaly", "trend"/)
   caption = "Global and zonal average annual mean precipitation (mm day-1)" 

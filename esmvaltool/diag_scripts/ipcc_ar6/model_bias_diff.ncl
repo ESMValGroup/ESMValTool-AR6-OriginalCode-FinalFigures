@@ -359,8 +359,8 @@ begin
       var_neg_signif / where((var_pos_signif + var_neg_signif) \
                              .ne. 0., var_pos_signif + \
                              var_neg_signif, diff1@_FillValue)
-    signif_and_sign = where(var_pos_signif_tmp .ge. 0.75 .or. \
-                            var_neg_signif_tmp .ge. 0.75, 1., 0.)
+    signif_and_sign = where(var_pos_signif_tmp .ge. 0.8 .or. \
+                            var_neg_signif_tmp .ge. 0.8, 1., 0.)
 ;    signif_and_sign = where(ismissing(signif_and_sign), 0.,\
 ;                            signif_and_sign)
     ; variablity threshold: sqrt(2)*1.645
