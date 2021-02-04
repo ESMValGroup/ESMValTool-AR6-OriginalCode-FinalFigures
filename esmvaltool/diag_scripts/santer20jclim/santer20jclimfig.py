@@ -260,7 +260,7 @@ def _plot_obs(trends, axx, maxh):
     obs_str = ''
     # IPCC colors for obs from
     # https://github.com/IPCC-WG1/colormaps/blob/master/
-    # categorical_colors_rgb_0-255/dark_cat.txt 
+    # categorical_colors_rgb_0-255/dark_cat.txt
     if trends['obs']:
         obs_str = ' Vertical lines show the trend for'
         for iii, obsname in enumerate(trends['obs'].keys()):
@@ -275,8 +275,10 @@ def _plot_obs(trends, axx, maxh):
                           0.5 + obscoli * 0.1)
             if obsname == 'RSS':
                 plotobscol = (221 / 255.0, 84 / 255.0, 46 / 255.0,)
+                # obsnamep = 'RSS'
             if obsname == 'ERA5':
                 plotobscol = (128 / 255.0, 54 / 255.0, 168 / 255.0,)
+                # obsnamep = 'ERA5.1'
             axx.vlines(trends['obs'][obsname], 0, maxh,
                        colors=plotobscol,
                        linewidth=3,
@@ -292,7 +294,7 @@ def _plot_trends(cfg, trends, valid_datasets, period):
 
     # IPCC colors for CMIP5 and CMIP6 from
     # https://github.com/IPCC-WG1/colormaps/blob/master/
-    # categorical_colors_rgb_0-255/cmip_cat.txt 
+    # categorical_colors_rgb_0-255/cmip_cat.txt
     # CMIP5
     if trends['cmip5']:
         res_ar['artrend_c5'] = np.fromiter(trends['cmip5'].values(),
@@ -412,8 +414,8 @@ def _plot_settings(cfg, axx, fig, figname, period):
     if 'common_lats' in period.keys():
         add = ' between ' + period['common_lats'] + add
 
-    axx.set_title('Probability density function of the decadal trend' + add)
-    axx.set_xlabel('Trend in Water Vapor Path (%/dec)')
+    axx.set_title('Trends in Water Vapor Path' + add)
+    axx.set_xlabel('Trend (%/decade)')
     fig.tight_layout()
     fig.savefig(get_plot_filename(figname, cfg), dpi=300)
 
@@ -563,11 +565,11 @@ def main(cfg):
             #            alias + ' ' +
             #            str(round(trend, 4)) + ' ' +
             #            str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
-            #            str(round(np.mean(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.median(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.max(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.min(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.std(cube_anom.data), 4)) + '\n')
+            #            str(round(np.mean(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.median(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.max(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.min(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.std(cube_only_filt.data), 4)) + '\n')
         elif project == 'CMIP5':
             trend = _calc_trend(cube_anom)
             trends['cmip5'][alias] = trend
@@ -576,11 +578,11 @@ def main(cfg):
             #            alias + ' ' +
             #            str(round(trend, 4)) + ' ' +
             #            str(round(1. / number_of_subdata[dataset], 4)) + ' ' +
-            #            str(round(np.mean(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.median(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.max(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.min(cube_anom.data), 4)) + ' ' +
-            #            str(round(np.std(cube_anom.data), 4)) + '\n')
+            #            str(round(np.mean(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.median(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.max(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.min(cube_only_filt.data), 4)) + ' ' +
+            #            str(round(np.std(cube_only_filt.data), 4)) + '\n')
         else:
             trend = _calc_trend(cube_anom)
             trends['obs'][dataset] = trend
