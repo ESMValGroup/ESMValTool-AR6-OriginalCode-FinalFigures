@@ -4080,12 +4080,12 @@ def sea_surface_salinity_plot(
     obs_change_cube = obs_cubes.extract(iris.Constraint(name='salinity_change'))[0]
     obs_change_cube = regrid_to_1x1(obs_change_cube[0]) # surface
     obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
-    obs_change_cube.cube.coord('longitude').attributes['circular'] = True
+    obs_change_cube.coord('longitude').attributes['circular'] = True
 
     obs_mean_cube = obs_cubes.extract(iris.Constraint(name='salinity_mean'))[0]
     obs_mean_cube = regrid_to_1x1(obs_mean_cube[0]) # surface
     obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
-    obs_mean_cube.cube.coord('longitude').attributes['circular'] = True
+    obs_mean_cube.coord('longitude').attributes['circular'] = True
 
     if obs_change_cube.data.ndim == 3:
         obs_change_cube = obs_change_cube[0]
