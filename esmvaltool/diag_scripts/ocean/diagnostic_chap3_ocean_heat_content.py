@@ -1938,63 +1938,63 @@ def check_units(cfg, metadata, files = [], keys = []):
 
 
 
-def calc_dyn_height_full(cfg,
-        metadatas,
-        hist_thetao_fn,
-        hist_so_fn,
-        picontrol_thetao_fn,
-        picontrol_so_fn,
-        trend='detrended',
-        method='dyn_height'
-        ):
-    """
-    calc_dyn_height_full: Calculates the Sea Level Rise
-    """
-    # Load relevant metadata
-    exp = metadatas[hist_thetao_fn]['exp']
-    dataset = metadatas[hist_thetao_fn]['dataset']
-    ensemble = metadatas[hist_thetao_fn]['ensemble']
-    project = metadatas[hist_thetao_fn]['project']
-
-    clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
-                      '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
-    # So, need to figure out the reference period for SSP stuff.
-
-    clim_files = {}
-    for clim_type in clim_types:
-        if clim_type == 'piControl':
-            clim_fn = calc_dyn_height_clim(
-                cfg,
-                metadatas,
-                picontrol_thetao_fn,
-                picontrol_so_fn,
-                clim_type=clim_type,
-                trend=trend,
-                method=method)
-        else:
-            clim_fn = calc_dyn_height_clim(
-                cfg,
-                metadatas,
-                hist_thetao_fn,
-                hist_so_fn,
-                clim_type=clim_type,
-                trend=trend,
-                method=method)
-        clim_files[clim_type] = clim_fn
-
-    steric_fn, thermo_fn, halo_fn = calc_dyn_height(
-        cfg,
-        metadatas,
-        hist_thetao_fn,
-        hist_so_fn,
-        trend=trend,
-        method=method)
-
-    clim_files['total'] = steric_fn
-    clim_files['thermo'] = thermo_fn
-    clim_files['halo'] = halo_fn
-
-    return clim_files
+# def calc_dyn_height_full(cfg,
+#         metadatas,
+#         hist_thetao_fn,
+#         hist_so_fn,
+#         picontrol_thetao_fn,
+#         picontrol_so_fn,
+#         trend='detrended',
+#         method='dyn_height'
+#         ):
+#     """
+#     calc_dyn_height_full: Calculates the Sea Level Rise
+#     """
+#     # Load relevant metadata
+#     exp = metadatas[hist_thetao_fn]['exp']
+#     dataset = metadatas[hist_thetao_fn]['dataset']
+#     ensemble = metadatas[hist_thetao_fn]['ensemble']
+#     project = metadatas[hist_thetao_fn]['project']
+#
+#     clim_types = ['1971-2018',  '2005-2018', '1850-1900' , '1995-2014',
+#                       '1985-2014', '2004-2018', 'fullhistorical', 'piControl']
+#     # So, need to figure out the reference period for SSP stuff.
+#
+#     clim_files = {}
+#     for clim_type in clim_types:
+#         if clim_type == 'piControl':
+#             clim_fn = calc_dyn_height_clim(
+#                 cfg,
+#                 metadatas,
+#                 picontrol_thetao_fn,
+#                 picontrol_so_fn,
+#                 clim_type=clim_type,
+#                 trend=trend,
+#                 method=method)
+#         else:
+#             clim_fn = calc_dyn_height_clim(
+#                 cfg,
+#                 metadatas,
+#                 hist_thetao_fn,
+#                 hist_so_fn,
+#                 clim_type=clim_type,
+#                 trend=trend,
+#                 method=method)
+#         clim_files[clim_type] = clim_fn
+#
+#     steric_fn, thermo_fn, halo_fn = calc_dyn_height(
+#         cfg,
+#         metadatas,
+#         hist_thetao_fn,
+#         hist_so_fn,
+#         trend=trend,
+#         method=method)
+#
+#     clim_files['total'] = steric_fn
+#     clim_files['thermo'] = thermo_fn
+#     clim_files['halo'] = halo_fn
+#
+#     return clim_files
 
 
 def calc_landerer_slr(
@@ -2061,6 +2061,8 @@ def calc_landerer_slr(
     # Check whether output paths exists already.
     # If they exist, then make some basic figures and return paths.
     if False not in [os.path.exists(fn) for fn in [total_fn, thermo_fn, halo_fn]]:
+        return slr_fn_dict
+
         for fn, key in zip([total_fn, thermo_fn, halo_fn], ['total', 'thermo', 'halo']):
             cube1 = iris.load_cube(fn)
             for t in [0, -1, 'mean']:
@@ -2076,6 +2078,7 @@ def calc_landerer_slr(
                       sym_zero=True,
                       )
         return slr_fn_dict
+                      
 
     # Load main temperature and salinity netcdfs
     so_cube = iris.load_cube(so_fn)
