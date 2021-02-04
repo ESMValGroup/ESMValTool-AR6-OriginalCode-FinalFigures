@@ -68,7 +68,7 @@ except:
 CMIP5_blue = '#2551cc'
 CMIP6_red = '#cc2323'
 histnat_green= '#004F00' # 0,79,0
-historical_beige = '#c47900' #  
+historical_beige = '#c47900' #
 
 model_type = {
     'EOS80': [], # The default
@@ -2591,15 +2591,27 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
     add_obs = True
     if add_obs:
+        obs_labels= {
+            '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc': 'EN4',
+            '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':'Ishii',
+            '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':'D&W',
+            }
+        obs_markers= {
+            '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc': '^',
+            '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':'o',
+            '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':'s',
+            }
         for obs_type in [
                          '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc',
                          '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc',
-#                          '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc',
+                         '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc',
 #                         '141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc',
 #                         '141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc',
 #                         '151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc',
                          ]:
             aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type
+            label = 'Observations'
+
             #141013_DurackandWijffels10_V1.0_50yr_steric_1980-2000_0-2000db.nc'
             #210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc
             #210201_EN4.2.1.g10_annual_steric_1970-2019_5-5350m.nc
@@ -2627,7 +2639,6 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                 mean = region_cube.collapsed(['latitude', 'longitude'], iris.analysis.MEAN, weights=areas)
 
                 obs_dat[region] = mean.data
-            label = 'Observations'
             print(obs_type, obs_type, ':', obs_dat['Pacific'], obs_dat['Atlantic'])
             if label not in labels:
                 plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s', label = label)
@@ -2915,34 +2926,45 @@ def plot_halo_multipane(
     #obs_files = ['DurackandWijffels10_V1.0_50yr', 'Ishii09_v6.13_annual_steric_1950-2010']
     #obs_files = ['Ishii09_v6.13_annual_steric_1950-2010','DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc']
     # obs_files = ['210127_DurackandWijffels',  'Ishii09_v6.13_annual_steric_1950-2010']
-    obs_files = ['210201_EN4.2.1.g10_annual_steric_1950-2019', '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc']
+    obs_files = ['210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc',
+                 '210201_EN4.2.1.g10_annual_steric_1950-2019',
+                 '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc', ]
 
 
-    if len(obs_files) == 3:
-        subplots = [421, 423, 425,]
-        cmip_subplots = [427, ]
-        scatter1=222
-        scatter2=224
-    if len(obs_files) == 2:
-        reverse = True
-        if reverse:
-##s0 = fig10.add_gridspec(1, 2)
- #           gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[1, 2], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.450, wspace =0.0600)
-            gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
-            gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
-            gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
-            #scatters
-            scatter1=fig.add_subplot(gs0[0,0])
-            scatter2=fig.add_subplot(gs0[1,0])
+    reverse = True
+    if reverse & len(obs_files) == 2:
+        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
+        gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
+        gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
+        #scatters
+        scatter1=fig.add_subplot(gs0[0,0])
+        scatter2=fig.add_subplot(gs0[1,0])
 
-            central_longitude=-160.+3.5
-            proj = ccrs.Robinson(central_longitude=central_longitude)
-            ax0 = fig.add_subplot(gs1[0, 0], projection=proj)
-            ax1 = fig.add_subplot(gs1[1, 0], projection=proj)
-            ax2 = fig.add_subplot(gs1[2, 0], projection=proj)
-            subplots = [ax0, ax1]
-            cmip_subplots = [ax2,]
+        central_longitude=-160.+3.5
+        proj = ccrs.Robinson(central_longitude=central_longitude)
+        ax0 = fig.add_subplot(gs1[0, 0], projection=proj)
+        ax1 = fig.add_subplot(gs1[1, 0], projection=proj)
+        ax2 = fig.add_subplot(gs1[2, 0], projection=proj)
+        subplots = [ax0, ax1]
+        cmip_subplots = [ax2,]
 
+    if reverse & len(obs_files) == 3:
+        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
+        gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
+        gs1 = gs[1].subgridspec(4, 1, hspace=0.06 ) # maps
+        #scatters
+        scatter1=fig.add_subplot(gs0[0,0])
+        scatter2=fig.add_subplot(gs0[1,0])
+
+        central_longitude=-160.+3.5
+        proj = ccrs.Robinson(central_longitude=central_longitude)
+        ax0 = fig.add_subplot(gs1[0, 0], projection=proj)
+        ax1 = fig.add_subplot(gs1[1, 0], projection=proj)
+        ax2 = fig.add_subplot(gs1[2, 0], projection=proj)
+        ax3 = fig.add_subplot(gs1[3, 0], projection=proj)
+
+        subplots = [ax0, ax1, ax2]
+        cmip_subplots = [ax3,]
 #            gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[1, 2], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.450, wspace =0.0600)
 #            central_longitude=-120.
 #            proj = ccrs.Robinson(central_longitude=central_longitude)
@@ -2953,17 +2975,17 @@ def plot_halo_multipane(
 #            cmip_subplots = [ax2,]
 #            scatter1=fig.add_subplot(gs[:3, 0])
 #            scatter2=fig.add_subplot(gs[3:, 0])
-        else:
-            gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[2, 1], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.10, wspace =0.25)
-            central_longitude=-160.+3.5
-            proj = ccrs.Robinson(central_longitude=central_longitude)
-            ax0 = fig.add_subplot(gs[0:2, 0], projection=proj)
-            ax1 = fig.add_subplot(gs[2:4, 0], projection=proj)
-            ax2 = fig.add_subplot(gs[4:6, 0], projection=proj)
-            subplots = [ax0, ax1]
-            cmip_subplots = [ax2,]
-            scatter1=fig.add_subplot(gs[:3, 1])
-            scatter2=fig.add_subplot(gs[3:, 1])
+        # else:
+        #     gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[2, 1], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.10, wspace =0.25)
+        #     central_longitude=-160.+3.5
+        #     proj = ccrs.Robinson(central_longitude=central_longitude)
+        #     ax0 = fig.add_subplot(gs[0:2, 0], projection=proj)
+        #     ax1 = fig.add_subplot(gs[2:4, 0], projection=proj)
+        #     ax2 = fig.add_subplot(gs[4:6, 0], projection=proj)
+        #     subplots = [ax0, ax1]
+        #     cmip_subplots = [ax2,]
+        #     scatter1=fig.add_subplot(gs[:3, 1])
+        #     scatter2=fig.add_subplot(gs[3:, 1])
 
     #plot_range=[-1.65, 1.65]
     plot_range=[-1.625, 1.625]
@@ -3099,25 +3121,22 @@ def plot_halo_obs_mean(
         #legend_txt = 'Ishii 1950-2010'
         legend_txt = 'Ishii' #1950-2010'
 
-    if obs_file == '210127_DurackandWijffels':
+    if obs_file in ['210127_DurackandWijffels', '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc']:
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc'
-        legend_txt = 'D&W (210127b)'
+        legend_txt = 'D&W'
 
     if obs_file == '210201_EN4.2.1.g10_annual_steric_1950-2019':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc'
-        legend_txt = 'D&W'
+        legend_txt = 'EN4'
 
     if obs_file == '210201_EN4.2.1.g10_annual_steric_1970-2019':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/210201_EN4.2.1.g10_annual_steric_1970-2019_5-5350m.nc'
-        legend_txt = 'D&W'
+        legend_txt = 'EN4'
 
     if obs_file == '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc'
         legend_txt = 'Ishii'
 
-            #210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc
-
-            #
 
     print('opening:', aux_file)
     obs_cubes = iris.load_raw(aux_file)
@@ -4117,11 +4136,11 @@ def sea_surface_salinity_plot(
         obs_change_cube.data = (obs_change_cube.data/obs_denom)*1000.
         print('calc_trend:', obs_change_cube.data.min(), obs_change_cube.data.max())
 
-    #change_nspace_50 =  np.linspace(-11.5, 11.5, 24) 
+    #change_nspace_50 =  np.linspace(-11.5, 11.5, 24)
     #change_nspace_70 =  np.linspace(-13, 13 , 16, endpoint=True)
     change_nspace_50 =  np.linspace(-11., 11., 12)
     change_nspace_70 =  np.linspace(-11., 11., 12)
- 
+
     if fig_type=='obs_change': # pane a (221, 211, also white contours)
         cube = obs_change_cube
         #nspace = np.linspace(-0.2, 0.2 , 22, endpoint=True)
@@ -5185,7 +5204,7 @@ def main(cfg):
             so_fn = detrended_ncs[(project, dataset, exp, ensemble, 'so')]
             print('detrending_method:', detrending_method, so_fn)
             ohc_fn = calc_ohc_full(cfg, metadatas, detrended_fn, so_fn, volcello_fn, trend='detrended')
-            print('Finished calc_ohc_full calc',ohc_fn) 
+            print('Finished calc_ohc_full calc',ohc_fn)
             if ohc_fn is None: continue
         else:
             assert 0
@@ -5235,7 +5254,7 @@ def main(cfg):
 
     # OHC detrending TS:
     print('\n----------------------\nplotting detrending figure. ')
-    do_detrending_fig = False 
+    do_detrending_fig = False
     for dataset, ensemble, project, depth_range  in itertools.product(datasets.keys(), ensembles.keys(), projects.keys(), depth_ranges):
         if not do_detrending_fig: continue
         for index in ocean_heat_content_timeseries.keys():
@@ -5267,7 +5286,7 @@ def main(cfg):
     # Multi model time series plotx for each time series
     # Figure based on 2.25.
     #
-    do_fig_like225 = False 
+    do_fig_like225 = False
     for dataset, ensemble, project, exp in itertools.product(datasets.keys(), ensembles.keys(), projects.keys(), exps.keys()):
         if not do_fig_like225: continue
         try:
