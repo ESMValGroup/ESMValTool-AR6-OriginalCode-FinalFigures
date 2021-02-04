@@ -24,12 +24,12 @@ save : dict, optional
 import logging
 import os
 
+import cf_units
 import iris
 from iris import Constraint
 import iris.quickplot
 import matplotlib.pyplot as plt
 import matplotlib.dates as mda
-# import iris.plot as iplt
 from scipy.ndimage import gaussian_filter
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from esmvaltool.diag_scripts.shared import (
@@ -38,15 +38,18 @@ from esmvaltool.diag_scripts.shared import (
     variables_available)
 import esmvaltool.diag_scripts.shared.ESRL_ccgcrv.ccgfilt as ccgfilt
 from esmvaltool.diag_scripts.shared.ESRL_ccgcrv.ccgdates import (
-    decimalDate, decimalDateFromDatetime, calendarDate, datetimeFromDecimalDate)
+    decimalDate, decimalDateFromDatetime, calendarDate,
+    datetimeFromDecimalDate)
 from matplotlib import rcParams
 import numpy as np
+from datetime import datetime
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
 
 logger = logging.getLogger(os.path.basename(__file__))
 
-def time_slice(cube, start_year, end_year, start_month = 1, start_day = 1, end_month = 12,
+def time_slice(cube, start_year, end_year, start_month = 1,
+               start_day = 1, end_month = 12,
                end_day = 31):
     """Slice cube on time.
     Parameters
@@ -103,8 +106,9 @@ def get_provenance_record():
     record = {
         'caption':
         ('Changes to the amplitude of the seasonal cycle of '
-         'atmospheric CO2 at Mauna Loa and global NBP. Observations and estimates '
-         'from global land models.(Zhao et al., 2016).'),
+         'atmospheric CO2 at Mauna Loa and global NBP.'
+         ' Observations and estimates from global land models. '
+         '(Zhao et al., 2016).'),
         'statistics': ['mean', 'stddev', 'trend'],
         'domains': ['global'],
         'plot_types': ['times', 'seas'],
@@ -115,27 +119,43 @@ def get_provenance_record():
     }
     return record
 
-def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filename):
+def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle,
+              dataset_groups, filename):
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
 
     """Plot data"""
-    linestyles = {"CO2-MLO": "-",  "CO2-GLOB": "dashed", "JMA-TRANSCOM": "dotted"}
-    colors = {"Multi-Model Mean": (204/255., 35/255., 35/255.), "CO2-MLO": (0, 0, 0),
-              "CO2-GLOB": (0, 0, 0), "JMA-TRANSCOM": (0, 0, 0),
-              #"CO2-GLOB": (36/255., 147/255., 126/255.), "JMA-TRANSCOM": (54/255., 156/255., 232/255.,),
-              "first10": (237/255., 128/255., 55/255.), "last10": (36/255., 147/255., 126/255.)}
-    CMIP6_colors = [(0, 0, 0), (112/255., 160/255., 205/255.), (178/255., 178/255., 178/255.), (196/255., 121/255., 0), (0/255., 52/255., 102/255.), (0, 79/255., 0)]
-    CMIP6_shading = [(128/255., 128/255., 128/255.), (91/255., 174/255., 178/255.), (191/255., 191/255., 191/255.), (204/255., 174/255., 113/255.), (67/255., 147/255., 195/255.), (223/255., 237/255., 195/255.)]
-    fig, ax = plt.subplots()#plt.figure(figsize=(6, 4))
+    linestyles = {"CO2-MLO": "-",  "CO2-GLOBAL": "dashed",
+                  "JMA-TRANSCOM": "dotted"}
+    colors = {"Multi-Model Mean": (204/255., 35/255., 35/255.),
+              "CO2-MLO": (0, 0, 0),
+              "CO2-GLOBAL": (0, 0, 0), "JMA-TRANSCOM": (0, 0, 0),
+              "first10": (237/255., 128/255., 55/255.),
+              "last10": (36/255., 147/255., 126/255.)}
+    # CMIP6_colors = [(0, 0, 0),
+    #                 (112/255., 160/255., 205/255.),
+    #                 (178/255., 178/255., 178/255.),
+    #                 (196/255., 121/255., 0),
+    #                 (0/255., 52/255., 102/255.),
+    #                 (0, 79/255., 0)]
+    # CMIP6_shading = [(128/255., 128/255., 128/255.),
+    #                  (91/255., 174/255., 178/255.),
+    #                  (191/255., 191/255., 191/255.),
+    #                  (204/255., 174/255., 113/255.),
+    #                  (67/255., 147/255., 195/255.),
+    #                  (223/255., 237/255., 195/255.)]
+    fig, ax = plt.subplots()
 
     # Compute MMM Shading
     mmm_amps = {}
     for dataset in dataset_groups['mmm_datasets']:
         mmm_amps[dataset] = amps[dataset]
-    mmm_time, mmm_mean, mmm_std = compute_mmm_std(timeranges, mmm_amps, "yearly")
-    plt.plot(mmm_time, mmm_mean, label = "Multi-Model Mean", color=colors["Multi-Model Mean"], linewidth = 3)
-    plt.fill_between(mmm_time, mmm_mean-mmm_std, mmm_mean + mmm_std, color=colors["Multi-Model Mean"], alpha=.2)
+    mmm_time, mmm_mean, mmm_std = compute_mmm_std(timeranges,
+                                                  mmm_amps, "yearly")
+    plt.plot(mmm_time, mmm_mean, label = "Multi-Model Mean",
+             color=colors["Multi-Model Mean"], linewidth = 3)
+    plt.fill_between(mmm_time, mmm_mean-mmm_std, mmm_mean + mmm_std,
+                     color=colors["Multi-Model Mean"], alpha=.2)
 
     # Non-mmm lines
     for dataset in yrs:
@@ -145,33 +165,46 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
                 # Make mean of last 10 years of dataset similar to mmm_mean
                 mean_dataset_10 = np.mean(amps[dataset][-10:])
                 if timeranges[dataset][1] < max_year:
-                    mmm_mean_10 = np.mean(mmm_mean[-10+timeranges[dataset][1]-\
-                                                        max_year:timeranges[dataset][1]-max_year])
+                    mmm_mean_10 =\
+                        np.mean(mmm_mean[-10+timeranges[dataset][1]
+                                         -max_year:timeranges[dataset][1]
+                                                   -max_year])
                 else:
                     mmm_mean_10 = np.mean(mmm_mean[-10:])
             else:
                 mmm_mean_10 = 0.
                 mean_dataset_10 = 0.
             if dataset in dataset_groups['ref_model']:
-                plt.plot(yrs[dataset], amps[dataset] - mean_dataset_10 + mmm_mean_10, label = dataset,
+                plt.plot(yrs[dataset], amps[dataset] - mean_dataset_10
+                         + mmm_mean_10, label = dataset,
                          color = colors[dataset], linewidth = 3)
-                plt.fill_between(yrs[dataset], amps[dataset] - amps['ref_std'] - mean_dataset_10 + mmm_mean_10, \
-                                     amps[dataset] + amps['ref_std'] - mean_dataset_10 + mmm_mean_10, \
-                                     color = colors[dataset], alpha=.2) #CMIP6_shading.pop(0), alpha=.3)
+                plt.fill_between(yrs[dataset], amps[dataset]
+                                 - amps['ref_std'] - mean_dataset_10
+                                 + mmm_mean_10,
+                                 amps[dataset] + amps['ref_std']
+                                 - mean_dataset_10 + mmm_mean_10,
+                                 color = colors[dataset], alpha=.2)
             else:
-                plt.plot(yrs[dataset], amps[dataset] - mean_dataset_10 + mmm_mean_10,
-                         label = dataset, color = colors[dataset], linewidth = 2, linestyle=linestyles[dataset])
+                plt.plot(yrs[dataset], amps[dataset]
+                         - mean_dataset_10 + mmm_mean_10,
+                         label = dataset, color = colors[dataset],
+                         linewidth = 2, linestyle=linestyles[dataset])
                 #CMIP6_shading.pop(0)
     # Prettify
     plt.ylabel('Relative change in amplitude')
     plt.legend(fontsize=10, loc = 2)
     plt.xlim(min_year, max_year-1)
     plt.ylim(0.78)
+    plt.title(r"Amplitude of CO$_2$ atmosphere concentration and land sink")
 
     # INSET
     axins = inset_axes(ax, width='30%', height='30%', loc=4, borderpad=2)
-    #CMIP6_colors = [(0, 0, 0), (112/255., 160/255., 205/255.), (196/255., 121/255., 0), (178/255., 178/255., 178/255.), (0/255., 52/255., 102/255.), (0, 79/255., 0)]
-    CMIP6_shading = [(128/255., 128/255., 128/255.), (91/255., 174/255., 178/255.), (204/255., 174/255., 113/255.), (191/255., 191/255., 191/255.), (67/255., 147/255., 195/255.), (223/255., 237/255., 195/255.)]
+    CMIP6_shading = [(128/255., 128/255., 128/255.),
+                     (91/255., 174/255., 178/255.),
+                     (204/255., 174/255., 113/255.),
+                     (191/255., 191/255., 191/255.),
+                     (67/255., 147/255., 195/255.),
+                     (223/255., 237/255., 195/255.)]
     # Initial
     iyrs = [min_year, min_year+9]
     cycle_data = {}
@@ -179,17 +212,23 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
         int_ind = (iyrs[0] - timeranges[dataset][0]) * 12
         fin_ind = int_ind + (iyrs[1] - timeranges[dataset][0]) * 12 + 11
         if int_ind>=0 and fin_ind<len(avg_cycle[dataset]):
-            cycle_data[dataset] = compute_avg_sca(t_cycle[dataset][int_ind:fin_ind], \
-                                                      avg_cycle[dataset][int_ind:fin_ind])
+            cycle_data[dataset] =\
+                compute_avg_sca(t_cycle[dataset][int_ind:fin_ind],
+                                avg_cycle[dataset][int_ind:fin_ind])
             if dataset in dataset_groups['plot_sca']:
-                axins.plot(range(1, 13), cycle_data[dataset], linestyle = "--", color = colors[dataset])#color = CMIP6_colors.pop(1))
+                axins.plot(range(1, 13), cycle_data[dataset],
+                           linestyle = "--", color = colors[dataset])
     # Compute MMM cycle
     mmm_cycle_data = {}
     for dataset in dataset_groups['mmm_datasets']:
         mmm_cycle_data[dataset] = cycle_data[dataset]
-    _, mmm_meanc, mmm_stdc =  compute_mmm_std(timeranges, mmm_cycle_data, "cycle")
-    axins.plot(range(1, 13), mmm_meanc, "k--", label = "Multi-Model Mean", color=colors["first10"])
-    axins.fill_between(range(1, 13), mmm_meanc-mmm_stdc, mmm_meanc + mmm_stdc, color = colors["first10"], alpha=.2)
+    _, mmm_meanc, mmm_stdc =  compute_mmm_std(timeranges,
+                                              mmm_cycle_data, "cycle")
+    axins.plot(range(1, 13), mmm_meanc, "k--", label = "Multi-Model Mean",
+               color=colors["first10"])
+    axins.fill_between(range(1, 13), mmm_meanc-mmm_stdc,
+                       mmm_meanc + mmm_stdc,
+                       color = colors["first10"], alpha=.2)
 
     # Final
     #fyrs = [1999, 2008]
@@ -197,32 +236,38 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
     cycle_data = {}
     for dataset in avg_cycle:
         int_ind = (fyrs[0] - timeranges[dataset][0]) * 12
-        fin_ind = len(avg_cycle[dataset]) - (timeranges[dataset][1] - fyrs[1]) * 12
+        fin_ind = len(avg_cycle[dataset])\
+                  - (timeranges[dataset][1] - fyrs[1]) * 12
         # int_ind doesn't seem quite right yet..
         if int_ind>0 and fin_ind<len(avg_cycle[dataset]):
-            cycle_data[dataset] = compute_avg_sca(t_cycle[dataset][int_ind:fin_ind], \
-                                                      avg_cycle[dataset][int_ind:fin_ind])
+            cycle_data[dataset] =\
+                compute_avg_sca(t_cycle[dataset][int_ind:fin_ind],
+                                avg_cycle[dataset][int_ind:fin_ind])
             if dataset in dataset_groups['plot_sca']:
                 axins.plot(range(1, 13), cycle_data[dataset])
         elif int_ind>0 and fin_ind==len(avg_cycle[dataset]):
-            cycle_data[dataset] = compute_avg_sca(t_cycle[dataset][int_ind:], \
-                                                      avg_cycle[dataset][int_ind:])
+            cycle_data[dataset] = \
+                compute_avg_sca(t_cycle[dataset][int_ind:],
+                                avg_cycle[dataset][int_ind:])
             if dataset in dataset_groups['plot_sca']:
                 axins.plot(range(1, 13), cycle_data[dataset])
     # Compute MMM cycle
     mmm_cycle_data = {}
     for dataset in dataset_groups['mmm_datasets']:
         mmm_cycle_data[dataset] = cycle_data[dataset]
-    _, mmm_meanf, mmm_stdf =  compute_mmm_std(timeranges, mmm_cycle_data, "cycle")
-    axins.plot(range(1, 13), mmm_meanf, "k", label = "Multi-Model Mean", color = colors["last10"])
-    axins.fill_between(range(1, 13), mmm_meanf-mmm_stdf, mmm_meanf + mmm_stdf, color = colors["last10"], alpha=.2)#color=(128/255., 128/255., 128/255.),alpha=.3)
+    _, mmm_meanf, mmm_stdf =  compute_mmm_std(timeranges,
+                                              mmm_cycle_data, "cycle")
+    axins.plot(range(1, 13), mmm_meanf, "k",
+               label = "Multi-Model Mean", color = colors["last10"])
+    axins.fill_between(range(1, 13), mmm_meanf-mmm_stdf,
+                       mmm_meanf + mmm_stdf, color = colors["last10"],
+                       alpha=.2)
 
 
     xlab = range(2, 13, 2)
     xlabels = ['Feb', 'Apr', 'Jun', 'Aug', 'Oct', 'Dec']
     plt.xticks(xlab, xlabels)
     plt.ylabel(r'NBP PgC yr$^{-1}$')
-    #plt.ylabel(r'F$_{TA}$ PgC yr$^{-1}$')
     axins.patch.set_alpha(0.0)
 
     fig.savefig(filename)
@@ -231,7 +276,6 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle, dataset_groups, filenam
 def compute_mmm_std(timeranges, data, freq):
     """Compute Multi-Model Mean and its std"""
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
-    #min_year2 = min([dataset['start_year'] for dataset in cfg['input_data'].values()])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
     if freq == "cycle":
         timelength = 12
@@ -240,7 +284,7 @@ def compute_mmm_std(timeranges, data, freq):
         timelength = (max_year - min_year + 1) * 12
         mmm_time = np.arange(min_year + 0.5/12, max_year + 1, 1./12)
     elif freq == "yearly":
-        timelength = max_year - min_year #SCA is missing the last year
+        timelength = max_year - min_year
         mmm_time = np.arange(min_year, max_year, 1)
     else:
         logger.info("Frequency not supported!")
@@ -252,11 +296,16 @@ def compute_mmm_std(timeranges, data, freq):
             if freq == "cycle":
                 dataset_values.append(data[dataset][ii])
             else:
-                if timeranges[dataset][0] <= mmm_time[ii] <= timeranges[dataset][1]:
+                if timeranges[dataset][0] <= mmm_time[ii] \
+                    <= timeranges[dataset][1]:
                     if freq == "monthly":
-                        dataset_values.append(data[dataset][ii - (min_year - timeranges[dataset][0])*12])
+                        dataset_values.append(
+                            data[dataset][ii - (min_year
+                                                - timeranges[dataset][0])*12])
                     elif freq == "yearly":
-                        dataset_values.append(data[dataset][ii - (min_year - timeranges[dataset][0])])
+                        dataset_values.append(
+                            data[dataset][ii - (min_year
+                                                - timeranges[dataset][0])])
         mmm_std[ii] = np.std(dataset_values)
         mmm_mean[ii] = np.mean(dataset_values)
     return mmm_time, mmm_mean, mmm_std
@@ -295,6 +344,42 @@ def rolling_meansqdiff_numpy(a, w):
     sums = np.einsum('ij,ij->i',subs,subs)
     return (sums/w)**0.5
 
+def write_data(data, time_coords, cfg):
+    var_attributes = {
+            'short_name': 'sca',
+            'long_name': 'Seasonal Cycle Amplitude',
+            'units': 'ppm'
+        }
+    input_data = list(cfg['input_data'].values())
+    path = get_diagnostic_filename('rel_trend_SCA', cfg)
+
+    # Make cubes from data
+    data_cubes = {}
+    for dataset in data:
+        if dataset == "ref_std":
+            times = time_coords[cfg['ref_model']]
+        else:
+            times = time_coords[dataset]
+        time_coord = iris.coords.DimCoord(times,
+                                          var_name='time',
+                                          standard_name='time',
+                                          long_name='time',
+                                          units='year')
+        time_coord.guess_bounds()
+        data_cubes[dataset] = iris.cube.Cube(
+            data[dataset],
+            dim_coords_and_dims = [(time_coord, 0)],
+            units = 'ppm')
+
+    io.save_1d_data(data_cubes, path, 'time', var_attributes)
+    provenance_record = get_provenance_record()
+    provenance_record['ancestors'] = list(group_metadata(input_data,
+                                                    'filename').keys())
+    with ProvenanceLogger(cfg) as provenance_logger:
+        provenance_logger.log(path, provenance_record)
+
+
+
 def main(cfg):
     """Run the diagnostic."""
     #logger.info(cfg['input_data'].keys())
@@ -308,28 +393,29 @@ def main(cfg):
     dataset_groups['plot_sca'] = []
     dataset_groups['ref_model'] = cfg['ref_model']
 
-    if 'co2data' in cfg:
-        for dataset in cfg['co2data']:
-            #logger.info(dataset)
-            cfg['input_data'][dataset] = {'filename': cfg['co2data'][dataset][0],
-                                          'dataset': dataset, 'short_name': 'co2',
-                                          'start_year': cfg['co2data'][dataset][1],
-                                          'end_year': cfg['co2data'][dataset][2],
-                                          'project': 'OBS'}
+    # if 'co2data' in cfg:
+    #     for dataset in cfg['co2data']:
+    #         #logger.info(dataset)
+    #         cfg['input_data'][dataset] = \
+    #             {'filename': cfg['co2data'][dataset][0],
+    #              'dataset': dataset, 'short_name': 'co2',
+    #              'start_year': cfg['co2data'][dataset][1],
+    #              'end_year': cfg['co2data'][dataset][2],
+    #              'project': 'OBS'}
 
     input_data = cfg['input_data'].values()
-    #logger.info(input_data)
     for data in input_data:
-        # Deal with co2 read-in differently!
         name = data['dataset']
+        # Deal with co2 read-in differently!
+        if data['short_name'] == 'co2s':
+            name = "CO2-" + data['version']
+            #cube_data = time_slice(cube_data, start_year = data['start_year'],
+            #                       end_year = data['end_year'])
+
         logger.info("Processing %s", name)
         cube_data = iris.load_cube(data['filename'])
-        # FTA is -NBP
-        #if data['short_name'] == 'nbp':
-        #    cube_data = cube_data * (-1)
 
-        if data['short_name'] == 'co2':
-            cube_data = time_slice(cube_data, start_year = data['start_year'], end_year = data['end_year'])
+
             # Need to select the right years
 
         timeranges[name] = [data['start_year'], data['end_year']]
@@ -342,7 +428,8 @@ def main(cfg):
 
         # Calculate seasonal cycle amplitudes
         t_data = np.asarray(t_data)
-        idx = np.where((np.isnan(cube_data.data)==False) & (np.isinf(cube_data.data)==False))
+        idx = np.where((np.isnan(cube_data.data)==False) &
+                       (np.isinf(cube_data.data)==False))
         filt = ccgfilt.ccgFilter(t_data[idx[0]], cube_data.data[idx])
         sca = filt.getAmplitudes()
         dataset_yrs[name], amps, _, _, _, _ = list(zip(*sca))
@@ -359,11 +446,14 @@ def main(cfg):
         if name in dataset_groups['ref_model']:
             sca_mean = np.mean(amps[:11])
             rel_trend_unsmoothed = amps/sca_mean
-            resid = np.array(rel_trend_unsmoothed) - np.array(rel_trend_sca[name])
+            resid = np.array(rel_trend_unsmoothed) \
+                    - np.array(rel_trend_sca[name])
             rolling_std = rolling_meansqdiff_numpy(resid, 9)
             # Extending first and last std outwards
-            rel_trend_sca['ref_std'] = np.concatenate(([rolling_std[0]]*4, rolling_std, \
-                                                          [rolling_std[-1]]*4), axis=None)
+            rel_trend_sca['ref_std'] = np.concatenate(([rolling_std[0]]*4,
+                                                       rolling_std,
+                                                       [rolling_std[-1]]*4),
+                                                      axis=None)
         #logger.info(rolling_std)
 
         # Get smooth Seasonal Cycle
@@ -382,20 +472,14 @@ def main(cfg):
     # Plot data
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
-    plot_path = get_plot_filename('SCA_trend_xy_' + str(min_year) + '_' + str(max_year), cfg)
-    plot_data(timeranges, dataset_yrs, rel_trend_sca, sca_x0, data_sca, dataset_groups, plot_path)
+    plot_path = get_plot_filename('SCA_trend_xy_' + str(min_year)
+                                  + '_' + str(max_year), cfg)
+    plot_data(timeranges, dataset_yrs, rel_trend_sca, sca_x0, data_sca,
+              dataset_groups, plot_path)
 
-    # Write netcdf file TODO! Currently just dummy
-    netcdf_path = get_diagnostic_filename('SCA_trend_xy_' + str(min_year) + '_' + str(max_year), cfg)
-    #save_scalar_data(rel_trend_sca, netcdf_path, var_attrs)
-    #netcdf_path = write_data(cfg, hist_cubes, pi_cubes, ecs_cube)
+    # Write netcdf file and provenance
+    write_data(rel_trend_sca, dataset_yrs, cfg)
 
-    # Provenance
-    provenance_record = get_provenance_record()
-    if plot_path is not None:
-        provenance_record['plot_file'] = plot_path
-    with ProvenanceLogger(cfg) as provenance_logger:
-        provenance_logger.log(netcdf_path, provenance_record)
 
 if __name__ == '__main__':
     with run_diagnostic() as config:
