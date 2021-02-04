@@ -1595,6 +1595,7 @@ begin
   delete(tres@tiYAxisString)
   tplot_C5(0) = taylor_diagram(wks, nam_taylor_stats_C5(:,1:1), nam_taylor_stats_C5(:,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot_C5(2) = taylor_diagram3(wks, sam_taylor_stats_C5(:,1:1), sam_taylor_stats_C5(:,0:0), tres)
   do gg =0,2
      overlay(tplot_C5(gg),tplot(gg))
@@ -1634,6 +1635,8 @@ begin
   tplot4b = new(3,graphic)
 ;  tplot5a = new(3,graphic)
   tplot5b = new(3,graphic)
+
+; CMIP5 MME
   tres@gsMarkerSizeF   = 0.008
   tres@Colors := "white"
   tres@Markers:= 16 ;new_marker
@@ -1655,27 +1658,29 @@ begin
      overlay(tplot_C5(gg),tplot3b(gg))
   end do
 
+; AMIP MME
 ;  tres@gsMarkerThicknessF = 1.0
 ;  tres@Colors := "white"
 ;  tres@Markers:= new_marker
-;  tplot4a(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6EM(0:0,1:1),tay_stats_hist_nao_cmip6EM(0:0,0:0), tres)
-;  tplot4a(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6EM(0:0,1:1),tay_stats_hist_nam_cmip6EM(0:0,0:0), tres)
-;  tplot4a(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6EM(0:0,1:1),tay_stats_hist_sam_cmip6EM(0:0,0:0), tres)
+;  tplot4a(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6AEM(0:0,1:1),tay_stats_hist_nao_cmip6AEM(0:0,0:0), tres)
+;  tplot4a(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6AEM(0:0,1:1),tay_stats_hist_nam_cmip6AEM(0:0,0:0), tres)
+;  tplot4a(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6AEM(0:0,1:1),tay_stats_hist_sam_cmip6AEM(0:0,0:0), tres)
 ;  do gg = 0,2
 ;     overlay(tplot_C5(gg),tplot4a(gg))
 ;  end do
   tres@Colors := 3
   tres@Markers:= 16
 ;  tres@gsMarkerThicknessF = 2.0
-  tplot4b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6EM(0:0,1:1),tay_stats_hist_nao_cmip6EM(0:0,0:0), tres)
+  tplot4b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6AEM(0:0,1:1),tay_stats_hist_nao_cmip6AEM(0:0,0:0), tres)
   delete(tres@tiYAxisString)
-  tplot4b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6EM(0:0,1:1),tay_stats_hist_nam_cmip6EM(0:0,0:0), tres)
+  tplot4b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6AEM(0:0,1:1),tay_stats_hist_nam_cmip6AEM(0:0,0:0), tres)
   tres@tiYAxisString = ""
-  tplot4b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6EM(0:0,1:1),tay_stats_hist_sam_cmip6EM(0:0,0:0), tres)
+  tplot4b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6AEM(0:0,1:1),tay_stats_hist_sam_cmip6AEM(0:0,0:0), tres)
   do gg = 0,2
      overlay(tplot_C5(gg),tplot4b(gg))
   end do
 
+; CMIP6 MME
 ;  tres@gsMarkerThicknessF = 1.0
 ;  tres@Colors := "white"
 ;  tres@Markers:= 16  ;new_marker

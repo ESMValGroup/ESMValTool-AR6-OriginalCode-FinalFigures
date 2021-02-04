@@ -564,7 +564,7 @@ begin
   rxy@tmXTOn            = False      ; Turn off right tick marks.
 
   rxy@xyDashPatterns    = (/ 0 /)    ; line characteristics (dash,solid)
-  rxy@xyLineThicknesses = (/ .5/)    ; choose line thickness
+  rxy@xyLineThicknesses = (/ 1./);(/ .5/)    ; choose line thickness
 
   rxy@gsnFrame          = False      ; Don't advance the frame.
 
@@ -665,7 +665,7 @@ begin
 ;;dum0 = gsn_add_text(wks,taylor,"OBSERVED",1.00,0.075,txRes)
 
   plRes               = True
-  plRes@gsLineThicknessF =  0.5 ;2.
+  plRes@gsLineThicknessF =  1. ;2.
   
   txRes@txJust        = "CenterLeft"              ; Default="CenterCenter".
   txRes@txFontHeightF = FontHeightF               ; match YL 
@@ -1064,7 +1064,7 @@ begin
   rxy@tmXTOn            = False      ; Turn off right tick marks.
 
   rxy@xyDashPatterns    = (/ 0 /)    ; line characteristics (dash,solid)
-  rxy@xyLineThicknesses = (/ .5/)    ; choose line thickness
+  rxy@xyLineThicknesses = (/1./) ;(/ .5/)    ; choose line thickness
 
   rxy@tmGridDrawOrder  = "PostDraw"
 
@@ -1114,7 +1114,7 @@ begin
   delete(yy)
                                                   
   if (rOpts .and. isatt(rOpts,"stnRad") ) then
-      rsrRes@gsLineThicknessF  = .5   ; rxy@xyLineThicknesses(0) 
+      rsrRes@gsLineThicknessF  = 1. ;.5   ; rxy@xyLineThicknesses(0) 
 
       nStnRad = dimsizes(rOpts@stnRad)
 
