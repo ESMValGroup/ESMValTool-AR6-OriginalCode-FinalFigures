@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210203 kosaka_yu: updated for the new recipe structure
 ;    20200925 kosaka_yu: revised to add sign consistency.
 ;    20200914 kosaka_yu: revised to weighting based on the ensemble size.
 ;    20200528 kosaka_yu: written.
@@ -84,7 +85,7 @@ begin
 ;
 ; ======================================================================
 
-  input_dir = diag_script_info@input_files+"/"
+  input_dirs = diag_script_info@input_files+"/"
   if (blend_globalmean) then
     GST = "GMST"
   else
@@ -96,9 +97,24 @@ begin
     masked = "unmasked"
   end if
 
-  ifileCMIP5 = systemfunc("ls "+input_dir+"trend"+GST+"_"+masked+"_CMIP5.txt")
-  ifileCMIP6 = systemfunc("ls "+input_dir+"trend"+GST+"_"+masked+"_CMIP6.txt")
-
+  do ii = 0, dimsizes(input_dirs)-1
+    path = input_dirs(ii)+"trend"+GST+"_"+masked+"_CMIP5.txt"    
+    if (fileexists(path)) then
+      if (isvar("ifileCMIP5")) then
+        ifileCMIP5 := array_append_record(ifileCMIP5, path, 0)
+      else
+        ifileCMIP5 = path
+      end if
+    end if
+    path = input_dirs(ii)+"trend"+GST+"_"+masked+"_CMIP6.txt"
+    if (fileexists(path)) then
+      if (isvar("ifileCMIP6")) then
+        ifileCMIP6 := array_append_record(ifileCMIP6, path, 0)
+      else
+        ifileCMIP6 = path
+      end if
+    end if
+  end do
   trendGSThiatusCMIP5 = read_GMtrend_as_list(ifileCMIP5)
   trendGSThiatusCMIP6 = read_GMtrend_as_list(ifileCMIP6)
 
@@ -169,7 +185,13 @@ begin
     delete(tmp)
     delete(wgt)
   elseif (any(composite_threshold.eq.(/"obs_mean", "obs_median", "obs_max"/))) then
-    ifileOBS   = systemfunc("ls "+input_dir+"trendGMST_*_OBS.txt")
+    do ii = 0, dimsizes(input_dirs)-1
+      path = input_dirs(ii)+"trendGMST_*_OBS.txt"
+      if (fileexists(path)) then
+        ifileOBS = path
+        break
+      end if
+    end do
     tmp = new(dimsizes(ifileOBS), "float")
     do ii = 0, dimsizes(ifileOBS)-1
       trendGSThiatusOBS = read_GMtrend_as_list(ifileOBS)
@@ -207,7 +229,13 @@ begin
     else
       name = composite_threshold
     end if
-    ifileOBS   = systemfunc("ls "+input_dir+"trendGMST_"+name+"_OBS.txt")
+    do ii = 0, dimsizes(input_dirs)-1
+      path = input_dirs(ii)+"trendGMST_"+name+"_OBS.txt"
+      if (fileexists(path)) then
+        ifileOBS = path
+        break
+      end if
+    end do
     delete(name)
     trendGSThiatusOBS = read_GMtrend_as_list(ifileOBS)
     if (ListCount(trendGSThiatusOBS).eq.1) then
@@ -288,10 +316,13 @@ begin
   if (any(composite_dataset.eq.(/"cmip5", "cmip5+cmip6"/))) then
     do ii = 0, ListCount(trendGSThiatusCMIP5)-1
       if (trendGSThiatusCMIP5[ii]@composite) then
-        path = input_dir + "HiatusTrendPattern_" + blended + "_" + masked \
-                + "_CMIP5_" + trendGSThiatusCMIP5[ii]@dataset + "_" \
-                + trendGSThiatusCMIP5[ii]@ensemble + ".nc"
-        if (fileexists(path)) then
+        do jj = 0, dimsizes(input_dirs)-1
+          path = input_dirs(jj) + "HiatusTrendPattern_" + blended + "_" + masked \
+                  + "_CMIP5_" + trendGSThiatusCMIP5[ii]@dataset + "_" \
+                  + trendGSThiatusCMIP5[ii]@ensemble + ".nc"
+          if (.not.fileexists(path)) then
+            continue
+          end if
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP5[ii]@weight_hiatus
@@ -318,11 +349,14 @@ begin
           end if
           delete(trend)
           nhiatusCMIP5 = nhiatusCMIP5 + 1
-        end if
-        path = input_dir + "PostTrendPattern_" + blended + "_" + "unmasked" \
-                + "_CMIP5_" + trendGSThiatusCMIP5[ii]@dataset + "_" \
-                + trendGSThiatusCMIP5[ii]@ensemble + ".nc"
-        if (fileexists(path)) then
+        end do
+        do jj = 0, dimsizes(input_dirs)-1
+          path = input_dirs(jj) + "PostTrendPattern_" + blended + "_" + "unmasked" \
+                  + "_CMIP5_" + trendGSThiatusCMIP5[ii]@dataset + "_" \
+                  + trendGSThiatusCMIP5[ii]@ensemble + ".nc"
+          if (.not.fileexists(path)) then
+            continue
+          end if
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP5[ii]@weight_post
@@ -349,7 +383,7 @@ begin
           end if
           delete(trend)
           npostCMIP5 = npostCMIP5 + 1
-        end if
+        end do
       end if
     end do
   end if
@@ -357,10 +391,13 @@ begin
   if (any(composite_dataset.eq.(/"cmip6", "cmip5+cmip6"/))) then
     do ii = 0, ListCount(trendGSThiatusCMIP6)-1
       if (trendGSThiatusCMIP6[ii]@composite) then
-        path = input_dir + "HiatusTrendPattern_" + blended + "_" + masked \
-                + "_CMIP6_CMIP_" + trendGSThiatusCMIP6[ii]@dataset + "_" \
-                + trendGSThiatusCMIP6[ii]@ensemble + ".nc"
-        if (fileexists(path)) then
+        do jj = 0, dimsizes(input_dirs)-1
+          path = input_dirs(jj) + "HiatusTrendPattern_" + blended + "_" + masked \
+                  + "_CMIP6_CMIP_" + trendGSThiatusCMIP6[ii]@dataset + "_" \
+                  + trendGSThiatusCMIP6[ii]@ensemble + ".nc"
+          if (.not.fileexists(path)) then
+            continue
+          end if
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP6[ii]@weight_hiatus
@@ -387,11 +424,14 @@ begin
           end if
           delete(trend)
           nhiatusCMIP6 = nhiatusCMIP6 + 1
-        end if
-        path = input_dir + "PostTrendPattern_" + blended + "_" + "unmasked" \
-                + "_CMIP6_CMIP_" + trendGSThiatusCMIP6[ii]@dataset + "_" \
-                + trendGSThiatusCMIP6[ii]@ensemble + ".nc"
-        if (fileexists(path)) then
+        end do
+        do jj = 0, dimsizes(input_dirs)-1
+          path = input_dirs(jj) + "PostTrendPattern_" + blended + "_" + "unmasked" \
+                  + "_CMIP6_CMIP_" + trendGSThiatusCMIP6[ii]@dataset + "_" \
+                  + trendGSThiatusCMIP6[ii]@ensemble + ".nc"
+          if (.not.fileexists(path)) then
+            continue
+          end if
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP6[ii]@weight_post
@@ -418,7 +458,7 @@ begin
           end if
           delete(trend)
           npostCMIP6 = npostCMIP6 + 1
-        end if
+        end do
       end if
     end do
   end if

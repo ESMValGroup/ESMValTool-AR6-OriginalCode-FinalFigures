@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210203 kosaka_yu: updated for the new recipe structure
 ;    20200531 kosaka_yu: written.
 ;
 ; Required diag_script_info attributes (diagnostic specific)
@@ -143,46 +144,53 @@ begin
   
 end
 
-function read_GMtrend_as_list(path)
-local head, data, dims, n, i, x, y, hiatus_period, post_period, add_post, \
-      syear_hiatus, eyear_hiatus, syear_post, eyear_post
+function read_GMtrend_as_list(paths)
+local paths, path, head, data, dims, n, x, y, hiatus_period, post_period, add_post, \
+      syear_hiatus, eyear_hiatus, syear_post, eyear_post, ii, jj, kk
 begin
-  head = readAsciiHead(path, 1)
-  hiatus_period = str_get_field(head(0), 4, " ")
-  syear_hiatus = stringtoint(str_get_field(hiatus_period, 1, "-"))
-  eyear_hiatus = stringtoint(str_get_field(hiatus_period, 2, "-"))
-  post_period = str_get_field(head(0), 5, " ")
-  if (post_period.ne."") then
-    add_post = True
-    syear_post = stringtoint(str_get_field(post_period, 1, "-"))
-    eyear_post = stringtoint(str_get_field(post_period, 2, "-"))
-  else
-    add_post = False
-  end if
-  data = readAsciiTable(path, 1, "string", 1)
-  dims = dimsizes(data)
-  n = dims(0)
-  x = NewList("fifo")
-  y = new(1, "float", default_fillvalue("float"))
-  do i = 0, n - 1
-    ListAppend(x, new(1, "float"))
-    x[i] = stringtofloat(str_get_field(data(i, 0), 3, " "))
-    x[i]@dataset = str_get_field(data(i, 0), 1, " ")
-    x[i]@ensemble = str_get_field(data(i, 0), 2, " ")
-    x[i]@hiatus_period = hiatus_period
-    x[i]@syear_hiatus = syear_hiatus
-    x[i]@eyear_hiatus = eyear_hiatus
-    if (add_post) then
-      x[i]@post_period = post_period
-      x[i]@syear_post = syear_post
-      x[i]@eyear_post = eyear_post
-    end if
-    if (str_get_field(data(i, 0), 4, " ").ne."") then
-      y = stringtofloat(str_get_field(data(i, 0), 4, " "))
+  do ii = 0, dimsizes(paths)-1
+    path = paths(ii)
+    head = readAsciiHead(path, 1)
+    hiatus_period = str_get_field(head(0), 4, " ")
+    syear_hiatus = stringtoint(str_get_field(hiatus_period, 1, "-"))
+    eyear_hiatus = stringtoint(str_get_field(hiatus_period, 2, "-"))
+    post_period = str_get_field(head(0), 5, " ")
+    if (post_period.ne."") then
+      add_post = True
+      syear_post = stringtoint(str_get_field(post_period, 1, "-"))
+      eyear_post = stringtoint(str_get_field(post_period, 2, "-"))
     else
-      y = y@_FillValue
+      add_post = False
     end if
-    x[i]@trend_post = y
+    data = readAsciiTable(path, 1, "string", 1)
+    dims = dimsizes(data)
+    n = dims(0)
+    if (ii.eq.0) then
+      x = NewList("fifo")
+    end if
+    y = new(1, "float", default_fillvalue("float"))
+    do jj = 0, n - 1
+      ListAppend(x, new(1, "float"))
+      kk = ListCount(x)-1
+      x[kk] = stringtofloat(str_get_field(data(jj, 0), 3, " "))
+      x[kk]@dataset = str_get_field(data(jj, 0), 1, " ")
+      x[kk]@ensemble = str_get_field(data(jj, 0), 2, " ")
+      x[kk]@hiatus_period = hiatus_period
+      x[kk]@syear_hiatus = syear_hiatus
+      x[kk]@eyear_hiatus = eyear_hiatus
+      if (add_post) then
+        x[kk]@post_period = post_period
+        x[kk]@syear_post = syear_post
+        x[kk]@eyear_post = eyear_post
+      end if
+      if (str_get_field(data(jj, 0), 4, " ").ne."") then
+        y = stringtofloat(str_get_field(data(jj, 0), 4, " "))
+      else
+        y = y@_FillValue
+      end if
+      x[kk]@trend_post = y
+    end do
+    delete([/y, data, dims/])
   end do
   return(x)
 end

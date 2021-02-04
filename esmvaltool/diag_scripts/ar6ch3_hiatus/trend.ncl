@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210203 kosaka_yu: updated for the new recipe structure
 ;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim
 ;    20200917 kosaka_yu: added statistical significance to the trend maps
 ;    20200525 kosaka_yu: written.
@@ -37,6 +38,9 @@ begin
     end if
   end if
   info = False
+  if (ListCount(infoList).le.0) then
+    return(info)
+  end if
   if (.not.all(isatt(infoRef, atts))) then
     return(info)
   end if
@@ -248,13 +252,19 @@ begin
     method_trend = diag_script_info@method_trend
   end if
 
-; 0.3 Output trend pattern?
+; 0.3 Output trend of reference data for masking?
+  output_ref_trend = True
+  if (isatt(diag_script_info, "output_ref_trend")) then
+    output_ref_trend = diag_script_info@output_ref_trend
+  end if
+  
+; 0.4 Output trend pattern?
   do_pattern = True
   if (isatt(diag_script_info, "do_pattern")) then
     do_pattern = diag_script_info@do_pattern
   end if
   
-; 0.4 Parameters
+; 0.5 Parameters
   load "$diag_scripts/ar6ch3_hiatus/config_datasets.ncl"
 
 ; =========================================================================
@@ -267,24 +277,32 @@ begin
   varList = metadata_att_as_array(input_file_info, "short_name")
   varList := get_unique_values(varList)
   
-  if (all(varList.ne."tas")) then
-    error_msg("f", DIAG_SCRIPT, "", "variable tas is missing.")
-  end if
+;  if (all(varList.ne."tas")) then
+;    error_msg("f", DIAG_SCRIPT, "", "variable tas is missing.")
+;  end if
 
   var = "tas"
-  infoTas = select_metadata_by_name(input_file_info, var)
-  dataset_names_tas = metadata_att_as_array(infoTas, "dataset")
-
+  if (any(var.eq.varList)) then
+    infoTas = select_metadata_by_name(input_file_info, var)
+    dataset_names_tas = metadata_att_as_array(infoTas, "dataset")
+  else
+    infoTas = NewList("fifo")
+  end if
+  
   var = "tasa"
   if (any(var.eq.varList)) then
     infoTasa = select_metadata_by_name(input_file_info, var)
     dataset_names_tasa = metadata_att_as_array(infoTasa, "dataset")
+  else
+    infoTasa = NewList("fifo")
   end if
   
   var = "tasaga"
   if (any(var.eq.varList)) then
     infoTasaga = select_metadata_by_name(input_file_info, var)
     dataset_names_tasaga = metadata_att_as_array(infoTasaga, "dataset")
+  else
+    infoTasaga = NewList("fifo")
   end if
 
   if (do_blend) then
@@ -299,12 +317,18 @@ begin
 
     if (any(varList.eq."sic")) then
       infoSic = select_metadata_by_name(input_file_info, "sic")
+    else
+      infoSic = NewList("fifo")
     end if
     if (any(varList.eq."siconc")) then
       infoSiconc = select_metadata_by_name(input_file_info, "siconc")
+    else
+      infoSiconc = NewList("fifo")
     end if
     if (any(varList.eq."siconca")) then
       infoSiconca = select_metadata_by_name(input_file_info, "siconca")
+    else
+      infoSiconca = NewList("fifo")
     end if
 
     if (all(varList.ne."sftlf") .and. all(varList.ne."sftof")) then
@@ -405,7 +429,33 @@ begin
   end if
 
 ; 1.3 Prepare outputs of GSAT/GMST trends
-  datasets_tmp = get_unique_values(array_append_record(array_append_record(dataset_names_tas, dataset_names_tasa, 0), dataset_names_tasaga, 0))
+  if (isvar("dataset_names_tas")) then
+    dataset_names_tmp = dataset_names_tas
+  end if
+  if (isvar("dataset_names_tasa")) then
+    if (isvar("dataset_names_tmp")) then
+      dataset_names_tmp := array_append_record(dataset_names_tmp, dataset_names_tasa, 0)
+    else
+      dataset_names_tmp = dataset_names_tasa
+    end if
+  end if
+  if (isvar("dataset_names_tasaga")) then
+    if (isvar("dataset_names_tmp")) then
+      dataset_names_tmp := array_append_record(dataset_names_tmp, dataset_names_tasaga, 0)
+    else
+      dataset_names_tmp = dataset_names_tasaga
+    end if
+  end if
+  datasets_tmp = get_unique_values(dataset_names_tmp)
+  delete(dataset_names_tmp)
+  if (.not.output_ref_trend) then
+    idataset_ex = ind(datasets_tmp.ne.masking_dataset_GMST.and.datasets_tmp.ne.masking_dataset_pattern)
+    datasets_tmptmp = datasets_tmp(idataset_ex)
+    delete(datasets_tmp)
+    datasets_tmp = datasets_tmptmp
+    delete(datasets_tmptmp)
+  end if
+    
   infoDummy = True
   opt = True
   opt@unique = "any"
@@ -427,7 +477,7 @@ begin
   delete([/datasets_tmp, infoDummy, opt/])
   GMList = make_GMList(work_dir, do_post, do_maskGlobalmean_post, do_blend, do_mask, \
                        syear_hiatus, eyear_hiatus, syear_post, eyear_post, datasets)
-   
+
 ; ========================================================================
 ;
 ;               Loop for each (historical) SAT/SATa/GMST data
@@ -450,6 +500,11 @@ begin
       SATvar = "tasaga"
     end if
 
+;   Skip masking reference data of output_trend_ref = False
+    if (.not.output_ref_trend .and. any(infoSAT@dataset.eq.(/masking_dataset_GMST, masking_dataset_pattern/))) then
+      continue
+    end if
+    
 ;   Skip if the time segment is rcp/ssp part
     if (any(infoSAT@project.eq.(/"CMIP5", "CMIP6"/)) .and. \
         .not.isStrSubset(infoSAT@exp, "historical")) then 
@@ -573,13 +628,21 @@ begin
                                  (/"project", "dataset", "ensemble", "exp", "end_year"/), opt)
         ICEvar = "sic"
       elseif (infoSAT@project.eq."CMIP6") then
-        infoICE = get_info_match(infoSAT, infoSiconc, \
-                                 (/"project", "dataset", "ensemble", "exp", "end_year"/), opt)
-        ICEvar = "siconc"
-        if (.not.infoICE) then
-          infoICE = get_info_match(infoSAT, infoSiconca, \
+        if (ListCount(infoSiconc).le.0) then
+          infoICE = False
+        else
+          infoICE = get_info_match(infoSAT, infoSiconc, \
                                    (/"project", "dataset", "ensemble", "exp", "end_year"/), opt)
-          ICEvar = "siconca"
+          ICEvar = "siconc"
+        end if
+        if (.not.infoICE) then
+          if (ListCount(infoSiconca).le.0) then
+            infoICE = False
+          else
+            infoICE = get_info_match(infoSAT, infoSiconca, \
+                                     (/"project", "dataset", "ensemble", "exp", "end_year"/), opt)
+            ICEvar = "siconca"
+          end if
         end if
       elseif (any(infoSAT@dataset.eq.reanalyses)) then
         infoICE = get_info_match(infoSAT, infoSic, \

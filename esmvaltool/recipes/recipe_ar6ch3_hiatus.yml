@@ -209,7 +209,6 @@ cmip5_models: &cmip5_models
   #- {dataset: bcc-csm1-1-m, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
   #- {dataset: inmcm4, ensemble: r1i1p1, exp: historical, end_year: 2005} #sic=0 everywhere
   #- {dataset: inmcm4, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
-  - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3, end_year: 2012}
   
 cmip6_siconc_models_gngngn: &cmip6_siconc_models_gngngn # models w/ siconc, all on the same grid
   - {dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1, exp: historical, end_year: 2014}
@@ -337,88 +336,92 @@ cmip6_siconca_models_gngngn: &cmip6_siconca_models_gngngn # models w/ siconca, a
   #- {dataset: GISS-E2-1-G, ensemble: r(5:7)i1p1f2, exp: ssp245, start_year: 2015} #siconca missing until 2049
   - {dataset: GISS-E2-1-G, ensemble: r(8:10)i1p1f2, exp: ssp245, start_year: 2015}
     
-sftlf_all: &sftlf_all
-  #- {project: CMIP5, dataset: ACCESS1-0, ensemble: r0i0p0, exp: historical} #sic=0 everywhere after regridding
-  #- {project: CMIP5, dataset: ACCESS1-3, ensemble: r0i0p0, exp: historical} #sic=0 everywhere after regridding
-  #- {project: CMIP5, dataset: BNU-ESM, ensemble: r0i0p0, exp: historical} #wrong sic longitude data
-  - {project: CMIP5, dataset: CanESM2, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: CCSM4, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: CESM1-BGC, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: CESM1-CAM5, ensemble: r0i0p0, exp: historical} 
-  #- {project: CMIP5, dataset: CESM1-FASTCHEM, ensemble: r0i0p0, exp: historical} #no rcp45 tos, sic
-  #- {project: CMIP5, dataset: CESM1-WACCM, ensemble: r0i0p0, exp: historical} #no data
-  #- {project: CMIP5, dataset: CMCC-CESM, ensemble: r0i0p0, exp: historical} #no rcp45 tos, sic
-  - {project: CMIP5, dataset: CMCC-CM, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: CMCC-CMS, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: CNRM-CM5-2, ensemble: r0i0p0, exp: historical} #no rcp45
-  - {project: CMIP5, dataset: CNRM-CM5, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: CSIRO-Mk3-6-0, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: CSIRO-Mk3L-1-2, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: EC-EARTH, ensemble: r0i0p0, exp: historical} #sic preprocessor failure
-  #- {project: CMIP5, dataset: FGOALS-g2, ensemble: r0i0p0, exp: historical} #sic preprocessor failure
-  - {project: CMIP5, dataset: GFDL-CM2p1, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: GFDL-CM3, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: GFDL-ESM2G, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: GFDL-ESM2M, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: GISS-E2-H, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: GISS-E2-R, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: HadCM3, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: HadGEM2-CC, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: IPSL-CM5A-LR, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: IPSL-CM5A-MR, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: IPSL-CM5B-LR, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: MIROC4h, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: MIROC5, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: MIROC-ESM, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: MIROC-ESM-CHEM, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: MPI-ESM-LR, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: MPI-ESM-MR, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: MPI-ESM-P, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: MRI-CGCM3, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: NorESM1-M, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP5, dataset: NorESM1-ME, ensemble: r0i0p0, exp: historical}
-  #- {project: CMIP5, dataset: bcc-csm1-1, ensemble: r0i0p0, exp: historical}
-  - {project: CMIP6, dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1, grid: gn, exp: historical}
-  #- {project: CMIP6, dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: CESM2, ensemble: r(1:10)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: CMCC-CM2-HR4, ensemble: r1i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr, exp: historical}
-  #- {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, exp: historical} #missing
-  - {project: CMIP6, dataset: CNRM-ESM2-1, ensemble: r(2:5)i1p1f2, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: E3SM-1-1-ECA, ensemble: r1i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: EC-Earth3-Veg, ensemble: r(1:3)i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: FGOALS-g3, ensemble: r(1:6)i1p1f1, grid: gn, exp: historical}
-  #- {project: CMIP6, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, exp: historical}
-  - {project: CMIP6, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, exp: historical}
-  - {project: CMIP6, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1, exp: historical}
-  - {project: CMIP6, dataset: INM-CM5-0, ensemble: r(1:10)i1p1f1, grid: gr1, exp: historical}
-  - {project: CMIP6, dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1, grid: gr, exp: historical}
-  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r(1:4)i1p1f2, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: MIROC6, ensemble: r(1:10)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: NorCPM1, ensemble: r(1:30)i1p1f1, grid: gn, exp: historical}
-  #- {project: CMIP6, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: NorESM2-LM, ensemble: r(2:3)i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: NorESM2-MM, ensemble: r(2:3)i1p1f1, grid: gn, exp: historical}
-  #- {project: CMIP6, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, exp: historical}
-  - {project: CMIP6, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn, exp: historical}
+sftlf_cmip5: &sftlf_cmip5
+  #- {dataset: ACCESS1-0} #sic=0 everywhere after regridding
+  #- {dataset: ACCESS1-3} #sic=0 everywhere after regridding
+  #- {dataset: BNU-ESM} #wrong sic longitude data
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-BGC}
+  - {dataset: CESM1-CAM5} 
+  #- {dataset: CESM1-FASTCHEM} #no rcp45 tos, sic
+  #- {dataset: CESM1-WACCM} #no data
+  #- {dataset: CMCC-CESM} #no rcp45 tos, sic
+  - {dataset: CMCC-CM}
+  - {dataset: CMCC-CMS}
+  #- {dataset: CNRM-CM5-2} #no rcp45
+  - {dataset: CNRM-CM5}
+  - {dataset: CSIRO-Mk3-6-0}
+  - {dataset: CSIRO-Mk3L-1-2}
+  #- {dataset: EC-EARTH} #sic preprocessor failure
+  #- {dataset: FGOALS-g2} #sic preprocessor failure
+  - {dataset: GFDL-CM2p1}
+  - {dataset: GFDL-CM3}
+  - {dataset: GFDL-ESM2G}
+  - {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H}
+  - {dataset: GISS-E2-R}
+  - {dataset: HadCM3}
+  - {dataset: HadGEM2-CC}
+  - {dataset: HadGEM2-ES}
+  - {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: IPSL-CM5B-LR}
+  #- {dataset: MIROC4h}
+  #- {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MPI-ESM-LR}
+  - {dataset: MPI-ESM-MR}
+  #- {dataset: MPI-ESM-P}
+  #- {dataset: MRI-CGCM3}
+  - {dataset: NorESM1-M}
+  - {dataset: NorESM1-ME}
+  #- {dataset: bcc-csm1-1}
 
-sftof_all: &sftof_all
-#  - {project: CMIP5, dataset: CanCM4, ensemble: r0i0p0, exp: historical}
-#  - {project: CMIP5, dataset: MRI-ESM1, ensemble: r0i0p0, exp: historical}
+sftlf_cmip6: &sftlf_cmip6
+  - {dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1, grid: gn}
+  - {dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1, grid: gn}
+#  - {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1, grid: gn}
+  - {dataset: CESM2, ensemble: r(1:10)i1p1f1, grid: gn}
+  - {dataset: CMCC-CM2-HR4, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
+  - {dataset: CNRM-ESM2-1, ensemble: r(2:5)i1p1f2, grid: gr}
+  - {dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn}
+  - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
+  - {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, grid: gr}
+  - {dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr}
+  - {dataset: E3SM-1-1-ECA, ensemble: r1i1p1f1, grid: gr}
+  - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  - {dataset: EC-Earth3-Veg, ensemble: r(1:3)i1p1f1, grid: gr}
+  - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1, grid: gr}
+  #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  - {dataset: FGOALS-g3, ensemble: r(1:6)i1p1f1, grid: gn}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, exp: piControl}
+  #- {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: INM-CM5-0, ensemble: r(1:10)i1p1f1, grid: gr1}
+  - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1, grid: gr}
+  - {dataset: MIROC-ES2L, ensemble: r(1:4)i1p1f2, grid: gn}
+  - {dataset: MIROC6, ensemble: r(1:10)i1p1f1, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
+  - {dataset: NorCPM1, ensemble: r(1:30)i1p1f1, grid: gn}
+  #- {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: NorESM2-LM, ensemble: r(2:3)i1p1f1, grid: gn}
+  - {dataset: NorESM2-MM, ensemble: r(2:3)i1p1f1, grid: gn}
+  #- {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+
+sftof_cmip5: &sftof_cmip5
+#  - {dataset: CanCM4}
+#  - {dataset: MRI-ESM1}
       
 tasa_datasets: &tasa_datasets
   - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
@@ -756,23 +759,25 @@ preprocessors:
 
 diagnostics:
 
-  trend_hiatus_posthiatus_5x5:
+  trend_hiatus_posthiatus_5x5_cmip5:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
     variables: 
-      sftlf: &sftlf_setting
+      sftlf_cmip5: &sftlf_setting
+        short_name: sftlf
+        project: CMIP5
+        exp: historical
+        ensemble: r0i0p0
         preprocessor: regrid5x5
         mip: fx
         start_year: 1961
         end_year: 2005
-        additional_datasets: *sftlf_all
-
+        additional_datasets: *sftlf_cmip5
 #      sftof: &sftof_setting # No file works
 #        preprocessor: regrid5x5
 #        mip: fx
 #        start_year: 1961
 #        end_year: 2005
 #        additional_datasets: *sftof_all
-        
       tas_cmip5: &tas_setting
         short_name: tas
         project: CMIP5
@@ -782,44 +787,12 @@ diagnostics:
         end_year: 2026
         preprocessor: regrid5x5
         additional_datasets: *cmip5_models
-
       tas_hadgem2_es_rcp45:
         <<: *tas_setting
         additional_datasets:
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r1i1p1, exp: rcp45, start_year: 2005}
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r(2:3)i1p1, exp: rcp45, start_year: 2006}
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r4i1p1, exp: rcp45, start_year: 2005}
-          
-      tas_cmip6_siconc_gngngn:
-        <<: *tas_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_gngngn
-
-      tas_cmip6_siconc_gngngr:
-        <<: *tas_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_gngngr
-        
-      tas_cmip6_siconc_grgngn:
-        <<: *tas_setting
-        project: CMIP6
-        grid: gr
-        additional_datasets: *cmip6_siconc_models_grgngn
-
-      tas_cmip6_siconc_gr1gngn:
-        <<: *tas_setting
-        project: CMIP6
-        grid: gr1
-        additional_datasets: *cmip6_siconc_models_gr1gngn
-        
-      tas_cmip6_siconca_gngngn:
-        <<: *tas_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconca_models_gngngn
-        
       tos_cmip5: &tos_setting
         short_name: tos
         project: CMIP5
@@ -829,43 +802,11 @@ diagnostics:
         start_year: 1961
         end_year: 2026
         additional_datasets: *cmip5_models
-
       tos_hadgem2_es_rcp45:
         <<: *tos_setting
         additional_datasets:
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r(2:4)i1p1, exp: rcp45, start_year: 2005}
-
-      tos_cmip6_siconc_gngngn:
-        <<: *tos_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_gngngn
-
-      tos_cmip6_siconc_gngngr:
-        <<: *tos_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_gngngr
-        
-      tos_cmip6_siconc_grgngn:
-        <<: *tos_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_grgngn
-
-      tos_cmip6_siconc_gr1gngn:
-        <<: *tos_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_gr1gngn
-        
-      tos_cmip6_siconca_gngngn:
-        <<: *tos_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconca_models_gngngn
-        
       sic: &sic_setting
         short_name: sic
         project: CMIP5
@@ -875,67 +816,20 @@ diagnostics:
         start_year: 1998
         end_year: 2026
         additional_datasets: *cmip5_models
-
       sic_hadgem2_es_rcp45:
         <<: *sic_setting
         additional_datasets:
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
           - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r(2:4)i1p1, exp: rcp45, start_year: 2005}
-
-      siconc_gngngn: &siconc_setting
-        short_name: siconc
-        project: CMIP6
-        preprocessor: regrid5x5
-        mip: SImon
-        frequency: mon
-        grid: gn
-        start_year: 1998
-        end_year: 2026
-        additional_datasets: *cmip6_siconc_models_gngngn
-
-      siconc_gngngr:
-        <<: *siconc_setting
-        grid: gr
-        additional_datasets: *cmip6_siconc_models_gngngr        
-
-      siconc_grgngn:
-        <<: *siconc_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_grgngn
-
-      siconc_gr1gngn:
-        <<: *siconc_setting
-        project: CMIP6
-        grid: gn
-        additional_datasets: *cmip6_siconc_models_gr1gngn
-
-      siconca_gngngn: &siconca_setting
-        short_name: siconca
-        project: CMIP6
-        preprocessor: regrid5x5
-        mip: SImon
-        frequency: mon
-        grid: gn
-        start_year: 1998
-        end_year: 2026
-        additional_datasets: *cmip6_siconca_models_gngngn
-
-      tasa: &tasa_setting
+      tasa_obs: &tasa_setting
+        short_name: tasa
         preprocessor: regrid5x5
         mip: Amon
         frequency: mon
         start_year: 1961
         end_year: 2012
-        additional_datasets: *tasa_datasets 
-
-      tasaga: &tasaga_setting
-        mip: Amon
-        frequency: mon
-        start_year: 1998
-        end_year: 2012
-        additional_datasets: *tasaga_datasets
-
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}          
     scripts:
       trendHiatusPosthiatus_refHadCRUT5: &trend_settings
         script: ar6ch3_hiatus/trend.ncl
@@ -947,43 +841,240 @@ diagnostics:
         syear_post: 2012
         eyear_post: 2026
         method_trend: least_square
+        output_ref_trend: False
+        
+  trend_hiatus_posthiatus_5x5_cmip6_samegrid:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+      tas_cmip6_siconc_gngngn:
+        <<: *tas_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_gngngn
+      tos_cmip6_siconc_gngngn:
+        <<: *tos_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_gngngn
+      siconc_gngngn: &siconc_setting
+        short_name: siconc
+        project: CMIP6
+        preprocessor: regrid5x5
+        mip: SImon
+        frequency: mon
+        grid: gn
+        start_year: 1998
+        end_year: 2026
+        additional_datasets: *cmip6_siconc_models_gngngn
+      tasa_obs:
+        <<: *tasa_setting
+    scripts:
+      trendHiatusPosthiatus_refHadCRUT5:
+        <<: *trend_settings
+
+  trend_hiatus_posthiatus_5x5_cmip6_gngngr:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+      tas_cmip6_siconc_gngngr:
+        <<: *tas_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_gngngr
+      tos_cmip6_siconc_gngngr:
+        <<: *tos_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_gngngr
+      siconc_gngngr:
+        <<: *siconc_setting
+        grid: gr
+        additional_datasets: *cmip6_siconc_models_gngngr
+      tasa_obs:
+        <<: *tasa_setting
+    scripts:
+      trendHiatusPosthiatus_refHadCRUT5:
+        <<: *trend_settings
+
+  trend_hiatus_posthiatus_5x5_cmip6_grgngn:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+      tas_cmip6_siconc_grgngn:
+        <<: *tas_setting
+        project: CMIP6
+        grid: gr
+        additional_datasets: *cmip6_siconc_models_grgngn
+      tos_cmip6_siconc_grgngn:
+        <<: *tos_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_grgngn
+      siconc_grgngn:
+        <<: *siconc_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_grgngn
+      tasa_obs:
+        <<: *tasa_setting
+    scripts:
+      trendHiatusPosthiatus_refHadCRUT5:
+        <<: *trend_settings
+
+  trend_hiatus_posthiatus_5x5_cmip6_gr1gngn:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    variables:
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+      tas_cmip6_siconc_gr1gngn:
+        <<: *tas_setting
+        project: CMIP6
+        grid: gr1
+        additional_datasets: *cmip6_siconc_models_gr1gngn
+      tos_cmip6_siconc_gr1gngn:
+        <<: *tos_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_gr1gngn
+      siconc_gr1gngn:
+        <<: *siconc_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_gr1gngn
+      tasa_obs:
+        <<: *tasa_setting
+    scripts:
+      trendHiatusPosthiatus_refHadCRUT5:
+        <<: *trend_settings
+
+  trend_hiatus_posthiatus_5x5_cmip6_siconca_samegrid:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+      tas_cmip6_siconca_gngngn:
+        <<: *tas_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconca_models_gngngn
+      tos_cmip6_siconca_gngngn:
+        <<: *tos_setting
+        project: CMIP6
+        grid: gn
+        additional_datasets: *cmip6_siconca_models_gngngn
+      siconca_gngngn: &siconca_setting
+        short_name: siconca
+        project: CMIP6
+        preprocessor: regrid5x5
+        mip: SImon
+        frequency: mon
+        grid: gn
+        start_year: 1998
+        end_year: 2026
+        additional_datasets: *cmip6_siconca_models_gngngn
+      tasa_obs:
+        <<: *tasa_setting
+    scripts:
+      trendHiatusPosthiatus_refHadCRUT5:
+        <<: *trend_settings
+
+  trend_hiatus_posthiatus_5x5_obs:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    variables: 
+      sftlf_cmip5:
+        <<: *sftlf_setting
+#      sftof_cmip5:
+#        <<: *sftof_setting
+      tas_cmip5:
+        <<: *tas_setting
+        additional_datasets:
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3, end_year: 2012}          
+      tos_cmip5:
+        <<: *tos_setting
+        additional_datasets:
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3, end_year: 2012}
+      sic:
+        <<: *sic_setting
+        additional_datasets:
+          - {dataset: ERA5, project: OBS, type: reanaly, version: 1, tier: 3, end_year: 2012}
+      tasa:
+        <<: *tasa_setting
+        additional_datasets: *tasa_datasets 
+      tasaga: &tasaga_setting
+        mip: Amon
+        frequency: mon
+        start_year: 1998
+        end_year: 2012
+        additional_datasets: *tasaga_datasets
+    scripts:
+      trendHiatusPosthiatus_refHadCRUT5:
+        <<: *trend_settings
+        output_ref_trend: True
+        
+  trend_hiatus_posthiatus_5x5:
+    description: Calculate trend composite and plot a figure
+    scripts:
       composite_refHadCRUT5_HadCRUT5mean: &composite_settings
         script: ar6ch3_hiatus/composite.ncl
         blend_globalmean: True
         mask_globalmean: True
         blend_pattern: True
         mask_pattern: True
-        composite_threshold: HadCRUT5mean
+        composite_threshold: HadCRUT5_mean
         composite_dataset: cmip6
-        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5']
+        ancestors: ['trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refHadCRUT5']
       plot_refHadCRUT5_HadCRUT5mean: &plot_settings
         script: ar6ch3_hiatus/draw.ncl
         obs_dataset_pattern: HadCRUT5_mean
-        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5',
+        ancestors: ['trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refHadCRUT5',
                     'trend_hiatus_posthiatus_5x5/composite_refHadCRUT5_HadCRUT5mean']
 
 # Following part is unrelated to the figure, but to make a table that support the text.
 # Will take very long time.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
-        
-      trendHiatusPosthiatus_refKadow:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: Kadow
-        do_post: False
-        do_pattern: False
-        
-      trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
-        <<: *trend_settings
-        method_GMST: NOAAGlobalTemp
-        mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
+#        
+#      trendHiatusPosthiatus_refKadow:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: Kadow
+#        do_post: False
+#        do_pattern: False
+#        
+#      trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
+#        <<: *trend_settings
+#        method_GMST: NOAAGlobalTemp
+#        mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
+#        do_post: False
+#        do_pattern: False
         
 #  trend_hiatus_posthiatus_2x2:
 #    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 2x2 observations
