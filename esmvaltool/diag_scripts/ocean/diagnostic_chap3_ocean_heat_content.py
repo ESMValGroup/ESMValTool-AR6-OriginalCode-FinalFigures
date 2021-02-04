@@ -488,16 +488,16 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                    '0-700': LHS_xlim,
                    '7-20': LHS_xlim,
                    '2plus': LHS_xlim }
-        no_ticks= {'full': True,
+        no_ticks= {'full': False,
                '0-700': True,
                '7-20': True,
                '2plus': False,}
-        axes_texts ={'full': 'Full-depth',
-               '0-700': '0-700m',
+        axes_texts ={'full': 'Full depth',
+               '0-700': '0m - 700m',
                '7-20': '700m - 2000m',
                '2plus':  '> 2000m',}
-        fig.set_size_inches(6 , 5)
-        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 1], wspace=0.06)
+        fig.set_size_inches(8 , 5)
+        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1.5, 1.], wspace=0.16)
         gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
         #scatters
         axes['full'] = fig.add_subplot(gs[0,0]) # LHS
@@ -4737,7 +4737,7 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = 0 #True 
+    do_SLR = 0 #True
     do_OHC =  True  #True
     do_SS =  True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
