@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210204 kosaka_yu: updated for the new recipe structure
 ;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim.
 ;    20200924 kosaka_yu: revised figure details.
 ;    20200917 kosaka_yu: revised figure details.
@@ -338,7 +339,7 @@ begin
   if (isatt(TstrendCMIPHiatus, "nmembers_CMIP6")) then
     nmembers_composite_cmip6 = TstrendCMIPHiatus@nmembers_CMIP6
   end if
-  if (isatt(TstrendCMIPHiatus, "nmembers_CMI56")) then
+  if (isatt(TstrendCMIPHiatus, "nmembers_CMIP5")) then
     nmembers_composite_cmip5 = TstrendCMIPHiatus@nmembers_CMIP5
   end if
   composite_member_names = str_left_strip(str_split(TstrendCMIPHiatus@dataset, ","))
@@ -347,9 +348,17 @@ begin
 
     filename = str_get_field(files(ii), str_fields_count(files(ii), "/"), "/")
     if (filename.eq. "trend"+GST+"_"+masking+"_CMIP5.txt") then
-      GMSTtrendCMIP5 = read_GMtrend_as_list(files(ii))
+      if (isvar("ifileCMIP5")) then
+        ifileCMIP5 := array_append_record(ifileCMIP5, files(ii), 0)
+      else
+        ifileCMIP5 = files(ii)
+      end if
     elseif (filename.eq. "trend"+GST+"_"+masking+"_CMIP6.txt") then
-      GMSTtrendCMIP6 = read_GMtrend_as_list(files(ii))
+      if (isvar("ifileCMIP6")) then
+        ifileCMIP6 := array_append_record(ifileCMIP6, files(ii), 0)
+      else
+        ifileCMIP6 = files(ii)
+      end if
     elseif ((isStrSubset(filename, "trendGMST_").or.isStrSubset(filename, "trendGSAT_")) \
             .and.isStrSubset(filename, "_OBS.txt")) then
       tmp = read_GMtrend_as_list(files(ii))
@@ -392,7 +401,10 @@ begin
     end if
     delete(filename)
   end do
-
+  GMSTtrendCMIP5 = read_GMtrend_as_list(ifileCMIP5)
+  GMSTtrendCMIP6 = read_GMtrend_as_list(ifileCMIP6)
+  delete([/ifileCMIP5, ifileCMIP6/])
+  
   cmip5_member_names = "CMIP5 "+metadata_att_as_array(GMSTtrendCMIP5, "dataset") \
                        +" "+metadata_att_as_array(GMSTtrendCMIP5, "ensemble")
   cmip6_member_names = "CMIP6 "+metadata_att_as_array(GMSTtrendCMIP6, "dataset") \
