@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210204 kosaka_yu: minor revision on figure format
 ;    20210130 kosaka_yu: minor revision on figure format
 ;    20200907 kosaka_yu: refined the details of figure
 ;    20200905 kosaka_yu: revised for consistency with CLIVAR ENSO metric package
@@ -520,14 +521,24 @@ begin
   lres@gsLineOpacityF = 1.
   lres@gsLineColor := "grey50"
   do i = 0, 8
-    dummy(idummy) = gsn_add_polyline(wks, ts_plots(0), (/-23.5+12.*i, -23.5+12*i/), \
+    dummy(idummy) = gsn_add_polyline(wks, ts_plots(0), (/-23.5+12.*i, -23.5+12.*i/), \
                                      (/rests@trYMinF, rests@trYMaxF/), lres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_polyline(wks, ts_plots(1), (/-23.5+12.*i, -23.5+12*i/), \
+    dummy(idummy) = gsn_add_polyline(wks, ts_plots(1), (/-23.5+12.*i, -23.5+12.*i/), \
                                      (/rests@trYMinF, rests@trYMaxF/), lres)
     idummy = idummy + 1
   end do
-
+  
+  lres@gsFillColor := "grey50"
+  lres@gsFillOpacityF = 0.15
+  dummy(idummy) = gsn_add_polygon(wks, ts_plots(0), (/11.55, 12.45, 12.45, 11.55/), \
+                                  (/rests@trYMinF, rests@trYMinF, rests@trYMaxF, rests@trYMaxF/), lres)
+  idummy = idummy + 1
+  dummy(idummy) = gsn_add_polygon(wks, ts_plots(1), (/11.55, 12.45, 12.45, 11.55/), \
+                                  (/rests@trYMinF, rests@trYMinF, rests@trYMaxF, rests@trYMaxF/), lres)
+  idummy = idummy + 1
+  delete(lres)
+  
   rests@xyDashPattern = 0
   rests@xyLineThicknessF = 0.25
   res = True
