@@ -63,9 +63,12 @@ try:
 except:
     print('Unable to load gsw.\n You need to install it in your conda environmetn with:\npip install gsw')
 
+#         box_colours =  {'GHG': [178,178,178], 'NAT':[0,79,0], 'AER':[0,52,102], 'HIST':[196,121,0]}
+
 CMIP5_blue = '#2551cc'
 CMIP6_red = '#cc2323'
 histnat_green= '#004F00' # 0,79,0
+historical_beige = '#c47900' #  
 
 model_type = {
     'EOS80': [], # The default
@@ -2524,7 +2527,9 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         plt.sca(ax) # set current axes
 
     count = 0
-    colours = {'observations':'black', 'historical': CMIP6_red, 'hist-nat': histnat_green}
+    # colours = {'observations':'black', 'historical': CMIP6_red, 'hist-nat': histnat_green}
+    colours = {'observations':'black', 'historical': historical_beige, 'hist-nat': histnat_green}
+
     labels = []
     max_value = 0.
     for dataset, exp, ensemble in itertools.product(datasets, exps, ensembles):
@@ -3405,6 +3410,10 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
                     )
 
         return output_ohc_fn
+    else:
+       print('these files should exist now')
+#       return None
+#       assert 0
 
     # Load netcdf files
     thetao_cube = iris.load_cube(thetao_fn)
@@ -3442,8 +3451,8 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
         print('Temperature file:', thetao_fn)
         print('Salinity file:', so_fn)
         print(dataset, thetao_cube.shape, 'so:', so_cube.shape, vol_cube.shape, depths.shape)
-        # l_cube = extract_time_range(thetao_cube
-        return None
+        vol_cube = vol_cube.collapsed([vol_cube.coord('time'),], iris.analysis.MEAN)
+
     # 2D!
     print(dataset, thetao_cube.shape, 'so:', so_cube.shape, vol_cube.shape, depths.shape)
     for z in np.arange(thetao_cube.data.shape[1]):
@@ -4031,6 +4040,7 @@ def sea_surface_salinity_plot(
         subplot=111,
         fig_type = 'mean',
         ref_file = None,
+        ref_file_2 = None,
         obs_key='DW1970',
         calc_trend = True
     ):
@@ -4052,11 +4062,17 @@ def sea_surface_salinity_plot(
         ref_cube = iris.load_cube(ref_file)
         ref_cube = ref_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
 
-    thresholds =[33., 33.5, 34., 34.5, 35., 35.5, 36., 36.5, 37.]
-    levels =[33., 34., 35., 36., 37.]
+    if ref_file_2 not in [None, (None,)]:
+        print('loading ref file:', fig_type, obs_key, ref_file_2)
+        ref_cube_2 = iris.load_cube(ref_file_2)
+        ref_cube_2 = ref_cube_2.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+
+
+    thresholds =[32., 32.5, 33., 33.5, 34., 34.5, 35., 35.5, 36., 36.5, 37., 37.5, ]
+    levels =[32., 33., 34., 35., 36., 37.]
     linestyles = ['-' for thres in thresholds]
     colours = ['k' for thres in thresholds]
-    linewidths = [1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5, 1.,]
+    linewidths = [1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5,]
 
     if calc_trend:
         thresholds_white = np.arange(-2, 2.25, 0.25)
@@ -4078,13 +4094,13 @@ def sea_surface_salinity_plot(
 
     obs_cubes = iris.load_raw(obs_file)
     obs_change_cube = obs_cubes.extract(iris.Constraint(name='salinity_change'))[0]
-    obs_change_cube = regrid_to_1x1(obs_change_cube[0]) # surface
-    obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+    #bs_change_cube = regrid_to_1x1(obs_change_cube[0]) # surface
+    obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))[0]
     obs_change_cube.coord('longitude').attributes['circular'] = True
 
     obs_mean_cube = obs_cubes.extract(iris.Constraint(name='salinity_mean'))[0]
-    obs_mean_cube = regrid_to_1x1(obs_mean_cube[0]) # surface
-    obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+    #bs_mean_cube = regrid_to_1x1(obs_mean_cube[0]) # surface
+    obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))[0]
     obs_mean_cube.coord('longitude').attributes['circular'] = True
 
     if obs_change_cube.data.ndim == 3:
@@ -4092,18 +4108,29 @@ def sea_surface_salinity_plot(
     if obs_mean_cube.data.ndim == 3:
         obs_mean_cube = obs_mean_cube[0]
 
+    # Set black contour cube:
+    black_con_cube = obs_mean_cube
+    if ref_file_2 not in [None, (None,)]:
+        black_con_cube = ref_cube_2
+
     if calc_trend:
         obs_change_cube.data = (obs_change_cube.data/obs_denom)*1000.
         print('calc_trend:', obs_change_cube.data.min(), obs_change_cube.data.max())
 
+    #change_nspace_50 =  np.linspace(-11.5, 11.5, 24) 
+    #change_nspace_70 =  np.linspace(-13, 13 , 16, endpoint=True)
+    change_nspace_50 =  np.linspace(-11., 11., 12)
+    change_nspace_70 =  np.linspace(-11., 11., 12)
+ 
     if fig_type=='obs_change': # pane a (221, 211, also white contours)
         cube = obs_change_cube
         #nspace = np.linspace(-0.2, 0.2 , 22, endpoint=True)
         if obs_key=='DW1950':
-            nspace = np.linspace(-10, 10 , 16, endpoint=True)
+            nspace = change_nspace_50
         if obs_key=='DW1970':
-            nspace = np.linspace(-13, 13 , 16, endpoint=True)
-
+            nspace = change_nspace_70
+        print(obs_key, nspace, cube.data.min(), cube.data.max())
+        #assert 0
         cmap=diagtools.misc_div
         label= obs_key+' trend ('+obs_time_str+')'
 
@@ -4132,9 +4159,9 @@ def sea_surface_salinity_plot(
         denom = 1000./(time_range[1]-time_range[0] +1.)
         cube.data = cube.data * denom
         if obs_key=='DW1950':
-            nspace = np.linspace(-10, 10 , 16, endpoint=True)
+            nspace = change_nspace_50
         if obs_key=='DW1970':
-            nspace = np.linspace(-13, 13 , 16, endpoint=True)
+            nspace = change_nspace_70
         cmap=diagtools.misc_div
         label= 'CMIP6 trend ('+time_range_str+')'
     else:
@@ -4163,6 +4190,10 @@ def sea_surface_salinity_plot(
     #    cmap=diagtools.misc_div
     #    plot_max = np.max([cube.data.max(), np.abs(cube.data.min())])
     #    nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
+    clip = True
+    if clip:
+        cube.data = np.ma.clip(cube.data, nspace.min(), nspace.max())
+
     print(fig_type, subplot, cube.data.shape, )
     qplot = iris.plot.contourf(
         cube,
@@ -4177,7 +4208,7 @@ def sea_surface_salinity_plot(
 
     black_contours = True
     if black_contours:
-        black_con = iris.plot.contour(obs_mean_cube,
+        black_con = iris.plot.contour(black_con_cube,
                  thresholds,
                  colors=colours,
                  linewidths=linewidths,
@@ -4260,7 +4291,8 @@ def sea_surface_salinity_multipane(
     qplots = {}
     for subplot, fig_type in zip(subplots, fig_types):
         axes[subplot] = fig.add_subplot(subplot, projection=proj)
-        ref_file = None,
+        ref_file = None
+        ref_file_2 = None
         if fig_type in ['obs_change', 'obs_mean']:
             fn = None
         if fig_type in ['model-obs', 'model-mean']:
@@ -4269,6 +4301,8 @@ def sea_surface_salinity_multipane(
         if fig_type in ['model_change',]:
             fn = ss_files[end_year]
             ref_file = ss_files[start_year]
+            ref_file_2 = ss_files[(start_year, end_year)]
+
             if ref_file is None:
                 print('cant find:', ref_file)
                 assert 0
@@ -4285,6 +4319,7 @@ def sea_surface_salinity_multipane(
                 subplot=subplot,
                 obs_key=obs_key,
                 ref_file=ref_file,
+                ref_file_2 = ref_file_2
            )
 
     if plot_type == '2_pane':
@@ -4307,7 +4342,8 @@ def sea_surface_salinity_multipane(
 
     if plot_type == 'trends_only':
         fig.suptitle('Sea Surface Salinity trends '+obs_key)
-        fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='mPSS-78/yr') #, ticks=cbar_ticks)
+        cbar_ticks = np.linspace(-10., 10., 11, )
+        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='mPSS-78/yr', ticks=cbar_ticks)
 
 
 
@@ -4737,9 +4773,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = 0 #True
-    do_OHC =  True  #True
-    do_SS =  True
+    do_SLR = True
+    do_OHC = 0 # True  #True
+    do_SS =  0 #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -4814,8 +4850,8 @@ def main(cfg):
         #    fig_type = 'trend',
         #    ref_file=ss_files[1950]
         #)
-
-        for plot_type,start_year in itertools.product(['trends_only', '2_pane', '4_pane', 'CMIP_only'], [1950, 1970]):
+        plot_types = ['trends_only',] # '2_pane', '4_pane', 'CMIP_only']
+        for plot_type,start_year in itertools.product(plot_types, [1950, 1970]):
             if start_year == 1950:
                 obs_key='DW1950'
             if start_year == 1970:
@@ -5149,6 +5185,7 @@ def main(cfg):
             so_fn = detrended_ncs[(project, dataset, exp, ensemble, 'so')]
             print('detrending_method:', detrending_method, so_fn)
             ohc_fn = calc_ohc_full(cfg, metadatas, detrended_fn, so_fn, volcello_fn, trend='detrended')
+            print('Finished calc_ohc_full calc',ohc_fn) 
             if ohc_fn is None: continue
         else:
             assert 0
@@ -5165,7 +5202,9 @@ def main(cfg):
 
         metadatas[ohc_fn] = metadatas[detrended_fn].copy()
 
+    do_volume_integrated_plot = False
     for (project, dataset, exp, ensemble, keya, keyb), ohc_fn in ocean_heat_content.items():
+        if not do_volume_integrated_plot: continue
         areacello_fn = guess_areacello_fn(file_dict, [project, dataset, 'areacello'])
         volume_integrated_plot(cfg, metadatas[ohc_fn], ohc_fn, areacello_fn)
 
@@ -5196,7 +5235,9 @@ def main(cfg):
 
     # OHC detrending TS:
     print('\n----------------------\nplotting detrending figure. ')
+    do_detrending_fig = False 
     for dataset, ensemble, project, depth_range  in itertools.product(datasets.keys(), ensembles.keys(), projects.keys(), depth_ranges):
+        if not do_detrending_fig: continue
         for index in ocean_heat_content_timeseries.keys():
             if dataset not in index: continue
             if depth_range not in index: continue
@@ -5226,7 +5267,9 @@ def main(cfg):
     # Multi model time series plotx for each time series
     # Figure based on 2.25.
     #
+    do_fig_like225 = False 
     for dataset, ensemble, project, exp in itertools.product(datasets.keys(), ensembles.keys(), projects.keys(), exps.keys()):
+        if not do_fig_like225: continue
         try:
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, 'ohc', 'detrended', 'total')]
         except: continue
