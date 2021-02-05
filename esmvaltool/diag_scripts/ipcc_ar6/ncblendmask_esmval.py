@@ -2,12 +2,28 @@ import sys, numpy, scipy.stats, math
 import netCDF4
 # Following two functions for blending and masking modified from Cowtan 2015.
 # Calculate blended temperatures using general methods
-# Usage:
-#  python ncblendmask.py <mode> tas.nc tos.nc sic.nc sftof.nc [Had4.nc] > blend.temp
-#  <mode> is one of xxx, mxx, xax, max, xxf, mxf, xaf, maf
-#  see README for more details
-# Nathan Gillett - Adapted from ncblendmask-nc4.py from Cowtan 2015
+# Source of original Cowtan code:
 # http://www-users.york.ac.uk//~kdc3/papers/robust2015/methods.html
+# Usage:
+#  python ncblendmask.py <mode> tas.nc tos.nc sic.nc sftlf.nc obs.nc dec_warming obs_dec_warming ann_warming gmst_comp_warming diag_name obs ensobs ensobs_diag ensobs_dec_warming
+#  <mode> is one of xxx, mxx, xax, max, xxf, mxf, xaf, maf
+# max means use masking of anomalies, with time-varying sea ice. See Cowtan website for more details.
+# tas.nc. tos.nc, sic.nc, sftlf.nc and obs.nc are names of NetCDF files containing tas, tos, siconc, sftlf from the simulation.
+# obs.nc is the name of the observations NetCDF file (the median if using an ensemble obs dataset).
+# dec_warming is 2010-2019 warming in GSAT from the model.
+# obs_dec_warming is 2010-2019 warming in GMST from the obs.
+# ann_warming is a timeseries of annual mean GSAT from the model.
+# gmst_comp_warming is 2010-2019 warming globally-complete GMST from the model.
+# diag_name is an input diagnostic name e.g. gmst05, hemi10, where the last two digits are the averaging period.
+# obs indicates which obs dataset is being used had5/had4 etc.
+# ensobs is the partial filename of ensemble obs dataset, if ensemble data is used, otherwise empty string.
+# ensobs_diag is the diabnostic requested for each of the ensemble members of an ensemble obs dataset.
+# ensobs_dec_warming is 2010-2019 warming in GMST for each for each of the ensemble members of obs dataset.
+#Outputs
+# diag is the requested diagnostic (e.g. gmst05) for the model.
+# obs_diag is the requested dignostic (e.g. gmst05) for the obs.
+
+## Nathan Gillett - Adapted from ncblendmask-nc4.py from Cowtan 2015
 
 # cell areas, used for calculating area weighted averages
 def areas( grid ):
@@ -17,7 +33,6 @@ def areas( grid ):
                   math.sin(math.radians(180.0*(i  )/grid-90.0)) ) /
                 math.sin(math.radians(180.0/grid)) )
   return area
-
 
 def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,dec_warming,obs_dec_warming,ann_warming,gmst_comp_warming,diag_name,obs='had4',ensobs='',ensobs_diag=[],ensobs_dec_warming=[]):
 # MAIN PROGRAM
@@ -31,8 +46,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
   nc = netCDF4.Dataset(tas_file, "r")
   lats1 = nc.variables["lat"][:]
   lons1 = nc.variables["lon"][:]
-#  year=nc.variables["year"][:]
-#  y0=year[0]#NPG - Added since existing y0 definition below did not work on ESMValTool preprocessed files.
   y0=1850 #Assume 1850 start time.
   tas = numpy.ma.filled(nc.variables["tas"][:,:,:],-1.0e30)
   nc.close()
@@ -42,8 +55,13 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
   lats2 = nc.variables["lat"][:]
   lons2 = nc.variables["lon"][:]
   tos = numpy.ma.filled(nc.variables["tos"][:,:,:],-1.0e30)
-#  y0 = int(nc.variables["time"][:][0]/10000)
   nc.close()
+
+#Added to correct GISS-E2-1-G data - ssp245-nat is labelled as C but is in K.
+#Convert values in K to C.
+  if numpy.amax(tos) - numpy.amin(tos[tos > -1e29]) > 100:
+    tos[tos > 100] = tos[tos > 100] - 273.15
+    print ('**** Fixing units in ',tos_file)
 
   # read sic.nc
   nc = netCDF4.Dataset(sic_file, "r")
@@ -56,14 +74,12 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
     sic = numpy.ma.filled(nc.variables["siconc"][:,:,:],-1.0e30)  
     nc.close()
 
-  # read sftlf.nc (NPG - Changed from sftof, because of better data availability for sftlf).
+  # read sftlf.nc 
   nc = netCDF4.Dataset(sftlf_file, "r")
   lats4 = nc.variables["lat"][:]
   lons4 = nc.variables["lon"][:]
   sftof = 1-numpy.ma.filled(nc.variables["sftlf"][:,:],-1.0e30) #NPG - added '1-' to use lf.
   nc.close()
-
-
 
   if 'm' in options:
     # read HadCRUT4 data as mask
@@ -73,7 +89,7 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
     if obs=='had5':
         enssize=200
         obs_tas = nc.variables["tas_median"][:,:,:]
-    #Make it work with HadCRUT5 - repeat last year in obs_tas
+    #Make it work with HadCRUT5 - repeat last year in obs_tas, as noted in Gillett et al.
         obs_tas=numpy.concatenate((obs_tas,obs_tas[2016:2028,:,:]))
     else:
         enssize=100
@@ -91,14 +107,11 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
     lons5=lons5[regrid_index]
     obs_tas=obs_tas[:,:,regrid_index]
     cvgmsk=cvgmsk[:,:,regrid_index]
-    #Print missing value fraction
-    print('Missing value frction',1.0*numpy.count_nonzero(cvgmsk<-100.)/numpy.size(cvgmsk),file=sys.stderr)
 
   sic = sic[0:tas.shape[0],:,:]
 
   # dates
   dates = (numpy.arange(tas.shape[0])+0.5)/12.0 + y0
-  print (dates,file=sys.stderr)
 
   # force missing cells to be open water/land and scale if stored as percentage
   sic[sic<  0.0] = 0.0
@@ -108,11 +121,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
   sftof[sftof<  0.0] = 0.0
   sftof[sftof>100.0] = 0.0
   if numpy.max(sftof)>90.0: sftof = 0.01*sftof
-
-  print ("tos ", numpy.min(tos), numpy.max(tos), numpy.mean(tos),file=sys.stderr)
-
-  print ("sic ", numpy.min(sic), numpy.max(sic), numpy.mean(sic),file=sys.stderr)
-  print ("sftof ", numpy.min(sftof), numpy.max(sftof), numpy.mean(sftof),file=sys.stderr)
 
   # optional fixed ice mode
   if 'f' in options:
@@ -153,7 +161,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
       s = ""
       for i in range(cvgmsk.shape[1]-1,0,-cvgmsk.shape[1]//25):
         for j in range(0,cvgmsk.shape[2],cvgmsk.shape[2]//50):
-#          s += "#" if -100 < cvgmsk[-1,i,j] < 500 else "."
           s += "#" if -100 < cvgmsk[400,i,j] < 500 else "."
         s += "\n"
       print (s, "\n",file=sys.stderr)
@@ -168,7 +175,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
 
     # prepare missing
     for m in range(sic.shape[0]):
-#      tos[m,tos[m,:,:]<-500.0] = numpy.nan
       tos[m,abs(tos[m,:,:])> 500.0] = numpy.nan 
 
     # baseline
@@ -201,7 +207,6 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
       norm = numpy.mean(base[m::12,:,:],axis=0)
       tos[m::12,:,:] = tos[m::12,:,:] - norm
 
-
   # deal with any remaining nans
   for m in range(sic.shape[0]):
     msk = numpy.isnan(tos[m,:,:])
@@ -211,14 +216,11 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
   wm = numpy.zeros_like(tas)
   a = areas(sftof.shape[0])
   for m in range(w.shape[0]):
-#    for i in range(w.shape[1]):
       for j in range(w.shape[2]):
         w[m,:,j] = a[:]
 
   wm=w.copy()
   if 'm' in options: wm[ cvgmsk[0:wm.shape[0],:,:] < -100 ] = 0.0
-  print (w[0,:,:],file=sys.stderr)
-  print (wm[0,:,:],file=sys.stderr)
   # calculate diagnostic
   diag=calc_diag(tos,wm,diag_name) #Diagnostic for attribution analysis.
   dec_warming.append(calc_dec_warming(tas,w)) #Diagnose SAT warming with global coverage for attributable trends.
@@ -229,8 +231,11 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
   if gmst_comp_warming!=0:
     gmst_comp_warming.append(calc_ann_warming(tos,w)) #Calculate warming in globally-complete blended data.
   obs_diag=calc_diag(obs_tas[0:tos.shape[0],:,:],wm,diag_name)
+  if numpy.amax(diag) > 10:
+    stop
 
-  #Repeat obs diagnostics for each member of ensemble observational dataset if ensobs is set. Assume missing data mask is the same as for main obs dataset.
+  #Repeat obs diagnostics for each member of ensemble observational dataset if ensobs is set.
+  #Assume missing data mask is the same as for main obs dataset.
   if ensobs != '':
     #Assume 100 member ensemble observations dataset.
     for ens in range(1,enssize+1):
@@ -248,6 +253,7 @@ def ncblendmask_esmval(options,sic_file,tas_file,tos_file,sftlf_file,obs_file,de
   return (diag,obs_diag)
 
 def calc_diag(tos,wm,diag_name):
+  #Calculate requested diagnostic from gridded SAT/SST.
   av_per=int(diag_name[4:6])*12 #Last two digits of diag_name are averaging period in yrs.
   #compute diagnostic based on masked/blended temperatures.
   if diag_name[0:4]=='gmst':
@@ -277,6 +283,7 @@ def calc_dec_warming(tas,w):
   return (numpy.nanmean(gmt_mon[(2010-1850)*12:(2020-1850)*12])-numpy.mean(gmt_mon[0:(1901-1850)*12]))
 
 def calc_ann_warming(tas,w):
+  #Calculate timeseries of annual mean GSAT.
   nyr=math.ceil(tas.shape[0]/12) #Round up number of years. 
   diag=numpy.zeros(nyr)
   gsat_mon=numpy.zeros(tas.shape[0])
@@ -284,7 +291,6 @@ def calc_ann_warming(tas,w):
   for m in range(tas.shape[0]):
     s = numpy.sum( w[m,:,:] )
     gsat_mon[m] = numpy.sum( w[m,:,:] * tas[m,:,:] ) / s
-#    print (gmst_mon)
   for m in range(nyr):
     diag[m]=numpy.mean(gsat_mon[m*12:(m+1)*12]) #Note - will calculate average over incomplete final year.
   diag=diag-numpy.mean(diag[0:(1901-1850)]) #Take anomalies relative to 1850-1901.

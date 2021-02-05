@@ -422,14 +422,9 @@ def main(cfg):
         for yy in range(ldiag-1):
             data_writer.writerow([years[yy],obs_gsat['GSAT estimate'][yy]])
         
-    print ('Ratio of GSAT to GMST warming',numpy.mean(mean_ann_warming[2010-1850:2020-1850,0,:])/numpy.mean(mean_diag[2010-1850:2020-1850,0,:]))
-    print (numpy.polyfit(years[1970-1850:2015-1850],numpy.mean(mean_ann_warming[1970-1850:2015-1850,0,:],axis=1),1))
-    print (numpy.polyfit(years[1970-1850:2015-1850],numpy.mean(mean_diag[1970-1850:2015-1850,0,:],axis=1),1))
-    fit_gsat=numpy.polyfit(years[1970-1850:2015-1850],numpy.mean(mean_ann_warming[1970-1850:2015-1850,0,:],axis=1),1)
-    fit_gmst=numpy.polyfit(years[1970-1850:2015-1850],numpy.mean(mean_diag[1970-1850:2015-1850,0,:],axis=1),1)
-    print ('Ratio of trends:',fit_gsat[0]/fit_gmst[0])
 
-    print ('ens_sizes',ens_sizes)    
+
+  
 
 #Make chapter figure (3.7)
     font = {'size'   : 9}
