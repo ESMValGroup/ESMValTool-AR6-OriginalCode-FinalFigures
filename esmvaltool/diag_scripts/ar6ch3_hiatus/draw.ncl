@@ -216,7 +216,7 @@ begin
   
   scale = 10.  ; trend in "per [scale] years" 
   long_name = "GMST trend"
-  unit = "K/decade"
+  unit = "~S~o~N~C (10 years)~S~-1~N~"
   input_dir = diag_script_info@input_files + "/"
 
   obs_dataset_pattern = "HadCRUT5_mean"
@@ -926,6 +926,7 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     ymarker = new(4, "float")
     j = 0
     do ii = 0, ListCount(SingleValhiatusObs)-1
+print(SingleValhiatusObs[ii]@dataset)
       polyres@gsFillColor := color_obs_single(j, :)
       polyres@gsLineColor := color_obs_single(j, :)
       datatondc(pdfs(0), tofloat(SingleValhiatusObs[ii]), res@trYMaxF, xmarker(0), ymarker(0))
@@ -1368,40 +1369,38 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
   copy_VarAtts(resTs, TstrendCMIPHiatus)
   patterns( 1 ) = contour_map(wks, TstrendCMIPHiatus, "")
 
-  if (isatt(TstrendCMIPHiatus, "frac_sign_match")) then
-    draw_sign_match = True
-    sign_match = TstrendCMIPHiatus
-    sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
-    sign_match@long_name = ""
-    sign_match@units = ""
-    sres@cnLevels = (/ 0.8 /)
-;    sres@cnFillPatterns = (/ -1, 3 /)
-    sres@cnFillPatterns = (/ 6, -1 /)
-    plot = gsn_csm_contour(wks, sign_match, sres)
-    overlay( patterns( 1 ), plot )
-
-    plres = True
-    x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
-    x1 = x2 - resTs@res_vpWidthF * 0.07
-    x3 = x2
-    x4 = x1
-    y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
-    y2 = y3 - resTs@res_vpHeightF * 0.07
-    y1 = y2
-    y4 = y3
-    plres = True
-    plres@gsFillScaleF = sres@cnFillScaleF
-;    plres@gsFillIndex = sres@cnFillPatterns(1)
-    plres@gsFillIndex = sres@cnFillPatterns(0)
-    lres = True
-    lres@gsLineDashPattern = 0
-    lres@gsLineThicknessF = 1.
-    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
-    gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
-    txres@txFontColor := "black"
-    txres@txJust = "TopRight"
-    gsn_text_ndc(wks, "Sign agreement < "+(sres@cnLevels(0)*100)+"%", x2, y2-0.005, txres)
-  end if
+;  if (isatt(TstrendCMIPHiatus, "frac_sign_match")) then
+;    draw_sign_match = True
+;    sign_match = TstrendCMIPHiatus
+;    sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
+;    sign_match@long_name = ""
+;    sign_match@units = ""
+;    sres@cnLevels = (/ 0.8 /)
+;    sres@cnFillPatterns = (/ 6, -1 /)
+;    plot = gsn_csm_contour(wks, sign_match, sres)
+;    overlay( patterns( 1 ), plot )
+;
+;    plres = True
+;    x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
+;    x1 = x2 - resTs@res_vpWidthF * 0.07
+;    x3 = x2
+;    x4 = x1
+;    y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
+;    y2 = y3 - resTs@res_vpHeightF * 0.07
+;    y1 = y2
+;    y4 = y3
+;    plres = True
+;    plres@gsFillScaleF = sres@cnFillScaleF
+;    plres@gsFillIndex = sres@cnFillPatterns(0)
+;    lres = True
+;    lres@gsLineDashPattern = 0
+;    lres@gsLineThicknessF = 1.
+;    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
+;    gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
+;    txres@txFontColor := "black"
+;    txres@txJust = "TopRight"
+;    gsn_text_ndc(wks, "Sign agreement < "+(sres@cnLevels(0)*100)+"%", x2, y2-0.005, txres)
+;  end if
   
   composite_projects = str_get_field(composite_member_names, 1, " ")
   composite_models = str_get_field(composite_member_names, 2, " ")

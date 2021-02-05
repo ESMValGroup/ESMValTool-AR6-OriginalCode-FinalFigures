@@ -32,6 +32,17 @@
 # and save it to $CONDA_PREFIX/envs/esmvaltool/lib/python3.7/site-packages/esmvalcore/cmor/tables/custom/
 #
 ---
+#
+# NOTES
+#
+# - Concatenation of historical and scenario runs by preprocessor often fails, especially in CMIP5.
+#   So this recipe preprocess them separately and let the diag scripts concatenate them.
+# - CMIP6 models are categorized based on i) siconc/siconca, ii) whether grids of tas/tos/siconc* are
+#   identical, gn/gn/gr , gr/gr/gn, or gr1/gn/gn, and iii) historical or ssp245.
+# - sftlf/sftof don't need to be categorized precisely as tas/tos/sic*. The script searches for i)
+#   the same model, same member, ii) the same model, iii) a similar model (based on the model name),
+#   and then iv) the file at the top of the list.
+
 documentation:
 
   description: |
@@ -863,18 +874,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
+        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_samegrid:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -946,18 +960,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
+        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_gngngr:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1026,18 +1043,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
+        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_grgngn:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1106,18 +1126,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
+        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_gr1gngn:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1186,18 +1209,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
+        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_siconca_samegrid:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1269,18 +1295,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
+        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
+        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_obs:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1384,6 +1413,7 @@ diagnostics:
         <<: *trend_settings
         method_GMST: GISTEMP
         mask_ref_dataset_GMST: GISTEMP
+        mask_ref_dataset_pattern: GISTEMP
         do_pattern: False
         do_post: False
         output_ref_trend: True
@@ -1434,6 +1464,7 @@ diagnostics:
         <<: *trend_settings
         method_GMST: GISTEMP
         mask_ref_dataset_GMST: GISTEMP
+        mask_ref_dataset_pattern: GISTEMP
         do_post: False
         do_pattern: False
 
@@ -1484,6 +1515,7 @@ diagnostics:
         <<: *trend_settings
         method_GMST: GISTEMP
         mask_ref_dataset_GMST: GISTEMP
+        mask_ref_dataset_pattern: GISTEMP
         do_post: False
         do_pattern: False
 
@@ -1534,6 +1566,7 @@ diagnostics:
         <<: *trend_settings
         method_GMST: GISTEMP
         mask_ref_dataset_GMST: GISTEMP
+        mask_ref_dataset_pattern: GISTEMP
         do_post: False
         do_pattern: False
         
@@ -1584,6 +1617,7 @@ diagnostics:
         <<: *trend_settings
         method_GMST: GISTEMP
         mask_ref_dataset_GMST: GISTEMP
+        mask_ref_dataset_pattern: GISTEMP
         do_post: False
         do_pattern: False
         
@@ -1633,6 +1667,7 @@ diagnostics:
         <<: *trend_settings
         method_GMST: GISTEMP
         mask_ref_dataset_GMST: GISTEMP
+        mask_ref_dataset_pattern: GISTEMP
         do_post: False
         do_pattern: False
 
@@ -1769,14 +1804,14 @@ diagnostics:
 #        do_post: False
 #        do_pattern: False
 #        
-#  summary_GMSTtrend_hiatus:
-#    description: Compare percentiles of cmip GMST trend for hiatus with obs
-#    scripts:
-#      percentiles:
-#        script: ar6ch3_hiatus/summary_percentiles.ncl
-#        ancestors: ['trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refHadCRUT5',
-#                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refCowtanWay',
-#                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refKadow',
-#                    'trend_hiatus_posthiatus_5x5/trendHiatusPosthiatus_refNOAAGlobalTemp-Interim',
-#                    'trend_hiatus_posthiatus_2x2/trendHiatusPosthiatus_refGISTEMP',
+  summary_GMSTtrend_hiatus:
+    description: Compare percentiles of cmip GMST trend for hiatus with obs
+    scripts:
+      percentiles:
+        script: ar6ch3_hiatus/summary_percentiles.ncl
+        ancestors: ['trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refHadCRUT5',
+                    'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refCowtanWay',
+                    'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refKadow',
+                    'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refNOAAGlobalTemp-Interim',
+                    'trend_hiatus_posthiatus_2x2_*/trendHiatusPosthiatus_refGISTEMP']
 #                    'trend_hiatus_posthiatus_1x1/trendHiatusPosthiatus_refBerkeleyEarth']

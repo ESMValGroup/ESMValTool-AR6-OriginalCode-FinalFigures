@@ -252,10 +252,14 @@ begin
     method_trend = diag_script_info@method_trend
   end if
 
-; 0.3 Output trend of reference data for masking?
+; 0.3 Output trend of reference or other obs data for masking?
   output_ref_trend = True
   if (isatt(diag_script_info, "output_ref_trend")) then
     output_ref_trend = diag_script_info@output_ref_trend
+  end if
+  output_obs_trend = True
+  if (isatt(diag_script_info, "output_obs_trend")) then
+    output_obs_trend = diag_script_info@output_obs_trend
   end if
   
 ; 0.4 Output trend pattern?
@@ -342,6 +346,37 @@ begin
       infoSftof = select_metadata_by_name(input_file_info, "sftof")
     end if
   end if
+
+  atts = True
+  atts@project = "OBS"
+  infoObs = select_metadata_by_atts(input_file_info, atts)
+  atts@project = "OBS6"
+  obs_tmp = select_metadata_by_atts(input_file_info, atts)
+  do iobs = 0, ListCount(obs_tmp) - 1
+    ListAppend(infoObs, obs_tmp[iobs])
+  end do
+  delete(obs_tmp)
+  atts@project = "obs"
+  obs_tmp = select_metadata_by_atts(input_file_info, atts)
+  do iobs = 0, ListCount(obs_tmp) - 1
+    ListAppend(infoObs, obs_tmp[iobs])
+  end do
+  delete(obs_tmp)
+  atts@project = "obs4mips"
+  obs_tmp = select_metadata_by_atts(input_file_info, atts)
+  do iobs = 0, ListCount(obs_tmp) - 1
+    ListAppend(infoObs, obs_tmp[iobs])
+  end do
+  delete(obs_tmp)
+  atts@project = "ana4mips"
+  obs_tmp = select_metadata_by_atts(input_file_info, atts)
+  do iobs = 0, ListCount(obs_tmp) - 1
+    ListAppend(infoObs, obs_tmp[iobs])
+  end do
+  delete(obs_tmp)
+  obs_datasets = metadata_att_as_array(infoObs, "dataset")
+  delete(infoObs)
+  delete(atts)
   
 ; 1.2 Get reference data for masking  
   if (do_mask) then
@@ -453,9 +488,18 @@ begin
     datasets_tmptmp = datasets_tmp(idataset_ex)
     delete(datasets_tmp)
     datasets_tmp = datasets_tmptmp
-    delete(datasets_tmptmp)
+    delete([/datasets_tmptmp, idataset_ex/])
   end if
-    
+  if (.not.output_obs_trend) then
+    do k = 0, dimsizes(obs_datasets)-1
+      idataset_ex = ind(datasets_tmp.ne.obs_datasets(k))
+      datasets_tmptmp = datasets_tmp(idataset_ex)
+      delete(datasets_tmp)
+      datasets_tmp = datasets_tmptmp
+      delete([/datasets_tmptmp, idataset_ex/])
+    end do
+  end if
+  
   infoDummy = True
   opt = True
   opt@unique = "any"
@@ -477,7 +521,7 @@ begin
   delete([/datasets_tmp, infoDummy, opt/])
   GMList = make_GMList(work_dir, do_post, do_maskGlobalmean_post, do_blend, do_mask, \
                        syear_hiatus, eyear_hiatus, syear_post, eyear_post, datasets)
-
+;print(GMList)
 ; ========================================================================
 ;
 ;               Loop for each (historical) SAT/SATa/GMST data
@@ -500,8 +544,12 @@ begin
       SATvar = "tasaga"
     end if
 
-;   Skip masking reference data of output_trend_ref = False
+;   Skip masking reference data of output_ref_trend = False
     if (.not.output_ref_trend .and. any(infoSAT@dataset.eq.(/masking_dataset_GMST, masking_dataset_pattern/))) then
+      continue
+    end if
+;   Skip masking reference data of output_obs_trend = False
+    if (.not.output_obs_trend .and. any(infoSAT@dataset.eq.obs_datasets)) then
       continue
     end if
     
