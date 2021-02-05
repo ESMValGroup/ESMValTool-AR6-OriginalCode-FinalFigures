@@ -766,8 +766,8 @@ preprocessors:
   regrid5x5:
     regrid: &regrid_method
       target_grid: 5x5
-      scheme: linear
-#      scheme: area_weighted
+#      scheme: linear
+      scheme: area_weighted
 
   regrid2x2:
     regrid: 
@@ -1671,139 +1671,312 @@ diagnostics:
         do_post: False
         do_pattern: False
 
+  trend_hiatus_posthiatus_1x1_cmip5:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables: 
+      sftlf_cmip5:
+        <<: *sftlf_setting
+        preprocessor: regrid1x1
+#      sftof:
+#        <<: *sftof_setting # No file works
+#        preprocessor: regrid1x1
+      tas_cmip5:
+        <<: *tas_setting
+        preprocessor: regrid1x1
+      tas_hadgem2_es_rcp45:
+        <<: *tas_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r1i1p1, exp: rcp45, start_year: 2005}
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r(2:3)i1p1, exp: rcp45, start_year: 2006}
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r4i1p1, exp: rcp45, start_year: 2005}
+      tos_cmip5:
+        <<: *tos_setting
+        preprocessor: regrid1x1
+      tos_hadgem2_es_rcp45:
+        <<: *tos_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r(2:4)i1p1, exp: rcp45, start_year: 2005}
+      sic:
+        <<: *sic_setting
+        preprocessor: regrid1x1
+      sic_hadgem2_es_rcp45:
+        <<: *sic_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
+          - {project: CMIP5, dataset: HadGEM2-ES, ensemble: r(2:4)i1p1, exp: rcp45, start_year: 2005}
+      tasa_obs:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        mask_ref_dataset_pattern: BerkeleyEarth
+        do_pattern: False
+        do_post: False
+        output_ref_trend: True
+        
+  trend_hiatus_posthiatus_1x1_cmip6_samegrid:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        preprocessor: regrid1x1
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+#        preprocessor: regrid1x1
+      tas_cmip6_siconc_h_gngngn:
+        <<: *tas_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_gngngn
+      tos_cmip6_siconc_h_gngngn:
+        <<: *tos_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        preprocessor: regrid1x1
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_h_gngngn
+      siconc_h_gngngn:
+        <<: *siconc_setting
+        preprocessor: regrid1x1
+        start_year: 1998
+        end_year: 2012
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_h_gngngn
+      tasa_obs:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        mask_ref_dataset_pattern: BerkeleyEarth
+        do_post: False
+        do_pattern: False
+
+  trend_hiatus_posthiatus_1x1_cmip6_gngngr:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        preprocessor: regrid1x1
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+#        preprocessor: regrid1x1
+      tas_cmip6_siconc_h_gngngr:
+        <<: *tas_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        preprocessor: regrid1x1
+        grid: gn
+        additional_datasets: *cmip6_siconc_models_h_gngngr
+      tos_cmip6_siconc_h_gngngr:
+        <<: *tos_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_gngngr
+      siconc_h_gngngr:
+        <<: *siconc_setting
+        exp: historical
+        start_year: 1998
+        end_year: 2012
+        grid: gr
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_gngngr
+      tasa_obs:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        mask_ref_dataset_pattern: BerkeleyEarth
+        do_post: False
+        do_pattern: False
+
+  trend_hiatus_posthiatus_1x1_cmip6_grgngn:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        preprocessor: regrid1x1
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+#        preprocessor: regrid1x1
+      tas_cmip6_siconc_h_grgngn:
+        <<: *tas_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gr
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_grgngn
+      tos_cmip6_siconc_h_grgngn:
+        <<: *tos_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_grgngn
+      siconc_h_grgngn:
+        <<: *siconc_setting
+        exp: historical
+        start_year: 1998
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_grgngn
+      tasa_obs:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        mask_ref_dataset_pattern: BerkeleyEarth
+        do_post: False
+        do_pattern: False
+        
+  trend_hiatus_posthiatus_1x1_cmip6_gr1gngn:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables:
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        preprocessor: regrid1x1
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+#        preprocessor: regrid1x1
+      tas_cmip6_siconc_h_gr1gngn:
+        <<: *tas_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gr1
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_gr1gngn
+      tos_cmip6_siconc_h_gr1gngn:
+        <<: *tos_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_gr1gngn
+      siconc_h_gr1gngn:
+        <<: *siconc_setting
+        exp: historical
+        start_year: 1998
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconc_models_h_gr1gngn
+      tasa_obs:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        mask_ref_dataset_pattern: BerkeleyEarth
+        do_post: False
+        do_pattern: False
+        
+  trend_hiatus_posthiatus_1x1_cmip6_siconca_samegrid:
+    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
+    variables: 
+      sftlf_cmip6:
+        <<: *sftlf_setting
+        project: CMIP6
+        preprocessor: regrid1x1
+        additional_datasets: *sftlf_cmip6
+#      sftof_cmip6:
+#        <<: *sftof_setting
+#        preprocessor: regrid1x1
+      tas_cmip6_siconca_h_gngngn:
+        <<: *tas_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconca_models_h_gngngn
+      tos_cmip6_siconca_h_gngngn:
+        <<: *tos_setting
+        project: CMIP6
+        exp: historical
+        start_year: 1961
+        end_year: 2012
+        grid: gn
+        preprocessor: regrid1x1
+        additional_datasets: *cmip6_siconca_models_h_gngngn
+      siconca_h_gngngn:
+        <<: *siconca_setting
+        grid: gn
+        preprocessor: regrid1x1
+        start_year: 1998
+        end_year: 2012
+        additional_datasets: *cmip6_siconca_models_h_gngngn
+      tasa_obs:
+        <<: *tasa_setting
+        preprocessor: regrid1x1
+        additional_datasets:
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      trendHiatusPosthiatus_refBerkeleyEarth:
+        <<: *trend_settings
+        method_GMST: BerkeleyEarth
+        mask_ref_dataset_GMST: BerkeleyEarth
+        mask_ref_dataset_pattern: BerkeleyEarth
+        do_post: False
+        do_pattern: False
 
 
-  #    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 2x2 observations
-#    variables: 
-#      sftlf:
-#        <<: *sftlf_setting
-#        preprocessor: regrid2x2
-##      sftof: &sftof_setting # No file works
-##        <<: *sftof_setting
-##        preprocessor: regrid2x2
-#      tas_cmip5:
-#        <<: *tas_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      tas_cmip6_siconc:
-#        <<: *tas_setting
-#        grid: gn
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconc_models
-#      tas_cmip6_siconca:
-#        <<: *tas_setting
-#        grid: gn
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconca_models
-#      tos_cmip5:
-#        <<: *tos_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      tos_cmip6_siconc:
-#        <<: *tos_setting
-#        grid: gn
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconc_models
-#      tos_cmip6_siconca:
-#        <<: *tos_setting
-#        grid: gn
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconca_models
-#      sic:
-#        <<: *sic_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      siconc:
-#        <<: *siconc_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      siconca:
-#        <<: *siconca_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      tasa:
-#        <<: *tasa_setting
-#        preprocessor: regrid2x2
-#        end_year: 2012
-#      tasaga:
-#        <<: *tasaga_setting
-#        end_year: 2012
-#    scripts:
-#      trendHiatusPosthiatus_refGISTEMP:
-#        <<: *trend_settings
-#        method_GMST: GISTEMP
-#        mask_ref_dataset_GMST: GISTEMP
-#        do_post: False
-#        do_pattern: False
-
-#  trend_hiatus_posthiatus_1x1:
-#    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 1x1 observations
-#    variables: 
-#      sftlf:
-#        <<: *sftlf_setting
-#        preprocessor: regrid1x1
-##      sftof: &sftof_setting # No file works
-##        <<: *sftof_setting
-##        preprocessor: regrid1x1
-#      tas_cmip5:
-#        <<: *tas_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      tas_cmip6_siconc:
-#        <<: *tas_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconc_models
-#      tas_cmip6_siconca:
-#        <<: *tas_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconca_models
-#      tos_cmip5:
-#        <<: *tos_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#      tos_cmip6_siconc:
-#        <<: *tos_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconc_models
-#      tos_cmip6_siconca:
-#        <<: *tos_setting
-#        preprocessor: regrid2x2
-#        end_year: 2015
-#        additional_datasets: *cmip6_siconca_models
-#      sic:
-#        <<: *sic_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      siconc:
-#        <<: *siconc_setting
-#        preprocessor: regrid1x1
-#        end_year: 2015
-#      siconca:
-#        <<: *siconca_setting
-#        preprocessor: regrid1x1
-#        end_year: 2015
-#      tasa:
-#        <<: *tasa_setting
-#        preprocessor: regrid1x1
-#        end_year: 2012
-#      tasaga:
-#        <<: *tasaga_setting
-#        end_year: 2012
-#    scripts:
-#      trendHiatusPosthiatus_refBerkeleyEarth:
-#        <<: *trend_settings
-#        method_GMST: BerkeleyEarth
-#        mask_ref_dataset_GMST: BerkeleyEarth
-#        do_post: False
-#        do_pattern: False
-#        
   summary_GMSTtrend_hiatus:
     description: Compare percentiles of cmip GMST trend for hiatus with obs
     scripts:
@@ -1813,5 +1986,5 @@ diagnostics:
                     'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refCowtanWay',
                     'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refKadow',
                     'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refNOAAGlobalTemp-Interim',
-                    'trend_hiatus_posthiatus_2x2_*/trendHiatusPosthiatus_refGISTEMP']
-#                    'trend_hiatus_posthiatus_1x1/trendHiatusPosthiatus_refBerkeleyEarth']
+                    'trend_hiatus_posthiatus_2x2_*/trendHiatusPosthiatus_refGISTEMP',
+                    'trend_hiatus_posthiatus_1x1_*/trendHiatusPosthiatus_refBerkeleyEarth']

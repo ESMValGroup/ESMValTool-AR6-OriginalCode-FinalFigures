@@ -766,8 +766,8 @@ preprocessors:
   regrid5x5:
     regrid: &regrid_method
       target_grid: 5x5
-      scheme: linear
-#      scheme: area_weighted
+#      scheme: linear
+      scheme: area_weighted
 
   regrid2x2:
     regrid: 
