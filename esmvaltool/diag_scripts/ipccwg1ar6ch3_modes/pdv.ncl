@@ -18,6 +18,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210205-Yu Kosaka: minor revision in figure legend
 ;   20210131-Yu Kosaka: revised from monthly to annual mean data
 ;   20210117-Yu Kosaka: adapt Adam's updates script to the ESMValTool
 ;   20200715-bock_lisa: adapt Adam's scipt to the ESMValTool
@@ -1504,7 +1505,7 @@ begin
     gsn_text_ndc(wks, obs_datasets(gg), x1+0.035, y1-gg*0.0125, txres)
   end do
 
-  x1 = 0.64
+  x1 = 0.62
   lres@gsLineDashPattern = 0
   lres@gsLineColor = 5
   lres@gsLineThicknessF = 2.5
@@ -1517,7 +1518,7 @@ begin
   lres@gsFillOpacityF = 0.6
   gsn_polygon_ndc(wks,(/x1,x1+0.03,x1+0.03,x1,x1/),(/y1-0.01,y1-0.01,y1-0.02,y1-0.02,y1-0.01/),lres)
   gsn_polygon_ndc(wks,(/x1,x1+0.03,x1+0.03,x1,x1/),(/y1-0.01,y1-0.01,y1-0.02,y1-0.02,y1-0.01/),lres)
-  gsn_text_ndc(wks, "CMIP5 Hist Range", x1+0.035, y1-0.016, txres)
+  gsn_text_ndc(wks, "CMIP5 Hist 5-95th range", x1+0.035, y1-0.016, txres)
 
   x1 = 0.78
   lres@gsLineColor = 3
@@ -1531,7 +1532,7 @@ begin
   lres@gsFillOpacityF = 0.3
   gsn_polygon_ndc(wks,(/x1,x1+0.03,x1+0.03,x1,x1/),(/y1-0.02,y1-0.02,y1-0.03,y1-0.03,y1-0.02/),lres)
   gsn_polygon_ndc(wks,(/x1,x1+0.03,x1+0.03,x1,x1/),(/y1-0.02,y1-0.02,y1-0.03,y1-0.03,y1-0.02/),lres)
-  gsn_text_ndc(wks, "CMIP6 Hist Range", x1+0.035, y1-0.026, txres)
+  gsn_text_ndc(wks, "CMIP6 Hist 5-95th range", x1+0.035, y1-0.026, txres)
   delete(lres@gsLineColor)
   delete(lres@gsLineThicknessF)
 
