@@ -1132,7 +1132,7 @@ begin
   res@gsnCenterString = "(b) CMIP6 Hist MME"
   plot(1) = gsn_csm_contour_map(wks,mme_amv,res)
 
-  res2@cnFillScaleF        = 0.4
+  res2@cnFillScaleF        = 1.  ; 0.4
   res2@cnFillPatterns = (/17,0/)
   res2@cnLevels = 0.5
   oplot = gsn_csm_contour(wks,sig(0,:,:),res2)
@@ -1140,7 +1140,7 @@ begin
 ;  res2@cnFillPatterns = (/11,0/)
   res2@cnFillPatterns = (/3,0/)
   res2@cnLevels = 0.5
-  res2@cnFillScaleF        = 0.7
+  res2@cnFillScaleF        = 0.8
   oplot1 = gsn_csm_contour(wks,mme_amv_sign,res2)
   overlay(plot(1),oplot1)
   
@@ -1619,7 +1619,7 @@ begin
   tlres@txFontHeightF = 0.008
   pmres0 = True
   pmres0@gsFillColor = "gray25"
-  pmres0@gsFillScaleF = 0.7
+  pmres0@gsFillScaleF = 0.8 ;0.7
 ;  pmres0@gsFillIndex = 11
   pmres0@gsFillIndex = 3
   lres = True
@@ -1634,7 +1634,7 @@ begin
   gsn_text_ndc(wks," < 80% of runs~C~ match MME sign",x2+0.004,0.62,tlres)
   
   pmres = pmres0
-  pmres@gsFillScaleF = 0.55
+  pmres@gsFillScaleF = 0.8 ; 0.55
   pmres@gsFillIndex = 17
   x1 = 0.047
   x2 = 0.071
