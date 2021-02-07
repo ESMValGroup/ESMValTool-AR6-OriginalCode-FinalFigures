@@ -542,9 +542,9 @@ print("==============================")
   mres@xyMonoLineColor = False
   mres@xyMonoDashPattern = False
   obsDashPatterns = (/0,1,2,0,1/)
-  mres@xyDashPatterns := obsDashPatterns
+  mres@xyDashPatterns := obsDashPatterns(0:dimsizes(obs_datasets)-1)
   obsColors = (/"black", "black", "black", "grey60", "grey60"/)
-  mres@xyLineColors := obsColors
+  mres@xyLineColors := obsColors(0:dimsizes(obs_datasets)-1)
   mres@xyLineDashSegLenF = 0.15
   plot(2) = gsn_csm_xy(wks,ispan(syear,eyear,1),obs_tseries,mres)
 
@@ -734,7 +734,7 @@ print("==============================")
   lineres = True
   lineres@lgLineThicknesses = 1.5                        ; line thicknesses
   lineres@LineLengthPercent = 3. ;2.5                         ; expressed as %, 0->100, length of line
-  lineres@lgDashIndexes = 0
+;  lineres@lgDashIndexes = 0
 
   textres = True
   textres@lgLabelFontHeights = 0.010
@@ -753,8 +753,8 @@ print("==============================")
     simple_legend_ndc(wks,gres,lineres,textres)
   else
     gres@XPosPercent = 56. ;62.5 
-    lineres@lgDashIndexes := obsDashPatterns ;(/0,2,3/)
-    lineres@lgLineColors := obsColors
+    lineres@lgDashIndexes := obsDashPatterns(0:dimsizes(obs_datasets)-1) ;(/0,2,3/)
+    lineres@lgLineColors := obsColors(0:dimsizes(obs_datasets)-1)
     textres@lgLabels := obs_datasets ;str_split(obs_tseries@datasets," ")
     simple_legend_ndc(wks,gres,lineres,textres)
   end if
