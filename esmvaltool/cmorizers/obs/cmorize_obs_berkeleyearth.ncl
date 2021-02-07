@@ -9,7 +9,7 @@
 ;    http://berkeleyearth.org/data/
 ;
 ; Last access
-;    20191101
+;    20210207
 ;
 ; Download and processing instructions
 ;    Download "Gridded Data -> Monthly Land + Ocean
@@ -22,7 +22,8 @@
 ;    Produces temperature anomalies (relative to the 1951-80 climatology)
 ;
 ; Modification history
-;    20191101-A_kosaka_yu: written.
+;    20210207-kosaka_yu: updated to 2020.
+;    20191101-kosaka_yu: written.
 ;
 ; #############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -41,7 +42,7 @@ begin
 
   ; Period
   YEAR1 = 1850
-  YEAR2 = 2018
+  YEAR2 = 2020
 
   ; Selected variable (standard name)
   VAR1 = "tas"

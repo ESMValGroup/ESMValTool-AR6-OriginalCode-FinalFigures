@@ -49,7 +49,7 @@ diagnostics:
         additional_datasets:
           - {dataset: ACCESS-CM2, grid: gn, ensemble: r1i1p1f1, start_year: 950, end_year: 1449}
           - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1, start_year: 101, end_year: 600}
-          - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, start_year: 2401, end_year: 2900}
+          #- {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, start_year: 2401, end_year: 2900}
           #- {dataset: AWI-ESM-1-1-LR, grid: gn, ensemble: r1i1p1f1, start_year: 1855, end_year: 2354}
           - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2349}
           #- {dataset: BCC-ESM1, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2349}
@@ -112,13 +112,13 @@ diagnostics:
         project: CMIP6
         grid: gn
         exp: [historical, ssp245]
-        start_year: 1900
+        start_year: 1850
         end_year: 2019
         preprocessor: temp_tr
         additional_datasets:
           - {dataset: ACCESS-CM2, ensemble: r(1:2)i1p1f1, grid: gn}
           - {dataset: ACCESS-ESM1-5, ensemble: r(1:10)i1p1f1, grid: gn}
-          - {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+          #- {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn} # preprocessor failure
           - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
           - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1, grid: gn}
           - {dataset: CESM2, ensemble: r(1:4)i1p1f1, grid: gn}
@@ -170,18 +170,28 @@ diagnostics:
           - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
 
+#      tasa_obs:
+#        short_name: tasa
+#        mip: Amon
+#        project: OBS
+#        start_year: 1850
+#        end_year: 2019
+#        additional_datasets:      
+#          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: v5, tier: 2}
+#          - {dataset: Kadow, project: OBS, type: median, version: 4.6.0.0, tier: 2}
+
       tasaga_obs:
         short_name: tasaga
         mip: Amon
         project: OBS
-        start_year: 1900
+        start_year: 1850
         end_year: 2019
         additional_datasets:      
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
-          - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2} # begins in 1880
           - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
           
     scripts:
       gsat_pi_hist_obs:
         script: ipccwg1ar6ch3_gsat_pi/gsat_pi_hist_obs.ncl
-        threshold: 0.75
