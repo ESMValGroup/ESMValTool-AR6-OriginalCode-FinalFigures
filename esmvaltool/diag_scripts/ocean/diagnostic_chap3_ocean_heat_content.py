@@ -46,6 +46,8 @@ from glob import glob
 from dask import array as da
 from shelve import open as shopen
 
+import csv
+
 from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 import cartopy.crs as ccrs
@@ -422,6 +424,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
     # (project, dataset, 'piControl', pi_ensemble, 'ohc', 'intact', depth_range)
     plot_details={}
     axes= {}
+    axes_text_y={}
     fig = plt.figure()
 
     if  plot_type=='7_panes':
@@ -499,6 +502,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                '0-700': '0m - 700m',
                '7-20': '700m - 2000m',
                '2plus':  '> 2000m',}
+        axes_text_y['full'] = 0.95
+
         fig.set_size_inches(8 , 5)
         gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1.5, 1.], wspace=0.16)
         gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
@@ -635,11 +640,15 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         ax.axhline(0., c='k', ls=':')
 
     for axes_key, text in axes_texts.items():
-        top_left_text(axes[axes_key], text)
+        y_loc = axes_text_y.get(axes_key, 0.9)
+        plt.text(0.05, y_loc, text,
+             horizontalalignment='left',
+             verticalalignment='center',
+             transform=axes[axes_key].transAxes)
 
     plt.suptitle('Global Ocean Heat Content')
 
-    add_all_obs = True
+    add_all_obs = False
     if add_all_obs:
         matfile = cfg['auxiliary_data_dir'] + '/OHC/AR6_GOHC_GThSL_timeseries_2019-11-26.mat'
         matdata = loadmat(matfile)
@@ -686,6 +695,46 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                            lw = 1.5, #0.5,
                            zorder=2,
                            )
+
+    all_obs_sigma = True
+    if all_obs_sigma:
+        fn = cfg['auxiliary_data_dir'] + '/OHC/210204_0908_DM-AR6FGDAssessmentTimeseriesOHC-v1.csv'
+        header = ['Year', 'Central Estimate 0-700m', '0-700m Uncertainty (1-sigma)', 'Central Estimate 700-2000m', '700-2000m Uncertainty (1-sigma)', 'Central Estimate >2000m', '>2000m Uncertainty (1-sigma)', 'Central Estimate Full-depth', 'Full-depth Uncertainty (1-sigma)']
+
+#        central_colums = {'Full-depth':7, '0-700 m':1, '700-2000 m':3, '>2000 m':5}
+#        sigma_columns = {'Full-depth':8, '0-700 m':2, '700-2000 m':4, '>2000 m':6}
+
+        central_colums = {'total':7, '0-700m':1, '700-2000m':3, '2000m_plus':5}
+        sigma_columns = {'total':8, '0-700m':2, '700-2000m':4, '2000m_plus':6}
+
+        for subplot, depth_key in depth_dict.items():
+            times = []
+            lower_sigma = []
+            centers = []
+            upper_sigma = []
+
+            with open(fn, ) as csvfile:
+                reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+                for r, row in enumerate(reader):
+                    if r < 2: continue
+                    time = float(row[0])
+                    center = float(row[central_colums[depth_key]])
+                    sigma = float(row[sigma_columns[depth_key]])
+
+                    times.append(time)
+                    lower_sigma.append(center - sigma)
+                    centers.append(center)
+                    upper_sigma.append(center + sigma)
+            print(depth_key, times)
+
+            axes[subplot].plot(np.array(times),
+                           np.array(centers),
+                           lw = 1.5, #0.5,
+                           zorder=2,
+                           color='black',  
+                           )
+            axes[subplot].fill_between(np.array(times), np.array(lower_sigma), np.array(upper_sigma), color='black', alpha=0.35, edgecolor=None)
+
     legend_fs = 12
     if plot_style in ['all_one', 'mono', '5-95']:leg_size=2
     else:
@@ -710,7 +759,11 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
     if plot_style in ['5-95', ]:
         axleg.plot([], [], c=CMIP6_red, lw=5, ls='-', alpha=0.85, label='CMIP6')
-        axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
+        if all_obs_sigma:
+            axleg.plot([], [], c='black', lw=1.5, marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11, ls='-', label='Observations '+r'$\pm 1 \sigma$')
+        else:
+            axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
+
         if show_UKESM:
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
 
@@ -720,6 +773,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         if show_UKESM:
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
 
+    if  plot_type=='large_full':
+        axes['full'].set_yticks([-400., -300., -200., -100., 0., 100., 200., 300., 400.])
 
     if plot_style == 'viridis':
         # Add emply plots to dummy axis.
@@ -730,6 +785,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             loc='upper center',
             #loc='lower center',
             ncol=5,
+            numpoints=1,
+            handlelength=0.85,
             prop={'size': legend_fs},
             bbox_to_anchor=(0.5, 0.5,),
             fontsize=legend_fs)
@@ -2502,6 +2559,8 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
     ensembles = {}
     exps = {}
 
+    hist_datasets = {}
+    histnat_datasets = {}
     for (project, dataset, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
         if dyn_type != plot_dyn: continue
         if trend != plot_trend: continue
@@ -2510,6 +2569,10 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         datasets[dataset] = True
         exps[exp] = True
         ensembles[ensemble] = True
+        if exp == 'historical':
+            hist_datasets[dataset] = True
+        if exp == 'hist-nat':
+            histnat_datasets[dataset] = True
         cube = iris.load_cube(fn)
         times = diagtools.cube_time_to_float(cube)
         if method == 'dyn_height': # anomaly is
@@ -2535,6 +2598,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
     labels = []
     max_value = 0.
+
     for dataset, exp, ensemble in itertools.product(datasets, exps, ensembles):
         pac =  trends.get((dataset, exp, ensemble, 'Pacific'), None)
         alt =  trends.get((dataset, exp, ensemble, 'Atlantic'), None)
@@ -2542,9 +2606,10 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         if None in [pac, alt]: continue
         col=  colours[exp]
         if exp == 'historical':
-            label = 'Historical'
+
+            label = 'historical (n = '+str(int(len(hist_datasets.keys())))+')'
         elif exp == 'hist-nat':
-            label = 'Hist-nat'
+            label = 'hist-nat (n = '+str(int(len(histnat_datasets.keys())))+')'
         else:
             label = exp
         max_value = np.max([max_value, abs(pac), abs(alt)])
@@ -2590,14 +2655,14 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 #                plt.scatter(np.mean(exps_pac), np.mean(exps_alt), c=col, s=20, marker='D', label = label)
 #            else:
             plt.scatter(np.mean(exps_pac), np.mean(exps_alt), facecolor=col,edgecolor='k', s=70, marker='D')
-        plt.scatter([], [], edgecolor='k', facecolor='none',  s=35, marker='D', label='Mean')
+        plt.scatter([], [], edgecolor='k', facecolor='none',  s=35, marker='D', label='Mean 1950-2014')
 
     add_obs = True
     if add_obs:
         obs_labels= {
-            '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc': 'EN4',
-            '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':'Ishii',
-            '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':'D&W',
+            '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc': 'EN4 1950-2019',
+            '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':'Ishii 1955-2019',
+            '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':'D&W 1950-2019',
             }
         obs_markers= {
             '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc': '^',
@@ -2605,21 +2670,17 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
             '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':'s',
             }
         for obs_type in [
+                         '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc',
                          '210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc',
                          '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc',
-                         '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc',
 #                         '141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc',
 #                         '141013a_DurackandWijffels10_V1.0_30yr_steric_1970-2000_0-2000db.nc',
 #                         '151103_Ishii09_v6.13_annual_steric_1950-2010_0-3000m.nc',
                          ]:
             aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/' + obs_type
-            label = 'Observations'
-
-            #141013_DurackandWijffels10_V1.0_50yr_steric_1980-2000_0-2000db.nc'
-            #210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc
-            #210201_EN4.2.1.g10_annual_steric_1970-2019_5-5350m.nc
-            #210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc
-
+            #label = 'Observations'
+            label = obs_labels[obs_type]
+            marker = obs_markers[obs_type]
             obs_cubes = iris.load_raw(aux_file)
             print(obs_type, ':', obs_cubes)
             if plot_dyn in ['halo_ts']:
@@ -2630,8 +2691,14 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
             # extract integral of surface to 2000m:
             cube = cube[17, :, :]
             obs_dat = {}
+
             for region in ['Pacific', 'Atlantic']:
-                shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/IPCC_WGI/IPCC-WGI-reference-'+region+'-v4.shp'
+                shapefiles = 'includeSO'
+                if shapefiles in [None, 'old', 'v4']:
+                    shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/IPCC_WGI/IPCC-WGI-reference-'+region+'-v4.shp'
+                elif shapefiles == 'includeSO':
+                    shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/includeSO/'+region.lower()+'.shp'
+
 
                 region_cube = extract_shape(
                         cube.copy(),
@@ -2644,14 +2711,22 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
                 obs_dat[region] = mean.data
             print(obs_type, obs_type, ':', obs_dat['Pacific'], obs_dat['Atlantic'])
             if label not in labels:
-                plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s', label = label)
+                plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker=marker, label = label)
                 labels.append(label)
             else:
-                plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker='s')
+                plt.scatter(obs_dat['Pacific'], obs_dat['Atlantic'], c='black', marker=marker)
 
     if show_legend:
-        #plt.legend(loc = 'lower left', framealpha=0., prop={'size': 9})
-        plt.legend(loc = 'lower right', framealpha=0., prop={'size': 9}, markerfirst=False )
+        handles, labels = plt.gca().get_legend_handles_labels()
+        if len(labels) ==6:
+            
+            order = [3,4,5,2,0, 1]
+        else:
+            order = np.arange(len(labels))
+
+        plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
+             loc = 'lower right', framealpha=0., prop={'size': 7}, markerfirst=False )
+        #plt.legend(loc = 'lower right', framealpha=0., prop={'size': 7}, markerfirst=False )
 
     ax.set_aspect("equal")
 
@@ -2853,6 +2928,10 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
+    clip = True
+    if clip:
+        mean_cube.data = np.ma.clip(mean_cube.data, plot_range[0], plot_range[1])
+
     qplot = iris.plot.contourf(
         mean_cube,
         nspace,
@@ -2884,14 +2963,14 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         return fig, ax, qplot
 
 
-def add_map_text(ax, text):
+def add_map_text(ax, text, spaces='       '):
     """
     Add a small text to a map.
     """
     #ax.text(0., 0., text, fontsize=10)
     #artisttext = AnchoredText(text+'       ',
     #                    loc=4, prop={'size': 12}, frameon=False)
-    artisttext = AnchoredText('          '+text, #+'       ',
+    artisttext = AnchoredText(spaces+text, #+'       ',
                         loc='upper left', prop={'size': 10}, frameon=False)
     ax.add_artist(artisttext)
     return ax
@@ -2909,6 +2988,8 @@ def plot_halo_multipane(
     ):
     """
     Make the halosteric multi pane figure needed for IPCC WG1 chapter 3, fig 3.27
+
+    if do_SLR is true!
     """
     # Create figure
     fig = plt.figure()
@@ -2935,7 +3016,7 @@ def plot_halo_multipane(
 
 
     reverse = True
-    if reverse & len(obs_files) == 2:
+    if reverse and len(obs_files) == 2:
         gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
         gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
         gs1 = gs[1].subgridspec(3, 1, hspace=0.06 ) # maps
@@ -2950,9 +3031,13 @@ def plot_halo_multipane(
         ax2 = fig.add_subplot(gs1[2, 0], projection=proj)
         subplots = [ax0, ax1]
         cmip_subplots = [ax2,]
+        cbar_axes = [ax0, ax1, ax2]
+        fig.set_size_inches(10, 7)
 
-    if reverse & len(obs_files) == 3:
-        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
+    if reverse and len(obs_files) == 3:
+        fig.set_size_inches(9,  7)
+
+        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 1.00], wspace=0.)
         gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
         gs1 = gs[1].subgridspec(4, 1, hspace=0.06 ) # maps
         #scatters
@@ -2968,6 +3053,8 @@ def plot_halo_multipane(
 
         subplots = [ax0, ax1, ax2]
         cmip_subplots = [ax3,]
+        cbar_axes = [ax0, ax1, ax2, ax3]
+
 #            gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[1, 2], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.450, wspace =0.0600)
 #            central_longitude=-120.
 #            proj = ccrs.Robinson(central_longitude=central_longitude)
@@ -3041,10 +3128,10 @@ def plot_halo_multipane(
 #    cmap='coolwarm'
 #    nspace = np.linspace(-2., 2, 15, endpoint=True)
 #    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
-    if reverse:
-        fig.colorbar(qplot, ax=list(axes.values()), location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
-    else:
-        fig.colorbar(qplot, ax=list(axes.values()), location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+#    if reverse:
+#        fig.colorbar(qplot, ax=cbar_axes, location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+#    else:
+#        fig.colorbar(qplot, ax=cbar_axes, location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
 
     #rhs:
     # Halosteric trend scatter:
@@ -3077,10 +3164,19 @@ def plot_halo_multipane(
 #    cbar = plt.colorbar(cax=cax,cmap=cmap, )
 #    cbar.set_clim(-2.0, 2.0)
 
+    #plt.tight_layout()
+
     time_range_str = '-'.join([str(t) for t in time_range])
 
-    fig.suptitle(''.join(['Halosteric Sea Level trend, ', time_range_str]))
-    # plt.tight_layout()
+    fig.suptitle('Halosteric and thermosteric sea level trends')
+
+    if reverse:
+        fig.colorbar(qplot, ax=cbar_axes, location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+    else:
+        fig.colorbar(qplot, ax=cbar_axes, location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+
+    #plt.tight_layout()
+
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
     if show_UKESM:
@@ -3180,6 +3276,11 @@ def plot_halo_obs_mean(
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
     ax = add_map_text(ax, legend_txt)
+
+    clip = True
+    if clip:
+       cube.data = np.ma.clip(cube.data, plot_range[0], plot_range[1])
+
     qplot = iris.plot.contourf(
         cube,
         nspace,
@@ -3286,10 +3387,11 @@ def plot_slr_full3d_ts(cfg, metadata, dyn_files, area_fn, trend):
 
 
 
-def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
+def calc_dyn_timeseries(cfg, metadatas, dyn_fn, areacella_fn,
         project, dataset, exp, ensemble, slr_type, region,
         trend,
-        method = 'dyn_height'):
+        method = 'dyn_height',
+        shapefiles = 'includeSO'):
     """
     Calculate dynamic time series.
     """
@@ -3298,7 +3400,11 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
     elif method =='Landerer':
         work_dir = diagtools.folder([cfg['work_dir'], 'Landerer_slr_ts'])
 
-    slr_ts_fn = work_dir + '_'.join([project, dataset, exp, ensemble, slr_type, region, trend, 'timeseries'])+'.nc'
+    if shapefiles is None or region in ['Global', ]:
+        slr_ts_fn = work_dir + '_'.join([project, dataset, exp, ensemble, slr_type, region, trend, 'timeseries', ])+'.nc'
+    else:
+        slr_ts_fn = work_dir + '_'.join([project, dataset, exp, ensemble, slr_type, region, trend, 'timeseries', shapefiles])+'.nc'
+
     if os.path.exists(slr_ts_fn):
         return slr_ts_fn
 
@@ -3311,7 +3417,11 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
     # coord_names = [c.var_name for c in dyn_cube.coords()]
     # print('calc_dyn_timeseries:', dyn_fn, '\ncoord_names:', coord_names)
     if region in ['Pacific', 'Atlantic']:
-        shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/IPCC_WGI/IPCC-WGI-reference-'+region+'-v4.shp'
+        if shapefiles is None:
+            shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/IPCC_WGI/IPCC-WGI-reference-'+region+'-v4.shp'
+        elif shapefiles == 'includeSO':
+            shapefile =  cfg['auxiliary_data_dir']+'/shapefiles/includeSO/'+region.lower()+'.shp'
+
         dyn_cube = extract_shape(
             dyn_cube,
             shapefile,
@@ -3320,6 +3430,15 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
             area_cube,
             shapefile,
             )
+#        print(dyn_cube)
+#        single_pane_map_plot(
+#                cfg,
+#                metadatas[dyn_fn],
+#                dyn_cube[0, ],
+#                key='dynheight_ohc'+region
+#                )
+       #assert 0
+
     elif region == 'Global':
         pass
     else:
@@ -3345,14 +3464,14 @@ def calc_dyn_timeseries(cfg, dyn_fn, areacella_fn,
         ax = fig.add_subplot(111)
         times = diagtools.cube_time_to_float(dyn_cube)
         plt.plot(times, dyn_cube.data, color='red')
-        plt.title(' '.join([project, dataset, exp, ensemble, slr_type, trend, 'timeseries']))
+        plt.title(' '.join([project, dataset, exp, ensemble, slr_type, trend, region, str(shapefiles),]))
 
         plt.xlabel('Year')
         plt.ylabel('Change in Sea Level, mm')
         #plt.axhline(0., c = 'k', ls=':' )
 
-        path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries', method])
-        path += '_'.join([project, dataset, exp, ensemble, slr_type, 'timeseries'])+diagtools.get_image_format(cfg)
+        path = diagtools.folder([cfg['plot_dir'], 'dyn_height_timeseries', method, region])
+        path += '_'.join([project, dataset, exp, ensemble, slr_type, 'timeseries', region, str(shapefiles)])+diagtools.get_image_format(cfg)
         print('Saving figure:', path)
         plt.savefig(path)
         plt.close()
@@ -4154,7 +4273,8 @@ def sea_surface_salinity_plot(
         print(obs_key, nspace, cube.data.min(), cube.data.max())
         #assert 0
         cmap=diagtools.misc_div
-        label= obs_key+' trend ('+obs_time_str+')'
+        #abel= obs_key+' trend ('+obs_time_str+')'
+        label = "Durack & Wijffels (1950-2019)"
 
     elif fig_type=='obs_mean': # pane b (222, also contours)
         cube = obs_mean_cube
@@ -4185,7 +4305,8 @@ def sea_surface_salinity_plot(
         if obs_key=='DW1970':
             nspace = change_nspace_70
         cmap=diagtools.misc_div
-        label= 'CMIP6 trend ('+time_range_str+')'
+        #label= 'CMIP6 trend ('+time_range_str+')'
+        label = "CMIP6 historical (1950-2014)" 
     else:
         print("Fig type not recognised", fig_type)
         assert 0
@@ -4308,7 +4429,6 @@ def sea_surface_salinity_multipane(
         fig_types = ['obs_change', 'model_change']
         fig.set_size_inches(10, 7)
 
-
     axes = {}
     qplots = {}
     for subplot, fig_type in zip(subplots, fig_types):
@@ -4329,7 +4449,6 @@ def sea_surface_salinity_multipane(
                 print('cant find:', ref_file)
                 assert 0
 
-
         fig, axes[subplot], qplots[subplot] = sea_surface_salinity_plot(
                 cfg,
                 fn,
@@ -4341,7 +4460,7 @@ def sea_surface_salinity_multipane(
                 subplot=subplot,
                 obs_key=obs_key,
                 ref_file=ref_file,
-                ref_file_2 = ref_file_2
+                ref_file_2 = ref_file_2,
            )
 
     if plot_type == '2_pane':
@@ -4363,11 +4482,9 @@ def sea_surface_salinity_multipane(
         fig.colorbar(qplots[212], ax=[axes[212], ], location='right',label='Error in PSU') #, ticks=cbar_ticks)
 
     if plot_type == 'trends_only':
-        fig.suptitle('Sea Surface Salinity trends '+obs_key)
+        #fig.suptitle('Near-Surface Salinity trends') #s_key)
         cbar_ticks = np.linspace(-10., 10., 11, )
-        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='mPSS-78/yr', ticks=cbar_ticks)
-
-
+        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
 
     unique_id = ['salinity', plot_type, time_range_str, obs_key]
     filename = '_'.join(unique_id).replace('/', '_')
@@ -4795,9 +4912,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SLR = True
-    do_OHC = 0 # True  #True
-    do_SS =  0 #True
+    do_SS =  True
+    do_SLR = False # True  #False
+    do_OHC = False #True  #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -5027,7 +5144,7 @@ def main(cfg):
                 for region in regions:
                     slr_averages={}
                     for slr_type, slr_fn in slr_fns_dict.items():
-                        slr_ts_fn = calc_dyn_timeseries(cfg, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type, region, trend, method = method)
+                        slr_ts_fn = calc_dyn_timeseries(cfg, metadatas, slr_fn, areacella_fn, project, dataset, exp, ensemble, slr_type, region, trend, method = method)
                         slr_fns[(project, dataset, exp, ensemble, slr_type, region, trend)] = slr_fn
                         slr_fns[(project, dataset, exp, ensemble, slr_type + '_ts', region, trend)] = slr_ts_fn
                         metadatas[slr_ts_fn] = metadatas[thetao_fn]
@@ -5046,8 +5163,8 @@ def main(cfg):
         do_plot_halo_multipane = True
         if do_plot_halo_multipane:
             plot_exp = 'historical'
-            time_ranges = [[1950, 2015], ] #[1950, 2000], [1970, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
-            for time_range,ukesm in itertools.product(time_ranges, [True, False]):
+            time_ranges = [[1950, 2015], ] #[1970, 2015], ] #[1950, 2000], [1970, 2000], [1970, 2015], [1950, 2015], [1860, 2015]]
+            for time_range,ukesm in itertools.product(time_ranges, [False, ]):
                 plot_halo_multipane(
                     cfg,
                     metadatas,
@@ -5234,6 +5351,7 @@ def main(cfg):
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     for depth_range in depth_ranges:
         for (project, dataset, exp, ensemble, short_name, trend), ohc_fn in ocean_heat_content.items():
+            if exp not in ['historical', 'piControl']: continue
             ohc_ts_fn = calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend)
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, short_name, trend, depth_range)] = ohc_ts_fn
             print('OHC:', (project, dataset, exp, ensemble, short_name, trend, depth_range))
@@ -5298,9 +5416,9 @@ def main(cfg):
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
     multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False)
-    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
+    #multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
 
-    for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one', '5-95'],['7_panes', '4_panes'], [True, False]):
+    for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one', '5-95'],['7_panes', '4_panes', 'large_full'], [True, False]):
         continue
         multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type =plot_type , plot_style=plot_style, show_UKESM=ukesm)
 
