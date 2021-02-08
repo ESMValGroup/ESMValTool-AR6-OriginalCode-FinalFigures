@@ -446,207 +446,7 @@ sftof_cmip5: &sftof_cmip5
 #  - {dataset: MRI-ESM1}
       
 tasa_datasets: &tasa_datasets
-  - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens001, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens002, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens003, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens004, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens005, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens006, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens007, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens008, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens009, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens010, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens011, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens012, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens013, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens014, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens015, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens016, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens017, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens018, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens019, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens020, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens021, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens022, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens023, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens024, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens025, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens026, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens027, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens028, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens029, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens030, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens031, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens032, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens033, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens034, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens035, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens036, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens037, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens038, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens039, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens040, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens041, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens042, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens043, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens044, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens045, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens046, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens047, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens048, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens049, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens050, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens051, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens052, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens053, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens054, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens055, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens056, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens057, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens058, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens059, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens060, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens061, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens062, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens063, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens064, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens065, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens066, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens067, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens068, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens069, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens070, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens071, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens072, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens073, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens074, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens075, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens076, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens077, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens078, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens079, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens080, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens081, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens082, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens083, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens084, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens085, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens086, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens087, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens088, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens089, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens090, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens091, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens092, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens093, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens094, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens095, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens096, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens097, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens098, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens099, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens100, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens101, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens102, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens103, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens104, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens105, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens106, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens107, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens108, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens109, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens110, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens111, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens112, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens113, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens114, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens115, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens116, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens117, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens118, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens119, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens120, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens121, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens122, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens123, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens124, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens125, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens126, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens127, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens128, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens129, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens130, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens131, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens132, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens133, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens134, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens135, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens136, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens137, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens138, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens139, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens140, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens141, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens142, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens143, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens144, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens145, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens146, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens147, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens148, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens149, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens150, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens151, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens152, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens153, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens154, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens155, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens156, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens157, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens158, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens159, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens160, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens161, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens162, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens163, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens164, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens165, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens166, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens167, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens168, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens169, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens170, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens171, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens172, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens173, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens174, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens175, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens176, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens177, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens178, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens179, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens180, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens181, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens182, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens183, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens184, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens185, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens186, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens187, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens188, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens189, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens190, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens191, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens192, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens193, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens194, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens195, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens196, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens197, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens198, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens199, version: 5.0, tier: 2}
-  - {dataset: HadCRUT5, project: OBS, type: ens200, version: 5.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
   - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
   #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
@@ -655,7 +455,207 @@ tasa_datasets: &tasa_datasets
   - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
 
 tasaga_datasets: &tasaga_datasets
-  - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens001, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens002, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens003, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens004, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens005, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens006, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens007, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens008, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens009, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens010, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens011, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens012, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens013, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens014, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens015, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens016, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens017, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens018, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens019, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens020, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens021, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens022, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens023, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens024, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens025, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens026, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens027, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens028, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens029, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens030, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens031, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens032, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens033, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens034, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens035, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens036, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens037, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens038, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens039, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens040, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens041, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens042, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens043, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens044, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens045, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens046, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens047, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens048, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens049, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens050, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens051, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens052, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens053, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens054, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens055, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens056, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens057, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens058, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens059, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens060, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens061, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens062, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens063, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens064, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens065, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens066, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens067, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens068, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens069, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens070, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens071, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens072, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens073, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens074, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens075, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens076, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens077, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens078, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens079, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens080, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens081, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens082, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens083, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens084, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens085, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens086, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens087, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens088, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens089, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens090, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens091, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens092, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens093, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens094, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens095, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens096, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens097, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens098, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens099, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens100, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens101, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens102, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens103, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens104, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens105, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens106, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens107, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens108, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens109, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens110, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens111, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens112, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens113, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens114, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens115, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens116, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens117, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens118, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens119, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens120, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens121, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens122, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens123, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens124, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens125, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens126, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens127, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens128, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens129, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens130, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens131, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens132, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens133, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens134, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens135, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens136, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens137, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens138, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens139, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens140, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens141, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens142, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens143, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens144, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens145, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens146, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens147, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens148, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens149, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens150, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens151, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens152, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens153, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens154, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens155, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens156, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens157, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens158, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens159, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens160, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens161, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens162, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens163, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens164, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens165, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens166, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens167, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens168, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens169, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens170, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens171, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens172, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens173, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens174, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens175, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens176, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens177, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens178, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens179, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens180, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens181, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens182, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens183, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens184, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens185, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens186, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens187, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens188, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens189, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens190, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens191, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens192, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens193, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens194, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens195, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens196, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens197, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens198, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens199, version: 5.0.1.0, tier: 2}
+  - {dataset: HadCRUT5, project: OBS, type: ens200, version: 5.0.1.0, tier: 2}
   - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
   #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
@@ -766,8 +766,8 @@ preprocessors:
   regrid5x5:
     regrid: &regrid_method
       target_grid: 5x5
-#      scheme: linear
-      scheme: area_weighted
+      scheme: linear
+#      scheme: area_weighted # This should be more precise, but often errors often occur
 
   regrid2x2:
     regrid: 
@@ -851,7 +851,7 @@ diagnostics:
         start_year: 1961
         end_year: 2012
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
           - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
           - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: v5, tier: 2}
           - {dataset: Kadow, project: OBS, type: median, version: 4.6.0.0, tier: 2}
@@ -867,6 +867,7 @@ diagnostics:
         eyear_post: 2026
         method_trend: least_square
         output_ref_trend: False
+        output_obs_trend: False
 # Following part is unrelated to the figure, but to make a table that support the text.
       trendHiatusPosthiatus_refCowtanWay:
         <<: *trend_settings
@@ -874,21 +875,18 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
-        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_samegrid:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -960,21 +958,18 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
-        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_gngngr:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1043,21 +1038,18 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
-        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_grgngn:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1126,21 +1118,18 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
-        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_gr1gngn:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1209,21 +1198,18 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
-        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_cmip6_siconca_samegrid:
     description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
@@ -1295,24 +1281,21 @@ diagnostics:
         mask_ref_dataset_GMST: CowtanWay
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
         mask_ref_dataset_GMST: Kadow
         do_post: False
         do_pattern: False
-        output_obs_trend: False
       trendHiatusPosthiatus_refNOAAGlobalTemp-Interim:
         <<: *trend_settings
         method_GMST: NOAAGlobalTemp
         mask_ref_dataset_GMST: NOAAGlobalTemp-Interim
         do_post: False
         do_pattern: False
-        output_obs_trend: False
 
   trend_hiatus_posthiatus_5x5_obs:
-    description: Calculate GMST trends for hiatus and post-hiatus periods with blending/masking based on 5x5 observations
+    description: Calculate GMST trends for hiatus period with blending/masking based on 5x5 observations
     variables: 
       sftlf_cmip5:
         <<: *sftlf_setting
@@ -1343,6 +1326,7 @@ diagnostics:
       trendHiatusPosthiatus_refHadCRUT5:
         <<: *trend_settings
         output_ref_trend: True
+        output_obs_trend: True
         
   trend_hiatus_posthiatus_5x5:
     description: Calculate trend composite and plot a figure

@@ -521,7 +521,7 @@ begin
   delete([/datasets_tmp, infoDummy, opt/])
   GMList = make_GMList(work_dir, do_post, do_maskGlobalmean_post, do_blend, do_mask, \
                        syear_hiatus, eyear_hiatus, syear_post, eyear_post, datasets)
-;print(GMList)
+
 ; ========================================================================
 ;
 ;               Loop for each (historical) SAT/SATa/GMST data
@@ -548,7 +548,7 @@ begin
     if (.not.output_ref_trend .and. any(infoSAT@dataset.eq.(/masking_dataset_GMST, masking_dataset_pattern/))) then
       continue
     end if
-;   Skip masking reference data of output_obs_trend = False
+;   Skip obs data of output_obs_trend = False
     if (.not.output_obs_trend .and. any(infoSAT@dataset.eq.obs_datasets)) then
       continue
     end if
