@@ -9,7 +9,7 @@
 ;    https://www-users.york.ac.uk/~kdc3/papers/coverage2013/series.html
 ;
 ; Last access
-;    20191101
+;    20210207
 ;
 ; Download and processing instructions
 ;    Download the Version 2.0 long reconstruction -> HadCRUT4 infilled by kriging
@@ -17,6 +17,7 @@
 ;                "Gridded data: netcdf" and "Ensmble: monthly"
 ;
 ; Modification history
+;    20210207-kosaka_yu: updated to 2020.
 ;    20191101-kosaka_yu: written.
 ;
 ; #############################################################################
@@ -36,7 +37,7 @@ begin
 
   ; Period
   YEAR1 = 1850
-  YEAR2 = 2018
+  YEAR2 = 2020
 
   ; Selected variable (standard name)
   VAR1 = "tasa"

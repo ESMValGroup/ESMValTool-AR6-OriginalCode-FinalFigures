@@ -9,21 +9,22 @@
 ;    https://data.giss.nasa.gov/gistemp/
 ;
 ; Last access
-;    20191101
+;    20210207
 ;
 ; Download and processing instructions
 ;    Download "Global-mean monthly, seasonal, and annual means
-;                -> TXT"
+;                -> CSV"
 ;            and
 ;             "Gridded Monthly Temperature Anomaly Data
-;                -> Compressed NetCDF Files (regular 2быб▀2бы gr
+;                -> Compressed NetCDF Files (regular 2x2x2 gr
 ;                   -> Land-Ocean Temperature Index, ERSSTv5, 1200km smoothing"  
 ;
 ; Caveats
 ;    Produces temperature anomalies (relative to the 1951-80 climatology)
 ;
 ; Modification history
-;    20191101-A_kosaka_yu: written.
+;    20210207-kosaka_yu: updated to 2020.
+;    20191101-kosaka_yu: written.
 ;
 ; #############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -42,7 +43,7 @@ begin
 
   ; Period
   YEAR1 = 1880
-  YEAR2 = 2018
+  YEAR2 = 2020
 
   ; Selected variable (standard name)
   VAR1 = "tasa"
