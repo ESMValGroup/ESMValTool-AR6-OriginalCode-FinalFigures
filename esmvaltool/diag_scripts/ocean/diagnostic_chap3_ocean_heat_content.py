@@ -4323,6 +4323,13 @@ def sea_surface_salinity_plot(
         # ax=subplot
         plt.sca(ax)
 
+    lat_constraint = iris.Constraint(
+        coord_values={
+            cube.coord('latitude'): lambda cell: -72. < cell.point < 72.})
+
+    cube = cube.extract(lat_constraint)
+    black_con_cube = black_con_cube.extract(lat_constraint)
+
     #if fig_type=='mean':
     #    cmap=diagtools.misc_seq
     #    nspace = np.linspace(
