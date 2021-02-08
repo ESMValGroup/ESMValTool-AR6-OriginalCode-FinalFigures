@@ -68,7 +68,7 @@ except:
 #         box_colours =  {'GHG': [178,178,178], 'NAT':[0,79,0], 'AER':[0,52,102], 'HIST':[196,121,0]}
 
 CMIP5_blue = '#2551cc'
-CMIP6_red = '#cc2323'
+CMIP6_red = '#cc2323' # (204, 35, 35)
 histnat_green= '#004F00' # 0,79,0
 historical_beige = '#c47900' #
 
@@ -571,7 +571,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
 
             for subplot, ax in axes.items():
                 key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
-                print(subplot, depth_dict[subplot])
+                #print(subplot, depth_dict[subplot])
                 fn = ocean_heat_content_timeseries[key]
 
                 times, data = load_convert(fn)
@@ -593,17 +593,23 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
 
         for subplot in fill_betweens.keys():
             times = sorted(fill_betweens[subplot].keys())
-            t_weights = [] # list of datasets.
             pc5s = []
             pc95s = []
             pc50s = []
+            median = False
             for t in times:
                 counts = Counter(weights[subplot][t])
+                t_weights = [] # list of datasets.
                 for dset in weights[subplot][t]:
                     t_weights.append(1./float(counts[dset]))
                 [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights)
                 pc5s.append(pc5)
-                pc50s.append(pc50)
+                if median:
+                    pc50s.append(pc50)
+                else: # mean:
+                   print(t, fill_betweens[subplot][t], t_weights, [len(fill_betweens[subplot][t]), len(t_weights)])
+                   mean = np.average(fill_betweens[subplot][t], weights=t_weights)
+                   pc50s.append(mean)
                 pc95s.append(pc95)
                 print(pc5, pc50, pc95)
             print('5-95:', pc5s, pc95s)
@@ -718,13 +724,17 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 for r, row in enumerate(reader):
                     if r < 2: continue
                     time = float(row[0])
+
+                    if depth_key == '2000m_plus' and time < 1992: 
+                        continue
                     center = float(row[central_colums[depth_key]])
                     sigma = float(row[sigma_columns[depth_key]])
 
                     times.append(time)
-                    lower_sigma.append(center - sigma)
+                    lower_sigma.append(center - 1.6*sigma)
                     centers.append(center)
-                    upper_sigma.append(center + sigma)
+                    upper_sigma.append(center + 1.6*sigma)
+
             print(depth_key, times)
 
             axes[subplot].plot(np.array(times),
@@ -758,9 +768,10 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         if show_UKESM:
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
     if plot_style in ['5-95', ]:
-        axleg.plot([], [], c=CMIP6_red, lw=5, ls='-', alpha=0.85, label='CMIP6')
+        #axleg.plot([], [], c=CMIP6_red, lw=5, ls='-', alpha=0.85, label='CMIP6')
+        axleg.plot([], [], c=CMIP6_red, lw=1.5, marker='s', markerfacecolor=(0.80, 0.137, 0.137, 0.35), markeredgewidth=0., markersize = 11, ls='-', label='CMIP6 mean and 5-95 percentile range')
         if all_obs_sigma:
-            axleg.plot([], [], c='black', lw=1.5, marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11, ls='-', label='Observations '+r'$\pm 1 \sigma$')
+            axleg.plot([], [], c='black', lw=1.5, marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11, ls='-', label='Observations '+r'$\pm 1.6 \sigma$')
         else:
             axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
 
@@ -2915,7 +2926,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         proj = ccrs.PlateCarree(central_longitude=central_longitude)
     else:
        proj = ccrs.Robinson(central_longitude=central_longitude)
-       mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+       mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
 
     if isinstance(subplot, int):
         ax = fig.add_subplot(subplot, projection=proj)
@@ -4193,20 +4204,20 @@ def sea_surface_salinity_plot(
     else:
         time_range_str = str(time_range)
     central_longitude=-160.+3.5
-
+    max_lat = 70.
     if fn:
         mean_cube = iris.load_cube(fn)
-        mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+        mean_cube = mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
 
     if ref_file not in [None, (None,)]:
         print('loading ref file:', fig_type, obs_key, ref_file)
         ref_cube = iris.load_cube(ref_file)
-        ref_cube = ref_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+        ref_cube = ref_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
 
     if ref_file_2 not in [None, (None,)]:
         print('loading ref file:', fig_type, obs_key, ref_file_2)
         ref_cube_2 = iris.load_cube(ref_file_2)
-        ref_cube_2 = ref_cube_2.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))
+        ref_cube_2 = ref_cube_2.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
 
 
     thresholds =[32., 32.5, 33., 33.5, 34., 34.5, 35., 35.5, 36., 36.5, 37., 37.5, ]
@@ -4236,12 +4247,12 @@ def sea_surface_salinity_plot(
     obs_cubes = iris.load_raw(obs_file)
     obs_change_cube = obs_cubes.extract(iris.Constraint(name='salinity_change'))[0]
     #bs_change_cube = regrid_to_1x1(obs_change_cube[0]) # surface
-    obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))[0]
+    obs_change_cube = obs_change_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))[0]
     obs_change_cube.coord('longitude').attributes['circular'] = True
 
     obs_mean_cube = obs_cubes.extract(iris.Constraint(name='salinity_mean'))[0]
     #bs_mean_cube = regrid_to_1x1(obs_mean_cube[0]) # surface
-    obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-73., 73.))[0]
+    obs_mean_cube = obs_mean_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))[0]
     obs_mean_cube.coord('longitude').attributes['circular'] = True
 
     if obs_change_cube.data.ndim == 3:
@@ -4325,10 +4336,12 @@ def sea_surface_salinity_plot(
 
     lat_constraint = iris.Constraint(
         coord_values={
-            cube.coord('latitude'): lambda cell: -72. < cell.point < 72.})
+            cube.coord('latitude'): lambda cell: -max_lat < cell.point < max_lat})
 
-    cube = cube.extract(lat_constraint)
-    black_con_cube = black_con_cube.extract(lat_constraint)
+    #cube = regrid_to_1x1(cube)
+    #black_con_cube = regrid_to_1x1(black_con_cube)
+    cube.extract(lat_constraint)
+    black_con_cube.extract(lat_constraint)
 
     #if fig_type=='mean':
     #    cmap=diagtools.misc_seq
@@ -4492,6 +4505,10 @@ def sea_surface_salinity_multipane(
         #fig.suptitle('Near-Surface Salinity trends') #s_key)
         cbar_ticks = np.linspace(-10., 10., 11, )
         cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
+        #cbar.remove()
+        #plt.tight_layout()
+        #plt.draw()
+        #cbar = fig.colorbar(qplots[212], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
 
     unique_id = ['salinity', plot_type, time_range_str, obs_key]
     filename = '_'.join(unique_id).replace('/', '_')
@@ -4919,9 +4936,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SS =  True
+    do_SS =  False #True
     do_SLR = False # True  #False
-    do_OHC = False #True  #True
+    do_OHC = True #False #True  #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -5358,7 +5375,8 @@ def main(cfg):
     depth_ranges = ['total', '0-700m', '700-2000m', '0-2000m', '2000m_plus']
     for depth_range in depth_ranges:
         for (project, dataset, exp, ensemble, short_name, trend), ohc_fn in ocean_heat_content.items():
-            if exp not in ['historical', 'piControl']: continue
+            if exp not in ['historical', 'piControl', 'hist-nat']: 
+                 continue
             ohc_ts_fn = calc_ohc_ts(cfg, metadatas, ohc_fn, depth_range, trend)
             ocean_heat_content_timeseries[(project, dataset, exp, ensemble, short_name, trend, depth_range)] = ohc_ts_fn
             print('OHC:', (project, dataset, exp, ensemble, short_name, trend, depth_range))
