@@ -965,8 +965,6 @@ begin
     + ", reference = " + names(ref_ind) + "."
   infiles = metadata_att_as_array(info0, "filename")
 
-print(plotfile)
-
   log_provenance(nc_filename, plotfile, prov_caption, statistics, \
                  domain, plottype, authors, references, infiles)
 
