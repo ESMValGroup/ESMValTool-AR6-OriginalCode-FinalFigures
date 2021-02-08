@@ -114,7 +114,7 @@ diagnostics:
         exp: historical
         grid: gr
         ensemble: r1i1p1f1
-        start_year: 1979
+        start_year: 1985
         end_year: 2014
     additional_datasets:
       - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}

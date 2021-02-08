@@ -241,7 +241,8 @@ begin
   ;res@cnLevels = (/-1.6, -1.4, -1.2, -1.0, -0.8, -0.6, -0.4, \
   ;                -0.2, 0., 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, \
   ;                1.4, 1.6/)  ; scale bar from Eyring et al. (2013)
-  res@cnLevels = (/-10., -5., -2., -1., -0.5, -0.2, -0.1, 0., 0.1, 0.2, 0.5, 1., 2., 5., 10./)
+  ;res@cnLevels = (/-10., -5., -2., -1., -0.5, -0.2, -0.1, 0., 0.1, 0.2, 0.5, 1., 2., 5., 10./)
+  res@cnLevels = (/-5., -2., -1., -0.5, -0.2, -0.1, 0., 0.1, 0.2, 0.5, 1., 2., 5./)
   res@tmXBMode = "Explicit"
   ;res@tmXBValues = (/-60., -30., 0., 30., 60./)
   ;res@tmXBLabels = (/"60S", "30S", "0", "30N", "60N"/)
@@ -361,10 +362,10 @@ begin
   plotz_1 = gsn_contour_shade(plotz_1, 1., 0.95, opt)
 
   overlay(plot_d(0), plotv_0)
-  overlay(plot_d(0), plotz_0)
+  ;overlay(plot_d(0), plotz_0)
 
   overlay(plot_d(1), plotv_1)
-  overlay(plot_d(1), plotz_1)
+  ;overlay(plot_d(1), plotz_1)
 
   ;draw(plotu)
   ;frame(wks)
