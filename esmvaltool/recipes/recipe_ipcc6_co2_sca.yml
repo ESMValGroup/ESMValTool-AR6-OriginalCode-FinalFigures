@@ -84,12 +84,11 @@ diagnostics:
         start_year: 1961
         end_year: 2014
         additional_datasets:
-          - {dataset: ESRL, project: OBS, type: ground,
-             version: MLO, tier: 2, start_year: 1973}
+          - {dataset: Scripps, project: OBS6, type: ground,
+             version: MLO, tier: 2}
           - {dataset: ESRL, project: OBS, type: ground,
              version: GLOBAL, tier: 2, start_year: 1980}
     scripts:
       fig_3_31_sca:
         script: ipcc_ar6/CO2_SCA_trend.py
-       # co2data: {CO2-MLO: [/work/bd0854/b309137/data_ext/Tier2/ESRL/OBS_ESRL_ground_MLO_T0M_co2_195801-201912.nc, 1961, 2014], CO2-GLOB: [/work/bd0854/b309137/data_ext/Tier2/ESRL/OBS_ESRL_ground_GLOB_T0M_co2_198001-201812.nc, 1980, 2014]}
         ref_model: CO2-MLO

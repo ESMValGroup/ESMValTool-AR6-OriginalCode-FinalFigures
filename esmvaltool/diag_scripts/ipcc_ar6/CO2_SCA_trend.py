@@ -160,7 +160,8 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle,
     # Non-mmm lines
     for dataset in yrs:
         if not dataset in dataset_groups['mmm_datasets']:
-            # Possibly need to readjust if start_year >> mmm_start_year to get relative amplitude in line
+            # Possibly need to readjust if start_year >> mmm_start_year
+            # to get relative amplitude in line
             if timeranges[dataset][0] > min_year:
                 # Make mean of last 10 years of dataset similar to mmm_mean
                 mean_dataset_10 = np.mean(amps[dataset][-10:])
@@ -392,16 +393,6 @@ def main(cfg):
     dataset_groups['mmm_datasets'] = []
     dataset_groups['plot_sca'] = []
     dataset_groups['ref_model'] = cfg['ref_model']
-
-    # if 'co2data' in cfg:
-    #     for dataset in cfg['co2data']:
-    #         #logger.info(dataset)
-    #         cfg['input_data'][dataset] = \
-    #             {'filename': cfg['co2data'][dataset][0],
-    #              'dataset': dataset, 'short_name': 'co2',
-    #              'start_year': cfg['co2data'][dataset][1],
-    #              'end_year': cfg['co2data'][dataset][2],
-    #              'project': 'OBS'}
 
     input_data = cfg['input_data'].values()
     for data in input_data:

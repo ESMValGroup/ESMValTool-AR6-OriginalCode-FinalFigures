@@ -57,7 +57,7 @@ preprocessors:
         end_month: 12
         end_day: 31
     regrid:
-      target_grid: reference_dataset
+      target_grid: 2x2 #reference_dataset
       scheme: linear
     #mask_multimodel: true
     area_statistics:
@@ -94,8 +94,17 @@ diagnostics:
   # status:
   # **********************************************************************
 
-  fig_3_38_co2:
+  fig_3_30_co2:
     description: Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+    themes:
+      - phys
+      - ghg
+      - carbon
+      - bgphys
+    realms:
+      - land
+      - ocean
+      - atmos
     variables:
       fgco2:
         preprocessor: fgco2_sum
@@ -109,8 +118,9 @@ diagnostics:
         additional_datasets:
           - {dataset: ACCESS-ESM1-5}
           - {dataset: CanESM5}
-          #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
           - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3}
+#          - {dataset: EC-Earth3-CC}
           #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
           - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
           - {dataset: MPI-ESM1-2-LR}
@@ -138,8 +148,9 @@ diagnostics:
         additional_datasets:
           - {dataset: ACCESS-ESM1-5}
           - {dataset: CanESM5}
-          #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
           - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3, grid: gr}
+#          - {dataset: EC-Earth3-CC, grid: gr}
           #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
           - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
           - {dataset: MPI-ESM1-2-LR}
@@ -161,14 +172,14 @@ diagnostics:
         exp: esm-hist
         mip: Amon
         start_year: 1850
-        end_year: 2014 #2010
+        end_year: 2014
         grid: gn
-        #reference_dataset: ESRL
         additional_datasets:
           - {dataset: ACCESS-ESM1-5}
           - {dataset: CanESM5}
-          #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
           - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3, grid: gr}
+#          - {dataset: EC-Earth3-CC} # ps and co2 are gr and gn respectively
           #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
           - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
           - {dataset: MPI-ESM1-2-LR}
@@ -177,17 +188,14 @@ diagnostics:
           - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2}
       co2s_obs:
         short_name: co2s
-        project: CMIP6
-        ensemble: r1i1p1f1
-        exp: esm-hist
         mip: Amon
         start_year: 1850
-        end_year: 2014 #2010
+        end_year: 2014
         grid: gn
         reference_dataset: ESRL
         additional_datasets:
-          - {dataset: ESRL, project: OBS, type: ground, version: GLOB, tier: 2,
-             start_year: 1980, end_year: 2014}
+          - {dataset: ESRL, project: OBS, type: ground, version: GLOBAL,
+             tier: 2, start_year: 1980}
       tas:
         preprocessor: glob_mean_ref
         project: CMIP6
@@ -195,14 +203,15 @@ diagnostics:
         exp: esm-hist
         mip: Amon
         start_year: 1850
-        end_year: 2014 #2010
+        end_year: 2014
         grid: gn
-        reference_dataset: HadCRUT4
+        #reference_dataset: HadCRUT4
         additional_datasets:
           - { dataset: ACCESS-ESM1-5, exp: historical }
           - { dataset: CanESM5, exp: historical }
-          #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, exp: historical}
           - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, exp: historical }
+#          - {dataset: EC-Earth3-CC, exp: historical, grid: gr}
           #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
           - { dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: historical }
           - { dataset: MPI-ESM1-2-LR, exp: historical }
@@ -212,15 +221,23 @@ diagnostics:
 
           - {dataset: ACCESS-ESM1-5}
           - {dataset: CanESM5}
-          #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
           - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3, grid: gr}
+ #         - {dataset: EC-Earth3-CC, grid: gr}
           #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
           - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
           - {dataset: MPI-ESM1-2-LR}
           - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1}
           - {dataset: NorESM2-LM}
           - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2}
-          - {dataset: HadCRUT4, project: OBS, type: ground, version: 1, tier: 2}
+      tasa:
+        preprocessor: glob_mean_ref
+        mip: Amon
+        start_year: 1850
+        end_year: 2014
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean,
+           version: 5.0, tier: 2}
     scripts:
-      fig_3_38_co2:
+      fig_3_30_co2:
         script: ipcc_ar6/fig_carbonsinks_timeseries_panels.py

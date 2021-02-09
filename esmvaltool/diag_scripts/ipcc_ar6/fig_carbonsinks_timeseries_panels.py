@@ -36,29 +36,77 @@ from esmvaltool.diag_scripts.shared import (
     ProvenanceLogger, extract_variables, get_diagnostic_filename,
     get_plot_filename, group_metadata, io, plot, run_diagnostic,
     variables_available, select_metadata)
-import esmvaltool.diag_scripts.shared.ESRL_ccgcrv.ccgfilt as ccgfilt
-from esmvaltool.diag_scripts.shared.ESRL_ccgcrv.ccgdates import (
-    decimalDate, decimalDateFromDatetime, calendarDate, datetimeFromDecimalDate)
+from esmvaltool.diag_scripts.shared.iris_helpers import unify_1d_cubes
 from matplotlib import rcParams
 import numpy as np
 
 logger = logging.getLogger(os.path.basename(__file__))
 
+def get_provenance_record():
+    """Create a provenance record describing the diagnostic data and plot."""
+    record = {
+        'caption':
+        ('Timeseries for carbon sinks, temperature anomaly and carbon content'
+         ' of the atmosphere in the historical period.'),
+        'statistics': ['mean', 'anomaly'],
+        'domains': ['global'],
+        'plot_types': ['times'],
+        'authors': ['gier_bettina'],
+        'references': ['acknow_project'],
+    }
+    return record
+
+def write_data(data, plot_path, cfg):
+    print(data)
+    vars = extract_variables(cfg)
+    vars['tasa']['standard_name'] = 'air_temperature_anomaly'
+    input_data = list(cfg['input_data'].values())
+    path = get_diagnostic_filename('fig_3_30_carbonsinks_timeseries', cfg)
+
+    # Make cubelist
+    var_cubes = []
+    for var in data:
+        print(vars[var])
+        print(data[var])
+        datasets = list(data[var].keys())
+        var_cubelist = iris.cube.CubeList(list(data[var].values()))
+        var_cubelist =  unify_1d_cubes(var_cubelist, 'year')
+        data_var = [c.data for c in var_cubelist]
+        dataset_coord = iris.coords.AuxCoord(datasets, long_name = 'dataset')
+        coord = var_cubelist[0].coord('year')
+        vars[var]['var_name'] = vars[var].pop('short_name')
+        var_cubes.append(iris.cube.Cube(np.ma.array(data_var),
+                              aux_coords_and_dims=[(dataset_coord, 0),
+                                                   (coord, 1)],
+                              **vars[var]))
+
+    io.iris_save(iris.cube.CubeList(var_cubes), path)
+
+    provenance_record = get_provenance_record()
+    provenance_record['plot_file'] = plot_path
+    provenance_record['ancestors'] = list(group_metadata(input_data,
+                                                    'filename').keys())
+    with ProvenanceLogger(cfg) as provenance_logger:
+        provenance_logger.log(path, provenance_record)
+
 def main(cfg):
     """Run the diagnostic."""
-    #cmip6_models = select_metadata(cfg['input_data'].values(), project="CMIP6")
-    #datasetnames = list(group_metadata(cmip6_models, 'dataset').keys())
 
-    n_cycle_models = ["ACCESS-ESM1-5", "BNU-ESM", "CESM1-BGC", "NorESM1-ME", "UKESM1-0-LL",
-                      "NorESM2-LM", "EC-Earth3-Veg", "CESM2", "CESM2-WACCM",
+    n_cycle_models = ["ACCESS-ESM1-5", "BNU-ESM", "CESM1-BGC",
+                      "NorESM1-ME", "UKESM1-0-LL",
+                      "NorESM2-LM", "EC-Earth3-Veg", "EC-Earth3-CC",
+                      "CESM2", "CESM2-WACCM",
                       "SAM0-UNICON", "MIROC-ES2L", "MPI-ESM1-2-LR"]
     legend_items = {}
 
     tas_data = select_metadata(cfg['input_data'].values(), short_name="tas")
+    tas_data += select_metadata(cfg['input_data'].values(),
+                                    short_name="tasa")
     nbp_data = select_metadata(cfg['input_data'].values(), short_name="nbp")
-    fgco2_data = select_metadata(cfg['input_data'].values(), short_name="fgco2")
+    fgco2_data = select_metadata(cfg['input_data'].values(),
+                                 short_name="fgco2")
     co2_data = select_metadata(cfg['input_data'].values(), short_name="co2s")
-    #logger.info(input_data)
+    plot_data = {'co2s': {}, 'tasa': {}, 'fgco2': {}, 'nbp': {}}
 
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 
@@ -71,16 +119,19 @@ def main(cfg):
         iris.coord_categorisation.add_year(cube, 'time')
         cube = cube.aggregated_by('year', iris.analysis.MEAN)
         if name=="ESRL":
-            cube = cube.collapsed(['longitude', 'latitude'], iris.analysis.MEAN)
+            cube = cube.collapsed(['longitude', 'latitude'],
+                                  iris.analysis.MEAN)
+            plot_data['co2s'][name] = cube
             ax1.plot(cube.coord("year").points, cube.data, color="black",
                      label = "OBS", linewidth = 1.5)
         else:
             style = plot.get_dataset_style(name, 'cmip6_ipcc')
             legend_items[name] = {'color': style['color'],
-                                  #'linestyle': linestyle,
                                   'linewidth': style['thick']}
 
-            ax1.plot(cube.coord("year").points, cube.data, color = style['color'],
+            plot_data['co2s'][name] = cube
+            ax1.plot(cube.coord("year").points, cube.data,
+                     color = style['color'],
                      label = name, linestyle = "-",
                      linewidth = legend_items[name]['linewidth'])
 
@@ -93,10 +144,10 @@ def main(cfg):
         name = data['dataset']
         logger.info("Processing %s", name)
         cube = iris.load_cube(data['filename'])
-        #cube.convert_units('celsius')
         iris.coord_categorisation.add_year(cube, 'time')
         cube = cube.aggregated_by('year', iris.analysis.MEAN)
-        if data['exp'] == 'historical' and name != "HadCRUT4":
+        if  name!="HadCRUT5" and data['exp'] == 'historical':
+            plot_data['tasa'][name+"_historical"] = cube
             linestyle = "--"
             if hist == 0:
                 historical = cube.data
@@ -104,14 +155,16 @@ def main(cfg):
             else:
                 historical += cube.data
             n += 1
-        elif data['exp'] == 'esm-hist' and name != "HadCRUT4":
+        elif name!="HadCRUT5" and data['exp'] == 'esm-hist':
+            plot_data['tasa'][name] = cube
             linestyle = "-"
             if esmhist == 0:
                 esmhistorical = cube.data
                 esmhist = 1
             else:
                 esmhistorical += cube.data
-        if name=="HadCRUT4":
+        if name=="HadCRUT5":
+            plot_data['tasa'][name] = cube
             time = cube.coord("year").points
             ax2.plot(cube.coord("year").points, cube.data, color="black",
                      label = "OBS", linewidth = 1.5, zorder= 100)
@@ -140,6 +193,7 @@ def main(cfg):
         if name=="GCP":
             cube = cube.collapsed(['longitude', 'latitude'], iris.analysis.MEAN)
             cube.data = cube.data * 148300000000000. #multiply by area
+            plot_data['nbp'][name] = cube
             ax3.plot(cube.coord("year").points, cube.data, color="black",
                      label = "OBS", linewidth = 1.5, zorder= 100)
             ax3.fill_between(cube.coord("year").points, cube.data - 0.6, cube.data + 0.6,
@@ -147,6 +201,7 @@ def main(cfg):
 
             ax3.axhline(color="grey", linestyle = "--")
         else:
+            plot_data['nbp'][name] = cube
             ax3.plot(cube.coord("year").points, cube.data,
                      color = legend_items[name]['color'],
                      linestyle = "-", label = name,
@@ -162,17 +217,21 @@ def main(cfg):
         cube = cube.aggregated_by('year', iris.analysis.MEAN)
         cube = cube.rolling_window('year', iris.analysis.MEAN, 10)
         if name=="GCP":
-            cube = cube.collapsed(['longitude', 'latitude'], iris.analysis.MEAN)
+            cube = cube.collapsed(['longitude', 'latitude'],
+                                  iris.analysis.MEAN)
             cube.data = cube.data * 360000000000000. #multiply by area
+            plot_data['fgco2'][name] = cube
             ax4.plot(cube.coord("year").points, cube.data, color="black",
                      label = "OBS", linewidth = 1.5, zorder= 100)
-            ax4.fill_between(cube.coord("year").points, cube.data - 0.5, cube.data + 0.5,
+            ax4.fill_between(cube.coord("year").points, cube.data - 0.5,
+                             cube.data + 0.5,
                              color = "black", alpha = 0.2, zorder= 101)
 
             ax4.axhline(color="grey", linestyle = "--")
         else:
             cube_ini = cube.extract(iris.Constraint(year=1850))
             cube = cube - cube_ini
+            plot_data['fgco2'][name] = cube
             ax4.plot(cube.coord("year").points, cube.data,
                      color = legend_items[name]['color'],
                      linestyle = "-", label = name,
@@ -205,24 +264,14 @@ def main(cfg):
 
     fig.legend(lines, labels,
                loc='upper left', bbox_to_anchor=(1, 0.92))
-    plot_path = get_plot_filename('carbonsinks_timeseries', cfg)
+    plot_path = get_plot_filename('fig_3_30_carbonsinks_timeseries', cfg)
 
     fig.suptitle("Carbon sinks in CMIP6 emission driven simulations")
     fig.tight_layout()
     fig.savefig(plot_path, bbox_inches='tight', dpi = 300)
     plt.close(fig)
 
-    # Write netcdf file TODO! Currently just dummy
-    #netcdf_path = get_diagnostic_filename('SCA_trend_xy_' + str(min_year) + '_' + str(max_year), cfg)
-    #save_scalar_data(rel_trend_sca, netcdf_path, var_attrs)
-    #netcdf_path = write_data(cfg, hist_cubes, pi_cubes, ecs_cube)
-
-    # Provenance
-    #provenance_record = get_provenance_record()
-    #if plot_path is not None:
-    #    provenance_record['plot_file'] = plot_path
-    #with ProvenanceLogger(cfg) as provenance_logger:
-    #    provenance_logger.log(netcdf_path, provenance_record)
+    write_data(plot_data, plot_path, cfg)
 
 if __name__ == '__main__':
     with run_diagnostic() as config:
