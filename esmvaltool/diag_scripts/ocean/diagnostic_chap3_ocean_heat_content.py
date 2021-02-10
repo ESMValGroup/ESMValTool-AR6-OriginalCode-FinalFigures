@@ -330,8 +330,20 @@ def zero_around(cube, year_initial=1971., year_final=1971.):
     """
     new_cube = extract_time(cube, year_initial, 1, 1, year_final, 12, 31)
     mean = new_cube.data.mean()
-    cube.data = cube.data - mean
-    return cube
+    data = cube.data - mean
+    return data
+
+def zero_around_arr(times, data, year_initial=1971., year_final=1971.):
+    """
+    Zero around the time range provided.
+
+    """
+    # print('zero_around_arr', times, data,  year_initial, year_final)
+    times = np.array(times)
+    data = np.array(data)
+    anomaly_data = np.ma.masked_where((times<year_initial) + (times>year_final), data).mean()
+    data = data - anomaly_data
+    return data
 
 
 def zero_around_dat(times, data, year):
@@ -352,11 +364,15 @@ def top_left_text(ax, text):
              transform=ax.transAxes)
 
 
-def load_convert(fn):
+def load_convert(fn, relative_to=1971.):
      cube = iris.load_cube(fn)
      cube.convert_units('ZJ')
      times = diagtools.cube_time_to_float(cube)
-     data = zero_around_dat(times, cube.data, 1971.)
+     # print('load_convert', cube.data, times,  relative_to)
+     if isinstance(relative_to, list):
+         data = zero_around(cube, year_initial=relative_to[0], year_final=relative_to[1])
+     else:
+         data = zero_around_dat(times, cube.data, relative_to)
      return times, data
 
 
@@ -386,7 +402,8 @@ def single_timeseries(fn, path, keys):
 def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         plot_style='viridis',
         plot_type='7_panes',
-        show_UKESM=False):
+        show_UKESM=False,
+        relative_to=1971):
     """
     Multimodel version of the 2.25 plot.
     produced when do_OHC is true
@@ -513,8 +530,6 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         axes['7-20'] = fig.add_subplot(gs1[1]) # LHS
         axes['2plus'] = fig.add_subplot(gs1[2]) # LHS
 
-
-
     for subplot in depth_dict.keys():
         if isinstance(subplot, int):
             axes[subplot] =  plt.subplot(subplot)
@@ -540,7 +555,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 print(subplot, depth_dict[subplot])
                 fn = ocean_heat_content_timeseries[key]
 
-                times, data = load_convert(fn)
+                times, data = load_convert(fn, relative_to=relative_to)
                 if '2000m_plus' ==  depth_dict[subplot]:
                     print(key, times, data)
                 for t, d in zip(times, data):
@@ -574,7 +589,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 #print(subplot, depth_dict[subplot])
                 fn = ocean_heat_content_timeseries[key]
 
-                times, data = load_convert(fn)
+                times, data = load_convert(fn, relative_to=relative_to)
+
                 for t, d in zip(times, data):
                     t = int(t) + 0.5
                     if np.ma.is_masked(d): continue
@@ -632,7 +648,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
                 fn = ocean_heat_content_timeseries[key]
 
-                times, data = load_convert(fn)
+                times, data = load_convert(fn, relative_to=relative_to)
+
                 if show_UKESM and dataset.lower().find('ukesm')>-1:
                     ax.plot(times, data, c=color_dict[dataset], alpha=1.0, lw=1.5, zorder=2)
                 else:
@@ -717,6 +734,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             times = []
             lower_sigma = []
             centers = []
+            sigmas = []
             upper_sigma = []
 
             with open(fn, ) as csvfile:
@@ -731,11 +749,20 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                     sigma = float(row[sigma_columns[depth_key]])
 
                     times.append(time)
-                    lower_sigma.append(center - 1.6*sigma)
+                    sigmas.append(sigma)
                     centers.append(center)
-                    upper_sigma.append(center + 1.6*sigma)
 
-            print(depth_key, times)
+            if isinstance(relative_to, list):
+                centers = zero_around_arr(times, centers, year_initial=relative_to[0], year_final=relative_to[1])
+            else:
+                centers = zero_around_arr(times, centers, year_initial=relative_to, year_final=relative_to)
+
+            upper_sigma = []
+            lower_sigma = []
+            for center, sigma in zip(centers, sigmas):
+                lower_sigma.append(center - 1.6*sigma)
+                upper_sigma.append(center + 1.6*sigma)
+
 
             axes[subplot].plot(np.array(times),
                            np.array(centers),
@@ -745,7 +772,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                            )
             axes[subplot].fill_between(np.array(times), np.array(lower_sigma), np.array(upper_sigma), color='black', alpha=0.35, edgecolor=None)
 
-    legend_fs = 12
+    legend_fs = 9  
     if plot_style in ['all_one', 'mono', '5-95']:leg_size=2
     else:
         leg_size = len(datasets)
@@ -769,9 +796,18 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
     if plot_style in ['5-95', ]:
         #axleg.plot([], [], c=CMIP6_red, lw=5, ls='-', alpha=0.85, label='CMIP6')
-        axleg.plot([], [], c=CMIP6_red, lw=1.5, marker='s', markerfacecolor=(0.80, 0.137, 0.137, 0.35), markeredgewidth=0., markersize = 11, ls='-', label='CMIP6 mean and 5-95 percentile range')
+        axleg.plot([], [], 
+                   c=CMIP6_red, lw=1.5, ls='-',
+                   marker='s', markerfacecolor=(0.80, 0.137, 0.137, 0.35), markeredgewidth=0., markersize = 11, 
+                   label='CMIP6 mean and 5-95 percentile range')
+
         if all_obs_sigma:
-            axleg.plot([], [], c='black', lw=1.5, marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11, ls='-', label='Observations '+r'$\pm 1.6 \sigma$')
+            #sigma_label = 'Observations '+r'$\pm 1.6 \sigma$'
+            sigma_label = 'Observations mean and 5-95 percentile range'
+
+            axleg.plot([], [], c='black', lw=1.5,ls='-', 
+                       marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11, 
+                       label=sigma_label)
         else:
             axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
 
@@ -785,7 +821,11 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
 
     if  plot_type=='large_full':
-        axes['full'].set_yticks([-400., -300., -200., -100., 0., 100., 200., 300., 400.])
+        if relative_to in [1971, 1971.]: 
+            #xes['full'].set_yticks([-900., -800., -700., -600., -500., -400., -300., -200., -100., 0., 100., 200., 300., 400.])
+            axes['full'].set_yticks([-400., -300., -200., -100., 0., 100., 200., 300., 400.])
+        else:
+            axes['full'].set_yticks([-600., -500.,-400., -300., -200., -100., 0., 100., 200.,])
 
     if plot_style == 'viridis':
         # Add emply plots to dummy axis.
@@ -809,11 +849,15 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
     fig_dir = diagtools.folder([cfg['plot_dir'], 'multimodel_ohc'])
     image_extention = diagtools.get_image_format(cfg)
 
+    if isinstance(relative_to, list):
+        rel_str = '-'.join([str(yr) for yr in relative_to])
+    else:
+        rel_str = str(relative_to)
     if show_UKESM:
-        fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,'UKESM',
+        fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,rel_str, 'UKESM',
                                      ])+image_extention
     else:
-        fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type,
+        fig_fn = fig_dir + '_'.join(['multimodel_ohc_range', plot_style, plot_type, rel_str,
                                      ])+image_extention
 
     plt.savefig(fig_fn)
@@ -4285,7 +4329,9 @@ def sea_surface_salinity_plot(
         #assert 0
         cmap=diagtools.misc_div
         #abel= obs_key+' trend ('+obs_time_str+')'
-        label = "Durack & Wijffels (1950-2019)"
+        # label = "Durack & Wijffels (1950-2019)"
+        label = "Observations (1950-2019)"
+
 
     elif fig_type=='obs_mean': # pane b (222, also contours)
         cube = obs_mean_cube
@@ -4317,7 +4363,7 @@ def sea_surface_salinity_plot(
             nspace = change_nspace_70
         cmap=diagtools.misc_div
         #label= 'CMIP6 trend ('+time_range_str+')'
-        label = "CMIP6 historical (1950-2014)" 
+        label = "CMIP6 historical multi-model mean (1950-2014)" 
     else:
         print("Fig type not recognised", fig_type)
         assert 0
@@ -4447,7 +4493,7 @@ def sea_surface_salinity_multipane(
     if plot_type == 'trends_only':
         subplots = [211, 212]
         fig_types = ['obs_change', 'model_change']
-        fig.set_size_inches(10, 7)
+        fig.set_size_inches(10, 10)
 
     axes = {}
     qplots = {}
@@ -4502,13 +4548,35 @@ def sea_surface_salinity_multipane(
         fig.colorbar(qplots[212], ax=[axes[212], ], location='right',label='Error in PSU') #, ticks=cbar_ticks)
 
     if plot_type == 'trends_only':
-        #fig.suptitle('Near-Surface Salinity trends') #s_key)
-        cbar_ticks = np.linspace(-10., 10., 11, )
-        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
+        fig.suptitle('Observed and modelled near surface salininty trends', y=0.93, fontweight='bold')
+        # cbar_ticks = np.linspace(-10., 10., 11, )
+        # cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label='mPSS-78 yr'+r'$^{-1}$', ticks=cbar_ticks)
         #cbar.remove()
-        #plt.tight_layout()
+#       plt.tight_layout()
         #plt.draw()
         #cbar = fig.colorbar(qplots[212], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
+
+        cbar_ticks = np.linspace(-10., 10., 11, )
+        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label='mPSS-78 yr'+r'$^{-1}$', ticks=cbar_ticks,pad=0.05, shrink=0.65)
+
+        axleg = plt.axes([0.05, 0.14, 0.9, 0.02])
+#        plt.tight_layout()
+
+        axleg.axis('off')
+
+        axleg.plot([], [], c='black', lw=1.5,ls='-',label='Near surface climatogical salininty')
+        legend_fs=10.5
+        legd = axleg.legend(
+            loc='upper center',
+            #loc='lower center',
+            #ncol=1,
+            #numpoints=1,
+            # handlelength=0.85,
+            prop={'size': legend_fs},
+            bbox_to_anchor=(0.5, 0.5,),
+            fontsize=legend_fs)
+        legd.draw_frame(False)
+        legd.get_frame().set_alpha(0.)
 
     unique_id = ['salinity', plot_type, time_range_str, obs_key]
     filename = '_'.join(unique_id).replace('/', '_')
@@ -4936,9 +5004,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SS =  False #True
-    do_SLR = False # True  #False
-    do_OHC = True #False #True  #True
+    do_SS = False #True
+    do_SLR = True  #False
+    do_OHC = False #True #False #True  #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -5440,7 +5508,10 @@ def main(cfg):
         except: continue
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
-    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False)
+    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=[1995.,2014.])
+
+    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=1971.)
+
     #multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
 
     for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one', '5-95'],['7_panes', '4_panes', 'large_full'], [True, False]):
