@@ -53,6 +53,10 @@ def _extract_variable(raw_var, cmor_info, attrs, filepath, out_dir):
         else:
             new_cube = cube[i]
 
+    # Fix metadata
+    utils.fix_var_metadata(new_cube, cmor_info)
+    utils.set_global_atts(new_cube, attrs)
+
     # Fix units
     new_cube.units = 'kg m-2 s-1'
 
@@ -66,10 +70,6 @@ def _extract_variable(raw_var, cmor_info, attrs, filepath, out_dir):
     new_cube.coord('latitude').bounds = lat_bnds
     new_cube.coord('longitude').bounds = None
     new_cube.coord('longitude').bounds = lon_bnds
-
-    # Fix metadata
-    utils.fix_var_metadata(new_cube, cmor_info)
-    utils.set_global_atts(new_cube, attrs)
 
     # Save variable
     utils.save_variable(new_cube,
