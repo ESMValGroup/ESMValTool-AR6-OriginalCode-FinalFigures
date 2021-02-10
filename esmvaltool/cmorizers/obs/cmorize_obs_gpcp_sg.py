@@ -42,15 +42,37 @@ def _get_filepath(in_dir, basename):
 def _extract_variable(raw_var, cmor_info, attrs, filepath, out_dir):
     """Extract variable."""
     var = cmor_info.short_name
-    cube = iris.load_cube(filepath, utils.var_name_constraint(raw_var))
-    new_cube = cube[1] # containing the data
+    cube = iris.load(filepath)
+    for i in range(4):
+        if cube[i].var_name == 'lat_bnds':
+            lat_bnds = cube[i].data
+        elif cube[i].var_name == 'lon_bnds':
+            lon_bnds = cube[i].data
+        elif cube[i].var_name == 'time_bnds':
+            time_bnds = cube[i].data
+        else:
+            new_cube = cube[i]
+
+    # Fix units
+    new_cube.units = 'kg m-2 s-1'
+
+    # Convert data from precipitation rate to precipitation flux
+    new_cube.data = new_cube.core_data() / 86400.0
+
+    # Fix bounds
     new_cube.coord('time').bounds = None
-    new_cube.coord('time').bounds = cube[0].data
+    new_cube.coord('time').bounds = time_bnds
     new_cube.coord('latitude').bounds = None
-    new_cube.coord('latitude').bounds = cube[2].data
+    new_cube.coord('latitude').bounds = lat_bnds
     new_cube.coord('longitude').bounds = None
-    new_cube.coord('longitude').bounds = cube[3].data
-    utils.save_variable(cube,
+    new_cube.coord('longitude').bounds = lon_bnds
+
+    # Fix metadata
+    utils.fix_var_metadata(new_cube, cmor_info)
+    utils.set_global_atts(new_cube, attrs)
+
+    # Save variable
+    utils.save_variable(new_cube,
                         var,
                         out_dir,
                         attrs,
