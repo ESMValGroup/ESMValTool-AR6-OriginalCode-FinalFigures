@@ -2779,9 +2779,12 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
         else:
             order = np.arange(len(labels))
 
-        plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
-             loc = 'lower right', framealpha=0., prop={'size': 7}, markerfirst=False )
-        #plt.legend(loc = 'lower right', framealpha=0., prop={'size': 7}, markerfirst=False )
+        ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
+            loc='upper center', bbox_to_anchor=(0.5, -0.15),
+            ncol=3,  framealpha=0., prop={'size': 7}, markerfirst=True )
+
+        # plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
+        #     loc = 'lower right', framealpha=0., prop={'size': 7}, markerfirst=False )
 
     ax.set_aspect("equal")
 
@@ -2790,11 +2793,11 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
     limits='custom'
     if limits=='custom' and plot_dyn == 'halo_ts':
-        ax.set_xlim([-0.5, 1.])
-        ax.set_ylim([-1., 0.5])
+        ax.set_xlim([-0.4, 1.])
+        ax.set_ylim([-1., 0.4])
     elif limits=='custom' and plot_dyn == 'thermo_ts':
-        ax.set_xlim([-1, 2.5])
-        ax.set_ylim([-1., 2.5])
+        ax.set_xlim([-0.5, 2. ])
+        ax.set_ylim([-0.5, 2. ])
     else:
         max_value = int(max_value)+1.
         ax.set_xlim([-max_value, max_value])
@@ -2965,6 +2968,8 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         title = ' '.join(['CMIP6 Multimodel mean', time_range_str ])
 
     central_longitude=-160.+3.5
+    max_lat = 70.
+
     square = False
     if square:
         proj = ccrs.PlateCarree(central_longitude=central_longitude)
@@ -3003,7 +3008,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
     try: plt.gca().coastlines()
     except: pass
 
-    ax = add_map_text(ax, 'CMIP6')
+    # ax = add_map_text(ax, 'CMIP6')
 
     # Saving files:
     if isinstance(subplot, int) and subplot==111:
@@ -3090,7 +3095,8 @@ def plot_halo_multipane(
         fig.set_size_inches(10, 7)
 
     if reverse and len(obs_files) == 3:
-        fig.set_size_inches(9,  7)
+        #fig.set_size_inches(9,  7)
+        fig.set_size_inches(10,  9)
 
         gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 1.00], wspace=0.)
         gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
@@ -3223,14 +3229,29 @@ def plot_halo_multipane(
 
     time_range_str = '-'.join([str(t) for t in time_range])
 
-    fig.suptitle('Halosteric and thermosteric sea level trends')
+    fig.suptitle('Halosteric and thermosteric sea level trends', fontweight='bold', y=0.93,)
 
     if reverse:
-        fig.colorbar(qplot, ax=cbar_axes, location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+        fig.colorbar(qplot, ax=cbar_axes, location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks, aspect=30., shrink=0.94)
+        # fig.colorbar(qplot, ax=cbar_axes, location='bottom',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
+
     else:
+        #fig.colorbar(qplot, ax=cbar_axes, location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
         fig.colorbar(qplot, ax=cbar_axes, location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
 
     #plt.tight_layout()
+    draw_line = True
+    if draw_line:
+        # Draw a horizontal lines at those coordinates
+       liney=0.88
+       line1 = plt.Line2D([0.5 ,0.5],[0.315,liney], transform=fig.transFigure, color="black", lw=0.7)
+       fig.add_artist(line1)
+       plt.figtext(0.505, liney, 'Observational Halosteric trends', fontsize=9, ha='left', va='top')
+
+       liney2=0.295 
+       line2 = plt.Line2D([0.5 ,0.5],[0.12,liney2], transform=fig.transFigure, color="black", lw=0.7)
+       fig.add_artist(line2)
+       plt.figtext(0.505, liney2, 'CMIP6 multi-model mean Halosteric trend', fontsize=9, ha='left', va='top')
 
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
@@ -4564,7 +4585,7 @@ def sea_surface_salinity_multipane(
 
         axleg.axis('off')
 
-        axleg.plot([], [], c='black', lw=1.5,ls='-',label='Near surface climatogical salininty')
+        axleg.plot([], [], c='black', lw=1.5,ls='-',label='Near surface climatogical salininty PSS-78')
         legend_fs=10.5
         legd = axleg.legend(
             loc='upper center',
