@@ -147,7 +147,7 @@ begin
   do_anomaly = True
   do_blend = True
   do_mask = True
-  if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4", "HadCRUT5", "GISTEMP", "NOAAGlobalTemp"/))) then
+  if (any(method_GMST.eq.(/"Cowtan2015", "HadCRUT4", "HadCRUT5", "GISTEMP", "NOAAGlobalTemp", "BerkeleyEarth"/))) then
     do_anomaly  = True
     do_blend = True
     do_mask  = True
@@ -167,24 +167,16 @@ begin
       masking_dataset_GMST = "NOAAGlobalTemp"
       syear_clim = 1971
       eyear_clim = 2000
+    elseif (method_GMST.eq."BerkeleyEarth") then
+      syear_clim = 1951
+      eyear_clim = 1980      
     end if
-   elseif (any(method_GMST.eq.(/"BerkeleyEarth", "CowtanWay", "global"/))) then
+  elseif (method_GMST.eq."global") then
     do_anomaly  = True
     do_blend = True
     do_mask  = False
-    if (method_GMST.eq."BerkeleyEarth") then
-      syear_clim = 1951
-      eyear_clim = 1980
-    elseif (any(method_GMST.eq.(/"CowtanWay", "Kadow"/))) then
-      syear_clim = 1961
-      eyear_clim = 1990
-    elseif (method_GMST.eq."NOAAGlobalTemp-Interim") then
-      syear_clim = 1971
-      eyear_clim = 2000
-    elseif (method_GMST.eq."global") then
-      syear_clim = 1961
-      eyear_clim = 1990
-    end if
+    syear_clim = 1961
+    eyear_clim = 1990
   elseif (method_GMST.eq."GSAT") then
     do_anomaly  = True
     do_blend = False

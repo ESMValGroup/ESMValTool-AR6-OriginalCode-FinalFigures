@@ -28,6 +28,7 @@ begin
   enter_msg(DIAG_SCRIPT, "")
 
   scale = 10. ; deg/decade
+  unit = "K/decade"
 
   input_dirs = diag_script_info@input_files + "/"
   ndirs = dimsizes(input_dirs)
@@ -84,7 +85,7 @@ begin
 
     fmt = "%8.5f"
     if (isvar("trend_obs")) then
-      hlist = obs_datasets(ii)+": "+sprintf(fmt, trend_obs)
+      hlist = obs_datasets(ii)+": "+sprintf(fmt, trend_obs)+unit
       write_table(ofile, "w", [/hlist/], "%s")
     else
       continue
