@@ -147,7 +147,7 @@ begin
   ; ------------------------------------------------------------------
   ;Calculate multi model mean and stddev
   ; ------------------------------------------------------------------
-  
+
   model_arr_stddev = new((/4, dimsizes(A_ref&lat)/), float)
   model_arr_stddev!1 = "lat"
   model_arr_stddev&lat = A_ref&lat
@@ -182,10 +182,10 @@ begin
 
   ; Select colors and other plotting attributes
   ; (see ./diag_scripts/shared/plot/style.ncl)
-  colors = project_style(info_items, diag_script_info, "colors")
-  dashes = project_style(info_items, diag_script_info, "dashes")
-  thicks = project_style(info_items, diag_script_info, "thicks")
-  annots = project_style(info_items, diag_script_info, "annots")
+  colors := project_style(info_items, diag_script_info, "colors")
+  dashes := project_style(info_items, diag_script_info, "dashes")
+  thicks := project_style(info_items, diag_script_info, "thicks")
+  annots := project_style(info_items, diag_script_info, "annots")
 
   ;colors = colors(::-1)
   ;dashes = dashes(::-1)
