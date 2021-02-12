@@ -8,7 +8,9 @@ documentation:
 
   authors:
     - bock_lisa
-    - eyring_veronika
+
+  projects:
+    - ipcc_ar6
 
 
 preprocessors:
@@ -753,8 +755,6 @@ diagnostics:
 #  # IPCC WGI AR6, chap. 3
 #  # Sect. 3.3
 #  # Fig. 3.2
-#  # **********************************************************************
-#  # Lisa
 #  # **********************************************************************
 #  # Multi model mean, multi model mean bias and root mean square error 
 #  # (geographical distributions) for CMIP6, CMIP5 and HighResMIP
