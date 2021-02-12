@@ -8,13 +8,14 @@
 ; Source
 ;
 ; Last access
-;    20191220
+;    20210207
 ;
 ; Download and processing instructions
 ;
 ; Caveats
 ;
 ; Modification history
+;    20210207-kosaka_yu: updated for v5.0.1.0
 ;    20191223-kosaka_yu: written.
 ;
 ; #############################################################################
@@ -34,7 +35,7 @@ begin
 
   ; Period
   YEAR1 = 1850
-  YEAR2 = 2018
+  YEAR2 = 2020
 
   ; Selected variable (standard name)
   VAR1 = "tas"
@@ -56,7 +57,7 @@ begin
     "/custom/CMOR_tasaga.dat"
 
   ; Version
-  VERSION = "5.0"
+  VERSION = "5.0.1.0"
 
   ; Type
 ;  TYPE1 = "ground"
@@ -64,9 +65,9 @@ begin
 
   ; Global attributes
   SOURCE = "https://crudata.uea.ac.uk/cru/data/temperature/"
-  REF1 =  ""
-  REF2 =  ""
-  REF3 =  ""
+  REF1 =  "Morice, C. P. et al. 2021, J. Geophys. Res. Atmosphere, doi: 10.1029/2019JD032361"
+  REF2 =  REF1
+  REF3 =  REF1
   COMMENT1 = "Temperature time-series calculated from the anomaly " + \
     "time-series by adding the temperature climatology for 1961-1990"
   COMMENT2 = "Temperature anomaly with respect to the period 1961-1990"
@@ -96,16 +97,13 @@ begin
 ;  log_info("  Climatology range: " + min(clim) + \
 ;           " K to " + max(clim) + " K")
 
-  do ens = -1, nens
+  do ens = 0, nens
     ; Read anomaly
-    if (ens.eq.-1) then
-      fname1 = input_dir_path + "HadCRUT.5.0.0.0.analysis.anomalies.ensemble_mean.nc"
+    if (ens.eq.0) then
+      fname1 = input_dir_path + "HadCRUT.5.0.1.0.analysis.anomalies.ensemble_mean.nc"
       vname  = "tas_mean"
-    elseif (ens.eq.0) then
-      fname1 = input_dir_path + "HadCRUT.5.0.0.0.analysis.anomalies.ensemble_median.nc"
-      vname  = "tas_median"
     else
-      fname1 = input_dir_path + "ensemble_members/HadCRUT.5.0.0.0.analysis.anomalies."+ens+".nc"
+      fname1 = input_dir_path + "ensemble_members/HadCRUT.5.0.1.0.analysis.anomalies."+ens+".nc"
       vname  = "tas"
     end if
     setfileoption("nc", "MissingToFillValue", True)
@@ -177,10 +175,8 @@ begin
     gAtt1 = set_global_atts(OBSNAME, TIER, SOURCE, REF1, COMMENT1)
     gAtt2 = set_global_atts(OBSNAME, TIER, SOURCE, REF2, COMMENT2)
 
-    if (ens.eq.-1) then
+    if (ens.eq.0) then
       ENS = "mean"
-    elseif (ens.eq.0) then
-      ENS = "median"
     else
       ENS = "ens"+sprinti("%0.3i", ens)
     end if
@@ -218,15 +214,18 @@ end
 begin
 
   ; Read file
-  do ens = -1, -1; nens
-    if (ens.eq.-1) then
-      fname = input_dir_path + "HadCRUT.5.0.0.0.analysis.summary_series.global.monthly.nc"
+  do ens = 0, nens
+    if (ens.eq.0) then
+      fname = input_dir_path + "HadCRUT.5.0.1.0.analysis.summary_series.global.monthly.nc"
       vname = "tas_mean"
+      f = addfile(fname, "r")
+      anomaly = f->$vname$(0:len-1)
     else
-
+      fname = input_dir_path + "HadCRUT.5.0.1.0.analysis.ensemble_series.global.monthly.nc"
+      vname = "tas"
+      f = addfile(fname, "r")
+      anomaly = f->$vname$(ens-1, 0:len-1)
     end if
-    f = addfile(fname, "r")
-    anomaly = f->$vname$(0:len-1)
   
     log_info("  Anomaly range: " + min(anomaly) + \
              " K to " + max(anomaly) + " K")
@@ -264,10 +263,8 @@ begin
 
   ; Write temperature anomaly time-series
     DATESTR = YEAR1 + "01-" + YEAR2 + "12"
-    if (ens.eq.-1) then
+    if (ens.eq.0) then
       ENS = "mean"
-    elseif (ens.eq.0) then
-      ENS = "median"
     else
       ENS = "ens"+sprinti("%0.3i", ens)
     end if
