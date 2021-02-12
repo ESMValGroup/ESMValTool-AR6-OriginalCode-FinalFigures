@@ -1213,7 +1213,7 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
       - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
       - {dataset: FGOALS-g2}
       - {dataset: FIO-ESM}
       - {dataset: GFDL-CM2p1}
@@ -1302,7 +1302,7 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
       - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
       - {dataset: FGOALS-g2}
       - {dataset: FIO-ESM}
       - {dataset: GFDL-CM2p1}
@@ -1390,7 +1390,7 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
       - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
       - {dataset: FGOALS-g2}
       - {dataset: FIO-ESM}
       - {dataset: GFDL-CM2p1}
@@ -1479,7 +1479,7 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
       - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
       - {dataset: FGOALS-g2}
       - {dataset: FIO-ESM}
       - {dataset: GFDL-CM2p1}
@@ -1568,7 +1568,7 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
       - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
       - {dataset: FGOALS-g2}
       - {dataset: FGOALS-s2}
       - {dataset: FIO-ESM}
@@ -1664,7 +1664,7 @@ diagnostics:
       - {dataset: CNRM-CM5}
       - {dataset: CNRM-CM5-2}
       - {dataset: CSIRO-Mk3-6-0}
-      - {dataset: EC-EARTH, ensemble: r6i1p1}
+      #- {dataset: EC-EARTH, ensemble: r6i1p1}
       - {dataset: FGOALS-g2}
       - {dataset: FGOALS-s2}
       - {dataset: FIO-ESM}
