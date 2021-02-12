@@ -101,6 +101,13 @@ E3SM-1-0:
   facecolor: none
   mark: o
   thick: 1
+EC-Earth3-CC:
+  avgstd: 0
+  color: '#d99694'
+  dash: ':'
+  facecolor: none
+  mark: s
+  thick: 1
 EC-Earth3-Veg:
   avgstd: 0
   color: '#d99694'
