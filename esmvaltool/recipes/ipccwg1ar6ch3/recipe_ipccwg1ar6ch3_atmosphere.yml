@@ -852,144 +852,146 @@ diagnostics:
 #
 #
 
-#
-#
-#  # **********************************************************************
-#  # IPCC WGI AR6, chap. 3
-#  # Sect. 3.3 
-#  # Fig 3.3
-#  # **********************************************************************
-#  # Timeseries of Global Near-Surface Air Temperature Anomaly
-#  # ***********************************************************************
-#
-#  fig_3_3_cmip6:
-#    description: Timeseries of Global Near-Surface Air Temperature Anomaly
-#    variables:
-#      tas: &tas_settings_cmip6
-#        preprocessor: regrid_5_5_mmm
-#        mip: Amon
-#        project: CMIP6
-#        exp: [historical, ssp245]
-#        grid: gr
-#        ensemble: r1i1p1f1
-#        start_year: 1850
-#        end_year: 2018
-#        additional_datasets: *cmip6_models
-#      tasa:
-#        <<: *tas_settings_cmip6
-#        preprocessor: regrid_5_5
-#        additional_datasets:
-#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-#             tier: 2}
-#    scripts:
-#      fig-3-3: &tsline_settings
-#        script: ipcc_ar6/tas_anom.ncl
-#        ref_start: 1850
-#        ref_end: 1900
-#        plot_units: "degC"
-#        y_min: -0.7
-#        y_max: 2.1
-#        volcanoes: true
-#        blending: False
-#        ref_mask: True
-#        write_stat: True
-#        styleset: CMIP6
-#
-#
-#  fig_3_3_cmip5:
-#    description: Blended surface temperature.
-#    variables:
-#      tas: &tas_settings_cmip5
-#        preprocessor: regrid_5_5_mmm
-#        mip: Amon
-#        project: CMIP5
-#        exp: [historical, rcp45]
-#        ensemble: r1i1p1
-#        start_year: 1850
-#        end_year: 2018
-#        additional_datasets: *cmip5_models
-#      tasa:
-#        <<: *tas_settings_cmip5
-#        preprocessor: regrid_5_5
-#        additional_datasets:
-#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-#             tier: 2}
-#    scripts:
-#      fig-3-3:
-#        <<: *tsline_settings
-#        styleset: CMIP5
-#
-#
-#  fig_3_3_collect:
-#    description: Collect all timeseries of blended surface temperature.
-#    variables:
-#      tasa: 
-#        <<: *tas_settings_cmip6
-#        end_year: 2018
-#        preprocessor: regrid_5_5
-#        additional_datasets:
-#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
-#          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
-#          - {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2,
-#             start_year: 1880}
-#          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
-#    scripts:
-#      collect: 
-#        <<: *tsline_settings
-#        script: ipcc_ar6/tsline_blend_collect.ncl
-#        ancestors: [tasa, 'fig_3_3_*/fig-3-3']
-#        start_year: 1850
-#        end_year: 2018
-#        ref: ["HadCRUT5"]
-#        order: ["CMIP6_historical-ssp245", "CMIP5_historical-rcp45"]
-#        stat_shading: True
-#        ref_shading: True
-#        ref_stderr: True
-#
-#  # **********************************************************************
-#  # IPCC WGI AR6, chap. 3
-#  # Sect. 3.3 
-#  # Fig 3.4
-#  # **********************************************************************
-#  # Global climate variability - surface temperature
-#  # **********************************************************************
-#
-#  fig_3_4:
-#    description: IPCC AR6 Ch. 3, Fig. 3.4 (near-surface temperature)
-#    variables:
-#      tas:
-#        preprocessor: regrid_5_5
-#        mip: Amon
-#        project: CMIP6
-#        exp: piControl
-#        ensemble: r1i1p1f1
-#        grid: gr
-#        additional_datasets: *models_cmip6_piControl_short
-#      tasa:
-#        preprocessor: regrid_5_5
-#        mip: Amon
-#        project: CMIP6
-#        exp: piControl
-#        ensemble: r1i1p1f1
-#        grid: gr
-#        start_year: 1950 #1850
-#        end_year: 2014 #1900
-#        additional_datasets:
-#          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, start_year: 1880, tier: 2}
-#          - {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2}
-#          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
-#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0, tier: 2}
-#          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
-#    scripts:
-#      fig_3_4:
-#        script: ipcc_ar6/zonal_st_dev.ncl
-#        multi_model_mean: True
-#        time_avg: "yearly"
-#        plot_units: "degC"
-#        plot_legend: False
-#        styleset: CMIP6
-#
-#
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig 3.3
+  # **********************************************************************
+  # Timeseries of Global Near-Surface Air Temperature Anomaly
+  # ***********************************************************************
+
+  fig_3_3_cmip6:
+    description: Timeseries of Global Near-Surface Air Temperature Anomaly
+    variables:
+      tas: &tas_settings_cmip6
+        preprocessor: regrid_5_5_mmm
+        mip: Amon
+        project: CMIP6
+        exp: [historical, ssp245]
+        grid: gr
+        ensemble: r1i1p1f1
+        start_year: 1850
+        end_year: 2020
+        additional_datasets: *cmip6_models
+      tasa:
+        <<: *tas_settings_cmip6
+        preprocessor: regrid_5_5
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+    scripts:
+      fig-3-3: &tsline_settings
+        script: ipcc_ar6/tas_anom.ncl
+        ref_start: 1850
+        ref_end: 1900
+        plot_units: "degC"
+        y_min: -0.7
+        y_max: 2.1
+        volcanoes: true
+        blending: False
+        ref_mask: True
+        write_stat: True
+        styleset: CMIP6
+
+
+  fig_3_3_cmip5:
+    description: Blended surface temperature.
+    variables:
+      tas: &tas_settings_cmip5
+        preprocessor: regrid_5_5_mmm
+        mip: Amon
+        project: CMIP5
+        exp: [historical, rcp45]
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2020
+        additional_datasets: *cmip5_models
+      tasa:
+        <<: *tas_settings_cmip5
+        preprocessor: regrid_5_5
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+    scripts:
+      fig-3-3:
+        <<: *tsline_settings
+        styleset: CMIP5
+
+
+  fig_3_3_collect:
+    description: Collect all timeseries of blended surface temperature.
+    variables:
+      tasa: 
+        <<: *tas_settings_cmip6
+        end_year: 2018
+        preprocessor: regrid_5_5
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
+          - {dataset: Kadow, project: OBS, type: ground, version: 5.0.1.0, tier: 2}
+          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2,
+          #   start_year: 1880}
+          #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_blend_collect.ncl
+        ancestors: [tasa, 'fig_3_3_*/fig-3-3']
+        start_year: 1850
+        end_year: 2018
+        ref: ["HadCRUT5"]
+        order: ["CMIP6_historical-ssp245", "CMIP5_historical-rcp45"]
+        stat_shading: True
+        ref_shading: True
+        ref_stderr: True
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig 3.4
+  # **********************************************************************
+  # Global climate variability - surface temperature
+  # **********************************************************************
+
+  fig_3_4:
+    description: IPCC AR6 Ch. 3, Fig. 3.4 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: regrid_5_5
+        mip: Amon
+        project: CMIP6
+        exp: piControl
+        ensemble: r1i1p1f1
+        grid: gr
+        additional_datasets: *models_cmip6_piControl_short
+      tasa:
+        preprocessor: regrid_5_5
+        mip: Amon
+        project: CMIP6
+        exp: piControl
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1950 #1850
+        end_year: 2014 #1900
+        additional_datasets:
+          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, start_year: 1880, tier: 2}
+          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2}
+          #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
+          - {dataset: Kadow, project: OBS, type: ground, version: 5.0.1.0, tier: 2}
+          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+    scripts:
+      fig_3_4:
+        script: ipcc_ar6/zonal_st_dev.ncl
+        multi_model_mean: True
+        time_avg: "yearly"
+        plot_units: "degC"
+        plot_legend: False
+        styleset: CMIP6
+
+
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
@@ -1011,7 +1013,7 @@ diagnostics:
         grid: gr
         ensemble: r1i1p1f1
         start_year: 1850
-        end_year: 2018
+        end_year: 2020
         additional_datasets: *cmip6_models
       tas_hist-nat_global:
         <<: *var_tas
@@ -1030,8 +1032,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
 
       tas_historical_land:
         <<: *var_tas
@@ -1057,8 +1058,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_land
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
 
       tas_historical_ocean:
         <<: *var_tas
@@ -1084,15 +1084,14 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_ocean
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
       tsline: &tsline_amon
         script: ipcc_ar6/tas_anom_damip.ncl
         ref_start: 1850
         ref_end: 1900
         start_year: 1850
-        end_year: 2018
+        end_year: 2020
         plot_units: "degC"
         y_min: -3.5
         y_max: 4.0
@@ -1133,8 +1132,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_north_america
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
 
       tas_historical_south_america:
         <<: *var_tas
@@ -1160,8 +1158,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_south_america
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
 
       tas_historical_europe:
         <<: *var_tas
@@ -1187,12 +1184,11 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_europe
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
       tsline:
         <<: *tsline_amon
-        header: ["North America", "South America", "Europe"]
+        header: ["North America", "Central and South America", "Europe and North Africa"]
         panels: [["tas_historical_north_america", "tas_hist-nat_north_america", "tas_hist-GHG_north_america", "tas_hist-aer_north_america"],
                  ["tas_historical_south_america", "tas_hist-nat_south_america", "tas_hist-GHG_south_america", "tas_hist-aer_south_america"],
                  ["tas_historical_europe", "tas_hist-nat_europe", "tas_hist-GHG_europe", "tas_hist-aer_europe"]]
@@ -1227,8 +1223,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_africa
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
 
       tas_historical_asia:
         <<: *var_tas
@@ -1254,8 +1249,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_asia
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
 
       tas_historical_australasia:
         <<: *var_tas
@@ -1281,8 +1275,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_australasia
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
       tsline:
         <<: *tsline_amon
@@ -1333,8 +1326,7 @@ diagnostics:
         short_name: tasa
         preprocessor: regrid_5_5_antarctica
         additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0,
-             tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
       tsline:
         <<: *tsline_amon
