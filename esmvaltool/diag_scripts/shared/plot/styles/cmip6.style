@@ -83,6 +83,8 @@ TaiESM1               | 174, 170, 170        |   0  |   2   |   4  |   0
 UKESM1-0-LL           | 164,  60, 112        |   0  |   2   |   4  |   0
 MultiModelMean        | 255,   0,   0        |   0  |   4   |  12  |   1
 MultiModelMedian      |   0,   0, 255        |   0  |   3   |  12  |   1
+multi-model mean      | 255,   0,   0        |   0  |   3   |  12  |   1
+CDS-XCO2              |   0,   0,   0        |   0  |   3   |  16  |   1
 NSIDC                 |   0,   0,   0        |   0  |   3   |  16  |   1
 HadISST               |   0,   0,   0        |   0  |   3   |  16  |   1
 MOHC-HadISST          |   0,   0,   0        |   1  |   3   |  16  |   1
@@ -108,10 +110,17 @@ ESACCI-SSMI           |   0,   0,   0        |   0  |   4   |   0  |   0
 ESACCI-AMSR           |   0,   0,   0        |   1  |   4   |   0  |   0
 NSIDC-NT              |   0,   0,   0        |   2  |   3   |   0  |   0
 NSIDC-BT              |   0,   0,   0        |  12  |   3   |   0  |   0
+<<<<<<< HEAD
 HadCRUT4              |   0,   0,   0        |   4  |   4   |   0  |   0
 HadCRUT5              |   0,   0,   0        |   0  |   4   |   0  |   0
 BerkeleyEarth         |   0,   0,   0        |   1  |   4   |   0  |   0
 GISTEMP               |   0,   0,   0        |   2  |   4   |   0  |   0
 CowtanWay             |   0,   0,   0        |   3  |   4   |   0  |   0
+=======
+HadCRUT4              |   0,   0,   0        |   0  |   3   |   0  |   0
+BerkeleyEarth         |   0,   0,   0        |   1  |   3   |   0  |   0
+GISTEMP               |   0,   0,   0        |   2  |   3   |   0  |   0
+CowtanWay             |   0,   0,   0        |   3  |   3   |   0  |   0
+>>>>>>> ar6/master
 GHCN                  |   0,   0,   0        |   0  |   3   |   0  |   0
 default               |   0,   0,   0        |   0  |   1   |  16  |   0
