@@ -1,5 +1,5 @@
 ; #############################################################################
-; ESMValTool CMORizer for NOAAGlobalTemp-Interim data
+; ESMValTool CMORizer for NOAAGlobalTemp data
 ; #############################################################################
 ;
 ; Tier
@@ -9,16 +9,17 @@
 ;    
 ;
 ; Last access
-;    20201104
+;    20210212
 ;
 ; Download and processing instructions
 ;    Download 
-;    ftp://ftp.ncdc.noaa.gov/pub/data/cmb/ersst/v5/2020.grl.dat/interim/temp.ano.merg5.asc
+;    https://www.ncei.noaa.gov/pub/data/cmb/ersst/v5/2020.grl.dat/interim.2020/temp.ano.merg5.asc
 ;    
 ; Caveats
-;    Produces temperature anomalies
+;    Produces temperature anomalies (relative to the 1971-2000 climatology)
 ;
 ; Modification history
+;    20210212 kosaka_yu: updated to interim.2020
 ;    20201105 kosaka_yu: written.
 ;
 ; #############################################################################
@@ -38,7 +39,7 @@ begin
 
   ; Period
   YEAR1 = 1850
-  YEAR2 = 2018
+  YEAR2 = 2020
 
   ; Selected variable (standard name)
   VAR1 = "tasa"
@@ -57,7 +58,7 @@ begin
 ;    "/custom/CMOR_tasaga.dat"
 
   ; Version
-  VERSION = "v5"
+  VERSION = "interim2020"
 
   ; Type
   TYPE = "ground"
@@ -74,7 +75,7 @@ end
 begin
 
   ; Read file
-  fname = input_dir_path + "temp.ano.merg5.asc"
+  fname = input_dir_path + "interim.2020/temp.ano.merg5.asc"
 
   ; Read anomaly
 ;  time = f->time
