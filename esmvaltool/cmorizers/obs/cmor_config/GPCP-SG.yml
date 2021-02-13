@@ -6,7 +6,7 @@ filename: 'precip.mon.mean.nc'
 attributes:
   dataset_id: GPCP-SG
   version: 'V2.3'
-  tier: 1
+  tier: 2
   modeling_realm: atmos
   project_id: OBS
   source: 'https://psl.noaa.gov/data/gridded/data.gpcp.html'
