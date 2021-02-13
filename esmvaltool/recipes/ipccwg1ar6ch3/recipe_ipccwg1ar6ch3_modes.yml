@@ -22,9 +22,9 @@ documentation:
 preprocessors:
  temp_tr:
    regrid:
-      target_grid: 2x2
+      target_grid: 2x5
       lon_offset: True
-      lat_offset: True
+      lat_offset: False
       scheme: linear
 
  enso:
