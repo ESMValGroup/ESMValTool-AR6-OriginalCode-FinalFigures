@@ -447,12 +447,12 @@ sftof_cmip5: &sftof_cmip5
       
 tasa_datasets: &tasa_datasets
   - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
   #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
-  - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: v5, tier: 2}
-  - {dataset: Kadow, project: OBS, type: median, version: 4.6.0.0, tier: 2}
-  - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+  - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+  - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+  - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
 
 tasaga_datasets: &tasaga_datasets
   - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
@@ -656,110 +656,110 @@ tasaga_datasets: &tasaga_datasets
   - {dataset: HadCRUT5, project: OBS, type: ens198, version: 5.0.1.0, tier: 2}
   - {dataset: HadCRUT5, project: OBS, type: ens199, version: 5.0.1.0, tier: 2}
   - {dataset: HadCRUT5, project: OBS, type: ens200, version: 5.0.1.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
   #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
-  - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens001, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens002, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens003, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens004, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens005, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens006, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens007, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens008, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens009, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens010, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens011, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens012, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens013, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens014, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens015, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens016, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens017, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens018, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens019, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens020, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens021, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens022, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens023, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens024, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens025, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens026, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens027, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens028, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens029, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens030, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens031, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens032, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens033, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens034, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens035, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens036, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens037, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens038, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens039, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens040, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens041, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens042, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens043, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens044, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens045, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens046, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens047, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens048, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens049, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens050, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens051, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens052, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens053, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens054, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens055, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens056, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens057, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens058, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens059, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens060, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens061, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens062, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens063, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens064, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens065, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens066, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens067, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens068, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens069, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens070, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens071, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens072, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens073, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens074, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens075, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens076, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens077, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens078, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens079, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens080, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens081, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens082, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens083, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens084, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens085, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens086, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens087, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens088, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens089, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens090, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens091, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens092, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens093, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens094, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens095, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens096, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens097, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens098, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens099, version: version2.0, tier: 2}
-  - {dataset: CowtanWay, project: OBS, type: ens100, version: version2.0, tier: 2}
+  #- {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens001, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens002, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens003, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens004, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens005, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens006, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens007, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens008, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens009, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens010, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens011, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens012, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens013, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens014, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens015, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens016, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens017, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens018, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens019, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens020, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens021, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens022, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens023, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens024, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens025, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens026, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens027, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens028, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens029, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens030, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens031, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens032, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens033, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens034, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens035, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens036, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens037, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens038, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens039, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens040, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens041, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens042, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens043, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens044, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens045, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens046, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens047, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens048, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens049, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens050, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens051, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens052, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens053, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens054, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens055, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens056, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens057, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens058, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens059, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens060, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens061, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens062, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens063, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens064, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens065, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens066, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens067, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens068, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens069, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens070, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens071, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens072, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens073, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens074, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens075, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens076, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens077, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens078, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens079, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens080, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens081, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens082, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens083, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens084, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens085, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens086, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens087, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens088, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens089, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens090, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens091, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens092, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens093, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens094, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens095, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens096, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens097, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens098, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens099, version: version2.0, tier: 2}
+  #- {dataset: CowtanWay, project: OBS, type: ens100, version: version2.0, tier: 2}
   
 preprocessors:
 
@@ -1214,9 +1214,9 @@ diagnostics:
     scripts:
       composite_refHadCRUT5_HadCRUT5mean: &composite_settings
         script: ar6ch3_hiatus/composite.ncl
-        blend_globalmean: True
+        blend_globalmean: False
         mask_globalmean: True
-        blend_pattern: True
+        blend_pattern: False
         mask_pattern: True
         composite_threshold: HadCRUT5_mean
         composite_dataset: cmip6

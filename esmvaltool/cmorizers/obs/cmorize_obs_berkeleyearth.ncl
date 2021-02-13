@@ -9,9 +9,11 @@
 ;    http://berkeleyearth.org/data/
 ;
 ; Last access
-;    20210207
+;    20210212
 ;
 ; Download and processing instructions
+;    Provided in a hidden link.
+;    The following is for the former (public) version as of Feb 12, 2021
 ;    Download "Gridded Data -> Monthly Land + Ocean
 ;                -> 1deg x 1deg Latitude-Longitude Grid"
 ;            and
@@ -22,6 +24,7 @@
 ;    Produces temperature anomalies (relative to the 1951-80 climatology)
 ;
 ; Modification history
+;    20210212-kosaka_yu: version update.
 ;    20210207-kosaka_yu: updated to 2020.
 ;    20191101-kosaka_yu: written.
 ;
@@ -64,7 +67,7 @@ begin
     "/custom/CMOR_tasaga.dat"
 
   ; Version
-  VERSION = "1"
+  VERSION = "H4"
 
   ; Type
   TYPE = "ground"
@@ -86,7 +89,7 @@ end
 begin
 
   ; Read file
-  fname = input_dir_path + "Land_and_Ocean_LatLong1.nc"
+  fname = input_dir_path + "Land_and_Ocean_LatLong1_H4.nc"
   f = addfile(fname, "r")    
   ; Read anomaly
   len = (YEAR2 - YEAR1 + 1)*12
@@ -196,6 +199,8 @@ begin
   delete(bounds2)
     
 end
+
+exit
 
 begin
 
