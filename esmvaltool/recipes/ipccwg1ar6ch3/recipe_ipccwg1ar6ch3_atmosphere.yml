@@ -923,7 +923,7 @@ diagnostics:
     variables:
       tasa: 
         <<: *tas_settings_cmip6
-        end_year: 2018
+        end_year: 2020
         preprocessor: regrid_5_5
         additional_datasets:
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
@@ -939,12 +939,13 @@ diagnostics:
         script: ipcc_ar6/tsline_blend_collect.ncl
         ancestors: [tasa, 'fig_3_3_*/fig-3-3']
         start_year: 1850
-        end_year: 2018
+        end_year: 2020
         ref: ["HadCRUT5"]
         order: ["CMIP6_historical-ssp245", "CMIP5_historical-rcp45"]
         stat_shading: True
         ref_shading: True
         ref_stderr: True
+
 
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
