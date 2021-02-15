@@ -1,0 +1,313 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3_biosphere.yml
+---
+documentation:
+
+  description: |
+    Producing Fig. 3.31, 3.32
+
+  authors:
+    - gier_bettina
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  fgco2_sum:
+    custom_order: true
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    area_statistics:
+      operator: sum
+    mask_landsea:
+      mask_out: land
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      #exclude: [reference_dataset]
+
+
+  glob_mean:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    area_statistics:
+      operator: mean
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      #exclude: [reference_dataset]
+
+  glob_mean_ref:
+    custom_order: true
+    anomalies:
+      period: full
+      reference:
+        start_year: 1850
+        start_month: 1
+        start_day: 1
+        end_year: 1900
+        end_month: 12
+        end_day: 31
+    regrid:
+      target_grid: 2x2 #reference_dataset
+      scheme: linear
+    #mask_multimodel: true
+    area_statistics:
+      operator: mean
+    #multi_model_statistics:
+    #  span: overlap
+    #  statistics: [mean]
+    #  exclude: [reference_dataset]
+
+  glob_mean_nommm:
+    area_statistics:
+      operator: mean
+
+  lm_sum:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    area_statistics:
+      operator: sum
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      #exclude: [reference_dataset]
+
+  nbp_mean:
+    mask_landsea:
+      mask_out: sea
+    area_statistics:
+      operator: mean
+
+
+diagnostics:
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.6.1
+  # Fig. 3.31
+  # **********************************************************************
+  # Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+  # **********************************************************************
+
+  fig_3_31_co2:
+    description: Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+    themes:
+      - phys
+      - ghg
+      - carbon
+      - bgphys
+    realms:
+      - land
+      - ocean
+      - atmos
+    variables:
+      fgco2:
+        preprocessor: fgco2_sum
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist
+        mip: Omon
+        start_year: 1850
+        end_year: 2014 #2010
+        grid: gn
+        additional_datasets:
+          - {dataset: ACCESS-ESM1-5}
+          - {dataset: CanESM5}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3}
+#          - {dataset: EC-Earth3-CC}
+          #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
+          - {dataset: MPI-ESM1-2-LR}
+          - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1, grid: gr}
+          - {dataset: NorESM2-LM}
+          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2}
+      fgco2_GCP:
+        short_name: fgco2
+        mip: Omon
+        reference_dataset: GCP
+        additional_datasets:
+          - {dataset: GCP, project: OBS, type: reanaly, version: 2019, tier: 2,
+             start_year: 1959, end_year: 2014, frequency: yr}
+
+      nbp:
+        preprocessor: lm_sum #glob_mean
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist
+        mip: Lmon
+        start_year: 1850
+        end_year: 2014 #2010
+        grid: gn
+        reference_dataset: GCP
+        additional_datasets:
+          - {dataset: ACCESS-ESM1-5}
+          - {dataset: CanESM5}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3, grid: gr}
+#          - {dataset: EC-Earth3-CC, grid: gr}
+          #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
+          - {dataset: MPI-ESM1-2-LR}
+          - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1}
+          - {dataset: NorESM2-LM}
+          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2}
+      nbp_GCP:
+        short_name: nbp
+        mip: Lmon
+        reference_dataset: GCP
+        additional_datasets:
+          - {dataset: GCP, project: OBS, type: reanaly, version: 2019, tier: 2,
+             start_year: 1959, end_year: 2014, frequency: yr}
+      co2s:
+        preprocessor: glob_mean
+        derive: true
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist
+        mip: Amon
+        start_year: 1850
+        end_year: 2014
+        grid: gn
+        additional_datasets:
+          - {dataset: ACCESS-ESM1-5}
+          - {dataset: CanESM5}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3, grid: gr}
+#          - {dataset: EC-Earth3-CC} # ps and co2 are gr and gn respectively
+          #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
+          - {dataset: MPI-ESM1-2-LR}
+          - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1}
+          - {dataset: NorESM2-LM}
+          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2}
+      co2s_obs:
+        short_name: co2s
+        mip: Amon
+        start_year: 1850
+        end_year: 2014
+        grid: gn
+        reference_dataset: ESRL
+        additional_datasets:
+          - {dataset: ESRL, project: OBS, type: ground, version: GLOBAL,
+             tier: 2, start_year: 1980}
+      tas:
+        preprocessor: glob_mean_ref
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist
+        mip: Amon
+        start_year: 1850
+        end_year: 2014
+        grid: gn
+        #reference_dataset: HadCRUT4
+        additional_datasets:
+          - { dataset: ACCESS-ESM1-5, exp: historical }
+          - { dataset: CanESM5, exp: historical }
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, exp: historical}
+          - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, exp: historical }
+#          - {dataset: EC-Earth3-CC, exp: historical, grid: gr}
+          #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
+          - { dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: historical }
+          - { dataset: MPI-ESM1-2-LR, exp: historical }
+          - { dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: historical }
+          - { dataset: NorESM2-LM, exp: historical }
+          - { dataset: UKESM1-0-LL, ensemble: r1i1p1f2, exp: historical }
+
+          - {dataset: ACCESS-ESM1-5}
+          - {dataset: CanESM5}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1}
+          - { dataset: CNRM-ESM2-1, ensemble: r1i1p1f3, grid: gr}
+ #         - {dataset: EC-Earth3-CC, grid: gr}
+          #- {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1} #hus, zg retracted
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
+          - {dataset: MPI-ESM1-2-LR}
+          - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1}
+          - {dataset: NorESM2-LM}
+          - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2}
+      tasa:
+        preprocessor: glob_mean_ref
+        mip: Amon
+        start_year: 1850
+        end_year: 2014
+        additional_datasets:
+          - {dataset: HadCRUT5, project: OBS, type: mean,
+           version: 5.0, tier: 2}
+    scripts:
+      fig_3_31_co2:
+        script: ipcc_ar6/fig_carbonsinks_timeseries_panels.py
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.6.1 
+  # Fig. 3.32
+  # **********************************************************************
+  # Changes to the amplitude of the net land carbon flux (nbp)
+  # **********************************************************************
+
+  fig_3_32_sca:
+    description: calculate trend of nbp sca
+    themes:
+      - phys
+    realms:
+      - land
+    variables:
+      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+        preprocessor: nbp_mean
+        project: CMIP6
+        ensemble: r1i1p1f1
+        field: T2Ms
+        exp: historical
+        mip: Lmon
+        start_year: 1961
+        end_year: 2014
+        additional_datasets:
+          - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 2, start_year: 1986, end_year: 2008}
+          #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 2018, tier: 3, start_year: 1986, end_year: 2014}
+          - {dataset: ACCESS-ESM1-5, grid: gn}
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1}
+          - {dataset: CESM2, grid: gn}
+          - {dataset: CESM2-FV2, grid: gn, institute: NCAR}
+          - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR}
+          - {dataset: CMCC-CM2-SR5, grid: gn}
+          - {dataset: CMCC-ESM2, grid: gn}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r7i1p1f2}
+          - {dataset: GFDL-ESM4, grid: gr1}
+          - {dataset: INM-CM4-8, grid: gr1}
+          - {dataset: INM-CM5-0, grid: gr1}
+          - {dataset: IPSL-CM6A-LR, grid: gr}
+          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, grid: gn}
+          - {dataset: MRI-ESM2-0, grid: gn, ensemble: r1i2p1f1}
+          - {dataset: NorCPM1, grid: gn, institute: NCC}
+          - {dataset: NorESM2-LM, grid: gn}
+          - {dataset: NorESM2-MM, grid: gn}
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r2i1p1f2, project: CMIP6}
+          - {dataset: SAM0-UNICON, grid: gn}
+          - {dataset: TaiESM1, grid: gn}
+      co2s_obs:
+        short_name: co2s
+        mip: Amon
+        start_year: 1961
+        end_year: 2014
+        additional_datasets:
+          - {dataset: Scripps, project: OBS6, type: ground,
+             version: MLO, tier: 2}
+          - {dataset: ESRL, project: OBS, type: ground,
+             version: GLOBAL, tier: 2, start_year: 1980}
+    scripts:
+      fig_3_32_sca:
+        script: ipcc_ar6/CO2_SCA_trend.py
+        ref_model: CO2-MLO

@@ -64,7 +64,13 @@ begin
   set_default_att(diag_script_info, "anomaly", True)
   set_default_att(diag_script_info, "ref_mask", False)
   set_default_att(diag_script_info, "region", "Global")
-  set_default_att(diag_script_info, "header", False)
+  ;set_default_att(diag_script_info, "header", False)
+
+  if (isatt(diag_script_info, "header")) then
+    header = diag_script_info@header(0)
+  else
+    header = ""
+  end if
 
   ; Create output directories
   plot_dir = config_user_info@plot_dir
@@ -110,7 +116,7 @@ begin
 
   ; Define workstation
   outfile = config_user_info@plot_dir + "tas_" + anom + "_damip_" \
-            + start_year + "-" + end_year
+            + header(0) + "_" + start_year + "-" + end_year
   wks = gsn_open_wks(file_type, outfile)
 
   ; Set resources
@@ -464,7 +470,7 @@ begin
     ; output to NetCDF
     ; *************************************
 
-    out_path1 = out_path + "tas_" + anom + "_damip_" + ivar + ".nc"
+    out_path1 = out_path + "tas_" + anom + "_damip_" + header(ivar) + ".nc"
     model_arr_stat@ncdf = out_path
     model_arr_stat@diag_script = DIAG_SCRIPT
     model_arr_stat@var = var0

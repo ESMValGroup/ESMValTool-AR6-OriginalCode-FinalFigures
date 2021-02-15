@@ -183,6 +183,7 @@ begin
     nbreak = dimsizes(data@breakpoints)
     do ibreak = 0, nbreak - 1
       vals(data@breakpoints(ibreak)) = 3.
+      ;vals(data@breakpoints(ibreak)) = 1.5
     end do
   else
     nbreak = 0
@@ -264,6 +265,7 @@ begin
   res@tmYROn = False
   res@trXMinF = 0.
   res@trXMaxF = 1.0 + 2.*nbreak/nmod
+  ;res@trXMaxF = 1.0 + 0.5*nbreak/nmod
   res@trYMinF = 0.
   res@trYMaxF = 1.0
 
@@ -549,6 +551,7 @@ begin
   step = res@vpWidthF / nmod
   resTxt@txJust = "CenterRight"
   xposs = 0.2 + (x_space+.5)*(res@vpWidthF/(nmod+2.*nbreak)) ;step / 2.
+  ;xposs = 0.2 + (x_space+.5)*(res@vpWidthF/(nmod+0.5*nbreak)) ;step / 2.
   ypos = 0.19
   do imod = 0, nmod - 1
     gsn_text_ndc(wks, data&models(imod), xposs(imod), ypos, resTxt)
