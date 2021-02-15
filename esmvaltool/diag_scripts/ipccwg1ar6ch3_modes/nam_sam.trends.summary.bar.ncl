@@ -363,10 +363,10 @@ begin
   bres@tmYLLabelFontColor = "white"
   bres@tiMainString = "(a) NAM ("+syear_a+"-"+eyear_a+")"
   plot_blank(1) = blank_boxplot(wks,bres)
-  bres@tmYLValues := (/-2.,-1.5,-1.,-0.5,0.,0.5,1,1.5,2./)
+  bres@tmYLValues := (/-1.6,-1.2,-0.8,-0.4,0.,0.4,0.8,1.2,1.6/) ; (/-2.,-1.5,-1.,-0.5,0.,0.5,1,1.5,2./)
   bres@tmYLLabels := bres@tmYLValues
-  bres@trYMinF = -1.5
-  bres@trYMaxF = 1.5
+  bres@trYMinF = -1.2
+  bres@trYMaxF = 1.2
   bres@tiMainString = "(b) SAM ("+syear_b+"-"+eyear_b+")"
   plot_blank(2) = blank_boxplot(wks,bres)
 
@@ -438,10 +438,10 @@ begin
 ;--- Create 2nd panel-----
 
   bres@tmXBLabels := (/"","","",""/)
-  bres@tmYLValues := (/-2.,-1.5,-1.,-0.5,0.,0.5,1.,1.5,2./)
+  bres@tmYLValues := (/-1.6,-1.2,-0.8,-0.4,0.,0.4,0.8,1.2,1.6/) ; (/-2.,-1.5,-1.,-0.5,0.,0.5,1.,1.5,2./)
   bres@tmYLLabels := bres@tmYLValues
-  bres@trYMinF = -1.5
-  bres@trYMaxF = 1.5
+  bres@trYMinF = -1.2
+  bres@trYMaxF = 1.2
   bres@tiMainString = "(b) SAM ("+syear_b+"-"+eyear_b+")"
   delete([/opti@boxFill_Colors, opti@boxFill_midColor/])
   opti@boxColors  := boxColors1
