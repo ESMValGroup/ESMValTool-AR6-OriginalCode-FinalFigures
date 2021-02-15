@@ -1,15 +1,12 @@
 # ESMValTool
-# recipe_eyring13jgr.yml
+# recipe_ipccwg1ar6ch3_fig_3_19.yml
 ---
 documentation:
   description: |
-    Diagnostics of stratospheric dynamics and chemistry reproducing selected
-    figures from Eyring et al. JGR (2013).
+    Producing Fig. 3.19
 
   authors:
     - cionni_irene
-
-  maintainer:
     - bock_lisa
 
   references:
@@ -17,6 +14,7 @@ documentation:
 
   projects:
     - crescendo
+    - ipcc_ar6
 
 
 datasets:
@@ -94,12 +92,15 @@ preprocessors:
 
 diagnostics:
 
-  # ==========================================================================
-  # Eyring et al. (2013) - Figure 12
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3
+  # Fig. 3.19
+  # **********************************************************************
   # Longterm mean and trend of the zonal wind
-  # ==========================================================================
+  # **********************************************************************
 
-  eyring13jgr_fig12:
+  fig_3_19:
     description: Longterm mean and trend zonal wind
     themes:
       - chem
