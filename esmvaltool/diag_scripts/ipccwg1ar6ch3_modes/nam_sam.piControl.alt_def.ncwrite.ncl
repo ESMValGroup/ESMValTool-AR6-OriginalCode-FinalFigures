@@ -9,6 +9,31 @@ begin
 
   enter_msg(DIAG_SCRIPT, "")
 
+  syear_a = 1958 - 1958
+  eyear_a = 2019 - 1958
+  syear_b = 1979 - 1958
+  eyear_b = 1999 - 1958
+  syear_c = 2000 - 1958
+  eyear_c = 2019 - 1958
+  if (isatt(diag_script_info, "syear_nam")) then
+    syear_a := diag_script_info@syear_nam
+  end if
+  if (isatt(diag_script_info, "eyear_nam")) then
+    eyear_a := diag_script_info@eyear_nam
+  end if
+  if (isatt(diag_script_info, "syear_sam0")) then
+    syear_b := diag_script_info@syear_sam0
+  end if
+  if (isatt(diag_script_info, "eyear_sam0")) then
+    eyear_b := diag_script_info@eyear_sam0
+  end if
+  if (isatt(diag_script_info, "syear_sam1")) then
+    syear_c := diag_script_info@syear_sam1
+  end if
+  if (isatt(diag_script_info, "eyear_sam1")) then
+    eyear_c := diag_script_info@eyear_sam1
+  end if
+  
   ; Create work directory
   out_path = config_user_info@work_dir
   system("mkdir -p " + out_path)
@@ -39,7 +64,6 @@ begin
   end if
   seas = str_lower(seas)
 
-
   nens = dim_MOD
   
   pictl_models = metadata_att_as_array(info_items, "dataset")
@@ -61,51 +85,88 @@ begin
 
   do gg = 0, nens-1
     arrF := read_data(info_items[gg])
-    arrF&time = cd_calendar(arrF&time,1)
+    arrF&time := cd_calendar(arrF&time,-1)
+    arrF&time = arrF&time - (arrF&time(0)/100)*100
 
-    if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ; 
-      continue
-    end if
+    syr_data = arrF&time(0)/100
+    eyr_data = arrF&time(dimsizes(arrF&time)-1)/100
+    
+;    if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ; 
+;      continue
+;    end if
 
     do hh = 0,2     ; nam, sam, sam
       if (hh.eq.0) then
-        arr := arrF                   ; use 62 years for NAM statistics
+        syr = syear_a
+        eyr = eyear_a
       end if
-      if (hh.eq.1) then
-        arr := arrF(:21*12-1,:,:)     ; use 21 years for SAM statistics
+      if (hh.ge.1) then
+        syr = min((/syear_b, syear_c/))
+        eyr = max((/eyear_b, eyear_c/))
       end if
-      if (hh.eq.2) then
-        arr := arrF(:20*12-1,:,:)     ; use 20 years for SAM statistics
-      end if
-      arr = rmMonAnnCycTLL(arr)
-      temp := runave_n_Wrap(arr,3,0,0)
-      temp(0,:,:) = (/ dim_avg_n(arr(:1,:,:),0) /)
+      arr := new((/3, eyr-syr+1, dimsizes(arrF&lat), dimsizes(arrF&lon)/), typeof(arrF))  ; (mon, yr, lat, lon)
+      arr!0 = "month"
+      arr!1 = "year"
+      arr!2 = arrF!1
+      arr!3 = arrF!2
       if (seas.eq."djf") then
-        arr_seas := temp(0::12,:,:)
+        smo = 0
+        emo = 2
+      elseif (seas.eq."jja") then
+        smo = 6
+        emo = 8
       end if
-      if (seas.eq."jja") then
-        arr_seas := temp(6::12,:,:)
-      end if
+      arr&month = ispan(smo, emo, 1)
+      arr&year = ispan(syr, eyr, 1)
+      arr&$arr!2$ = arrF&$arrF!1$
+      arr&$arr!3$ = arrF&$arrF!2$
+      do mon = smo, emo
+        if (mon.lt.1) then
+          mo = mon + 12
+          syrF = syr - 1
+          eyrF = eyr - 1
+        else
+          mo = mon
+          syrF = syr
+          eyrF = eyr
+        end if
+        syrO = syr
+        eyrO = eyr
+        if (syrF.lt.syr_data) then
+          syrO = syr + syr_data - syrF
+          syrF = syr_data
+        end if
+        if (eyrF.gt.eyr_data) then
+          eyrO = eyr + eyr_data - eyrF
+          eyrF = eyr_data
+        end if
+        arr({mon}, {syrO:eyrO}, :, :) = (/arrF({syrF*100+mo:eyrF*100+mo:12}, :, :)/)
+      end do
+      zm := dim_avg_n_Wrap(arr, 3) ; (mon, yr, lat)
+      zm = dim_standardize_n(zm, 0, 1)  ; standardize along "year" dimension for each calendar month
+      zm_seas := dim_avg_n_Wrap(zm, 0) ; (yr, lat) seasonal mean
+
+      arr_seas := dim_avg_n_Wrap(arr, 0) ; (yr, lat, lon) seasonal mean
+
+      delete([/arr, zm/])
+
       if (hh.eq.0) then   ; NAM
-        finarr_nam_pc := dim_standardize(dim_standardize(dim_avg(arr_seas(:,{35},:)),0) - dim_standardize(dim_avg(arr_seas(:,{65},:)),0),0)
-        finarr_nam := regCoef_n(finarr_nam_pc,arr_seas,0,0)
+        finarr_nam_pc := zm_seas({syear_a:eyear_a}, {35}) - zm_seas({syear_a:eyear_a}, {65})
+        finarr_nam := regCoef_n(dim_standardize(finarr_nam_pc, 0),arr_seas({syear_a:eyear_a}, :, :),0,0)
         copy_VarMeta(arr_seas(0,:,:),finarr_nam)
       end if
-      if (hh.ge.1) then   ; SAM
-        finarr_sam_pc := dim_standardize(dim_standardize(dim_avg(arr_seas(:,{-40},:)),0) - dim_standardize(dim_avg(arr_seas(:,{-65},:)),0),0)
-        finarr_sam := regCoef_n(finarr_sam_pc,arr_seas,0,0)
-        copy_VarMeta(arr_seas(0,:,:),finarr_sam)
+      if (hh.eq.1) then   ; SAM
+        finarr_sam_pc0 := zm_seas({syear_b:eyear_b}, {-40}) - zm_seas({syear_b:eyear_b}, {-65})
+        finarr_sam0 := regCoef_n(dim_standardize(finarr_sam_pc0, 0),arr_seas({syear_b:eyear_b}, :, :),0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_sam0)
       end if
-      if (hh.eq.1) then
-        finarr_sam0 := finarr_sam
-        finarr_sam_pc0 := finarr_sam_pc
-      end if
-      if (hh.eq.2) then
-        finarr_sam1 := finarr_sam
-        finarr_sam_pc1 := finarr_sam_pc
+      if (hh.eq.2) then   ; SAM
+        finarr_sam_pc1 := zm_seas({syear_c:eyear_c}, {-40}) - zm_seas({syear_c:eyear_c}, {-65})
+        finarr_sam1 := regCoef_n(dim_standardize(finarr_sam_pc1, 0),arr_seas({syear_c:eyear_c}, :, :),0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_sam1)
       end if
     end do
-
+    delete(arrF)
     if (gg.eq.0) then
       nam_patterns := new((/nens,dimsizes(finarr_nam&lat),dimsizes(finarr_nam&lon)/),typeof(finarr_nam))
       nam_patterns!0 = "E"
@@ -122,12 +183,20 @@ begin
       nam_timeseries!0 = "E"
       nam_timeseries&E = nam_patterns&E
       nam_timeseries!1 = "time"
-      nam_timeseries&time = ispan(1958,2019,1) 
+      nam_timeseries&time = ispan(syear_a,eyear_a,1) 
       nam_timeseries = nam_timeseries@_FillValue
-      sam_timeseries0 := nam_timeseries(:,{1979:1999})
+      sam_timeseries0 := new((/nens,dimsizes(finarr_sam_pc0)/),float)
+      sam_timeseries0!0 = "E"
+      sam_timeseries0&E = sam_patterns0&E
       sam_timeseries0!1 = "time2"
-      sam_timeseries1 := nam_timeseries(:,{2000:})
+      sam_timeseries0&time2 = ispan(syear_b,eyear_b,1) 
+      sam_timeseries0 = sam_timeseries0@_FillValue
+      sam_timeseries1 := new((/nens,dimsizes(finarr_sam_pc1)/),float)
+      sam_timeseries1!0 = "E"
+      sam_timeseries1&E = sam_patterns1&E
       sam_timeseries1!1 = "time3"
+      sam_timeseries1&time3 = ispan(syear_c,eyear_c,1) 
+      sam_timeseries1 = sam_timeseries1@_FillValue
 
       nam_pc_trends := nam_timeseries(:,0)
       sam_pc_trends0 := nam_timeseries(:,0)
@@ -137,11 +206,14 @@ begin
       ensemble_assign&E = nam_timeseries&E
     end if
 
-    nam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0) /)
+;    nam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0) /)
+    nam_patterns(gg,:,:)  = (/ finarr_nam /)
          
-    sam_patterns0(gg,:,:)  = (/ linint2_Wrap(finarr_sam0&lon,finarr_sam0&lat,finarr_sam0,True,sam_patterns0&lon,sam_patterns0&lat,0) /)
+;    sam_patterns0(gg,:,:)  = (/ linint2_Wrap(finarr_sam0&lon,finarr_sam0&lat,finarr_sam0,True,sam_patterns0&lon,sam_patterns0&lat,0) /)
+    sam_patterns0(gg,:,:)  = (/ finarr_sam0 /)
 
-    sam_patterns1(gg,:,:)  = (/ linint2_Wrap(finarr_sam1&lon,finarr_sam1&lat,finarr_sam1,True,sam_patterns1&lon,sam_patterns1&lat,0) /)
+;    sam_patterns1(gg,:,:)  = (/ linint2_Wrap(finarr_sam1&lon,finarr_sam1&lat,finarr_sam1,True,sam_patterns1&lon,sam_patterns1&lat,0) /)
+    sam_patterns1(gg,:,:)  = (/ finarr_sam1 /)
 
     tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nam_pc)-1,1),finarr_nam_pc,False,True,0)
     nam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nam_pc)  /)            
@@ -156,7 +228,7 @@ begin
     print("Done with "+gg+" out of "+nens)
   end do
 
-  fn = out_path + "nam_sam.alt_def.piControl."+seas+".62_21_20yr.nc"
+  fn = out_path + "nam_sam.alt_def.piControl."+seas+".nc"
   system("rm -f " + fn)  
   z = addfile(fn,"c")
   z@source = systemfunc("pwd")+"/"+get_script_name()

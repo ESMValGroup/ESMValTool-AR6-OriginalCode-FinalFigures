@@ -8,7 +8,7 @@
 ; Caveats
 ;
 ; Modification history
-;   20210211-Yu Kosaka: changed figure format
+;   20210212-Yu Kosaka: changed figure format
 ;   20210206-Yu Kosaka: changed from linear trend to period difference
 ;   20210202-Yu Kosaka: revised figure details
 ;   20210131-Yu Kosaka: adapt Adam's script to the ESMValTool
@@ -84,7 +84,32 @@ begin
   obs_datasets = metadata_att_as_array(obs,  "dataset")
 ;  dim_obs = dimsizes(obs_datasets)
 
+; order the obs datasets for legends
   imax = dimsizes(obs_datasets)-1
+  jj = 0
+  if (any(obs_datasets.eq."HadCRUT5")) then
+    ii = ind(obs_datasets.eq."HadCRUT5")
+    if (ii.ne.jj) then
+      obs_datasets(ii) = obs_datasets(jj)
+      obs_datasets(jj) = "HadCRUT5"
+      obs_tmp = obs[jj]
+      obs[jj] = obs[ii]
+      obs[ii] = obs_tmp
+      delete(obs_tmp)
+    end if
+    jj = jj + 1
+  end if
+  if (any(obs_datasets.eq."NOAAGlobalTemp-Interim")) then
+    ii = ind(obs_datasets.eq."NOAAGlobalTemp-Interim")
+    if (ii.ne.2) then
+      obs_datasets(ii) = obs_datasets(2)
+      obs_datasets(2) = "NOAAGlobalTemp-Interim"
+      obs_tmp = obs[2]
+      obs[2] = obs[ii]
+      obs[ii] = obs_tmp
+      delete(obs_tmp)
+    end if
+  end if
   if (any(obs_datasets.eq."Kadow")) then
     ii = ind(obs_datasets.eq."Kadow")
     if (ii.lt.imax) then
@@ -542,9 +567,9 @@ begin
   delete(mres@tiXAxisString)
   mres@xyMonoLineColor = False
   mres@xyMonoDashPattern = False
-  obsDashPatterns = (/0,1,2,0,1/)
+  obsDashPatterns = (/0,1,2,3,0/)
   mres@xyDashPatterns := obsDashPatterns(0:dimsizes(obs_datasets)-1)
-  obsColors = (/"black", "black", "black", "grey60", "grey60"/)
+  obsColors = (/"black", "black", "black", "black", "grey60"/)
   obsColors0 = obsColors
   obsColors0 = "grey60"
   mres@xyLineDashSegLenF = 0.15
@@ -760,7 +785,7 @@ begin
 
   lineres = True
   lineres@lgLineThicknesses = 2.                        ; line thicknesses
-  lineres@LineLengthPercent = 3.                        ; expressed as %, 0->100, length of line
+  lineres@LineLengthPercent = 4.7                       ; expressed as %, 0->100, length of line
 ;  lineres@lgDashIndexes = 0
 
   textres = True
@@ -768,12 +793,12 @@ begin
 
   gres@YPosPercent = 9.
   if (dimsizes(obs_datasets).gt.3) then
-    gres@XPosPercent = 56. 
+    gres@XPosPercent = 60.
     lineres@lgDashIndexes := obsDashPatterns(0:2) ;(/0,2,3/)
     lineres@lgLineColors := obsColors(0:2)
     textres@lgLabels := obs_datasets(0:2) ;str_split(obs_tseries@datasets," ")
     simple_legend_ndc(wks,gres,lineres,textres)
-    gres@XPosPercent = 70.
+    gres@XPosPercent = 78.
     lineres@lgDashIndexes := obsDashPatterns(3:dimsizes(obs_datasets)-1) ;(/0,2,3/)
     lineres@lgLineColors := obsColors(3:dimsizes(obs_datasets)-1)
     textres@lgLabels := obs_datasets(3:dimsizes(obs_datasets)-1) ;str_split(obs_tseries@datasets," ")

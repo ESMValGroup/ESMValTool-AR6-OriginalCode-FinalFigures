@@ -170,16 +170,6 @@ diagnostics:
           - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
 
-#      tasa_obs:
-#        short_name: tasa
-#        mip: Amon
-#        project: OBS
-#        start_year: 1850
-#        end_year: 2019
-#        additional_datasets:      
-#          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: v5, tier: 2}
-#          - {dataset: Kadow, project: OBS, type: median, version: 4.6.0.0, tier: 2}
-
       tasaga_obs:
         short_name: tasaga
         mip: Amon
@@ -188,9 +178,17 @@ diagnostics:
         end_year: 2019
         additional_datasets:      
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-          #- {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2} # begins in 1880
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
-          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+          
+      tasa_obs:
+        short_name: tasa
+        mip: Amon
+        project: OBS
+        start_year: 1850
+        end_year: 2019
+        additional_datasets:
+          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
+          - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
           
     scripts:
       gsat_pi_hist_obs:
