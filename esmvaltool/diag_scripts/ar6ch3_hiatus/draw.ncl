@@ -283,8 +283,10 @@ begin
   color_cmip5_legend = "grey50"
   color_cmip6_legend = color_cmip6
   color_obs_ens = (/ "grey40", "black"/)
-  color_obs_single = tofloat((/(/54, 156, 232/),  (/36, 147, 126/), \
-                               (/127, 68, 170/), (/237, 128, 55/), (/48, 79, 191/) /))/255.
+;  color_obs_single = tofloat((/(/54, 156, 232/),  (/36, 147, 126/), \
+;                               (/127, 68, 170/), (/237, 128, 55/), (/48, 79, 191/) /))/255.
+    color_obs_single = tofloat((/(/48, 79, 191/), (/36, 147, 126/), \
+                               (/127, 68, 170/), (/237, 128, 55/), (/54, 156, 232/)/))/255.
   opacity_pdf_cmip5 = 0.7
   opacity_pdf_cmip6 = 0.15 ;0.2
   opacity_selected_pdf = 0.25
@@ -344,24 +346,70 @@ begin
     nmembers_composite_cmip5 = TstrendCMIPHiatus@nmembers_CMIP5
   end if
   composite_member_names = str_left_strip(str_split(TstrendCMIPHiatus@dataset, ","))
-  
-  do ii = 0, dimsizes(files)-1
 
+
+  ; Read GMST
+  do ii = 0, dimsizes(files)-1
     filename = str_get_field(files(ii), str_fields_count(files(ii), "/"), "/")
-    if (filename.eq. "trend"+GST+"_"+masking+"_CMIP5.txt") then
+    if (filename.eq. "trendGMST_"+masking+"_CMIP5.txt") then
       if (isvar("ifileCMIP5")) then
         ifileCMIP5 := array_append_record(ifileCMIP5, files(ii), 0)
       else
         ifileCMIP5 = files(ii)
       end if
-    elseif (filename.eq. "trend"+GST+"_"+masking+"_CMIP6.txt") then
+    elseif (filename.eq. "trendGMST_"+masking+"_CMIP6.txt") then
       if (isvar("ifileCMIP6")) then
         ifileCMIP6 := array_append_record(ifileCMIP6, files(ii), 0)
       else
         ifileCMIP6 = files(ii)
       end if
-    elseif ((isStrSubset(filename, "trendGMST_").or.isStrSubset(filename, "trendGSAT_")) \
-            .and.isStrSubset(filename, "_OBS.txt")) then
+    end if
+    delete(filename)
+  end do
+  GMSTtrendCMIP5 = read_GMtrend_as_list(ifileCMIP5)
+  GMSTtrendCMIP6 = read_GMtrend_as_list(ifileCMIP6)
+  delete([/ifileCMIP5, ifileCMIP6/])
+
+  ; Read GSAT
+  do ii = 0, dimsizes(files)-1
+
+    filename = str_get_field(files(ii), str_fields_count(files(ii), "/"), "/")
+    if (filename.eq. "trendGSAT_"+masking+"_CMIP5.txt") then
+      if (isvar("ifileCMIP5")) then
+        ifileCMIP5 := array_append_record(ifileCMIP5, files(ii), 0)
+      else
+        ifileCMIP5 = files(ii)
+      end if
+    elseif (filename.eq. "trendGSAT_"+masking+"_CMIP6.txt") then
+      if (isvar("ifileCMIP6")) then
+        ifileCMIP6 := array_append_record(ifileCMIP6, files(ii), 0)
+      else
+        ifileCMIP6 = files(ii)
+      end if
+    end if
+    delete(filename)
+  end do
+  GSATtrendCMIP5 = read_GMtrend_as_list(ifileCMIP5)
+  GSATtrendCMIP6 = read_GMtrend_as_list(ifileCMIP6)
+  delete([/ifileCMIP5, ifileCMIP6/])
+
+  if (GST.eq."GMST") then
+    cmip5_member_names = "CMIP5 "+metadata_att_as_array(GMSTtrendCMIP5, "dataset") \
+                         +" "+metadata_att_as_array(GMSTtrendCMIP5, "ensemble")
+    cmip6_member_names = "CMIP6 "+metadata_att_as_array(GMSTtrendCMIP6, "dataset") \
+                         +" "+metadata_att_as_array(GMSTtrendCMIP6, "ensemble")
+  elseif (GST.eq."GSAT") then
+    cmip5_member_names = "CMIP5 "+metadata_att_as_array(GSATtrendCMIP5, "dataset") \
+                         +" "+metadata_att_as_array(GSATtrendCMIP5, "ensemble")
+    cmip6_member_names = "CMIP6 "+metadata_att_as_array(GSATtrendCMIP6, "dataset") \
+                         +" "+metadata_att_as_array(GSATtrendCMIP6, "ensemble")
+  end if
+
+  ; Read obs
+  do ii = 0, dimsizes(files)-1
+    filename = str_get_field(files(ii), str_fields_count(files(ii), "/"), "/")
+    if ((/isStrSubset(filename, "trendGMST_").or.isStrSubset(filename, "trendGSAT_")/) \
+        .and.isStrSubset(filename, "_OBS.txt")) then
       tmp = read_GMtrend_as_list(files(ii))
       if (any(tmp[0]@dataset.eq.reanalyses)) then
         if (.not.isStrSubset(filename, "trend"+GST).or. \
@@ -370,8 +418,8 @@ begin
           continue
         end if
       end if
-      if (.not.isdefined("GMSTtrendObs")) then
-        GMSTtrendObs = NewList("fifo")
+      if (.not.isdefined("GSTtrendObs")) then
+        GSTtrendObs = NewList("fifo")
       end if
       if (ListCount(tmp).gt.1) then
         ensemble = metadata_att_as_array(tmp, "ensemble")
@@ -394,26 +442,24 @@ begin
         y = tmp[0]
         y@dataset = tmp[0]@dataset
       end if
-      ListAppend(GMSTtrendObs, new(dimsizes(y), typeof(y)))
-      i = ListCount(GMSTtrendObs)-1
-      GMSTtrendObs[i] = y
+      if (isStrSubset(filename, "trendGMST_")) then
+        y@GST = "GMST"
+      elseif (isStrSubset(filename, "trendGSAT_")) then
+        y@GST = "GSAT"
+      end if
+      ListAppend(GSTtrendObs, new(dimsizes(y), typeof(y)))
+      i = ListCount(GSTtrendObs)-1
+      GSTtrendObs[i] = y
       delete(y)
       delete(tmp)
     end if
     delete(filename)
   end do
-  GMSTtrendCMIP5 = read_GMtrend_as_list(ifileCMIP5)
-  GMSTtrendCMIP6 = read_GMtrend_as_list(ifileCMIP6)
-  delete([/ifileCMIP5, ifileCMIP6/])
-  
-  cmip5_member_names = "CMIP5 "+metadata_att_as_array(GMSTtrendCMIP5, "dataset") \
-                       +" "+metadata_att_as_array(GMSTtrendCMIP5, "ensemble")
-  cmip6_member_names = "CMIP6 "+metadata_att_as_array(GMSTtrendCMIP6, "dataset") \
-                       +" "+metadata_att_as_array(GMSTtrendCMIP6, "ensemble")
 
+                         
 ; ======================================================================
 ;
-;                       2. Make PDFs of GMST trends
+;                       2. Make PDFs of GST trends
 ;
 ; ======================================================================
 
@@ -421,27 +467,29 @@ begin
   resPDFobs = True
   resPDFobs@bin_min = tofloat(0.00 * scale)
   resPDFobs@bin_max = tofloat(0.02 * scale)
-  if (isdefined("GMSTtrendObs")) then
-    do ii = 0, ListCount(GMSTtrendObs)-1
-      GMSTtrendObs[ii] = GMSTtrendObs[ii] * scale
-      if (dimsizes(GMSTtrendObs[ii]).gt.1) then
+  if (isdefined("GSTtrendObs")) then
+    do ii = 0, ListCount(GSTtrendObs)-1
+      GSTtrendObs[ii] = GSTtrendObs[ii] * scale
+      if (dimsizes(GSTtrendObs[ii]).gt.1) then
         if (.not.isdefined("PDFhiatusObs")) then
           PDFhiatusObs = NewList("fifo")
         end if
         ListAppend(PDFhiatusObs, new(nbinsobs, "double"))
         i = ListCount(PDFhiatusObs)-1
-        PDFhiatusObs[i] = pdfx(GMSTtrendObs[ii], nbinsobs, resPDFobs)
+        PDFhiatusObs[i] = pdfx(GSTtrendObs[ii], nbinsobs, resPDFobs)
         PDFhiatusObs[i] = PDFhiatusObs[i] / 100.
         PDFhiatusObs[i] = PDFhiatusObs[i] / PDFhiatusObs[i]@bin_spacing
-        PDFhiatusObs[i]@dataset = GMSTtrendObs[ii]@dataset
+        PDFhiatusObs[i]@dataset = GSTtrendObs[ii]@dataset
+        PDFhiatusObs[i]@GST = GSTtrendObs[ii]@GST
       else
         if (.not.isdefined("SingleValhiatusObs")) then
           SingleValhiatusObs = NewList("fifo")
         end if
         ListAppend(SingleValhiatusObs, new(1, "double"))
         i = ListCount(SingleValhiatusObs)-1
-        SingleValhiatusObs[i] = GMSTtrendObs[ii]
-        SingleValhiatusObs[i]@dataset = GMSTtrendObs[ii]@dataset
+        SingleValhiatusObs[i] = GSTtrendObs[ii]
+        SingleValhiatusObs[i]@dataset = GSTtrendObs[ii]@dataset
+        SingleValhiatusObs[i]@GST = GSTtrendObs[ii]@GST
       end if
     end do
   end if
@@ -456,7 +504,7 @@ begin
                             nbins)
   resPDF@bin_bounds = fspan(resPDF@bin_min, resPDF@bin_max, nbins + 1)
 
-print("trend (K/decade): hiatus    post-hiatus")
+print("trend (K/decade):     hiatus    post-hiatus")
   if (isvar("GMSTtrendCMIP5")) then
     GMSTtrendCMIP5Hiatus = list_to_array(GMSTtrendCMIP5)
     GMSTtrendCMIP5Hiatus = GMSTtrendCMIP5Hiatus * scale
@@ -472,12 +520,19 @@ print("trend (K/decade): hiatus    post-hiatus")
       end if
     end do
     weight = 1./tofloat(esize)
-    PDFhiatusCMIP5 = weighted_pdfx(GMSTtrendCMIP5Hiatus, weight, resPDF)
-    PDFhiatusCMIP5 = PDFhiatusCMIP5 / 100.
-    PDFhiatusCMIP5 = PDFhiatusCMIP5 / PDFhiatusCMIP5@bin_spacing
-    PDFhiatusCMIP5@mean = weighted_mean(GMSTtrendCMIP5Hiatus, weight)
-    PDFhiatusCMIP5@nmodels = count_unique_values(model)
-    PDFhiatusCMIP5@nruns = num(.not.ismissing(GMSTtrendCMIP5Hiatus))
+
+    if (GST.eq."GMST") then
+      PDFhiatusCMIP5 = weighted_pdfx(GMSTtrendCMIP5Hiatus, weight, resPDF)
+      PDFhiatusCMIP5 = PDFhiatusCMIP5 / 100.
+      PDFhiatusCMIP5 = PDFhiatusCMIP5 / PDFhiatusCMIP5@bin_spacing
+      PDFhiatusCMIP5@mean = weighted_mean(GMSTtrendCMIP5Hiatus, weight)
+      PDFhiatusCMIP5@nmodels = count_unique_values(model)
+      PDFhiatusCMIP5@nruns = num(.not.ismissing(GMSTtrendCMIP5Hiatus))
+      PDFhiatusCMIP5@GST = "GMST"
+    else
+      AltMeanHiatusCMIP5 = weighted_mean(GMSTtrendCMIP5Hiatus, weight)
+      AltMeanHiatusCMIP5@GST = "GMST"
+    end if
     delete(weight)
     delete(model)
     hiatus_period = GMSTtrendCMIP5[0]@hiatus_period
@@ -496,31 +551,36 @@ print("trend (K/decade): hiatus    post-hiatus")
       end if
     end do
     weight = 1./tofloat(esize)
-    PDFpostCMIP5 = weighted_pdfx(GMSTtrendCMIP5Post, weight, resPDF)
-    PDFpostCMIP5 = PDFpostCMIP5 / 100.
-    PDFpostCMIP5 = PDFpostCMIP5 / PDFpostCMIP5@bin_spacing
-    PDFpostCMIP5@mean = weighted_mean(GMSTtrendCMIP5Post, weight)
-    PDFpostCMIP5@nmodels = count_unique_values(model)
-    PDFpostCMIP5@nruns = num(.not.ismissing(GMSTtrendCMIP5Post))
 
-    if (any(composite_project.eq.(/"cmip5", "cmip5+cmip6"/))) then
-      GMSTtrendCMIP5Post_selected = GMSTtrendCMIP5Post 
-      do ii = 0, dimsizes(cmip5_member_names)-1
-        if (all(cmip5_member_names(ii).ne.composite_member_names)) then
-          GMSTtrendCMIP5Post_selected(ii) = GMSTtrendCMIP5Post_selected@_FillValue
-        end if
-      end do
-      PDFpostCMIP5selected = weighted_pdfx(GMSTtrendCMIP5Post_selected, weight, resPDF)
-      PDFpostCMIP5selected = PDFpostCMIP5selected / 100.
-      PDFpostCMIP5selected = PDFpostCMIP5selected / PDFpostCMIP5selected@bin_spacing
-      PDFpostCMIP5selected = PDFpostCMIP5selected \
-                              * sum(where(ismissing(GMSTtrendCMIP5Post_selected), 0., weight)) \
-                              / sum(where(ismissing(GMSTtrendCMIP5Post), 0., weight))
+    if (GST.eq."GMST") then
+      PDFpostCMIP5 = weighted_pdfx(GMSTtrendCMIP5Post, weight, resPDF)
+      PDFpostCMIP5 = PDFpostCMIP5 / 100.
+      PDFpostCMIP5 = PDFpostCMIP5 / PDFpostCMIP5@bin_spacing
+      PDFpostCMIP5@mean = weighted_mean(GMSTtrendCMIP5Post, weight)
+      PDFpostCMIP5@nmodels = count_unique_values(model)
+      PDFpostCMIP5@nruns = num(.not.ismissing(GMSTtrendCMIP5Post))
+      PDFpostCMIP5@GST = "GMST"
+      if (any(composite_project.eq.(/"cmip5", "cmip5+cmip6"/))) then
+        GMSTtrendCMIP5Post_selected = GMSTtrendCMIP5Post 
+        do ii = 0, dimsizes(cmip5_member_names)-1
+          if (all(cmip5_member_names(ii).ne.composite_member_names)) then
+            GMSTtrendCMIP5Post_selected(ii) = GMSTtrendCMIP5Post_selected@_FillValue
+          end if
+        end do
+        PDFpostCMIP5selected = weighted_pdfx(GMSTtrendCMIP5Post_selected, weight, resPDF)
+        PDFpostCMIP5selected = PDFpostCMIP5selected / 100.
+        PDFpostCMIP5selected = PDFpostCMIP5selected / PDFpostCMIP5selected@bin_spacing
+        PDFpostCMIP5selected = PDFpostCMIP5selected \
+                                * sum(where(ismissing(GMSTtrendCMIP5Post_selected), 0., weight)) \
+                                / sum(where(ismissing(GMSTtrendCMIP5Post), 0., weight))
+      end if
+    else
+      AltMeanPostCMIP5 = weighted_mean(GMSTtrendCMIP5Post, weight)
+      AltMeanPostCMIP5@GST = "GMST"
     end if
     delete(weight)
     delete(esize)
     delete(model)
-print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     
     do ii = 0, ListCount(GMSTtrendCMIP5)-1
       if (isatt(GMSTtrendCMIP5[ii], "post_period")) then
@@ -530,6 +590,98 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     end do
   end if
 
+  if (isvar("GSATtrendCMIP5")) then
+    GSATtrendCMIP5Hiatus = list_to_array(GSATtrendCMIP5)
+    GSATtrendCMIP5Hiatus = GSATtrendCMIP5Hiatus * scale
+    model = metadata_att_as_array(GSATtrendCMIP5, "dataset")
+    model@_FillValue = ""
+    model = where(ismissing(GSATtrendCMIP5Hiatus), model@_FillValue, model)
+    esize = new(dimsizes(model), "integer")
+    do i = 0, dimsizes(model)-1
+      if (ismissing(model(i))) then
+        esize(i) = esize@_FillValue
+      else
+        esize(i) = num(model.eq.model(i))
+      end if
+    end do
+    weight = 1./tofloat(esize)
+
+    if (GST.eq."GSAT") then
+      PDFhiatusCMIP5 = weighted_pdfx(GSATtrendCMIP5Hiatus, weight, resPDF)
+      PDFhiatusCMIP5 = PDFhiatusCMIP5 / 100.
+      PDFhiatusCMIP5 = PDFhiatusCMIP5 / PDFhiatusCMIP5@bin_spacing
+      PDFhiatusCMIP5@mean = weighted_mean(GSATtrendCMIP5Hiatus, weight)
+      PDFhiatusCMIP5@nmodels = count_unique_values(model)
+      PDFhiatusCMIP5@nruns = num(.not.ismissing(GSATtrendCMIP5Hiatus))
+      PDFhiatusCMIP5@GST = "GSAT"
+    else
+      AltMeanHiatusCMIP5 = weighted_mean(GSATtrendCMIP5Hiatus, weight)
+      AltMeanHiatusCMIP5@GST = "GSAT"
+    end if
+    delete(weight)
+    delete(model)
+    if (.not.isdefined("hiatus_period")) then
+      hiatus_period = GSATtrendCMIP5[0]@hiatus_period
+    end if
+    
+    GSATtrendCMIP5Post = metadata_att_as_array(GSATtrendCMIP5, "trend_post")
+    GSATtrendCMIP5Post = GSATtrendCMIP5Post * scale
+    model = metadata_att_as_array(GSATtrendCMIP5, "dataset")
+    model@_FillValue = ""
+    model = where(ismissing(GSATtrendCMIP5Post), model@_FillValue, model)
+    esize = 0
+    do i = 0, dimsizes(model)-1
+      if (ismissing(model(i))) then
+        esize(i) = esize@_FillValue
+      else
+        esize(i) = num(model.eq.model(i))
+      end if
+    end do
+    weight = 1./tofloat(esize)
+
+    if (GST.eq."GSAT") then
+      PDFpostCMIP5 = weighted_pdfx(GSATtrendCMIP5Post, weight, resPDF)
+      PDFpostCMIP5 = PDFpostCMIP5 / 100.
+      PDFpostCMIP5 = PDFpostCMIP5 / PDFpostCMIP5@bin_spacing
+      PDFpostCMIP5@mean = weighted_mean(GSATtrendCMIP5Post, weight)
+      PDFpostCMIP5@nmodels = count_unique_values(model)
+      PDFpostCMIP5@nruns = num(.not.ismissing(GSATtrendCMIP5Post))
+      PDFpostCMIP5@GST = "GSAT"
+      if (any(composite_project.eq.(/"cmip5", "cmip5+cmip6"/))) then
+        GSATtrendCMIP5Post_selected = GSATtrendCMIP5Post 
+        do ii = 0, dimsizes(cmip5_member_names)-1
+          if (all(cmip5_member_names(ii).ne.composite_member_names)) then
+            GSATtrendCMIP5Post_selected(ii) = GSATtrendCMIP5Post_selected@_FillValue
+          end if
+        end do
+        PDFpostCMIP5selected = weighted_pdfx(GSATtrendCMIP5Post_selected, weight, resPDF)
+        PDFpostCMIP5selected = PDFpostCMIP5selected / 100.
+        PDFpostCMIP5selected = PDFpostCMIP5selected / PDFpostCMIP5selected@bin_spacing
+        PDFpostCMIP5selected = PDFpostCMIP5selected \
+                                * sum(where(ismissing(GSATtrendCMIP5Post_selected), 0., weight)) \
+                                / sum(where(ismissing(GSATtrendCMIP5Post), 0., weight))
+      end if
+    else
+      AltMeanPostCMIP5 = weighted_mean(GSATtrendCMIP5Post, weight)
+      AltMeanPostCMIP5@GST = "GSAT"
+    end if
+    delete(weight)
+    delete(esize)
+    delete(model)
+
+    if (.not.isdefined("post_period")) then
+      do ii = 0, ListCount(GSATtrendCMIP5)-1
+        if (isatt(GSATtrendCMIP5[ii], "post_period")) then
+          post_period = GSATtrendCMIP5[ii]@post_period
+          break
+        end if
+      end do
+    end if
+  end if
+
+  print("CMIP5 MME mean "+PDFhiatusCMIP5@GST+": "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
+  print("CMIP5 MME mean "+AltMeanHiatusCMIP5@GST+": "+AltMeanHiatusCMIP5+"   "+AltMeanPostCMIP5)
+  
   if (isvar("GMSTtrendCMIP6")) then
     GMSTtrendCMIP6Hiatus = list_to_array(GMSTtrendCMIP6)
     GMSTtrendCMIP6Hiatus = GMSTtrendCMIP6Hiatus * scale
@@ -545,12 +697,18 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
       end if
     end do
     weight = 1./tofloat(esize)
-    PDFhiatusCMIP6 = weighted_pdfx(GMSTtrendCMIP6Hiatus, weight, resPDF)
-    PDFhiatusCMIP6 = PDFhiatusCMIP6 / 100.
-    PDFhiatusCMIP6 = PDFhiatusCMIP6 / PDFhiatusCMIP6@bin_spacing
-    PDFhiatusCMIP6@mean = weighted_mean(GMSTtrendCMIP6Hiatus, weight)
-    PDFhiatusCMIP6@nmodels = count_unique_values(model)
-    PDFhiatusCMIP6@nruns = num(.not.ismissing(GMSTtrendCMIP6Hiatus))
+    if (GST.eq."GMST") then
+      PDFhiatusCMIP6 = weighted_pdfx(GMSTtrendCMIP6Hiatus, weight, resPDF)
+      PDFhiatusCMIP6 = PDFhiatusCMIP6 / 100.
+      PDFhiatusCMIP6 = PDFhiatusCMIP6 / PDFhiatusCMIP6@bin_spacing
+      PDFhiatusCMIP6@mean = weighted_mean(GMSTtrendCMIP6Hiatus, weight)
+      PDFhiatusCMIP6@nmodels = count_unique_values(model)
+      PDFhiatusCMIP6@nruns = num(.not.ismissing(GMSTtrendCMIP6Hiatus))
+      PDFhiatusCMIP6@GST = "GMST"
+    else
+      AltMeanHiatusCMIP6 = weighted_mean(GMSTtrendCMIP6Hiatus, weight)
+      AltMeanHiatusCMIP6@GST = "GMST"
+    end if
     delete(weight)
     delete(model)
     if (.not.isvar("hiatus_period")) then
@@ -571,34 +729,39 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
       end if
     end do
     weight = 1./tofloat(esize)
-    PDFpostCMIP6 = weighted_pdfx(GMSTtrendCMIP6Post, weight, resPDF)
-    PDFpostCMIP6 = PDFpostCMIP6 / 100.
-    PDFpostCMIP6 = PDFpostCMIP6 / PDFpostCMIP6@bin_spacing
-    PDFpostCMIP6@mean = weighted_mean(GMSTtrendCMIP6Post, weight)
-    PDFpostCMIP6@nmodels = count_unique_values(model)
-    PDFpostCMIP6@nruns = num(.not.ismissing(GMSTtrendCMIP6Post))
 
-    GMSTtrendCMIP6Post_composited = GMSTtrendCMIP6Post
+    if (GST.eq."GMST") then
+      PDFpostCMIP6 = weighted_pdfx(GMSTtrendCMIP6Post, weight, resPDF)
+      PDFpostCMIP6 = PDFpostCMIP6 / 100.
+      PDFpostCMIP6 = PDFpostCMIP6 / PDFpostCMIP6@bin_spacing
+      PDFpostCMIP6@mean = weighted_mean(GMSTtrendCMIP6Post, weight)
+      PDFpostCMIP6@nmodels = count_unique_values(model)
+      PDFpostCMIP6@nruns = num(.not.ismissing(GMSTtrendCMIP6Post))
+      PDFpostCMIP6@GST = "GMST"
+      GMSTtrendCMIP6Post_composited = GMSTtrendCMIP6Post
 
-    if (any(composite_project.eq.(/"cmip6", "cmip5+cmip6"/))) then
-      GMSTtrendCMIP6Post_selected = GMSTtrendCMIP6Post 
-      do ii = 0, dimsizes(cmip6_member_names)-1
-        if (all(cmip6_member_names(ii).ne.composite_member_names)) then
-          GMSTtrendCMIP6Post_selected(ii) = GMSTtrendCMIP6Post_selected@_FillValue
-        end if
-      end do
-      PDFpostCMIP6selected = weighted_pdfx(GMSTtrendCMIP6Post_selected, weight, resPDF)
-      PDFpostCMIP6selected = PDFpostCMIP6selected / 100.
-      PDFpostCMIP6selected = PDFpostCMIP6selected / PDFpostCMIP6selected@bin_spacing
-      PDFpostCMIP6selected = PDFpostCMIP6selected \
-                              * sum(where(ismissing(GMSTtrendCMIP6Post_selected), 0., weight)) \
-                              / sum(where(ismissing(GMSTtrendCMIP6Post), 0., weight))
+      if (any(composite_project.eq.(/"cmip6", "cmip5+cmip6"/))) then
+        GMSTtrendCMIP6Post_selected = GMSTtrendCMIP6Post 
+        do ii = 0, dimsizes(cmip6_member_names)-1
+          if (all(cmip6_member_names(ii).ne.composite_member_names)) then
+            GMSTtrendCMIP6Post_selected(ii) = GMSTtrendCMIP6Post_selected@_FillValue
+          end if
+        end do
+        PDFpostCMIP6selected = weighted_pdfx(GMSTtrendCMIP6Post_selected, weight, resPDF)
+        PDFpostCMIP6selected = PDFpostCMIP6selected / 100.
+        PDFpostCMIP6selected = PDFpostCMIP6selected / PDFpostCMIP6selected@bin_spacing
+        PDFpostCMIP6selected = PDFpostCMIP6selected \
+                                * sum(where(ismissing(GMSTtrendCMIP6Post_selected), 0., weight)) \
+                                / sum(where(ismissing(GMSTtrendCMIP6Post), 0., weight))
+      end if
+    else
+      AltMeanPostCMIP6 = weighted_mean(GMSTtrendCMIP6Post, weight)
+      AltMeanPostCMIP6@GST = "GMST"
     end if
     delete(weight)
     delete(esize)
     delete(model)
 
-    print("CMIP6 MME mean: "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
     if (.not.isvar("post_period")) then
       do ii = 0, ListCount(GMSTtrendCMIP6)-1
         if (isatt(GMSTtrendCMIP6[ii], "post_period")) then
@@ -608,7 +771,100 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
       end do
     end if
   end if
-  
+
+  if (isvar("GSATtrendCMIP6")) then
+    GSATtrendCMIP6Hiatus = list_to_array(GSATtrendCMIP6)
+    GSATtrendCMIP6Hiatus = GSATtrendCMIP6Hiatus * scale
+    model = metadata_att_as_array(GSATtrendCMIP6, "dataset")
+    model@_FillValue = ""
+    model = where(ismissing(GSATtrendCMIP6Hiatus), model@_FillValue, model)
+    esize = new(dimsizes(model), "integer")
+    do i = 0, dimsizes(model)-1
+      if (ismissing(model(i))) then
+        esize(i) = esize@_FillValue
+      else
+        esize(i) = num(model.eq.model(i))
+      end if
+    end do
+    weight = 1./tofloat(esize)
+    if (GST.eq."GSAT") then
+      PDFhiatusCMIP6 = weighted_pdfx(GSATtrendCMIP6Hiatus, weight, resPDF)
+      PDFhiatusCMIP6 = PDFhiatusCMIP6 / 100.
+      PDFhiatusCMIP6 = PDFhiatusCMIP6 / PDFhiatusCMIP6@bin_spacing
+      PDFhiatusCMIP6@mean = weighted_mean(GSATtrendCMIP6Hiatus, weight)
+      PDFhiatusCMIP6@nmodels = count_unique_values(model)
+      PDFhiatusCMIP6@nruns = num(.not.ismissing(GSATtrendCMIP6Hiatus))
+      PDFhiatusCMIP6@GST = "GSAT"
+    else
+      AltMeanHiatusCMIP6 = weighted_mean(GSATtrendCMIP6Hiatus, weight)
+      AltMeanHiatusCMIP6@GST = "GSAT"
+    end if
+    delete(weight)
+    delete(model)
+    if (.not.isvar("hiatus_period")) then
+      hiatus_period = GSATtrendCMIP6[0]@hiatus_period
+    end if
+    
+    GSATtrendCMIP6Post = metadata_att_as_array(GSATtrendCMIP6, "trend_post")
+    GSATtrendCMIP6Post = GSATtrendCMIP6Post * scale
+    model = metadata_att_as_array(GSATtrendCMIP6, "dataset")
+    model@_FillValue = ""
+    model = where(ismissing(GSATtrendCMIP6Post), model@_FillValue, model)
+    esize = 0
+    do i = 0, dimsizes(model)-1
+      if (ismissing(model(i))) then
+        esize(i) = esize@_FillValue
+      else
+        esize(i) = num(model.eq.model(i))
+      end if
+    end do
+    weight = 1./tofloat(esize)
+
+    if (GST.eq."GSAT") then
+      PDFpostCMIP6 = weighted_pdfx(GSATtrendCMIP6Post, weight, resPDF)
+      PDFpostCMIP6 = PDFpostCMIP6 / 100.
+      PDFpostCMIP6 = PDFpostCMIP6 / PDFpostCMIP6@bin_spacing
+      PDFpostCMIP6@mean = weighted_mean(GSATtrendCMIP6Post, weight)
+      PDFpostCMIP6@nmodels = count_unique_values(model)
+      PDFpostCMIP6@nruns = num(.not.ismissing(GSATtrendCMIP6Post))
+      PDFpostCMIP6@GST = "GSAT"
+      GSATtrendCMIP6Post_composited = GSATtrendCMIP6Post
+
+      if (any(composite_project.eq.(/"cmip6", "cmip5+cmip6"/))) then
+        GSATtrendCMIP6Post_selected = GSATtrendCMIP6Post 
+        do ii = 0, dimsizes(cmip6_member_names)-1
+          if (all(cmip6_member_names(ii).ne.composite_member_names)) then
+            GSATtrendCMIP6Post_selected(ii) = GSATtrendCMIP6Post_selected@_FillValue
+          end if
+        end do
+        PDFpostCMIP6selected = weighted_pdfx(GSATtrendCMIP6Post_selected, weight, resPDF)
+        PDFpostCMIP6selected = PDFpostCMIP6selected / 100.
+        PDFpostCMIP6selected = PDFpostCMIP6selected / PDFpostCMIP6selected@bin_spacing
+        PDFpostCMIP6selected = PDFpostCMIP6selected \
+                                * sum(where(ismissing(GSATtrendCMIP6Post_selected), 0., weight)) \
+                                / sum(where(ismissing(GSATtrendCMIP6Post), 0., weight))
+      end if
+    else
+      AltMeanPostCMIP6 = weighted_mean(GSATtrendCMIP6Post, weight)
+      AltMeanPostCMIP6@GST = "GSAT"
+    end if
+    delete(weight)
+    delete(esize)
+    delete(model)
+
+    if (.not.isvar("post_period")) then
+      do ii = 0, ListCount(GSATtrendCMIP6)-1
+        if (isatt(GSATtrendCMIP6[ii], "post_period")) then
+          post_period = GSATtrendCMIP6[ii]@post_period
+          break
+        end if
+      end do
+    end if
+  end if
+
+  print("CMIP6 MME mean "+PDFhiatusCMIP6@GST+": "+PDFhiatusCMIP6@mean+"   "+PDFpostCMIP6@mean)
+  print("CMIP6 MME mean "+AltMeanHiatusCMIP6@GST+": "+AltMeanHiatusCMIP6+"   "+AltMeanPostCMIP6)
+    
 ; ======================================================================
 ;
 ;                            3. Plot PDFs
@@ -635,7 +891,7 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
   res@gsnDraw = False
   res@gsnFrame = False
   res@trYMinF = 0.
-  res@trYMaxF = 7.
+  res@trYMaxF = 7.5
   res@trXMinF = -0.02*scale
   res@trXMaxF = 0.08*scale ; 0.06*scale
   res@tmYROn = False
@@ -658,7 +914,7 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
   res@tiMainFontHeightF = 0.017
   res@tiMainFont = "helvetica" ;"helvetica-bold"
   res@tiMainString = "(a) "+hiatus_period ;+" GMST trend"
-  res@tiMainOffsetYF = 0. ;-0.01
+  res@tiMainOffsetYF = 0.01 ;0.
   res@tiMainFontThicknessF = 2.
   res@tiYAxisString = "Normalized Density" ;"Probability Density [("+unit+")~S~-1~N~]"
   res@tiYAxisFontHeightF = 0.015
@@ -705,17 +961,47 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
 ;    idummy = idummy + 1
     ; CMIP5 PDF mean
     polyres := True
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
-    polyres@gsFillColor = color_cmip5
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(0), PDFhiatusCMIP5@mean, res@trYMaxF, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.008
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) + 0.01
     ymarker(2) = ymarker(0) + 0.02
     ymarker(3) = ymarker(0) + 0.01
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    ymarker(4) = ymarker(0)
+    if (PDFhiatusCMIP5@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip5
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip5
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
+    delete(xmarker)
+    delete(ymarker)
+  end if
+  if (isvar("AltMeanHiatusCMIP5")) then
+    polyres := True
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
+    datatondc(pdfs(0), AltMeanHiatusCMIP5, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    ymarker(4) = ymarker(0)
+    if (AltMeanHiatusCMIP5@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip5
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip5
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
     delete(xmarker)
     delete(ymarker)
   end if
@@ -727,17 +1013,47 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
 ;    idummy = idummy + 1
     ; CMIP6 PDF mean
     polyres := True
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
-    polyres@gsFillColor = color_cmip6
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(0), PDFhiatusCMIP6@mean, res@trYMaxF, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.008
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) + 0.01
     ymarker(2) = ymarker(0) + 0.02
     ymarker(3) = ymarker(0) + 0.01
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    ymarker(4) = ymarker(0)
+    if (PDFhiatusCMIP6@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip6
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip6
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
+    delete(xmarker)
+    delete(ymarker)
+  end if
+  if (isvar("AltMeanHiatusCMIP6")) then
+    polyres := True
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
+    datatondc(pdfs(0), AltMeanHiatusCMIP6, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    ymarker(4) = ymarker(0)
+    if (AltMeanHiatusCMIP6@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip6
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip6
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
     delete(xmarker)
     delete(ymarker)
   end if
@@ -769,26 +1085,46 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     polyres@gsFillOpacityF = 1.
     x = xlabel-0.05
     y = ylabel-ilabel*ylabeli
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(0), x+0.03, y, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.005
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) - 0.00625
     ymarker(2) = ymarker(0) - 0.0125
     ymarker(3) = ymarker(0) - 0.00625
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
-    dummy(idummy) = gsn_add_text(wks, pdfs(0), "ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    ymarker(4) = ymarker(0)
+    gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "GSAT ensemble mean", x, y, txres)
     idummy = idummy + 1
     ilabel = ilabel + 1.
+    
+    y = ylabel-ilabel*ylabeli
+    datatondc(pdfs(0), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    ymarker(4) = ymarker(0)
+    polyres@gsLineColor = color_cmip6
+    gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "GMST ensemble mean", x, y, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    delete([/xmarker, ymarker/])
+    
     polyres@gsFillOpacityF = opacity_pdf_cmip6
     y = ylabel-ilabel*ylabeli
     xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
     ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
     dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_text(wks, pdfs(0), "histogram", x, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), GST+" histogram", x, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
     if (isStrSubset(composite_project, "cmip6")) then
       polyres@gsFillColor := color_cmip6_selected
@@ -806,7 +1142,7 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
       dummy(idummy) = gsn_add_text(wks, pdfs(0), "selected members", xlabel, ylabel-ilabel*ylabeli, txres)
       txres@txFontOpacityF = 1.
       idummy = idummy + 1
-      polyres@gsLineColor = color_cmip6_selected
+      polyres@gsLineColor := color_cmip6_selected
       x = (xmarker(0)+xmarker(1))/2.
       y = ylabel-ilabel*ylabeli
       dummy(idummy) = gsn_add_polyline(wks, pdfs(0), (/x, x-0.01/), (/y+ylabeli/2., y/), polyres)
@@ -829,26 +1165,46 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     polyres@gsFillOpacityF = 1.
     x = xlabel-0.05
     y = ylabel-ilabel*ylabeli
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(0), x+0.03, y, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.005
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) - 0.00625
     ymarker(2) = ymarker(0) - 0.0125
     ymarker(3) = ymarker(0) - 0.00625
+    ymarker(4) = ymarker(0)
     gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
-    dummy(idummy) = gsn_add_text(wks, pdfs(0), "ensemble mean", x, y, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "GSAT ensemble mean", x, y, txres)
     idummy = idummy + 1
     ilabel = ilabel + 1.
+
+    y = ylabel-ilabel*ylabeli
+    datatondc(pdfs(0), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    ymarker(4) = ymarker(0)
+    polyres@gsLineColor = color_cmip5
+    gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), "GMST ensemble mean", x, y, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    delete([/xmarker, ymarker/])
+    
     polyres@gsFillOpacityF = opacity_pdf_cmip5
     y = ylabel-ilabel*ylabeli
     xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
     ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
     dummy(idummy) = gsn_add_polygon(wks, pdfs(0), xmarker, ymarker, polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_text(wks, pdfs(0), "histogram", x, y, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(0), GST+" histogram", x, y, txres)
     idummy = idummy + 1
     if (isStrSubset(composite_project, "cmip5")) then
       polyres@gsFillColor := color_cmip5_selected
@@ -927,7 +1283,6 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
     ymarker = new(4, "float")
     j = 0
     do ii = 0, ListCount(SingleValhiatusObs)-1
-print(SingleValhiatusObs[ii]@dataset)
       polyres@gsFillColor := color_obs_single(j, :)
       polyres@gsLineColor := color_obs_single(j, :)
       datatondc(pdfs(0), tofloat(SingleValhiatusObs[ii]), res@trYMaxF, xmarker(0), ymarker(0))
@@ -937,9 +1292,7 @@ print(SingleValhiatusObs[ii]@dataset)
       ymarker(1) = ymarker(0) + 0.02
       ymarker(2) = ymarker(1)
       ymarker(3) = ymarker(0)
-      if (any(SingleValhiatusObs[ii]@dataset.eq.reanalyses)) then
-        gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
-      else
+      if (any(SingleValhiatusObs[ii]@GST.eq."GSAT")) then ; Draw filled triangles first
         gsn_polygon_ndc(wks, xmarker(0:2), ymarker(0:2), polyres)
       end if
       x = xlabel+0.05
@@ -952,7 +1305,7 @@ print(SingleValhiatusObs[ii]@dataset)
       ymarker(1) = ymarker(0) - 0.0125
       ymarker(2) = ymarker(0)
       ymarker(3) = ymarker(0)
-      if (any(SingleValhiatusObs[ii]@dataset.eq.reanalyses)) then
+      if (any(SingleValhiatusObs[ii]@GST.eq."GMST")) then
         gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
       else
         gsn_polygon_ndc(wks, xmarker(0:2), ymarker(0:2), polyres)
@@ -970,6 +1323,23 @@ print(SingleValhiatusObs[ii]@dataset)
       ilabel = ilabel + 1
       j = j + 1
     end do
+
+    j = 0
+    do ii = 0, ListCount(SingleValhiatusObs)-1
+      polyres@gsFillColor := color_obs_single(j, :)
+      polyres@gsLineColor := color_obs_single(j, :)
+      datatondc(pdfs(0), tofloat(SingleValhiatusObs[ii]), res@trYMaxF, xmarker(0), ymarker(0))
+      xmarker(1) = xmarker(0) - 0.007
+      xmarker(2) = xmarker(0) + 0.007
+      xmarker(3) = xmarker(0)
+      ymarker(1) = ymarker(0) + 0.02
+      ymarker(2) = ymarker(1)
+      ymarker(3) = ymarker(0)
+      if (any(SingleValhiatusObs[ii]@GST.eq."GMST")) then ; Superpose open triangles
+        gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+      end if
+      j = j + 1
+    end do
     delete(xmarker)
     delete(ymarker)
   end if
@@ -983,7 +1353,7 @@ print(SingleValhiatusObs[ii]@dataset)
   res@vpHeightF = vpH(1)
   res@vpWidthF = vpW(1)
   res@tiMainString = "(b) "+post_period; +" GMST trend"
-  res@tiMainOffsetYF = 0. ;-0.02
+  res@tiMainOffsetYF = 0.01 ;0.
   pdfs(1) = gsn_csm_xy(wks, (/-1., 1./), (/ 0., 0./), res)
   ilabel = 0.
   xlabel = xlabelR
@@ -1051,17 +1421,48 @@ print(SingleValhiatusObs[ii]@dataset)
 ;    idummy = idummy + 1
     ; CMIP5 PDF mean
     polyres := True
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
-    polyres@gsFillColor = color_cmip5
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(1), PDFpostCMIP5@mean, res@trYMaxF, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.008
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) + 0.01
     ymarker(2) = ymarker(0) + 0.02
     ymarker(3) = ymarker(0) + 0.01
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    ymarker(4) = ymarker(0)
+    if (PDFpostCMIP5@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip5
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip5
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
+    delete(xmarker)
+    delete(ymarker)
+  end if
+  if (isvar("AltMeanPostCMIP5")) then
+    ; CMIP5 PDF mean
+    polyres := True
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
+    datatondc(pdfs(1), AltMeanPostCMIP5, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    ymarker(4) = ymarker(0)
+    if (AltMeanPostCMIP5@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip5
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip5
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
     delete(xmarker)
     delete(ymarker)
   end if
@@ -1073,17 +1474,48 @@ print(SingleValhiatusObs[ii]@dataset)
 ;    idummy = idummy + 1
     ; CMIP6 PDF mean
     polyres := True
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
-    polyres@gsFillColor = color_cmip6
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(1), PDFpostCMIP6@mean, res@trYMaxF, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.008
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) + 0.01
     ymarker(2) = ymarker(0) + 0.02
     ymarker(3) = ymarker(0) + 0.01
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
+    ymarker(4) = ymarker(0)
+    if (PDFpostCMIP6@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip6
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip6
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
+    delete(xmarker)
+    delete(ymarker)
+  end if
+  if (isvar("AltMeanPostCMIP6")) then
+    ; CMIP5 PDF mean
+    polyres := True
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
+    datatondc(pdfs(1), AltMeanPostCMIP6, res@trYMaxF, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.008
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.008
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) + 0.01
+    ymarker(2) = ymarker(0) + 0.02
+    ymarker(3) = ymarker(0) + 0.01
+    ymarker(4) = ymarker(0)
+    if (AltMeanPostCMIP6@GST.eq."GMST") then
+      polyres@gsLineColor = color_cmip6
+      gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    else
+      polyres@gsFillColor = color_cmip6
+      gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    end if
     delete(xmarker)
     delete(ymarker)
   end if
@@ -1099,26 +1531,46 @@ print(SingleValhiatusObs[ii]@dataset)
     polyres@gsFillOpacityF = 1.
     x = xlabel-0.05
     y = ylabel-ilabel*ylabeli
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(1), x+0.03, y, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.005
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) - 0.00625
     ymarker(2) = ymarker(0) - 0.0125
     ymarker(3) = ymarker(0) - 0.00625
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
-    dummy(idummy) = gsn_add_text(wks, pdfs(1), "ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    ymarker(4) = ymarker(0)
+    gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "GSAT ensemble mean", x, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
     ilabel = ilabel + 1.
+
+    y = ylabel-ilabel*ylabeli
+    datatondc(pdfs(1), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    ymarker(4) = ymarker(0)
+    polyres@gsLineColor = color_cmip6
+    gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "GMST ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    delete([/xmarker, ymarker/])
+    
     polyres@gsFillOpacityF = opacity_pdf_cmip6
     y = ylabel-ilabel*ylabeli
     xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
     ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
     dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_text(wks, pdfs(1), "histogram", x, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), GST+" histogram", x, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
     if (isStrSubset(composite_project, "cmip6")) then
       polyres@gsFillColor := color_cmip6_selected
@@ -1140,7 +1592,7 @@ print(SingleValhiatusObs[ii]@dataset)
       dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a)", xlabel, ylabel-ilabel*ylabeli, txres)
       txres@txFontOpacityF = 1.
       idummy = idummy + 1
-      polyres@gsLineColor = color_cmip6_selected
+      polyres@gsLineColor := color_cmip6_selected
       x = (xmarker(0)+xmarker(1))/2.
       y = ymarker(2)+(ymarker(0)-ymarker(2))*0.5
       dummy(idummy) = gsn_add_polyline(wks, pdfs(1), (/x, x-0.015/), (/y, ylabel-ilabel*ylabeli/), polyres)
@@ -1163,19 +1615,39 @@ print(SingleValhiatusObs[ii]@dataset)
     polyres@gsFillOpacityF = 1.
     x = xlabel-0.05
     y = ylabel-ilabel*ylabeli
-    xmarker = new(4, "float")
-    ymarker = new(4, "float")
+    xmarker = new(5, "float")
+    ymarker = new(5, "float")
     datatondc(pdfs(1), x+0.03, y, xmarker(0), ymarker(0))
     xmarker(1) = xmarker(0) - 0.005
     xmarker(2) = xmarker(0)
     xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
     ymarker(1) = ymarker(0) - 0.00625
     ymarker(2) = ymarker(0) - 0.0125
     ymarker(3) = ymarker(0) - 0.00625
-    gsn_polygon_ndc(wks, xmarker, ymarker, polyres)
-    dummy(idummy) = gsn_add_text(wks, pdfs(1), "ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    ymarker(4) = ymarker(0)
+    gsn_polygon_ndc(wks, xmarker(0:3), ymarker(0:3), polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "GSAT ensemble mean", x, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
     ilabel = ilabel + 1.
+    
+    y = ylabel-ilabel*ylabeli
+    datatondc(pdfs(1), x+0.03, y, xmarker(0), ymarker(0))
+    xmarker(1) = xmarker(0) - 0.005
+    xmarker(2) = xmarker(0)
+    xmarker(3) = xmarker(0) + 0.005
+    xmarker(4) = xmarker(0)
+    ymarker(1) = ymarker(0) - 0.00625
+    ymarker(2) = ymarker(0) - 0.0125
+    ymarker(3) = ymarker(0) - 0.00625
+    ymarker(4) = ymarker(0)
+    polyres@gsLineColor = color_cmip5
+    gsn_polyline_ndc(wks, xmarker, ymarker, polyres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), "GMST ensemble mean", x, ylabel-ilabel*ylabeli, txres)
+    idummy = idummy + 1
+    ilabel = ilabel + 1.
+    delete([/xmarker, ymarker/])
+    
     polyres@gsFillOpacityF = opacity_pdf_cmip5
     y = ylabel-ilabel*ylabeli
     xmarker = (/x+0.01, x+0.05, x+0.05, x+0.01/)
@@ -1475,10 +1947,10 @@ print(SingleValhiatusObs[ii]@dataset)
   txres@txFontHeightF = 0.02
   txres@txFont = "helvetica"
   txres@txJust = "TopCenter"
-  gsn_text_ndc(wks, "Decadal modulation of the surface global warming trend", 0.5, max(vpY)+0.12, txres)
+  gsn_text_ndc(wks, "Decadal modulation of the surface global warming trend", 0.5, max(vpY)+0.11, txres)
   txres@txFont = "helvetica-bold"
   txres@txFontHeightF = 0.018
-  gsn_text_ndc(wks, "Distribution of the GMST trend", (vpX(0)+vpX(3))/2.-0.01, vpY(0)+0.075, txres)
+  gsn_text_ndc(wks, "Distribution of GMST/GSAT trend", (vpX(0)+vpX(3))/2.-0.01, vpY(0)+0.075, txres)
   gsn_text_ndc(wks, "Pattern of trend over 1998-2012", (vpX(3)+1.)/2., vpY(0)+0.075, txres)
   draw(pdfs)
   draw(patterns)

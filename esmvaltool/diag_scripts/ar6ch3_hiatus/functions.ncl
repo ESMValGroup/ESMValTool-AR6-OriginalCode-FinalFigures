@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210215 kosaka_yu: fixed missing value handling in calc_trend.
 ;    20200917 kosaka_yu: revised to add significance in calc_trend.
 ;    20200914 kosaka_yu: revised to account for weighting in percentiles.
 ;    20200525 kosaka_yu: written.
@@ -40,7 +41,6 @@ begin
     if (all(.not.ismissing(y))) then
       break
     end if
-;print("iter = "+iter+" #missing = "+num(ismissing(y)))
     z = y
     i = 0
     tmp(:, :,   0) = z(:, :, imax)
@@ -204,12 +204,8 @@ begin
 end
 
 function blend_tas_tos(tas, tos, sic, sftlf, method)
-;local tas, tos, sic, sftlf, lf, lftmp, ts, SAT, SST, SIC, SFTLF, stime, etime, method
 local tas, tos, sic, sftlf, lf, lftmp, frac, ts, stime, etime, method
 begin
-;  SAT = set_yyyymm(tas)
-;  SST = set_yyyymm(tos)
-;  SIC = set_yyyymm(sic)
   stime = max((/tas&time(0), tos&time(0), sic&time(0)/))
   etime = min((/tas&time(dimsizes(tas&time)-1), tos&time(dimsizes(tos&time)-1), sic&time(dimsizes(sic&time)-1)/))
   lf = sftlf
@@ -232,39 +228,11 @@ begin
   return(ts)
 end
 
-; =================================================================
-;
-;                          Time functions
-;
-; =================================================================
-
-;function set_yyyymm(x)
-;local x, y, time
-;begin
-;  y = x
-;  if (min(mod(x&time,100)).lt.1.or.max(mod(x&time,100)).gt.12) then
-;    time = cd_calendar(x&time, -1)
-;    y&time = time
-;  end if
-;  if (isatt(x&time,"calendar")) then
-;    if (y&time@calendar .eq. "proleptic_gregorian") then
-;      y&time@calendar = "gregorian"
-;    else
-;      y&time@calendar = y&time@calendar
-;    end if
-;  end if
-;  y&time@long_name = "time"
-;  y&time@standard_name = "time"
-;  y&time@axid = "T"
-;  return(y)
-;end
-
 function monthly2annual(x, smonth_ann, emonth_ann, syear_ann, eyear_ann)
 local y, year, month, syear, eyear, ndays, ndays_min, nseasons, nseasons_min, \
       smonth1, emonth1, smonht2, emonth2, smonth3, emonth3, smonth4, emonth4, \
       tmp
 begin
-;  y = set_yyyymm(x)
   y = x
   year = 0
   year@calendar = y&time@calendar
@@ -429,15 +397,9 @@ begin
                         "least_squares", "LeastSquares", "Least_Squares", \
                         "ls", "LS"/))) then
       dims = dimsizes(y({ts:te}, :, :))
-;      tmp = dtrend_msg_n(tofloat(ispan(1, dims(0), 1)), y({ts:te}, :, :), True, True, 0)
-;      tr = y(0, :, :)
       tr = regCoef_n(tofloat(ispan(1, dims(0), 1)), y({ts:te}, :, :), 0, 0)
       tr = where(dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0).gt.dims(0)*frac_threshold, \
                  tr, tr@_FillValue)
-;      tmp2 = trend_manken(y({ts:te}, :, :), False, 0)
-;      sig = tr
-;      sig = where(ismissing(tr), tr@_FillValue, tmp2(0, :, :))
-;      delete(tmp2)
       delete(dims)
       tmp = esacr_n(y({ts:te}, :, :), 1, 0)
       edof = dim_num_n(.not.ismissing(y({ts:te}, :, :)), 0) * where(tmp(1, :, :).gt.0., (1.-tmp(1, :, :))/(1.+tmp(1, :, :)), 1.) - 2.
@@ -445,6 +407,7 @@ begin
       b = edof
       b = 0.5
       sig = 1. - betainc(edof/(edof + reshape(tr@tval, dimsizes(tr))^2), edof/2.0, b)
+      sig = where(ismissing(tr), sig@_FillValue, sig)
       delete(edof)
       delete(b)
     elseif (any(method.eq.(/"Sen", "sen", "median_slope", "MedianSlope", \
