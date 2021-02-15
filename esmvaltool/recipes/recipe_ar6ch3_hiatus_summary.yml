@@ -852,9 +852,9 @@ diagnostics:
         end_year: 2012
         additional_datasets:
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-          - {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
-          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: v5, tier: 2}
-          - {dataset: Kadow, project: OBS, type: median, version: 4.6.0.0, tier: 2}
+          #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
+          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+          - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
       trendHiatusPosthiatus_refHadCRUT5: &trend_settings
         script: ar6ch3_hiatus/trend.ncl
@@ -869,12 +869,12 @@ diagnostics:
         output_ref_trend: False
         output_obs_trend: False
 # Following part is unrelated to the figure, but to make a table that support the text.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
@@ -952,12 +952,12 @@ diagnostics:
       trendHiatusPosthiatus_refHadCRUT5:
         <<: *trend_settings
 # Following part is unrelated to the figure, but to make a table that support the text.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
@@ -1032,12 +1032,12 @@ diagnostics:
       trendHiatusPosthiatus_refHadCRUT5:
         <<: *trend_settings
 # Following part is unrelated to the figure, but to make a table that support the text.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
@@ -1112,12 +1112,12 @@ diagnostics:
       trendHiatusPosthiatus_refHadCRUT5:
         <<: *trend_settings
 # Following part is unrelated to the figure, but to make a table that support the text.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
@@ -1192,12 +1192,12 @@ diagnostics:
       trendHiatusPosthiatus_refHadCRUT5:
         <<: *trend_settings
 # Following part is unrelated to the figure, but to make a table that support the text.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
@@ -1275,12 +1275,12 @@ diagnostics:
       trendHiatusPosthiatus_refHadCRUT5:
         <<: *trend_settings
 # Following part is unrelated to the figure, but to make a table that support the text.
-      trendHiatusPosthiatus_refCowtanWay:
-        <<: *trend_settings
-        method_GMST: Cowtan2015
-        mask_ref_dataset_GMST: CowtanWay
-        do_post: False
-        do_pattern: False
+#      trendHiatusPosthiatus_refCowtanWay:
+#        <<: *trend_settings
+#        method_GMST: Cowtan2015
+#        mask_ref_dataset_GMST: CowtanWay
+#        do_post: False
+#        do_pattern: False
       trendHiatusPosthiatus_refKadow:
         <<: *trend_settings
         method_GMST: Cowtan2015
@@ -1696,7 +1696,7 @@ diagnostics:
         <<: *tasa_setting
         preprocessor: regrid1x1
         additional_datasets:
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
     scripts:
       trendHiatusPosthiatus_refBerkeleyEarth:
         <<: *trend_settings
@@ -1747,7 +1747,7 @@ diagnostics:
         <<: *tasa_setting
         preprocessor: regrid1x1
         additional_datasets:
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
     scripts:
       trendHiatusPosthiatus_refBerkeleyEarth:
         <<: *trend_settings
@@ -1798,7 +1798,7 @@ diagnostics:
         <<: *tasa_setting
         preprocessor: regrid1x1
         additional_datasets:
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
     scripts:
       trendHiatusPosthiatus_refBerkeleyEarth:
         <<: *trend_settings
@@ -1849,7 +1849,7 @@ diagnostics:
         <<: *tasa_setting
         preprocessor: regrid1x1
         additional_datasets:
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
     scripts:
       trendHiatusPosthiatus_refBerkeleyEarth:
         <<: *trend_settings
@@ -1900,7 +1900,7 @@ diagnostics:
         <<: *tasa_setting
         preprocessor: regrid1x1
         additional_datasets:
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
     scripts:
       trendHiatusPosthiatus_refBerkeleyEarth:
         <<: *trend_settings
@@ -1950,7 +1950,7 @@ diagnostics:
         <<: *tasa_setting
         preprocessor: regrid1x1
         additional_datasets:
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
     scripts:
       trendHiatusPosthiatus_refBerkeleyEarth:
         <<: *trend_settings
@@ -1967,7 +1967,7 @@ diagnostics:
       percentiles:
         script: ar6ch3_hiatus/summary_percentiles.ncl
         ancestors: ['trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refHadCRUT5',
-                    'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refCowtanWay',
+#                    'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refCowtanWay',
                     'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refKadow',
                     'trend_hiatus_posthiatus_5x5_*/trendHiatusPosthiatus_refNOAAGlobalTemp-Interim',
                     'trend_hiatus_posthiatus_2x2_*/trendHiatusPosthiatus_refGISTEMP',

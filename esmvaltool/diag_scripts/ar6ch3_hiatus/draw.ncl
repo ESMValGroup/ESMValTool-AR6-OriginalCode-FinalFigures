@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210215 kosaka_yu: revised figure details
 ;    20210204 kosaka_yu: updated for the new recipe structure
 ;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim.
 ;    20200924 kosaka_yu: revised figure details.
@@ -636,7 +637,7 @@ print("CMIP5 MME mean: "+PDFhiatusCMIP5@mean+"   "+PDFpostCMIP5@mean)
   res@trYMinF = 0.
   res@trYMaxF = 7.
   res@trXMinF = -0.02*scale
-  res@trXMaxF = 0.07*scale ; 0.06*scale
+  res@trXMaxF = 0.08*scale ; 0.06*scale
   res@tmYROn = False
   res@tmXTOn = False
   res@tmYLLabelFontHeightF = 0.016
@@ -1122,7 +1123,11 @@ print(SingleValhiatusObs[ii]@dataset)
     if (isStrSubset(composite_project, "cmip6")) then
       polyres@gsFillColor := color_cmip6_selected
       polyres@gsFillOpacityF = opacity_selected_pdf
-      ymarker(0) = ymarker(2)+(ymarker(0)-ymarker(2))*0.3
+      xmarker(0) = xmarker(0)+0.01
+      xmarker(1) = xmarker(1)-0.01
+      xmarker(2) = xmarker(2)-0.01
+      xmarker(3) = xmarker(3)+0.01
+      ymarker(0) = ymarker(2)+(ymarker(0)-ymarker(2))*0.45
       ymarker(1) = ymarker(0)
       dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
       idummy = idummy + 1    
