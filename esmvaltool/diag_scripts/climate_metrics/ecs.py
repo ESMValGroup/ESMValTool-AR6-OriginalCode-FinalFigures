@@ -19,12 +19,13 @@ Configuration options in recipe
 -------------------------------
 calculate_mmm : bool, optional (default: True)
     Calculate multi-model mean ECS.
+output_attributes : dict, optional
+    Write additional attributes to netcdf files.
 read_external_file : str, optional
     Read ECS and feedback parameters from external file. The path can be given
     relative to this diagnostic script or as absolute path.
 seaborn_settings : dict, optional
-    Options for :func:`seaborn.set` (affects all plots), see
-    <https://seaborn.pydata.org/generated/seaborn.set.html>.
+    Options for :func:`seaborn.set` (affects all plots).
 
 """
 
@@ -43,9 +44,17 @@ import yaml
 from scipy import stats
 
 from esmvaltool.diag_scripts.shared import (
-    ProvenanceLogger, extract_variables, get_diagnostic_filename,
-    get_plot_filename, group_metadata, io, plot, run_diagnostic,
-    select_metadata, variables_available)
+    ProvenanceLogger,
+    extract_variables,
+    get_diagnostic_filename,
+    get_plot_filename,
+    group_metadata,
+    io,
+    plot,
+    run_diagnostic,
+    select_metadata,
+    variables_available,
+)
 
 logger = logging.getLogger(os.path.basename(__file__))
 
@@ -337,6 +346,7 @@ def plot_ecs_regression(cfg, dataset_name, tas_cube, rtnt_cube, reg_stats):
         'Climate Feedback Parameter': -reg_stats.slope,
         'ECS': ecs,
     }
+    attrs.update(cfg.get('output_attributes', {}))
     cube = iris.cube.Cube(rtnt_cube.data,
                           attributes=attrs,
                           aux_coords_and_dims=[(tas_coord, 0)],
@@ -385,6 +395,7 @@ def write_data(ecs_data, feedback_parameter_data, ancestor_files, cfg):
             f"For datasets {RTMT_DATASETS}, 'rtmt' (net top of model "
             f"radiation) instead of 'rtnt' (net top of atmosphere radiation) "
             f"is used due to lack of data. These two variables might differ.")
+    attrs.update(cfg.get('output_attributes', {}))
     data_available = False
     for (idx, var_attr) in enumerate(var_attrs):
         if not data[idx]:

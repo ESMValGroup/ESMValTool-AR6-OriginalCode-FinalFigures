@@ -1,7 +1,9 @@
 """Utils module for Python cmorizers."""
+from pathlib import Path
 import datetime
 import logging
 import os
+import re
 from contextlib import contextmanager
 
 import iris
@@ -10,11 +12,12 @@ import yaml
 from cf_units import Unit
 from dask import array as da
 
-from esmvalcore._config import get_tag_value
 from esmvalcore.cmor.table import CMOR_TABLES
-from esmvaltool import __version__ as version
+from esmvaltool import __version__ as version, __file__ as esmvaltool_file
 
 logger = logging.getLogger(__name__)
+
+REFERENCES_PATH = Path(esmvaltool_file).absolute().parent / 'references'
 
 
 def add_height2m(cube):
@@ -180,6 +183,35 @@ def save_variable(cube, var, outdir, attrs, **kwargs):
     iris.save(cube, file_path, fill_value=1e20, **kwargs)
 
 
+def extract_doi_value(tags):
+    """Extract doi(s) from a bibtex entry."""
+    reference_doi = []
+    pattern = r'doi\ = {(.*?)\},'
+
+    if not isinstance(tags, list):
+        tags = [tags]
+
+    for tag in tags:
+        bibtex_file = REFERENCES_PATH / f'{tag}.bibtex'
+        if bibtex_file.is_file():
+            reference_entry = bibtex_file.read_text()
+            if re.search("doi", reference_entry):
+                reference_doi.append(
+                    f'doi:{re.search(pattern, reference_entry).group(1)}'
+                )
+            else:
+                reference_doi.append('doi not found')
+                logger.warning(
+                    'The reference file %s does not have a doi.', bibtex_file
+                )
+        else:
+            reference_doi.append('doi not found')
+            logger.warning(
+                'The reference file %s does not exist.', bibtex_file
+            )
+    return ', '.join(reference_doi)
+
+
 def set_global_atts(cube, attrs):
     """Complete the cmorized file with global metadata."""
     logger.debug("Setting global metadata...")
@@ -201,7 +233,7 @@ def set_global_atts(cube, attrs):
             'source':
             attrs.pop('source'),
             'reference':
-            get_tag_value('references', attrs.pop('reference')),
+            extract_doi_value(attrs.pop('reference')),
             'comment':
             attrs.pop('comment'),
             'user':
