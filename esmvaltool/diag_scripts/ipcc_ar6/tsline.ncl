@@ -31,7 +31,6 @@
 ;             of years
 ;    header: if true, region name as header
 ;    write_stat: if true, write multi model statistics in nc-file
-;    stat: statistics for multi model nc-file (MinMax,5-95,10-90)
 ;
 ; Caveats
 ;
@@ -208,9 +207,6 @@ begin
     anom = "noanom"
   end if
 
-  ; TODO
-  model_arr_stddev = 0
-
   ; Create model array
   model_arr = new((/dim_MOD, ntime/), double)
   model_arr!0 = "model"
@@ -242,6 +238,11 @@ begin
         ; Determine start/end year
         start_year = info_items[imod]@start_year
         end_year = info_items[imod]@end_year
+        if (start_year .gt. diag_script_info@ref_start) then
+          ref_start = start_year
+        else
+          ref_start = diag_script_info@ref_start
+        end if
         A_ref_mask = time_operations(A_ref, start_year, \
                                      end_year, "extract", "", 0)
         A0_nomask_ref = time_operations(A0, ref_start, \
@@ -286,6 +287,7 @@ begin
         delete(year)
         delete(month)
         delete(date)
+        delete(weights)
         delete(A0_monavg_ref)
 
         ; calculate global mean of reference period
@@ -390,58 +392,6 @@ begin
 
   end do
 
-  ; individual case for HadCRUT4 observations
-  ; mean value comes from climatology file (absolute.nc).
-  ; There are no missing values as in the anomaly data.
-  if (anom .eq. "anom" .and. isatt(variable_info[0], "reference_dataset") \
-      .and. variable_info[0]@reference_dataset .eq. "HadCRUT4") then
-    if(ref_start .eq. 1961 .and. ref_end .eq. 1990) then
-      anom_ref(ref_ind) = 14.0
-    else
-      anom_ref(ref_ind) = anom_ref@_FillValue
-    end if
-  end if
-
-  ; calculate multi model statistics
-  if (diag_script_info@write_stat) then
-    if (isatt(variable_info[0], "reference_dataset")) then
-      ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
-                    datasetnames.ne.variable_info[0]@reference_dataset)
-    else
-      ind_mod = ind(datasetnames.ne."MultiModelMean")
-    end if
-
-    model_arr_stat = new((/4, ntime/), double)
-    model_arr_stat!0 = "stat"
-    model_arr_stat!1 = "time"
-    model_arr_stat&time = model_arr&time
-    model_arr_stat&stat = (/"mean", "min", "max", "ref"/)
-
-    model_arr_stat(0, :) = (/model_arr(mmm_ind, :)/)
-    do i = 0, ntime-1
-      statb = stat_dispersion(model_arr(ind_mod, i), False)
-      if (diag_script_info@stat .eq. "MinMax") then
-        ; min
-        model_arr_stat(1,i) = (/statb(2)/)
-        ; max
-        model_arr_stat(2, i) = (/statb(14)/)
-      elseif (diag_script_info@stat .eq. "5-95") then
-        ; 5% quantile
-        model_arr_stat(0, i) = (/statb(24)/)
-        ; 95% quantile
-        model_arr_stat(0,i) = (/statb(25)/)
-      elseif (diag_script_info@stat .eq. "10-90") then
-        ; 10% quantile
-        model_arr_stat(1, i) = (/statb(3)/)
-        ; 90% quantile
-        model_arr_stat(2, i) = (/statb(13)/)
-      end if
-    end do
-    if (isatt(variable_info[0], "reference_dataset")) then
-      model_arr_stat(3, :) = (/model_arr(ref_ind, :)/)
-    end if
-  end if
-
   ; Convert time coordinate to years (required by the plot routine)
   if (time_avg.eq."monthly") then
     year = model_arr&time / 100
@@ -463,6 +413,60 @@ begin
     delete(tmp)
   end if
 
+  ; individual case for HadCRUT4 observations
+  ; mean value comes from climatology file (absolute.nc).
+  ; There are no missing values as in the anomaly data.
+  if (anom .eq. "anom" .and. isatt(variable_info[0], "reference_dataset") \
+      .and. variable_info[0]@reference_dataset .eq. "HadCRUT4") then
+    if(ref_start .eq. 1961 .and. ref_end .eq. 1990) then
+      anom_ref(ref_ind) = 14.0
+    else
+      anom_ref(ref_ind) = anom_ref@_FillValue
+    end if
+  end if
+
+  ; calculate multi model statistics
+  if (diag_script_info@write_stat) then
+    if (isatt(variable_info[0], "reference_dataset")) then
+      ind_mod = ind(datasetnames.ne."MultiModelMean" .and. \
+                    datasetnames.ne.variable_info[0]@reference_dataset)
+    else
+      ind_mod = ind(datasetnames.ne."MultiModelMean")
+    end if
+
+    model_arr_stat = new((/ntime, 10/), double)
+    model_arr_stat!1 = "stat"
+    model_arr_stat!0 = "time"
+    model_arr_stat&time = model_arr&time
+    model_arr_stat&stat = (/"mean", "stddev", "spread", "min", "5%", "10%", "90%", \
+                            "95%", "max", "ref"/)
+
+    model_arr_stat(:, 0) = (/model_arr(mmm_ind, :)/)
+    do i = 0, ntime-1
+      statb = stat_dispersion(model_arr(ind_mod, i), False)
+      ; standard deviation
+      model_arr_stat(i, 1) = (/statb(1)/)
+      ; spread
+      model_arr_stat(i, 2) = (/statb(14)-statb(2)/)
+      ; min
+      model_arr_stat(i, 3) = (/statb(2)/)
+      ; max
+      model_arr_stat(i, 8) = (/statb(14)/)
+      ; 5% quantile
+      model_arr_stat(i, 4) = (/statb(24)/)
+      ; 95% quantile
+      model_arr_stat(i, 7) = (/statb(25)/)
+      ; 10% quantile
+      model_arr_stat(i, 5) = (/statb(3)/)
+      ; 90% quantile
+      model_arr_stat(i, 6) = (/statb(13)/)
+    end do
+    if (isatt(variable_info[0], "reference_dataset")) then
+      model_arr_stat(:, 9) = (/model_arr(ref_ind, :)/)
+    end if
+
+  end if
+
   ; *************************************
   ; output to NetCDF
   ; *************************************
@@ -476,11 +480,12 @@ begin
   ncdf_outfile = ncdf_write(model_arr, out_path1)
   ; statistics
   if (diag_script_info@write_stat) then
-    out_path2 = out_path + "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
+    out_path2 = out_path + "tsline_gmst_" + anom + "_stat.nc"
     model_arr_stat@ncdf = out_path
     model_arr_stat@experiment = project0 + "_" + exp0
     model_arr_stat@diag_script = DIAG_SCRIPT
-    model_arr_stat@var = var0
+    ;model_arr_stat@var = var0
+    model_arr_stat@var = "gmst_mean"
     model_arr_stat@units = model_arr@units
     ncdf_outfile = ncdf_write(model_arr_stat, out_path2)
   end if
@@ -555,10 +560,20 @@ begin
 
   if (anom .eq. "anom") then
     xy_line_anom(wks, anom_ref, model_arr, model_arr&time, \
-                 model_arr_stddev, ref_start, ref_end, res, res0, info_items)
+                 0, ref_start, ref_end, res, res0, info_items)
+                 ;model_arr_stddev, ref_start, ref_end, res, res0, info_items)
   else
     xy_line(wks, model_arr, model_arr&time, model_arr_stddev, res, info_items)
   end if
+
+  ;outfile_stat = config_user_info@plot_dir + var0 + "_" \
+  ;  + str_sub_str(diag_script_info@region, " ", "_") \
+  ;  + "_" + project0 + "_" + exp0 + "_" + anom + "_" + run_ave + "_" \
+  ;  + start_year + "-" + end_year + "_stat"
+  ;wks = gsn_open_wks(file_type, outfile_stat)
+  ;xy_line_collect(wks, model_arr(mmm_ind, :), model_arr(ref_ind, :), model_arr&time, \
+  ;               model_arr_stddev(2:3, :), ref_start, ref_end, res, res0, info_items)
+
 
   log_info(" wrote " + outfile + "." + file_type)
 

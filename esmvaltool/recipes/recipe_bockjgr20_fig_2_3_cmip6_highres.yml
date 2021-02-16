@@ -1,0 +1,100 @@
+# ESMValTool
+# recipe_bockjgr20.yml
+---
+documentation:
+
+  description: |
+    Producing figures from Bock et al., 2020, JGR
+
+  authors:
+    - bock_lisa
+    - lauer_axel
+
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    #mask_fillvalues:
+    #  threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+datasets:
+  ##LowRes models
+  #- {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}  # CMCC
+  #- {dataset: CNRM-CM6-1, exp: hist-1950, ensemble: r1i1p1f2} # CNRM-CERFACS
+  ##- {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1} # EC-Earth-Consortium
+  #- {dataset: ECMWF-IFS-LR, exp: hist-1950, ensemble: r1i1p1f1} # ECMWF
+  #- {dataset: HadGEM3-GC31-LL, exp: hist-1950, ensemble: r1i1p1f1, grid: gn} # MOHC
+  #- {dataset: MPI-ESM1-2-HR, exp: hist-1950, ensemble: r1i1p1f1, grid: gn} # MPI-M
+  #HighRes models
+  - {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}  # CMCC
+  - {dataset: CNRM-CM6-1-HR, exp: hist-1950, ensemble: r1i1p1f2} # CNRM-CERFACS
+  #- {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1} # EC-Earth-Consortium
+  - {dataset: ECMWF-IFS-HR, exp: hist-1950, ensemble: r1i1p1f1} # ECMWF
+  - {dataset: HadGEM3-GC31-HM, exp: hist-1950, ensemble: r1i1p1f1, grid: gn} # MOHC
+  - {dataset: MPI-ESM1-2-XR, exp: hist-1950, ensemble: r1i1p1f1, grid: gn} # MPI-M
+
+
+cmip6_hist_models_tas_era: &cmip6_hist_models_tas_era
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+
+cmip6_hist_models_pr_gpcp: &cmip6_hist_models_pr_gpcp
+  - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3,
+              tier: 1}
+
+
+diagnostics:
+
+  fig_2:
+    description: CMIP6 multi-model mean and bias of near-surface temperature
+    variables:
+      tas:
+        preprocessor: clim
+        reference_dataset: ERA5
+        mip: Amon
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1995
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models_tas_era
+    scripts:
+      model_bias: &fig-2_and_3_settings
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
+
+
+  fig_3:
+    description: CMIP6 multi-model mean and bias of percipitation
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        project: CMIP6
+        mip: Amon
+        grid: gr
+        exp: historical
+        ensemble: r1i1p1f1
+        start_year: 1995
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models_pr_gpcp
+    scripts:
+      model_bias:
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim

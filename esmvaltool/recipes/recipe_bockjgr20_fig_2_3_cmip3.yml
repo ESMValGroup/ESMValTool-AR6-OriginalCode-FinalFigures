@@ -1,0 +1,111 @@
+# ESMValTool
+# recipe_bockjgr20.yml
+---
+documentation:
+
+  description: |
+    Producing figures from Bock et al., 2020, JGR
+
+  authors:
+    - bock_lisa
+    - lauer_axel
+
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    #mask_fillvalues:
+    #  threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+datasets:
+  - {dataset: bccr_bcm2_0,  institute: BCCR}
+  - {dataset: cccma_cgcm3_1, institute: CCCMA}
+  - {dataset: cccma_cgcm3_1_t63, institute: CCCMA}
+  - {dataset: csiro_mk3_0, institute: CSIRO}
+  - {dataset: gfdl_cm2_0, institute: GFDL}
+  - {dataset: gfdl_cm2_1, institute: GFDL}
+  - {dataset: giss_aom, institute: NASA}
+  - {dataset: giss_model_e_h, institute: NASA}
+  - {dataset: giss_model_e_r, institute: NASA}
+  - {dataset: iap_fgoals1_0_g, institute: LASG}
+  - {dataset: ingv_echam4, institute: INGV}
+  - {dataset: inmcm3_0, institute: INM}
+  - {dataset: ipsl_cm4, institute: IPSL}
+  - {dataset: miroc3_2_hires, institute: NIES}
+  - {dataset: miroc3_2_medres, institute: NIES}
+  #- {dataset: miub_echo_g, institute: MIUB-KMA} #something wrong with numeration of years
+  - {dataset: mpi_echam5, institute: MPIM}
+  - {dataset: mri_cgcm2_3_2a, institute: MRI}
+  - {dataset: ncar_ccsm3_0, institute: NCAR}
+  - {dataset: ncar_pcm1, institute: NCAR}
+  - {dataset: ukmo_hadcm3, institute: UKMO}
+  - {dataset: ukmo_hadgem1, institute: UKMO}
+
+
+cmip6_hist_models_tas_era: &cmip6_hist_models_tas_era
+  - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, mip: Amon, 
+     tier: 3}
+
+cmip6_hist_models_pr_gpcp: &cmip6_hist_models_pr_gpcp
+  - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3,
+     tier: 1}
+
+
+diagnostics:
+
+  fig_2:
+    description: CMIP3 multi-model mean and bias of near-surface temperature
+    variables:
+      tas:
+        preprocessor: clim
+        reference_dataset: ERA5
+        mip: A1
+        project: CMIP3
+        modeling_realm: atm
+        exp: 20c3m
+        frequency: mo
+        ensemble: run1
+        start_year: 1980
+        end_year: 1999
+    additional_datasets: *cmip6_hist_models_tas_era
+    scripts:
+      model_bias: &fig-2_and_3_settings
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
+
+
+  fig_3:
+    description: CMIP3 multi-model mean and bias of percipitation
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        mip: A1
+        project: CMIP3
+        modeling_realm: atm
+        exp: 20c3m
+        frequency: mo
+        ensemble: run1
+        start_year: 1980
+        end_year: 1999
+    additional_datasets: *cmip6_hist_models_pr_gpcp
+    scripts:
+      model_bias:
+        script: ipcc_ar6/model_bias.ncl
+        projection: Robinson
+        timemean: annualclim
