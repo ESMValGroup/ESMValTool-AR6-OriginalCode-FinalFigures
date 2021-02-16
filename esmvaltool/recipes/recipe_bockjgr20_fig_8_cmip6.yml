@@ -1,0 +1,113 @@
+# ESMValTool
+# recipe_clouds_ipcc.yml
+---
+documentation:
+  description: |
+    Diagnostics of clouds and hydrological cycle multi-model mean bias,
+    zonal means; similar to IPCC AR5 fig. 9.5.
+
+  authors:
+    - lauer_axel
+
+  maintainer:
+    - lauer_axel
+
+  references:
+    - flato13ipcc
+
+  projects:
+    - esmval
+
+datasets:
+  - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #tas: newest version only 1850
+  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: ACCESS-ESM1-5, institute: CSIRO, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: AWI-ESM-1-1-LR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #rlut time not monotonic
+  - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}# different ensembles
+  - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: CESM2-FV2, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: CESM2-WACCM, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: CESM2-WACCM-FV2, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  #- {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6} #no rsutcs
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
+  - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
+  - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
+  #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # years not complete available
+  - {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
+  - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  #- {dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #permission denied
+  - {dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn, project: CMIP6}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn, project: CMIP6}
+  - {dataset: INM-CM4-8, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+  - {dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+  #- {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rlutcs
+  - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn, project: CMIP6}
+  - {dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: NESM3, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  - {dataset: NorCPM1, grid: gn, institute: NCC, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: NorESM2-MM, grid: gn, institute: NCC, ensemble: r1i1p1f1, project: CMIP6}
+  - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+  #- {dataset: TaiESM1, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #permission denied
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, project: CMIP6}
+
+preprocessors:
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_fillvalues:
+      threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+diagnostics:
+
+  fig_8_cmip6:
+    description: differences of multi-model mean and reference dataset
+    themes:
+      - clouds
+    realms:
+      - atmos
+    variables:
+      swcre:
+        preprocessor: clim
+        reference_dataset: CERES-EBAF
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        mip: Amon
+        start_year: 1995
+        end_year: 2014
+        derive: true
+    additional_datasets:
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-8,
+         start_year: 2001, end_year: 2015, tier: 1}
+    scripts:
+      clim: &clim_settings
+        script: clouds/clouds_ipcc.ncl
+        projection: Robinson
+        #colormap: WhiteBlueGreenYellowRed
+        timemean: annualclim
+        explicit_cn_levels: [-40., -35., -30., -25., -20., -15., -10., -5., 0., 5., 10., 15., 20., 25., 30., 35., 40.]
+
+

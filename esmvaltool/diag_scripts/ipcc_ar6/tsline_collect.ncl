@@ -49,9 +49,19 @@ begin
   enter_msg(DIAG_SCRIPT, "")
   diag_script_base = basename(DIAG_SCRIPT)
 
+  var_names = metadata_att_as_array(variable_info, "short_name")
   var0 = variable_info[0]@short_name
+  ;var0 = "tas"
+  ind_tas = ind(var_names .eq. "tas")
   info_items = select_metadata_by_name(input_file_info, var0)
   units0 = info_items[0]@units
+  if(any(var_names .eq. "tasStderr")) then
+    obs_stderr = True
+    var1 = "tasStderr"
+    info_items1 = select_metadata_by_name(input_file_info, var1)
+  else
+    obs_stderr = False
+  end if
 
   ; Create output plot directory
   plot_dir = config_user_info@plot_dir
@@ -88,6 +98,7 @@ begin
   start_year = diag_script_info@start_year
   end_year = diag_script_info@end_year
   all_years = ispan(start_year, end_year, 1)
+  nyears = end_year - start_year + 1
 
   ; Anomaly
   if (isatt(diag_script_info, "ts_anomaly")) then
@@ -119,10 +130,10 @@ begin
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-    "tsline_mm_" + var0 + "_" + anom + "_stat.nc"
+    "tsline_mm_tas_" + anom + "_stat.nc"
+    ;"tsline_mm_" + var0 + "_" + anom + "_stat.nc"
     ;"extent_" + var0 + "_Antarctic_September_1950-2014.nc"
   input_files := tostring(input_files)
-
 print(input_files)
 
   ; Filter out non-existing files
@@ -137,13 +148,10 @@ print(input_files)
 
     data_temp = ncdf_read(input_files(ii), var0)
 
-printVarSummary(data_temp)
+    log_info("Experiment: " + data_temp@experiment)
 
     if(isatt(diag_script_info, "order")) then
-print(diag_script_info@order)
-print(data_temp@experiment)
       ii_n = ind(data_temp@experiment .eq. diag_script_info@order)
-print("ii_n = " + ii_n)
       if (all(ismissing(ii_n))) then
         error_msg("f", DIAG_SCRIPT, "", "Collected experiment " + \
                   data_temp@experiment + " does not appear in " + \
@@ -157,20 +165,6 @@ print("ii_n = " + ii_n)
     end if
 
     if( ii .eq. 0) then
-      ; Create time coordinate
-      ; if (time_avg.eq."monthly") then
-      ;   ntime = 12 * (end_year - start_year + 1)
-      ;   time = new(ntime, integer)
-      ;   do yy = start_year, end_year
-      ;       do mm = 1, 12
-      ;           time(12 * (yy - start_year) + mm - 1) = 100 * yy + mm
-      ;       end do
-      ;   end do
-      ; elseif (time_avg.eq."yearly")
-      ;   ntime = end_year - start_year + 1
-      ;   time = new(ntime, integer)
-      ;   time = ispan(start_year, end_year, 1)
-      ; end if
       time = data_temp&time
       ntime = dimsizes(time)
 
@@ -200,79 +194,61 @@ print("ii_n = " + ii_n)
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
     delete(date)
 
-    data_mean(ii_n, idx1:idx2)  = (/data_temp(0, :)/)
+    data_mean(ii_n, idx1:idx2)  = (/data_temp(:, 0)/)
     data_mean&experiment(ii_n) = data_temp@experiment
 
     if (ii .eq. 0) then
-      ;if (isatt(diag_script_info, "plot_units")) then
-      ;  data_mean@units = diag_script_info@plot_units
-      ;else
-      ;  data_mean@units = ""
-      ;end if
       data_mean@units = data_temp@units
       if (isatt(diag_script_info, "ref")) then
-        data_ref(0, idx1:idx2)  = (/data_temp(3, :)/)
+        data_ref(0, idx1:idx2)  = (/data_temp(:, 9)/)
         data_ref&dataset(0) = diag_script_info@ref
       end if
     end if
 
-    data_stat(0, ii_n, idx1:idx2) = data_temp(1, :)
-    data_stat(1, ii_n, idx1:idx2) = data_temp(2, :)
+    ; add statistics to multi-model mean
+    ;dev from obs
+    ;data_stat(0, ii_n, idx1:idx2) = where( data_temp(:, 9) .gt. data_temp(:, 3), data_temp(:, 9) - data_temp(:, 3), data_temp(:, 3) - data_temp(:, 9))
+    ;data_stat(1, ii_n, idx1:idx2) = where( data_temp(:, 9) .gt. data_temp(:, 8), data_temp(:, 9) - data_temp(:, 8), data_temp(:, 8) - data_temp(:, 9))
+    ;; not working: rmsd of mmm to obs
+    ;; data_stat(0, ii_n, idx1:idx2) = sqrt(dim_avg_n_Wrap((data_temp(:, 0) - data_temp(:, 9)) ^ 2, 0))
+    ;stddev
+    data_stat(0, ii_n, idx1:idx2) = data_temp(:, 0) - data_temp(:, 1)
+    data_stat(1, ii_n, idx1:idx2) = data_temp(:, 0) + data_temp(:, 1)
+    ;minmax
+    ;data_stat(0, ii_n, idx1:idx2) = data_temp(:, 3) 
+    ;data_stat(1, ii_n, idx1:idx2) = data_temp(:, 8) 
 
     delete(data_temp)
 
   end do
 
-  ;; -------------------------------------------
-  ;; Read observational data
-  ;; -------------------------------------------
+  if (obs_stderr) then
 
-  ;if (isatt(diag_script_info, "ref")) then
-  ;  input_files_ref = diag_script_info@input_files + "/" + \
-  ;    "tsline_" + var0 + "_" + anom + ".nc"
-  ;  input_files_ref := tostring(input_files_ref)
+    data_ref_stderr = new ((/2, ntime/), double)
+    data_ref_stderr!0 = "statistics"
+    data_ref_stderr!1 = "time"
+    data_ref_stderr&time = time
 
-  ;  ; Filter out non-existing files
-  ;  input_files_ref := input_files_ref(ind(isfilepresent(input_files_ref)))
+;    data_temp = read_data(info_items1[0])
 
-  ;  data_temp = ncdf_read(input_files_ref(0), var0)
+;    data_ref_stderr(0, :) = data_ref(0, :) - data_temp(:)
+;    data_ref_stderr(1, :) = data_ref(0, :) + data_temp(:)
 
-  ;  log_info("Read in " + input_files_ref(0))
+    fdata = "/work/bd0854/b309059/data/HadCRUT4/HadCRUT.4.6.0.0.annual_ns_avg.txt"
+    data   = asciiread(fdata,(/171,12/),"float")
+  
+    data_temp = data(:, 1) - data(:, 10)
+print(data_temp)
+    data_ref_stderr(0, :) = data_ref(0, :) - (/data_temp(0:(ntime-1))/)
+    data_temp = data(:, 11) - data(:, 1)
+print(data_temp)
+    data_ref_stderr(1, :) = data_ref(0, :) + (/data_temp(0:(ntime-1))/)
 
-  ;  do i = 0, dimsizes(diag_script_info@ref)-1
+  else
 
-  ;    ind_ref = ind(data_temp&model .eq. diag_script_info@ref(i))
-  ;    if (all(ismissing(ind_ref))) then
-  ;      error_msg("f", DIAG_SCRIPT, "", "observational data set not available")
-  ;    else
-  ;      ; Match time coordinate
-  ;      if (time_avg.eq."monthly") then
-  ;        date = cd_calendar(data_temp&time, -1)
-  ;      elseif (time_avg.eq."yearly") then
-  ;        date = data_temp&time
-  ;      end if
-  ;      idx1 = ind(date(0).eq.data_ref&time)
-  ;      idx2 = ind(date(dimsizes(date) - 1).eq.data_ref&time)
-  ;      delete(date)
+    data_ref_stderr = 0
 
-  ;      ; Running Mean
-  ;      if(diag_script_info@run_ave .gt. 0) then
-  ;        run_ave = "running_mean"
-  ;        tmp = runave_Wrap(data_temp, 12 * diag_script_info@run_ave, 1)
-  ;        ;delete(data_temp)
-  ;        data_temp = tmp
-  ;        delete(tmp)
-  ;      else
-  ;        run_ave = ""
-  ;      end if
-
-  ;      data_ref(i, idx1:idx2) = (/data_temp(ind_ref, :)/)
-  ;    end if
-
-  ;  end do
-
-  ;  delete(data_temp)
-  ;end if
+  end if
 
   ; -------------------------------------------
   ; NetCDF Output
@@ -326,7 +302,8 @@ print("ii_n = " + ii_n)
     res@trYMinF = diag_script_info@y_min
   end if
   if (isatt(diag_script_info, "y_max")) then
-    res@trYMaxF = diag_script_info@y_max
+    ;res@trYMaxF = diag_script_info@y_max
+    res@trYMaxF = 1.2
   end if
 
   if (xmin .eq. 1850) then
@@ -374,10 +351,10 @@ print("ii_n = " + ii_n)
   ref_end = diag_script_info@ref_end
 
   if (isatt(diag_script_info, "ref")) then
-    xy_line_collect(wks, data_mean, data_ref, data_ref&time, \
+    xy_line_collect(wks, data_mean, data_ref, data_ref_stderr, data_ref&time, \
                    data_stat, ref_start, ref_end, res, res0, info_items)
   else
-    xy_line_collect(wks, data_mean, 0, data_mean&time, \
+    xy_line_collect(wks, data_mean, 0, 0, data_mean&time, \
                     data_stat, ref_start, ref_end, res, res0, info_items)
   end if
 
