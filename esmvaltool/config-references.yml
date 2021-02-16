@@ -242,6 +242,10 @@ authors:
     name: Kalverla, Peter
     institute: NLeSC, Netherlands
     orcid: https://orcid.org/0000-0002-5025-7862
+  karmouche_soufiane:
+    name: Karmouche, Soufiane
+    institute: University of Bremen, Germany
+    orcid:
   kindermann_stephan:
     name: Kindermann, Stephan
     institute: DKRZ, Germany
@@ -373,6 +377,10 @@ authors:
     name: Rio, Catherine
     institute: IPSL, France
     orcid: https://orcid.org/0000-0002-6590-7733
+  roberts_charles:
+    name: Roberts, Charles
+    institute: University of Reading, UK
+    orcid: https://orcid.org/0000-0002-1147-8961
   roehrig_romain:
     name: Roehrig, Romain
     institute: MeteoFr, France
@@ -630,6 +638,10 @@ authors:
     name: Tilmes, Simone
     institute: NCAR, US
     orcid:
+  gillett_nathan:
+    name: Gillett, Nathan
+    institute: CCCma, ECCC, Canada.
+    orcid: https://orcid.org/0000-0002-2957-0002
 
 # Note: the reference section has been replaced by the folder esmvaltool/references that contains bibtex files.
 # How to add a bibtex file to esmvaltool/references:
@@ -638,7 +650,7 @@ authors:
 #  - add the file to the folder esmvaltool/references.
 
 projects:
-  4c: EU 2020 project 4C
+  4c: EU H2020 project 4C
   applicate: EU Horizon 2020 Advanced prediction in polar regions and beyond
   c3s-magic: Copernicus Climate Change Service 34a Lot 2 (MAGIC) project
   climval: BMBF MiKlip Project ClimVal

@@ -21,6 +21,8 @@ Atmosphere
    recipe_diurnal_temperature_index
    recipe_extreme_events
    recipe_eyring06jgr
+   recipe_eyring13jgr
+   recipe_gier20bg
    recipe_heatwaves_coldwaves
    recipe_hyint
    recipe_modes_of_variability
@@ -49,6 +51,7 @@ Future projections
    recipe_schlund20jgr
    recipe_emergent_constraints
    recipe_wenzel14jgr
+   recipe_schlund20esd
    recipe_cox18nature
    recipe_snowalbedo
    recipe_ecs

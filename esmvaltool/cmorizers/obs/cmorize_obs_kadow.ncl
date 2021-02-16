@@ -64,7 +64,7 @@ begin
   SOURCE = "" ; "http://users.met.fu-berlin.de/~ChristopherKadow/HadCRUT.5.0.1.0.anomalies.Kadow_et_al_2020_20crAI-infilled.ensemble_mean_185001-202012.nc"
   REF1 =  "Kadow et al., Nature Geosci, doi:10.1038/s41561-020-0582-5, 2020"
 ;  REF2 =  REF1
-  COMMENT1 = "Temperature anomaly with respect to the period 1961-1990, ensemble median, infilled by AI"
+  COMMENT1 = "Temperature anomaly with respect to the period 1961-1990, ensemble mean, infilled by AI"
 ;  COMMENT2 = COMMENT2
 
 end
