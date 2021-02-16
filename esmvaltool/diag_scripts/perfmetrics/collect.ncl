@@ -290,7 +290,7 @@ begin
     plotpath = config_user_info@plot_dir + "SMPI"
 
     ; Write output
-    if (config_user_info@write_netcdf) then
+    if (diag_script_info@write_netcdf) then
       system("mkdir -p " + config_user_info@work_dir)
       ncdf_outfile = ncdf_write(data_smpi, workpath)
     end if
@@ -431,7 +431,7 @@ begin
     delete(diags)
 
     ; Write output
-    if (config_user_info@write_netcdf) then
+    if (diag_script_info@write_netcdf) then
       system("mkdir -p " + config_user_info@work_dir)
       ncdf_outfile = ncdf_write(data_all, workpath)
     end if
