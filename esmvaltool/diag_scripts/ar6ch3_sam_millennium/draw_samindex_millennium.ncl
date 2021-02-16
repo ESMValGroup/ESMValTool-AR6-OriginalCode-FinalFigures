@@ -407,6 +407,22 @@ begin
   draw(plot0)
   frame(wks)
   
+;  ; ------------------------------------------------------------------------
+;  ; write provenance to netcdf output and plot file
+;  ; ------------------------------------------------------------------------
+;
+;  plotfile = wks@fullname
+;  authors = (/"kosaka_yu"/)
+;  statistics = (/"clim"/)
+;  domain = ("global")
+;  plottype = ("geo")
+;  references = (/"flato13ipcc"/)
+;  caption = "caption"
+;  infiles = metadata_att_as_array(info, "filename")
+;
+;  log_provenance(nc_filename, plotfile, caption, statistics, \
+;                 domain, plottype, authors, references, infiles)
+
   leave_msg(DIAG_SCRIPT, "")
 
 end
