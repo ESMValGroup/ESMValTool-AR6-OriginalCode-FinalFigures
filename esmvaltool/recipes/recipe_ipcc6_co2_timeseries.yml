@@ -1,0 +1,155 @@
+# ESMValTool
+# recipe_ipcc6_co2.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+  authors:
+    - gier_bettina
+
+#  maintainer:
+
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  co2_surface:
+    extract_levels:
+      levels: 100000
+      scheme: linear
+    area_statistics:
+      operator: mean
+
+  regridding:
+    custom_order: true
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_landsea:
+      mask_out: land
+  #  average_region:
+  #    coord1: latitude
+  #    coord2: longitude
+
+#  3d_glob_mean:
+#    average_volume:
+#      coord1: latitude
+#      coord2: longitude
+#      coordz: plev
+
+  glob_mean:
+    area_statistics:
+      operator: mean
+
+
+  landmask:
+    mask_landsea:
+      mask_out: sea
+
+diagnostics:
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.6.1 (ZOD fig. 3.39)
+  # **********************************************************************
+  # Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+  # **********************************************************************
+  # status:
+  # **********************************************************************
+
+  fig_3_38_co2:
+    description: Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
+    variables:
+      fgco2:
+        preprocessor: regridding
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist #esmHistorical #[esmHistorical, esmrcp85]
+        mip: Omon
+        start_year: 1850
+        end_year: 2014 #2010
+        additional_datasets:
+          #- {dataset: BCC-CSM2-MR, grid: gn} #esmvalcore.cmor.check.CMORCheckError: There were errors in variable fgco2:
+          #fgco2: does not match coordinate rank
+          - {dataset: CanESM5, grid: gn}
+          # - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2} #too low, due to carbon leak
+          - {dataset: NorESM2-LM, grid: gn}
+          - {dataset: GFDL-ESM4, grid: gr}
+
+#   #       - {dataset: bcc-csm1-1, exp: esmHistorical} # Multi-dimensional coordinate not supported: 'latitude'
+#   #       - {dataset: bcc-csm1-1-m, exp: esmHistorical} # Multi-dimensional coordinate not supported: 'latitude'
+#          - {dataset: CanESM2}
+#          - {dataset: CESM1-BGC}
+#          #- {dataset: GFDL-ESM2G, start_year: 1861} #10^35 ocean sink ?? - wrong missing value treatment?
+#        #  - {dataset: GFDL-ESM2M, start_year: 1861} #10^35 ocean sink ??
+#        #  - {dataset: HadGEM2-ES, start_year: 1860} #10^35 ocean sink ??
+#          #- {dataset: inmcm4, start_year: 1850, end_year: 2005}
+#          - {dataset: IPSL-CM5A-LR}
+#          - {dataset: MIROC-ESM}
+#          - {dataset: MPI-ESM-LR}
+#        #  - {dataset: MRI-ESM1} # Ocean sink = 0
+#          - {dataset: NorESM1-ME}
+      nbp:
+        preprocessor: landmask #glob_mean
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist #esmHistorical #[esmHistorical, esmrcp85]
+        mip: Lmon
+        start_year: 1850
+        end_year: 2014 #2010
+        additional_datasets:
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2}
+          - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: NorESM2-LM, grid: gn}
+#          - {dataset: BNU-ESM}
+#          - {dataset: CanESM2}
+#          - {dataset: CESM1-BGC}
+#          - {dataset: FIO-ESM}
+#          - {dataset: GFDL-ESM2G, start_year: 1861}
+#          - {dataset: GFDL-ESM2M, start_year: 1861}
+#          - {dataset: inmcm4}
+#          - {dataset: IPSL-CM5A-LR}
+#          - {dataset: MIROC-ESM}
+#          - {dataset: MPI-ESM-LR}
+#          - {dataset: MRI-ESM1}
+#          - {dataset: NorESM1-ME}
+      co2:
+        preprocessor: co2_surface
+        project: CMIP6
+        ensemble: r1i1p1f1
+        exp: esm-hist #esmHistorical
+        mip: Amon
+        start_year: 1850
+        end_year: 2014 #2010
+        additional_datasets:
+          - {dataset: BCC-CSM2-MR, grid: gn} # -> sorta got retracted?
+          - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f3} #some problem with f3 FIX! f2 works
+          - {dataset: CanESM5, grid: gn}
+          - {dataset: CESM2, grid: gn, ensemble: r2i1p1f1}
+          - {dataset: GFDL-ESM4, grid: gr1}
+        # - {dataset: MIROC-ES2L, grid: gn} #There were errors in variable co2:
+            #plev: standard_name should be air_pressure, not None
+          # plev: units should be Pa, not 1
+          # co2: does not match coordinate rank
+
+
+          #- {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2, mip: AERmon} needs special stuff!
+#          - {dataset: BNU-ESM}
+#          - {dataset: CanESM2}
+#          - {dataset: CESM1-BGC}
+#          - {dataset: FIO-ESM}
+#      #    - {dataset: GFDL-ESM2G, start_year: 1861} # 10^35 co2 - missing values badly?
+#      #    - {dataset: GFDL-ESM2M, start_year: 1861} # 10^35 co2 - missing values badly?
+#          - {dataset: MIROC-ESM}
+#          - {dataset: MPI-ESM-LR}
+#          - {dataset: MRI-ESM1}
+    scripts:
+      fig_3_38_co2:
+        script: ipcc_ar6/fig_carbonsinks_timeseries_panels.ncl
+        reference: "LeQuere2018"
