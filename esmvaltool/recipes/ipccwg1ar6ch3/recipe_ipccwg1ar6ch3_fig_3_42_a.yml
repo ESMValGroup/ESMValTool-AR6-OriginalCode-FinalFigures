@@ -1,9 +1,9 @@
 # ESMValTool
-# recipe_bockjgr20.yml
+# recipe_ipccwg1ar6ch3_fig_3_42.yml
 ---
 documentation:
   description: |
-    Producing figures from Bock et al., 2020, JGR
+    Producing Fig. 3.42a
 
   authors:
     - bock_lisa
@@ -12,7 +12,12 @@ documentation:
   references:
     - gleckler08jgr
 
+  projects:
+    - ipcc_ar6
+
+
 preprocessors:
+
   pp850:
     extract_levels:
       levels: 85000
@@ -53,26 +58,6 @@ preprocessors:
     mask_fillvalues:
       threshold_fraction: 0.95
 
-  pp30:
-    extract_levels:
-      levels: 3000
-      scheme: linear
-    regrid:
-      target_grid: reference_dataset
-      scheme: linear
-    mask_fillvalues:
-      threshold_fraction: 0.95
-
-  pp5:
-    extract_levels:
-      levels: 500
-      scheme: linear
-    regrid:
-      target_grid: reference_dataset
-      scheme: linear
-    mask_fillvalues:
-      threshold_fraction: 0.95
-
   ppNOLEV1:
     regrid:
       target_grid: reference_dataset
@@ -80,40 +65,9 @@ preprocessors:
     mask_fillvalues:
       threshold_fraction: 0.95
 
-  ppNOLEV2:
-    regrid:
-      target_grid: reference_dataset
-      scheme: linear
-    mask_fillvalues:
-      threshold_fraction: 0.95
-
-  ppNOLEV1thr10:
-    regrid:
-      target_grid: reference_dataset
-      scheme: linear
-    mask_fillvalues:
-      threshold_fraction: 0.10
-
-  ppNOLEV2thr10:
-    regrid:
-      target_grid: reference_dataset
-      scheme: linear
-    mask_fillvalues:
-      threshold_fraction: 0.10
-
   ppNOLEV1x1:
     regrid:
       target_grid: 1x1
-      scheme: linear
-    mask_fillvalues:
-      threshold_fraction: 0.95
-
-  ppALL:
-    extract_levels:
-      levels: reference_dataset
-      scheme: linear
-    regrid:
-      target_grid: reference_dataset
       scheme: linear
     mask_fillvalues:
       threshold_fraction: 0.95
@@ -169,7 +123,7 @@ datasets:
   - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
   #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # only ta, ua, psl, tas, pr, ts, clt
   #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # only ta, ua, psl, tas, pr
-  #- {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no tas, rsutcs, rlutcs
+  #- {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rsutcs, rlutcs
   - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   - {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
@@ -203,6 +157,14 @@ datasets:
 
 diagnostics:
 
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.8
+  # Fig. 3.42a
+  # **********************************************************************
+  # Perfmetrics of atmosphere vars for CMIP3, CMIP5, CMIP6
+  # **********************************************************************
+
 
   ### clt: TOTAL CLOUD COVER ##################################################
   clt:
@@ -213,7 +175,7 @@ diagnostics:
       - atmos
     variables:
       clt:
-        preprocessor: ppNOLEV2
+        preprocessor: ppNOLEV1
         reference_dataset: ESACCI-CLOUD
         alternative_dataset: PATMOS-x
         mip: Amon
@@ -280,28 +242,6 @@ diagnostics:
          version: AVHRR-fv3.0, tier: 2, start_year: 1982}
       - {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2, start_year: 1982}
     scripts:
-      latlon: &latlon_settings
-        script: perfmetrics/main.ncl
-        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-        plot_type: latlon
-        # Time average ('opt' argument of time_operations.ncl)
-        time_avg: annualclim
-        # Region ('global', 'trop', 'nhext', 'shext')
-        region: global
-        # Draw difference plots
-        plot_diff: true
-        # Calculate t-test in difference plots
-        t_test: true
-        # Confidence level for the t-test
-        conf_level: 0.95
-        # Add global average to the plot
-        show_global_avg: true
-        # Contour levels for absolute plot
-        abs_levs: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        # Contour levels for difference plot
-        diff_levs: [-30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30]
-      #grading:
-      #  <<: *grading_settings
       grading: &grading_settings
         script: perfmetrics/main.ncl
         # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
@@ -334,8 +274,8 @@ diagnostics:
       - atmos
     variables:
       tas:
-        preprocessor: ppNOLEV2
-        reference_dataset: ERA-Interim
+        preprocessor: ppNOLEV1
+        reference_dataset: ERA5  #ERA-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -398,7 +338,7 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
+      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
@@ -407,20 +347,10 @@ diagnostics:
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
-      latlon:
-        <<: *latlon_settings
-        # Add global average to the plot
-        show_global_avg: false
-        # Contour levels for absolute plot
-        abs_levs: [240, 243, 246, 249, 252, 255, 258,
-                   261, 264, 267, 270, 273, 276, 279,
-                   282, 285, 288, 291, 294, 297, 300]
-        # Contour levels for difference plot
-        diff_levs: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
       grading:
         <<: *grading_settings
 
@@ -493,7 +423,7 @@ diagnostics:
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
-      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
+      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
@@ -519,7 +449,7 @@ diagnostics:
       - atmos
     variables:
       pr:
-        preprocessor: ppNOLEV2
+        preprocessor: ppNOLEV1
         reference_dataset: GPCP-SG
         alternative_dataset: GHCN
         mip: Amon
@@ -584,7 +514,7 @@ diagnostics:
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
-      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
+      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
@@ -611,7 +541,7 @@ diagnostics:
     variables:
       zg:
         preprocessor: pp500
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -679,8 +609,8 @@ diagnostics:
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
@@ -697,7 +627,7 @@ diagnostics:
       psl:
         preprocessor: ppNOLEV1
         reference_dataset: JRA-55
-        alternative_dataset: ERA-Interim
+        alternative_dataset: ERA5 #-Interim
         mip: Amon
         project: CMIP5
         exp: historical
@@ -758,7 +688,7 @@ diagnostics:
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
-      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
+      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
@@ -769,8 +699,8 @@ diagnostics:
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
       - {dataset: JRA-55, project: ana4mips, type: reanalysis, tier: 1}
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
     scripts:
       grading:
         <<: *grading_settings
@@ -838,7 +768,7 @@ diagnostics:
 
       #- {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, project: CMIP6}
-      - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
+      # {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
 
@@ -847,14 +777,6 @@ diagnostics:
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B,
          version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}
     scripts:
-      latlon:
-        <<: *latlon_settings
-        # Add global average to the plot
-        show_global_avg: false
-        # Contour levels for absolute plot
-        abs_levs: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        # Contour levels for difference plot
-        diff_levs: [-30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30]
       grading:
         <<: *grading_settings
 
@@ -920,6 +842,7 @@ diagnostics:
       #- {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
+      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
   
@@ -928,14 +851,6 @@ diagnostics:
       - {dataset: CERES-EBAF, project: obs4mips, level: L3B,
          version: Ed2-8, tier: 1, start_year: 2001, end_year: 2015}
     scripts:
-      latlon:
-        <<: *latlon_settings
-        # Add global average to the plot
-        show_global_avg: false
-        # Contour levels for absolute plot
-        abs_levs: [-100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0]
-        # Contour levels for difference plot
-        diff_levs: [-30, -25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25, 30]
       grading:
         <<: *grading_settings
 
@@ -1030,7 +945,7 @@ diagnostics:
       hus:
         preprocessor: pp400
         reference_dataset: AIRS
-        alternative_dataset: ERA-Interim
+        alternative_dataset: ERA5 #-Interim
         mip: Amon
         project: CMIP5
         exp: historical
@@ -1083,6 +998,7 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
+      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
@@ -1092,8 +1008,8 @@ diagnostics:
 
       - {dataset: AIRS, project: obs4mips, level: L3,
          version: RetStd-v5, tier: 1, start_year: 2003, end_year: 2010}
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
     scripts:
       grading:
         <<: *grading_settings
@@ -1161,6 +1077,7 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
+      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
@@ -1185,7 +1102,7 @@ diagnostics:
     variables:
       ua:
         preprocessor: pp200
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -1257,8 +1174,8 @@ diagnostics:
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
@@ -1275,7 +1192,7 @@ diagnostics:
     variables:
       va:
         preprocessor: pp850
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -1336,16 +1253,17 @@ diagnostics:
       #- {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
-      - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
+      # {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
+      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #empty folder
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
@@ -1362,7 +1280,7 @@ diagnostics:
     variables:
       ua:
         preprocessor: pp850
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -1434,8 +1352,8 @@ diagnostics:
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
@@ -1452,7 +1370,7 @@ diagnostics:
     variables:
       va:
         preprocessor: pp200
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -1514,6 +1432,7 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
+      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # empty folder
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
@@ -1521,8 +1440,8 @@ diagnostics:
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
@@ -1540,7 +1459,7 @@ diagnostics:
     variables:
       ta:
         preprocessor: pp850
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -1605,7 +1524,7 @@ diagnostics:
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
+      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #not all years
       - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
@@ -1614,16 +1533,16 @@ diagnostics:
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
         <<: *grading_settings
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD, taylor]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median, none]
+        ## Metric ('RMSD', 'BIAS', taylor')
+        #metric: [RMSD, taylor]
+        ## Normalization ('mean', 'median', 'centered_median', 'none')
+        #normalization: [centered_median, none]
 
 
   ### ta: AIR TEMPERATURE (200 hPa) ###########################################
@@ -1636,7 +1555,7 @@ diagnostics:
     variables:
       ta:
         preprocessor: pp200
-        reference_dataset: ERA-Interim
+        reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
         mip: Amon
         project: CMIP5
@@ -1701,7 +1620,7 @@ diagnostics:
       #- {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, project: CMIP6}
-      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no all years
+      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no all years
       - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
       - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
       #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
@@ -1710,315 +1629,13 @@ diagnostics:
   
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
 
-      - {dataset: ERA-Interim, project: OBS6, type: reanaly,
-         version: 1, tier: 3}
+      #- {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       grading:
         <<: *grading_settings
 
-
-#  ### od550aer: AEROSOL OPTICAL DEPTH AT 550 nm ###############################
-#  od550aer:
-#    description: Aerosol optical depth at 550 nm
-#    themes:
-#      - aerosols
-#    realms:
-#      - atmos
-#    variables:
-#      od550aer:
-#        preprocessor: ppNOLEV2thr10
-#        reference_dataset: ESACCI-AEROSOL
-#        alternative_dataset: MODIS
-#        mip: aero
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1995
-#        end_year: 2004
-#    additional_datasets:
-#      - {dataset: ACCESS1-0}
-#      - {dataset: ACCESS1-3}
-#      - {dataset: BNU-ESM}
-#      - {dataset: CESM1-CAM5}
-#      - {dataset: CSIRO-Mk3-6-0}
-#      - {dataset: GFDL-CM3}
-#      - {dataset: GFDL-ESM2G}
-#      - {dataset: GFDL-ESM2M}
-#      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-#      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-#      - {dataset: HadGEM2-CC}
-#      - {dataset: HadGEM2-ES}
-#      - {dataset: IPSL-CM5B-LR}
-#      - {dataset: MIROC4h}
-#      - {dataset: MIROC5}
-#      - {dataset: MIROC-ESM}
-#      - {dataset: MIROC-ESM-CHEM}
-#      - {dataset: MRI-CGCM3}
-#      - {dataset: NorESM1-M}
-#      - {dataset: NorESM1-ME}
-#
-#      #- {mip: AERmon, dataset: AWI-CM-1-1-MR, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CESM2-WACCM, institute: NCAR, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-#      #- mip: AERmon, {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: MIROC6, ensemble: r6i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MPI-ESM1-2-HR, ensemble: r10i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: NESM3, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
-#
-#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat,
-#         version: SU-v4.21, tier: 2}
-#      - {dataset: MODIS, project: OBS, type: sat, version: MYD08-M3, tier: 3}
-#    scripts:
-#      grading:
-#        <<: *grading_settings
-#
-#
-#  ### od870aer: AEROSOL OPTICAL DEPTH AT 870 nm ###############################
-#  od870aer:
-#    description: Aerosol optical depth at 870 nm
-#    themes:
-#      - aerosols
-#    realms:
-#      - atmos
-#    variables:
-#      od870aer:
-#        preprocessor: ppNOLEV1thr10
-#        reference_dataset: ESACCI-AEROSOL
-#        mip: aero
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1995
-#        end_year: 2004
-#    additional_datasets:
-#      - {dataset: ACCESS1-0}
-#      - {dataset: ACCESS1-3}
-#      - {dataset: CSIRO-Mk3-6-0}
-#      - {dataset: GFDL-CM3}
-#      - {dataset: GFDL-ESM2G}
-#      - {dataset: GFDL-ESM2M}
-#      - {dataset: HadGEM2-CC}
-#      - {dataset: HadGEM2-ES}
-#      - {dataset: MIROC5}
-#      - {dataset: MIROC-ESM}
-#      - {dataset: MIROC-ESM-CHEM}
-#      - {dataset: MRI-CGCM3}
-#
-
-#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat,
-#         version: SU-v4.21, tier: 2}
-#    scripts:
-#      grading:
-#        <<: *grading_settings
-#
-#
-#  ### abs550aer: ABSORPTION OPTICAL DEPTH AT 550 nm ###########################
-#  abs550aer:
-#    description: Absorption optical depth at 550 nm
-#    themes:
-#      - aerosols
-#    realms:
-#      - atmos
-#    variables:
-#      abs550aer:
-#        preprocessor: ppNOLEV1thr10
-#        reference_dataset: ESACCI-AEROSOL
-#        mip: aero
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1995
-#        end_year: 2004
-#    additional_datasets:
-#      - {dataset: CSIRO-Mk3-6-0}
-#      - {dataset: GFDL-CM3}
-#      - {dataset: GFDL-ESM2G}
-#      - {dataset: GFDL-ESM2M}
-#      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-#      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-#      - {dataset: IPSL-CM5B-LR}
-#      - {dataset: MIROC5}
-#      - {dataset: MIROC-ESM}
-#      - {dataset: MIROC-ESM-CHEM}
-#      - {dataset: NorESM1-M}
-#      - {dataset: NorESM1-ME}
-#
-#      #- {mip: AERmon, dataset: AWI-CM-1-1-MR, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CESM2-WACCM, institute: NCAR, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, project: CMIP6}
-#      - {mip: AERmon, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-#      #- mip: AERmon, {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      #- {mip: AERmon, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: MIROC6, ensemble: r6i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MPI-ESM1-2-HR, ensemble: r10i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: NESM3, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
-#
-#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat,
-#         version: SU-v4.21, tier: 2}
-#    scripts:
-#      grading:
-#        <<: *grading_settings
-#
-#
-#  ### od550lt1aer: FINE MODE AEROSOL OPTICAL DEPTH AT 550 nm ##################
-#  od550lt1aer:
-#    description: Fine mode optical depth at 550 nm
-#    themes:
-#      - aerosols
-#    realms:
-#      - atmos
-#    variables:
-#      od550lt1aer:
-#        preprocessor: ppNOLEV1thr10
-#        reference_dataset: ESACCI-AEROSOL
-#        mip: aero
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1995
-#        end_year: 2004
-#    additional_datasets:
-#      - {dataset: CSIRO-Mk3-6-0}
-#      - {dataset: GFDL-CM3}
-#      - {dataset: GFDL-ESM2G}
-#      - {dataset: GFDL-ESM2M}
-#      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-#      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-#      - {dataset: IPSL-CM5B-LR}
-#      - {dataset: MIROC5}
-#      - {dataset: MIROC-ESM}
-#      - {dataset: MIROC-ESM-CHEM}
-#      - {dataset: MRI-CGCM3}
-#
-#      #- {mip: AERmon, dataset: AWI-CM-1-1-MR, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CESM2-WACCM, institute: NCAR, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-#      #- mip: AERmon, {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: MIROC6, ensemble: r6i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: MPI-ESM1-2-HR, ensemble: r10i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: NESM3, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
-#
-#      - {dataset: ESACCI-AEROSOL, project: OBS, type: sat,
-#         version: SU-v4.21, tier: 2}
-#    scripts:
-#      grading:
-#        <<: *grading_settings
-#
-#
-#  ### toz: TOTAL COLUMN OZONE #################################################
-#  toz:
-#    description: Total column ozone
-#    themes:
-#      - chem
-#      - ghg
-#    realms:
-#      - atmosChem
-#    variables:
-#      toz:
-#        preprocessor: ppNOLEV2thr10
-#        reference_dataset: ESACCI-OZONE
-#        alternative_dataset: NIWA-BS
-#        mip: Amon
-#        derive: true
-#        force_derivation: false
-#        project: CMIP5
-#        exp: historical
-#        ensemble: r1i1p1
-#        start_year: 1995
-#        end_year: 2004
-#    additional_datasets:
-#      - {dataset: CESM1-WACCM, ensemble: r2i1p1}
-#      - {dataset: CNRM-CM5}
-#      - {dataset: GFDL-CM3}
-#      - {dataset: GISS-E2-H, ensemble: r1i1p2}
-#      - {dataset: GISS-E2-R, ensemble: r1i1p2}
-#      - {dataset: MIROC-ESM-CHEM}
-#
-#      #- {mip: AERmon, dataset: AWI-CM-1-1-MR, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CanESM5, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CESM2, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: CESM2-WACCM, institute: NCAR, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-CM6-1, ensemble: r9i1p1f2, grid: gr, project: CMIP6}
-#      - {mip: AERmon, dataset: CNRM-ESM2-1, ensemble: r5i1p1f2, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-#      #- mip: AERmon, {dataset: FGOALS-f3-L, ensemble: r3i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      - {mip: AERmon, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G, ensemble: r9i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-G-CC, institute: NASA-GISS, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: GISS-E2-1-H, ensemble: r4i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: HadGEM3-GC31-LL, ensemble: r4i1p1f3, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: IPSL-CM6A-LR, ensemble: r6i1p1f1, grid: gr, project: CMIP6}
-#      #- {mip: AERmon, dataset: MIROC6, ensemble: r6i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MIROC-ES2L, ensemble: r3i1p1f2, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MPI-ESM1-2-HR, ensemble: r10i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: MRI-ESM2-0, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: NESM3, ensemble: r5i1p1f1, grid: gn, project: CMIP6}
-#      #- {mip: AERmon, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-#      - {mip: AERmon, dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn, project: CMIP6}
-#
-#      - {dataset: ESACCI-OZONE, project: OBS, type: sat, version: L3, tier: 2}
-#      - {dataset: NIWA-BS, project: OBS, type: sat, version: v3.3, tier: 3}
-#    scripts:
-#      grading_global:
-#        <<: *grading_settings
-#      grading_shpolar:
-#        <<: *grading_settings
-#        # Region
-#        region: shpolar
 
 
   ### COLLECT METRICS #########################################################
@@ -2033,6 +1650,7 @@ diagnostics:
         label_scale: 0.1
         disp_values: false
         cm_interval: [2, 241]
+        no_labelbar: True
         # Sort dataset in alphabetic order (excluding MMM)
         #sort: true
         project_order: ['CMIP3', 'CMIP5', 'CMIP6'] 
@@ -2042,6 +1660,3 @@ diagnostics:
                      'zg500-global', 'psl-global', 'hus400-global', 'tas-global',
                      'ts-global', 'pr-global', 'clt-global', 'rlut-global',
                      'rsut-global', 'lwcre-global', 'swcre-global']
-                     #'od550aer-global', 'od870aer-global', 'abs550aer-global',
-                     #'od550lt1aer-global', 'toz-global', 'toz-shpolar',
-                     #'sm-global']
