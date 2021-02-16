@@ -6,6 +6,7 @@
 ; Description
 ;
 ; Modification history
+;   20210216-Yu Kosaka: revised figure details
 ;   20210212-Yu Kosaka: revised to get trend periods from input files
 ;   20210129-Yu Kosaka: adapt Adam's script to the ESMValTool
 ;
@@ -359,7 +360,9 @@ begin
   bres@tmYLMode = "Explicit"
   bres@tmYLValues = (/-.4,-.3,-.2,-.1,0,.1,.2,.3,.4/)
   bres@tmYLLabels = (/"-0.4","-0.3","-0.2","-0.1","0","0.1","0.2","0.3","0.4"/)
+  bres@tiYAxisString = "(decade~S~-1~N~)"
   bres@tiMainFontColor = "white"
+  bres@tiYAxisFontColor = "white"
   bres@tmYLLabelFontColor = "white"
   bres@tiMainString = "(a) NAM ("+syear_a+"-"+eyear_a+")"
   plot_blank(1) = blank_boxplot(wks,bres)
@@ -407,6 +410,7 @@ begin
   bplot = new(4,graphic)
   bplot2 = bplot
   bres@tiMainFontColor = "black"
+  bres@tiYAxisFontColor = "black"
   bres@tmYLLabelFontColor = "black"
   bres@trYMinF = -0.3
   bres@trYMaxF = 0.3
