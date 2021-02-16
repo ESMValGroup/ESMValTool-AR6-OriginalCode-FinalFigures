@@ -129,22 +129,11 @@ begin
     end if
   end if
 
-; make sure path for (optional) netcdf output exists
+  ; make sure path for (optional) netcdf output exists
 
-  if (config_user_info@write_netcdf.eq."True") then
-    write_nc = True
-    work_dir = config_user_info@work_dir + "/"
-    ; Create work dir
-    system("mkdir -p " + work_dir)
-  else
-    write_nc = False
-  end if
-
-  if (config_user_info@write_plots.eq."True") then
-    write_plots = True
-  else
-    write_plots = False
-  end if
+  work_dir = config_user_info@work_dir + "/"
+  ; Create work dir
+  system("mkdir -p " + work_dir)
 
 ; ========================================================================
 ; ========================== initialization ==============================
@@ -653,303 +642,299 @@ begin
   ; ========================================================================
   ; ============================= plotting =================================
   ; ========================================================================
-  if (write_plots) then
-    log_info(DIAG_SCRIPT + " plotting NAM and SAM patterns")
-    pattern = True
-    pattern@diag_script = DIAG_SCRIPT
-    pattern@res = True
 
-    pattern@res_gsnMaximize     = False      ; use full page for the plot
-    pattern@res_cnFillOn        = True      ; color plot desired
-    pattern@res_cnLineLabelsOn  = False     ; contour lines
-    pattern@res_cnLinesOn       = False
-    pattern@res_tiMainOn        = False
-    pattern@res_mpPerimOn       = False
-    pattern@res_mpGridLineColor = -1
-    pattern@res_mpGridAndLimbOn = True
+  log_info(DIAG_SCRIPT + " plotting NAM and SAM patterns")
+  pattern = True
+  pattern@diag_script = DIAG_SCRIPT
+  pattern@res = True
 
-    pattern@res_gsnLeftStringFontHeightF = 0.015
-    pattern@res_cnLevelSelectionMode     = "ExplicitLevels"
-    pattern@res_mpOutlineOn     = True
-    pattern@res_mpGeophysicalLineColor = "grey30"
-    pattern@res_mpPerimOn       = True
-    pattern@res_mpFillOn        = False
+  pattern@res_gsnMaximize     = False      ; use full page for the plot
+  pattern@res_cnFillOn        = True      ; color plot desired
+  pattern@res_cnLineLabelsOn  = False     ; contour lines
+  pattern@res_cnLinesOn       = False
+  pattern@res_tiMainOn        = False
+  pattern@res_mpPerimOn       = False
+  pattern@res_mpGridLineColor = -1
+  pattern@res_mpGridAndLimbOn = True
 
-    pattern@res_lbLabelBarOn          = False
-    pattern@res_gsnRightString        = ""
-    pattern@res_mpFillDrawOrder       = "PostDraw"    ; draw map fill last
-    pattern@res_cnMissingValFillColor = "Gray"
-    pattern@res_tmYLLabelsOn          = False
-    pattern@res_tmYLOn                = False
-    pattern@res_tmYRLabelsOn          = False
-    pattern@res_tmYROn                = False
-    pattern@res_tmXBLabelsOn          = False
-    pattern@res_tmXBOn                = False
-    pattern@res_tmXTLabelsOn          = False
-    pattern@res_tmXTOn                = False
-    pattern@res_cnInfoLabelOn         = False    ; turn off cn info label
+  pattern@res_gsnLeftStringFontHeightF = 0.015
+  pattern@res_cnLevelSelectionMode     = "ExplicitLevels"
+  pattern@res_mpOutlineOn     = True
+  pattern@res_mpGeophysicalLineColor = "grey30"
+  pattern@res_mpPerimOn       = True
+  pattern@res_mpFillOn        = False
 
-    pattern@res_cnLevelSelectionMode = "ExplicitLevels"
-    pattern@res_cnLevels = tofloat(ispan(-5, 5, 1))
+  pattern@res_lbLabelBarOn          = False
+  pattern@res_gsnRightString        = ""
+  pattern@res_mpFillDrawOrder       = "PostDraw"    ; draw map fill last
+  pattern@res_cnMissingValFillColor = "Gray"
+  pattern@res_tmYLLabelsOn          = False
+  pattern@res_tmYLOn                = False
+  pattern@res_tmYRLabelsOn          = False
+  pattern@res_tmYROn                = False
+  pattern@res_tmXBLabelsOn          = False
+  pattern@res_tmXBOn                = False
+  pattern@res_tmXTLabelsOn          = False
+  pattern@res_tmXTOn                = False
+  pattern@res_cnInfoLabelOn         = False    ; turn off cn info label
 
-    pattern@var = var
-    if (.not. isatt(variable_info[mainvarind], "long_name")) then
-      variable_info[mainvarind]@long_name = ""
-    end if
-    if (.not. isatt(variable_info[mainvarind], "units")) then
-      variable_info[mainvarind]@units = ""
-    end if
-    pattern@var_long_name = variable_info[mainvarind]@long_name
-    pattern@var_units     = variable_info[mainvarind]@units
+  pattern@res_cnLevelSelectionMode = "ExplicitLevels"
+  pattern@res_cnLevels = tofloat(ispan(-5, 5, 1))
 
-    plots = new((/2, 3/), graphic)
+  pattern@var = var
+  if (.not. isatt(variable_info[mainvarind], "long_name")) then
+    variable_info[mainvarind]@long_name = ""
+  end if
+  if (.not. isatt(variable_info[mainvarind], "units")) then
+    variable_info[mainvarind]@units = ""
+  end if
+  pattern@var_long_name = variable_info[mainvarind]@long_name
+  pattern@var_units     = variable_info[mainvarind]@units
+
+  plots = new((/2, 3/), graphic)
 
   ; --------------------------------------------------------------------
   ; create workspace
 
-    if (isvar("wks")) then
-      delete(wks)
-    end if
+  if (isvar("wks")) then
+    delete(wks)
+  end if
 
-    if (season_nam.eq.season_sam) then
-      wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                    "nam_sam_"+refname+"_vs_mme_"+season_nam)
-    else
-      wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                    "nam_sam_"+refname+"_vs_mme_"+season_nam+"4NAM_"\
-                    + season_sam+"4SAM")
-    end if
+  if (season_nam.eq.season_sam) then
+    wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
+                  "nam_sam_"+refname+"_vs_mme_"+season_nam)
+  else
+    wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
+                  "nam_sam_"+refname+"_vs_mme_"+season_nam+"4NAM_"\
+                  + season_sam+"4SAM")
+  end if
   ; --------------------------------------------------------------------
 
-    pattern@res_gsnDraw       = False  ; do not draw yet
-    pattern@res_gsnFrame      = False  ; don't advance frame
-    pattern@res_gsnAddCyclic = True
+  pattern@res_gsnDraw       = False  ; do not draw yet
+  pattern@res_gsnFrame      = False  ; don't advance frame
+  pattern@res_gsnAddCyclic = True
 
   ; plot contour map
-    pattern@res_gsnPolar = "NH"
-    pattern@res_mpMinLatF = 20
-    copy_VarAtts(pattern, NAMref)
-    copy_VarAtts(pattern, NAM)
+  pattern@res_gsnPolar = "NH"
+  pattern@res_mpMinLatF = 20
+  copy_VarAtts(pattern, NAMref)
+  copy_VarAtts(pattern, NAM)
 
-    pattern@res_gsnPolar = "SH"
-    delete(pattern@res_mpMinLatF)
-    pattern@res_mpMaxLatF = -20
-    copy_VarAtts(pattern, SAMref)
-    copy_VarAtts(pattern, SAM)
+  pattern@res_gsnPolar = "SH"
+  delete(pattern@res_mpMinLatF)
+  pattern@res_mpMaxLatF = -20
+  copy_VarAtts(pattern, SAMref)
+  copy_VarAtts(pattern, SAM)
 
-    diag_script_info@region = "Arctic"
-    diag_script_info@min_lat = 20
-    plots(0, 0) = contour_map_polar(wks, NAMref, var)
-    plots(0, 1) = contour_map_polar(wks, dim_avg_n_Wrap(NAM, 0), var)
+  diag_script_info@region = "Arctic"
+  diag_script_info@min_lat = 20
+  plots(0, 0) = contour_map_polar(wks, NAMref, var)
+  plots(0, 1) = contour_map_polar(wks, dim_avg_n_Wrap(NAM, 0), var)
 
-    diag_script_info@region = "Antarctic"
-    delete(diag_script_info@min_lat)
-    diag_script_info@max_lat = -20
-    plots(1, 0) = contour_map_polar(wks, SAMref, var)
-    plots(1, 1) = contour_map_polar(wks, dim_avg_n_Wrap(SAM, 0), var)
+  diag_script_info@region = "Antarctic"
+  delete(diag_script_info@min_lat)
+  diag_script_info@max_lat = -20
+  plots(1, 0) = contour_map_polar(wks, SAMref, var)
+  plots(1, 1) = contour_map_polar(wks, dim_avg_n_Wrap(SAM, 0), var)
 
-    pres = True
-    pres@gsnDraw           = True
-    pres@gsnFrame          = False
-    pres@gsnPanelLabelBar  = True
-    pres@pmLabelBarOrthogonalPosF = 0.0
-    pres@lbTitleString = var + " anomaly (" + units + ")"
-    pres@lbTitlePosition = "Bottom"
-    pres@lbLabelFontHeightF = 0.012
-    pres@lbAutoManage    = False
-    pres@lbTitleFontHeightF = 0.012
-    pres@gsnPanelRight    = 0.5
-    pres@gsnPanelYWhiteSpacePercent = 10.
-    pres@gsnMaximize = False
-    pres@gsnOrientation = "landscape"
-    pres@gsnPanelFigureStringsPerimOn     = False
-    pres@gsnPanelFigureStringsFontHeightF = 0.01
-    pres@amJust                           = "TopLeft"
-    pres@amOrthogonalPosF                 = -0.65
-    pres@gsnPanelFigureStrings = (/ "(a) NAM ("+refname+")", \
-                                    "(b) NAM (MME mean)", \
-                                    "(d) SAM ("+refname+")", \
-                                    "(e) SAM (MME mean)" /)
-    gsn_panel(wks, ndtooned(plots(0:1, 0:1)), (/2, 2/), pres)
+  pres = True
+  pres@gsnDraw           = True
+  pres@gsnFrame          = False
+  pres@gsnPanelLabelBar  = True
+  pres@pmLabelBarOrthogonalPosF = 0.0
+  pres@lbTitleString = var + " anomaly (" + units + ")"
+  pres@lbTitlePosition = "Bottom"
+  pres@lbLabelFontHeightF = 0.012
+  pres@lbAutoManage    = False
+  pres@lbTitleFontHeightF = 0.012
+  pres@gsnPanelRight    = 0.5
+  pres@gsnPanelYWhiteSpacePercent = 10.
+  pres@gsnMaximize = False
+  pres@gsnOrientation = "landscape"
+  pres@gsnPanelFigureStringsPerimOn     = False
+  pres@gsnPanelFigureStringsFontHeightF = 0.01
+  pres@amJust                           = "TopLeft"
+  pres@amOrthogonalPosF                 = -0.65
+  pres@gsnPanelFigureStrings = (/ "(a) NAM ("+refname+")", \
+                                  "(b) NAM (MME mean)", \
+                                  "(d) SAM ("+refname+")", \
+                                  "(e) SAM (MME mean)" /)
+  gsn_panel(wks, ndtooned(plots(0:1, 0:1)), (/2, 2/), pres)
 
-    log_info(DIAG_SCRIPT + " plotting NAM and SAM indices")
-    res                   = True
-    res@xyDashPattern     = 0
-    res@xyMonoLineColor   = False
-    res@gsnYRefLine       = 0.
-    res@xyLineThicknesses = 0.5
-    res@xyLineColor       = "grey50"
-    res@tmYLLabelFontHeightF = 0.01
-    res@gsnDraw           = False
-    res@gsnFrame          = False
-    range = max((/max(abs(NAMindex)), max(abs(NAMindexref)), \
-                 max(abs(SAMindex)), max(abs(SAMindexref))/))
-    if (range.gt.4.) then
-      res@trYMinF = -5.
-      res@trYMaxF = 5.
-    elseif(range.gt.3) then
-      res@trYMinF = -4.
-      res@trYMaxF = 4.
-    elseif(range.gt.2) then
-      res@trYMinF = -3.
-      res@trYMaxF = 3.
-    elseif(range.gt.1) then
-      res@trYMinF = -2.
-      res@trYMaxF = 2.
+  log_info(DIAG_SCRIPT + " plotting NAM and SAM indices")
+  res                   = True
+  res@xyDashPattern     = 0
+  res@xyMonoLineColor   = False
+  res@gsnYRefLine       = 0.
+  res@xyLineThicknesses = 0.5
+  res@xyLineColor       = "grey50"
+  res@tmYLLabelFontHeightF = 0.01
+  res@gsnDraw           = False
+  res@gsnFrame          = False
+  range = max((/max(abs(NAMindex)), max(abs(NAMindexref)), \
+               max(abs(SAMindex)), max(abs(SAMindexref))/))
+  if (range.gt.4.) then
+    res@trYMinF = -5.
+    res@trYMaxF = 5.
+  elseif(range.gt.3) then
+    res@trYMinF = -4.
+    res@trYMaxF = 4.
+  elseif(range.gt.2) then
+    res@trYMinF = -3.
+    res@trYMaxF = 3.
+  elseif(range.gt.1) then
+    res@trYMinF = -2.
+    res@trYMaxF = 2.
+  else
+    res@trYMinF = -1.
+    res@trYMaxF = 1.
+  end if
+  res@tmXTOn = False
+  res@tmYROn = False
+  res@vpWidthF        = 0.4
+  res@vpHeightF       = 0.2
+  res@vpXF            = 0.55
+  if (max(NAMindex&time).gt.999) then
+    NAMtime = new(dimsizes(NAMindex&time), "float")
+    i = 0
+    do yr = toint(NAMindex&time(0))/100, \
+      toint(NAMindex&time(dimsizes(NAMindex&time)-1))/100
+      do mo = 1, 12
+        NAMtime(i) = tofloat(yr)+tofloat(mo-1)/12.
+        i = i + 1
+      end do
+    end do
+    NAMtimeref = new(dimsizes(NAMindexref&time), "float")
+    i = 0
+    do yr = toint(NAMindexref&time(0))/100, \
+      toint(NAMindexref&time(dimsizes(NAMindexref&time)-1))/100
+      do mo = 1, 12
+        NAMtimeref(i) = tofloat(yr)+tofloat(mo-1)/12.
+        i = i + 1
+      end do
+    end do
+  else
+    NAMtime = NAMindex&time
+    NAMtimeref = NAMindexref&time
+  end if
+  if (max(SAMindex&time).gt.9999) then
+    SAMtime = new(dimsizes(SAMindex&time), "float")
+    i = 0
+    do yr = toint(SAMindex&time(0))/100, \
+      toint(SAMindex&time(dimsizes(SAMindex&time)-1))/100
+      do mo = 1, 12
+        SAMtime(i) = tofloat(yr)+tofloat(mo-1)/12.
+        i = i + 1
+      end do
+    end do
+    SAMtimeref = new(dimsizes(SAMindexref&time), "float")
+    i = 0
+    do yr = toint(SAMindexref&time(0))/100, \
+      toint(SAMindexref&time(dimsizes(SAMindexref&time)-1))/100
+      do mo = 1, 12
+        SAMtimeref(i) = tofloat(yr)+tofloat(mo-1)/12.
+        i = i + 1
+      end do
+    end do
+  else
+    SAMtime = SAMindex&time
+    SAMtimeref = SAMindexref&time
+  end if
+  NAMindex@long_name = ""
+  SAMindex@long_name = ""
+  NAMindexref@long_name = ""
+  SAMindexref@long_name = ""
+  res@vpYF            = 0.8
+  res@tmXBLabelFontHeightF = 0.
+  res@tiMainFontHeightF = 0.01
+  res@tiMainOffsetYF = -0.008
+  res@tiMainString = "(c) NAM index"
+  if (ave_window.gt.0) then
+    if (season_nam.eq."monthly") then
+      res@tiMainString = res@tiMainString+" ("+ave_window+"mon moving ave)"
     else
-      res@trYMinF = -1.
-      res@trYMaxF = 1.
+      res@tiMainString = res@tiMainString+" ("+ave_window+"yr moving ave)"
     end if
-    res@tmXTOn = False
-    res@tmYROn = False
-    res@vpWidthF        = 0.4
-    res@vpHeightF       = 0.2
-    res@vpXF            = 0.55
-    if (max(NAMindex&time).gt.999) then
-      NAMtime = new(dimsizes(NAMindex&time), "float")
-      i = 0
-      do yr = toint(NAMindex&time(0))/100, \
-        toint(NAMindex&time(dimsizes(NAMindex&time)-1))/100
-        do mo = 1, 12
-          NAMtime(i) = tofloat(yr)+tofloat(mo-1)/12.
-          i = i + 1
-        end do
-      end do
-      NAMtimeref = new(dimsizes(NAMindexref&time), "float")
-      i = 0
-      do yr = toint(NAMindexref&time(0))/100, \
-        toint(NAMindexref&time(dimsizes(NAMindexref&time)-1))/100
-        do mo = 1, 12
-          NAMtimeref(i) = tofloat(yr)+tofloat(mo-1)/12.
-          i = i + 1
-        end do
-      end do
+  end if
+  plots(0, 2) = gsn_csm_xy(wks, NAMtime, NAMindex, res)
+  res@vpYF            = 0.52
+  res@tmXBLabelFontHeightF = res@tmYLLabelFontHeightF
+  res@tiMainString = "(f) SAM index"
+  if (ave_window.gt.0) then
+    if (season_nam.eq."monthly") then
+      res@tiMainString = res@tiMainString+" ("+ave_window+"mon moving ave)"
     else
-      NAMtime = NAMindex&time
-      NAMtimeref = NAMindexref&time
+      res@tiMainString = res@tiMainString+" ("+ave_window+"yr moving ave)"
     end if
-    if (max(SAMindex&time).gt.9999) then
-      SAMtime = new(dimsizes(SAMindex&time), "float")
-      i = 0
-      do yr = toint(SAMindex&time(0))/100, \
-        toint(SAMindex&time(dimsizes(SAMindex&time)-1))/100
-        do mo = 1, 12
-          SAMtime(i) = tofloat(yr)+tofloat(mo-1)/12.
-          i = i + 1
-        end do
-      end do
-      SAMtimeref = new(dimsizes(SAMindexref&time), "float")
-      i = 0
-      do yr = toint(SAMindexref&time(0))/100, \
-        toint(SAMindexref&time(dimsizes(SAMindexref&time)-1))/100
-        do mo = 1, 12
-          SAMtimeref(i) = tofloat(yr)+tofloat(mo-1)/12.
-          i = i + 1
-        end do
-      end do
-    else
-      SAMtime = SAMindex&time
-      SAMtimeref = SAMindexref&time
-    end if
-    NAMindex@long_name = ""
-    SAMindex@long_name = ""
-    NAMindexref@long_name = ""
-    SAMindexref@long_name = ""
-    res@vpYF            = 0.8
-    res@tmXBLabelFontHeightF = 0.
-    res@tiMainFontHeightF = 0.01
-    res@tiMainOffsetYF = -0.008
-    res@tiMainString = "(c) NAM index"
-    if (ave_window.gt.0) then
-      if (season_nam.eq."monthly") then
-        res@tiMainString = res@tiMainString+" ("+ave_window+"mon moving ave)"
-      else
-        res@tiMainString = res@tiMainString+" ("+ave_window+"yr moving ave)"
-      end if
-    end if
-    plots(0, 2) = gsn_csm_xy(wks, NAMtime, NAMindex, res)
-    res@vpYF            = 0.52
-    res@tmXBLabelFontHeightF = res@tmYLLabelFontHeightF
-    res@tiMainString = "(f) SAM index"
-    if (ave_window.gt.0) then
-      if (season_nam.eq."monthly") then
-        res@tiMainString = res@tiMainString+" ("+ave_window+"mon moving ave)"
-      else
-        res@tiMainString = res@tiMainString+" ("+ave_window+"yr moving ave)"
-      end if
-    end if
-    plots(1, 2) = gsn_csm_xy(wks, SAMtime, SAMindex, res)
-    res@xyLineColor = "red"
-    delete(res@xyLineThicknesses)
-    res@xyLineThicknessF = 2.
-    plot = gsn_csm_xy(wks, NAMtimeref, NAMindexref, res)
-    overlay(plots(0, 2), plot)
-    plot = gsn_csm_xy(wks, SAMtimeref, SAMindexref, res)
-    overlay(plots(1, 2), plot)
+  end if
+  plots(1, 2) = gsn_csm_xy(wks, SAMtime, SAMindex, res)
+  res@xyLineColor = "red"
+  delete(res@xyLineThicknesses)
+  res@xyLineThicknessF = 2.
+  plot = gsn_csm_xy(wks, NAMtimeref, NAMindexref, res)
+  overlay(plots(0, 2), plot)
+  plot = gsn_csm_xy(wks, SAMtimeref, SAMindexref, res)
+  overlay(plots(1, 2), plot)
 
-    res@xyLineColor = "black"
-    plot = gsn_csm_xy(wks, NAMtime, dim_avg_n_Wrap(NAMindex, 0), res)
-    overlay(plots(0, 2), plot)
-    plot = gsn_csm_xy(wks, SAMtime, dim_avg_n_Wrap(SAMindex, 0), res)
-    overlay(plots(1, 2), plot)
+  res@xyLineColor = "black"
+  plot = gsn_csm_xy(wks, NAMtime, dim_avg_n_Wrap(NAMindex, 0), res)
+  overlay(plots(0, 2), plot)
+  plot = gsn_csm_xy(wks, SAMtime, dim_avg_n_Wrap(SAMindex, 0), res)
+  overlay(plots(1, 2), plot)
 
-    delete(NAMtime)
-    delete(SAMtime)
+  delete(NAMtime)
+  delete(SAMtime)
 
-    draw(plots(:, 2))
-    frame(wks)
-    log_info("Wrote " + wks@fullname)
+  draw(plots(:, 2))
+  frame(wks)
+  log_info("Wrote " + wks@fullname)
 
-    ; add meta data to plot (for reporting)
+  ; add meta data to plot (for reporting)
 
-    caption = ""
-    id = DIAG_SCRIPT + "_" + var + "_" + season
+  caption = ""
+  id = DIAG_SCRIPT + "_" + var + "_" + season
 
-    contrib_authors = "kosa_yu"
-
-  end if  ; if write_plots
+  contrib_authors = "kosa_yu"
 
   ; ###########################################
   ; # Optional output to netCDF               #
   ; ###########################################
 
-  if (write_nc) then
-    NAM@var = var
-    SAM@var = var
-    NAMref@var = var
-    SAMref@var = var
-    NAM@diag_script = DIAG_SCRIPT
-    SAM@diag_script = DIAG_SCRIPT
-    NAMref@diag_script = DIAG_SCRIPT
-    SAMref@diag_script = DIAG_SCRIPT
+  NAM@var = var
+  SAM@var = var
+  NAMref@var = var
+  SAMref@var = var
+  NAM@diag_script = DIAG_SCRIPT
+  SAM@diag_script = DIAG_SCRIPT
+  NAMref@diag_script = DIAG_SCRIPT
+  SAMref@diag_script = DIAG_SCRIPT
 
-    NAMindex@var = var
-    SAMindex@var = var
-    NAMindexref@var = var
-    SAMindexref@var = var
-    NAMindex@diag_script = DIAG_SCRIPT
-    SAMindex@diag_script = DIAG_SCRIPT
-    NAMindexref@diag_script = DIAG_SCRIPT
-    SAMindexref@diag_script = DIAG_SCRIPT
+  NAMindex@var = var
+  SAMindex@var = var
+  NAMindexref@var = var
+  SAMindexref@var = var
+  NAMindex@diag_script = DIAG_SCRIPT
+  SAMindex@diag_script = DIAG_SCRIPT
+  NAMindexref@diag_script = DIAG_SCRIPT
+  SAMindexref@diag_script = DIAG_SCRIPT
 
-    nc_filename = work_dir + "NAM_pattern_models.nc"
-    nc_outfile = ncdf_write(NAM, nc_filename)
-    nc_filename = work_dir + "NAM_pattern_ref.nc"
-    nc_outfile = ncdf_write(NAMref, nc_filename)
-    nc_filename = work_dir + "SAM_pattern_models.nc"
-    nc_outfile = ncdf_write(SAM, nc_filename)
-    nc_filename = work_dir + "SAM_pattern_ref.nc"
-    nc_outfile = ncdf_write(SAMref, nc_filename)
+  nc_filename = work_dir + "NAM_pattern_models.nc"
+  nc_outfile = ncdf_write(NAM, nc_filename)
+  nc_filename = work_dir + "NAM_pattern_ref.nc"
+  nc_outfile = ncdf_write(NAMref, nc_filename)
+  nc_filename = work_dir + "SAM_pattern_models.nc"
+  nc_outfile = ncdf_write(SAM, nc_filename)
+  nc_filename = work_dir + "SAM_pattern_ref.nc"
+  nc_outfile = ncdf_write(SAMref, nc_filename)
 
-    nc_filename = work_dir + "NAM_index_models.nc"
-    nc_outfile = ncdf_write(NAMindex, nc_filename)
-    nc_filename = work_dir + "NAM_index_ref.nc"
-    nc_outfile = ncdf_write(NAMindexref, nc_filename)
-    nc_filename = work_dir + "SAM_index_models.nc"
-    nc_outfile = ncdf_write(SAMindex, nc_filename)
-    nc_filename = work_dir + "SAM_index_ref.nc"
-    nc_outfile = ncdf_write(SAMindexref, nc_filename)
-  end if
+  nc_filename = work_dir + "NAM_index_models.nc"
+  nc_outfile = ncdf_write(NAMindex, nc_filename)
+  nc_filename = work_dir + "NAM_index_ref.nc"
+  nc_outfile = ncdf_write(NAMindexref, nc_filename)
+  nc_filename = work_dir + "SAM_index_models.nc"
+  nc_outfile = ncdf_write(SAMindex, nc_filename)
+  nc_filename = work_dir + "SAM_index_ref.nc"
+  nc_outfile = ncdf_write(SAMindexref, nc_filename)
 
   leave_msg(DIAG_SCRIPT, "")
 
