@@ -937,7 +937,7 @@ diagnostics:
       collect: 
         <<: *tsline_settings
         script: ipcc_ar6/tsline_blend_collect.ncl
-        ancestors: [tasa, 'fig_3_3_*/fig-3-3']
+        ancestors: [tasa, 'fig_3_4_*/fig-3-4']
         start_year: 1850
         end_year: 2020
         ref: ["HadCRUT5"]
