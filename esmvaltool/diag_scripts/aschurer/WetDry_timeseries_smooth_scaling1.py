@@ -243,26 +243,21 @@ def main(cfg):
     stAnal=1980
     option=1
     modconversion=86400
-    MainPath='/gws/nopw/j04/edin_cesd/aschurer/ESMVALtools/'
     NsampperpiC=10
     ##################################################
     # Read in observations
-    obsANNyr,obswet,obsdry,obsANNyrS,obswetS,obsdryS=RunWetDryMonths(MainPath+'data/GPCP23.precip.mon.mean_122020.nc','Average Monthly Rate of Precipitation',option,1,True)
-    #downloaded from http://psl.noaa.gov/data/gridded/data.gpcp.html on 01/02/2021
-    eraANNyr,erawet,eradry,eraANNyrS,erawetS,eradryS=RunWetDryMonths(MainPath+'data/ERA5.tot_precip.2p5.1979-2020.nc','Total precipitation',option,1000,True)
-    #downloaded from https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels-monthly-means
-    #reprocessed using python commands:
-    #import iris
-    #target=iris.load('/gws/nopw/j04/edin_cesd/aschurer/ESMVALtools/data/GPCP23.precip.mon.mean_122020.nc','Average Monthly Rate of Precipitation')[0]
-    #dataERA  =iris.load('/gws/nopw/j04/edin_cesd/aschurer/ESMVALtools/data/ERA5.tot_precip.0p25.1979-2020.nc','Total precipitation')[0]
-    #dataERA.data[-1,0,:,:]=data.data[-1,1,:,:]  #for last point use experimental data
-    #dataERA=dataERA[:,0,:,:]  #For rest of points use the actual values    
-    #newdata=dataERA.regrid(target,iris.analysis.Linear())
-    #iris.save(newdata,'/gws/nopw/j04/edin_cesd/aschurer/ESMVALtools/data/ERA5.tot_precip.2p5.1979-2020.nc')
+    preproc_dir = cfg["input_files"][0] # to get the metadata.yml in the preproc dir
+    preproc_dir = os.path.dirname(preproc_dir) # to remove metadata.yml from the path 
+    gpcp_filename = glob.glob(preproc_dir+"/*GPCP*")[0]
+    obsANNyr,obswet,obsdry,obsANNyrS,obswetS,obsdryS=RunWetDryMonths(gpcp_filename,'precipitation_flux',option,modconversion,True)
+    era5_filename = glob.glob(preproc_dir+"/*ERA5*")[0]
+    eraANNyr,erawet,eradry,eraANNyrS,erawetS,eradryS=RunWetDryMonths(era5_filename,'precipitation_flux',option,modconversion,True)
     ##################################################
     # Get a description of the preprocessed data that we will use as input.
     input_data = cfg['input_data'].values()
     grouped_input_data = group_metadata(input_data, 'dataset', sort='ensemble')
+    #print(grouped_input_data)
+    grouped_obs_input_data = group_metadata(input_data, 'dataset')
     logger.info(
         "Group input data by model and sort by ensemble:"
         "\n%s", pformat(grouped_input_data))
@@ -279,43 +274,45 @@ def main(cfg):
     #And calculate wet & dry regional timeseries
     for mm, dataset in enumerate(grouped_input_data):
         logger.info("*************** Processing model %s", dataset)
-        model_names.append(dataset)
-        lbl=dataset
-        grouped_model_input_data = group_metadata(
+        if dataset!='ERA5' and dataset!='GPCP-SG': #ignore observations
+           model_names.append(dataset)
+           lbl=dataset
+           grouped_model_input_data = group_metadata(
             grouped_input_data[dataset], 'exp', sort='ensemble')
-        for exp in grouped_model_input_data:
-           if exp!='piControl':
-            logger.info("***** Processing experiment %s", exp)    
-            grouped_exp_input_data = group_metadata(
-              grouped_model_input_data[exp], 'ensemble', sort='variable_group')
+           for exp in grouped_model_input_data:
+              if exp=='historical-ssp245':
+               logger.info("***** Processing experiment %s", exp)    
+               grouped_exp_input_data = group_metadata(
+                 grouped_model_input_data[exp], 'ensemble', sort='variable_group')
 	            
-            for ee, ensemble in enumerate(grouped_exp_input_data):
-                logger.info("** Processing ensemble %s", ensemble)
-                files=[]
-                for attributes in grouped_exp_input_data[ensemble]:
-                    logger.info("Processing variable %s", attributes['variable_group'])
-                    files.append(attributes['filename'])
-                modANNyr,modwet,moddry,modANNyrS,modwetS,moddryS=RunWetDryMonths(files[0],'precipitation_flux',option,modconversion,True)
-                if firsttime:
-                	firsttime=False
-                	MMMwet=numpy.zeros([len(modANNyr)])
-                	MMMdry=numpy.zeros([len(modANNyr)])
-                	MMMwetS=numpy.zeros([len(modANNyrS)])
-                	MMMdryS=numpy.zeros([len(modANNyrS)])
-                plt.subplot(grid[0,0:4])
-                plt.plot(modANNyrS,modwetS,'lightblue')
-                plt.subplot(grid[1,0:4]) 
-                plt.plot(modANNyrS,moddryS,'pink')
-                MMMwet+=modwet
-                MMMdry+=moddry
-                MMMwetS+=modwetS
-                MMMdryS+=moddryS		
-                count+=1		
+               for ee, ensemble in enumerate(grouped_exp_input_data):
+                   logger.info("** Processing ensemble %s", ensemble)
+                   files=[]
+                   for attributes in grouped_exp_input_data[ensemble]:
+                       logger.info("Processing variable %s", attributes['variable_group'])
+                       files.append(attributes['filename'])
+                   modANNyr,modwet,moddry,modANNyrS,modwetS,moddryS=RunWetDryMonths(files[0],'precipitation_flux',option,modconversion,True)
+                   if firsttime:
+                      firsttime=False
+                      MMMwet=numpy.zeros([len(modANNyr)])
+                      MMMdry=numpy.zeros([len(modANNyr)])
+                      MMMwetS=numpy.zeros([len(modANNyrS)])
+                      MMMdryS=numpy.zeros([len(modANNyrS)])
+                   plt.subplot(grid[0,0:4])
+                   plt.plot(modANNyrS,modwetS,'lightblue')
+                   plt.subplot(grid[1,0:4]) 
+                   plt.plot(modANNyrS,moddryS,'pink')
+                   MMMwet+=modwet
+                   MMMdry+=moddry
+                   MMMwetS+=modwetS
+                   MMMdryS+=moddryS
+                   count+=1		
     nsims=float(count)
     MMMwet/=nsims
     MMMdry/=nsims
     MMMwetS/=nsims
     MMMdryS/=nsims
+    #			
     #Plot timeseries
     plt.subplot(grid[0,0:4])
     plt.title('Detection and attribution analysis of tropical precipitation')	
@@ -382,9 +379,9 @@ def main(cfg):
     		dryobs=obsdry[st:]-numpy.mean(obsdry[st:])
     	if iobs==1:	
 	    	st= numpy.argwhere(eraANNyr>=startyear)[0][0]
-    		yrobs=eraANNyr[st:]
-    		wetobs=erawet[st:]-numpy.mean(erawet[st:])
-    		dryobs=eradry[st:]-numpy.mean(eradry[st:])
+    		yrobs=eraANNyr[st:-1]
+    		wetobs=erawet[st:-1]-numpy.mean(erawet[st:-1])
+    		dryobs=eradry[st:-1]-numpy.mean(eradry[st:-1])
     	st= numpy.argwhere(modANNyr>=startyear)[0][0]
     	fi= st+len(yrobs)
     	yrmod=modANNyr[st:fi]
@@ -406,14 +403,16 @@ def main(cfg):
     		dryobsS=obsdryS[st:]-numpy.mean(obsdryS[st:])
     	if iobs==1:	
 	    	st= numpy.argwhere(eraANNyrS>=startyear)[0][0]
-    		yrobsS=eraANNyrS[st:]
-    		wetobsS=erawetS[st:]-numpy.mean(erawetS[st:])
-    		dryobsS=eradryS[st:]-numpy.mean(eradryS[st:])
+    		yrobsS=eraANNyrS[st:-1]
+    		wetobsS=erawetS[st:-1]-numpy.mean(erawetS[st:-1])
+    		dryobsS=eradryS[st:-1]-numpy.mean(eradryS[st:-1])
     	st= numpy.argwhere(modANNyrS>=startyear)[0][0]
+	#
     	fi= st+len(yrobsS)
     	yrmodS=modANNyrS[st:fi]
     	wetmodS=MMMwetS[st:fi]-numpy.mean(MMMwetS[st:fi])
     	drymodS=MMMdryS[st:fi]-numpy.mean(MMMdryS[st:fi])
+	#
     	ntS=len(yrobsS)
     	#Get piControl samples for the D&A
     	piCfiles=glob.glob("../../../preproc/*/pr/*piControl*.nc")
@@ -455,9 +454,10 @@ def main(cfg):
     	stdContdry=numpy.mean(stdCont)
     	Zmatrix[-1,:]=numpy.concatenate((wetobsS/stdContwet,dryobsS/stdContdry))
     	Zmatrix[0,:]=numpy.concatenate((wetmodS/stdContwet,drymodS/stdContdry))/xs
+    	#				
     	for ic in range(nc): 
     		wetSampsS[ic,:]/=stdContwet
-    		drySampsS[ic,:]/=stdContdry
+    		drySampsS[ic,:]/=stdContdry		
     	scalefact,ztilde,xs,lam=run_TLS(Zmatrix,xs,numpy.concatenate((wetSampsS,drySampsS),axis=1))
     	print('Regular TLS')
     	print(scalefact)
@@ -486,7 +486,7 @@ def main(cfg):
     	stdContdry=numpy.mean(stdCont)
     	Zmatrix[-1,:]=numpy.concatenate((wetobs/stdContwet,dryobs/stdContdry))
     	Zmatrix[0,:]=numpy.concatenate((wetmod/stdContwet,drymod/stdContdry))/xs
-	#	
+	#
     	newZ=numpy.zeros([nsig+1,nt*2])
     	for ii in range(nbetas):
     		ind = [0]*newZ.shape[1]
@@ -503,7 +503,6 @@ def main(cfg):
     	else:
     		plt.plot([4.5],  [numpy.percentile(betas,50)],color='grey',marker='o')
     	plt.text(3,2.2,'Bootstrap',rotation=90,color='m')
-	
     plt.savefig(plot_file)
     plt.close() 				
 if __name__ == '__main__':

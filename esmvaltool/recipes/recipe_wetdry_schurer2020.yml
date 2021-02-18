@@ -36,6 +36,8 @@ diagnostics:
         start_year: 1980
         end_year: 2020
         additional_datasets:
+          - {dataset: ERA5, project: OBS6, tier: 3, type: reanaly, version: v1}
+          - {dataset: GPCP-SG, project: OBS, tier: 2, type: atmos, version: V2.3}
           - {dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1}
           #- {dataset: ACCESS-CM2, ensemble: r1i1p1f1} #searching for CSIRO-ARCCSS-BoM should be CSIRO-ARCCSS
           #- {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1}
