@@ -1,0 +1,228 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+
+  authors:
+    - bock_lisa
+    - eyring_veronika
+
+#  maintainer:
+    
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim_5x5_land_50N-90N:
+    mask_landsea:
+      mask_out: sea
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: 50.
+      end_latitude: 90.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_5x5_land_50S-70S:
+    mask_landsea:
+      mask_out: sea
+    regrid:
+      target_grid: 5x5
+      scheme: linear
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: -70.
+      end_latitude: -50.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+Datasets_CMIP6_historical: &cmip6_historical_models_pr
+#  - {dataset: AWI-CM-1-1-MR, grid: gn, start_year: 1851}
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: BCC-ESM1, grid: gn}
+  - {dataset: CAMS-CSM1-0, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
+  - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: E3SM-1-0} 
+  - {dataset: EC-Earth3, ensemble: r22i1p1f1}
+  - {dataset: EC-Earth3-Veg}
+  - {dataset: FGOALS-f3-L, ensemble: r3i1p1f1}
+  - {dataset: FGOALS-g3, grid: gn}
+  - {dataset: GFDL-CM4, grid: gr1}
+  - {dataset: GFDL-ESM4, grid: gr1}
+  - {dataset: GISS-E2-1-G, grid: gn}
+  - {dataset: GISS-E2-1-G-CC, grid: gn, institute: NASA-GISS} #no data 1951-2000
+  - {dataset: GISS-E2-1-H, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: INM-CM4-8, grid: gr1}
+  - {dataset: INM-CM5-0, grid: gr1}
+  - {dataset: IPSL-CM6A-LR}
+  # - {dataset: MCM-UA-1-0, grid: gn} fix required
+  - {dataset: MIROC6, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, grid: gn}
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
+  - {dataset: MPI-ESM1-2-LR, grid: gn}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: NESM3, grid: gn}
+  - {dataset: NorCPM1, grid: gn, institute: NCC}
+  - {dataset: NorESM2-LM, grid: gn, institute: NCC} 
+  - {dataset: SAM0-UNICON, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+
+cmip6_hist_models: &cmip6_histNat_models_pr
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: CanESM5, grid: gn}
+  - {dataset: CESM2, grid: gn}
+  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {dataset: IPSL-CM6A-LR}
+  - {dataset: MRI-ESM2-0, grid: gn}
+  - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+
+
+diagnostics:
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3.2 
+  # Fig 3.11 (ZOD fig. 3.16)
+  # Lisa
+  # **********************************************************************
+  # Global and zonal average changes in annual mean precipitation
+  # **********************************************************************
+ 
+  ########################################################################
+  # 50-90N
+  ########################################################################
+
+  pr_hist_50N-90N: &diag_pr
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr: &var_pr
+        preprocessor: clim_5x5_land_50N-90N
+        reference_dataset: GHCN   
+        mip: Amon
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1950
+        end_year: 2014
+    additional_datasets: *cmip6_historical_models_pr
+    scripts:
+      tsline: &tsline_settings_pr
+        script: ipcc_ar6/tsline_new.ncl
+        time_avg: "yearly"
+        ts_anomaly: "anom"
+        region: "50N-90N"
+        ref_start: 1961
+        ref_end: 1990
+        ref_value: False
+        ref_mask: True
+        write_stat: True
+        stat: "MinMax"
+        #run_ave: 11
+        plot_units: "mm/day"
+        styleset: CMIP6
+        y_min: -0.2
+        y_max: 0.2
+        yr_mean: 5
+
+  pr_histNat_50N-90N:
+    <<: *diag_pr
+    variables:
+      pr:
+        <<: *var_pr
+        exp: hist-nat
+    additional_datasets: *cmip6_histNat_models_pr
+
+  fig_3_11_50N-90N: &diag_pr_collect
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_50N-90N   
+        mip: Amon
+        reference_dataset: GHCN
+        start_year: 1950
+        end_year: 2014
+    additional_datasets:
+      - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
+    scripts:
+      collect: &tsline_collect 
+        <<: *tsline_settings_pr
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [pr, 'pr_*_50N-90N/tsline*']
+        start_year: 1950
+        end_year: 2014
+        ref: ["GHCN"]
+        order: ["CMIP6_historical", "CMIP6_hist-nat"]
+        stat_shading: True
+        ref_shading: False 
+
+  ########################################################################
+  # 50-70S
+  ########################################################################
+
+  pr_hist_50S-70S:
+    <<: *diag_pr
+    variables:
+      pr:
+        <<: *var_pr
+        preprocessor: clim_5x5_land_50S-70S
+    scripts:
+      tsline:
+        <<: *tsline_settings_pr
+        region: "50S-70S"
+
+  pr_histNat_50S-70S:
+    <<: *diag_pr
+    variables:
+      pr:
+        <<: *var_pr
+        exp: hist-nat
+    additional_datasets: *cmip6_histNat_models_pr
+    scripts:
+      tsline:
+        <<: *tsline_settings_pr
+        region: "50S-70S"
+
+  fig_3_11_50S-70S:
+    <<: *diag_pr_collect
+    variables:
+      pr:
+        preprocessor: clim_5x5_land_50S-70S
+        mip: Amon
+        reference_dataset: GHCN
+        start_year: 1950
+        end_year: 2014
+    scripts:
+      collect: 
+        <<: *tsline_collect
+        ancestors: [pr, 'pr_*_50S-70S/tsline*']
+        region: "50S-70S"
+

@@ -14,7 +14,7 @@
 ;    time_avg: type of time average (currently only "yearly" and "monthly" are
 ;              available).
 ;    ts_anomaly: calculates anomalies with respect to the defined period;
-;                for each gird point by removing the mean for the given
+;                for each grid point by removing the mean for the given
 ;                calendar month (requiring at least 50% of the data to be
 ;                non-missing)
 ;    ref_start: start year of reference period for anomalies
@@ -208,10 +208,18 @@ begin
         ; Determine start/end year
         start_year = info_items[imod]@start_year
         end_year = info_items[imod]@end_year
+                
+        if (start_year .gt. diag_script_info@ref_start) then
+          ref_start = start_year
+        else
+          ref_start = diag_script_info@ref_start
+        end if
+
         A_ref_mask = time_operations(A_ref, start_year, \
                                      end_year, "extract", "", 0)
         A0_nomask_ref = time_operations(A0, ref_start, \
                                         ref_end, "extract", "", 0)
+
         A0 = where(A_ref_mask.eq.A_ref_mask@_FillValue, \
                    A_ref_mask@_FillValue, A0)
         delete(A_ref_mask)
@@ -252,6 +260,7 @@ begin
         delete(year)
         delete(month)
         delete(date)
+        delete(weights)
         delete(tmp)
         delete(A0_monavg_ref)
 

@@ -65,37 +65,37 @@ begin
 
   ; Period
   YEAR1 = 1948
-  YEAR2 = 2018
+  YEAR2 = 2019
 
   ; Selected variable (standard name)
   VAR = (/"ta", "zg", "hur", "hus", "ua", \
-          "va", "wap", "tas", "pr", \
-          "ua", "va", "pr", "rlut"/)
+          "va", "wap", "tas", "pr", "ps", "psl" /)
+;          "ua", "va", "pr", "rlut"/)
 
   ; Name in the raw data
   NAME = (/"air", "hgt", "rhum", "shum", "uwnd", \
-           "vwnd", "omega", "air", "prate", \
-           "uwnd", "vwnd", "prate", "ulwrf"/)
+           "vwnd", "omega", "air", "prate", "pres", "slp" /)
+;           "uwnd", "vwnd", "prate", "ulwrf"/)
 
   ; Subdirectory
   SUBDIR = (/"pressure/", "pressure/", "pressure/", "pressure/", "pressure/", \
-             "pressure/", "pressure/", "surface/", "surface/", \
-             "pressure/", "pressure/", "surface/", "surface/"/)
+             "pressure/", "pressure/", "surface/", "surface/", "surface/", "surface/" /)
+;             "pressure/", "pressure/", "surface/", "surface/"/)
 
   ; Expected units (according to CMOR standard)
   EXPUNITS = (/"K", "m", "%", "1", "m/s", \
-               "m/s", "Pascal/s", "K", "Kg/m^2/s", \
-               "m/s", "m/s", "Kg/m^2/s", "W/m^2"/)
+               "m/s", "Pascal/s", "K", "Kg/m^2/s", "Pa", "Pa" /)
+;               "m/s", "m/s", "Kg/m^2/s", "W/m^2"/)
 
   ; MIP
   MIP = (/"Amon", "Amon", "Amon", "Amon", "Amon", \
-          "Amon", "Amon", "Amon", "Amon", \
-          "day", "day", "day", "day"/)
+          "Amon", "Amon", "Amon", "Amon", "Amon", "Amon" /)
+;          "day", "day", "day", "day"/)
 
   ; Frequency
   FREQ = (/"mon", "mon", "mon", "mon", "mon", \
-           "mon", "mon", "mon", "mon", \
-           "day", "day", "day", "day"/)
+           "mon", "mon", "mon", "mon", "mon", "mon" /)
+;           "day", "day", "day", "day"/)
 
   ; CMOR tables
   CMOR_TABLE = getenv("cmor_tables") + "/cmip5/Tables/CMIP5_" + MIP
@@ -166,13 +166,18 @@ begin
 
       ; Convert units
       if (any(VAR(vv).eq.(/"ta", "tas"/)) .and. \
-          output@units.eq."degC") then
+        output@units.eq."degC") then
         output = output + 273.15
         output@units = "K"
       end if
       if (VAR(vv).eq."hus" .and. output@units.eq."grams/kg") then
         output = output / 1000.
         output@units = "1"
+      end if
+      if (any(VAR(vv).eq.(/"ps", "psl"/)) .and. \
+        output@units.eq."millibar") then
+        output = output * 100.
+        output@units = "Pa"
       end if
       if (output@units.ne.EXPUNITS(vv)) then
         error_msg("f", DIAG_SCRIPT, "", \
