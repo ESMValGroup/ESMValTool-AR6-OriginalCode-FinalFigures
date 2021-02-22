@@ -17,6 +17,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210211-Yu Kosaka: changed stippling to cross marks
 ;   20210116-Yu Kosaka: adapt Adam's updates script to the ESMValTool
 ;   20200727-Soufiane Karmouche: adapt Adam's scipt to the ESMValTool
 ;
@@ -573,9 +574,9 @@ begin
 ;    print(nam_pc_trends(gg)+"  "+nao_pc_trends(gg)+"  "+sam_pc_trends(gg))
 
 
-     printVarSummary(finarr_sam_pc)
-     printVarSummary(finarr_nam_pc)
-     printVarSummary(finarr_nao_pc)
+;     printVarSummary(finarr_sam_pc)
+;     printVarSummary(finarr_nam_pc)
+;     printVarSummary(finarr_nao_pc)
 
      nam_timeseries(gg,:) = (/ finarr_nam_pc /)
      nao_timeseries(gg,:) = (/ finarr_nao_pc /)
@@ -1492,13 +1493,19 @@ begin
 ;  plot(5) = gsn_csm_contour_map_polar(wks,mme_sam_C6,res)
   plot(5) = gsn_csm_contour_map_polar(wks,mme_sam_C6_map,res)
 
-  res2@cnFillScaleF        = 0.55
-  res2@cnFillPatterns = (/17,0/)
+  res2@cnFillScaleF   = 1. ;0.55
+  res2@cnFillPatterns = (/6, 0/);(/17,0/)
   res2@cnLevels = 0.5
+;
+;  res3 = True
+;  res3@gsnShadeFillType = "pattern"
+;  res3@gsnShadeLow      = 6
+;  res3@gsnShadeFillScaleF = 1. 
   oplot = new(3,graphic)
   do gg = 0,2
-     oplot(gg) = gsn_csm_contour(wks,obs_significance(gg,:,:),res2)
-     overlay(plot(gg),oplot(gg))
+    oplot(gg) = gsn_csm_contour(wks,obs_significance(gg,:,:),res2)
+;    oplot(gg) = gsn_contour_shade(oplot(gg), 1., 0., res3)
+    overlay(plot(gg),oplot(gg))
   end do
 
   res2@cnFillPatterns = (/3,0/) ;(/11,0/)
@@ -1595,6 +1602,7 @@ begin
   delete(tres@tiYAxisString)
   tplot_C5(0) = taylor_diagram(wks, nam_taylor_stats_C5(:,1:1), nam_taylor_stats_C5(:,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot_C5(2) = taylor_diagram3(wks, sam_taylor_stats_C5(:,1:1), sam_taylor_stats_C5(:,0:0), tres)
   do gg =0,2
      overlay(tplot_C5(gg),tplot(gg))
@@ -1634,6 +1642,8 @@ begin
   tplot4b = new(3,graphic)
 ;  tplot5a = new(3,graphic)
   tplot5b = new(3,graphic)
+
+; CMIP5 MME
   tres@gsMarkerSizeF   = 0.008
   tres@Colors := "white"
   tres@Markers:= 16 ;new_marker
@@ -1655,27 +1665,29 @@ begin
      overlay(tplot_C5(gg),tplot3b(gg))
   end do
 
+; AMIP MME
 ;  tres@gsMarkerThicknessF = 1.0
 ;  tres@Colors := "white"
 ;  tres@Markers:= new_marker
-;  tplot4a(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6EM(0:0,1:1),tay_stats_hist_nao_cmip6EM(0:0,0:0), tres)
-;  tplot4a(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6EM(0:0,1:1),tay_stats_hist_nam_cmip6EM(0:0,0:0), tres)
-;  tplot4a(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6EM(0:0,1:1),tay_stats_hist_sam_cmip6EM(0:0,0:0), tres)
+;  tplot4a(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6AEM(0:0,1:1),tay_stats_hist_nao_cmip6AEM(0:0,0:0), tres)
+;  tplot4a(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6AEM(0:0,1:1),tay_stats_hist_nam_cmip6AEM(0:0,0:0), tres)
+;  tplot4a(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6AEM(0:0,1:1),tay_stats_hist_sam_cmip6AEM(0:0,0:0), tres)
 ;  do gg = 0,2
 ;     overlay(tplot_C5(gg),tplot4a(gg))
 ;  end do
   tres@Colors := 3
   tres@Markers:= 16
 ;  tres@gsMarkerThicknessF = 2.0
-  tplot4b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6EM(0:0,1:1),tay_stats_hist_nao_cmip6EM(0:0,0:0), tres)
+  tplot4b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6AEM(0:0,1:1),tay_stats_hist_nao_cmip6AEM(0:0,0:0), tres)
   delete(tres@tiYAxisString)
-  tplot4b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6EM(0:0,1:1),tay_stats_hist_nam_cmip6EM(0:0,0:0), tres)
+  tplot4b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6AEM(0:0,1:1),tay_stats_hist_nam_cmip6AEM(0:0,0:0), tres)
   tres@tiYAxisString = ""
-  tplot4b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6EM(0:0,1:1),tay_stats_hist_sam_cmip6EM(0:0,0:0), tres)
+  tplot4b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6AEM(0:0,1:1),tay_stats_hist_sam_cmip6AEM(0:0,0:0), tres)
   do gg = 0,2
      overlay(tplot_C5(gg),tplot4b(gg))
   end do
 
+; CMIP6 MME
 ;  tres@gsMarkerThicknessF = 1.0
 ;  tres@Colors := "white"
 ;  tres@Markers:= 16  ;new_marker
@@ -2018,8 +2030,8 @@ begin
 ;  gsn_polymarker_ndc(wks,.2275,.479,pmres)
 ;  gsn_polymarker_ndc(wks,.2225,.479,pmres)
   pmres = pmres0
-  pmres@gsFillScaleF = 0.55
-  pmres@gsFillIndex = 17
+  pmres@gsFillScaleF = 0.8 ; 0.55
+  pmres@gsFillIndex = 6 ;17
   x1 = 0.20
   x2 = 0.22
   y1 = 0.47 ; 0.475

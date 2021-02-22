@@ -6,6 +6,8 @@
 ; Description
 ;
 ; Modification history
+;   20210216-Yu Kosaka: revised figure details
+;   20210212-Yu Kosaka: revised to get trend periods from input files
 ;   20210129-Yu Kosaka: adapt Adam's script to the ESMValTool
 ;
 ; #############################################################################
@@ -27,10 +29,6 @@ begin
   if (ismissing(file_type)) then
     file_type = "ps"
   end if
-
-  nam_yrs = 62.   ; number of years of NAM period (float). Used to rescale final zarr* arrays, as well as em_* arrays containing ensemble means (when adding gsn_add_polymarker) 
-  sam_yrs0 = 21.  ; number of years of SAM0 period (float)
-  sam_yrs1 = 20.  ; number of years of SAM1 period (float)
 
   idirs = diag_script_info@input_files
   
@@ -152,6 +150,18 @@ begin
       end do
     end if
   end do
+
+  syear_a = nam_obs_djfA@syear
+  eyear_a = nam_obs_djfA@eyear
+  syear_b = sam_obs_djfA_0@syear
+  eyear_b = sam_obs_djfA_0@eyear
+  syear_c = sam_obs_djfA_1@syear
+  eyear_c = sam_obs_djfA_1@eyear
+
+  nam_yrs = tofloat(eyear_a - syear_a + 1)
+  sam_yrs0 = tofloat(eyear_b - syear_b + 1)
+  sam_yrs1 = tofloat(eyear_c - syear_c + 1)
+  
 ;-------------------------------------------------------------------------
   ea_hist = where(ismissing(nam_hist_djfA),ea_hist@_FillValue,ea_hist)  ; set ea_* arrays to _FillValue when a trend isn't there (for weighting purposes)
   ea_histstrat = where(ismissing(nam_histstrat_djfA),ea_histstrat@_FillValue,ea_histstrat)
@@ -204,24 +214,25 @@ begin
   nhist      = count_unique_values(ea_hist)+" models, "+num(.not.ismissing(nam_hist_djfA))+" runs"   ;dimsizes(nam_hist_djfA)
   nctl       = num(.not.ismissing(nam_ctl_djfA))+" models, "+num(.not.ismissing(nam_ctl_djfA))+" segments"  ;dimsizes(nam_ctl_djfA)
 
-  tarr = set_min_numEMsize(em_nam_hist_djfA,3) 
-  print(tarr+" "+tarr@num_ensemble_members)
+  nmod_crit = 3  ; 3 or more models needed to count for box_whisker_2
+  
+  tarr = set_min_numEMsize(em_nam_hist_djfA,nmod_crit) 
+;  print(tarr+" "+tarr@num_ensemble_members)
   nhistF      = num(.not.ismissing(tarr))+" models, "+sum(tarr@num_ensemble_members)+" runs"  
-  tarr := set_min_numEMsize(em_nam_histstrat_djfA,3) 
+  tarr := set_min_numEMsize(em_nam_histstrat_djfA,nmod_crit) 
   nhiststrat = num(.not.ismissing(tarr))+" models, "+sum(tarr@num_ensemble_members)+" runs"
-  tarr := set_min_numEMsize(em_nam_histaer_djfA,3) 
+  tarr := set_min_numEMsize(em_nam_histaer_djfA,nmod_crit) 
   nhistaer   = num(.not.ismissing(tarr))+" models, "+sum(tarr@num_ensemble_members)+" runs"
-  tarr := set_min_numEMsize(em_nam_histghg_djfA,3) 
+  tarr := set_min_numEMsize(em_nam_histghg_djfA,nmod_crit) 
   nhistghg   = num(.not.ismissing(tarr))+" models, "+sum(tarr@num_ensemble_members)+" runs"
-  tarr := set_min_numEMsize(em_nam_histnat_djfA,3) 
+  tarr := set_min_numEMsize(em_nam_histnat_djfA,nmod_crit) 
   nhistnat   = num(.not.ismissing(tarr))+" models, "+sum(tarr@num_ensemble_members)+" runs"
 ;-------------------------------------------------------------------------
-; values are in units of per 57yrs (NAM) and 20/16 years (SAM), will convert
+; values are in units of per trend period, will convert
 ; to be in terms of per decade
 
   wgt_ctl := new(dimsizes(nam_ctl_djfA),float)   ; set weights for piControl (= to 1)
   wgt_ctl = 1
-  nmod_crit = 3  ; 3 or more models needed to count for box_whisker_2
 
   zarrN = new((/14,5/),float)
   zarrN(0,:) = (/ box_whisker_1b(nam_hist_djfA,wgt_hist) /)  
@@ -330,53 +341,52 @@ begin
   txres@txFontHeightF = 0.020
   plres = True
   plres@gsLineColor = "gray15"  
-  plres@gsLineThicknessF = 1.
+  plres@gsLineThicknessF = 0.5
   plres@tfPolyDrawOrder = "PostDraw"
-  plres@gsLineDashPattern = 1
+  plres@gsLineDashPattern = 2
 
   plres2 = True
-  plres2@gsLineColor = "gray15"   ;(/0.1,0.1,0.1,0.3/)  ;"gray50" 
-  plres2@gsLineThicknessF = 2.
+  plres2@gsLineColor = "gray15"
+  plres2@gsLineThicknessF = 1.
   plres2@tfPolyDrawOrder = "PostDraw"
-
 
   plres3 = True
   plres3@gsLineThicknessF = 2.0
   plres3@gsLineColor = "gray50"
 
   plot_blank = new(4,graphic)
-  bres@trYMinF = -.3
-  bres@trYMaxF = .3
+  bres@trYMinF = -0.3
+  bres@trYMaxF = 0.3
   bres@tmYLMode = "Explicit"
   bres@tmYLValues = (/-.4,-.3,-.2,-.1,0,.1,.2,.3,.4/)
   bres@tmYLLabels = (/"-0.4","-0.3","-0.2","-0.1","0","0.1","0.2","0.3","0.4"/)
-;  bres@tmYLMinorValues = fspan(-.3,.3,13)
+  bres@tiYAxisString = "(decade~S~-1~N~)"
   bres@tiMainFontColor = "white"
+  bres@tiYAxisFontColor = "white"
   bres@tmYLLabelFontColor = "white"
-  bres@tiMainString = "(a) NAM (1958-2014)"
+  bres@tiMainString = "(a) NAM ("+syear_a+"-"+eyear_a+")"
   plot_blank(1) = blank_boxplot(wks,bres)
-  bres@tmYLValues := (/-1.25,-1.00,-0.75,-0.5,-0.25,0,0.25,0.50,0.75,1,1.25/)
+  bres@tmYLValues := (/-1.6,-1.2,-0.8,-0.4,0.,0.4,0.8,1.2,1.6/) ; (/-2.,-1.5,-1.,-0.5,0.,0.5,1,1.5,2./)
   bres@tmYLLabels := bres@tmYLValues
-;  bres@tmYLMinorValues := fspan(-1.2,1.2,13)
-  bres@trYMinF = -1.
-  bres@trYMaxF = 1.
-  bres@tiMainString = "(b) SAM (1979-1998)"
+  bres@trYMinF = -1.2
+  bres@trYMaxF = 1.2
+  bres@tiMainString = "(b) SAM ("+syear_b+"-"+eyear_b+")"
   plot_blank(2) = blank_boxplot(wks,bres)
 
-  bres@tiMainString = "(b) SAM (1999-2014)"
+  bres@tiMainString = "(c) SAM ("+syear_c+"-"+eyear_c+")"
   plot_blank(3) = blank_boxplot(wks,bres)
 
-  print("NAM DJF Obs: "+nam_obs_djfA)
-  print("NAM JJA Obs: "+nam_obs_jjaA)
-  print("SAM DJF Obs-0: "+sam_obs_djfA_0)
-  print("SAM JJA Obs-0: "+sam_obs_jjaA_0)
-  print("SAM DJF Obs-1: "+sam_obs_djfA_1)
-  print("SAM JJA Obs-1: "+sam_obs_jjaA_1)
+;  print("NAM DJF Obs: "+nam_obs_djfA)
+;  print("NAM JJA Obs: "+nam_obs_jjaA)
+;  print("SAM DJF Obs-0: "+sam_obs_djfA_0)
+;  print("SAM JJA Obs-0: "+sam_obs_jjaA_0)
+;  print("SAM DJF Obs-1: "+sam_obs_djfA_1)
+;  print("SAM JJA Obs-1: "+sam_obs_jjaA_1)
 
-  dum = new(18,graphic)
+  dum = new(24,graphic)
 
   cntr = 0
-  do gg = 0,2
+  do gg = 0,nobs-1
      plres3@gsLineDashPattern = gg
      dum(cntr) = gsn_add_polyline(wks,plot_blank(1),(/0.5,2.5/),(/nam_obs_djfA(gg),nam_obs_djfA(gg)/),plres3)
      dum(cntr+1) = gsn_add_polyline(wks,plot_blank(1),(/8.5,10.5/),(/nam_obs_jjaA(gg),nam_obs_jjaA(gg)/),plres3)
@@ -400,17 +410,16 @@ begin
   bplot = new(4,graphic)
   bplot2 = bplot
   bres@tiMainFontColor = "black"
+  bres@tiYAxisFontColor = "black"
   bres@tmYLLabelFontColor = "black"
-  bres@trYMinF = -.3
-  bres@trYMaxF = .3
+  bres@trYMinF = -0.3
+  bres@trYMaxF = 0.3
   bres@tmYLValues := (/-.4,-.3,-.2,-.1,0,.1,.2,.3,.4/)
   bres@tmYLLabels := (/"-0.4","-0.3","-0.2","-0.1","0","0.1","0.2","0.3","0.4"/)
-;  bres@tmYLMinorValues = fspan(-.3,.3,13)
-  bres@tiMainString = "(a) NAM (1958-2019)"
+  bres@tiMainString = "(a) NAM ("+syear_a+"-"+eyear_a+")"
 
   bres@tmXBLabels := (/"","","",""/)
   opti@boxColors  := boxColors1
-
   bplot(1) = boxplot2(wks,(/1,2,9,10/),zarrN((/0,1,7,8/),:),opti,bres,llres)	
 
 
@@ -428,18 +437,17 @@ begin
   dum2(0) = gsn_add_text(wks,bplot2(1),"DJF",4.,bres@trYMinF+0.0425,txres)
   dum2(1) = gsn_add_text(wks,bplot2(1),"JJA",12.,bres@trYMinF+0.0425,txres)
   dum2(2) = gsn_add_polyline(wks,bplot2(1),(/-15,15.75/),(/0.,0./),plres2)
-  dum2(3) = gsn_add_polyline(wks,bplot2(1),(/8,8/),(/-2.,.26/),plres)
+  dum2(3) = gsn_add_polyline(wks,bplot2(1),(/8,8/),(/-2.,bres@trYMaxF*0.85/),plres)
   overlay(bplot(1),bplot2(1))
 ;--- Create 2nd panel-----
 
   bres@tmXBLabels := (/"","","",""/)
-  bres@tmYLValues := (/-1.25,-1.00,-0.75,-0.5,-0.25,0,0.25,0.50,0.75,1,1.25/)
+  bres@tmYLValues := (/-1.6,-1.2,-0.8,-0.4,0.,0.4,0.8,1.2,1.6/) ; (/-2.,-1.5,-1.,-0.5,0.,0.5,1.,1.5,2./)
   bres@tmYLLabels := bres@tmYLValues
-;  bres@tmYLMinorValues := fspan(-1.2,1.2,13)
-  bres@trYMinF = -1.
-  bres@trYMaxF = 1.
-  bres@tiMainString = "(b) SAM (1979-1999)"
-  delete([/opti@boxFill_Colors,opti@boxFill_midColor/])
+  bres@trYMinF = -1.2
+  bres@trYMaxF = 1.2
+  bres@tiMainString = "(b) SAM ("+syear_b+"-"+eyear_b+")"
+  delete([/opti@boxFill_Colors, opti@boxFill_midColor/])
   opti@boxColors  := boxColors1
   bplot(2) = boxplot2(wks,(/1,2,9,10/),zarrS0((/0,1,7,8/),:),opti,bres,llres)	
 
@@ -453,13 +461,13 @@ begin
   dum3(0) = gsn_add_text(wks,bplot2(2),"DJF",4.,bres@trYMinF+0.14,txres)
   dum3(1) = gsn_add_text(wks,bplot2(2),"JJA",12.,bres@trYMinF+0.14,txres)
   dum3(2) = gsn_add_polyline(wks,bplot2(2),(/-15,15.75/),(/0.,0./),plres2)
-  dum3(3) = gsn_add_polyline(wks,bplot2(2),(/8,8/),(/-2.,.9/),plres)
+  dum3(3) = gsn_add_polyline(wks,bplot2(2),(/8,8/),(/-3.,bres@trYMaxF*0.85/),plres)
   overlay(bplot(2),bplot2(2))
 
 ;--- Create 3rd panel-----
 
   bres@tmXBLabels := (/"","","",""/)
-  bres@tiMainString = "(c) SAM (2000-2019)"
+  bres@tiMainString = "(c) SAM ("+syear_c+"-"+eyear_c+")"
   delete([/opti@boxFill_Colors,opti@boxFill_midColor/])
   opti@boxColors  := boxColors1
   bplot(3) = boxplot2(wks,(/1,2,9,10/),zarrS1((/0,1,7,8/),:),opti,bres,llres)	
@@ -474,7 +482,7 @@ begin
   dum4(0) = gsn_add_text(wks,bplot2(3),"DJF",4.,bres@trYMinF+0.14,txres)
   dum4(1) = gsn_add_text(wks,bplot2(3),"JJA",12.,bres@trYMinF+0.14,txres)
   dum4(2) = gsn_add_polyline(wks,bplot2(3),(/-15,15.75/),(/0.,0./),plres2)
-  dum4(3) = gsn_add_polyline(wks,bplot2(3),(/8,8/),(/-2.,.9/),plres)
+  dum4(3) = gsn_add_polyline(wks,bplot2(3),(/8,8/),(/-3.,bres@trYMaxF*0.85/),plres)
   overlay(bplot(3),bplot2(3))
 ;---------------------------------------------
 ; Add ensemble means (as dots)
@@ -554,35 +562,35 @@ begin
   dum7 = new(10,graphic)
   xarr := new(dimsizes(em_sam_hist_djfA_1),float)
   xarr = 3
-  dum7(0) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_hist_djfA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(0) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_hist_djfA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histghg_djfA_1),float)
   xarr = 4
-  dum7(1) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histghg_djfA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(1) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histghg_djfA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histaer_djfA_1),float)
   xarr = 5
-  dum7(2) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histaer_djfA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(2) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histaer_djfA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histstrat_djfA_1),float)
   xarr = 6
-  dum7(3) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histstrat_djfA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(3) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histstrat_djfA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histnat_djfA_1),float)
   xarr = 7
-  dum7(4) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histnat_djfA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(4) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histnat_djfA_1,nmod_crit)/sam_yrs1)*10.,polymres)
 
   xarr := new(dimsizes(em_sam_hist_jjaA_1),float)
   xarr = 11
-  dum7(5) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_hist_jjaA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(5) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_hist_jjaA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histghg_jjaA_1),float)
   xarr = 12
-  dum7(6) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histghg_jjaA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(6) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histghg_jjaA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histaer_jjaA_1),float)
   xarr = 13
-  dum7(7) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histaer_jjaA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(7) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histaer_jjaA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histstrat_jjaA_1),float)
   xarr = 14
-  dum7(8) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histstrat_jjaA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(8) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histstrat_jjaA_1,nmod_crit)/sam_yrs1)*10.,polymres)
   xarr := new(dimsizes(em_sam_histnat_jjaA_1),float)
   xarr = 15
-  dum7(9) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histnat_jjaA_1,nmod_crit)/sam_yrs0)*10.,polymres)
+  dum7(9) = gsn_add_polymarker(wks,bplot2(3),xarr,(set_min_numEMsize(em_sam_histnat_jjaA_1,nmod_crit)/sam_yrs1)*10.,polymres)
 
 ;---------------------------------------------
 ; Create legend
@@ -590,7 +598,7 @@ begin
   gres = True
   gres@YPosPercent = 64.5    ; expressed as %, 0->100, sets position of top border of legend 
                             ;  when gres@Position is set to its default setting of "Top" (Default = 95.)
-  gres@XPosPercent = 22.      ; expressed as %, 0->100, sets position of left border of legend(Default = 5.)
+  gres@XPosPercent = 19.      ; expressed as %, 0->100, sets position of left border of legend(Default = 5.)
   gres@LineLabelWhiteSpacePercent = 1.
   gres@ItemSpacePercent = 2.
 
@@ -609,9 +617,11 @@ begin
 ;  lineres@lgLineColors := boxColors2(1:4)
 ;  simple_legend_ndc(wks,gres,lineres,textres)
 
-  gres@YPosPercent = 72. 
-  lineres@lgLineColors := (/plres3@gsLineColor,plres3@gsLineColor,plres3@gsLineColor/)
-  lineres@lgDashIndexes := (/0,1,2/)
+  gres@YPosPercent = 72.
+  obsColors = (/plres3@gsLineColor,plres3@gsLineColor,plres3@gsLineColor/)
+  obsIndexes = (/0,1,2/)
+  lineres@lgLineColors := obsColors(0:nobs-1)
+  lineres@lgDashIndexes := obsIndexes(0:nobs-1)
 
   textres@lgLabels := where(obs_datasets.eq."NCEP", "NCEP/NCAR", obs_datasets)
   simple_legend_ndc(wks,gres,lineres,textres)
@@ -622,33 +632,34 @@ begin
   gsn_text_ndc(wks,"Historical (unfilled box, "+nhist+")",gres@XPosPercent/100.,.66,txres)
   txres@txFontColor = boxColors1(1)
   gsn_text_ndc(wks,"piControl ("+nctl+")",gres@XPosPercent/100.,.64,txres)
+
   txres@txFontColor = boxColors1(0)
-  gsn_text_ndc(wks,"Historical (filled box, "+nhistF+")",gres@XPosPercent/100.,.62,txres)
+  gsn_text_ndc(wks,"Historical (filled box, "+nhistF+")",gres@XPosPercent/100.,.60,txres)
   txres@txFontColor = boxColors2(1)
-  gsn_text_ndc(wks,"Hist-GHG ("+nhistghg+")",gres@XPosPercent/100.,.6,txres)
+  gsn_text_ndc(wks,"Hist-GHG ("+nhistghg+")",gres@XPosPercent/100.,.58,txres)
   txres@txFontColor = boxColors2(2)
-  gsn_text_ndc(wks,"Hist-aer ("+nhistaer+")",gres@XPosPercent/100.,.58,txres)
+  gsn_text_ndc(wks,"Hist-aer ("+nhistaer+")",gres@XPosPercent/100.,.56,txres)
   txres@txFontColor = boxColors2(3)
-  gsn_text_ndc(wks,"Hist-stratO3 ("+nhiststrat+")",gres@XPosPercent/100.,.56,txres)
+  gsn_text_ndc(wks,"Hist-stratO3 ("+nhiststrat+")",gres@XPosPercent/100.,.54,txres)
   txres@txFontColor = boxColors2(4)
-  gsn_text_ndc(wks,"Hist-nat ("+nhistnat+")",gres@XPosPercent/100.,.54,txres)
+  gsn_text_ndc(wks,"Hist-nat ("+nhistnat+")",gres@XPosPercent/100.,.52,txres)
 
   txres@txFont = 22
   txres@txFontHeightF = 0.018
   txres@txFontColor := "black"
-  gsn_text_ndc(wks,"Attribution of observed seasonal~C~trends of annular modes to forcings",0.05,0.78,txres)
+  gsn_text_ndc(wks,"  Attribution of observed seasonal~C~trends of annular modes to forcings",0.05,0.78,txres)
 
   bres@trYMinF = -1.   ; set up box plot legend 
   bres@trYMaxF = 1.
   bres@trXMinF = 0.
-  bres@trXMaxF = 2.0
+  bres@trXMaxF = 2.
   bres@tmYLOn = False
   bres@tmXBOn = False
   bres@tmYLBorderOn = False
   bres@tmXBBorderOn = False
   bres@vpXF = .12
-  bres@vpYF = .7297
-  bres@vpWidthF = .08
+  bres@vpYF = .71
+  bres@vpWidthF = .055
   bres@vpHeightF = .125
   bres@tiYAxisOn = False
   bres@tiMainOn = False
@@ -659,11 +670,9 @@ begin
 
   yval_lg = new((/2,5/),"float")
   yval_lg(0,:) = (/-.5,-.25,0,.25,.5/)
-
   bplg = boxplot2(wks,(/0.5,0.5/),yval_lg,opti,bres,llres)
   draw(bplg)
-
-  bres@vpYF = .6297
+  bres@vpYF = .6217
   opti@boxFill_Colors := (/"gray50","gray50"/)
   opti@boxFill_midColor := (/"white","white"/)
   opti@boxColors := (/"gray50","gray50"/)        ; (/5,3/)  
@@ -674,29 +683,26 @@ begin
   tlres = True
   tlres@txFontHeightF = 0.007
   tlres@txJust = "CenterLeft"
-  gsn_text_ndc(wks,"- 95th",.15,.699,tlres)
-  gsn_text_ndc(wks,"- 75th",.16,.683,tlres)
-;  gsn_text_ndc(wks,"- Median",.16,.668,tlres)
-  gsn_text_ndc(wks,"- Mean",.16,.668,tlres)
-  gsn_text_ndc(wks,"- 25th",.16,.6525,tlres)
-  gsn_text_ndc(wks,"- 5th",.15,.6367,tlres)
+  gsn_text_ndc(wks,"- 95th",.14,.6793,tlres)
+  gsn_text_ndc(wks,"- 75th",.15,.6633,tlres)
+  gsn_text_ndc(wks,"- Mean",.15,.6483,tlres)
+  gsn_text_ndc(wks,"- 25th",.15,.6328,tlres)
+  gsn_text_ndc(wks,"- 5th",.14,.6170,tlres)
 
-  gsn_text_ndc(wks,"- 95%",.16,.5835,tlres)
-;  gsn_text_ndc(wks,"- Median",.16,.568,tlres)
-  gsn_text_ndc(wks,"- Mean",.16,.568,tlres)
-  gsn_text_ndc(wks,"- 5%",.16,.5525,tlres)
+  gsn_text_ndc(wks,"- 95%",.15,.5755,tlres)
+  gsn_text_ndc(wks,"- Mean",.15,.56,tlres)
+  gsn_text_ndc(wks,"- 5%",.15,.5445,tlres)
 
   tlres@txAngleF = 90
   tlres@txJust = "CenterCenter"
-  gsn_text_ndc(wks,"Ensemble Range",.105,.668,tlres)
-  gsn_text_ndc(wks,"(all models)",.115,.668,tlres)
+  gsn_text_ndc(wks,"Ensemble Range",.105,.6483,tlres)
+  gsn_text_ndc(wks,"(all models)",.115,.6483,tlres)
 
-  gsn_text_ndc(wks,"Confidence Interval",.095,.568,tlres)
-  gsn_text_ndc(wks,"(models with > 3)",.105,.568,tlres)
-  gsn_text_ndc(wks,"(runs only)",.115,.568,tlres)
+  gsn_text_ndc(wks,"Confidence Interval",.095,.56,tlres)
+  gsn_text_ndc(wks,"(models with ~F34~3~F21~ "+nmod_crit,.105,.56,tlres)
+  gsn_text_ndc(wks,"runs only)",.115,.56,tlres)
 
   gsn_panel(wks,bplot,(/2,2/),panres)
-;  drawNDCGrid(wks)
   frame(wks)
   delete(wks)
   system("convert -density 216 -trim +repage -border 10 -bordercolor white "+ofile+"."+file_type+" "+ofile+".png")

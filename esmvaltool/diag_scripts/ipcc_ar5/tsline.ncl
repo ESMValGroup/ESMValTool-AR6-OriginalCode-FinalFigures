@@ -14,7 +14,7 @@
 ;    time_avg: type of time average (currently only "yearly" and "monthly" are
 ;              available).
 ;    ts_anomaly: calculates anomalies with respect to the defined period;
-;                for each gird point by removing the mean for the given
+;                for each grid point by removing the mean for the given
 ;                calendar month (requiring at least 50% of the data to be
 ;                non-missing)
 ;    ref_start: start year of reference period for anomalies

@@ -282,6 +282,7 @@ begin
       exp0 = info_items[0]@exp
       ;project0 = input_file_info[0]@project
       datasetnames := metadata_att_as_array(info_items, "dataset")
+      ensembles := metadata_att_as_array(info_items, "ensemble") 
       dim_MOD = ListCount(info_items)
 
       ; get multi-model mean index
@@ -404,21 +405,64 @@ begin
 
       end do
 
+      ; *************************************
+      ; calculate means over ensemble members
+      ; *************************************
+
+      ndim := dimsizes(datasetnames)
+      ensemble_assign := new(ndim, integer)
+      ensemble_size := new(ndim, integer)
+
+      enum = 1
+      temp = datasetnames(0)
+      do gg = 0, ndim - 1
+        if (temp.eq.datasetnames(gg)) then ; does the model name match what's in temp?
+          ensemble_assign(gg) = enum ; if so, assign it the same number
+        else
+          enum = enum + 1              ; if not, assign it the next number
+          ensemble_assign(gg) = enum
+          temp = datasetnames(gg)
+        end if
+      end do   
+      ensemble_assign@model = datasetnames
+      delete(temp)
+      ensemble_assign@models = str_join(datasetnames+"/"+ensembles,",")
+
+      model_arr_em := model_arr(:max(ensemble_assign)-1,:)
+      model_arr_em = model_arr_em@_FillValue
+      model_arr_trend_em := model_arr_trend(:max(ensemble_assign)-1)
+      model_arr_trend_em = model_arr_em@_FillValue
+      datasetnames_em := datasetnames(:max(ensemble_assign)-1)
+
+      do gg = 1,max(ensemble_assign)         ; calculate ensemble means
+        wind := ind(ensemble_assign.eq.gg)
+        ensemble_size(wind) = dimsizes(wind)
+        if (dimsizes(wind).eq.1) then
+          model_arr_em(gg-1,:) = (/ model_arr(wind,:) /)
+          model_arr_trend_em(gg-1) = (/ model_arr_trend(wind) /)
+          datasetnames_em(gg-1) = datasetnames(wind)
+        else
+          model_arr_em(gg-1,:) = (/ dim_avg_n(model_arr(wind,:),0) /)
+          model_arr_trend_em(gg-1) = (/ dim_avg_n(model_arr_trend(wind),0) /)
+          datasetnames_em(gg-1) = datasetnames(wind(0))
+        end if
+      end do
+
       ; --------------------------------------------------------------------
       ; calculate multi model statistics
       ; --------------------------------------------------------------------
 
       if (isatt(info_items[0], "reference_dataset")) then
-        ind_mod := ind(datasetnames.ne."MultiModelMean" .and. \
-                      datasetnames.ne.info_items[0]@reference_dataset .and. \
-                      datasetnames.ne."GHCN" .and. \
-                      datasetnames.ne."GPCP-SG" .and. \
-                      datasetnames.ne."CRU")
+        ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
+                       datasetnames_em.ne.info_items[0]@reference_dataset .and. \
+                       datasetnames_em.ne."GHCN" .and. \
+                       datasetnames_em.ne."GPCP-SG" .and. \
+                       datasetnames_em.ne."CRU")
       else
-        ind_mod := ind(datasetnames.ne."MultiModelMean" .and. \
-                       datasetnames.ne."GHCN" .and. \
-                       datasetnames.ne."GPCP-SG" .and. \
-                       datasetnames.ne."CRU")
+        ind_mod := ind(datasetnames_em.ne."MultiModelMean" .and. \
+                       datasetnames_em.ne."GHCN" .and. \
+                       datasetnames_em.ne."GPCP-SG" .and. \
+                       datasetnames_em.ne."CRU")
       end if
 
       model_arr_stat&exp(iexp) =  var
@@ -431,17 +475,17 @@ begin
       weight := new(dimsizes(ind_mod), float)
       weight = 1
       weight@_FillValue = 1e+20
-      model_arr_stat(iexp, 0, :) = (/weighted_mean(model_arr(ind_mod, :), weight)/)
-      model_arr_stat(iexp, 1, :) = (/weighted_percentile(model_arr(ind_mod, :), weight, 0.05)/)
-      model_arr_stat(iexp, 2, :) = (/weighted_percentile(model_arr(ind_mod, :), weight, 0.95)/)
+      model_arr_stat(iexp, 0, :) = (/weighted_mean(model_arr_em(ind_mod, :), weight)/)
+      model_arr_stat(iexp, 1, :) = (/weighted_percentile(model_arr_em(ind_mod, :), weight, 0.05)/)
+      model_arr_stat(iexp, 2, :) = (/weighted_percentile(model_arr_em(ind_mod, :), weight, 0.95)/)
 
       if (iexp .eq. 1 .and. isatt(info_items[0], "reference_dataset")) then
-        ;model_arr_stat(2, 0, :) = (/model_arr(ref_ind, :)/)
+        ;model_arr_stat(2, 0, :) = (/model_arr_em(ref_ind, :)/)
         ind_ref = new(3, integer)
-        ind_ref(0) = ind(datasetnames .eq. "GHCN")
-        ind_ref(1) = ind(datasetnames .eq. "GPCP-SG")
-        ind_ref(2) = ind(datasetnames .eq. "CRU")
-        model_arr_ref = (/model_arr(ind_ref, :)/) 
+        ind_ref(0) = ind(datasetnames_em .eq. "GHCN")
+        ind_ref(1) = ind(datasetnames_em .eq. "GPCP-SG")
+        ind_ref(2) = ind(datasetnames_em .eq. "CRU")
+        model_arr_ref = (/model_arr_em(ind_ref, :)/) 
       end if
 
       delete(model_arr)
@@ -479,11 +523,11 @@ begin
       weight = 1
       weight@_FillValue = 1e+20
 
-      model_arr_box(iexp, 2) = weighted_mean(model_arr_trend(ind_mod), weight)
-      model_arr_box(iexp, 0) = weighted_percentile(model_arr_trend(ind_mod), weight, 0.05)
-      model_arr_box(iexp, 1) = weighted_percentile(model_arr_trend(ind_mod), weight, 0.25)
-      model_arr_box(iexp, 3) = weighted_percentile(model_arr_trend(ind_mod), weight, 0.75)
-      model_arr_box(iexp, 4) = weighted_percentile(model_arr_trend(ind_mod), weight, 0.95)
+      model_arr_box(iexp, 2) = weighted_mean(model_arr_trend_em(ind_mod), weight)
+      model_arr_box(iexp, 0) = weighted_percentile(model_arr_trend_em(ind_mod), weight, 0.05)
+      model_arr_box(iexp, 1) = weighted_percentile(model_arr_trend_em(ind_mod), weight, 0.25)
+      model_arr_box(iexp, 3) = weighted_percentile(model_arr_trend_em(ind_mod), weight, 0.75)
+      model_arr_box(iexp, 4) = weighted_percentile(model_arr_trend_em(ind_mod), weight, 0.95)
 
     end do
 
@@ -632,7 +676,7 @@ begin
 
     ;resb@trYMinF = min(model_arr_box) - 0.05 * (max(model_arr_box) - min(model_arr_box))
     ;resb@trYMaxF = max(model_arr_box) + 0.05 * (max(model_arr_box) - min(model_arr_box))
-    resb@tiYAxisString = "Precipitation Trend (" + units + ")"
+    resb@tiYAxisString = "Precipitation Trend (" + units + "/yr)"
 
     box = boxplot(wks, (/0, 2/), model_arr_box, opti, resb, llres) 
 
@@ -694,37 +738,27 @@ begin
 
   log_info(" wrote " + outfile + "." + file_type)
 
-;  ; ***************************************
-;  ; add meta data to plot (for reporting)
-;  ; ***************************************
-;
-;  if (diag_script_info@region .eq. "Global") then
-;    domain = "global"
-;  else
-;    domain = "reg"
-;  end if
-;
-;  if (anom .eq. "anom") then
-;    statistics = "anomaly"
-;  else
-;    statistics = "mean"
-;  end if
-;
-;  caption = "Time series of the " + statistics + " for variable " \
-;    + varname + ", similar to IPCC AR5, fig. 9.8."
-;  contrib_authors = (/"cionni_irene", "righi_mattia", \
-;                      "wenzel_sabrina", "bock_lisa"/)
-;
-;  ; Call provenance logger
-;  log_provenance(ncdf_outfile, \
-;                 outfile + "." + file_type, \
-;                 caption, \
-;                 statistics, \
-;                 domain, \
-;                 "times", \
-;                 contrib_authors, \
-;                 (/"flato13ipcc", "jones13jgr"/), \
-;                 metadata_att_as_array(input_file_info, "filename"))
+  ; ***************************************
+  ; add meta data to plot (for reporting)
+  ; ***************************************
+
+  out_path1 = out_path + "precip_" + anom + "_0" + ".nc"
+
+  domain = "reg"
+  statistics = (/"anomaly", "trend"/)
+  caption = "Global and zonal average annual mean precipitation (mm day-1)" 
+  contrib_authors = (/"bock_lisa"/)
+
+  ; Call provenance logger
+  log_provenance(out_path1, \
+                 outfile + "." + file_type, \
+                 caption, \
+                 statistics, \
+                 domain, \
+                 "times", \
+                 contrib_authors, \
+                 (/""/), \
+                 metadata_att_as_array(input_file_info, "filename"))
 
   leave_msg(DIAG_SCRIPT, "")
 

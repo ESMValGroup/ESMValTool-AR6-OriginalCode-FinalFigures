@@ -290,7 +290,7 @@ begin
     plotpath = config_user_info@plot_dir + "SMPI"
 
     ; Write output
-    if (config_user_info@write_netcdf) then
+    if (diag_script_info@write_netcdf) then
       system("mkdir -p " + config_user_info@work_dir)
       ncdf_outfile = ncdf_write(data_smpi, workpath)
     end if
@@ -371,6 +371,7 @@ begin
           pid3 = sort_alphabetically(data_temp&models(id3), id3_mm, "begin")
           n3 = dimsizes(id3)
           breakpoints := array_append_record(breakpoints, n1+n2, 0)
+          ; breakpoints := array_append_record(breakpoints, n2, 0)
           if (dimsizes(dimsizes(data_all)).eq.3) then
             data_all(:, (n1+n2):(n1+n2+n3-1), :) = data_temp(:, id3(pid3), :)
           else
@@ -430,7 +431,7 @@ begin
     delete(diags)
 
     ; Write output
-    if (config_user_info@write_netcdf) then
+    if (diag_script_info@write_netcdf) then
       system("mkdir -p " + config_user_info@work_dir)
       ncdf_outfile = ncdf_write(data_all, workpath)
     end if

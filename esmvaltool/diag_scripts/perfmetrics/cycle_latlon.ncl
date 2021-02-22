@@ -92,6 +92,9 @@ begin
         var_all_mod(:,:,:,:,imod) = var_all
       end if
     end if 
+    ;if ((imod.ne.ref_ind) .and. (.not. (l_altern .and. imod.eq.alt_ind))) then
+    ;    var_all_mod(:,:,:,:,imod) = var_all
+    ;end if
 
     ; Store reference dataset
     if (imod.eq.ref_ind) then
@@ -106,7 +109,7 @@ begin
     end if
 
     ; Write output
-    if (config_user_info@write_netcdf) then
+    if (diag_script_info@write_netcdf) then
       var_all@ncdf = workpath
       ncdf = ncdf_write(var_all, workpath)
     end if
@@ -199,7 +202,7 @@ begin
         ensemble_assign(gg) = enum
         temp = datasetnames(gg)
       end if
-    end do   
+    end do
     ensemble_assign@model = datasetnames
     delete(temp)
 
@@ -268,6 +271,7 @@ begin
       tmp := new((/dims(0), dims(1), dims(2) +2, dims(3)/), float)
       copy_VarAtts(grading, tmp)
       tmp(imet, 0, :dims(2)-1, :) = grading(imet, 0, :, :)
+      ;tmp(imet, 0, :dims(2)-1, :) = grading
       tmp(imet, 0, dims(2), 0) = (/mean_ref/)
       tmp(imet, 0, dims(2)+1, 0) = (/median_ref/)
       if (l_altern) then
@@ -281,7 +285,11 @@ begin
       grading&models(dims(2)+1) = projects(iproj)+"_median" 
       grading@projects = grading@projects + " " + projects(iproj) + \
                          " " + projects(iproj)
+      ;grading&models(dims(2)+1) = projects(iproj)+"_median"
+      ;grading@projects = grading@projects + " " + projects(iproj) + \
+      ;                   " " + projects(iproj)
       delete(tmp)
+      ;delete(ind_proj)
     end do
 
   end if

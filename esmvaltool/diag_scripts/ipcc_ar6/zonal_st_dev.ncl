@@ -147,7 +147,7 @@ begin
   ; ------------------------------------------------------------------
   ;Calculate multi model mean and stddev
   ; ------------------------------------------------------------------
-  
+
   model_arr_stddev = new((/4, dimsizes(A_ref&lat)/), float)
   model_arr_stddev!1 = "lat"
   model_arr_stddev&lat = A_ref&lat
@@ -182,10 +182,10 @@ begin
 
   ; Select colors and other plotting attributes
   ; (see ./diag_scripts/shared/plot/style.ncl)
-  colors = project_style(info_items, diag_script_info, "colors")
-  dashes = project_style(info_items, diag_script_info, "dashes")
-  thicks = project_style(info_items, diag_script_info, "thicks")
-  annots = project_style(info_items, diag_script_info, "annots")
+  colors := project_style(info_items, diag_script_info, "colors")
+  dashes := project_style(info_items, diag_script_info, "dashes")
+  thicks := project_style(info_items, diag_script_info, "thicks")
+  annots := project_style(info_items, diag_script_info, "annots")
 
   ;colors = colors(::-1)
   ;dashes = dashes(::-1)
@@ -297,6 +297,38 @@ begin
     amres = True
     amres@amParallelPosF   = 0.65
     amres@amOrthogonalPosF = 0.0
+    annoid1 = gsn_add_annotation(plot, lbid, amres)
+
+  else
+
+    colors := project_style(info_items1, diag_script_info, "colors")
+    dashes := project_style(info_items1, diag_script_info, "dashes")
+    annots := project_style(info_items1, diag_script_info, "annots")
+    colors := array_append_record(colors, (/"red"/), 0)
+    dashes := array_append_record(dashes, (/0/), 0)
+    annots := array_append_record(annots, (/"MultiModelMean"/), 0)
+    
+    lgres                    = True
+    lgres@lgItemType         = "Lines"   ; show lines only (default)
+    lgres@lgLabelFontHeightF = .06       ; set the legend label font thickness
+    lgres@vpWidthF           = 0.2      ; width of legend (NDC)
+    lgres@vpHeightF          = 0.15      ; height of legend (NDC)
+    lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
+    lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
+    ;lgres@lgBoxBackground    = "white"
+    lgres@lgPerimFill        = 0
+    lgres@lgPerimFillColor   = "white"
+
+    lgres@lgLineColors      = colors
+    lgres@lgDashIndexes     = dashes
+    lgres@lgLineThicknessF = 3
+
+    ; Create legend
+    lbid = gsn_create_legend(wks, dimsizes(annots), annots, lgres)
+
+    amres = True
+    amres@amParallelPosF   = -0.25 ;-0.38  ;0.81
+    amres@amOrthogonalPosF = - 0.25 ;-0.3  ;0.0
     annoid1 = gsn_add_annotation(plot, lbid, amres)
 
   end if

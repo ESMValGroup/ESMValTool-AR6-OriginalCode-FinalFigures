@@ -76,12 +76,6 @@ begin
   ; Create work dir
   system("mkdir -p " + work_dir)
 
-  if (config_user_info@write_plots.eq."True") then
-    write_plots = True
-  else
-    write_plots = False
-  end if
-
 end
 
 begin
@@ -359,8 +353,8 @@ begin
       var_neg_signif / where((var_pos_signif + var_neg_signif) \
                              .ne. 0., var_pos_signif + \
                              var_neg_signif, diff1@_FillValue)
-    signif_and_sign = where(var_pos_signif_tmp .ge. 0.75 .or. \
-                            var_neg_signif_tmp .ge. 0.75, 1., 0.)
+    signif_and_sign = where(var_pos_signif_tmp .ge. 0.8 .or. \
+                            var_neg_signif_tmp .ge. 0.8, 1., 0.)
 ;    signif_and_sign = where(ismissing(signif_and_sign), 0.,\
 ;                            signif_and_sign)
     ; variablity threshold: sqrt(2)*1.645
@@ -698,135 +692,132 @@ begin
     pres@gsnPanelMainString = diag_script_info@panel_title
   end if
 
-  if (write_plots) then
-    ; --------------------------------------------------------------------
-    ; create workspace
+  ; --------------------------------------------------------------------
+  ; create workspace
 
-    if (isvar("wks")) then
-      delete(wks)
+  if (isvar("wks")) then
+    delete(wks)
+  end if
+
+  wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_diff_" + var0 \
+                + "_annualclim_" + input_file_info[0]@project )
+
+  plotfile = wks@fullname
+
+  ;plots(0) = contour_map(wks, mmdata, var0)
+  plots(0) = contour_map(wks, diff1, var0)
+  plots(1) = contour_map(wks, diff2, var0)
+  ;if (plot_abs_diff) then
+  ;  plots(2) = contour_map(wks, absdiff, var0)
+  ;end if
+  ;if (plot_rms_diff) then
+  ;  plots(3) = contour_map(wks, rmsdiff, var0)
+  ;end if
+  ;if (plot_rel_diff) then
+  ;  plots(4) = contour_map(wks, reldiff, var0)
+  ;end if
+
+  ; add significance
+  if (stippandhatch) then
+    ; resources dots
+    ress = True
+    ress@gsnDraw = False
+    ress@gsnFrame = False
+    ress@gsnAddCyclic = True
+    ress@cnLinesOn = False
+    ress@cnLineLabelsOn = False
+    ress@cnLevelSelectionMode = "ExplicitLevels"
+    ress@cnLevels = (/.3, 1.3/)
+    ress@cnInfoLabelOn = False
+    ress@tiMainOn = False
+    ress@cnFillOn = True
+    ress@cnFillMode = "AreaFill"
+    ress@cnMonoFillPattern = False
+    ress@cnFillPatterns = (/-1, 6, 6/)
+    ress@cnMonoFillColor = True
+    ress@lbLabelBarOn = False
+    ress@gsnLeftString = ""
+    ress@gsnRightString = ""
+    ress@cnFillDotSizeF       = 0.001
+    ress@cnFillScaleF        = 1.        ; add extra density
+
+    ; plot cross-hatching
+    if (max(to_plot_confl_sign_1(:, :)) .gt. \
+        min(to_plot_confl_sign_1(:, :))) then
+      plot1 = gsn_csm_contour(wks, to_plot_confl_sign_1(:, :), ress)
+      overlay(plots(0), plot1)
+    end if
+    if (max(to_plot_confl_sign_2(:, :)) .gt. \
+        min(to_plot_confl_sign_2(:, :))) then
+      plot2 = gsn_csm_contour(wks, to_plot_confl_sign_2(:, :), ress)
+      overlay(plots(1), plot2)
     end if
 
-    wks = get_wks("dummy_for_wks", DIAG_SCRIPT, "model_bias_diff_" + var0 \
-                  + "_annualclim_" + input_file_info[0]@project )
+    ; resources hatching
+    resb = True
+    resb@gsnDraw = False
+    resb@gsnFrame = False
+    resb@gsnAddCyclic = True
+    resb@cnLinesOn = False
+    resb@cnLineLabelsOn = False
+    resb@cnLevelSelectionMode = "ExplicitLevels"
+    resb@cnLevels = (/.3, 1.3/)
+    resb@cnInfoLabelOn = False
+    resb@tiMainOn = False
+    resb@cnFillOn = True
+    resb@cnFillMode = "AreaFill"
+    resb@cnRasterSmoothingOn = False
+    resb@cnMonoFillPattern = False
+    resb@cnFillPatterns = (/-1, 4, 4/)
+    resb@cnMonoFillColor = True
+    resb@lbLabelBarOn = False
+    resb@gsnLeftString = ""
+    resb@gsnRightString = ""
+    resb@cnFillScaleF = 0.5
 
-    plotfile = wks@fullname
-
-    ;plots(0) = contour_map(wks, mmdata, var0)
-    plots(0) = contour_map(wks, diff1, var0)
-    plots(1) = contour_map(wks, diff2, var0)
-    ;if (plot_abs_diff) then
-    ;  plots(2) = contour_map(wks, absdiff, var0)
-    ;end if
-    ;if (plot_rms_diff) then
-    ;  plots(3) = contour_map(wks, rmsdiff, var0)
-    ;end if
-    ;if (plot_rel_diff) then
-    ;  plots(4) = contour_map(wks, reldiff, var0)
-    ;end if
-
-    ; add significance
-    if (stippandhatch) then
-      ; resources dots
-      ress = True
-      ress@gsnDraw = False
-      ress@gsnFrame = False
-      ress@gsnAddCyclic = True
-      ress@cnLinesOn = False
-      ress@cnLineLabelsOn = False
-      ress@cnLevelSelectionMode = "ExplicitLevels"
-      ress@cnLevels = (/.3, 1.3/)
-      ress@cnInfoLabelOn = False
-      ress@tiMainOn = False
-      ress@cnFillOn = True
-      ress@cnFillMode = "AreaFill"
-      ress@cnMonoFillPattern = False
-      ress@cnFillPatterns = (/-1, 6, 6/)
-      ress@cnMonoFillColor = True
-      ress@lbLabelBarOn = False
-      ress@gsnLeftString = ""
-      ress@gsnRightString = ""
-      ress@cnFillDotSizeF       = 0.001
-      ress@cnFillScaleF        = 1.        ; add extra density
-
-      ; plot cross-hatching
-      if (max(to_plot_confl_sign_1(:, :)) .gt. \
-          min(to_plot_confl_sign_1(:, :))) then
-        plot1 = gsn_csm_contour(wks, to_plot_confl_sign_1(:, :), ress)
-        overlay(plots(0), plot1)
-      end if
-      if (max(to_plot_confl_sign_2(:, :)) .gt. \
-          min(to_plot_confl_sign_2(:, :))) then
-        plot2 = gsn_csm_contour(wks, to_plot_confl_sign_2(:, :), ress)
-        overlay(plots(1), plot2)
-      end if
-
-      ; resources hatching
-      resb = True
-      resb@gsnDraw = False
-      resb@gsnFrame = False
-      resb@gsnAddCyclic = True
-      resb@cnLinesOn = False
-      resb@cnLineLabelsOn = False
-      resb@cnLevelSelectionMode = "ExplicitLevels"
-      resb@cnLevels = (/.3, 1.3/)
-      resb@cnInfoLabelOn = False
-      resb@tiMainOn = False
-      resb@cnFillOn = True
-      resb@cnFillMode = "AreaFill"
-      resb@cnRasterSmoothingOn = False
-      resb@cnMonoFillPattern = False
-      resb@cnFillPatterns = (/-1, 4, 4/)
-      resb@cnMonoFillColor = True
-      resb@lbLabelBarOn = False
-      resb@gsnLeftString = ""
-      resb@gsnRightString = ""
-      resb@cnFillScaleF = 0.5
-
-      ; plot hatching
-      if (max(to_plot_not_robust_1(:, :)) .gt. \
-          min(to_plot_not_robust_1(:, :))) then
-        plot3 = gsn_csm_contour(wks, to_plot_not_robust_1(:, :), resb)
-        overlay(plots(0), plot3)
-      end if
-      if (max(to_plot_not_robust_2(:, :)) .gt. \
-          min(to_plot_not_robust_2(:, :))) then
-        plot4 = gsn_csm_contour(wks, to_plot_not_robust_2(:, :), resb)
-        overlay(plots(1), plot4)
-      end if
-
-      ; mark improvements in panel 0
-      ;resb@cnFillPatterns = (/-1, 3, 3/)
-      resb@cnFillPatterns = (/-1, 17, 17/)
-      ; plot diamonds
-      if all(to_plot_improve(:, :) .eq. 1) then
-        to_plot_improve(0, 0) = 0
-      end if
-      if (max(to_plot_improve(:, :)) .gt. \
-          min(to_plot_improve(:, :))) then
-        plot5 = gsn_csm_contour(wks, to_plot_improve(:, :), resb)
-        overlay(plots(0), plot5)
-      end if
-
-
+    ; plot hatching
+    if (max(to_plot_not_robust_1(:, :)) .gt. \
+        min(to_plot_not_robust_1(:, :))) then
+      plot3 = gsn_csm_contour(wks, to_plot_not_robust_1(:, :), resb)
+      overlay(plots(0), plot3)
+    end if
+    if (max(to_plot_not_robust_2(:, :)) .gt. \
+        min(to_plot_not_robust_2(:, :))) then
+      plot4 = gsn_csm_contour(wks, to_plot_not_robust_2(:, :), resb)
+      overlay(plots(1), plot4)
     end if
 
-    gsn_panel(wks, plots(plotind), plotsperline, pres)
+    ; mark improvements in panel 0
+    ;resb@cnFillPatterns = (/-1, 3, 3/)
+    resb@cnFillPatterns = (/-1, 17, 17/)
+    ; plot diamonds
+    if all(to_plot_improve(:, :) .eq. 1) then
+      to_plot_improve(0, 0) = 0
+    end if
+    if (max(to_plot_improve(:, :)) .gt. \
+        min(to_plot_improve(:, :))) then
+      plot5 = gsn_csm_contour(wks, to_plot_improve(:, :), resb)
+      overlay(plots(0), plot5)
+    end if
 
-    ; add meta data to plot (for reporting)
 
-    caption = "Multi model values, from top left to bottom right: " \
-              + "mean, bias"
-    ;if (plot_abs_diff) then
-    ;  caption = caption + ", absolute error"
-    ;end if
-    ;if (plot_rms_diff) then
-    ;  caption = caption + ", root mean square error"
-    ;end if
-    ;if (plot_rel_diff) then
-    ;  caption = caption + ", relative error"
-    ;end if
+  end if
 
-  end if  ; if write_plots
+  gsn_panel(wks, plots(plotind), plotsperline, pres)
+
+  ; add meta data to plot (for reporting)
+
+  caption = "Multi model values, from top left to bottom right: " \
+            + "mean, bias"
+  ;if (plot_abs_diff) then
+  ;  caption = caption + ", absolute error"
+  ;end if
+  ;if (plot_rms_diff) then
+  ;  caption = caption + ", root mean square error"
+  ;end if
+  ;if (plot_rel_diff) then
+  ;  caption = caption + ", relative error"
+  ;end if
 
   ; ###########################################
   ; # output to netCDF                        #
@@ -960,13 +951,13 @@ begin
   statistics = (/"clim", "diff"/)
   domain = ("global")
   plottype = ("geo")
-  references = (/"flato13ipcc"/)
+  references = (/""/)
   prov_caption = caption + " for variable " + var0 \
     + ", reference = " + names(ref_ind) + "."
   infiles = metadata_att_as_array(info0, "filename")
 
-  ;log_provenance(nc_filename, plotfile, prov_caption, statistics, \
-  ;               domain, plottype, authors, references, infiles)
+  log_provenance(nc_filename, plotfile, prov_caption, statistics, \
+                 domain, plottype, authors, references, infiles)
 
   leave_msg(DIAG_SCRIPT, "")
 

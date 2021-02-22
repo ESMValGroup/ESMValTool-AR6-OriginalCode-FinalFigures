@@ -1811,8 +1811,11 @@ begin
   labels = get_unique_values(annots)
   ind_end = ind(labels .eq. source@ref .or. \
                 labels .eq. "MultiModelMean")
+  labels_old = labels
   labels := labels(sort_alphabetically(labels, ind_end, "end"))
   label_ind = get1Dindex(annots, labels)
+  labels_lb := labels_old(sort_alphabetically(labels_old, ind_end, "begin"))
+  label_ind_lb = get1Dindex(annots, labels_lb)
 
 ;  colors := array_append_record(colors, "(/1,0,0/)", 0)
 ;  dashes := array_append_record(dashes, 0, 0)
@@ -1892,6 +1895,7 @@ begin
   ;res@tiXAxisString = "Year"
   res@tiXAxisString = ""
   res@gsnStringFontHeightF = 0.016
+  ;res@tiMainFontHeightF = .025    ; font height
 
   res@xyDashPatterns    = dashes(label_ind)
   res@xyLineThicknesses = thicks(label_ind)  ; make 2nd lines thicker
@@ -1917,7 +1921,7 @@ begin
   txtres@txFontColor   = "Grey40"
   txtres@txFontHeightF = 0.013
   ref_txt = gsn_add_text(wks, plot, "reference period", \
-                         0.5*(ref_start + ref_end), res@trYMinF + 0.1, txtres)
+                         0.5*(ref_start + ref_end), res@trYMaxF - 0.15, txtres)
 
   ; ---------------------------------------------------------------------
   ; add lines and names for volcanic eruptions
@@ -1935,7 +1939,7 @@ begin
 
     yy = (/res@trYMinF, res@trYMaxF/)
 
-    vol_name1 = gsn_add_text(wks, plot, "Krakatoa", 1885, res@trYMaxF - 0.4, txres)
+    vol_name1 = gsn_add_text(wks, plot, "Krakatoa", 1885, res@trYMaxF - 0.6, txres)
     xx = (/1883.0, 1883.0/)
     vol1 = gsn_add_polyline(wks, plot(0), xx, yy, vres)
     vol_name2 = gsn_add_text(wks, plot, "Santa Maria", 1904, res@trYMaxF - 0.4, txres)
@@ -2003,20 +2007,20 @@ begin
 
   lgres                    = True
   lgres@lgItemType         = "Lines"   ; show lines only (default)
-  lgres@lgLabelFontHeightF = .1       ; set the legend label font thickness
+  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
   lgres@vpWidthF           = 0.3      ; width of legend (NDC)
   lgres@vpHeightF          = 1.       ; height of legend (NDC)
   lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
   lgres@lgPerimThicknessF  = 1.0       ; thicken the box perimeter
 
-  lgres@lgLineColors      = colors(label_ind)
-  lgres@lgDashIndexes     = dashes(label_ind)
+  lgres@lgLineColors      = colors(label_ind_lb)
+  lgres@lgDashIndexes     = dashes(label_ind_lb)
   lgres@lgLineThicknessF = 3
   nitems = dimsizes(labels)
   lgres@lgItemOrder = ispan(nitems - 1, 0, 1)
 
   ; Create legend
-  lbid = gsn_create_legend(wks, nitems, labels, lgres)
+  lbid = gsn_create_legend(wks, nitems, labels_lb, lgres)
 
   amres = True
   amres@amParallelPosF   = 0.9
