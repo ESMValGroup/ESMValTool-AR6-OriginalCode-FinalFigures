@@ -22,8 +22,8 @@ preprocessors:
       target_grid: reference_dataset
       scheme: linear
     extract_region:
-      start_latitude: -20
-      end_latitude: 20
+      start_latitude: -50
+      end_latitude: 50
       start_longitude: 0
       end_longitude: 360
 
