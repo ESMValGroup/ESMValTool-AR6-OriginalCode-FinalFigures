@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210221 kosaka_yu: added file output and provenance.
 ;    20210129 kosaka_yu: removed DJF.
 ;    20201029 kosaka_yu: removed MME mean.
 ;    20200916 kosaka_yu: revised.
@@ -84,12 +85,15 @@ begin
   
   ; Define array
   sam = new((/nintegrations, eyear_data-syear_data+1/), "float")
+  sam!0 = "ensemble"
+  sam&ensemble = ispan(1, nintegrations, 1)
   sam!1 = "time"
   sam&time = ispan(syear_data, eyear_data, 1)
   north = sam
   south = sam
   cmip_phase = new((/nintegrations/), "string")
   model_name = new((/nintegrations/), "string")
+  ensemble_name = new((/nintegrations/), "string")
   
   do ii = 0, ListCount(info) - 1
     ; Read data
@@ -116,6 +120,7 @@ begin
     delete(slp)
     cmip_phase(int) = info[ii]@project
     model_name(int) = info[ii]@dataset
+    ensemble_name(int) = info[ii]@ensemble
   end do
   
   north = (north - conform(north, dim_avg_n(north(:, {syear_ref:eyear_ref}), 1), 0)) \
@@ -132,29 +137,52 @@ begin
     sam = sam - conform(sam, dim_avg_n(sam(:, {syear_ref:eyear_ref}), 1), 0)
     sam = sam / conform(sam, dim_stddev_n(sam(:, {syear_ref:eyear_ref}), 1), 0)
   end if
-
+  
 ; ======================== READ RECONSTRUCTIONS ========================
 
   script = get_script_name()
   dirs = str_split(script, "/")
   dirs = dirs+"/"
-  dir = "/"+str_concat(dirs(0:dimsizes(dirs)-2))
+  diag_script_dir = "/"+str_concat(dirs(0:dimsizes(dirs)-2))
   delete(dirs)
   delete(script)
-  file_abram = dir+"abram2014sam/abram2014sam.txt"
-  file_datwyler_ann = dir+"datwyler2017/Reconstructions_Annual_LC.txt"
-  delete(dir)
+  dir_abram = "abram2014sam/"
+  dir_datwyler = "datwyler2017/"
+  file_abram = "abram2014sam.txt"
+  file_datwyler_ann = "Reconstructions_Annual_LC.txt"
 
+  address_abram = "ftp://ftp.ncdc.noaa.gov/pub/data/paleo/contributions_by_author/abram2014/abram2014sam.txt"
+  address_datwyler_ann = "https://www1.ncdc.noaa.gov/pub/data/paleo/reconstructions/datwyler2017/Reconstructions_Annual_LC.txt"
+  
   do n = 0, 1
     if (n.eq.0) then
-      path = file_abram
+      path = diag_script_dir+dir_abram+file_abram
+      download_path = address_abram
+      save_dir = dir_abram
+      save_file = file_abram
       ncol = 1
       delimiter = str_get_tab()
     elseif (n.eq.1) then
-      path = file_datwyler_ann
+      path = diag_script_dir+dir_datwyler+file_datwyler_ann
+      download_path = address_datwyler_ann
+      save_dir = dir_datwyler
+      save_file = file_datwyler_ann
       ncol = 2
       delimiter = ";"
     end if
+    if (.not.fileexists(path)) then
+      path = config_user_info@work_dir+save_dir+save_file
+      if (.not.fileexists(path)) then
+        system("mkdir -p "+config_user_info@work_dir+save_dir)
+        system("wget -P "+config_user_info@work_dir+save_dir+" "+download_path)
+      end if
+    end if
+    if (isvar("file_reconstruction")) then
+      file_reconstruction := array_append_record(file_reconstruction, path, 0)
+    else
+      file_reconstruction = path
+    end if
+    
     lines = asciiread(path, -1, "string")
     nlines = dimsizes(lines)
     do ii = 0, nlines-1
@@ -204,14 +232,14 @@ begin
     syr = toint(data(0, 0))
     eyr = toint(data(dims(0)-1, 0))
     delete(dims)
-    if (path.eq.file_abram) then
+    if (isStrSubset(path, file_abram)) then
       sam_abram = sam(0, :)
       sam_abram = sam_abram@_FillValue
       sam_abram({syr:eyr}) = (/data(:, 1)/)
       sam_abram = sam_abram - avg(sam_abram({syear_ref:eyear_ref}))
       sam_abram@source = "Abram et al. (2014)"
       sam_abram@color = (/68., 113., 212./)/255. ;(/36., 147., 126./)/255.
-    elseif (path.eq.file_datwyler_ann) then
+    elseif (isStrSubset(path, file_datwyler_ann)) then
       sam_datwyler_ann = sam(0, :)
       sam_datwyler_ann = sam_datwyler_ann@_FillValue
       sam_datwyler_ann({syr:eyr}) = (/data(:, 1)/)
@@ -224,7 +252,10 @@ begin
   end do
 
 ; ============================== FILTERING =============================
-      
+
+  sam@project = str_join(cmip_phase, ",")
+  sam@dataset = str_join(model_name + "/" + ensemble_name, ",")
+  
   ; Running mean
   wgt = new(runmean, "float")
   wgt = 1.
@@ -407,21 +438,77 @@ begin
   draw(plot0)
   frame(wks)
   
-;  ; ------------------------------------------------------------------------
-;  ; write provenance to netcdf output and plot file
-;  ; ------------------------------------------------------------------------
+; =============================== Write Output ===============================
+  outpath = config_user_info@work_dir + "sam_millennium.nc"
+  if (config_user_info@write_netcdf) then
+    system("mkdir -p " + config_user_info@work_dir)
+    delete(sam_runmean@wgt_runave_op_ncl)
+    delete(sam_lowpass@wgt_runave_op_ncl)
+    delete(sam_abram_runmean@wgt_runave_op_ncl)
+    delete(sam_abram_lowpass@wgt_runave_op_ncl)
+    delete(sam_datwyler_ann_runmean@wgt_runave_op_ncl)
+    delete(sam_datwyler_ann_lowpass@wgt_runave_op_ncl)
+    delete(sam_abram_runmean@ensemble)
+    delete(sam_abram_lowpass@ensemble)
+    delete(sam_datwyler_ann_runmean@ensemble)
+    delete(sam_datwyler_ann_lowpass@ensemble)
+    delete(sam_abram_runmean@color)
+    delete(sam_abram_lowpass@color)
+    delete(sam_datwyler_ann_runmean@color)
+    delete(sam_datwyler_ann_lowpass@color)
+    delete(sam_abram_runmean@source)
+    delete(sam_abram_lowpass@source)
+    delete(sam_datwyler_ann_runmean@source)
+    delete(sam_datwyler_ann_lowpass@source)
+    sam_abram_runmean@reference = "Abram et al. (2014)"
+    sam_abram_lowpass@reference = "Abram et al. (2014)"
+    sam_datwyler_ann_runmean@reference = "Datwyler et al. (2018)"
+    sam_datwyler_ann_lowpass@reference = "Datwyler et al. (2018)"
+    sam_runmean@filter = runmean+"-year running mean"
+    sam_abram_runmean@filter = runmean+"-year running mean"
+    sam_datwyler_ann_runmean@filter = runmean+"-year running mean"
+    sam_lowpass@filter = cutoff_period + "-year low-pass filtered"
+    sam_abram_lowpass@filter = cutoff_period + "-year low-pass filtered"
+    sam_datwyler_ann_lowpass@filter = cutoff_period + "-year low-pass filtered"
+    
+    sam_runmean@var = "sam_cmip_runmean"
+    sam_runmean@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(sam_runmean, outpath)
+    outpath@existing = "append" 
+    sam_lowpass@var = "sam_cmip_lowpass"
+    sam_lowpass@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(sam_lowpass, outpath)
+    sam_abram_runmean@var = "sam_abram_runmean"
+    sam_abram_runmean@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(sam_abram_runmean, outpath)
+    sam_abram_lowpass@var = "sam_abram_lowpass"
+    sam_abram_lowpass@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(sam_abram_lowpass, outpath)
+    sam_datwyler_ann_runmean@var = "sam_datwyler_runmean"
+    sam_datwyler_ann_runmean@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(sam_datwyler_ann_runmean, outpath)
+    sam_datwyler_ann_lowpass@var = "sam_datwyler_lowpass"
+    sam_datwyler_ann_lowpass@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(sam_datwyler_ann_lowpass, outpath)
+  end if
+  
+
+; ------------------------------------------------------------------------
+; write provenance to netcdf output and plot file
+; ------------------------------------------------------------------------
 ;
-;  plotfile = wks@fullname
-;  authors = (/"kosaka_yu"/)
-;  statistics = (/"clim"/)
-;  domain = ("global")
-;  plottype = ("geo")
-;  references = (/"flato13ipcc"/)
-;  caption = "caption"
-;  infiles = metadata_att_as_array(info, "filename")
-;
-;  log_provenance(nc_filename, plotfile, caption, statistics, \
-;                 domain, plottype, authors, references, infiles)
+  plotfile = wks@fullname
+  authors = "kosaka_yu"
+  statistics = "var"
+  domain = (/"shmidlat"/)
+  plottype = "times"
+  references = (/"abram14natcc", "datwyler18climdyn"/)
+  caption = "Filtered time series of annual SAM indices from reconstructions and model simulations."
+  infiles = metadata_att_as_array(info, "filename")
+  infiles := array_append_record(infiles, file_reconstruction, 0)
+  
+  log_provenance(outpath, plotfile, caption, statistics, \
+                 domain, plottype, authors, references, infiles)
 
   leave_msg(DIAG_SCRIPT, "")
 
