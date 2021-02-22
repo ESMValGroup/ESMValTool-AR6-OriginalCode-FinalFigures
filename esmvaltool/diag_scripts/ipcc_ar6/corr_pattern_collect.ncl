@@ -71,17 +71,17 @@ begin
 
     data_temp = ncdf_read(file_list(ii), "cor")
     var_name(ii) = data_temp@corvar_long
-    if (var_name(ii) .eq. "Near-Surface Air Temperature") then
-      var_name(ii) = "   Near-Surface ~C~ Air Temperature"
-    elseif (var_name(ii) .eq. "Precipitation") then
-      var_name(ii) = "Precipitation"
-    elseif (var_name(ii) .eq. "Sea Level Pressure") then
-      var_name(ii) = "Sea Level ~C~ Pressure"
-    elseif (var_name(ii) .eq. "TOA Shortwave Cloud Radiative Effect") then
-      var_name(ii) = "TOA Shortwave Cloud ~C~      Radiative Effect"
-    elseif (var_name(ii) .eq. "TOA Outgoing Longwave Radiation") then
-      var_name(ii) = "     TOA Outgoing ~C~ Longwave Radiation"
-    end if
+    ;if (var_name(ii) .eq. "Near-Surface Air Temperature") then
+    ;  var_name(ii) = "   Near-Surface ~C~ Air Temperature"
+    ;elseif (var_name(ii) .eq. "Precipitation") then
+    ;  var_name(ii) = "Precipitation"
+    ;elseif (var_name(ii) .eq. "Sea Level Pressure") then
+    ;  var_name(ii) = "Sea Level ~C~ Pressure"
+    ;elseif (var_name(ii) .eq. "TOA Shortwave Cloud Radiative Effect") then
+    ;  var_name(ii) = "TOA Shortwave Cloud ~C~      Radiative Effect"
+    ;elseif (var_name(ii) .eq. "TOA Outgoing Longwave Radiation") then
+    ;  var_name(ii) = "     TOA Outgoing ~C~ Longwave Radiation"
+    ;end if
     var_collect(ii) = data_temp@corvar
     var_diag(ii) = data_temp@diagnostics
     alt_obs(ii) = data_temp@alt_obs
@@ -89,6 +89,7 @@ begin
     ; Make 2D array to store all data
     if (.not.isdefined("data_all")) then
       data_all = new((/dimsizes(data_temp), dimsizes(file_list)/), float)
+      ;data_all@_FillValue = 1.e20
       data_all(:, ii) = data_temp
       data_all!0 = "models"
       data_all&models = data_temp&models
@@ -267,6 +268,7 @@ begin
 
   do iproj = 0, nr_projects - 1
     mod_proj_ind = ind(data_all&models@project(mod_ind).eq.projects(iproj))
+    ;data_all@_FillValue = 1.e20
     means(iproj, :) = dim_avg_n(data_all(mod_proj_ind, :), 0)
     if (diag_script_info@plot_median) then
       median(iproj, :) = dim_median_n(data_all(mod_proj_ind, :), 0)
@@ -299,6 +301,7 @@ begin
   res@gsnDraw          = False
   res@gsnFrame         = False
   res@tiMainString = "Pattern Correlation With Observational Reference"
+  res@tiMainFontHeightF = 0.01
   res@vpWidthF = 0.8
   n_square = 16.
   if x_max.le. n_square then
@@ -309,12 +312,12 @@ begin
   font_height = 0.02/0.6 * res@vpHeightF
   res@gsnMaximize      = True
   res@tiYAxisString = "Correlation"
-  res@trYMinF = y_min
+  res@trYMinF = max((/y_min, 0./))
   res@trYMaxF = 1
   yspan = res@trYMaxF - res@trYMinF
   res@trXMinF = 0
   res@trXMaxF = x_max
-  res@tmXBLabels = data_all&vars
+  res@tmXBLabels = diag_script_info@labels ;data_all&vars
   res@tmXBValues = x_val
   res@tmXBMode = "Explicit"
   res@tmXBLabelFontHeightF = font_height
@@ -341,7 +344,7 @@ begin
   res_circ@gsMarkerIndex = 16
   ;res_circ@gsMarkerColor = (/178,178,178,255/) / 255.
   res_circ@gsMarkerColor = (/120,120,120,255/) / 255.
-  res_circ@gsMarkerSizeF = 2 * marker_size
+  res_circ@gsMarkerSizeF = 4 * marker_size
   res_circ@gsMarkerOpacityF = 0.4
 
   ; Resources for white markers below median
@@ -463,7 +466,7 @@ begin
                                                  lb_stride*(iproj+1.2), res_text)
   end do
   res_text@txFontColor = res_circ@gsMarkerColor
-  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "alternative Observations", \
+  plot@$unique_string("dum_l")$ = gsn_add_text(wks, plot, "additional Observations", \
                                                x_val(0)-0.5, y_min_label, \
                                                res_text)
 
