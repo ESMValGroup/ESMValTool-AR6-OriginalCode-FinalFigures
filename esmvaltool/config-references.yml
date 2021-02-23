@@ -242,10 +242,6 @@ authors:
     name: Kalverla, Peter
     institute: NLeSC, Netherlands
     orcid: https://orcid.org/0000-0002-5025-7862
-  karmouche_soufiane:
-    name: Karmouche, Soufiane
-    institute: University of Bremen, Germany
-    orcid:
   kindermann_stephan:
     name: Kindermann, Stephan
     institute: DKRZ, Germany
@@ -254,10 +250,6 @@ authors:
     name: Koirala, Sujan
     institute: MPI-BGC, Germany
     orcid: https://orcid.org/0000-0001-5681-1986
-  kosaka_yu:
-    name: Kosaka, Yu
-    institute: RCAST, University of Tokyo, Japan
-    orcid: https://orcid.org/0000-0001-5575-4668
   krasting_john:
     name: Krasting, John
     institute: NOAA, USA
@@ -280,6 +272,10 @@ authors:
     orcid:
   lledo_llorenc:
     name: Lledo, Llorenc
+    institute: BSC, Spain
+    orcid:
+  loosveldt-tomas_saskia:
+    name: Loosveldt-Tomas, Saskia
     institute: BSC, Spain
     orcid:
   lorenz_ruth:
@@ -326,6 +322,10 @@ authors:
     name: Mello, Felipe
     institute: INPE, Brazil
     orcid: https://orcid.org/0000-0002-8832-2869
+  moreno-chamarro_eduardo:
+    name: Moreno-Chamarro, Eduardo
+    institute: BSC, Spain
+    orcid:
   dalvi_mohit:
     name: Dalvi, Mohit
     institute: MetOffice, UK
@@ -391,10 +391,18 @@ authors:
     name: Russell, Joellen
     institute: Univ. of Arizona, USA
     orcid:
+  schurer_andrew:
+    name: Schurer, Andrew
+    institute: Univ of Edinburgh
+    orcid: https://orcid.org/0000-0002-9176-3622  
   senftleben_daniel:
     name: Senftleben, Daniel
     institute: DLR, Germany
     orcid: https://orcid.org/0000-0002-3903-3841
+  sanchez-gomez_emilia:
+    name: Sanchez, Emilia
+    institute: CERFACS, France
+    orcid:
   serva_federico:
     name: Serva, Federico
     institute: CNR, Italy
@@ -638,16 +646,13 @@ authors:
     name: Tilmes, Simone
     institute: NCAR, US
     orcid:
-  gillett_nathan:
-    name: Gillett, Nathan
-    institute: CCCma, ECCC, Canada.
-    orcid: https://orcid.org/0000-0002-2957-0002
 
 # Note: the reference section has been replaced by the folder esmvaltool/references that contains bibtex files.
 # How to add a bibtex file to esmvaltool/references:
 #  - make a bibtex file for a reference entry. There are some online tools to convert a doi to bibtex format like https://doi2bib.org/
 #  - rename the file to the tag used in the recipe or diagnostic.
 #  - add the file to the folder esmvaltool/references.
+
 
 projects:
   4c: EU H2020 project 4C
@@ -663,7 +668,7 @@ projects:
   esmval: DLR project ESMVal
   eval4cmip: DLR and University of Bremen project funded by the Initiative and Networking Fund of the Helmholtz Society
   ewatercycle: eWaterCycle project
-  ipcc_ar6: IPCC AR6 contributions
+  ipcc_ar6: IPCC AR6 WG1 contributions
   primavera: EU H2020 project PRIMAVERA
   qa4ecv: QA4ECV
   russell_project: US Clivar, Ocean Carbon Biogeochemistry, ESGF, NOAA, NSF, NASA, US Antarctic program

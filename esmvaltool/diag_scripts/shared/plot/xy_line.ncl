@@ -1892,7 +1892,6 @@ begin
   res@trYMinF  = min(source) - 0.05 * (max(source) - min(source))
   res@trYMaxF  = max(source) + 0.05 * (max(source) - min(source))
   res@tiYAxisOn = True
-  ;res@tiXAxisString = "Year"
   res@tiXAxisString = ""
   res@gsnStringFontHeightF = 0.016
   ;res@tiMainFontHeightF = .025    ; font height
@@ -1904,7 +1903,6 @@ begin
   copy_VarMeta(res_in, res)  ; copy passed resources
 
   plot(0) = gsn_csm_xy(wks, source_x, source(label_ind, :), res)  ; create plot
-
 
   ; ---------------------------------------------------------------------
   ; grey shading of reference period
@@ -1969,7 +1967,6 @@ begin
   yy = (/0.0, 0.0/)
   dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
 
-
   ; ---------------------------------------------------------------------
   ; Add right panel with mean values in anomaly plot
   ; ---------------------------------------------------------------------
@@ -1989,15 +1986,17 @@ begin
       "trYMaxF"   : ymax
     end getvalues
 
-    xbox1 = (/xmin,xmax,xmax,xmin,xmin/)
-    ybox1 = (/ymin,ymin,ymax,ymax,ymin/)
+    xbox1 = (/xmin, xmax, xmax, xmin, xmin/)
+    ybox1 = (/ymin, ymin, ymax, ymax, ymin/)
 
     gnres = True
     gnres@gsFillColor     = "Gray70"
     gnres@gsFillOpacityF = 0.1
     gnres@tfPolyDrawOrder = "PreDraw"
-    plot@$unique_string("box")$ = gsn_add_polygon(wks,plot2,xbox1,ybox1,gnres)
- 
+
+    plot@$unique_string("box")$ = gsn_add_polygon(wks, plot2, xbox1, \
+                                                  ybox1, gnres)
+
     newplot = gsn_attach_plots(plot(0), plot2, res, res0)
   end if
 
@@ -2335,6 +2334,266 @@ begin
   amres@amOrthogonalPosF = -0.3  ;0.0
   annoid1 = gsn_add_annotation(plot(0), lbid, amres)
 
+
+  resP = True
+  resP@gsnMaximize = True
+
+  gsn_panel(wks, plot, (/1, 1/), resP)
+
+  leave_msg(scriptname, funcname)
+
+end
+
+; #############################################################################
+undef("xy_line_collect")
+procedure xy_line_collect(wks[1],
+                          source_mean,
+                          source,
+                          source_stderr,
+                          source_x,
+                          source_stat,
+                          ref_start,
+                          ref_end,
+                          res_in: logical,
+                          res0_in: logical,
+                          items: list)
+;
+; Arguments:
+;    wks:  workstation, must be passed - no default used yet!
+;    source_mean:   source_mean
+;    source:        data to be plotted (no netCDF input possible yet)
+;    source_stderr: standard error of reference
+;    source_x:      x-axis of array to be plotted (e.g. source&time, ... )
+;    source_stat:   statistics of multi_model_mean, e.g. 5 and 95% quantile
+;                   or stddev
+;    ref_start:     start year of the reference dataset
+;    ref_end:       end year of the reference dataset
+;    res_in:        diag_script-specific resources passed from diag_script
+;    res0_in:       res0_in
+;    items:         list of input_file_info metadata
+;
+; Source prototype
+;
+; Description
+;    Defines default ressources, which are overridden by argument res.
+;    Creates an xy-plot, according to wks & res.
+;    Adds multi model mean and standard deviation if
+;    diag_script_info@multi_model_mean is set to "y".
+;
+; Caveats
+;
+; Modification history
+;    20160822_A_bock_li: written
+;
+
+local funcname, scriptname, verbosity, res, res_in, res_stat, source, \
+    source_x, source_stat, wks, wks_in, colors, colors_mm, dashes, \
+    dashes_mm, thicks, thicks_mm, annots, annots_mm, avgstd, avgstd_mm, temp, \
+    plot, shading_plot, mm, lgres, nitems, lbid, amres, annoid, labels, \
+    psres, vpx, vph, vpy, vpw, bpres, tmborder
+
+begin
+
+  funcname = "xy_line_collect"
+  scriptname = "plot_scripts/ncl/xy_line.ncl"
+  enter_msg(scriptname, funcname)
+
+  ; Select colors and other plotting attributes
+  ; (see ./diag_scripts/lib/ncl/style.ncl)
+  colors = project_style(items, diag_script_info, "colors")
+  dashes = project_style(items, diag_script_info, "dashes")
+  thicks = project_style(items, diag_script_info, "thicks")
+  annots = project_style(items, diag_script_info, "annots")
+  avgstd = project_style(items, diag_script_info, "avgstd")
+
+  ; ************************************************
+  ; plotting parameters
+  ; ************************************************
+
+  plot = new(1, graphic)
+
+  res           = True
+  res@gsnDraw   = False
+  res@gsnFrame  = False
+
+  res@vpXF      = 0.05
+  res@vpYF      = 0.7
+  res@vpHeightF = 0.4
+  res@vpWidthF  = 0.7
+  res@pmLegendDisplayMode = "Never"
+  res@tmYRLabelFontHeightF = 0.016
+  res@tmYLLabelFontHeightF = 0.016
+  res@tiXAxisFontHeightF = 0.016
+  res@tiYAxisFontHeightF = 0.016
+  res@tmXBMajorOutwardLengthF = 0.006
+  res@tmYLMajorOutwardLengthF = 0.006
+  res@tmXBMinorOutwardLengthF = 0.003
+  res@tmYLMinorOutwardLengthF = 0.003
+  res@tmXBMajorLengthF = 0.006
+  res@tmYLMajorLengthF = 0.006
+  res@tmXBMinorLengthF = 0.003
+  res@tmYLMinorLengthF = 0.003
+
+  if (isatt(diag_script_info, "ref")) then
+    min_tmp = (/min(source_mean), min(source), min(source_stderr), \
+               min(source_stat)/)
+    max_tmp = (/max(source_mean), max(source), max(source_stderr), \
+               max(source_stat)/)
+  else
+    min_tmp = (/min(source_mean), min(source_stat)/)
+    max_tmp = (/max(source_mean), max(source_stat)/)
+  end if
+  res@trYMinF  = min(min_tmp) - 0.05 * (max(max_tmp) - min(min_tmp))
+  res@trYMaxF  = max(max_tmp) + 0.05 * (max(max_tmp) - min(min_tmp))
+  res@tiYAxisOn = True
+  res@tiXAxisString = ""
+  res@gsnStringFontHeightF = 0.016
+
+  copy_VarMeta(res_in, res)  ; copy passed resources
+
+  ; ---------------------------------------------------------------------
+  ; add multi model mean of different experiments
+  ; ---------------------------------------------------------------------
+  ; number of different experiments
+  tmp = dimsizes(source_mean)
+  nexp     = tmp(0)
+  delete(tmp)
+
+  cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/cmip_line.rgb")
+  res@xyDashPatterns    = (/0, 0, 0, 0, 0, 0/)
+  res@xyLineThicknesses = (/5, 5, 5, 5, 5, 5/)
+  res@xyLineColors = cmap(:, :)
+
+  if (nexp .gt. 6) then
+    error_msg("w", scriptname, funcname, "Color palette not defined for " \
+              + "more than " + nexp + " experiments")
+  end if
+
+  res@pmLegendDisplayMode = "Always"
+  res@xyExplicitLegendLabels = source_mean&experiment
+  res@lgBoxMinorExtentF      = 0.2       ; Shorten the legend lines
+
+  plot(0) = gsn_csm_xy(wks, source_x, source_mean, res)  ; create plot
+
+  res@pmLegendDisplayMode = "Never"
+
+  ; ---------------------------------------------------------------------
+  ; Add multi model statistics (5% and 95% quantile)
+  ; ---------------------------------------------------------------------
+  if (isatt(diag_script_info, "stat_shading")) then
+    if (diag_script_info@stat_shading .ne. False) then
+      res_stat = True
+      res_stat@gsnXYFillOpacities = 0.2
+      cmap = read_colormap_file("$diag_scripts/shared/plot/rgb/" + \
+                                "cmip_shading.rgb")
+      copy_VarMeta(res, res_stat)
+      res_stat@gsnXYFillColors = cmap(0, :)
+      delete(res_stat@xyLineColors)
+      res_stat@xyLineColor = cmap(0, :)
+      delete(res_stat@xyLineThicknesses)
+      res_stat@xyLineThicknesses = (/1, 1/)
+      shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 0, :), \
+                                res_stat)
+      overlay(plot(0), shading_plot)
+      if(nexp .ge. 2) then
+        res_stat@gsnXYFillColors = cmap(1, :)
+        res_stat@xyLineColor = cmap(1, :)
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 1, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .ge. 3) then
+        res_stat@gsnXYFillColors = cmap(2, :)
+        res_stat@xyLineColor = cmap(2, :)
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 2, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .ge. 4) then
+        res_stat@gsnXYFillColors = cmap(3, :)
+        res_stat@xyLineColor = cmap(3, :)
+        shading_plot = gsn_csm_xy(wks, source_x, source_stat(0:1, 3, :), \
+                                  res_stat)
+        overlay(plot(0), shading_plot)
+      end if
+      if(nexp .gt. 4) then
+        error_msg("w", scriptname, funcname, "Color palette not defined for " \
+                  + nexp + " experiments")
+      end if
+    end if
+  end if
+
+  ; ---------------------------------------------------------------------
+  ; add reference datasets
+  ; ---------------------------------------------------------------------
+  if (isatt(diag_script_info, "ref")) then
+    delete(res@xyDashPatterns)
+    delete(res@xyLineThicknesses)
+    delete(res@xyLineColors)
+    res@xyDashPatterns    = dashes
+    res@xyLineThicknesses = (/5/)
+    res@xyLineColors      = colors  ; change line color
+
+    ref_p = gsn_csm_xy(wks, source_x, source, res)  ; create plot
+    overlay(plot(0), ref_p)
+  end if
+
+  ; ---------------------------------------------------------------------
+  ; add standard error of reference datasets
+  ; ---------------------------------------------------------------------
+  if (isatt(diag_script_info, "ref_stderr")) then
+    if (diag_script_info@ref_stderr .ne. False) then
+      res_stderr = True
+      res_stderr@gsnXYFillOpacities = 0.2
+      copy_VarMeta(res, res_stderr)
+      res_stderr@gsnXYFillColors = "grey"
+      delete(res_stderr@xyLineColors)
+      delete(res_stderr@xyLineThicknesses)
+      ; We don't want the line, so make it transparent.
+      res_stderr@xyLineColor = "grey"
+      res_stderr@xyLineThicknesses = (/1, 1/)
+      shading_plot = gsn_csm_xy(wks, source_x, source_stderr(:, :), \
+                                res_stderr)
+      overlay(plot(0), shading_plot)
+    end if
+  end if
+
+  if (diag_script_info@ts_anomaly .eq. "anom" .and. \
+      diag_script_info@ref_shading) then
+
+    ; ---------------------------------------------------------------------
+    ; yellow shading of reference period
+    ; ---------------------------------------------------------------------
+    gsres                = True
+    gsres@gsFillColor    = "Grey70"
+    gsres@gsFillOpacityF = 0.1
+    xbox = (/ref_start, ref_end, ref_end, ref_start, ref_start/)
+    ybox = (/res@trYMinF, res@trYMinF, res@trYMaxF, res@trYMaxF, res@trYMinF/)
+    newplot00 = gsn_add_polygon(wks, plot(0), xbox, ybox, gsres)
+
+    txtres               = True
+    txtres@txFont        = "helvetica-bold"
+    txtres@txFontColor   = "Grey40"
+    txtres@txFontHeightF = 0.013
+    ref_txt = gsn_add_text(wks, plot, "reference period", \
+                           0.5*(ref_start + ref_end), \
+                           res@trYMinF + 0.05 * (res@trYMaxF - res@trYMinF), \
+                           txtres)
+
+  end if
+
+  ; ---------------------------------------------------------------------
+  ; Draw some lines to create a legend
+  ; ---------------------------------------------------------------------
+  res_lines                   = True      ; polyline mods desired
+  res_lines@tfPolyDrawOrder   = "Predraw"
+  res_lines@gsLineColor       = "grey"    ; line color
+  res_lines@gsLineThicknessF  = 1.        ; line thicker
+  res_lines@gsLineDashPattern = 1.        ; dash pattern
+
+  xx = (/res@trXMinF, res@trXMaxF/)
+  yy = (/0.0, 0.0/)
+  dum0 = gsn_add_polyline(wks, plot(0), xx, yy, res_lines)
 
   resP = True
   resP@gsnMaximize = True

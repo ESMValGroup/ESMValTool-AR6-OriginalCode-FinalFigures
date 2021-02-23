@@ -10,14 +10,17 @@
 ;    https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html
 ;
 ; Last access
-;    20200625
-;    Attention: Files will be permanently updated with newer time periods,
-;               but file names will not be changed.
+;    20201125
 ;
 ; Download and processing instructions
 ;    Download the dataset "HadCRUT4" (median temperature anomalies) and
 ;    the dataset "Absolute" (absolute temperatures for the base period
 ;    1961-90 on a 5x5 grid).
+;    For the 5% to 95% confidence interval of the combined effects of all the
+;    uncertainties described in the HadCRUT4 error model (measurement and
+;    sampling, bias, and coverage uncertainties) download:
+;    HadCRUT.4.6.0.0.annual_ns_avg.txt from
+;    https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html
 ;
 ; Caveats
 ;    In contrast to the HadCRUT3 reformat script which produces temperature
@@ -27,7 +30,7 @@
 ;    temperature time-series and one with the anomaly time-series
 ;
 ; Modification history
-;    20200625-bock_lisa: add standard error
+;    20201125-bock_lisa: add tas uncertainty
 ;    20190916-righi_mattia: remove no-longer used climatology output.
 ;    20190229-righi_mattia: added output for anomaly (tasa).
 ;    20190208-righi_mattia: added output for climatology and adapted to v2.
@@ -58,7 +61,7 @@ begin
   DAY2 = "30"
 
   ; Selected variable (standard name)
-  VAR = "tas"
+  VAR = (/"tas", "tasa", "tasConf5", "tasConf95"/)
 
   ; MIP
   MIP = "Amon"
@@ -72,7 +75,9 @@ begin
   CMOR_TABLE2 = getenv("cmor_tables") + \
     "/custom/CMOR_tasa.dat"
   CMOR_TABLE3 = getenv("cmor_tables") + \
-    "/custom/CMOR_tasStderr.dat"
+    "/custom/CMOR_tasConf5.dat"
+  CMOR_TABLE4 = getenv("cmor_tables") + \
+    "/custom/CMOR_tasConf95.dat"
 
   ; Version
   VERSION = "1"
@@ -87,8 +92,7 @@ begin
   COMMENT1 = "Temperature time-series calculated from the anomaly " + \
     "time-series by adding the temperature climatology for 1961-1990"
   COMMENT2 = "Temperature anomaly with respect to the period 1961-1990"
-  COMMENT3 = "HadCRUT4 surface temperature ensemble data - square " + \
-    "root of covariance matrix diagonal"
+  COMMENT3 = "Yearly uncertainty of temperature time-series"
 
 end
 
@@ -169,11 +173,11 @@ begin
   bounds3 = guess_coord_bounds(output3, FREQ)
 
   ; Set variable attributes
-  tmp = format_variable(output1, VAR, CMOR_TABLE1)
+  tmp = format_variable(output1, VAR(0), CMOR_TABLE1)
   delete(output1)
   output1 = tmp
   delete(tmp)
-  tmp = format_variable(output2, "tasa", CMOR_TABLE2)
+  tmp = format_variable(output2, VAR(1), CMOR_TABLE2)
   delete(output2)
   output2 = tmp
   delete(tmp)
@@ -200,9 +204,9 @@ begin
   ; Write temperature time-series
   DATESTR = YEAR1 + MONTH1 + "-" + YEAR2 + MONTH2
   fout = output_dir_path + \
-    str_join((/"OBS", OBSNAME, TYPE, VERSION, \
-               MIP, VAR, DATESTR/), "_") + ".nc"
-  write_nc(fout, VAR, output1, bounds1, gAtt1)
+    str_join((/"OBS", OBSNAME, TYPE1, VERSION, \
+               MIP, VAR(0), DATESTR/), "_") + ".nc"
+  write_nc(fout, VAR(0), output1, bounds1, gAtt1)
   w = addfile(fout, "w")
   w->height = height
   delete(w)
@@ -213,25 +217,77 @@ begin
   ; Write temperature anomaly time-series
   DATESTR = YEAR1 + MONTH1 + "-" + YEAR2 + MONTH2
   fout = output_dir_path + \
-    str_join((/"OBS", OBSNAME, TYPE, VERSION, \
-               MIP, "tasa", DATESTR/), "_") + ".nc"
-  write_nc(fout, "tasa", output2, bounds2, gAtt2)
+    str_join((/"OBS", OBSNAME, TYPE2, VERSION, \
+               MIP, VAR(1), DATESTR/), "_") + ".nc"
+  write_nc(fout, VAR(1), output2, bounds2, gAtt2)
   w = addfile(fout, "w")
   delete(w)
   delete(gAtt2)
   delete(bounds2)
   delete(output2)
 
-  ; Write standard_error of temperature anomaly time-series
+  ; -------------------------------------
+  ; Uncertainties
+  ; -------------------------------------
+
+  ; Read uncertainty file
+  fname = input_dir_path + "HadCRUT.4.6.0.0.annual_ns_avg.txt"
+
+  ntime = YEAR2 - YEAR1 + 1
+  tmp = asciiread(fname, (/ntime, 12/), "float")
+
+  ntime2 = 12 * (YEAR2 - YEAR1 + 1)
+  data1 = new(ntime2, float)
+  data2 = new(ntime2, float)
+
+  i = 0
+  do yy = 0, ntime - 1
+    data1((yy * 12) : (yy * 12 + 11)) = tmp(yy, 1) - tmp(yy, 10)
+    data2((yy * 12) : (yy * 12 + 11)) = tmp(yy, 11) - tmp(yy, 1)
+  end do
+
+  delete(tmp)
+
+  data1!0 = "time"
+  data1&time =  create_timec(YEAR1, YEAR2)
+  format_coords(data1, YEAR1 + "0101", YEAR2 + "1231", FREQ)
+  data2!0 = "time"
+  data2&time = data1&time
+
+  ; Set variable attributes
+  tmp = format_variable(data1, VAR(2), CMOR_TABLE3)
+  delete(data1)
+  data1 = tmp
+  delete(tmp)
+  tmp = format_variable(data2, VAR(3), CMOR_TABLE4)
+  delete(data2)
+  data2 = tmp
+  delete(tmp)
+
+  ; Calculate coordinate bounds
+  bounds = guess_coord_bounds(data1, FREQ)
+  bounds = guess_coord_bounds(data2, FREQ)
+
+  ; Set global attributes
+  gAtt = set_global_atts(OBSNAME, TIER, SOURCE, REF1, COMMENT3)
+
+  ; Write temperature time-series uncertainties
   DATESTR = YEAR1 + "01-" + YEAR2 + "12"
   fout = output_dir_path + \
-    str_join((/"OBS", OBSNAME, TYPE, VERSION, \
-               MIP, "tasStderr", DATESTR/), "_") + ".nc"
-  write_nc(fout, "tasStderr", output3, bounds3, gAtt3)
+    str_join((/"OBS", OBSNAME, TYPE1, VERSION, \
+               MIP, VAR(2), DATESTR/), "_") + ".nc"
+  write_nc(fout, VAR(2), data1, bounds, gAtt)
   w = addfile(fout, "w")
   delete(w)
-  delete(gAtt3)
-  delete(bounds3)
-  delete(output3)
+  fout = output_dir_path + \
+    str_join((/"OBS", OBSNAME, TYPE1, VERSION, \
+               MIP, VAR(3), DATESTR/), "_") + ".nc"
+  write_nc(fout, VAR(3), data2, bounds, gAtt)
+  w = addfile(fout, "w")
+  delete(w)
+  delete(gAtt)
+  delete(bounds)
+  delete(data1)
+  delete(data2)
 
 end
