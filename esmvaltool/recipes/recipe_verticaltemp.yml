@@ -26,10 +26,6 @@ datasets:
   # rich v1.7, no ensemble available
   - {dataset: rich17obs, project: RICH_TTL, ensemble: mean, start_year: 1979, end_year: 2014}
 
-  # raobcore v1.5.1
-  # it's named raobcore17 here because it used version 1.7.3 of the software, but with the parameters of version 1.5.1
-  #- {dataset: raobcore, project: OBS, mip: Amon, tier: 3, type: atmos, version: raobcore17, start_year: 1979, end_year: 2014}
-
   # rich-obs v1.5.1 ensemble
   - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio00, start_year: 1979, end_year: 2014}
   - {dataset: rich, project: OBS, mip: Amon, tier: 3, type: atmos, version: rio01, start_year: 1979, end_year: 2014}
@@ -126,8 +122,12 @@ datasets:
   - {dataset: TaiESM1, institute: AS-RCEC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: UKESM1-0-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gn}
   # CMIP6 Coupled, ESGF
-  
-  # CMIP6 AMIP, JASMIN except GFDL-AM4 (starts in 1980)
+  - {dataset: IPSL-CM5A2-INCA, institute: IPSL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  - {dataset: IPSL-CM6A-LR-INCA, institute: IPSL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
+  # only has 1850 data in all 3 ensembles, as of 2021/02/23
+  #- {dataset: MIROC-ES2H, institute: MIROC, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f2, start_year: 1979, end_year: 2014, grid: gn}  
+ 
+  # CMIP6 AMIP
   - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: ACCESS-ESM1-5, institute: CSIRO, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: BCC-CSM2-MR, institute: BCC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
@@ -151,6 +151,7 @@ datasets:
   - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  # starts in 1980
   - {dataset: GFDL-AM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GFDL-CM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GFDL-ESM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}

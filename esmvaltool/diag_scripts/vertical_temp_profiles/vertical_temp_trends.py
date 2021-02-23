@@ -6,6 +6,7 @@ import numpy.ma as ma
 import iris
 import iris.coord_categorisation as icc
 import statsmodels.api as sm
+from datetime import date
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.patches import Patch
@@ -227,7 +228,8 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, \
 
     # save
     plt.tight_layout()
-    png_name = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95.png"
+    today = date.today().strftime("%Y%m%d")
+    png_name = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_"+today+".png"
     plt.savefig(os.path.join(local_path, png_name))
     plt.close()
 
