@@ -93,7 +93,7 @@ datasets:
   - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   # esmvalcore.cmor.check.CMORCheckError: There were errors in variable ta: lat: is not monotonic
-  - {dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  #- {dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: GFDL-CM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GFDL-ESM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GISS-E2-1-G, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: historical, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
@@ -150,9 +150,10 @@ datasets:
   - {dataset: EC-Earth3-Veg, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-f3-L, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
   - {dataset: FGOALS-g3, institute: CAS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
-  - {dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
+  # esmvalcore.cmor.check.CMORCheckError: There were errors in variable ta:
+  #- {dataset: FIO-ESM-2-0, institute: FIO-QLNM, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   # starts in 1980
-  - {dataset: GFDL-AM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
+  #- {dataset: GFDL-AM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GFDL-CM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GFDL-ESM4, institute: NOAA-GFDL, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr1}
   - {dataset: GISS-E2-1-G, institute: NASA-GISS, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p3f1, start_year: 1979, end_year: 2014, grid: gn}
@@ -177,7 +178,7 @@ datasets:
   - {dataset: TaiESM1, institute: AS-RCEC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   - {dataset: SAM0-UNICON, institute: SNU, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gn}
   # fix_metadata; if cube.attributes[parent_units] == bad_value; KeyError: 'parent_time_units'
-  - {dataset: UKESM1-0-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f4, start_year: 1979, end_year: 2014, grid: gn}
+  #- {dataset: UKESM1-0-LL, institute: MOHC, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f4, start_year: 1979, end_year: 2014, grid: gn}
   # CMIP6 AMIP, ESGF
   - {dataset: EC-Earth3-CC, institute: EC-Earth-Consortium, project: CMIP6, activity: CMIP, exp: amip, ensemble: r1i1p1f1, start_year: 1979, end_year: 2014, grid: gr}
 
