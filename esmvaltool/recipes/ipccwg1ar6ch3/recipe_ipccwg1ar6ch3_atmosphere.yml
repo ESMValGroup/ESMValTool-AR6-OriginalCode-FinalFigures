@@ -754,7 +754,7 @@ diagnostics:
 #  # **********************************************************************
 #  # IPCC WGI AR6, chap. 3
 #  # Sect. 3.3
-#  # Fig. 3.2
+#  # Fig. 3.3
 #  # **********************************************************************
 #  # Multi model mean, multi model mean bias and root mean square error 
 #  # (geographical distributions) for CMIP6, CMIP5 and HighResMIP
@@ -796,7 +796,7 @@ diagnostics:
 #
 
 #
-#  fig_3_2_cmip6:
+#  fig_3_3_cmip6:
 #    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
 #    variables:
 #      tas:
@@ -813,7 +813,7 @@ diagnostics:
 #    additional_datasets:
 #      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 #    scripts:
-#      fig_3_2: 
+#      fig_3_3: 
 #        script: ipcc_ar6/model_bias.ncl
 #        ancestors: ['tas', 'IAV_calc_tas_cmip6/calc_IAV_for_stippandhatch']
 #        projection: Robinson
@@ -825,7 +825,7 @@ diagnostics:
 #        panel_title: "Near-Surface Air Temperature"
 #
 #
-#  fig_3_2_cmip5:
+#  fig_3_3_cmip5:
 #    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
 #    variables:
 #      tas:
@@ -841,7 +841,7 @@ diagnostics:
 #    additional_datasets:
 #      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
 #    scripts:
-#      fig_3_2: 
+#      fig_3_3: 
 #        script: ipcc_ar6/model_bias.ncl
 #        ancestors: ['tas', 'IAV_calc_tas_cmip5/calc_IAV_for_stippandhatch']
 #        projection: Robinson
@@ -857,12 +857,12 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig 3.3
+  # Fig 3.4
   # **********************************************************************
   # Timeseries of Global Near-Surface Air Temperature Anomaly
   # ***********************************************************************
 
-  fig_3_3_cmip6:
+  fig_3_4_cmip6:
     description: Timeseries of Global Near-Surface Air Temperature Anomaly
     variables:
       tas: &tas_settings_cmip6
@@ -881,7 +881,7 @@ diagnostics:
         additional_datasets:
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
-      fig-3-3: &tsline_settings
+      fig-3-4: &tsline_settings
         script: ipcc_ar6/tas_anom.ncl
         ref_start: 1850
         ref_end: 1900
@@ -895,7 +895,7 @@ diagnostics:
         styleset: CMIP6
 
 
-  fig_3_3_cmip5:
+  fig_3_4_cmip5:
     description: Blended surface temperature.
     variables:
       tas: &tas_settings_cmip5
@@ -913,12 +913,12 @@ diagnostics:
         additional_datasets:
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
-      fig-3-3:
+      fig-3-4:
         <<: *tsline_settings
         styleset: CMIP5
 
 
-  fig_3_3_collect:
+  fig_3_4_collect:
     description: Collect all timeseries of blended surface temperature.
     variables:
       tasa: 
@@ -928,8 +928,8 @@ diagnostics:
         additional_datasets:
           - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
           - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
-          - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
           - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+          - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
           #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2,
           #   start_year: 1880}
           #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
@@ -937,7 +937,7 @@ diagnostics:
       collect: 
         <<: *tsline_settings
         script: ipcc_ar6/tsline_blend_collect.ncl
-        ancestors: [tasa, 'fig_3_3_*/fig-3-3']
+        ancestors: [tasa, 'fig_3_4_*/fig-3-4']
         start_year: 1850
         end_year: 2020
         ref: ["HadCRUT5"]
@@ -950,12 +950,12 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3 
-  # Fig 3.4
+  # Fig 3.5
   # **********************************************************************
   # Global climate variability - surface temperature
   # **********************************************************************
 
-  fig_3_4:
+  fig_3_5:
     description: IPCC AR6 Ch. 3, Fig. 3.4 (near-surface temperature)
     variables:
       tas:
@@ -979,12 +979,12 @@ diagnostics:
           #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, start_year: 1880, tier: 2}
           #- {dataset: GISTEMP, project: OBS, type: ground, version: v4-all, tier: 2}
           #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
           - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
           - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
+          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
     scripts:
-      fig_3_4:
+      fig_3_5:
         script: ipcc_ar6/zonal_st_dev.ncl
         multi_model_mean: True
         time_avg: "yearly"
@@ -994,364 +994,368 @@ diagnostics:
 
 
 
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Sect. 3.3 
-  # Fig 3.8
-  # **********************************************************************
-  # Global and continental anomalies in annual mean near-surface temperature
-  # **********************************************************************
- 
-  fig_3_8_tas_anom_damip_1: &diag_tas_anom 
-    description: Anomaly of surface temperature.
-    variables:
-      tas_historical_global: &var_tas
-        short_name: tas
-        preprocessor: regrid_5_5_mmm
-        mip: Amon
-        project: CMIP6
-        exp: [historical, ssp245]
-        grid: gr
-        ensemble: r1i1p1f1
-        start_year: 1850
-        end_year: 2020
-        additional_datasets: *cmip6_models
-      tas_hist-nat_global:
-        <<: *var_tas
-        exp: hist-nat
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_global:
-        <<: *var_tas
-        exp: hist-GHG
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_global:
-        <<: *var_tas
-        exp: hist-aer
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_global:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-
-      tas_historical_land:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_land
-        additional_datasets: *cmip6_models
-      tas_hist-nat_land:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_land
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_land:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_land
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_land:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_land
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_land:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_land
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-
-      tas_historical_ocean:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_ocean
-        additional_datasets: *cmip6_models
-      tas_hist-nat_ocean:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_ocean
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_ocean:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_ocean
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_ocean:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_ocean
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_ocean:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_ocean
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-    scripts:
-      tsline: &tsline_amon
-        script: ipcc_ar6/tas_anom_damip.ncl
-        ref_start: 1850
-        ref_end: 1900
-        start_year: 1850
-        end_year: 2020
-        plot_units: "degC"
-        y_min: -3.5
-        y_max: 4.0
-        ref_mask: True
-        experiments: ["historical", "hist-nat", "hist-GHG", "hist-aer"]
-        header: ["Global Ocean", "Global", "Global Land"]
-        panels: [["tas_historical_ocean", "tas_hist-nat_ocean", "tas_hist-GHG_ocean", "tas_hist-aer_ocean"],
-                 ["tas_historical_global", "tas_hist-nat_global", "tas_hist-GHG_global", "tas_hist-aer_global"],
-                 ["tas_historical_land", "tas_hist-nat_land", "tas_hist-GHG_land", "tas_hist-aer_land"]]
-        reference: ["tasa_ocean", "tasa_global", "tasa_land"]
-        panel_figure_strings: ["a)", "b)", "c)"]
-                   
-
-  fig_3_8_tas_anom_damip_2:
-    <<: *diag_tas_anom
-    variables:
-      tas_historical_north_america:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_north_america
-        additional_datasets: *cmip6_models
-      tas_hist-nat_north_america:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_north_america
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_north_america:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_north_america
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_north_america:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_north_america
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_north_america:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_north_america
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-
-      tas_historical_south_america:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_south_america
-        additional_datasets: *cmip6_models
-      tas_hist-nat_south_america:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_south_america
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_south_america:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_south_america
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_south_america:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_south_america
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_south_america:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_south_america
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-
-      tas_historical_europe:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_europe
-        additional_datasets: *cmip6_models
-      tas_hist-nat_europe:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_europe
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_europe:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_europe
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_europe:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_europe
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_europe:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_europe
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-    scripts:
-      tsline:
-        <<: *tsline_amon
-        header: ["North America", "Central and South America", "Europe and North Africa"]
-        panels: [["tas_historical_north_america", "tas_hist-nat_north_america", "tas_hist-GHG_north_america", "tas_hist-aer_north_america"],
-                 ["tas_historical_south_america", "tas_hist-nat_south_america", "tas_hist-GHG_south_america", "tas_hist-aer_south_america"],
-                 ["tas_historical_europe", "tas_hist-nat_europe", "tas_hist-GHG_europe", "tas_hist-aer_europe"]]
-        reference: ["tasa_north_america", "tasa_south_america", "tasa_europe"] 
-        panel_figure_strings: ["d)", "e)", "f)"]
-
-
-  fig_3_8_tas_anom_damip_3:
-    <<: *diag_tas_anom
-    variables:
-      tas_historical_africa:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_africa
-        additional_datasets: *cmip6_models
-      tas_hist-nat_africa:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_africa
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_africa:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_africa
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_africa:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_africa
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_africa:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_africa
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-
-      tas_historical_asia:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_asia
-        additional_datasets: *cmip6_models
-      tas_hist-nat_asia:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_asia
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_asia:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_asia
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_asia:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_asia
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_asia:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_asia
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-
-      tas_historical_australasia:
-        <<: *var_tas
-        preprocessor: regrid_5_5_mmm_australasia
-        additional_datasets: *cmip6_models
-      tas_hist-nat_australasia:
-        <<: *var_tas
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_australasia
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_australasia:
-        <<: *var_tas
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_australasia
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_australasia:
-        <<: *var_tas
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_australasia
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_australasia:
-        <<: *var_tas
-        short_name: tasa
-        preprocessor: regrid_5_5_australasia
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-    scripts:
-      tsline:
-        <<: *tsline_amon
-        header: ["Africa", "Asia", "Australasia"]
-        panels: [["tas_historical_africa", "tas_hist-nat_africa", "tas_hist-GHG_africa", "tas_hist-aer_africa"],
-                 ["tas_historical_asia", "tas_hist-nat_asia", "tas_hist-GHG_asia", "tas_hist-aer_asia"],
-                 ["tas_historical_australasia", "tas_hist-nat_australasia", "tas_hist-GHG_australasia", "tas_hist-aer_australasia"]]
-        reference: ["tasa_africa", "tasa_asia", "tasa_australasia"]
-        panel_figure_strings: ["g)", "h)", "i)"]
-
-
-  fig_3_8_tas_anom_damip_4:
-    #<<: *diag_tas_anom
-    variables:
-      tas_historical_antarctica:
-        <<: *var_tas
-        #short_name: tas
-        #mip: Amon
-        #project: CMIP6
-        #exp: [historical, ssp245]
-        #grid: gr
-        #ensemble: r1i1p1f1
-        #end_year: 2018
-        start_year: 1900
-        preprocessor: regrid_5_5_mmm_antarctica
-        additional_datasets: *cmip6_models
-      tas_hist-nat_antarctica:
-        <<: *var_tas
-        start_year: 1900
-        exp: hist-nat
-        preprocessor: regrid_5_5_mmm_antarctica
-        additional_datasets: *models_cmip6_hist-nat
-      tas_hist-GHG_antarctica:
-        <<: *var_tas
-        start_year: 1900
-        exp: hist-GHG
-        preprocessor: regrid_5_5_mmm_antarctica
-        additional_datasets: *models_cmip6_hist-GHG
-      tas_hist-aer_antarctica:
-        <<: *var_tas
-        start_year: 1900
-        exp: hist-aer
-        preprocessor: regrid_5_5_mmm_antarctica
-        additional_datasets: *models_cmip6_hist-aer
-      tasa_antarctica:
-        <<: *var_tas
-        start_year: 1900
-        short_name: tasa
-        preprocessor: regrid_5_5_antarctica
-        additional_datasets:
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-    scripts:
-      tsline:
-        <<: *tsline_amon
-        #script: ipcc_ar6/tas_anom_damip.ncl
-        #start_year: 1850
-        #end_year: 2018
-        #plot_units: "degC"
-        #y_min: -0.5
-        #y_max: 1.6
-        #ref_mask: True
-        #experiments: ["historical", "hist-nat", "hist-GHG", "hist-aer"]
-        ref_start: 1900
-        ref_end: 2010
-        header: ["Antarctica"]
-        panels: [["tas_historical_antarctica", "tas_hist-nat_antarctica", "tas_hist-GHG_antarctica", "tas_hist-aer_antarctica"]]
-        reference: ["tasa_antarctica"]
-        panel_figure_strings: ["j)"]
-
-
-
+#  # **********************************************************************
+#  # IPCC WGI AR6, chap. 3
+#  # Sect. 3.3 
+#  # Fig 3.9
+#  # **********************************************************************
+#  # Global and continental anomalies in annual mean near-surface temperature
+#  # **********************************************************************
+# 
+#  fig_3_9_tas_anom_damip_1: &diag_tas_anom 
+#    description: Anomaly of surface temperature.
+#    variables:
+#      tas_historical_global: &var_tas
+#        short_name: tas
+#        preprocessor: regrid_5_5_mmm
+#        mip: Amon
+#        project: CMIP6
+#        exp: [historical, ssp245]
+#        grid: gr
+#        ensemble: r1i1p1f1
+#        start_year: 1850
+#        end_year: 2020
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_global:
+#        <<: *var_tas
+#        exp: hist-nat
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_global:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_global:
+#        <<: *var_tas
+#        exp: hist-aer
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_global:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#
+#      tas_historical_land:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_land
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_land:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_land
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_land:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_land
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_land:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_land
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_land:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_land
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#
+#      tas_historical_ocean:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_ocean
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_ocean:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_ocean
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_ocean:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_ocean
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_ocean:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_ocean
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_ocean:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_ocean
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#    scripts:
+#      tsline: &tsline_amon
+#        script: ipcc_ar6/tas_anom_damip.ncl
+#        ref_start: 1850
+#        ref_end: 1900
+#        start_year: 1850
+#        end_year: 2020
+#        plot_units: "degC"
+#        y_min: -3.5
+#        y_max: 4.0
+#        ref_mask: True
+#        experiments: ["historical", "hist-nat", "hist-GHG", "hist-aer"]
+#        header: ["Global Ocean", "Global", "Global Land"]
+#        title: "global"
+#        panels: [["tas_historical_ocean", "tas_hist-nat_ocean", "tas_hist-GHG_ocean", "tas_hist-aer_ocean"],
+#                 ["tas_historical_global", "tas_hist-nat_global", "tas_hist-GHG_global", "tas_hist-aer_global"],
+#                 ["tas_historical_land", "tas_hist-nat_land", "tas_hist-GHG_land", "tas_hist-aer_land"]]
+#        reference: ["tasa_ocean", "tasa_global", "tasa_land"]
+#        panel_figure_strings: ["a)", "b)", "c)"]
+#                   
+#
+#  fig_3_9_tas_anom_damip_2:
+#    <<: *diag_tas_anom
+#    variables:
+#      tas_historical_north_america:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_north_america
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_north_america:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_north_america
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_north_america:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_north_america
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_north_america:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_north_america
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_north_america:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_north_america
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#
+#      tas_historical_south_america:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_south_america
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_south_america:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_south_america
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_south_america:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_south_america
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_south_america:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_south_america
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_south_america:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_south_america
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#
+#      tas_historical_europe:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_europe
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_europe:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_europe
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_europe:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_europe
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_europe:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_europe
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_europe:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_europe
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#    scripts:
+#      tsline:
+#        <<: *tsline_amon
+#        header: ["North America", "Central and South America", "Europe and North Africa"]
+#        title: "america_europe"
+#        panels: [["tas_historical_north_america", "tas_hist-nat_north_america", "tas_hist-GHG_north_america", "tas_hist-aer_north_america"],
+#                 ["tas_historical_south_america", "tas_hist-nat_south_america", "tas_hist-GHG_south_america", "tas_hist-aer_south_america"],
+#                 ["tas_historical_europe", "tas_hist-nat_europe", "tas_hist-GHG_europe", "tas_hist-aer_europe"]]
+#        reference: ["tasa_north_america", "tasa_south_america", "tasa_europe"] 
+#        panel_figure_strings: ["d)", "e)", "f)"]
+#
+#
+#  fig_3_9_tas_anom_damip_3:
+#    <<: *diag_tas_anom
+#    variables:
+#      tas_historical_africa:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_africa
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_africa:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_africa
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_africa:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_africa
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_africa:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_africa
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_africa:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_africa
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#
+#      tas_historical_asia:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_asia
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_asia:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_asia
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_asia:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_asia
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_asia:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_asia
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_asia:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_asia
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#
+#      tas_historical_australasia:
+#        <<: *var_tas
+#        preprocessor: regrid_5_5_mmm_australasia
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_australasia:
+#        <<: *var_tas
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_australasia
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_australasia:
+#        <<: *var_tas
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_australasia
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_australasia:
+#        <<: *var_tas
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_australasia
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_australasia:
+#        <<: *var_tas
+#        short_name: tasa
+#        preprocessor: regrid_5_5_australasia
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#    scripts:
+#      tsline:
+#        <<: *tsline_amon
+#        header: ["Africa", "Asia", "Australasia"]
+#        title: "africa_asia"
+#        panels: [["tas_historical_africa", "tas_hist-nat_africa", "tas_hist-GHG_africa", "tas_hist-aer_africa"],
+#                 ["tas_historical_asia", "tas_hist-nat_asia", "tas_hist-GHG_asia", "tas_hist-aer_asia"],
+#                 ["tas_historical_australasia", "tas_hist-nat_australasia", "tas_hist-GHG_australasia", "tas_hist-aer_australasia"]]
+#        reference: ["tasa_africa", "tasa_asia", "tasa_australasia"]
+#        panel_figure_strings: ["g)", "h)", "i)"]
+#
+#
+#  fig_3_9_tas_anom_damip_4:
+#    #<<: *diag_tas_anom
+#    variables:
+#      tas_historical_antarctica:
+#        <<: *var_tas
+#        #short_name: tas
+#        #mip: Amon
+#        #project: CMIP6
+#        #exp: [historical, ssp245]
+#        #grid: gr
+#        #ensemble: r1i1p1f1
+#        #end_year: 2018
+#        start_year: 1900
+#        preprocessor: regrid_5_5_mmm_antarctica
+#        additional_datasets: *cmip6_models
+#      tas_hist-nat_antarctica:
+#        <<: *var_tas
+#        start_year: 1900
+#        exp: hist-nat
+#        preprocessor: regrid_5_5_mmm_antarctica
+#        additional_datasets: *models_cmip6_hist-nat
+#      tas_hist-GHG_antarctica:
+#        <<: *var_tas
+#        start_year: 1900
+#        exp: hist-GHG
+#        preprocessor: regrid_5_5_mmm_antarctica
+#        additional_datasets: *models_cmip6_hist-GHG
+#      tas_hist-aer_antarctica:
+#        <<: *var_tas
+#        start_year: 1900
+#        exp: hist-aer
+#        preprocessor: regrid_5_5_mmm_antarctica
+#        additional_datasets: *models_cmip6_hist-aer
+#      tasa_antarctica:
+#        <<: *var_tas
+#        start_year: 1900
+#        short_name: tasa
+#        preprocessor: regrid_5_5_antarctica
+#        additional_datasets:
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#    scripts:
+#      tsline:
+#        <<: *tsline_amon
+#        #script: ipcc_ar6/tas_anom_damip.ncl
+#        #start_year: 1850
+#        #end_year: 2018
+#        #plot_units: "degC"
+#        #y_min: -0.5
+#        #y_max: 1.6
+#        #ref_mask: True
+#        #experiments: ["historical", "hist-nat", "hist-GHG", "hist-aer"]
+#        ref_start: 1900
+#        ref_end: 2010
+#        header: ["Antarctica"]
+#        title: "antarctica"
+#        panels: [["tas_historical_antarctica", "tas_hist-nat_antarctica", "tas_hist-GHG_antarctica", "tas_hist-aer_antarctica"]]
+#        reference: ["tasa_antarctica"]
+#        panel_figure_strings: ["j)"]
+#
+#
+#
 #   # **********************************************************************
 #   # IPCC WGI AR6, chap. 3
 #   # Sect. 3.3
-#   # Fig. 3.12
+#   # Fig. 3.13
 #   # **********************************************************************
 #   # Lisa
 #   # **********************************************************************
@@ -1383,7 +1387,7 @@ diagnostics:
 # 
  
 # 
-#   fig_3_12_cmip6:
+#   fig_3_13_cmip6:
 #     description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
 #     variables:
 #       pr:
@@ -1400,7 +1404,7 @@ diagnostics:
 #     additional_datasets:
 #       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
 #     scripts:
-#       fig_3_12: 
+#       fig_3_13: 
 #         script: ipcc_ar6/model_bias.ncl
 #         ancestors: ['pr', 'IAV_calc_pr_cmip6/calc_IAV_for_stippandhatch']
 #         projection: Robinson
@@ -1412,7 +1416,7 @@ diagnostics:
 #         panel_title: "Precipitation"
 # 
 # 
-#   fig_3_12_cmip5:
+#   fig_3_13_cmip5:
 #     description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
 #     variables:
 #       pr:
@@ -1428,7 +1432,7 @@ diagnostics:
 #     additional_datasets:
 #       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
 #     scripts:
-#       fig_3_12: 
+#       fig_3_13: 
 #         script: ipcc_ar6/model_bias.ncl
 #         ancestors: ['pr', 'IAV_calc_pr_cmip5/calc_IAV_for_stippandhatch']
 #         projection: Robinson
@@ -1443,12 +1447,12 @@ diagnostics:
 #  # **********************************************************************
 #  # IPCC WGI AR6, chap. 3
 #  # Sect. 3.3 
-#  # Fig 3.14
+#  # Fig 3.15
 #  # **********************************************************************
 #  # Global and zonal average anomalies in annual mean precipitation
 #  # **********************************************************************
 # 
-#  fig_3_14_precip_anom:   
+#  fig_3_15_precip_anom:   
 #    description: IPCC AR6 Ch. 3, Fig. 3.12 (precipitation)
 #    variables:
 #      pr_historical_global: &var_pr
