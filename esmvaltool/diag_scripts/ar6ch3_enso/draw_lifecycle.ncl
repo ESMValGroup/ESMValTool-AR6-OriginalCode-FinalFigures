@@ -1,4 +1,4 @@
-; draw_hadleycell_trend
+; draw_enso_lifecycle
 ; ############################################################################
 ; Author: Yu Kosaka (RCAST, U. Tokyo, Japan)
 ; IPCC AR6 Chapter 3
@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210223 kosaka_yu: added netcdf output and provenance
 ;    20210204 kosaka_yu: minor revision on figure format
 ;    20210130 kosaka_yu: minor revision on figure format
 ;    20200907 kosaka_yu: refined the details of figure
@@ -132,12 +133,20 @@ begin
     obs = new(nobs, "string")
     ts_el_obs = new((/nobs, (lag_range(1)-lag_range(0)+1)*12/), type)
     ts_la_obs = new((/nobs, (lag_range(1)-lag_range(0)+1)*12/), type)
+    ts_el_obs!0 = "dataset"
+    ts_la_obs!0 = "dataset"
     ts_el_obs!1 = "time"
     ts_la_obs!1 = "time"
+    ts_el_obs&dataset = ispan(1, nobs, 1)
+    ts_la_obs&dataset = ispan(1, nobs, 1)
     ts_el_obs&time = ispan(lag_range(0)*12+1, (lag_range(1)+1)*12, 1)
     ts_la_obs&time = ispan(lag_range(0)*12+1, (lag_range(1)+1)*12, 1)
     duration_el_obs = new(nobs, "float")
     duration_la_obs = new(nobs, "float")
+    duration_el_obs!0 = "dataset"
+    duration_la_obs!0 = "dataset"
+    duration_el_obs&dataset = ispan(1, nobs, 1)
+    duration_la_obs&dataset = ispan(1, nobs, 1)
   end if
 
   if (nruns_cmip5.gt.0) then
@@ -146,12 +155,20 @@ begin
     esizes_cmip5 = new(nruns_cmip5, "integer")
     ts_el_cmip5 = new((/nruns_cmip5, (lag_range(1)-lag_range(0)+1)*12/), type)
     ts_la_cmip5 = new((/nruns_cmip5, (lag_range(1)-lag_range(0)+1)*12/), type)
+    ts_el_cmip5!0 = "ens_cmip5"
+    ts_la_cmip5!0 = "ens_cmip5"
     ts_el_cmip5!1 = "time"
     ts_la_cmip5!1 = "time"
+    ts_el_cmip5&ens_cmip5 = ispan(1, nruns_cmip5, 1)
+    ts_la_cmip5&ens_cmip5 = ispan(1, nruns_cmip5, 1)
     ts_el_cmip5&time = ispan(lag_range(0)*12+1, (lag_range(1)+1)*12, 1)
     ts_la_cmip5&time = ispan(lag_range(0)*12+1, (lag_range(1)+1)*12, 1)
     duration_el_cmip5 = new(nruns_cmip5, "float")
     duration_la_cmip5 = new(nruns_cmip5, "float")
+    duration_el_cmip5!0 = "ens_cmip5"
+    duration_la_cmip5!0 = "ens_cmip5"
+    duration_el_cmip5&ens_cmip5 = ispan(1, nruns_cmip5, 1)
+    duration_la_cmip5&ens_cmip5 = ispan(1, nruns_cmip5, 1)
   end if
 
   if (nruns_cmip6.gt.0) then
@@ -160,12 +177,20 @@ begin
     esizes_cmip6 = new(nruns_cmip6, "integer")
     ts_el_cmip6 = new((/nruns_cmip6, (lag_range(1)-lag_range(0)+1)*12/), type)
     ts_la_cmip6 = new((/nruns_cmip6, (lag_range(1)-lag_range(0)+1)*12/), type)
+    ts_el_cmip6!0 = "ens_cmip6"
+    ts_la_cmip6!0 = "ens_cmip6"
     ts_el_cmip6!1 = "time"
     ts_la_cmip6!1 = "time"
+    ts_el_cmip6&ens_cmip6 = ispan(1, nruns_cmip6, 1)
+    ts_la_cmip6&ens_cmip6 = ispan(1, nruns_cmip6, 1)
     ts_el_cmip6&time = ispan(lag_range(0)*12+1, (lag_range(1)+1)*12, 1)
     ts_la_cmip6&time = ispan(lag_range(0)*12+1, (lag_range(1)+1)*12, 1)
     duration_el_cmip6 = new(nruns_cmip6, "float")
     duration_la_cmip6 = new(nruns_cmip6, "float")
+    duration_el_cmip6!0 = "ens_cmip6"
+    duration_la_cmip6!0 = "ens_cmip6"
+    duration_el_cmip6&ens_cmip6 = ispan(1, nruns_cmip6, 1)
+    duration_la_cmip6&ens_cmip6 = ispan(1, nruns_cmip6, 1)
   end if
 
   time_composite = new((lag_range(1)-lag_range(0)+1)*12, "integer") ; for ts array in the loop
@@ -394,6 +419,9 @@ begin
     end if
   end do
 
+  ts_el_obs@dataset = str_join(obs, ",")
+  ts_la_obs@dataset = str_join(obs, ",")
+  
   if (nruns_cmip5.gt.0) then
     ts_el_cmip5_mean = weighted_mean(ts_el_cmip5, 1./tofloat(esizes_cmip5))
     ts_el_cmip5_5th = weighted_percentile(ts_el_cmip5, 1./tofloat(esizes_cmip5), 0.05)
@@ -411,6 +439,14 @@ begin
     duration_la_cmip5_25th = weighted_percentile(duration_la_cmip5, 1./tofloat(esizes_cmip5), 0.25)
     duration_la_cmip5_75th = weighted_percentile(duration_la_cmip5, 1./tofloat(esizes_cmip5), 0.75)
     duration_la_cmip5_95th = weighted_percentile(duration_la_cmip5, 1./tofloat(esizes_cmip5), 0.95)
+    ts_el_cmip5@dataset = str_join(models_cmip5+"/"+runs_cmip5, ",")
+    ts_la_cmip5@dataset = str_join(models_cmip5+"/"+runs_cmip5, ",")
+    duration_el_cmip5@dataset = str_join(models_cmip5+"/"+runs_cmip5, ",")
+    duration_la_cmip5@dataset = str_join(models_cmip5+"/"+runs_cmip5, ",")
+    ts_el_cmip5@weight = 1./tofloat(esizes_cmip5)
+    ts_la_cmip5@weight = 1./tofloat(esizes_cmip5)
+    duration_el_cmip5@weight = 1./tofloat(esizes_cmip5)
+    duration_la_cmip5@weight = 1./tofloat(esizes_cmip5)
   end if
 
   if (nruns_cmip6.gt.0) then
@@ -430,6 +466,14 @@ begin
     duration_la_cmip6_25th = weighted_percentile(duration_la_cmip6, 1./tofloat(esizes_cmip6), 0.25)
     duration_la_cmip6_75th = weighted_percentile(duration_la_cmip6, 1./tofloat(esizes_cmip6), 0.75)
     duration_la_cmip6_95th = weighted_percentile(duration_la_cmip6, 1./tofloat(esizes_cmip6), 0.95)
+    ts_el_cmip6@dataset = str_join(models_cmip6+"/"+runs_cmip6, ",")
+    ts_la_cmip6@dataset = str_join(models_cmip6+"/"+runs_cmip6, ",")
+    duration_el_cmip6@dataset = str_join(models_cmip6+"/"+runs_cmip6, ",")
+    duration_la_cmip6@dataset = str_join(models_cmip6+"/"+runs_cmip6, ",")
+    ts_el_cmip6@weight = 1./tofloat(esizes_cmip6)
+    ts_la_cmip6@weight = 1./tofloat(esizes_cmip6)
+    duration_el_cmip6@weight = 1./tofloat(esizes_cmip6)
+    duration_la_cmip6@weight = 1./tofloat(esizes_cmip6)
   end if
 
 ; ================================= Plot ================================
@@ -1057,4 +1101,56 @@ begin
   draw(mme_plots(0))
   draw(mme_plots(1))
 
+
+; =========================== Write output and Provenance =============================  
+  system("mkdir -p "+config_user_info@work_dir)
+  outpath = config_user_info@work_dir + "enso_lifecycle.nc"
+  if (fileexists(outpath)) then
+    system("rm -f "+outpath)
+  end if
+  ;ncdf = addfile(outpath, "w")
+  
+  ts_el_obs@var = "ts_elnino_obs"
+  ts_el_obs@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(ts_el_obs, outpath)
+  outpath@existing = "append"
+  ts_la_obs@var = "ts_lanina_obs"
+  ts_la_obs@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(ts_la_obs, outpath)
+  duration_el_obs@var = "duration_elnino_obs"
+  duration_el_obs@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(duration_el_obs, outpath)
+  duration_la_obs@var = "duration_lanina_obs"
+  duration_la_obs@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(duration_la_obs, outpath)
+  ts_el_cmip5@var = "ts_elnino_cmip5"
+  ts_el_cmip5@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(ts_el_cmip5, outpath)
+  ts_la_cmip5@var = "ts_lanina_cmip5"
+  ts_la_cmip5@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(ts_la_cmip5, outpath)
+  duration_el_cmip5@var = "duration_elnino_cmip5"
+  duration_el_cmip5@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(duration_el_cmip5, outpath)
+  duration_la_cmip5@var = "duration_lanina_cmip5"
+  duration_la_cmip5@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(duration_la_cmip5, outpath)
+  ts_el_cmip6@var = "ts_elnino_cmip6"
+  ts_el_cmip6@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(ts_el_cmip6, outpath)
+  ts_la_cmip6@var = "ts_lanina_cmip6"
+  ts_la_cmip6@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(ts_la_cmip6, outpath)
+  duration_el_cmip6@var = "duration_elnino_cmip6"
+  duration_el_cmip6@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(duration_el_cmip6, outpath)
+  duration_la_cmip6@var = "duration_lanina_cmip6"
+  duration_la_cmip6@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(duration_la_cmip6, outpath)
+  
+  log_provenance(outpath, wks@fullname, \
+                 "ENSO lifecycle and duration", (/"var", "perc", "other"/), \
+                 "eq", (/"times", "box", "other"/), "kosaka_yu", "planton21bams", paths)
+
+  leave_msg(DIAG_SCRIPT, "")
 end

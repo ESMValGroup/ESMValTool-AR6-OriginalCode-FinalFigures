@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210223 kosaka_yu: added netcdf output and provenance
 ;    20210130 kosaka_yu: minor revision on figure format
 ;    20200907 kosaka_yu: refined the details of figure
 ;    20200905 kosaka_yu: refined the drawing part
@@ -111,6 +112,13 @@ begin
   seasonality_obs = new(nobs, "float")
   obs = new(nobs, "string")
 
+  stdv_obs!0 = "dataset"
+  stdv_obs!1 = "month"
+  seasonality_obs!0 = "dataset"
+  stdv_obs&dataset = ispan(1, nobs, 1)
+  stdv_obs&month = ispan(1, 12, 1)
+  seasonality_obs&dataset = ispan(1, nobs, 1)
+  
   iobs = 0
   irun = 0
   do ii = 0, dimsizes(paths) - 1
@@ -175,6 +183,9 @@ begin
     delete(ts)
   end do
 
+  stdv_obs@dataset = obs
+  seasonality_obs@dataset = obs
+
   ; ========================================================================
 
   ; Calculate multimodel statistics
@@ -182,28 +193,50 @@ begin
   nruns_cmip5 = num(projects.eq."CMIP5")
   nruns_cmip6 = num(projects.eq."CMIP6")
   if (nruns_cmip5.gt.0) then
-    stdv_cmip5 = new((/nruns_cmip5, 12/), "float")
+    models_cmip5 = new(nruns_cmip5, "string")
+    runs_cmip5 = new(nruns_cmip5, "string")
     esize_cmip5 = new(nruns_cmip5, "integer")
+    stdv_cmip5 = new((/nruns_cmip5, 12/), "float")
     seasonality_cmip5 = new(nruns_cmip5, "float")
+
+    stdv_cmip5!0 = "ens_cmip5"
+    stdv_cmip5!1 = "month"
+    seasonality_cmip5!0 = "ens_cmip5"
+    stdv_cmip5&ens_cmip5 = ispan(1, nruns_cmip5, 1)
+    stdv_cmip5&month = ispan(1, 12, 1)
+    seasonality_cmip5&ens_cmip5 = ispan(1, nruns_cmip5, 1)
   end if
   if (nruns_cmip6.gt.0) then
-    stdv_cmip6 = new((/nruns_cmip6, 12/), "float")
+    models_cmip6 = new(nruns_cmip6, "string")
+    runs_cmip6 = new(nruns_cmip6, "string")
     esize_cmip6 = new(nruns_cmip6, "integer")
+    stdv_cmip6 = new((/nruns_cmip6, 12/), "float")
     seasonality_cmip6 = new(nruns_cmip6, "float")
+    
+    stdv_cmip6!0 = "ens_cmip6"
+    stdv_cmip6!1 = "month"
+    seasonality_cmip6!0 = "ens_cmip6"
+    stdv_cmip6&ens_cmip6 = ispan(1, nruns_cmip6, 1)
+    stdv_cmip6&month = ispan(1, 12, 1)
+    seasonality_cmip6&ens_cmip6 = ispan(1, nruns_cmip6, 1)
   end if
   irun_cmip5 = 0
   irun_cmip6 = 0
   do ii = 0, nruns-1
     esize = num(projects(ii)+"-"+models(ii).eq.projects+"-"+models)
     if (projects(ii).eq."CMIP5") then
-      stdv_cmip5(irun_cmip5, :) = stdv(ii, :)
+      models_cmip5(irun_cmip5) = models(ii)
+      runs_cmip5(irun_cmip5) = runs(ii)
       esize_cmip5(irun_cmip5) = esize
-      seasonality_cmip5(irun_cmip5) = seasonality(ii)
+      stdv_cmip5(irun_cmip5, :) = (/stdv(ii, :)/)
+      seasonality_cmip5(irun_cmip5) = (/seasonality(ii)/)
       irun_cmip5 = irun_cmip5 + 1
     elseif (projects(ii).eq."CMIP6") then
-      stdv_cmip6(irun_cmip6, :) = stdv(ii, :)
+      models_cmip6(irun_cmip6) = models(ii)
+      runs_cmip6(irun_cmip6) = runs(ii)
       esize_cmip6(irun_cmip6) = esize
-      seasonality_cmip6(irun_cmip6) = seasonality(ii)
+      stdv_cmip6(irun_cmip6, :) = (/stdv(ii, :)/)
+      seasonality_cmip6(irun_cmip6) = (/seasonality(ii)/)
       irun_cmip6 = irun_cmip6 + 1
     end if
   end do
@@ -217,6 +250,11 @@ begin
     seasonality_cmip5_25th = weighted_percentile(seasonality_cmip5, 1./tofloat(esize_cmip5), 0.25)
     seasonality_cmip5_75th = weighted_percentile(seasonality_cmip5, 1./tofloat(esize_cmip5), 0.75)
     seasonality_cmip5_95th = weighted_percentile(seasonality_cmip5, 1./tofloat(esize_cmip5), 0.95)
+
+    stdv_cmip5@dataset = str_join(models_cmip5+"/"+runs_cmip5, ",")
+    seasonality_cmip5@dataset = str_join(models_cmip5+"/"+runs_cmip5, ",")
+    stdv_cmip5@weight = 1./tofloat(esize_cmip5)
+    seasonality_cmip5@weight = 1./tofloat(esize_cmip5)
   end if
 
   if (nruns_cmip6.gt.0) then
@@ -228,8 +266,14 @@ begin
     seasonality_cmip6_25th = weighted_percentile(seasonality_cmip6, 1./tofloat(esize_cmip6), 0.25)
     seasonality_cmip6_75th = weighted_percentile(seasonality_cmip6, 1./tofloat(esize_cmip6), 0.75)
     seasonality_cmip6_95th = weighted_percentile(seasonality_cmip6, 1./tofloat(esize_cmip6), 0.95)
+
+    stdv_cmip6@dataset = str_join(models_cmip6+"/"+runs_cmip6, ",")
+    seasonality_cmip6@dataset = str_join(models_cmip6+"/"+runs_cmip6, ",")
+    stdv_cmip6@weight = 1./tofloat(esize_cmip6)
+    seasonality_cmip6@weight = 1./tofloat(esize_cmip6)
   end if
 
+  delete([/models_cmip5, models_cmip6/])
   models_cmip5 = get_unique_values(models(ind(projects.eq."CMIP5")))
   models_cmip6 = get_unique_values(models(ind(projects.eq."CMIP6")))
 
@@ -375,26 +419,24 @@ begin
   res_obs = True
   lres = True
   lres@gsLineThicknessF = 1.5
-  do i = 0, nobs-1
+  do ii = 0, nobs-1
     res_obs@project = "OBS"
-    res_obs@dataset = obs(i)
+    res_obs@dataset = obs(ii)
     lres@gsLineColor = get_color(res_obs)
     lres@gsLineDashPattern = get_lineindex(res_obs)
     dummy(idummy) = gsn_add_polyline(wks, seasonality_plot, \
-                                     month, expand_season(stdv_obs(i, :)), lres)
+                                     month, expand_season((/stdv_obs(ii, :)/)), lres)
     idummy = idummy + 1
-
     ; Legend
-    y = vpY + 0.01 - i*0.03
+    y = vpY + 0.01 - ii*0.03
     gsn_polyline_ndc(wks, (/x1, x2/), (/y, y/), lres)
     y = y - 0.006
     txres@txFontColor := get_color(res_obs)
     txres@txJust = "TopCenter"
-    gsn_text_ndc(wks, obs(i), x, y, txres)
+    gsn_text_ndc(wks, obs(ii), x, y, txres)
   end do
 
   ; Legend
-
   txres@txFontHeightF = 0.01
   txres@txJust = "BottomCenter"
   resp@gsFillColor := color_cmip5
@@ -554,17 +596,18 @@ begin
   fmt = "%4.2f" 
   
   lnres@gsLineThicknessF = 2.
-  do j = 0, nobs-1
+  do jj = 0, nobs-1
     res_obs@project = "OBS"
-    res_obs@dataset = obs(j)
+    res_obs@dataset = obs(jj)
     lnres@gsLineColor := get_color(res_obs)
     lnres@gsLineDashPattern =  get_lineindex(res_obs)
-    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/seasonality_obs(j), seasonality_obs(j)/), \
+
+    dummy(idummy) = gsn_add_polyline(wks, mme_plot, (/seasonality_obs(jj), seasonality_obs(jj)/), \
                                      (/res@trYMinF, res@trYMaxF/), lnres)
     idummy = idummy + 1
 
     txres@txFontColor := lnres@gsLineColor
-    dummy(idummy) = gsn_add_text(wks, mme_plot, obs(j)+": "+sprintf(fmt, seasonality_obs(j)), x1, y1, txres)
+    dummy(idummy) = gsn_add_text(wks, mme_plot, obs(jj)+": "+sprintf(fmt, (/seasonality_obs(jj)/)), x1, y1, txres)
     idummy = idummy + 1
     y1 = y1 + dy
   end do
@@ -709,7 +752,35 @@ begin
   txres@txFont = "helvetica-bold"
   txres@txJust = "TopCenter"  
   gsn_text_ndc(wks, "ENSO seasonality", 0.5, 0.9999, txres)
-    
+
   draw(mme_plot)
+
+;  =========================== Write output and Provenance ============================= 
+  system("mkdir -p "+config_user_info@work_dir)
+  outpath = config_user_info@work_dir + "enso_seasonality.nc"
+  stdv_obs@var = "stdv_enso_obs"
+  stdv_obs@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(stdv_obs, outpath)
+  outpath@existing = "append"
+  stdv_cmip5@var = "stdv_enso_cmip5"
+  stdv_cmip5@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(stdv_cmip5, outpath)
+  stdv_cmip6@var = "stdv_enso_cmip6"
+  stdv_cmip6@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(stdv_cmip6, outpath)
+  seasonality_obs@var = "seasonality_enso_obs"
+  seasonality_obs@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(seasonality_obs, outpath)
+  seasonality_cmip5@var = "seasonality_enso_cmip5"
+  seasonality_cmip5@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(seasonality_cmip5, outpath)
+  seasonality_cmip6@var = "seasonality_enso_cmip6"
+  seasonality_cmip6@diag_script = DIAG_SCRIPT
+  ncdf_outfile = ncdf_write(seasonality_cmip6, outpath)
+  
+  log_provenance(outpath, wks@fullname, "ENSO seasonality", (/"stddev", "perc"/), \
+                 "eq", (/"seas", "box", "other"/), "kosaka_yu", "planton21bams", paths)
+
+  leave_msg(DIAG_SCRIPT, "")
 
 end

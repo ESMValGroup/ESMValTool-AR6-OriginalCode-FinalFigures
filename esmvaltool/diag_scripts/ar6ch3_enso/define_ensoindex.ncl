@@ -308,6 +308,10 @@ begin
     end if
     nc_outfile = ncdf_write(Nino, nc_filename)
 
+; Call provenance logger
+    log_provenance(nc_filename, "n/a", "ENSO index", "anomaly", \
+                  "eq", "other", "kosaka_yu", "", infoTs[ii]@filename)    
+    
     delete(Nino)
   end do
 
