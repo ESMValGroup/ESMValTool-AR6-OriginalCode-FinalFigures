@@ -847,6 +847,7 @@ def make_pane_a(
     #plt.rc('text', usetex=True)
     #plt.title(r'\fontsize{24}{3em}\selectfont{}{Modelled AMOC mean state\r}{\fontsize{18pt}{3em}\selectfont{}(a) AMOC streamfunction profiles}')
     plt.title('(a) AMOC streamfunction profiles')# at 26.5N')
+    ax.set_xlabel('Meridional overturning mass streamfunction, Tg s'+r'$^{-1}$')
 
     # Add Legend outside right.
     # diagtools.add_legend_outside_right(plot_details, plt.gca())

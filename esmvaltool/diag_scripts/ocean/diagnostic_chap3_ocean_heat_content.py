@@ -1952,7 +1952,7 @@ def calc_dyn_height(
 
             pressure = np.ma.masked_where(temp.mask, pressure)
 
-            # Confirm that we use absolute salininty & conservative temperature
+            # Confirm that we use absolute salinity & conservative temperature
             sal, temp = step_4and5(dataset, lo, la, pressure, sal, temp)
 
             # Calculate Dynamic height anomaly
@@ -2315,7 +2315,7 @@ def calc_landerer_slr(
 
             pressure = np.ma.masked_where(temp.mask, pressure)
 
-            # Confirm that we use absolute salininty & conservative temperature
+            # Confirm that we use absolute salinity & conservative temperature
             sal, temp = step_4and5(dataset, lo, la, pressure, sal, temp)
 
             #Calculate SLR, and convert into mm
@@ -2781,7 +2781,7 @@ def plot_slr_regional_scatter(cfg, metadatas, dyn_fns,
 
         ax.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
             loc='upper center', bbox_to_anchor=(0.5, -0.15),
-            ncol=3,  framealpha=0., prop={'size': 7}, markerfirst=True )
+            ncol=2,  framealpha=0., prop={'size': 7}, markerfirst=True )
 
         # plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order],
         #     loc = 'lower right', framealpha=0., prop={'size': 7}, markerfirst=False )
@@ -3023,7 +3023,7 @@ def make_multimodel_halosteric_salinity_trend(cfg, metadatas,
         return fig, ax, qplot
 
 
-def add_map_text(ax, text, spaces='       '):
+def add_map_text(ax, text, spaces='          '):
     """
     Add a small text to a map.
     """
@@ -3031,7 +3031,7 @@ def add_map_text(ax, text, spaces='       '):
     #artisttext = AnchoredText(text+'       ',
     #                    loc=4, prop={'size': 12}, frameon=False)
     artisttext = AnchoredText(spaces+text, #+'       ',
-                        loc='upper left', prop={'size': 10}, frameon=False)
+                        loc='upper left', prop={'size': 9}, frameon=False)
     ax.add_artist(artisttext)
     return ax
 
@@ -3098,9 +3098,10 @@ def plot_halo_multipane(
         #fig.set_size_inches(9,  7)
         fig.set_size_inches(10,  9)
 
-        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 1.00], wspace=0.)
-        gs0 = gs[0].subgridspec(2, 1, hspace=0.35) # scatters
-        gs1 = gs[1].subgridspec(4, 1, hspace=0.06 ) # maps
+        gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 1.200], wspace=0.01)
+        linex = 1./2.2 +0.012
+        gs0 = gs[0].subgridspec(3, 1, height_ratios=[1,1,0.04], hspace=0.3 ) # scatters
+        gs1 = gs[1].subgridspec(5, 1, height_ratios=[1,1,1, 0.15, 1],hspace=0.06 ) # maps
         #scatters
         scatter1=fig.add_subplot(gs0[0,0])
         scatter2=fig.add_subplot(gs0[1,0])
@@ -3110,11 +3111,13 @@ def plot_halo_multipane(
         ax0 = fig.add_subplot(gs1[0, 0], projection=proj)
         ax1 = fig.add_subplot(gs1[1, 0], projection=proj)
         ax2 = fig.add_subplot(gs1[2, 0], projection=proj)
-        ax3 = fig.add_subplot(gs1[3, 0], projection=proj)
-
+        ax3 = fig.add_subplot(gs1[4, 0], projection=proj)
+        ax4 = fig.add_subplot(gs1[3, 0])
+        ax4.axis('off')
+ 
         subplots = [ax0, ax1, ax2]
         cmip_subplots = [ax3,]
-        cbar_axes = [ax0, ax1, ax2, ax3]
+        cbar_axes = [ax0, ax1, ax2, ax4, ax3]
 
 #            gs = matplotlib.gridspec.GridSpec(6, 2, width_ratios=[1, 2], height_ratios=[1, 1, 1, 1, 1, 1], hspace=0.450, wspace =0.0600)
 #            central_longitude=-120.
@@ -3243,15 +3246,22 @@ def plot_halo_multipane(
     draw_line = True
     if draw_line:
         # Draw a horizontal lines at those coordinates
-       liney=0.88
-       line1 = plt.Line2D([0.5 ,0.5],[0.315,liney], transform=fig.transFigure, color="black", lw=0.7)
+#       liney=0.89
+       liney1 = ax0.get_position().y1 +0.020
+       liney0 = ax2.get_position().y0 #+0.002
+       line1 = plt.Line2D([linex ,linex],[liney0,liney1], transform=fig.transFigure, color="black", lw=0.7)
        fig.add_artist(line1)
-       plt.figtext(0.505, liney, 'Observational Halosteric trends', fontsize=9, ha='left', va='top')
+       plt.figtext(linex+ 0.005, liney1, 'Observational halosteric trends', fontsize=10, ha='left', va='top')
 
-       liney2=0.295 
-       line2 = plt.Line2D([0.5 ,0.5],[0.12,liney2], transform=fig.transFigure, color="black", lw=0.7)
+       #liney2=0.295
+       liney2 = ax3.get_position().y1+0.020
+       liney3 = ax3.get_position().y0 #+ 0.002
+ 
+       line2 = plt.Line2D([linex, linex],[liney3,liney2], transform=fig.transFigure, color="black", lw=0.7)
        fig.add_artist(line2)
-       plt.figtext(0.505, liney2, 'CMIP6 multi-model mean Halosteric trend', fontsize=9, ha='left', va='top')
+       plt.figtext(linex + 0.0050, liney2, 'CMIP6 multi-model mean halosteric trend', fontsize=10, ha='left', va='top')
+    
+    
 
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
@@ -3351,6 +3361,7 @@ def plot_halo_obs_mean(
         extent = [central_longitude-180., central_longitude+180., -73, 73]
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
+    
     ax = add_map_text(ax, legend_txt)
 
     clip = True
@@ -3695,7 +3706,7 @@ def calc_ohc_full(cfg, metadatas, thetao_fn, so_fn, volcello_fn, trend='intact')
             pressure = gsw.conversions.p_from_z(depth, lat) # dbar
 
 
-            # Confirm that we use absolute salininty & conservative temperature
+            # Confirm that we use absolute salinity & conservative temperature
             sal, temp = step_4and5(dataset, lon, lat, pressure, sal, temp)
 
             # 6) Calculation of "heat content"
@@ -4262,7 +4273,7 @@ def sea_surface_salinity_plot(
         calc_trend = True
     ):
     """
-    Make a multi-pane plot of the Sea Surface Salininty.
+    Make a multi-pane plot of the Sea Surface salinity.
     """
     if isinstance(time_range, list):
         time_range_str = '-'.join(str(t) for t in time_range)
@@ -4486,7 +4497,7 @@ def sea_surface_salinity_multipane(
     obs_key='DW1970'
     ):
     """
-    Plot the multipane sea surface salininty plot.
+    Plot the multipane sea surface salinity plot.
     do_ss if True
     """
     time_range_str = '-'.join([str(t) for t in [start_year, end_year]])
@@ -4569,7 +4580,7 @@ def sea_surface_salinity_multipane(
         fig.colorbar(qplots[212], ax=[axes[212], ], location='right',label='Error in PSU') #, ticks=cbar_ticks)
 
     if plot_type == 'trends_only':
-        fig.suptitle('Observed and modelled near surface salininty trends', y=0.93, fontweight='bold')
+        fig.suptitle('Observed and modelled near surface salinity trends', y=0.93, fontweight='bold')
         # cbar_ticks = np.linspace(-10., 10., 11, )
         # cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label='mPSS-78 yr'+r'$^{-1}$', ticks=cbar_ticks)
         #cbar.remove()
@@ -4578,14 +4589,21 @@ def sea_surface_salinity_multipane(
         #cbar = fig.colorbar(qplots[212], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
 
         cbar_ticks = np.linspace(-10., 10., 11, )
-        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label='mPSS-78 yr'+r'$^{-1}$', ticks=cbar_ticks,pad=0.05, shrink=0.65)
+        #cbar_label = 'mPSS-78 yr'+r'$^{-1}$'
+        cbar_label = 'mg kg'+r'$^{-1}$'+' yr'+r'$^{-1}$'
+ 
+        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label=cbar_label, ticks=cbar_ticks,pad=0.05, shrink=0.65)
 
         axleg = plt.axes([0.05, 0.14, 0.9, 0.02])
 #        plt.tight_layout()
 
         axleg.axis('off')
 
-        axleg.plot([], [], c='black', lw=1.5,ls='-',label='Near surface climatogical salininty PSS-78')
+        #contour_label = 'Near surface climatogical salinity, PSS-78'
+        contour_label = 'Near surface climatogical salinity, g kg'+r'$^{-1}$'
+
+        axleg.plot([], [], c='black', lw=1.5,ls='-',label=contour_label)
+
         legend_fs=10.5
         legd = axleg.legend(
             loc='upper center',
@@ -5025,9 +5043,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SS = False #True
-    do_SLR = True  #False
-    do_OHC = False #True #False #True  #True
+    do_SS = 0#True  #True
+    do_SLR = 0 # e  #False
+    do_OHC = True #False #True  #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
