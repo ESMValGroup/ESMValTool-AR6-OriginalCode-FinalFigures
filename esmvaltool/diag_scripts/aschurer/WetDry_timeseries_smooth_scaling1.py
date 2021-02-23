@@ -22,26 +22,28 @@ from esmvaltool.diag_scripts.shared.plot import quickplot
 
 
 
-def get_provenance_record(attributes, ancestor_files):
+def get_provenance_record(ancestor_files):
     """Create a provenance record describing the diagnostic data and plot."""
-    caption = ("Average {long_name} between {start_year} and {end_year} "
-               "according to {dataset}.".format(**attributes))
+    caption = ("Wet and dry region tropical mean (30°S-30°N) annual precipitation anomalies")
 
     record = {
         'caption': caption,
         'statistics': ['mean'],
-        'domains': ['global'],
-        'plot_type': 'zonal',
+        'domains': ['trop'],
+        'plot_type': ['times'],
         'authors': [
-            'ande_bo',
-            'righ_ma',
+            'schurer_andrew',
         ],
+        'projects': ['ipcc_ar6'],
         'references': [
-            'acknow_project',
+            'schurer20erl'
         ],
+        'realms': ['atmos'],
+        'themes': ['phys'],
         'ancestors': ancestor_files,
     }
     return record
+
 #=================================
 def addAuxCoords(cube):
 	"""
@@ -505,6 +507,16 @@ def main(cfg):
     	plt.text(3,2.2,'Bootstrap',rotation=90,color='m')
     plt.savefig(plot_file)
     plt.close() 				
+
+    ancestor_files = list(config['input_data'].keys())
+    provenance_record = get_provenance_record(ancestor_files)
+
+    logger.info("Recording provenance of %s:\n%s", plot_file,
+                pformat(provenance_record))
+    with ProvenanceLogger(cfg) as provenance_logger:
+        provenance_logger.log(plot_file, provenance_record)
+
+
 if __name__ == '__main__':
 
     with run_diagnostic() as config:
