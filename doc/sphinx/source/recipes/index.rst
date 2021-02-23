@@ -29,6 +29,7 @@ Atmosphere
    recipe_ipccwg1ar6ch3_santer20jclim
    recipe_modes_of_variability
    recipe_quantilebias
+   recipe_bock20jgr
    recipe_spei
    recipe_martin18grl
    recipe_autoassess_stratosphere
