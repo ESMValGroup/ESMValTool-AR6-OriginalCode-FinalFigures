@@ -1654,9 +1654,17 @@ diagnostics:
         # Sort dataset in alphabetic order (excluding MMM)
         #sort: true
         project_order: ['CMIP3', 'CMIP5', 'CMIP6'] 
+        caption: "                                            Relative model performance ~C~ ~Z75~ CMIP3                                                       CMIP5                                                                               CMIP6                         "
         # Sort diagnostics in a specific order (name = 'diagnositic'-'region')
         diag_order: ['ta850-global', 'ta200-global', 'ua850-global',
                      'ua200-global', 'va850-global', 'va200-global',
                      'zg500-global', 'psl-global', 'hus400-global', 'tas-global',
                      'ts-global', 'pr-global', 'clt-global', 'rlut-global',
                      'rsut-global', 'lwcre-global', 'swcre-global']
+        diag_label: ['temperature 850hPa', 'temperature 200hPa', 'eastward wind 850hPa', 
+                     'eastward wind 200hPa', ' northward wind 850hPa', 'northward wind 200hPa', 
+                     'geopotential height 500hPa', 'sea level pressure', 
+                     'specific humidity 400hPa', 'near-surface temperature', 
+                     'surface temperature', 'precipitation', 'cloud cover', 
+                     'TOA outgoing longwave radiation', 'TOA outgoing shortwave radiation', 
+                     'TOA longwave cloud radiative effect', 'TOA shortwave cloud radiative effect']

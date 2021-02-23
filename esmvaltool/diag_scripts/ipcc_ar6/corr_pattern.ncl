@@ -82,6 +82,7 @@ begin
 
   ; Make output array
   all_cor = new((/dim_MOD-1/), float)
+  all_cor@_FillValue = 1.e20
   all_cor!0 = "models"
   all_cor&models = datasetnames(mod_ind_woref)
   ; Pass on alt models
