@@ -8,8 +8,9 @@
 ;    Outputs:
 ;
 ; History
+;    20210224 kosaka_yu: added provenance.
 ;    20210129 kosaka_yu: minor change in legends.
-;    20201024 kosaka_yu: added ERA-Interim..
+;    20201024 kosaka_yu: added ERA-Interim.
 ;    20201019 kosaka_yu: modified the legend format.
 ;    20200930 kosaka_yu: enabled ensemble obs/reanalysis datasets.
 ;    20200918 kosaka_yu: adjusted parameter for confidence intervals.
@@ -279,9 +280,19 @@ begin
   
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                 "hadley_walker_trends")
-  output_dir = config_user_info@plot_dir + "/"
-  system("mkdir -p "+output_dir)
+  plot_dir = config_user_info@plot_dir + "/"
+  system("mkdir -p "+plot_dir)
+  out_dir =  config_user_info@work_dir + "/"
+  system("mkdir -p "+out_dir)
 
+  nc_outfile = out_dir+"trend_hadley_walker.nc"
+  if (config_user_info@write_netcdf) then
+    if (fileexists(nc_outfile)) then
+      system("rm -f "+nc_outfile)
+    end if
+    nc_outfile@existing = "append"
+  end if
+    
   plots = new(dims, "graphic")
   dummy = new(1000, "graphic")
   idummy = 0
@@ -392,12 +403,17 @@ begin
           varname = "dslp"
         end if
         data = f->$varname$
-        if (varname.eq."dslp".and.data@units.eq."Pa") then
+        if (varname.eq."dslp".and.data@units.eq."Pa/yr") then
           data = data /100.
-          data@units = "hPa"
+          data@units = "hPa/yr"
         end if
         data = data * scale
-        if (isStrSubset(fname, "_cmip").and..not.isStrSubset(fname, "pi.nc")) then
+        data@units = str_sub_str(data@units, "yr", toint(scale)+"yr")
+        if (isStrSubset(fname, "_cmip").and.isStrSubset(fname, "pi.nc")) then
+          nyears = toint(data@eyear) - toint(data@syear) + 1
+          delete(data@syear)
+          delete(data@eyear)
+        else
           syear = toint(data@syear)
           eyear = toint(data@eyear)
         end if
@@ -408,6 +424,7 @@ begin
           cmip5hist@exp = "    all  ~C~ forcing"
           cmip5hist@hemisphere = hemisphere
           range = max((/range, max(abs(cmip5hist))/))
+          data@var = "cmip5hist"
           ncmip5 = ncmip5 + 1
         elseif (isStrSubset(paths(k), "_cmip5pi.nc")) then
 ;print("cmip5 piControl")
@@ -416,6 +433,7 @@ begin
           cmip5pi@exp = "piControl"
           cmip5pi@hemisphere = hemisphere
           range = max((/range, max(abs(cmip5pi))/))
+          data@var = "cmip5pi"
           ncmip5 = ncmip5 + 1
         elseif (isStrSubset(paths(k), "_cmip6hist.nc")) then
 ;print("cmip6 hist")
@@ -424,6 +442,7 @@ begin
           cmip6hist@exp = "    all  ~C~ forcing"
           cmip6hist@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6hist))/))
+          data@var = "cmip6hist"
           ncmip6 = ncmip6 + 1
         elseif (isStrSubset(paths(k), "_cmip6pi.nc")) then
 ;print("cmip6 piControl")
@@ -432,6 +451,7 @@ begin
           cmip6pi@exp = "piControl"
           cmip6pi@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6pi))/))
+          data@var = "cmip6pi"
           ncmip6 = ncmip6 + 1
         elseif (isStrSubset(paths(k), "_cmip6amip.nc") .or. \
                 isStrSubset(paths(k), "_cmip6amip-hist.nc")) then
@@ -446,6 +466,7 @@ begin
             cmip6amip@activity = "GMMIP"
           end if
           range = max((/range, max(abs(cmip6amip))/))
+          data@var = "cmip6amip"
           ncmip6 = ncmip6 + 1
         elseif (isStrSubset(paths(k), "_cmip6GHG.nc")) then
 ;print("cmip6 GHG")
@@ -454,6 +475,7 @@ begin
           cmip6GHG@exp = "GHG"
           cmip6GHG@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6GHG))/))
+          data@var = "cmip6GHG"
           ncmip6 = ncmip6 + 1
           ncmip6_single = ncmip6_single + 1
         elseif (isStrSubset(paths(k), "_cmip6aer.nc")) then
@@ -463,6 +485,7 @@ begin
           cmip6aer@exp = "aerosol"
           cmip6aer@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6aer))/))
+          data@var = "cmip6aer"
           ncmip6 = ncmip6 + 1
           ncmip6_single = ncmip6_single + 1
         elseif (isStrSubset(paths(k), "_cmip6nat.nc")) then
@@ -472,6 +495,7 @@ begin
           cmip6nat@exp = "natural"
           cmip6nat@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6nat))/))
+          data@var = "cmip6nat"
           ncmip6 = ncmip6 + 1
           ncmip6_single = ncmip6_single + 1
         elseif (isStrSubset(paths(k), "_cmip6stratO3.nc")) then
@@ -481,6 +505,7 @@ begin
           cmip6stratO3@exp = "strat~C~ O3  "
           cmip6stratO3@hemisphere = hemisphere
           range = max((/range, max(abs(cmip6stratO3))/))
+          data@var = "cmip6stratO3"
           ncmip6 = ncmip6 + 1
           ncmip6_single = ncmip6_single + 1
         else
@@ -521,12 +546,50 @@ begin
             end if
             range = max((/range, abs(data)/))
           end if
+          data@var = data@dataset
+        end if
+
+        if (config_user_info@write_netcdf) then              
+          if (season.eq."annual mean") then
+            seas = "ANN"
+          else
+            seas = season
+          end if
+          if (varname.eq."lat") then
+            data!0 = "ensemble_hadley_edge_"+hemisphere+"_"+seas+"_"+data@var
+            data@var = "trend_hadley_edge_"+hemisphere+"_"+seas+"_"+data@var
+          elseif (varname.eq."dslp") then
+            data!0 = "ensemble_walker_strength_"+seas+"_"+data@var
+            data@var = "trend_walker_strength_"+seas+"_"+data@var
+          end if
+          if (isStrSubset(fname, "_cmip").and.isStrSubset(fname, "pi.nc")) then
+            data@var = data@var+"_"+nyears+"yrs"
+            data!0 = data!0+"_"+nyears+"yrs"
+          else
+            data@var = data@var+"_"+syear+"-"+eyear
+            data!0 = data!0+"_"+syear+"-"+eyear
+          end if
+          data@diag_script = DIAG_SCRIPT
+          if (isatt(data, "model_id")) then
+            delete(data@model_id)
+          end if
+          ncdf_outfile = ncdf_write(data, nc_outfile)
         end if
         delete(data)
       end do
+
       nexp = ncmip5 + ncmip6
       if (ncmip5.gt.0) then
         nexp = nexp + 1
+      end if
+
+      if (isvar("paths_all")) then
+        tmp = paths_all
+        delete(paths_all)
+        paths_all = array_append_record(tmp, paths, 0)
+        delete(tmp)
+      else
+        paths_all = paths
       end if
       
       delete(paths)
@@ -1266,5 +1329,10 @@ begin
        end if
      end do
   end if
+
+  log_provenance(nc_outfile, wks@fullname, "trend of the subtropical edge latitude of the Hadley cells and strength of the Pacific Walker circulation", \
+                 "trend", "trop", "box", "kosaka_yu", "", paths_all)  
+  
+  leave_msg(DIAG_SCRIPT, "")
   
 end

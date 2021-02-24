@@ -655,6 +655,7 @@ function ncdf_write(data,
 ;    http://www.ncl.ucar.edu/Support/talk_archives/2009/0367.html
 ;
 ; Modification history
+;    20210223-kosaka_yu: bug fix in outfile_in@existing = "append" option
 ;    20131107-gottschaldt_klaus-dirk: written.
 ;
 local funcname, scriptname, data, outfile, outfile_in, ncdf, varname
@@ -708,8 +709,8 @@ begin
         dimSzs = new(dimsizes(dims_new), long)
         dimUnlim = new(dimsizes(dims_new), logical)
         dimUnlim(:) = False
-        do i = 0, dim_dim - 1
-          dimSzs(i) = dimsizes(data&$dimsnew(i)$)
+        do i = 0, dimsizes(dims_new) - 1
+          dimSzs(i) = dimsizes(data&$dims_new(i)$)
         end do
         filedimdef(ncdf, dimNames, dimSzs, dimUnlim)
       end if

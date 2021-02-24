@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210224 kosaka_yu: added provenance.
 ;    20200929 kosaka_yu: support ensemble reanalyses.
 ;    20200918 kosaka_yu: output model id as attributes..
 ;    20200915 kosaka_yu: merged with Walker circulation figure.
@@ -115,14 +116,16 @@ begin
     tr = where(dim_num_n(.not.ismissing(x), 0).gt.dims(0)*frac_threshold, \
                tmp(1, :), tmp@_FillValue)
   end if
-  copy_VarMeta(x(0), tr)
-
+;  copy_VarMeta(x(0), tr)
+  tr@units = "degrees/yr"
+  tr@_FillValue = x@_FillValue
+  
   delete(tmp)
   return(tr)
 end
 
-procedure write_data(x, branch, dataset)
-local nc_filename, work_dir, y
+function write_data(x, branch, dataset)
+local nc_filename, nc_outfile, work_dir, y
 begin
   work_dir = config_user_info@work_dir + "/"
   system("mkdir -p " + work_dir)
@@ -144,6 +147,7 @@ begin
     nc_outfile = ncdf_write(y, nc_filename)
   end if
   delete(y)
+  return(nc_outfile)
 end
 
 begin
@@ -342,8 +346,9 @@ begin
           trendObs@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
           trendObs@diag_script = DIAG_SCRIPT
 
-          write_data(trendObs, hemisphere, input_file_info[ii]@dataset)
-
+          nc_filename = write_data(trendObs, hemisphere, input_file_info[ii]@dataset)
+          log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                         "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", input_file_info[ii]@dataset)
           delete(trendObs)
         else
           if (input_file_info[ii]@dataset.eq."20CRv3") then
@@ -352,6 +357,10 @@ begin
               delete(trend_20crv3)
               trend_20crv3 = array_append_record(tmp, trend_edge, 0)
               trend_20crv3@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+              tmp = paths_20crv3
+              delete(paths_20crv3)
+              paths_20crv3 = array_append_record(tmp, input_file_info[ii]@filename, 0)
               delete(tmp)
             else
               trend_20crv3 = (/trend_edge/)
@@ -363,6 +372,7 @@ begin
               trend_20crv3@var = "lat"
               trend_20crv3@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_20crv3@diag_script = DIAG_SCRIPT
+              paths_20crv3 = (/input_file_info[ii]@filename/)
             end if
           elseif (input_file_info[ii]@dataset.eq."20CRv2c") then
             if (isvar("trend_20crv2c")) then
@@ -370,6 +380,10 @@ begin
               delete(trend_20crv2c)
               trend_20crv2c = array_append_record(tmp, trend_edge, 0)
               trend_20crv2c@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+              tmp = paths_20crv2c
+              delete(paths_20crv2c)
+              paths_20crv2c = array_append_record(tmp, input_file_info[ii]@filename, 0)
               delete(tmp)
             else
               trend_20crv2c = (/trend_edge/)
@@ -381,6 +395,7 @@ begin
               trend_20crv2c@var = "lat"
               trend_20crv2c@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_20crv2c@diag_script = DIAG_SCRIPT
+              paths_20crv2c = (/input_file_info[ii]@filename/)
             end if
           elseif (input_file_info[ii]@dataset.eq."20CRv2") then
             if (isvar("trend_20crv2")) then
@@ -388,6 +403,10 @@ begin
               delete(trend_20crv2)
               trend_20crv2 = array_append_record(tmp, trend_edge, 0)
               trend_20crv2@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+              tmp = paths_20crv2
+              delete(paths_20crv2)
+              paths_20crv2 = array_append_record(tmp, input_file_info[ii]@filename, 0)
               delete(tmp)
             else
               trend_20crv2 = (/trend_edge/)
@@ -399,6 +418,7 @@ begin
               trend_20crv2@var = "lat"
               trend_20crv2@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_20crv2@diag_script = DIAG_SCRIPT
+              paths_20crv2 = (/input_file_info[ii]@filename/)
             end if
           elseif (input_file_info[ii]@dataset.eq."CERA-20C") then
             if (isvar("trend_cera20c")) then
@@ -406,6 +426,10 @@ begin
               delete(trend_cera20c)
               trend_cera20c = array_append_record(tmp, trend_edge, 0)
               trend_cera20c@esize := array_append_record(tmp@esize, esize, 0)
+              delete(tmp)
+              tmp = paths_cera20c
+              delete(paths_cera20c)
+              paths_cera20c = array_append_record(tmp, input_file_info[ii]@filename, 0)
               delete(tmp)
             else
               trend_cera20c = (/trend_edge/)
@@ -417,6 +441,7 @@ begin
               trend_cera20c@var = "lat"
               trend_cera20c@long_name = "trend of "+hemisphere+" Hadley cell edge latitude"
               trend_cera20c@diag_script = DIAG_SCRIPT
+              paths_cera20c = (/input_file_info[ii]@filename/)
             end if
           end if
         end if
@@ -434,9 +459,15 @@ begin
             trend_cmip5hist = array_append_record(tmp, trend_edge, 0)
             trend_cmip5hist@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip5hist@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip5hist@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip5hist
+            delete(paths_cmip5hist)
+            paths_cmip5hist = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip5hist = (/trend_edge/)
+            trend_cmip5hist@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip5hist@model_id = model_id
             trend_cmip5hist@esize = esize
             trend_cmip5hist@hemisphere = hemisphere
@@ -447,8 +478,8 @@ begin
             trend_cmip5hist@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip5hist@diag_script = DIAG_SCRIPT
+            paths_cmip5hist = (/input_file_info[ii]@filename/)
           end if
-
         elseif (input_file_info[ii]@project.eq."CMIP5" .and. \
                 input_file_info[ii]@exp.eq."piControl") then
           if (isvar("trend_cmip5pi")) then
@@ -457,9 +488,15 @@ begin
             trend_cmip5pi = array_append_record(tmp, trend_edge, 0)
             trend_cmip5pi@esize := array_append_record(tmp@esize, nseg, 0)
             trend_cmip5pi@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip5pi@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip5pi
+            delete(paths_cmip5pi)
+            paths_cmip5pi = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip5pi = (/trend_edge/)
+            trend_cmip5pi@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip5pi@model_id = model_id
             trend_cmip5pi@esize = nseg
             trend_cmip5pi@hemisphere = hemisphere
@@ -470,8 +507,8 @@ begin
             trend_cmip5pi@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip5pi@diag_script = DIAG_SCRIPT
+            paths_cmip5pi = (/input_file_info[ii]@filename/)
           end if
-
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 isStrSubset(input_file_info[ii]@exp, "historical")) then
           if (isvar("trend_cmip6hist")) then
@@ -480,9 +517,15 @@ begin
             trend_cmip6hist = array_append_record(tmp, trend_edge, 0)
             trend_cmip6hist@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6hist@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6hist@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6hist
+            delete(paths_cmip6hist)
+            paths_cmip6hist = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6hist = (/trend_edge/)
+            trend_cmip6hist@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6hist@model_id = model_id
             trend_cmip6hist@esize = esize
             trend_cmip6hist@hemisphere = hemisphere
@@ -493,8 +536,8 @@ begin
             trend_cmip6hist@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6hist@diag_script = DIAG_SCRIPT
+            paths_cmip6hist = (/input_file_info[ii]@filename/)
           end if
-
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."piControl") then
           if (isvar("trend_cmip6pi")) then
@@ -503,9 +546,15 @@ begin
             trend_cmip6pi = array_append_record(tmp, trend_edge, 0)
             trend_cmip6pi@esize := array_append_record(tmp@esize, nseg, 0)
             trend_cmip6pi@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6pi@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6pi
+            delete(paths_cmip6pi)
+            paths_cmip6pi = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6pi = (/trend_edge/)
+            trend_cmip6pi@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6pi@model_id = model_id
             trend_cmip6pi@esize = nseg
             trend_cmip6pi@hemisphere = hemisphere
@@ -516,6 +565,7 @@ begin
             trend_cmip6pi@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6pi@diag_script = DIAG_SCRIPT
+            paths_cmip6pi = (/input_file_info[ii]@filename/)
           end if
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."amip") then
@@ -525,9 +575,15 @@ begin
             trend_cmip6amip = array_append_record(tmp, trend_edge, 0)
             trend_cmip6amip@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6amip@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6amip@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6amip
+            delete(paths_cmip6amip)
+            paths_cmip6amip = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6amip = (/trend_edge/)
+            trend_cmip6amip@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6amip@model_id = model_id
             trend_cmip6amip@esize = esize
             trend_cmip6amip@hemisphere = hemisphere
@@ -538,6 +594,7 @@ begin
             trend_cmip6amip@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6amip@diag_script = DIAG_SCRIPT
+            paths_cmip6amip = (/input_file_info[ii]@filename/)
           end if
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."amip-hist") then
@@ -547,9 +604,15 @@ begin
             trend_cmip6amiphist = array_append_record(tmp, trend_edge, 0)
             trend_cmip6amiphist@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6amiphist@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6amiphist@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6amiphist
+            delete(paths_cmip6amiphist)
+            paths_cmip6amiphist = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6amiphist = (/trend_edge/)
+            trend_cmip6amiphist@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6amiphist@model_id = model_id
             trend_cmip6amiphist@esize = esize
             trend_cmip6amiphist@hemisphere = hemisphere
@@ -560,6 +623,7 @@ begin
             trend_cmip6amiphist@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6amiphist@diag_script = DIAG_SCRIPT
+            paths_cmip6amiphist = (/input_file_info[ii]@filename/)
           end if
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."hist-GHG") then
@@ -569,9 +633,15 @@ begin
             trend_cmip6GHG = array_append_record(tmp, trend_edge, 0)
             trend_cmip6GHG@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6GHG@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6GHG@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6GHG
+            delete(paths_cmip6GHG)
+            paths_cmip6GHG = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6GHG = (/trend_edge/)
+            trend_cmip6GHG@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6GHG@model_id = model_id
             trend_cmip6GHG@esize = esize
             trend_cmip6GHG@hemisphere = hemisphere
@@ -582,6 +652,7 @@ begin
             trend_cmip6GHG@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6GHG@diag_script = DIAG_SCRIPT
+            paths_cmip6GHG = (/input_file_info[ii]@filename/)
           end if
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."hist-aer") then
@@ -591,9 +662,15 @@ begin
             trend_cmip6aer = array_append_record(tmp, trend_edge, 0)
             trend_cmip6aer@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6aer@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6aer@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6aer
+            delete(paths_cmip6aer)
+            paths_cmip6aer = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6aer = (/trend_edge/)
+            trend_cmip6aer@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6aer@model_id = model_id
             trend_cmip6aer@esize = esize
             trend_cmip6aer@hemisphere = hemisphere
@@ -604,6 +681,7 @@ begin
             trend_cmip6aer@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6aer@diag_script = DIAG_SCRIPT
+            paths_cmip6aer = (/input_file_info[ii]@filename/)
           end if
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."hist-nat") then
@@ -613,9 +691,15 @@ begin
             trend_cmip6nat = array_append_record(tmp, trend_edge, 0)
             trend_cmip6nat@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6nat@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6nat@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6nat
+            delete(paths_cmip6nat)
+            paths_cmip6nat = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6nat = (/trend_edge/)
+            trend_cmip6nat@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6nat@model_id = model_id
             trend_cmip6nat@esize = esize
             trend_cmip6nat@hemisphere = hemisphere
@@ -626,6 +710,7 @@ begin
             trend_cmip6nat@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6nat@diag_script = DIAG_SCRIPT
+            paths_cmip6nat = (/input_file_info[ii]@filename/)
           end if
         elseif (input_file_info[ii]@project.eq."CMIP6" .and. \
                 input_file_info[ii]@exp.eq."hist-stratO3") then
@@ -635,9 +720,15 @@ begin
             trend_cmip6stratO3 = array_append_record(tmp, trend_edge, 0)
             trend_cmip6stratO3@esize := array_append_record(tmp@esize, esize, 0)
             trend_cmip6stratO3@model_id := array_append_record(tmp@model_id, model_id, 0)
+            trend_cmip6stratO3@dataset := tmp@dataset+","+input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
+            delete(tmp)
+            tmp = paths_cmip6stratO3
+            delete(paths_cmip6stratO3)
+            paths_cmip6stratO3 = array_append_record(tmp, input_file_info[ii]@filename, 0)
             delete(tmp)
           else
             trend_cmip6stratO3 = (/trend_edge/)
+            trend_cmip6stratO3@dataset = input_file_info[ii]@dataset+"/"+input_file_info[ii]@ensemble
             trend_cmip6stratO3@model_id = model_id
             trend_cmip6stratO3@esize = esize
             trend_cmip6stratO3@hemisphere = hemisphere
@@ -648,6 +739,7 @@ begin
             trend_cmip6stratO3@long_name \
               = "trend of "+hemisphere+" Hadley cell edge latitude"
             trend_cmip6stratO3@diag_script = DIAG_SCRIPT
+            paths_cmip6stratO3 = (/input_file_info[ii]@filename/)
           end if
           
         end if
@@ -662,48 +754,76 @@ begin
 
   ; output ensemble obs/reanalysis
   if (isvar("trend_20crv3")) then
-    write_data(trend_20crv3, hemisphere, "20CRv3")
+    nc_filename = write_data(trend_20crv3, hemisphere, "20CRv3")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_20crv3)  
   end if
   if (isvar("trend_20crv2c")) then
-    write_data(trend_20crv2c, hemisphere, "20CRv2c")
+    nc_filename = write_data(trend_20crv2c, hemisphere, "20CRv2c")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                  "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_20crv2c)  
   end if
   if (isvar("trend_20crv2")) then
-    write_data(trend_20crv2, hemisphere, "20CRv2")
+    nc_filename = write_data(trend_20crv2, hemisphere, "20CRv2")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_20crv2)  
   end if
   if (isvar("trend_cera20c")) then
-    write_data(trend_cera20c, hemisphere, "CERA-20C")
+    nc_filename = write_data(trend_cera20c, hemisphere, "CERA-20C")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cera20c)  
   end if
   
   ; output model trends
   if (isvar("trend_cmip5hist")) then
-    write_data(trend_cmip5hist, hemisphere, "cmip5hist")
+    nc_filename = write_data(trend_cmip5hist, hemisphere, "cmip5hist")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip5hist)  
   end if
   if (isvar("trend_cmip5pi")) then
-    write_data(trend_cmip5pi, hemisphere, "cmip5pi")
+    nc_filename = write_data(trend_cmip5pi, hemisphere, "cmip5pi")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip5pi)  
   end if
   if (isvar("trend_cmip6hist")) then
-    write_data(trend_cmip6hist, hemisphere, "cmip6hist")
+    nc_filename = write_data(trend_cmip6hist, hemisphere, "cmip6hist")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6hist)  
   end if
   if (isvar("trend_cmip6pi")) then
-    write_data(trend_cmip6pi, hemisphere, "cmip6pi")
+    nc_filename = write_data(trend_cmip6pi, hemisphere, "cmip6pi")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6pi)  
   end if
   if (isvar("trend_cmip6amip")) then
-    write_data(trend_cmip6amip, hemisphere, "cmip6amip")
+    nc_filename = write_data(trend_cmip6amip, hemisphere, "cmip6amip")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6amip)  
   end if
   if (isvar("trend_cmip6amiphist")) then
-    write_data(trend_cmip6amiphist, hemisphere, "cmip6amip-hist")
+    nc_filename = write_data(trend_cmip6amiphist, hemisphere, "cmip6amip-hist")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6amiphist)  
   end if
   if (isvar("trend_cmip6GHG")) then
-    write_data(trend_cmip6GHG, hemisphere, "cmip6GHG")
+    nc_filename = write_data(trend_cmip6GHG, hemisphere, "cmip6GHG")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6GHG)  
   end if
   if (isvar("trend_cmip6aer")) then
-    write_data(trend_cmip6aer, hemisphere, "cmip6aer")
+    nc_filename = write_data(trend_cmip6aer, hemisphere, "cmip6aer")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6aer)  
   end if
   if (isvar("trend_cmip6nat")) then
-    write_data(trend_cmip6nat, hemisphere, "cmip6nat")
+    nc_filename = write_data(trend_cmip6nat, hemisphere, "cmip6nat")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6nat)  
   end if
   if (isvar("trend_cmip6stratO3")) then
-    write_data(trend_cmip6stratO3, hemisphere, "cmip6stratO3")
+    nc_filename = write_data(trend_cmip6stratO3, hemisphere, "cmip6stratO3")
+    log_provenance(nc_filename, "n/a", "trend of the "+hemisphere+" subtropical edge latitude of Hadley cell", \
+                   "trend", str_lower(hemisphere)+"trop", "other", "kosaka_yu", "", paths_cmip6stratO3)  
   end if
   
   leave_msg(DIAG_SCRIPT, "")
