@@ -262,7 +262,7 @@ def plot_trends(cfg, provenance_record, \
     plt.close()
 
     # save data
-    out_data = np.zeroes((3, len(plevs), 12))
+    out_data = np.zeros((3, len(plevs), 12))
     out_data[0,:,0] = obs_trends_all["raob"]
     out_data[0,:,1] = obs_trends_all["rich"]  
     out_data[0,:,2] = obs_trends_all["rens"][0]
