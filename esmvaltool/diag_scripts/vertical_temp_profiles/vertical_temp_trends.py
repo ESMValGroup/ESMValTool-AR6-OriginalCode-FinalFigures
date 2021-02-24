@@ -264,30 +264,30 @@ def plot_trends(cfg, provenance_record, \
 
     # save data
     out_data = np.zeros((3, len(plevs), 12))
-    out_data[0,:,0] = obs_trends_all["raob"]
-    out_data[0,:,1] = obs_trends_all["rich"]  
-    out_data[0,:,2] = obs_trends_all["rens"][0]
-    out_data[0,:,3] = obs_trends_all["rens"][1]     # lower limit
-    out_data[0,:,4] = obs_trends_all["rens"][2]     # upper limit
-    out_data[0,:,5] = obs_trends_all["era5"]
-    out_data[0,:,6] = ha_means
-    out_data[0,:,7] = ha_perts[0]                   # lower limit
-    out_data[0,:,8] = ha_perts[1]                   # upper limit
-    out_data[0,:,9] = aa_means
-    out_data[0,:,10] = aa_perts[0]                  # lower limit
-    out_data[0,:,11] = aa_perts[1]                  # upper limit 
-    out_data[1,:,0] = obs_trends_preoz["raob"]
-    out_data[1,:,1] = obs_trends_preoz["rich"]
-    out_data[1,:,2] = obs_trends_preoz["rens"][0]   
-    out_data[1,:,3] = obs_trends_preoz["rens"][1]   # lower limit
-    out_data[1,:,4] = obs_trends_preoz["rens"][2]   # upper limit
-    out_data[1,:,5] = obs_trends_preoz["era5"]
-    out_data[1,:,6] = hpr_means
-    out_data[1,:,7] = hpr_perts[0]                  # lower limit
-    out_data[1,:,8] = hpr_perts[1]                  # upper limit
-    out_data[1,:,9] = apre_means
-    out_data[1,:,10] = apre_perts[0]                # lower limit
-    out_data[1,:,11] = apre_perts[1]                # upper limit 
+    out_data[0,:,0] = obs_trends_preoz["raob"]
+    out_data[0,:,1] = obs_trends_preoz["rich"]
+    out_data[0,:,2] = obs_trends_preoz["rens"][0]
+    out_data[0,:,3] = obs_trends_preoz["rens"][1]   # lower limit
+    out_data[0,:,4] = obs_trends_preoz["rens"][2]   # upper limit
+    out_data[0,:,5] = obs_trends_preoz["era5"]
+    out_data[0,:,6] = hpr_means
+    out_data[0,:,7] = hpr_perts[0]                  # lower limit
+    out_data[0,:,8] = hpr_perts[1]                  # upper limit
+    out_data[0,:,9] = apre_means
+    out_data[0,:,10] = apre_perts[0]                # lower limit
+    out_data[0,:,11] = apre_perts[1]                # upper limit 
+    out_data[1,:,0] = obs_trends_all["raob"]
+    out_data[1,:,1] = obs_trends_all["rich"]  
+    out_data[1,:,2] = obs_trends_all["rens"][0]
+    out_data[1,:,3] = obs_trends_all["rens"][1]     # lower limit
+    out_data[1,:,4] = obs_trends_all["rens"][2]     # upper limit
+    out_data[1,:,5] = obs_trends_all["era5"]
+    out_data[1,:,6] = ha_means
+    out_data[1,:,7] = ha_perts[0]                   # lower limit
+    out_data[1,:,8] = ha_perts[1]                   # upper limit
+    out_data[1,:,9] = aa_means
+    out_data[1,:,10] = aa_perts[0]                  # lower limit
+    out_data[1,:,11] = aa_perts[1]                  # upper limit 
     out_data[2,:,0] = obs_trends_postoz["raob"]
     out_data[2,:,1] = obs_trends_postoz["rich"]
     out_data[2,:,2] = obs_trends_postoz["rens"][0]
@@ -300,12 +300,13 @@ def plot_trends(cfg, provenance_record, \
     out_data[2,:,9] = apo_means
     out_data[2,:,10] = apo_perts[0]                 # lower limit
     out_data[2,:,11] = apo_perts[1]                 # upper limit 
-    time_period = iris.coord.DimCoord(np.array([1997, 1988, 2006]), \
-                                      bounds = np.array([[1979, 2004], [1979, 1997], [1998, 2014]]), \
+    time_period = iris.coords.DimCoord(np.array([1988, 1997, 2006]), \
+                                      bounds = np.array([[1979, 1997], [1979, 2004], [1998, 2014]]), \
                                       long_name="time_period")
-    pressure_levels = iris.coord.DimCoord(plevs, long_name="pressure level", units="hPa")
-    data_source = iris.coord.DimCoord(np.arange(12), long_name="data source")
-    out_cube = iris.cube.Cube(out_data, dim_coords_and_dims=[(time_period, 0), (pressure_levels, 1), (data_source, 2)], \
+    pressure_levels = iris.coords.DimCoord(plevs, long_name="pressure_level", units="hPa")
+    data_source = iris.coords.DimCoord(np.arange(12), long_name="data_source")
+    out_cube = iris.cube.Cube(out_data, long_name="tropic_temperature_trend", units="celsius per decade", \
+                              dim_coords_and_dims=[(time_period, 0), (pressure_levels, 1), (data_source, 2)], \
                               attributes={"0":"RAOBCORE v1.7", "1":"RICH-obs v1.7 mean", "2":"RICH-obs v1.5.1 mean", \
                                           "3":"RICH-obs v1.5.1 lower limit", "4":"RICH-obs v1.5.1 upper limit", \
                                           "5":"ERA5/5.1", "6":"Couple ocean models mean", "7":"Couple ocean models lower limit", \
