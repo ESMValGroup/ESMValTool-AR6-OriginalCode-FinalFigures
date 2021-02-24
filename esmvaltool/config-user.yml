@@ -52,7 +52,7 @@ log_level: info
 # Exit on warning (only for NCL diagnostic scripts)? true/[false]
 exit_on_warning: false
 # Plot file format? [png]/pdf/ps/eps/epsi
-output_file_type: png
+output_file_type: [png, eps]
 # Use netCDF compression true/[false]
 compress_netcdf: false
 # Save intermediary cubes in the preprocessor true/[false]

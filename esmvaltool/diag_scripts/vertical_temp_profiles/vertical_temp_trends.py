@@ -10,12 +10,38 @@ from datetime import date
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.patches import Patch
-from esmvaltool.diag_scripts.shared import run_diagnostic, select_metadata, group_metadata
+from esmvaltool.diag_scripts.shared import (
+    run_diagnostic, 
+    select_metadata, 
+    group_metadata,
+    save_data,
+    save_figure,
+)
 
 
 ''' Atmospheric temperature trends at pressure levels '''
 ''' from CMIP6 coupled and atmos-only models, and radiosonde and reanalysis data '''
 ''' Eunice Lo '''
+
+
+def get_provenance_record(caption, ancestor_files):
+
+    ''' create a provenance record describing the diagnostic data and plot '''
+
+    record = {
+        'caption': caption,
+        'statistics': ['trend'],
+        'domains': ['trop'],
+        'plot_types': ['vert'],
+        'authors': [
+            'lo_eunice',
+        ],
+        'references': [
+            'mitchell20erl',
+        ],
+        'ancestors': ancestor_files,
+    }
+    return record
 
 
 def annual_mean(mthly_cubelist):
@@ -85,7 +111,8 @@ def remove_nans(in_2darray):
     return out_list
 
 
-def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, \
+def plot_trends(cfg, provenance_record, \
+                obs_trends_all, hist_trends_all, amip_trends_all, \
                 obs_trends_preoz, hist_trends_preoz, amip_trends_preoz, \
                 obs_trends_postoz, hist_trends_postoz, amip_trends_postoz, \
                 plevs, syr, myr, eyr):
@@ -226,13 +253,65 @@ def plot_trends(cfg, obs_trends_all, hist_trends_all, amip_trends_all, \
     ax3.xaxis.set_major_locator(ticker.FixedLocator([-0.9, -0.6, -0.3, 0., 0.3, 0.6, 0.9]))
     ax3.set_xlabel("Trend ($^{\circ}$C/decade)")
 
-    # save
+    # save plot
     plt.tight_layout()
     today = date.today().strftime("%Y%m%d")
-    png_name = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_"+today+".png"
-    plt.savefig(os.path.join(local_path, png_name))
+    fstem = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_"+today
+    save_figure(fstem, provenance_record, cfg)
+    plt.savefig(os.path.join(local_path, fstem+".svg"), format="svg")
     plt.close()
 
+    # save data
+    out_data = np.zeroes((3, len(plevs), 12))
+    out_data[0,:,0] = obs_trends_all["raob"]
+    out_data[0,:,1] = obs_trends_all["rich"]  
+    out_data[0,:,2] = obs_trends_all["rens"][0]
+    out_data[0,:,3] = obs_trends_all["rens"][1]     # lower limit
+    out_data[0,:,4] = obs_trends_all["rens"][2]     # upper limit
+    out_data[0,:,5] = obs_trends_all["era5"]
+    out_data[0,:,6] = ha_means
+    out_data[0,:,7] = ha_perts[0]                   # lower limit
+    out_data[0,:,8] = ha_perts[1]                   # upper limit
+    out_data[0,:,9] = aa_means
+    out_data[0,:,10] = aa_perts[0]                  # lower limit
+    out_data[0,:,11] = aa_perts[1]                  # upper limit 
+    out_data[1,:,0] = obs_trends_preoz["raob"]
+    out_data[1,:,1] = obs_trends_preoz["rich"]
+    out_data[1,:,2] = obs_trends_preoz["rens"][0]   
+    out_data[1,:,3] = obs_trends_preoz["rens"][1]   # lower limit
+    out_data[1,:,4] = obs_trends_preoz["rens"][2]   # upper limit
+    out_data[1,:,5] = obs_trends_preoz["era5"]
+    out_data[1,:,6] = hpr_means
+    out_data[1,:,7] = hpr_perts[0]                  # lower limit
+    out_data[1,:,8] = hpr_perts[1]                  # upper limit
+    out_data[1,:,9] = apre_means
+    out_data[1,:,10] = apre_perts[0]                # lower limit
+    out_data[1,:,11] = apre_perts[1]                # upper limit 
+    out_data[2,:,0] = obs_trends_postoz["raob"]
+    out_data[2,:,1] = obs_trends_postoz["rich"]
+    out_data[2,:,2] = obs_trends_postoz["rens"][0]
+    out_data[2,:,3] = obs_trends_postoz["rens"][1]  # lower limit
+    out_data[2,:,4] = obs_trends_postoz["rens"][2]  # upper limit
+    out_data[2,:,5] = obs_trends_postoz["era5"]
+    out_data[2,:,6] = hpo_means
+    out_data[2,:,7] = hpo_perts[0]                  # lower limit
+    out_data[2,:,8] = hpo_perts[1]                  # upper limit
+    out_data[2,:,9] = apo_means
+    out_data[2,:,10] = apo_perts[0]                 # lower limit
+    out_data[2,:,11] = apo_perts[1]                 # upper limit 
+    time_period = iris.coord.DimCoord(np.array([1997, 1988, 2006]), \
+                                      bounds = np.array([[1979, 2004], [1979, 1997], [1998, 2014]]), \
+                                      long_name="time_period")
+    pressure_levels = iris.coord.DimCoord(plevs, long_name="pressure level", units="hPa")
+    data_source = iris.coord.DimCoord(np.arange(12), long_name="data source")
+    out_cube = iris.cube.Cube(out_data, dim_coords_and_dims=[(time_period, 0), (pressure_levels, 1), (data_source, 2)], \
+                              attributes={"0":"RAOBCORE v1.7", "1":"RICH-obs v1.7 mean", "2":"RICH-obs v1.5.1 mean", \
+                                          "3":"RICH-obs v1.5.1 lower limit", "4":"RICH-obs v1.5.1 upper limit", \
+                                          "5":"ERA5/5.1", "6":"Couple ocean models mean", "7":"Couple ocean models lower limit", \
+                                          "8":"Couple ocean models upper limit", "9":"Prescribed SSTs models mean", \
+                                          "10":"Prescribed SSTs models lower limit", "11":"Prescribed SSTs models upper limit"}) 
+    save_data(fstem, provenance_record, cfg, out_cube)
+ 
     return "Saved plot!" 
 
 
@@ -240,12 +319,6 @@ def main(cfg):
        
     ''' run the diagnostic '''
     
-    # extract the Tropics (-20 to 20N)
-    # start_latitude and start_longitude defined in recipe    
- 
-    # load regridded data
-    # start_year and end_year of data defined in recipe
-
     # RAOBCORE v1.7
     input_raob_data = select_metadata(cfg['input_data'].values(), dataset="raobcore17")
     # cubelist of 1
@@ -260,6 +333,9 @@ def main(cfg):
     # load in deg Celsius, they are anomales anyway
     rich_cube[0].units = 'celsius'
 
+    # record input files
+    input_files = [input_raob_data[0]['filename'], input_rich_data[0]['filename']]    
+
     # RICH-obs v1.5.1 ensemble
     input_rens_data = select_metadata(cfg['input_data'].values(), dataset="rich")
     rens_cubes = iris.cube.CubeList()
@@ -268,12 +344,16 @@ def main(cfg):
         cube = iris.load_cube(data['filename'])
         cube.units = 'celsius'  
         rens_cubes.append(cube)
+        # record input file
+        input_files.append(data['filename'])
 
     # ERA5/5.1
     input_era5_data = select_metadata(cfg['input_data'].values(), dataset="era5.1")
     # cubelist of 1
     era5_cube = iris.load(input_era5_data[0]['filename'])
-    
+    # record input file
+    input_files.append(input_era5_data[0]['filename'])   
+ 
     # CMIP6
     input_hist_data = select_metadata(cfg['input_data'].values(), exp="historical")
     input_amip_data = select_metadata(cfg['input_data'].values(), exp="amip")
@@ -296,6 +376,8 @@ def main(cfg):
         # mask unrealistic Ts that are actually fill values
         cube.data.mask[np.abs(cube.data) >= 100.] = True
         hist_cubes.append(cube)
+        # record input file
+        input_files.append(data['filename'])
     
     # get amip (atmos only) data
     amip_models = []
@@ -311,6 +393,8 @@ def main(cfg):
         # mask unrealistic Ts that are actually fill values
         cube.data.mask[np.abs(cube.data) >= 100.] = True
         amip_cubes.append(cube)
+        # record input file
+        input_files.append(data['filename'])
     
     # turn into annual values, discarding years with more than 3 months of data missing
     raob_annuals = annual_mean(raob_cube)
@@ -386,35 +470,15 @@ def main(cfg):
         
     # do the plotting
     # in hPa
-    plevs = hist_tropmeans[0].coord("air_pressure").points/100.    
-    plot_trends(cfg, obs_trends_allyrs, hist_trends_allyrs, amip_trends_allyrs, \
+    plevs = hist_tropmeans[0].coord("air_pressure").points/100.   
+    caption = "Vertical profiles of air temperature trends between 1979 and 2014."
+    provenance_record = get_provenance_record(caption, input_files) 
+    plot_trends(cfg, provenance_record, \
+                obs_trends_allyrs, hist_trends_allyrs, amip_trends_allyrs, \
                 obs_trends_preoz, hist_trends_preoz, amip_trends_preoz, \
                 obs_trends_postoz, hist_trends_postoz, amip_trends_postoz, \
                 plevs=plevs, syr=1979, myr=1997, eyr=2014)
 
-    # save models and their trend values
-    local_path = cfg['work_dir']
-    with open(os.path.join(local_path,"hist_models.txt"), "w") as f:
-        for item in hist_models:
-            f.write("%s\n" % item)
-    with open(os.path.join(local_path,"amip_models.txt"), "w") as f:
-        for item in amip_models:
-            f.write("%s\n" % item)
-    np.save(os.path.join(local_path,"raob17_trends_allyrs.npy"), raob_trends_allyrs)
-    np.save(os.path.join(local_path,"rich17_trends_allyrs.npy"), rich_trends_allyrs)
-    np.save(os.path.join(local_path,"rio151_trends_allyrs.npy"), rens_trends_allyrs)
-    np.save(os.path.join(local_path,"hist_trends_allyrs.npy"), hist_trends_allyrs)
-    np.save(os.path.join(local_path,"amip_trends_allyrs.npy"), amip_trends_allyrs)
-    np.save(os.path.join(local_path,"raob17_trends_preoz.npy"), raob_trends_preoz)
-    np.save(os.path.join(local_path,"rich17_trends_preoz.npy"), rich_trends_preoz)
-    np.save(os.path.join(local_path,"rio151_trends_preoz.npy"), rens_trends_preoz)
-    np.save(os.path.join(local_path,"hist_trends_preoz.npy"), hist_trends_preoz)
-    np.save(os.path.join(local_path,"amip_trends_preoz.npy"), amip_trends_preoz)
-    np.save(os.path.join(local_path,"raob17_trends_postoz.npy"), raob_trends_postoz)
-    np.save(os.path.join(local_path,"rich17_trends_postoz.npy"), rich_trends_postoz)
-    np.save(os.path.join(local_path,"rio151_trends_postoz.npy"), rens_trends_postoz)
-    np.save(os.path.join(local_path,"hist_trends_postoz.npy"), hist_trends_postoz)
-    np.save(os.path.join(local_path,"amip_trends_postoz.npy"), amip_trends_postoz)
  
 if __name__ == '__main__':
 
