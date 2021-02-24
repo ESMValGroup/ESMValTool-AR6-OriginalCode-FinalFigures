@@ -1,0 +1,149 @@
+# ESMValTool
+# recipe_NAM_SAM_eof.yml
+---
+documentation:
+  description: |
+    Calculate NAM and SAM as EOF1s of sea level pressure.
+
+  authors:
+    - kosa_yu
+
+  maintainer:
+    - kosa_yu
+
+  references:
+    - acknow_project
+
+  projects:
+    - ipcc_ar6
+
+  realms:
+    - atmos
+
+  themes:
+    - varmodes
+
+  domains:
+    - polar
+
+  plot_types:
+    - polar
+    - times
+
+  statistics:
+    - eof
+
+datasets:
+  - {dataset: ACCESS1-0, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: ACCESS1-3, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: bcc-csm1-1, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: bcc-csm1-1-m, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: BNU-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CanESM2, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CCSM4, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CESM1-BGC, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CESM1-CAM5-1-FV2, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CESM1-CAM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CESM1-FASTCHEM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CESM1-WACCM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CMCC-CESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CMCC-CM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CMCC-CMS, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CNRM-CM5-2, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CNRM-CM5, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: CSIRO-Mk3-6-0, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: FGOALS-g2, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GFDL-CM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GFDL-ESM2G, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GFDL-ESM2M, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GISS-E2-H-CC, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GISS-E2-H, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GISS-E2-R-CC, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: GISS-E2-R, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: HadGEM2-CC, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: HadGEM2-ES, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: inmcm4, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: IPSL-CM5A-LR, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: IPSL-CM5A-MR, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: IPSL-CM5B-LR, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MIROC4h, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1950, end_year: 2005}
+  - {dataset: MIROC5, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MIROC-ESM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MIROC-ESM-CHEM, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MPI-ESM-LR, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MPI-ESM-MR, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MPI-ESM-P, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: MRI-CGCM3, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: NorESM1-M, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+  - {dataset: NorESM1-ME, project: CMIP5, exp: historical, ensemble: r1i1p1,
+     start_year: 1920, end_year: 2005}
+
+
+preprocessors:
+  pp_psl:
+    regrid:
+      target_grid: 2.5x2.5
+      scheme: linear
+
+diagnostics:
+
+  nam_sam:
+    description: apply EOF to monthly psl over NH and SH
+    variables:
+      psl:
+        preprocessor: pp_psl
+        reference_dataset: JRA-55
+        mip: Amon
+        field: T2Ms
+    additional_datasets:
+      - {dataset: JRA-55, project: ana4mips, type: reanalysis, version: 1,
+         start_year: 1958, end_year: 2006, tier: 3}
+    scripts:
+      pattern_index: 
+        script: annular_modes/annular_modes_eof.ncl
+        season_nam: monthly
+        season_sam: monthly
+        syear_eof: 1979
+        eyear_eof: 2004
+        movingave_index: 12

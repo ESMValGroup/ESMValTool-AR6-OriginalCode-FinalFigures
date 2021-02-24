@@ -655,6 +655,7 @@ function ncdf_write(data,
 ;    http://www.ncl.ucar.edu/Support/talk_archives/2009/0367.html
 ;
 ; Modification history
+;    20210223-kosaka_yu: bug fix in outfile_in@existing = "append" option
 ;    20131107-gottschaldt_klaus-dirk: written.
 ;
 local funcname, scriptname, data, outfile, outfile_in, ncdf, varname
@@ -694,19 +695,33 @@ begin
       ncdf = addfile(outfile, "w")
       dimNames = getvardims(data)
       dim_dim = dimsizes(dimNames)
-      ; define dimensions in case not defined yet
-      dimSzs = new(dimsizes(dimNames), long)
-      dimUnlim = new(dimsizes(dimNames), logical)
-      dimUnlim(:) = False
-      do i = 0, dim_dim - 1
-        dimSzs(i) = dimsizes(data&$dimNames(i)$)
+      ; define dimensions in case not defined
+      do idim = 0, dim_dim-1
+        if all(dimNames(idim) .ne. getvardims(ncdf)) then
+          if .not. isdefined("dims_new") then
+            dims_new = dimNames(idim)
+          else
+            dims_new := array_append_record(dims_new, dimNames(idim), 0)
+          end if
+        end if
       end do
-      filedimdef(ncdf, dimNames, dimSzs, dimUnlim)
+      if isdefined("dims_new") then
+        dimSzs = new(dimsizes(dims_new), long)
+        dimUnlim = new(dimsizes(dims_new), logical)
+        dimUnlim(:) = False
+        do i = 0, dimsizes(dims_new)- 1
+          dimSzs(i) = dimsizes(data&$dims_new(i)$)
+        end do
+        filedimdef(ncdf, dims_new, dimSzs, dimUnlim)
+      end if
       filevardef(ncdf, varname, typeof(data), dimNames)
       ; Copy attributes associated with each variable to the file
       do i = 0, dim_dim - 1
         ; No attribute assignment to variable if no attributes are available
-        if (.not.(all(ismissing(getvaratts(data&$dimNames(i)$))))) then
+        ; Also skip existing dimensions
+        if ((.not.(all(ismissing(getvaratts(data&$dimNames(i)$))))) .and. \
+            (all(dimNames(i) .ne. getvardims(ncdf)))) then
+          print("in if I should not be in")
           filevarattdef(ncdf, dimNames(i), data&$dimNames(i)$)
         end if
       end do

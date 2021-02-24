@@ -1,0 +1,1154 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3.yml
+---
+documentation:
+
+  description: |
+    Producing selected figures from IPCC WGI AR6, chap. 3
+
+  authors:
+    - bock_ls
+    - eyri_ve
+
+#  maintainer:
+    
+  references:
+    - flato13ipcc
+
+  projects:
+    - ipcc_ar6
+
+
+preprocessors:
+
+  clim_ref:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_land:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_ocean:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: land #if land, will mask land out; if sea, will mask seas and oceans out
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_north_america:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -168.
+      end_longitude: -10.
+      start_latitude: 11.
+      end_latitude: 85.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_south_america:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -82.
+      end_longitude: -34.
+      start_latitude: -56.
+      end_latitude: 11.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_europe:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -10.
+      end_longitude: 40.
+      start_latitude: 30.
+      end_latitude: 75.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_africa:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -20.
+      end_longitude: 52.
+      start_latitude: -35.
+      end_latitude: 30.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_asia:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: 40.
+      end_longitude: 180.
+      start_latitude: 5.
+      end_latitude: 70.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_australasia:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: 95.
+      end_longitude: 180.
+      start_latitude: -50.
+      end_latitude: 20.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+  clim_ref_antarctica:
+    regrid:
+      target_grid: reference_dataset
+      scheme: linear
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      start_longitude: -180.
+      end_longitude: 180.
+      start_latitude: -90.
+      end_latitude: -60.
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+cmip5_hist_models: &cmip5_hist_models
+  - {dataset: ACCESS1-0}
+  - {dataset: ACCESS1-3}
+  - {dataset: bcc-csm1-1}
+  - {dataset: bcc-csm1-1-m}
+  - {dataset: BNU-ESM}
+  #- {dataset: CanCM4}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-BGC}
+  - {dataset: CESM1-CAM5}
+  #- {dataset: CESM1-CAM5-1-FV2}
+  - {dataset: CESM1-FASTCHEM}
+  - {dataset: CESM1-WACCM}
+  - {dataset: CMCC-CESM}
+  - {dataset: CMCC-CM}
+  - {dataset: CMCC-CMS}
+  - {dataset: CNRM-CM5}
+  - {dataset: CNRM-CM5-2}
+  - {dataset: CSIRO-Mk3-6-0}
+  #- {dataset: EC-EARTH, ensemble: r6i1p1}
+  #- {dataset: FGOALS-g2}
+  #- {dataset: FGOALS-s2}
+  - {dataset: FIO-ESM}
+  #- {dataset: GFDL-CM2p1}
+  #- {dataset: GFDL-CM3}
+  #- {dataset: GFDL-ESM2G}
+  #- {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H, ensemble: r1i1p2}
+  - {dataset: GISS-E2-H-CC}
+  - {dataset: GISS-E2-R, ensemble: r1i1p2}
+  - {dataset: GISS-E2-R-CC}
+  #- {dataset: HadCM3}
+  #- {dataset: HadGEM2-AO}
+  #- {dataset: HadGEM2-CC}
+  #- {dataset: HadGEM2-ES}
+  - {dataset: inmcm4}
+  - {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: IPSL-CM5B-LR}
+  #- {dataset: MIROC4h}
+  - {dataset: MIROC5}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MPI-ESM-LR}
+  - {dataset: MPI-ESM-MR}
+  - {dataset: MPI-ESM-P}
+  - {dataset: MRI-CGCM3}
+  #- {dataset: MRI-ESM1}
+  - {dataset: NorESM1-M}
+  - {dataset: NorESM1-ME}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+     start_year: 1850, end_year: 2017, tier: 2}
+
+cmip5_histNat_models: &cmip5_histNat_models
+  - {dataset: ACCESS1-3}
+  - {dataset: bcc-csm1-1}
+  - {dataset: BNU-ESM}
+  - {dataset: CanESM2}
+  - {dataset: CCSM4}
+  - {dataset: CESM1-CAM5}
+  - {dataset: CNRM-CM5}
+  - {dataset: CSIRO-Mk3-6-0}
+  - {dataset: FGOALS-g2}
+  #- {dataset: GFDL-CM3}
+  #- {dataset: GFDL-ESM2M}
+  - {dataset: GISS-E2-H}
+  - {dataset: GISS-E2-R}
+  #- {dataset: HadGEM2-ES}
+  #- {dataset: IPSL-CM5A-LR}
+  - {dataset: IPSL-CM5A-MR}
+  - {dataset: MIROC-ESM}
+  - {dataset: MIROC-ESM-CHEM}
+  - {dataset: MRI-CGCM3}
+  - {dataset: NorESM1-M}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+     start_year: 1850, end_year: 2017, tier: 2}
+
+cmip6_hist_models: &cmip6_hist_models
+  - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2}
+  - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
+  - {dataset: GISS-E2-1-G, ensemble: r3i1p1f1, grid: gn}
+  - {dataset: IPSL-CM6A-LR, ensemble: r29i1p1f1}
+  - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+     start_year: 1850, end_year: 2017, tier: 2}
+
+diagnostics:
+
+  
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3 
+  # Fig. 3.7 (ZOD fig. 3.13)
+  # Lisa  
+  # **********************************************************************
+  # Temperature anomaly - global, land, ocaean and continental
+  # **********************************************************************
+  # status: developing from AR5 9_8 
+  # **********************************************************************
+
+  ########################################################################
+  # Global
+  ########################################################################
+
+  tas_hist_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline: &tsline_settings
+        script: ipcc_ar6/tsline_anom_tas.ncl
+        time_avg: "yearly"
+        ts_anomaly: "anom"    #"anom" for anomaly-plot else "noanom"
+        region: "Global"
+        ref_start: 1850       #start year of reference period for anomalies
+        ref_end: 1900         #end year of reference period for anomalies
+        ref_value: True       #attach absolute values on the right
+        ref_mask: True        #True: maksing of models by observations
+        mean_nh_sh: True
+        stat_shading: True    #shading of multi model statistics
+        write_stat: True      #write multi model statistics in nc-file
+        stat: "10-90"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        plot_units: "degC"
+        # Plot style
+        styleset: CMIP5
+        y_min: -1.0
+        y_max: 2.0
+
+  tas_hist_nat_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+
+  tas_cmip6_hist_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        styleset: CMIP6
+
+  fig_3_7_global:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*global/tsline*']
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # Land
+  ########################################################################
+
+  tas_hist_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Global Land"
+
+  tas_hist_nat_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Global Land"
+
+  tas_cmip6_hist_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land 
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Global Land"
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        styleset: CMIP6
+
+  fig_3_7_land:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_land   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*land/tsline*']
+        region: "Global Land"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # Ocean
+  ########################################################################
+
+  tas_hist_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Global Ocean"
+
+  tas_hist_nat_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Global Ocean"
+
+  tas_cmip6_hist_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Global Ocean"
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        styleset: CMIP6
+
+  fig_3_7_ocean:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_ocean   
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*ocean/tsline*']
+        region: "Global Ocean"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+
+  ########################################################################
+  # North America
+  ########################################################################
+
+  tas_hist_north_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_north_america  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline:
+        <<: *tsline_settings
+        region: "North America"
+        mean_nh_sh: False
+
+  tas_hist_nat_north_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_north_america   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "North America"
+        mean_nh_sh: False
+
+  tas_cmip6_hist_north_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_north_america
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        region: "North America"
+        mean_nh_sh: False
+        styleset: CMIP6
+
+  fig_3_7_north_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_north_america
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*north_america/tsline*']
+        region: "North America"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # South America
+  ########################################################################
+
+  tas_hist_south_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_south_america  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline:
+        <<: *tsline_settings
+        region: "South America"
+        mean_nh_sh: False
+
+  tas_hist_nat_south_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_south_america   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "South America"
+        mean_nh_sh: False
+
+  tas_cmip6_hist_south_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_south_america
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        region: "South America"
+        mean_nh_sh: False
+        styleset: CMIP6
+
+  fig_3_7_south_america:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_south_america
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*south_america/tsline*']
+        region: "South America"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # Europe
+  ########################################################################
+
+  tas_hist_europe:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_europe  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline:
+        <<: *tsline_settings
+        region: "Europe"
+        mean_nh_sh: False
+
+  tas_hist_nat_europe:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_europe   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Europe"
+        mean_nh_sh: False
+
+  tas_cmip6_hist_europe:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_europe
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        region: "Europe"
+        mean_nh_sh: False
+        styleset: CMIP6
+
+  fig_3_7_europe:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_europe
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*europe/tsline*']
+        region: "Europe"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # Africa
+  ########################################################################
+
+  tas_hist_africa:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_africa  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline:
+        <<: *tsline_settings
+        region: "Africa"
+        mean_nh_sh: False
+
+  tas_hist_nat_africa:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_africa   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Africa"
+        mean_nh_sh: False
+
+  tas_cmip6_hist_africa:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_africa
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        region: "Africa"
+        mean_nh_sh: False
+        styleset: CMIP6
+
+  fig_3_7_africa:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_africa
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*africa/tsline*']
+        region: "Africa"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # Asia
+  ########################################################################
+
+  tas_hist_asia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_asia  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline:
+        <<: *tsline_settings
+        region: "Asia"
+        mean_nh_sh: False
+
+  tas_hist_nat_asia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_asia   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Asia"
+        mean_nh_sh: False
+
+  tas_cmip6_hist_asia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_asia
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        region: "Asia"
+        mean_nh_sh: False
+        styleset: CMIP6
+
+  fig_3_7_asia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_asia
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*asia/tsline*']
+        region: "Asia"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+  ########################################################################
+  # Australasia
+  ########################################################################
+
+  tas_hist_australasia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_australasia  
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1850 #1990
+        end_year: 2004
+    additional_datasets: *cmip5_hist_models
+    scripts:
+      tsline:
+        <<: *tsline_settings
+        region: "Australasia"
+        mean_nh_sh: False
+
+  tas_hist_nat_australasia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_australasia   
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP5
+        exp: historicalNat
+        ensemble: r1i1p1
+        start_year: 1850
+        end_year: 2004
+    additional_datasets: *cmip5_histNat_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        region: "Australasia"
+        mean_nh_sh: False
+
+  tas_cmip6_hist_australasia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_australasia
+        reference_dataset: HadCRUT4   
+        mip: Amon
+        field: T2Ms
+        project: CMIP6
+        exp: historical
+        grid: gr
+        start_year: 1850
+        end_year: 2014
+    additional_datasets: *cmip6_hist_models
+    scripts:
+      tsline: 
+        <<: *tsline_settings
+        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+        region: "Australasia"
+        mean_nh_sh: False
+        styleset: CMIP6
+
+  fig_3_7_australasia:
+    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+    variables:
+      tas:
+        preprocessor: clim_ref_australasia
+        mip: Amon
+        field: T2Ms
+        reference_dataset: HadCRUT4   
+    additional_datasets:
+      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+         start_year: 1850, end_year: 2017, tier: 2}
+    scripts:
+      collect: 
+        <<: *tsline_settings
+        script: ipcc_ar6/tsline_collect.ncl
+        ancestors: [tas, 'tas*australasia/tsline*']
+        region: "Australasia"
+        start_year: 1850
+        end_year: 2017
+        ref: ["HadCRUT4"]
+        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+
+#  ########################################################################
+#  # Antarctica
+#  ########################################################################
+#
+#  tas_hist_antarctica:
+#    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim_ref_antarctica  
+#        reference_dataset: HadCRUT4   
+#        mip: Amon
+#        field: T2Ms
+#        project: CMIP5
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1850 #1990
+#        end_year: 2004
+#    additional_datasets: *cmip5_hist_models
+#    scripts:
+#      tsline:
+#        <<: *tsline_settings
+#        region: "Antarctica"
+#        mean_nh_sh: False
+#
+#  tas_hist_nat_antarctica:
+#    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim_ref_antarctica   
+#        reference_dataset: HadCRUT4   
+#        mip: Amon
+#        field: T2Ms
+#        project: CMIP5
+#        exp: historicalNat
+#        ensemble: r1i1p1
+#        start_year: 1850
+#        end_year: 2004
+#    additional_datasets: *cmip5_histNat_models
+#    scripts:
+#      tsline: 
+#        <<: *tsline_settings
+#        region: "Antarctica"
+#        mean_nh_sh: False
+#
+#  tas_cmip6_hist_antarctica:
+#    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim_ref_antarctica
+#        reference_dataset: HadCRUT4   
+#        mip: Amon
+#        field: T2Ms
+#        project: CMIP6
+#        exp: historical
+#        grid: gr
+#        start_year: 1850
+#        end_year: 2014
+#    additional_datasets: *cmip6_hist_models
+#    scripts:
+#      tsline: 
+#        <<: *tsline_settings
+#        stat: "MinMax"         #statistics for multi model nc-file (MinMax,5-95,10-90)
+#        region: "Antarctica"
+#        mean_nh_sh: False
+#        styleset: CMIP6
+#
+#  fig_3_7_antarctica:
+#    description: IPCC AR5 Ch. 10, Fig. 10.7 (near-surface temperature)
+#    variables:
+#      tas:
+#        preprocessor: clim_ref_antarctica
+#        mip: Amon
+#        field: T2Ms
+#        reference_dataset: HadCRUT4   
+#    additional_datasets:
+#      - {dataset: HadCRUT4, project: OBS, type: ground, version: 1,
+#         start_year: 1850, end_year: 2017, tier: 2}
+#    scripts:
+#      collect: 
+#        <<: *tsline_settings
+#        script: ipcc_ar6/tsline_collect.ncl
+#        ancestors: [tas, 'tas*antarctica/tsline*']
+#        region: "Antarctica"
+#        start_year: 1850
+#        end_year: 2017
+#        ref: ["HadCRUT4"]
+#        order: ["CMIP5_historicalNat", "CMIP5_historical", "CMIP6_historical"]
+

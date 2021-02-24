@@ -150,6 +150,7 @@ function time_operations(field:numeric,
 ; References
 ;
 ; Modification history
+;    20201214-lauer_axel:   bugfix time weights
 ;    20190503-righi_mattia: removed obsolete option "mymm" (used only in
 ;                           reformat_obs, now outdated).
 ;    20140703-gottschaldt_klaus-dirk: added option "mymm".
@@ -197,6 +198,19 @@ begin
   date := cd_calendar(field&time, 0)
   year := date(:, 0)
   month := date(:, 1)
+  cal = field&time@calendar
+
+  ; check that calendar is supported by 'days_in_month'
+
+  valid_cal = (/"standard", "gregorian", "julian", "360_day", "360",  \
+                "365_day", "365", "366_day", "366", "noleap", "no_leap",  \
+                "allleap", "all_leap", "none"/)
+
+  if (ismissing(ind(valid_cal .eq. cal))) then
+    log_info("Warning: unsupported calendar in function " + funcname +  \
+             " (" + scriptname + "): " + cal + ". Using 'standard' instead.")
+    cal = "standard"
+  end if
 
   ; Determine indexes for the requested time range
   if (y1.eq.-1) then
@@ -244,7 +258,9 @@ begin
 
   ; Define weights as days-per-month
   if (l_wgt) then
-    weights = days_in_month(toint(year), toint(month))
+    iyear = toint(year)
+    iyear@calendar = cal
+    weights = days_in_month(iyear, toint(month))
   else
     weights = tofloat(subfield&time)
     weights = 1.
@@ -1262,6 +1278,7 @@ function calculate_metric(var:numeric,
 ;    dimensionality.
 ;
 ; Modification history
+;    20190312-A_bock_lisa: added calculation of RMSDxy
 ;    20140313-righi_mattia: implemented weights calculation within the
 ;                           function, depending on dimensionality.
 ;    20140120-frank_franziska: written.
@@ -1336,27 +1353,31 @@ begin
       time_weights = 1.
     end if
 
-    if (dim_names(1).eq."lat" .and. dim_names(2).eq."lon") then
-      area_weights = map_area(var&lat, var&lon)
-    end if
+    if (metric .eq. "RMSDxy") then
+       weights = time_weights
+    else
+      if (dim_names(1).eq."lat" .and. dim_names(2).eq."lon") then
+        area_weights = map_area(var&lat, var&lon)
+      end if
 
-    if (dim_names(1).eq."plev" .and. dim_names(2).eq."lat") then
-      areas = map_area(ref&lat, (/1.0, 2.0/))
-      nlev = dimsizes(ref&plev)
-      ptop = ref&plev(nlev - 1) - \
-        0.5 * (ref&plev(nlev - 2) - ref&plev(nlev - 1))
-      delta_p = dpres_plevel(ref&plev, 101325., ptop, 0)
-      area_weights = new((/nlev, dimsizes(ref&lat)/), float)
-      wdims = dimsizes(area_weights)
-      area_weights = conform_dims(wdims, delta_p, 0) * \
-        conform_dims(wdims, areas(:, 0), 1)
-    end if
+      if (dim_names(1).eq."plev" .and. dim_names(2).eq."lat") then
+        areas = map_area(ref&lat, (/1.0, 2.0/))
+        nlev = dimsizes(ref&plev)
+        ptop = ref&plev(nlev - 1) - \
+          0.5 * (ref&plev(nlev - 2) - ref&plev(nlev - 1))
+        delta_p = dpres_plevel(ref&plev, 101325., ptop, 0)
+        area_weights = new((/nlev, dimsizes(ref&lat)/), float)
+        wdims = dimsizes(area_weights)
+        area_weights = conform_dims(wdims, delta_p, 0) * \
+          conform_dims(wdims, areas(:, 0), 1)
+      end if
 
-    if (isdefined("time_weights").and.isdefined("area_weights")) then
-      weights = new(dimsizes(var), float)
-      do ii = 0, dimsizes(time_weights) - 1
-        weights(ii, :, :) = time_weights(ii) * area_weights
-      end do
+      if (isdefined("time_weights").and.isdefined("area_weights")) then
+        weights = new(dimsizes(var), float)
+        do ii = 0, dimsizes(time_weights) - 1
+          weights(ii, :, :) = time_weights(ii) * area_weights
+        end do
+      end if
     end if
   end if
 
@@ -1376,13 +1397,24 @@ begin
     wgt1d = 1.0
   end if
 
-  ; Calculate weighted averages
-  avg_var = dim_avg_wgt_Wrap(var1d, wgt1d, 1)
-  avg_ref = dim_avg_wgt_Wrap(ref1d, wgt1d, 1)
+  if (isStrSubset(metric, "stddev_ratio") .or. \
+      isStrSubset(metric, "correlation")) then
+    ; Calculate weighted averages
+    avg_var = dim_avg_wgt_Wrap(var1d, wgt1d, 1)
+    avg_ref = dim_avg_wgt_Wrap(ref1d, wgt1d, 1)
+  end if
 
   ; RMSD
   if (metric.eq."RMSD") then
     out = sqrt(dim_avg_wgt_Wrap((var1d - ref1d) ^ 2, wgt1d, 1))
+    leave_msg(scriptname, funcname)
+    return(out)
+  end if
+
+  ; RMSD
+  if (metric.eq."RMSDxy") then
+    out = sqrt(dim_avg_wgt_n_Wrap((var - ref) ^ 2, weights, 1, 0))
+    ;out = onedtond(tmp, (/dimsizes(var&lat),dimsizes(var&lon)/))
     leave_msg(scriptname, funcname)
     return(out)
   end if

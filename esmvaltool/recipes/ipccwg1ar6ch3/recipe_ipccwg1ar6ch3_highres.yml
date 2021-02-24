@@ -1,0 +1,98 @@
+# ESMValTool
+# recipe_ipccwg1ar6ch3_highres.yml
+---
+documentation:
+
+  description: |
+    Producing Fig. 3.2 e,f, Fig. 3.13 e,f
+
+  authors:
+    - bock_lisa
+
+
+preprocessors:
+
+  clim_wo_mmm:
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+
+
+
+models_highresmip_hist-1950: &models_highresmip_hist-1950
+  # low res models
+  #- {dataset: CMCC-CM2-HR4, exp: hist-1950, grid: gn}
+  - {dataset: CNRM-CM6-1, exp: hist-1950, ensemble: r1i1p1f2}
+  - {dataset: EC-Earth3P, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-LR, exp: hist-1950}
+  - {dataset: HadGEM3-GC31-LL, exp: hist-1950, grid: gn}
+  #- {dataset: MPI-ESM1-2-HR, exp: hist-1950, grid: gn}
+  # high res models
+  #- {dataset: CMCC-CM2-VHR4, exp: hist-1950, grid: gn}
+  - {dataset: CNRM-CM6-1-HR, exp: hist-1950, ensemble: r1i1p1f2}
+  - {dataset: EC-Earth3P-HR, exp: hist-1950, ensemble: r1i1p2f1}
+  - {dataset: ECMWF-IFS-HR, exp: hist-1950}
+  - {dataset: HadGEM3-GC31-HM, exp: hist-1950, grid: gn}
+  #- {dataset: MPI-ESM1-2-XR, exp: hist-1950, grid: gn}
+
+
+
+diagnostics:
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3
+  # Fig. 3.2
+  # **********************************************************************
+
+  fig_3_2_highresmip:
+    description: Near-Surface Air Temperature Bias
+    variables:
+      tas: &var_highres
+        preprocessor: clim_wo_mmm
+        reference_dataset: ERA5
+        mip: Amon
+        project: CMIP6
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1985
+        end_year: 2014
+        additional_datasets: *models_highresmip_hist-1950
+    additional_datasets:
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
+    scripts:
+      fig_3_2:  &diag_highres
+        script: ipcc_ar6/model_bias_diff.ncl
+        projection: Robinson
+        caption: ['HighResMIP (high) bias', 'HighResMIP (low) bias']
+        panel_num: ['e)', 'f)']
+        stippandhatch: True
+        groups: ['highresmip_high', 'highresmip_low']
+        modelgroup_1: ['CNRM-CM6-1-HR', 'EC-Earth3P-HR', 'ECMWF-IFS-HR',
+                       'HadGEM3-GC31-HM']
+        modelgroup_2: ['CNRM-CM6-1', 'EC-Earth3P', 'ECMWF-IFS-LR',
+                       'HadGEM3-GC31-LL']
+        #modelgroup_1: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'EC-Earth3P-HR', 'ECMWF-IFS-HR',
+        #               'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+        #modelgroup_2: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'EC-Earth3P', 'ECMWF-IFS-LR',
+        #               'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
+
+
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3
+  # Fig. 3.13
+  # **********************************************************************
+
+  fig_3_13_highresmip:
+    description: Precipitation bias
+    variables:
+      pr:
+        <<: *var_highres
+        reference_dataset: GPCP-SG
+    additional_datasets:
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
+    scripts:
+      fig_3_13: 
+        <<: *diag_highres
+

@@ -831,7 +831,7 @@ diagnostics:
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
       - {dataset: ERA-Interim, project: OBS6, type: reanaly, version: 1, tier: 3}
-      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}      
+      - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
     scripts:
       fig09-6_pattern_cor: &fig09_6_pattern_cor
         script: ipcc_ar5/ch09_fig09_6.ncl
@@ -915,7 +915,7 @@ diagnostics:
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
 
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}
     scripts:
       fig09-6_pattern_cor:
         <<: *fig09_6_pattern_cor
@@ -1081,7 +1081,7 @@ diagnostics:
       - {dataset: NorESM1-M}
       - {dataset: NorESM1-ME}
 
-      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}      
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7, tier: 1, start_year: 2003, end_year: 2011}
     scripts:
       fig09-6_pattern_cor:
         <<: *fig09_6_pattern_cor
@@ -1512,7 +1512,9 @@ diagnostics:
   # Flato et al. (2013) - IPCC AR5, chap. 9
   # similar to fig. 9.42
   # **********************************************************************
-  #
+  # Equilibrium climate sensitivity (ECS) vs. global mean surface
+  # temperature (GMSAT)
+  # Contribution by Manuel Schlund
   # **********************************************************************
 
   ecs_cmip5:

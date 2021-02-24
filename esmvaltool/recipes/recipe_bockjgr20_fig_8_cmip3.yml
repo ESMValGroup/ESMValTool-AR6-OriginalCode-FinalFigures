@@ -1,0 +1,88 @@
+# ESMValTool
+# recipe_clouds_ipcc.yml
+---
+documentation:
+  description: |
+    Diagnostics of clouds and hydrological cycle multi-model mean bias,
+    zonal means; similar to IPCC AR5 fig. 9.5.
+
+  authors:
+    - lauer_axel
+
+  maintainer:
+    - lauer_axel
+
+  references:
+    - flato13ipcc
+
+  projects:
+    - esmval
+
+datasets:
+  #- &cmip3 {dataset: bccr_bcm2_0,  institute: BCCR, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
+  - &cmip3 {dataset: cccma_cgcm3_1,  institute: CCCMA, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
+  #- {<<: *cmip3, dataset: cccma_cgcm3_1, institute: CCCMA}
+  - {<<: *cmip3, dataset: cccma_cgcm3_1_t63, institute: CCCMA}
+  - {<<: *cmip3, dataset: csiro_mk3_0, institute: CSIRO}
+  - {<<: *cmip3, dataset: gfdl_cm2_0, institute: GFDL}
+  - {<<: *cmip3, dataset: gfdl_cm2_1, institute: GFDL}
+  - {<<: *cmip3, dataset: giss_model_e_h, institute: NASA}
+  - {<<: *cmip3, dataset: giss_model_e_r, institute: NASA}
+  - {<<: *cmip3, dataset: iap_fgoals1_0_g, institute: LASG}
+  - {<<: *cmip3, dataset: inmcm3_0, institute: INM}
+  - {<<: *cmip3, dataset: ipsl_cm4, institute: IPSL}
+  - {<<: *cmip3, dataset: miroc3_2_hires, institute: NIES}
+  - {<<: *cmip3, dataset: miroc3_2_medres, institute: NIES}
+  #- {<<: *cmip3, dataset: miub_echo_g, institute: MIUB-KMA}
+  - {<<: *cmip3, dataset: mpi_echam5, institute: MPIM}
+  - {<<: *cmip3, dataset: mri_cgcm2_3_2a, institute: MRI}
+  - {<<: *cmip3, dataset: ncar_ccsm3_0, institute: NCAR}
+  - {<<: *cmip3, dataset: ncar_pcm1, institute: NCAR}
+  - {<<: *cmip3, dataset: ukmo_hadcm3, institute: UKMO}
+  - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
+
+
+preprocessors:
+  clim:
+    regrid:
+      target_grid: 2x2
+      scheme: linear
+    mask_fillvalues:
+      threshold_fraction: 0.95
+    multi_model_statistics:
+      span: overlap
+      statistics: [mean]
+      exclude: [reference_dataset]
+
+
+diagnostics:
+
+  fig_8_cmip3:
+    description: differences of multi-model mean and reference dataset
+    themes:
+      - clouds
+    realms:
+      - atmos
+    variables:
+      swcre:
+        preprocessor: clim
+        reference_dataset: CERES-EBAF
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        mip: Amon
+        start_year: 1980
+        end_year: 1999
+        derive: true
+    additional_datasets:
+      - {dataset: CERES-EBAF, project: obs4mips, level: L3B, version: Ed2-7,
+         start_year: 2001, end_year: 2010, tier: 1}
+    scripts:
+      clim: &clim_settings
+        script: clouds/clouds_ipcc.ncl
+        projection: Robinson
+        #colormap: WhiteBlueGreenYellowRed
+        timemean: annualclim
+        explicit_cn_levels: [-40., -35., -30., -25., -20., -15., -10., -5., 0., 5., 10., 15., 20., 25., 30., 35., 40.]
+
+
