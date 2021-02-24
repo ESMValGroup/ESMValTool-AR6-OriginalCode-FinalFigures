@@ -14,7 +14,7 @@ documentation:
     - mitchell20erl
 
   projects:
-    - esmval
+    - ipcc_ar6
 
 datasets:
   # ERA5/5.1
