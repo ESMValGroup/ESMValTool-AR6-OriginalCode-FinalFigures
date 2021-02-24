@@ -39,6 +39,7 @@ def get_provenance_record(caption, ancestor_files):
         'references': [
             'mitchell20erl',
         ],
+        'projects': ['ipcc_ar6'],
         'ancestors': ancestor_files,
     }
     return record
@@ -258,7 +259,7 @@ def plot_trends(cfg, provenance_record, \
     today = date.today().strftime("%Y%m%d")
     fstem = "vertical_temp_profiles_20S-20N_"+str(syr)+"_"+str(eyr)+"_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_"+today
     save_figure(fstem, provenance_record, cfg)
-    plt.savefig(os.path.join(local_path, fstem+".svg"), format="svg")
+    #plt.savefig(os.path.join(local_path, fstem+".svg"), format="svg")
     plt.close()
 
     # save data
