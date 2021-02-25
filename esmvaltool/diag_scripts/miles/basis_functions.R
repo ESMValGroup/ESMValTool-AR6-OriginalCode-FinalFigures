@@ -235,7 +235,7 @@ progression_bar <- function(index, total_length, each = 10) {
 
 # to convert season charname to months number
 season2timeseason <- function(season) {
-  if (nchar(season) <= 3 & toupper(season) == season) {
+  if (nchar(season) <= 4 & toupper(season) == season) {
     if (season == "ALL") {
       timeseason <- 1:12
     }
