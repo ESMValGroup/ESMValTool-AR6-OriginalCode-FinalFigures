@@ -264,30 +264,30 @@ def plot_trends(cfg, provenance_record, \
 
     # save data
     out_data = np.zeros((3, len(plevs), 12))
-    out_data[0,:,0] = obs_trends_preoz["raob"]
-    out_data[0,:,1] = obs_trends_preoz["rich"]
-    out_data[0,:,2] = obs_trends_preoz["rens"][0]
-    out_data[0,:,3] = obs_trends_preoz["rens"][1]   # lower limit
-    out_data[0,:,4] = obs_trends_preoz["rens"][2]   # upper limit
-    out_data[0,:,5] = obs_trends_preoz["era5"]
-    out_data[0,:,6] = hpr_means
-    out_data[0,:,7] = hpr_perts[0]                  # lower limit
-    out_data[0,:,8] = hpr_perts[1]                  # upper limit
-    out_data[0,:,9] = apre_means
-    out_data[0,:,10] = apre_perts[0]                # lower limit
-    out_data[0,:,11] = apre_perts[1]                # upper limit 
-    out_data[1,:,0] = obs_trends_all["raob"]
-    out_data[1,:,1] = obs_trends_all["rich"]  
-    out_data[1,:,2] = obs_trends_all["rens"][0]
-    out_data[1,:,3] = obs_trends_all["rens"][1]     # lower limit
-    out_data[1,:,4] = obs_trends_all["rens"][2]     # upper limit
-    out_data[1,:,5] = obs_trends_all["era5"]
-    out_data[1,:,6] = ha_means
-    out_data[1,:,7] = ha_perts[0]                   # lower limit
-    out_data[1,:,8] = ha_perts[1]                   # upper limit
-    out_data[1,:,9] = aa_means
-    out_data[1,:,10] = aa_perts[0]                  # lower limit
-    out_data[1,:,11] = aa_perts[1]                  # upper limit 
+    out_data[0,:,0] = obs_trends_all["raob"]
+    out_data[0,:,1] = obs_trends_all["rich"]  
+    out_data[0,:,2] = obs_trends_all["rens"][0]
+    out_data[0,:,3] = obs_trends_all["rens"][1]     # lower limit
+    out_data[0,:,4] = obs_trends_all["rens"][2]     # upper limit
+    out_data[0,:,5] = obs_trends_all["era5"]
+    out_data[0,:,6] = ha_means
+    out_data[0,:,7] = ha_perts[0]                   # lower limit
+    out_data[0,:,8] = ha_perts[1]                   # upper limit
+    out_data[0,:,9] = aa_means
+    out_data[0,:,10] = aa_perts[0]                  # lower limit
+    out_data[0,:,11] = aa_perts[1]                  # upper limit 
+    out_data[1,:,0] = obs_trends_preoz["raob"]
+    out_data[1,:,1] = obs_trends_preoz["rich"]
+    out_data[1,:,2] = obs_trends_preoz["rens"][0]
+    out_data[1,:,3] = obs_trends_preoz["rens"][1]   # lower limit
+    out_data[1,:,4] = obs_trends_preoz["rens"][2]   # upper limit
+    out_data[1,:,5] = obs_trends_preoz["era5"]
+    out_data[1,:,6] = hpr_means
+    out_data[1,:,7] = hpr_perts[0]                  # lower limit
+    out_data[1,:,8] = hpr_perts[1]                  # upper limit
+    out_data[1,:,9] = apre_means
+    out_data[1,:,10] = apre_perts[0]                # lower limit
+    out_data[1,:,11] = apre_perts[1]                # upper limit 
     out_data[2,:,0] = obs_trends_postoz["raob"]
     out_data[2,:,1] = obs_trends_postoz["rich"]
     out_data[2,:,2] = obs_trends_postoz["rens"][0]
@@ -300,18 +300,24 @@ def plot_trends(cfg, provenance_record, \
     out_data[2,:,9] = apo_means
     out_data[2,:,10] = apo_perts[0]                 # lower limit
     out_data[2,:,11] = apo_perts[1]                 # upper limit 
-    time_period = iris.coords.DimCoord(np.array([1988, 1997, 2006]), \
-                                      bounds = np.array([[1979, 1997], [1979, 2004], [1998, 2014]]), \
-                                      long_name="time_period")
+    time_period_index = iris.coords.DimCoord(np.arange(3), long_name="time_period_index")
     pressure_levels = iris.coords.DimCoord(plevs, long_name="pressure_level", units="hPa")
-    data_source = iris.coords.DimCoord(np.arange(12), long_name="data_source")
-    out_cube = iris.cube.Cube(out_data, long_name="tropic_temperature_trend", units="celsius per decade", \
-                              dim_coords_and_dims=[(time_period, 0), (pressure_levels, 1), (data_source, 2)], \
-                              attributes={"0":"RAOBCORE v1.7", "1":"RICH-obs v1.7 mean", "2":"RICH-obs v1.5.1 mean", \
-                                          "3":"RICH-obs v1.5.1 lower limit", "4":"RICH-obs v1.5.1 upper limit", \
-                                          "5":"ERA5/5.1", "6":"Couple ocean models mean", "7":"Couple ocean models lower limit", \
-                                          "8":"Couple ocean models upper limit", "9":"Prescribed SSTs models mean", \
-                                          "10":"Prescribed SSTs models lower limit", "11":"Prescribed SSTs models upper limit"}) 
+    data_source_index = iris.coords.DimCoord(np.arange(12), long_name="data_source_index")
+    out_cube = iris.cube.Cube(out_data, long_name="tropic_temperature_trend (celsius per decade)", \
+                              dim_coords_and_dims=[(time_period_index, 0), (pressure_levels, 1), (data_source_index, 2)], \
+                              attributes={"time_period_index 0":"1979-2014", "time_period_index 1":"1979-1997", \
+                                          "time_period_index 2":"1998-2014", "data_source_index 0":"RAOBCORE v1.7", \
+                                          "data_source_index 1":"RICH-obs v1.7 mean", \
+                                          "data_source_index 2":"RICH-obs v1.5.1 mean", \
+                                          "data_source_index 3":"RICH-obs v1.5.1 lower limit", \
+                                          "data_source_index 4":"RICH-obs v1.5.1 upper limit", \
+                                          "data_source_index 5":"ERA5/5.1", \
+                                          "data_source_index 6":"Couple ocean models mean", \
+                                          "data_source_index 7":"Couple ocean models lower limit", \
+                                          "data_source_index 8":"Couple ocean models upper limit", \
+                                          "data_source_index 9":"Prescribed SSTs models mean", \
+                                          "data_source_index 10":"Prescribed SSTs models lower limit", \
+                                          "data_source_index 11":"Prescribed SSTs models upper limit"}) 
     save_data(fstem, provenance_record, cfg, out_cube)
  
     return "Saved plot!" 
