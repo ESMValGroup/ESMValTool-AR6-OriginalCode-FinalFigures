@@ -1073,59 +1073,59 @@ diagnostics:
         styleset: CMIP6
 
 
-  # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Sect. 3.3 
-  # Fig 3.6
-  # **********************************************************************
-  # GSAT in piControl and GSAT trends in piControl, obs and historical-ssp245
-  # ***********************************************************************
-
-  gsat_pi+hist+obs:
-    description: IPCC AR6 Ch. 3, Fig. 3.6
-    themes:
-      - phys
-    realms:
-      - atmos
-    variables:
-      tas_pi: &var_sat
-        short_name: tas
-        mip: Amon
-        project: CMIP6
-        exp: piControl
-        preprocessor: temp_tr
-        additional_datasets: *models_cmip6_piControl_500
-      tas_hist:
-        short_name: tas
-        mip: Amon
-        project: CMIP6
-        grid: gn
-        exp: [historical, ssp245]
-        start_year: 1850
-        end_year: 2019
-        preprocessor: temp_tr
-        additional_datasets: *cmip6_models
-      tasaga_obs:
-        short_name: tasaga
-        mip: Amon
-        project: OBS
-        start_year: 1850
-        end_year: 2019
-        additional_datasets:      
-          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-      tasa_obs:
-        short_name: tasa
-        mip: Amon
-        project: OBS
-        start_year: 1850
-        end_year: 2019
-        additional_datasets:
-          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
-          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
-          - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
-    scripts:
-      gsat_pi_hist_obs:
-        script: ipccwg1ar6ch3_gsat_pi/gsat_pi_hist_obs.ncl
+#  # **********************************************************************
+#  # IPCC WGI AR6, chap. 3
+#  # Sect. 3.3 
+#  # Fig 3.6
+#  # **********************************************************************
+#  # GSAT in piControl and GSAT trends in piControl, obs and historical-ssp245
+#  # ***********************************************************************
+#
+#  gsat_pi+hist+obs:
+#    description: IPCC AR6 Ch. 3, Fig. 3.6
+#    themes:
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      tas_pi: &var_sat
+#        short_name: tas
+#        mip: Amon
+#        project: CMIP6
+#        exp: piControl
+#        preprocessor: temp_tr
+#        additional_datasets: *models_cmip6_piControl_500
+#      tas_hist:
+#        short_name: tas
+#        mip: Amon
+#        project: CMIP6
+#        grid: gn
+#        exp: [historical, ssp245]
+#        start_year: 1850
+#        end_year: 2019
+#        preprocessor: temp_tr
+#        additional_datasets: *cmip6_models
+#      tasaga_obs:
+#        short_name: tasaga
+#        mip: Amon
+#        project: OBS
+#        start_year: 1850
+#        end_year: 2019
+#        additional_datasets:      
+#          - {dataset: HadCRUT5, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#      tasa_obs:
+#        short_name: tasa
+#        mip: Amon
+#        project: OBS
+#        start_year: 1850
+#        end_year: 2019
+#        additional_datasets:
+#          - {dataset: NOAAGlobalTemp-Interim, project: OBS, type: ground, version: interim2020, tier: 2}
+#          - {dataset: BerkeleyEarth, project: OBS, type: ground, version: H4, tier: 2}
+#          - {dataset: Kadow, project: OBS, type: mean, version: 5.0.1.0, tier: 2}
+#    scripts:
+#      gsat_pi_hist_obs:
+#        script: ipccwg1ar6ch3_gsat_pi/gsat_pi_hist_obs.ncl
 
 
   # **********************************************************************
@@ -1486,96 +1486,96 @@ diagnostics:
 
 
 
-   # **********************************************************************
-   # IPCC WGI AR6, chap. 3
-   # Sect. 3.3
-   # Fig. 3.13
-   # **********************************************************************
-   # Lisa
-   # **********************************************************************
-   # Multi model mean, multi model mean bias and root mean square error 
-   # (geographical distributions) for CMIP6, CMIP5 and HighResMIP
-   # **********************************************************************
- 
-   IAV_calc_pr_cmip6:
-     <<: *diag_IAV
-     variables:
-       pr:
-         preprocessor: preproc_map
-         project: CMIP6
-         mip: Amon
-         exp: piControl
-         ensemble: r1i1p1f1
-         grid: gr
- 
-   IAV_calc_pr_cmip5: 
-     <<: *diag_IAV
-     variables:
-       pr:
-         preprocessor: preproc_map
-         project: CMIP5
-         mip: Amon
-         exp: piControl
-         ensemble: r1i1p1
-     additional_datasets: *models_cmip5_piControl
- 
+  # **********************************************************************
+  # IPCC WGI AR6, chap. 3
+  # Sect. 3.3
+  # Fig. 3.13
+  # **********************************************************************
+  # Lisa
+  # **********************************************************************
+  # Multi model mean, multi model mean bias and root mean square error 
+  # (geographical distributions) for CMIP6, CMIP5 and HighResMIP
+  # **********************************************************************
 
- 
-   fig_3_13_cmip6:
-     description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
-     variables:
-       pr:
-         preprocessor: clim
-         reference_dataset: GPCP-SG
-         mip: Amon
-         project: CMIP6
-         exp: historical
-         ensemble: r1i1p1f1
-         grid: gr
-         start_year: 1995
-         end_year: 2014
-         additional_datasets: *models_cmip6_historical
-     additional_datasets:
-       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
-     scripts:
-       fig_3_13: 
-         script: ipcc_ar6/model_bias.ncl
-         ancestors: ['pr', 'IAV_calc_pr_cmip6/calc_IAV_for_stippandhatch']
-         projection: Robinson
-         mean_caption: "CMIP6"
-         bias_caption: "CMIP6 bias"
-         plot_rms_diff: True
-         rmsd_caption: "CMIP6 root mean square error"
-         stippandhatch: True
-         panel_title: "Precipitation"
- 
- 
-   fig_3_13_cmip5:
-     description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
-     variables:
-       pr:
-         preprocessor: clim
-         reference_dataset: GPCP-SG
-         mip: Amon
-         project: CMIP5
-         exp: historical
-         ensemble: r1i1p1
-         start_year: 1985
-         end_year: 2004
-         additional_datasets: *models_cmip5_historical
-     additional_datasets:
-       - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
-     scripts:
-       fig_3_13: 
-         script: ipcc_ar6/model_bias.ncl
-         ancestors: ['pr', 'IAV_calc_pr_cmip5/calc_IAV_for_stippandhatch']
-         projection: Robinson
-         mean_caption: "CMIP5"
-         bias_caption: "CMIP5 bias"
-         panel_num: ['c)', 'd)']
-         stippandhatch: True
- 
- 
+  IAV_calc_pr_cmip6:
+    <<: *diag_IAV
+    variables:
+      pr:
+        preprocessor: preproc_map
+        project: CMIP6
+        mip: Amon
+        exp: piControl
+        ensemble: r1i1p1f1
+        grid: gr
+
+  IAV_calc_pr_cmip5: 
+    <<: *diag_IAV
+    variables:
+      pr:
+        preprocessor: preproc_map
+        project: CMIP5
+        mip: Amon
+        exp: piControl
+        ensemble: r1i1p1
+    additional_datasets: *models_cmip5_piControl
+
+
+
+  fig_3_13_cmip6:
+    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        mip: Amon
+        project: CMIP6
+        exp: historical
+        ensemble: r1i1p1f1
+        grid: gr
+        start_year: 1995
+        end_year: 2014
+        additional_datasets: *models_cmip6_historical
+    additional_datasets:
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
+    scripts:
+      fig_3_13: 
+        script: ipcc_ar6/model_bias.ncl
+        ancestors: ['pr', 'IAV_calc_pr_cmip6/calc_IAV_for_stippandhatch']
+        projection: Robinson
+        mean_caption: "CMIP6"
+        bias_caption: "CMIP6 bias"
+        plot_rms_diff: True
+        rmsd_caption: "CMIP6 root mean square error"
+        stippandhatch: True
+        panel_title: "Precipitation"
+
+
+  fig_3_13_cmip5:
+    description: IPCC AR6 Ch. 3, Fig. 3.2 (near-surface temperature)
+    variables:
+      pr:
+        preprocessor: clim
+        reference_dataset: GPCP-SG
+        mip: Amon
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1985
+        end_year: 2004
+        additional_datasets: *models_cmip5_historical
+    additional_datasets:
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
+    scripts:
+      fig_3_13: 
+        script: ipcc_ar6/model_bias.ncl
+        ancestors: ['pr', 'IAV_calc_pr_cmip5/calc_IAV_for_stippandhatch']
+        projection: Robinson
+        mean_caption: "CMIP5"
+        bias_caption: "CMIP5 bias"
+        panel_num: ['c)', 'd)']
+        stippandhatch: True
+
+
 
 
   # **********************************************************************

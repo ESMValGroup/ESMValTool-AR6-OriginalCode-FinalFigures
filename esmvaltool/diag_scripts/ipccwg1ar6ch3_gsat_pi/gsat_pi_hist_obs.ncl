@@ -862,5 +862,23 @@ begin
   frame(wks)
   delete(wks)
   system("convert -density 216 -trim +repage -border 10 -bordercolor white -flatten "+ofile+"."+file_type+" "+ofile+".png")
+  
+;- - - - - - - - - - - - - - - - - - - - - - - 
+; write provenance to netcdf output and plot file
+; 
+  authors = (/"kosaka_yu"/)
+  statistics = (/"mean", "anomaly"/)
+  domain = ("global")
+  plottype = ("times")
+  references = (/""/)
+  prov_caption = "GSAT in piControl and GSAT trends in piControl, " \
+                 + "obs and historical-ssp245"
+  infiles = metadata_att_as_array(info_items, "filename")
+  ;info_items_obs = select_metadata_by_name(input_file_info, var_obs)
+  ;infiles := array_append_record(infiles, metadata_att_as_array(info_items_obs, "filename"), 0)
+
+  log_provenance(fn, ofile+"."+file_type, prov_caption, statistics, \
+                 domain, plottype, authors, references, infiles)
+
 end
 
