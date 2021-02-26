@@ -312,7 +312,8 @@ begin
   font_height = 0.02/0.6 * res@vpHeightF
   res@gsnMaximize      = True
   res@tiYAxisString = "Correlation"
-  res@trYMinF = max((/y_min, 0./))
+  ;res@trYMinF = max((/y_min, 0./))
+  res@trYMinF = y_min
   res@trYMaxF = 1
   yspan = res@trYMaxF - res@trYMinF
   res@trXMinF = 0
