@@ -197,6 +197,16 @@ end
 
 begin
 
+  out_dir =  config_user_info@work_dir + "/"
+  system("mkdir -p "+out_dir)
+  nc_outfile = out_dir+"global_monsoon.nc"
+  if (config_user_info@write_netcdf) then
+    if (fileexists(nc_outfile)) then
+      system("rm -f "+nc_outfile)
+    end if
+    nc_outfile@existing = "append"
+  end if
+  
   if (.not.all(input_dir_map .eq. "")) then
     if (dimsizes(input_dir_map).eq.1) then
         domainFileRef  = input_dir_map+"domain_monsoon_"+refPr_map+".nc"
@@ -277,61 +287,88 @@ begin
         end if
       end do
     end if
+
+    paths_all = (/domainFileRef, domainFileMME/)
     
     f = addfile(domainFileRef, "r")
     domainRef = f->monsoon_domain
-    domainRef@long_name = ""
     f = addfile(domainFileMME, "r")
     domainMME = f->monsoon_domain
+
+    if (config_user_info@write_netcdf) then
+      domainRef@var = "domainRef"
+      ncdf_outfile = ncdf_write(domainRef, nc_outfile)
+      domainMME@var = "domainMME"
+      ncdf_outfile = ncdf_write(domainMME, nc_outfile)
+    end if
+    domainRef@long_name = ""
     domainMME@long_name = ""
 
     syear_clim = domainRef@syear_clim
     eyear_clim = domainRef@eyear_clim
       
-;    drawPr = False
-;    if (fileexists(prFileRef).and.fileexists(prFileMME)) then
-;      drawPr = True
-      f = addfile(prFileRef, "r")
-      if (scale_precip_map_ann) then
-        prRef = f->MPI
-      else
-        prRef = f->pr
-      end if
-      prRef@long_name = ""
-      prRef@units = ""
-      refnamePr = prRef@dataset
-      f = addfile(prFileMME, "r")
-      if (scale_precip_map_ann) then
-        prMME = f->MPI
-      else
-        prMME = f->pr
-      end if
-      prMME@long_name = ""
-      prMME@units = ""
-      MMEnamePr = prMME@dataset
-;    end if
+    f = addfile(prFileRef, "r")
+    if (scale_precip_map_ann) then
+      prRef = f->MPI
+    else
+      prRef = f->pr
+    end if
+    refnamePr = prRef@dataset
+    f = addfile(prFileMME, "r")
+    if (scale_precip_map_ann) then
+      prMME = f->MPI
+    else
+      prMME = f->pr
+    end if
+    MMEnamePr = prMME@dataset
+
+    if (config_user_info@write_netcdf) then
+      prRef@var = "prRef"
+      ncdf_outfile = ncdf_write(prRef, nc_outfile)
+      prMME@var = "prMME"
+      ncdf_outfile = ncdf_write(prMME, nc_outfile)
+    end if
     
+    prRef@long_name = ""
+    prRef@units = ""
+    prMME@long_name = ""
+    prMME@units = ""
+       
     drawUV = False
     if (fileexists(uFileRef).and.fileexists(vFileRef).and. \
         fileexists(uFileMME).and.fileexists(vFileMME)) then
+      paths_all := array_append_record(paths_all, (/uFileRef, vFileRef, uFileMME, vFileMME/), 0)
+
       drawUV = True
       f = addfile(uFileRef, "r")
       uRef = f->u
       uunits = uRef@units
-      uRef@long_name = ""
-      uRef@units = ""
       refnameUV = uRef@dataset
       f = addfile(uFileMME, "r")
       uMME = f->u
-      uMME@long_name = ""
-      uMME@units = ""
 
       f = addfile(vFileRef, "r")
       vRef = f->v
-      vRef@long_name = ""
-      vRef@units = ""
       f = addfile(vFileMME, "r")
       vMME = f->v
+
+      if (config_user_info@write_netcdf) then
+        uRef@var = "uRef"
+        ncdf_outfile = ncdf_write(uRef, nc_outfile)
+        vRef@var = "vRef"
+        ncdf_outfile = ncdf_write(vRef, nc_outfile)
+        uMME@var = "uMME"
+        ncdf_outfile = ncdf_write(uMME, nc_outfile)
+        vMME@var = "vMME"
+        ncdf_outfile = ncdf_write(vMME, nc_outfile)
+      end if
+
+      uRef@long_name = ""
+      uRef@units = ""
+      uMME@long_name = ""
+      uMME@units = ""
+      vRef@long_name = ""
+      vRef@units = ""
       vMME@long_name = ""
       vMME@units = ""
     end if
@@ -359,7 +396,7 @@ begin
                       "global_monsoon_" + refnamePr)
       end if
     end if
-
+    
     resPr = True
     resPr@res_gsnDraw = False
     resPr@res_gsnFrame = False
@@ -495,14 +532,14 @@ begin
     prRef@res_tmXBOn = False
     prRef@res_gsnLeftString = "(a)"
     plots(0, 0) = contour_map(wks, prRef, "pr")
-
+    
     copy_VarAtts(resDomain, domainRef)
     plot = contourplot(wks, domainRef, "domain")
     overlay(plots(0, 0), plot)
     copy_VarAtts(resDomainBound, domainRefBound)
     plot = contourplot(wks, domainRefBound, "domain")
     overlay(plots(0, 0), plot)
-    
+
     copy_VarAtts(resPr, prMME)
     prMME@res_gsnStringFontHeightF = prRef@res_gsnStringFontHeightF
     prMME@res_tiMainString = ""  ;"MME mean"
@@ -655,6 +692,8 @@ begin
     Prfiles = systemfunc("ls "+paths)
 
     do ii = 0, dimsizes(Prfiles)-1
+      paths_all := array_append_record(paths_all, Prfiles(ii), 0)
+      
       f = addfile(Prfiles(ii), "r")
       tmp = f->GMpr
       if (moving_ave.gt.1) then
@@ -877,6 +916,8 @@ begin
       drawCirc = False
     else
       do ii = 0, dimsizes(NHMufiles)-1
+        paths_all := array_append_record(paths_all, NHMufiles(ii), 0)
+        
         f = addfile(NHMufiles(ii), "r")
         tmp = f->NHMu
         if (moving_ave.gt.1) then
@@ -922,6 +963,7 @@ begin
         if (any(dataset_obsu(ii).eq.obs_reanal_ens)) then
           if (.not.isdefined("NHMuObsEns")) then
             NHMuObsEns = NewList("fifo")
+            NHMuObsEns_range = NewList("fifo")
           end if
           idx = ind(metadata_att_as_array(uObs, "dataset").eq.dataset_obsu(ii))
           syear = -999999
@@ -933,10 +975,17 @@ begin
           tmp = new((/dimsizes(idx), eyear-syear+1/), typeof(uObs[idx(0)]))
           tmp!0 = "ensemble"
           tmp!1 = "year"
+          tmp&ensemble = ispan(1, dimsizes(idx), 1)
           tmp&year = ispan(syear, eyear, 1)
           do jj = 0, dimsizes(idx)-1
-            tmp(jj, :) = (/uObs[idx(jj)]({syear:eyear})/)
+            e = toint(uObs[idx(jj)]@ensemble)
+            tmp({e}, :) = (/uObs[idx(jj)]({syear:eyear})/)
           end do
+          tmp@dataset = dataset_obsu(ii)
+          ListAppend(NHMuObsEns, new(dimsizes(tmp), typeof(tmp)))
+          kk = ListCount(NHMuObsEns)-1
+          NHMuObsEns[kk] = tmp
+
 ;          tmpesize = tmp(:, 0)
 ;          tmpesize = tofloat(dimsizes(idx))
           ranges = new((/2, eyear-syear+1/), typeof(tmp))
@@ -947,13 +996,13 @@ begin
           ranges(0, :) = dim_min_n(tmp, 0)
           ranges(1, :) = dim_max_n(tmp, 0)
           
-          ListAppend(NHMuObsEns, new(dimsizes(ranges), typeof(ranges)))
-          kk = ListCount(NHMuObsEns) - 1
+          ListAppend(NHMuObsEns_range, new(dimsizes(ranges), typeof(ranges)))
+          kk = ListCount(NHMuObsEns_range) - 1
           ranges@color = colors_reanal_ens(kk)
           ranges@pattern = patterns_reanal_ens(kk)
           ranges@dataset = dataset_obsu(ii)
           ranges@fillscale = fillscale_reanal_ens(kk)
-          NHMuObsEns[kk] = ranges
+          NHMuObsEns_range[kk] = ranges
           delete(ranges)
           delete(tmp)
 ;          delete(tmpesize)
@@ -1204,6 +1253,13 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprCMIP5mean&time, GMprCMIP5mean, resl)
       idummy = idummy + 1
+
+      if (config_user_info@write_netcdf) then
+        GMprCMIP5@var = "GMprecip_cmip5"
+        GMprCMIP5!0 = "ensemble_cmip5"
+        GMprCMIP5!1 = "time_cmip5"
+        ncdf_outfile = ncdf_write(GMprCMIP5, nc_outfile)
+      end if
     end if
 
     if (isvar("GMprCMIP6mean")) then
@@ -1218,6 +1274,13 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprCMIP6mean&time, GMprCMIP6mean, resl)
       idummy = idummy + 1
+
+      if (config_user_info@write_netcdf) then
+        GMprCMIP6@var = "GMprecip_cmip6"
+        GMprCMIP6!0 = "ensemble_cmip6"
+        GMprCMIP6!1 = "time_cmip6"
+        ncdf_outfile = ncdf_write(GMprCMIP6, nc_outfile)
+      end if
     end if
 
     if (isvar("GMprAMIPmean")) then
@@ -1232,6 +1295,13 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprAMIPmean&time, GMprAMIPmean, resl)
       idummy = idummy + 1
+
+      if (config_user_info@write_netcdf) then
+        GMprAMIP@var = "GMprecip_amip"
+        GMprAMIP!0 = "ensemble_amip"
+        GMprAMIP!1 = "time_amip"
+        ncdf_outfile = ncdf_write(GMprAMIP, nc_outfile)
+      end if
     end if
 
     if (isdefined("GMprObsSingle")) then
@@ -1242,6 +1312,12 @@ begin
         resl@gsLineDashSegLenF = GMprObsSingle[n]@seglen
         dummy(idummy) = gsn_add_polyline(wks, plotts(0), GMprObsSingle[n]&time, GMprObsSingle[n], resl)
         idummy = idummy + 1
+
+        if (config_user_info@write_netcdf) then
+          GMprObsSingle[n]@var = "GMprecip_"+GMprObsSingle[n]@dataset
+          GMprObsSingle[n]!0 = "time_"+GMprObsSingle[n]@dataset
+          ncdf_outfile = ncdf_write(GMprObsSingle[n], nc_outfile)
+        end if
       end do
     end if
 
@@ -1309,6 +1385,13 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuCMIP5mean&time, NHMuCMIP5mean, resl)
       idummy = idummy + 1
+
+      if (config_user_info@write_netcdf) then
+        NHMuCMIP5@var = "NHMcirc_cmip5"
+        NHMuCMIP5!0 = "ensemble_cmip5"
+        NHMuCMIP5!1 = "time_cmip5"
+        ncdf_outfile = ncdf_write(NHMuCMIP5, nc_outfile)
+      end if
     end if
     if (isvar("NHMuCMIP6mean")) then
       x := array_append_record(NHMuCMIP6_5th&time, NHMuCMIP6_95th&time(::-1), 0)
@@ -1322,6 +1405,13 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuCMIP6mean&time, NHMuCMIP6mean, resl)
       idummy = idummy + 1
+
+      if (config_user_info@write_netcdf) then
+        NHMuCMIP6@var = "NHMcirc_cmip6"
+        NHMuCMIP6!0 = "ensemble_cmip6"
+        NHMuCMIP6!1 = "time_cmip6"
+        ncdf_outfile = ncdf_write(NHMuCMIP6, nc_outfile)
+      end if
     end if
     if (isvar("NHMuAMIPmean")) then
       x := array_append_record(NHMuAMIP_5th&time, NHMuAMIP_95th&time(::-1), 0)
@@ -1335,36 +1425,57 @@ begin
       resl@gsLineDashPattern = 0
       dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuAMIPmean&time, NHMuAMIPmean, resl)
       idummy = idummy + 1
+
+      if (config_user_info@write_netcdf) then
+        NHMuAMIP@var = "NHMcirc_amip"
+        NHMuAMIP!0 = "ensemble_amip"
+        NHMuAMIP!1 = "time_amip"
+        ncdf_outfile = ncdf_write(NHMuAMIP, nc_outfile)
+      end if
     end if
-    if (isvar("NHMuObsEns")) then
+    if (isvar("NHMuObsEns_range")) then
       resl@gsLineThicknessF = 1.
-      do n = 0, ListCount(NHMuObsEns)-1
-        resp@gsFillColor := NHMuObsEns[n]@color
-        resp@gsFillIndex = NHMuObsEns[n]@pattern
-        resp@gsFillScaleF = NHMuObsEns[n]@fillscale
+      do n = 0, ListCount(NHMuObsEns_range)-1
+        resp@gsFillColor := NHMuObsEns_range[n]@color
+        resp@gsFillIndex = NHMuObsEns_range[n]@pattern
+        resp@gsFillScaleF = NHMuObsEns_range[n]@fillscale
         resp@gsFillLineThicknessF = resl@gsLineThicknessF
-        x := array_append_record(NHMuObsEns[n]&time, NHMuObsEns[n]&time(::-1), 0)
-        y := array_append_record(NHMuObsEns[n](0, :), NHMuObsEns[n](1, ::-1), 0)
+        x := array_append_record(NHMuObsEns_range[n]&time, NHMuObsEns_range[n]&time(::-1), 0)
+        y := array_append_record(NHMuObsEns_range[n](0, :), NHMuObsEns_range[n](1, ::-1), 0)
         dummy(idummy) = gsn_add_polygon(wks, plotts(1), x, y, resp)
         idummy = idummy + 1
         delete(x)
         delete(y)
-        resl@gsLineColor := NHMuObsEns[n]@color
+        resl@gsLineColor := NHMuObsEns_range[n]@color
         resl@gsLineDashPattern = 0
-        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsEns[n]&time, NHMuObsEns[n](0, :), resl)
+        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsEns_range[n]&time, NHMuObsEns_range[n](0, :), resl)
         idummy = idummy + 1
-        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsEns[n]&time, NHMuObsEns[n](1, :), resl)
+        dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsEns_range[n]&time, NHMuObsEns_range[n](1, :), resl)
         idummy = idummy + 1
+
+        if (config_user_info@write_netcdf) then
+          NHMuObsEns[n]@var = "NHMcirc_"+NHMuObsEns[n]@dataset
+          NHMuObsEns[n]!0 = "ensemble_"+NHMuObsEns[n]@dataset
+          NHMuObsEns[n]!1 = "time_"+NHMuObsEns[n]@dataset
+          ncdf_outfile = ncdf_write(NHMuObsEns[n], nc_outfile)
+        end if
       end do
     end if
     if (isvar("NHMuObsSingle")) then
       resl@gsLineThicknessF = 1.5
       do n = 0, ListCount(NHMuObsSingle)-1
+        printVarSummary(NHMuObsSingle[n])
         resl@gsLineColor := NHMuObsSingle[n]@color
         resl@gsLineDashPattern = NHMuObsSingle[n]@pattern
         resl@gsLineDashSegLenF = NHMuObsSingle[n]@seglen
         dummy(idummy) = gsn_add_polyline(wks, plotts(1), NHMuObsSingle[n]&time, NHMuObsSingle[n], resl)
         idummy = idummy + 1
+
+        if (config_user_info@write_netcdf) then
+          NHMuObsSingle[n]@var = "NHMcirc_"+NHMuObsSingle[n]@dataset
+          NHMuObsSingle[n]!0 = "time_"+NHMuObsSingle[n]@dataset
+          ncdf_outfile = ncdf_write(NHMuObsSingle[n], nc_outfile)
+        end if
       end do
     end if
     
@@ -1474,14 +1585,14 @@ begin
     end do
   end if
   
-  if (isvar("NHMuObsEns")) then
+  if (isvar("NHMuObsEns_range")) then
     resl@gsLineThicknessF = 1.
-    do n = 0, ListCount(NHMuObsEns)-1    
-      resp@gsFillColor := NHMuObsEns[n]@color
-      resp@gsFillIndex = NHMuObsEns[n]@pattern
+    do n = 0, ListCount(NHMuObsEns_range)-1    
+      resp@gsFillColor := NHMuObsEns_range[n]@color
+      resp@gsFillIndex = NHMuObsEns_range[n]@pattern
       resp@gsFillLineThicknessF = resl@gsLineThicknessF
-      resp@gsFillScaleF = NHMuObsEns[n]@fillscale
-      resl@gsLineColor := NHMuObsEns[n]@color
+      resp@gsFillScaleF = NHMuObsEns_range[n]@fillscale
+      resl@gsLineColor := NHMuObsEns_range[n]@color
       resl@gsLineDashPattern = 0
       x4 = x3 + wLegend
       y1 = yLegend1 + 0.004
@@ -1491,7 +1602,7 @@ begin
       txres@txJust = "TopCenter"
       txres@txFontColor := resl@gsLineColor
       txres@txFontHeightF = 0.012
-      gsn_text_ndc(wks, NHMuObsEns[n]@dataset, (x3+x4)/2., yLegend1-0.004, txres)
+      gsn_text_ndc(wks, NHMuObsEns_range[n]@dataset, (x3+x4)/2., yLegend1-0.004, txres)
 
       txres@txJust = "CenterCenter"
       txres@txFontHeightF = 0.008
@@ -1534,4 +1645,8 @@ begin
   gsn_panel(wks, plotts, (/1, 2/), pres)
   frame(wks)
 
+  log_provenance(nc_outfile, wks@fullname, "global monsoon domain, intensity and circulation", \
+                 (/"clim", "var"/), "global", (/"geo", "times"/), "kosaka_yu", "", paths_all)
+
+  leave_msg(DIAG_SCRIPT, "")
 end

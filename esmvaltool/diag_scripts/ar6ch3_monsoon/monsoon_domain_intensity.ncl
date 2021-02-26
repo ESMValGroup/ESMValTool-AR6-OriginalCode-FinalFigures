@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210225 kosaka_yu: added provenance
 ;    20201009 kosaka_yu: enabled to handle ensemble reanayses for u and v.
 ;    20200825 kosaka_yu: calculate multimodel means individually for CMIP5 and CMIP6.
 ;    20200513 kosaka_yu: cleaned up.
@@ -317,14 +318,16 @@ begin
                         smonth_monsoonyr, emonth_monsoonyr)
       delete(pr)
 
-      prRange = summer_minus_winter(prClim, opt)  ; mm/day
+      prRange = (/summer_minus_winter(prClim, opt)/)  ; mm/day
+      copy_VarCoords(prClim(0, :, :), prRange)
       prClimANN = dim_avg_n(prClim, 0)
       MPI = prRange
       MPI = prRange / where(prClimANN.gt.0., prClimANN, prClimANN@_FillValue)
       MPI@long_name = "Monsoon precipitation index"
       MPI@units = ""
-
-      prRange = summer_minus_winter(prClim, optAccum)  ; mm
+      
+      prRange = (/summer_minus_winter(prClim, optAccum)/)  ; mm
+      prRange@_FillValue = prClim@_FillValue
       prRange@var = "pr"
       prRange@units = "mm"
       prRange@diag_script = DIAG_SCRIPT
@@ -341,8 +344,12 @@ begin
         nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
       end if
       nc_outfile = ncdf_write(prRange, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological monsoon precipitation", \
+                     "clim", "global", "other", "kosaka_yu", "", infoPr[ii]@filename)
 
-      domain := monsoon_domain(MPI, prRange, optDomain)
+                     
+      domain := (/monsoon_domain(MPI, prRange, optDomain)/)
+      copy_VarCoords(MPI, domain)
       domain@var = "monsoon_domain"
       domain@diag_script = DIAG_SCRIPT
       domain@dataset = dataset
@@ -358,6 +365,8 @@ begin
         nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
       end if
       nc_outfile = ncdf_write(domain, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon domain", \
+                     "clim", "global", "other", "kosaka_yu", "", infoPr[ii]@filename)
 
       MPI@var = "MPI"
       MPI@diag_script = DIAG_SCRIPT
@@ -374,16 +383,22 @@ begin
         nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
       end if
       nc_outfile = ncdf_write(MPI, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon precipitation index", \
+                     "clim", "global", "other", "kosaka_yu", "", infoPr[ii]@filename)
 
       if (isvar("iPrCMIP5")) then
         if (any(ii.eq.iPrCMIP5)) then
           w = 1./tofloat(num(metadata_att_as_array(infoPr, "dataset").eq.infoPr[ii]@dataset))
           if (isvar("prClimCMIP5")) then
             prClimCMIP5 = prClimCMIP5 + prClim * w
+            prClimCMIP5@ensemble = prClimCMIP5@ensemble+","+infoPr[ii]@dataset+"/"+infoPr[ii]@ensemble
+            prClimCMIP5@weight := array_append_record(prClimCMIP5@weight, w, 0)
             nprClimCMIP5 = nprClimCMIP5 + w
           else
-            prClimCMIP5 = prClim
             prClimCMIP5 = prClim * w
+            copy_VarCoords(prClim, prClimCMIP5)
+            prClimCMIP5@ensemble = infoPr[ii]@dataset+"/"+infoPr[ii]@ensemble
+            prClimCMIP5@weight = w
             nprClimCMIP5 = w
           end if
         end if
@@ -393,10 +408,14 @@ begin
           w = 1./tofloat(num(metadata_att_as_array(infoPr, "dataset").eq.infoPr[ii]@dataset))
           if (isvar("prClimCMIP6")) then
             prClimCMIP6 = prClimCMIP6 + prClim * w
+            prClimCMIP6@ensemble = prClimCMIP6@ensemble+","+infoPr[ii]@dataset+"/"+infoPr[ii]@ensemble
+            prClimCMIP6@weight := array_append_record(prClimCMIP6@weight, w, 0)
             nprClimCMIP6 = nprClimCMIP6 + w
           else
-            prClimCMIP6 = prClim
             prClimCMIP6 = prClim * w
+            copy_VarCoords(prClim, prClimCMIP6)
+            prClimCMIP6@ensemble = infoPr[ii]@dataset+"/"+infoPr[ii]@ensemble
+            prClimCMIP6@weight = w
             nprClimCMIP6 = w
           end if
         end if
@@ -406,10 +425,14 @@ begin
           w = 1./tofloat(num(metadata_att_as_array(infoPr, "dataset").eq.infoPr[ii]@dataset))
           if (isvar("prClimAMIP")) then
             prClimAMIP = prClimAMIP + prClim * w
+            prClimAMIP@ensemble = prClimAMIP@ensemble+","+infoPr[ii]@dataset+"/"+infoPr[ii]@ensemble
+            prClimAMIP@weight := array_append_record(prClimAMIP@weight, w, 0)
             nprClimAMIP = nprClimAMIP + w
           else
-            prClimAMIP = prClim
             prClimAMIP = prClim * w
+            copy_VarCoords(prClim, prClimAMIP)
+            prClimAMIP@ensemble = infoPr[ii]@dataset+"/"+infoPr[ii]@ensemble
+            prClimAMIP@weight = w
             nprClimAMIP = w
           end if
         end if
@@ -450,10 +473,15 @@ begin
       prRange@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(prRange, nc_filename)
-
-      domain := monsoon_domain(MPI, prRange, optDomain)
+      log_provenance(nc_filename, "n/a", "climatological monsoon precipitation", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrCMIP5], "filename"))
+      
+      domain := (/monsoon_domain(MPI, prRange, optDomain)/)
+      copy_VarCoords(MPI, domain)
       domain@var = "monsoon_domain"
       domain@diag_script = DIAG_SCRIPT
+      domain@weight = MPI@weight
+      domain@ensemble = MPI@ensemble
       domain@dataset = dataset
       domain@syear_clim = syear_clim
       domain@eyear_clim = eyear_clim
@@ -463,6 +491,8 @@ begin
       domain@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(domain, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon domain", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrCMIP5], "filename"))
 
       MPI@var = "MPI"
       MPI@diag_script = DIAG_SCRIPT
@@ -475,6 +505,8 @@ begin
       MPI@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
       nc_outfile = ncdf_write(MPI, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon precipitation index", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrCMIP5], "filename"))
       delete(prClimCMIP5)
       delete(nprClimCMIP5)
       delete(prClimANN)
@@ -508,10 +540,15 @@ begin
       prRange@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(prRange, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological monsoon precipitation", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrCMIP6], "filename"))
 
-      domain := monsoon_domain(MPI, prRange, optDomain)
+      domain := (/monsoon_domain(MPI, prRange, optDomain)/)
+      copy_VarCoords(MPI, domain)
       domain@var = "monsoon_domain"
       domain@diag_script = DIAG_SCRIPT
+      domain@weight = MPI@weight
+      domain@ensemble = MPI@ensemble
       domain@dataset = dataset
       domain@syear_clim = syear_clim
       domain@eyear_clim = eyear_clim
@@ -521,6 +558,8 @@ begin
       domain@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(domain, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon domain", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrCMIP6], "filename"))
 
       MPI@var = "MPI"
       MPI@diag_script = DIAG_SCRIPT
@@ -533,6 +572,8 @@ begin
       MPI@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
       nc_outfile = ncdf_write(MPI, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon precipitation index", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrCMIP6], "filename"))
       delete(prClimCMIP6)
       delete(nprClimCMIP6)
       delete(prClimANN)
@@ -566,10 +607,15 @@ begin
       prRange@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "precip_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(prRange, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological monsoon precipitation", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrAMIP], "filename"))
 
-      domain := monsoon_domain(MPI, prRange, optDomain)
+      domain := (/monsoon_domain(MPI, prRange, optDomain)/)
+      copy_VarCoords(MPI, domain)
       domain@var = "monsoon_domain"
       domain@diag_script = DIAG_SCRIPT
+      domain@weight = MPI@weight
+      domain@ensemble = MPI@ensemble
       domain@dataset = dataset
       domain@syear_clim = syear_clim
       domain@eyear_clim = eyear_clim
@@ -579,6 +625,8 @@ begin
       domain@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "domain_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(domain, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon domain", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrAMIP], "filename"))
 
       MPI@var = "MPI"
       MPI@diag_script = DIAG_SCRIPT
@@ -591,6 +639,8 @@ begin
       MPI@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "monsoon_precip_index_"+dataset+".nc"
       nc_outfile = ncdf_write(MPI, nc_filename)
+      log_provenance(nc_filename, "n/a", "monsoon precipitation index", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iPrAMIP], "filename"))
       delete(prClimAMIP)
       delete(nprClimAMIP)
       delete(prClimANN)
@@ -621,9 +671,11 @@ begin
       u = correct_FillValue_uv(u)
       uClim = get_clim(u, syear_clim, eyear_clim, \
                        smonth_monsoonyr, emonth_monsoonyr)
-      uMonsoon = summer_minus_winter(uClim, opt)
-
+      uMonsoon = (/summer_minus_winter(uClim, opt)/)
+      copy_VarCoords(uClim(0, :, :), uMonsoon)
+      
       uMonsoon@var = "u"
+      uMonsoon@units = uClim@units
       uMonsoon@diag_script = DIAG_SCRIPT
       uMonsoon@dataset = dataset
       uMonsoon@long_name = "Climatological summer - winter zonal wind velocity"
@@ -640,16 +692,22 @@ begin
         nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
       end if
       nc_outfile = ncdf_write(uMonsoon, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological summer-winter zonal wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", infoU[ii]@filename)
 
       if (isvar("iUCMIP5")) then
         if (any(ii.eq.iUCMIP5)) then
           w = 1./tofloat(num(metadata_att_as_array(infoU, "dataset").eq.infoU[ii]@dataset))
           if (isvar("uClimCMIP5")) then
             uClimCMIP5 = uClimCMIP5 + uClim * w
+            uClimCMIP5@ensemble = uClimCMIP5@ensemble+","+infoU[ii]@dataset+"/"+infoU[ii]@ensemble
+            uClimCMIP5@weight := array_append_record(uClimCMIP5@weight, w, 0)
             nuClimCMIP5 = nuClimCMIP5 + w
           else
-            uClimCMIP5 = uClim
             uClimCMIP5 = uClim * w
+            copy_VarCoords(uClim, uClimCMIP5)
+            uClimCMIP5@ensemble = infoU[ii]@dataset+"/"+infoU[ii]@ensemble
+            uClimCMIP5@weight = w
             nuClimCMIP5 = w
           end if
         end if
@@ -659,10 +717,14 @@ begin
           w = 1./tofloat(num(metadata_att_as_array(infoU, "dataset").eq.infoU[ii]@dataset))
           if (isvar("uClimCMIP6")) then
             uClimCMIP6 = uClimCMIP6 + uClim * w
+            uClimCMIP6@ensemble = uClimCMIP6@ensemble+","+infoU[ii]@dataset+"/"+infoU[ii]@ensemble
+            uClimCMIP6@weight := array_append_record(uClimCMIP6@weight, w, 0)
             nuClimCMIP6 = nuClimCMIP6 + w
           else
-            uClimCMIP6 = uClim
             uClimCMIP6 = uClim * w
+            copy_VarCoords(uClim, uClimCMIP6)
+            uClimCMIP6@ensemble = infoU[ii]@dataset+"/"+infoU[ii]@ensemble
+            uClimCMIP6@weight = w
             nuClimCMIP6 = w
           end if
         end if
@@ -672,10 +734,14 @@ begin
           w = 1./tofloat(num(metadata_att_as_array(infoU, "dataset").eq.infoU[ii]@dataset))
           if (isvar("uClimAMIP")) then
             uClimAMIP = uClimAMIP + uClim * w
+            uClimAMIP@ensemble = uClimAMIP@ensemble+","+infoU[ii]@dataset+"/"+infoU[ii]@ensemble
+            uClimAMIP@weight := array_append_record(uClimAMIP@weight, w, 0)
             nuClimAMIP = nuClimAMIP + w
           else
-            uClimAMIP = uClim
             uClimAMIP = uClim * w
+            copy_VarCoords(uClim, uClimAMIP)
+            uClimAMIP@ensemble = infoU[ii]@dataset+"/"+infoU[ii]@ensemble
+            uClimAMIP@weight = w
             nuClimAMIP = w
           end if
         end if
@@ -707,8 +773,9 @@ begin
       v = correct_FillValue_uv(v)
       vClim = get_clim(v, syear_clim, eyear_clim, \
                        smonth_monsoonyr, emonth_monsoonyr)
-      vMonsoon = summer_minus_winter(vClim, opt)
-
+      vMonsoon = (/summer_minus_winter(vClim, opt)/)
+      copy_VarCoords(vClim(0, :, :), vMonsoon)
+      
       vMonsoon@var = "v"
       vMonsoon@diag_script = DIAG_SCRIPT
       vMonsoon@dataset = dataset
@@ -727,16 +794,22 @@ begin
         nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
       end if
       nc_outfile = ncdf_write(vMonsoon, nc_filename)
-
-      if (isvar("iVMIP5")) then
+      log_provenance(nc_filename, "n/a", "climatological summer-winter meridional wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", infoV[ii]@filename)
+      
+      if (isvar("iVCMIP5")) then
         if (any(ii.eq.iVCMIP5)) then
           w = 1./tofloat(num(metadata_att_as_array(infoV, "dataset").eq.infoV[ii]@dataset))
           if (isvar("vClimCMIP5")) then
             vClimCMIP5 = vClimCMIP5 + vClim * w
+            vClimCMIP5@ensemble = vClimCMIP5@ensemble+","+infoV[ii]@dataset+"/"+infoV[ii]@ensemble
+            vClimCMIP5@weight := array_append_record(vClimCMIP5@weight, w, 0)
             nvClimCMIP5 = nvClimCMIP5 + w
           else
-            vClimCMIP5 = vClim
             vClimCMIP5 = vClim * w
+            copy_VarCoords(vClim, vClimCMIP5)
+            vClimCMIP5@ensemble = infoV[ii]@dataset+"/"+infoV[ii]@ensemble
+            vClimCMIP5@weight = w
             nvClimCMIP5 = w
           end if
         end if
@@ -746,10 +819,14 @@ begin
           w = 1./tofloat(num(metadata_att_as_array(infoV, "dataset").eq.infoV[ii]@dataset))
           if (isvar("vClimCMIP6")) then
             vClimCMIP6 = vClimCMIP6 + vClim * w
+            vClimCMIP6@ensemble = vClimCMIP6@ensemble+","+infoV[ii]@dataset+"/"+infoV[ii]@ensemble
+            vClimCMIP6@weight := array_append_record(vClimCMIP6@weight, w, 0)
             nvClimCMIP6 = nvClimCMIP6 + w
           else
-            vClimCMIP6 = vClim
             vClimCMIP6 = vClim * w
+            copy_VarCoords(vClim, vClimCMIP6)
+            vClimCMIP6@ensemble = infoV[ii]@dataset+"/"+infoV[ii]@ensemble
+            vClimCMIP6@weight = w
             nvClimCMIP6 = w
           end if
         end if
@@ -759,10 +836,14 @@ begin
           w = 1./tofloat(num(metadata_att_as_array(infoV, "dataset").eq.infoV[ii]@dataset))
           if (isvar("vClimAMIP")) then
             vClimAMIP = vClimAMIP + vClim * w
+            vClimAMIP@ensemble = vClimAMIP@ensemble+","+infoV[ii]@dataset+"/"+infoV[ii]@ensemble
+            vClimAMIP@weight := array_append_record(vClimAMIP@weight, w, 0)
             nvClimAMIP = nvClimAMIP + w
           else
-            vClimAMIP = vClim
             vClimAMIP = vClim * w
+            copy_VarCoords(vClim, vClimAMIP)
+            vClimAMIP@ensemble = infoV[ii]@dataset+"/"+infoV[ii]@ensemble
+            vClimAMIP@weight = w
             nvClimAMIP = w
           end if
         end if
@@ -794,6 +875,8 @@ begin
       uMonsoon@long_name = "Climatological summer - winter zonal wind velocity"
       nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(uMonsoon, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological summer-winter zonal wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iUCMIP5], "filename"))
 
       delete(uClimCMIP5)
       delete(nuClimCMIP5)
@@ -818,6 +901,8 @@ begin
       vMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(vMonsoon, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological summer-winter meridional wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iVCMIP5], "filename"))
 
       delete(vClimCMIP5)
       delete(nvClimCMIP5)
@@ -842,7 +927,9 @@ begin
       uMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(uMonsoon, nc_filename)
-
+      log_provenance(nc_filename, "n/a", "climatological summer-winter zonal wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iUCMIP6], "filename"))
+      
       delete(uClimCMIP6)
       delete(nuClimCMIP6)
       delete(uMonsoon)
@@ -866,7 +953,9 @@ begin
       vMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(vMonsoon, nc_filename)
-
+      log_provenance(nc_filename, "n/a", "climatological summer-winter meridional wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iVCMIP6], "filename"))
+      
       delete(vClimCMIP6)
       delete(nvClimCMIP6)
       delete(vMonsoon)
@@ -890,6 +979,8 @@ begin
       uMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "u_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(uMonsoon, nc_filename)
+      log_provenance(nc_filename, "n/a", "climatological summer-winter zonal wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iUAMIP], "filename"))
 
       delete(uClimAMIP)
       delete(nuClimAMIP)
@@ -914,7 +1005,9 @@ begin
       vMonsoon@emonth_SHsummer = emonth_SHsummer
       nc_filename = work_dir + "v_monsoon_"+dataset+".nc"
       nc_outfile = ncdf_write(vMonsoon, nc_filename)
-
+      log_provenance(nc_filename, "n/a", "climatological summer-winter meridional wind velocity", \
+                     "clim", "global", "other", "kosaka_yu", "", metadata_att_as_array(infoPr[iVAMIP], "filename"))
+      
       delete(vClimAMIP)
       delete(nvClimAMIP)
       delete(vMonsoon)
@@ -1040,6 +1133,8 @@ begin
 
         if (nc_filename.ne."") then
           nc_outfile = ncdf_write(GMpr, nc_filename)
+          log_provenance(nc_filename, "n/a", "global summer monsoon precipitation anomaly", \
+                        "var", "global", "other", "kosaka_yu", "", infoPr[ii]@filename)
         end if
         delete(GMpr)
         delete(clim)
@@ -1076,6 +1171,8 @@ begin
         end if
         if (nc_filename.ne."") then
           nc_outfile = ncdf_write(NHMpr, nc_filename)
+          log_provenance(nc_filename, "n/a", "NH summer monsoon precipitation anomaly", \
+                        "var", "nh", "other", "kosaka_yu", "", infoPr[ii]@filename)
         end if
         delete(NHMpr)
         delete(clim)
@@ -1112,6 +1209,8 @@ begin
         end if
         if (nc_filename.ne."") then
           nc_outfile = ncdf_write(SHMpr, nc_filename)
+          log_provenance(nc_filename, "n/a", "SH summer monsoon precipitation anomaly", \
+                        "var", "sh", "other", "kosaka_yu", "", infoPr[ii]@filename)
         end if
         delete(SHMpr)
       end if
@@ -1193,6 +1292,8 @@ begin
 
         if (nc_filename.ne."") then
           nc_outfile = ncdf_write(NHMu, nc_filename)
+          log_provenance(nc_filename, "n/a", "NH summer monsoon circulation index anomaly", \
+                        "var", "nh", "other", "kosaka_yu", "", infoU[ii]@filename)
         end if
 
         delete(udNHSM)
