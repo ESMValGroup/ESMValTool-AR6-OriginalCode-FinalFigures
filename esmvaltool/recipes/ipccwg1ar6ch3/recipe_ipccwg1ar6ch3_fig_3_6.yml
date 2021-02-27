@@ -52,7 +52,7 @@ diagnostics:
           - {dataset: ACCESS-CM2, grid: gn, ensemble: r1i1p1f1, start_year: 950, end_year: 1449}
           - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1, start_year: 101, end_year: 600}
           - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1, start_year: 2401, end_year: 2900}
-          - {dataset: AWI-ESM-1-1-LR, grid: gn, ensemble: r1i1p1f1, start_year: 1855, end_year: 1954}
+          #- {dataset: AWI-ESM-1-1-LR, grid: gn, ensemble: r1i1p1f1, start_year: 1855, end_year: 1954}
           - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2349}
           #- {dataset: BCC-ESM1, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2349}
           - {dataset: CAMS-CSM1-0, grid: gn, ensemble: r1i1p1f1, start_year: 2900, end_year: 3399}
@@ -181,36 +181,36 @@ diagnostics:
           - {dataset: ACCESS-CM2, grid: gn, institute: CSIRO-ARCCSS, ensemble: r(1:3)i1p1f1}
           - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO, ensemble: r(1:11)i1p1f1}
           - {dataset: AWI-CM-1-1-MR, grid: gn, ensemble: r1i1p1f1}
-          - {dataset: AWI-ESM-1-1-LR, grid: gn, end_year: 2014} #no ssp245
+          #- {dataset: AWI-ESM-1-1-LR, grid: gn, end_year: 2014} #no ssp245
           - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r1i1p1f1}
-          - {dataset: BCC-ESM1, grid: gn, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: BCC-ESM1, grid: gn, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: CAMS-CSM1-0, grid: gn, ensemble: r(1:2)i1p1f1}
           - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p1f1}
           - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p2f1}
           #- {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
-          - {dataset: CAS-ESM2-0, institute: CAS, grid: gn, ensemble: r(1:4)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: CAS-ESM2-0, institute: CAS, grid: gn, ensemble: r(1:4)i1p1f1, end_year: 2014} #no ssp245
           #- {dataset: CESM2, grid: gn, ensemble: r(1:11)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: CESM2, grid: gn, ensemble: r1i1p1f1}
           - {dataset: CESM2, grid: gn, ensemble: r4i1p1f1}
           - {dataset: CESM2, grid: gn, ensemble: r(10:11)i1p1f1}
-          - {dataset: CESM2-FV2, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: CESM2-FV2, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: CESM2-WACCM, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1}
-          - {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: CESM2-WACCM-FV2, grid: gn, institute: NCAR, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: CIESM, ensemble: r1i1p1f1}
-          - {dataset: CMCC-CM2-HR4, grid: gn, end_year: 2014} #no ssp245
+          #- {dataset: CMCC-CM2-HR4, grid: gn, end_year: 2014} #no ssp245
           - {dataset: CMCC-CM2-SR5, grid: gn}
           - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2}
           - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
           - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2}
-          - {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, end_year: 2014} #no ssp245
-          - {dataset: E3SM-1-1, institute: E3SM-Project, end_year: 2014} #no ssp245
-          - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, end_year: 2014} #no ssp245
+          #- {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: E3SM-1-1, institute: E3SM-Project, end_year: 2014} #no ssp245
+          #- {dataset: E3SM-1-1-ECA, institute: E3SM-Project, end_year: 2014} #no ssp245
           - {dataset: EC-Earth3, ensemble: r(1:2)i1p1f1} #not all years available
           - {dataset: EC-Earth3, ensemble: r4i1p1f1} #not all years available
           - {dataset: EC-Earth3, ensemble: r(6:7)i1p1f1} #not all years available
           - {dataset: EC-Earth3, ensemble: r(9:22)i1p1f1} #not all years available
           - {dataset: EC-Earth3, ensemble: r(24:25)i1p1f1} #not all years available
-          - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, end_year: 2014}
+          #- {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, end_year: 2014}
           - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1}
           - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1}
           - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1}
@@ -220,14 +220,14 @@ diagnostics:
           - {dataset: GFDL-CM4, grid: gr1} #permission denied tas
           - {dataset: GFDL-ESM4, grid: gr1, ensemble: r(1:3)i1p1f1}
           - {dataset: GISS-E2-1-G, grid: gn, ensemble: r(1:10)i1p1f2}
-          - {dataset: GISS-E2-1-G-CC, grid: gn, end_year: 2014}
-          - {dataset: GISS-E2-1-H, grid: gn, ensemble: r(1:10)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: GISS-E2-1-G-CC, grid: gn, end_year: 2014}
+          #- {dataset: GISS-E2-1-H, grid: gn, ensemble: r(1:10)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
-          - {dataset: HadGEM3-GC31-MM, ensemble: r(1:4)i1p1f3, grid: gn, end_year: 2014} #no sp245
+          #- {dataset: HadGEM3-GC31-MM, ensemble: r(1:4)i1p1f3, grid: gn, end_year: 2014} #no sp245
           - {dataset: IITM-ESM, grid: gn}
           - {dataset: INM-CM4-8, grid: gr1}
           - {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1}
-          - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, end_year: 2014}
+          #- {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, end_year: 2014}
           - {dataset: IPSL-CM6A-LR, ensemble: r(1:6)i1p1f1}
           - {dataset: KACE-1-0-G, ensemble: r(1:3)i1p1f1}
           #- {dataset: KIOST-ESM, grid: gr1} #no pr data
@@ -236,15 +236,15 @@ diagnostics:
           - {dataset: MIROC-ES2L, grid: gn, ensemble: r(1:2)i1p1f2}
           - {dataset: MIROC-ES2L, grid: gn, ensemble: r4i1p1f2}
           - {dataset: MIROC-ES2L, grid: gn, ensemble: r(6:9)i1p1f2}
-          - {dataset: MPI-ESM-1-2-HAM, grid: gn, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: MPI-ESM-1-2-HAM, grid: gn, ensemble: r(1:3)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: MPI-ESM1-2-HR, grid: gn, ensemble: r(1:2)i1p1f1}
           - {dataset: MPI-ESM1-2-LR, grid: gn, ensemble: r(1:10)i1p1f1}
           - {dataset: MRI-ESM2-0, grid: gn, ensemble: r(1:5)i1p1f1}
           - {dataset: NESM3, grid: gn, ensemble: r(1:2)i1p1f1}
-          - {dataset: NorCPM1, grid: gn, institute: NCC, ensemble: r(1:30)i1p1f1, end_year: 2014} #no ssp245
+          #- {dataset: NorCPM1, grid: gn, institute: NCC, ensemble: r(1:30)i1p1f1, end_year: 2014} #no ssp245
           - {dataset: NorESM2-LM, grid: gn, institute: NCC, ensemble: r(1:3)i1p1f1}
           - {dataset: NorESM2-MM, grid: gn, institute: NCC, ensemble: r(1:2)i1p1f1} 
-          - {dataset: SAM0-UNICON, grid: gn, end_year: 2014} #no ssp245
+          #- {dataset: SAM0-UNICON, grid: gn, end_year: 2014} #no ssp245
           - {dataset: TaiESM1, grid: gn} #no ssp245
           - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
