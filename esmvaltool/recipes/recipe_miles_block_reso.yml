@@ -1,0 +1,73 @@
+# ESMValTool
+# recipe_miles_block.yml
+---
+documentation:
+  description: |
+    Recipe for computing and plotting blocking statistics using
+    the MiLES (Mid-Latitude Evaluation System) package
+  authors:
+    - vonhardenberg_jost
+    - davini_paolo
+    - arnone_enrico
+
+  references:
+    - davini18
+    - davini12jclim
+    - tibaldi90tel
+
+  projects:
+    - c3s-magic
+
+preprocessors:
+    preproc1:
+      extract_levels:
+        levels: 50000
+        scheme: linear
+      regrid:
+        target_grid: 2.5x2.5
+        lat_offset: False
+        scheme: linear_extrapolate
+      extract_region:
+        start_longitude: 0.
+        end_longitude: 360.
+        start_latitude: -1.25
+        end_latitude: 90.
+
+diagnostics:
+
+  miles_diagnostics:
+    description: MiLES Blocking Diagnostics
+    variables:
+      zg:
+        preprocessor: preproc1
+        mip: day
+        start_year: 1979
+        end_year: 2000
+    additional_datasets:
+      - {dataset: CMCC-CM2-HR4, project: CMIP6, exp: hist-1950, grid: gn}
+      - {dataset: CNRM-CM6-1, project: CMIP6, exp: hist-1950, ensemble: r1i1p1f2}
+      - {dataset: ECMWF-IFS-LR, project: CMIP6, exp: hist-1950}
+      - {dataset: HadGEM3-GC31-LL, project: CMIP6, exp: hist-1950, grid: gn}
+      - {dataset: MPI-ESM1-2-HR, project: CMIP6, exp: hist-1950, grid: gn}
+      - {dataset: CMCC-CM2-VHR4, project: CMIP6, exp: hist-1950, grid: gn}
+      - {dataset: CNRM-CM6-1-HR, project: CMIP6, exp: hist-1950, ensemble: r1i1p1f2}
+      - {dataset: ECMWF-IFS-HR, project: CMIP6, exp: hist-1950}
+      - {dataset: HadGEM3-GC31-HM, project: CMIP6, exp: hist-1950, grid: gn}
+      - {dataset: MPI-ESM1-2-XR, project: CMIP6, exp: hist-1950, grid: gn}
+      - {dataset: ERA5, project: OBS6, type: reanaly, version: '1', tier: 3}
+    scripts:
+        miles_block:
+            script: miles/miles_block_groupby_reso.R
+            seasons: DJF # Select season ('DJF','MAM','JJA','SON')
+            color_lines: ['black', 'dodgerblue', 'darkred', 'orange', 'green']
+            legend_loc: [0, 30]
+            linewidth: 4
+            modelgroup_HR: ['CMCC-CM2-VHR4', 'CNRM-CM6-1-HR', 'ECMWF-IFS-HR', 'HadGEM3-GC31-HM', 'MPI-ESM1-2-XR']
+            modelgroup_LR: ['CMCC-CM2-HR4', 'CNRM-CM6-1', 'ECMWF-IFS-LR', 'HadGEM3-GC31-LL', 'MPI-ESM1-2-HR']
+            obs_legend: ['ERA5']
+            plot_title: 'Blocking - resolution comparison'
+            reso_legend: ['LR', 'HR']
+            transparency: 0.15 # in [0, 1]
+            xlabel: 'Longitude'
+            ylabel: 'Blocked Days (%)'
+            yrange: [0, 30]

@@ -235,7 +235,7 @@ progression_bar <- function(index, total_length, each = 10) {
 
 # to convert season charname to months number
 season2timeseason <- function(season) {
-  if (nchar(season) == 3 & toupper(season) == season) {
+  if (nchar(season) <= 4 & toupper(season) == season) {
     if (season == "ALL") {
       timeseason <- 1:12
     }
@@ -250,6 +250,9 @@ season2timeseason <- function(season) {
     }
     if (season == "SON") {
       timeseason <- 9:11
+    }
+    if (season == "DJFM") {
+      timeseason <- c(1, 2, 3, 12)
     }
   } else {
     charseason <- strsplit(season, "_")[[1]]
@@ -523,13 +526,13 @@ ncdf_opener_universal <- # nolint
           format = "%Y-%m-%d"
         )
 
-      if (max(timeline) < lastday | min(timeline) > firstday) {
-        print(firstday)
-        print(lastday)
-        print(min(timeline))
-        print(max(timeline))
-        stop("You requested a time interval that is not present in the NetCDF")
-      }
+      #if (max(timeline) < lastday | min(timeline) > firstday) {
+      #  print(firstday)
+      #  print(lastday)
+      #  print(min(timeline))
+      #  print(max(timeline))
+      #  stop("You requested a time interval that is not present in the NetCDF")
+      #}
     }
 
     # time selection and variable loading
@@ -1137,6 +1140,15 @@ field_details <- function(field) {
     lev_diff <- NULL
     legend_unit <- "Blocked Days (%)"
     title_name <- "TM90 Instantaneous Blocking"
+  }
+
+  if (field == "DA98") {
+    color_field <- c("dodgerblue", "darkred")
+    color_diff <- NULL
+    lev_field <- c(0, 30)
+    lev_diff <- NULL
+    legend_unit <- "Blocked Days (%)"
+    title_name <- "DA98 Instantaneous Blocking"
   }
 
   if (field == "InstBlock") {

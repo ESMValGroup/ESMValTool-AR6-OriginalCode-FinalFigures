@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210227 kosaka_yu: revised SAM index definition.
 ;    20210221 kosaka_yu: added file output and provenance.
 ;    20210129 kosaka_yu: removed DJF.
 ;    20201029 kosaka_yu: removed MME mean.
@@ -56,7 +57,7 @@ begin
     cutoff_period = diag_script_info@cutoff_period
   end if
 
-  normalize = True
+  restandardize = True ;False
   
   ; ========================================================================
 
@@ -87,53 +88,73 @@ begin
   sam = new((/nintegrations, eyear_data-syear_data+1/), "float")
   sam!0 = "ensemble"
   sam&ensemble = ispan(1, nintegrations, 1)
-  sam!1 = "time"
-  sam&time = ispan(syear_data, eyear_data, 1)
-  north = sam
-  south = sam
+  sam!1 = "year"
+  sam&year = ispan(syear_data, eyear_data, 1)
   cmip_phase = new((/nintegrations/), "string")
   model_name = new((/nintegrations/), "string")
   ensemble_name = new((/nintegrations/), "string")
+
+  north = new((/nintegrations, eyear_data-syear_data+1, 12/), "float")
+  north!0 = "ensemble"
+  north&ensemble = ispan(1, nintegrations, 1)
+  north!1 = "year"
+  north&year = ispan(syear_data, eyear_data, 1)
+  north!2 = "month"
+  north&month = ispan(1, 12, 1)
+  south = north
   
   do ii = 0, ListCount(info) - 1
     ; Read data
     psl = read_data(info[ii])
-    slp = tofloat(psl)
-    copy_VarMeta(psl, slp)
-    delete(psl)
     
-    time = cd_calendar(slp&time, -1)
+    time = cd_calendar(psl&time, -1)
     syr = time(0)/100
     eyr = time(dimsizes(time)-1)/100
+    smo = time(0) - syr*100
+    emo = time(dimsizes(time)-1) - eyr*100
+    
+    slp = new((/eyr-syr+1, 12, dimsizes(psl(0, :))/), typeof(psl))
+    copy_VarCoords(psl(0, :), slp(0, 0, :))
+    slp!0 = "year"
+    slp&year = ispan(syr, eyr, 1)
+    slp!1 = "month"
+    slp&month = ispan(1, 12, 1)
+
+    do yr = syr, eyr
+      do mo = 1, 12
+        if ((yr.eq.syr.and.mo.lt.smo).or.(yr.eq.eyr.and.mo.gt.emo)) then
+          continue
+        end if
+        slp({yr}, {mo}, :) = (/psl(ind(time.eq.yr*100+mo), :)/)
+      end do
+    end do
     delete(time)
-    time = ispan(syr, eyr, 1)
-    slp&time = time
-    delete(time)
+    delete(psl)
 
     yr0 = max((/syr, syear_data/))
     yr1 = min((/eyr, eyear_data/))
 
     int = ind(info[ii]@project+"_"+info[ii]@dataset+"_"+info[ii]@ensemble.eq.integrations)
     
-    north(int, {yr0:yr1}) = (/slp({yr0:yr1}, {-40.})/)
-    south(int, {yr0:yr1}) = (/slp({yr0:yr1}, {-65.})/)
-    delete(slp)
+    north(int, {yr0:yr1}, :) = (/slp({yr0:yr1}, :, {-40.})/)
+    south(int, {yr0:yr1}, :) = (/slp({yr0:yr1}, :, {-65.})/)
     cmip_phase(int) = info[ii]@project
     model_name(int) = info[ii]@dataset
     ensemble_name(int) = info[ii]@ensemble
+
+    delete(slp)
   end do
-  
-  north = (north - conform(north, dim_avg_n(north(:, {syear_ref:eyear_ref}), 1), 0)) \
-;  north = (north - avg(north(:, {syear_ref:eyear_ref}))) \
-             / conform(north, dim_stddev_n(north(:, {syear_ref:eyear_ref}), 1), 0)
-  south = (south - conform(south, dim_avg_n(south(:, {syear_ref:eyear_ref}), 1), 0)) \
-;  south = (south - avg(south(:, {syear_ref:eyear_ref}))) \
-             / conform(south, dim_stddev_n(south(:, {syear_ref:eyear_ref}), 1), 0) 
-  sam = north - south
+
+  north = north - conform(north, dim_avg_n(north(:, {syear_ref:eyear_ref}, :), 1), (/0, 2/))
+  north = north / conform(north, dim_stddev_n(north(:, {syear_ref:eyear_ref}, :), 1), (/0, 2/))
+  south = south - conform(south, dim_avg_n(south(:, {syear_ref:eyear_ref}, :), 1), (/0, 2/))
+  south = south / conform(south, dim_stddev_n(south(:, {syear_ref:eyear_ref}, :), 1), (/0, 2/))
+    
+  sam = dim_avg_n(north, 2) - dim_avg_n(south, 2)
   delete(north)
   delete(south)
 
-  if (normalize) then
+  if (restandardize) then
     sam = sam - conform(sam, dim_avg_n(sam(:, {syear_ref:eyear_ref}), 1), 0)
     sam = sam / conform(sam, dim_stddev_n(sam(:, {syear_ref:eyear_ref}), 1), 0)
   end if
@@ -146,13 +167,13 @@ begin
   diag_script_dir = "/"+str_concat(dirs(0:dimsizes(dirs)-2))
   delete(dirs)
   delete(script)
-  dir_abram = "abram2014sam/"
+  dir_abram = "abram2014/"
   dir_datwyler = "datwyler2017/"
   file_abram = "abram2014sam.txt"
   file_datwyler_ann = "Reconstructions_Annual_LC.txt"
 
-  address_abram = "ftp://ftp.ncdc.noaa.gov/pub/data/paleo/contributions_by_author/abram2014/abram2014sam.txt"
-  address_datwyler_ann = "https://www1.ncdc.noaa.gov/pub/data/paleo/reconstructions/datwyler2017/Reconstructions_Annual_LC.txt"
+  address_abram = "ftp://ftp.ncdc.noaa.gov/pub/data/paleo/contributions_by_author/abram2014/"+file_abram
+  address_datwyler_ann = "https://www1.ncdc.noaa.gov/pub/data/paleo/reconstructions/datwyler2017/"+file_datwyler_ann
   
   do n = 0, 1
     if (n.eq.0) then
@@ -221,7 +242,7 @@ begin
       data = data(::-1, :)
     end if
 
-    if (normalize) then
+    if (restandardize) then
       ts = ind(data(:, 0).eq.syear_ref)
       te = ind(data(:, 0).eq.eyear_ref)
       data(:, 1) = data(:, 1) - avg(data(ts:te, 1))
@@ -327,9 +348,9 @@ begin
   rests@trYMaxF = 4.
   rests@tmYLOn = True
   rests@tmYLLabelsOn = True
-  rests@tmYLValues = (/-4, -2, 0, 2, 4/)
+  rests@tmYLValues = (/-6, -4, -2, 0, 2, 4, 6/)
   rests@tmYLLabels =   rests@tmYLValues
-  rests@tmYLMinorValues = (/-3., -1., 1., 3. /)
+  rests@tmYLMinorValues = (/-5., -3., -1., 1., 3., 5. /)
   
   rests@xyLineColor = (/0.5, 0.5, 0.5/)
   rests@xyDashPattern     = 0
@@ -356,18 +377,18 @@ begin
   lres@gsLineDashPattern = 0
   lres@gsLineThicknessF = 0.5
   lres@gsLineColor = sam_abram@color
-  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_abram_runmean&time, sam_abram_runmean, lres)
+  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_abram_runmean&year, sam_abram_runmean, lres)
   idummy = idummy + 1
   lres@gsLineColor    = sam_datwyler_ann@color
-  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_datwyler_ann_runmean&time, sam_datwyler_ann_runmean, lres)
+  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_datwyler_ann_runmean&year, sam_datwyler_ann_runmean, lres)
   idummy = idummy + 1
 
   lres@gsLineThicknessF = 2.5
   lres@gsLineColor = sam_abram@color
-  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_abram_lowpass&time, sam_abram_lowpass, lres)
+  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_abram_lowpass&year, sam_abram_lowpass, lres)
   idummy = idummy + 1
   lres@gsLineColor = sam_datwyler_ann@color
-  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_datwyler_ann_lowpass&time, sam_datwyler_ann_lowpass, lres)
+  dummy(idummy) = gsn_add_polyline(wks, plot0, sam_datwyler_ann_lowpass&year, sam_datwyler_ann_lowpass, lres)
   idummy = idummy + 1
 
   color_cmip5 = (/0.5, 0.5, 0.5/)
@@ -381,7 +402,7 @@ begin
       lres@gsLineThicknessF = 0.5
       lres@gsLineOpacityF = 1.
     end if
-    dummy(idummy) = gsn_add_polyline(wks, plot1, sam_runmean&time, sam_runmean(ii, :), lres)
+    dummy(idummy) = gsn_add_polyline(wks, plot1, sam_runmean&year, sam_runmean(ii, :), lres)
     idummy = idummy + 1
   end do
   lres@gsLineOpacityF = 1.
@@ -393,7 +414,7 @@ begin
       lres@gsLineColor := get_color(model_name(ii))
       lres@gsLineThicknessF = 2.5
     end if
-    dummy(idummy) = gsn_add_polyline(wks, plot1, sam_lowpass&time, sam_lowpass(ii, :), lres)
+    dummy(idummy) = gsn_add_polyline(wks, plot1, sam_lowpass&year, sam_lowpass(ii, :), lres)
     idummy = idummy + 1
   end do
 

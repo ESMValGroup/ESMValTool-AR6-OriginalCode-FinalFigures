@@ -97,34 +97,65 @@ miles_block_fast <- # nolint
       stop("Longitudinal resolution is not a factor of 5 deg")
     }
 
+    # ##########################################################
+    # #--------------Tibaldi and Molteni 1990------------------#
+    # ##########################################################
+
+    # print("Tibaldi and Molteni (1990) index...")
+    # # TM90: parametres for blocking detection
+    # tm90_fi0 <- 60 # central_lat
+    # tm90_fin <- tm90_fi0 + 20
+    # tm90_fis <- tm90_fi0 - 20 # south and north lat, 80N and 40N
+    # tm90_central <- whicher(ipsilon, tm90_fi0)
+    # tm90_south <- whicher(ipsilon, tm90_fis)
+    # tm90_north <- whicher(ipsilon, tm90_fin)
+    # tm90_range <- seq(-5, 5, yreso) / yreso # 5 degrees to the north,
+    # #  5 to the south (larger than TM90 or D'Andrea et al 1998)
+
+    # # TM90: beta version, the amazing power of R vectorization!
+    # # 6 lines to get the climatology
+    # tm90_ghgn <- (z500[, tm90_north + tm90_range, ] -
+    #   z500[, tm90_central + tm90_range, ]) / (tm90_fin - tm90_fi0)
+    # tm90_ghgs <- (z500[, tm90_central + tm90_range, ] -
+    #   z500[, tm90_south + tm90_range, ]) / (tm90_fi0 - tm90_fis)
+    # tm90_check <-
+    #   (tm90_ghgs > 0 & tm90_ghgn < (-10)) # TM90 conditions
+    # tm90_check[tm90_check == T] <- 1
+    # tm90_check[tm90_check == F] <- 0
+    # tottm90 <- apply(tm90_check, c(1, 3), max, na.rm = T)
+    # tm90 <- apply(tottm90, 1, mean) * 100
+    # print("Done!")
+
     ##########################################################
     #--------------Tibaldi and Molteni 1990------------------#
     ##########################################################
 
-    print("Tibaldi and Molteni (1990) index...")
-    # TM90: parametres for blocking detection
+    # TM90 and DA98: parametres for blocking detection
     tm90_fi0 <- 60 # central_lat
-    tm90_fin <- tm90_fi0 + 20
-    tm90_fis <- tm90_fi0 - 20 # south and north lat, 80N and 40N
+    tm90_fiN <- tm90_fi0 + 20
+    tm90_fiS <- tm90_fi0 - 20 # south and north lat, 80N and 40N
     tm90_central <- whicher(ipsilon, tm90_fi0)
-    tm90_south <- whicher(ipsilon, tm90_fis)
-    tm90_north <- whicher(ipsilon, tm90_fin)
-    tm90_range <- seq(-5, 5, yreso) / yreso # 5 degrees to the north,
-    #  5 to the south (larger than TM90 or D'Andrea et al 1998)
+    tm90_south <- whicher(ipsilon, tm90_fiS)
+    tm90_north <- whicher(ipsilon, tm90_fiN)
+    tm90_range <- seq(-5, 5, yreso) / yreso # 5 degrees to the north, 5 to the south (larger than original TM90 or D'Andrea et al 1998 due to resolution)
 
-    # TM90: beta version, the amazing power of R vectorization!
-    # 6 lines to get the climatology
-    tm90_ghgn <- (z500[, tm90_north + tm90_range, ] -
-      z500[, tm90_central + tm90_range, ]) / (tm90_fin - tm90_fi0)
-    tm90_ghgs <- (z500[, tm90_central + tm90_range, ] -
-      z500[, tm90_south + tm90_range, ]) / (tm90_fi0 - tm90_fis)
-    tm90_check <-
-      (tm90_ghgs > 0 & tm90_ghgn < (-10)) # TM90 conditions
+    # 1D meridional gradients
+    tm90_ghgn <- (z500[, tm90_north + tm90_range, ] - z500[, tm90_central + tm90_range, ]) / (tm90_fiN - tm90_fi0)
+    tm90_ghgs <- (z500[, tm90_central + tm90_range, ] - z500[, tm90_south + tm90_range, ]) / (tm90_fi0 - tm90_fiS)
+
+    print("Tibaldi and Molteni (1990) index...")
+    tm90_check <- (tm90_ghgs > 0 & tm90_ghgn < (-10)) # TM90 conditions
     tm90_check[tm90_check == T] <- 1
     tm90_check[tm90_check == F] <- 0
-    tottm90 <- apply(tm90_check, c(1, 3), max, na.rm = T)
-    tm90 <- apply(tottm90, 1, mean) * 100
-    print("Done!")
+    totTM90 <- apply(tm90_check, c(1, 3), max, na.rm = T)
+    TM90 <- apply(totTM90, 1, mean) * 100
+
+    print("D'Andrea et al. (1998) index...")
+    da98_check <- (tm90_ghgs > 0 & tm90_ghgn < (-5)) # DA98 conditions
+    da98_check[da98_check == T] <- 1
+    da98_check[da98_check == F] <- 0
+    totDA98 <- apply(da98_check, c(1, 3), max, na.rm = T)
+    DA98 <- apply(totDA98, 1, mean) * 100
 
     ##########################################################
     #--------------Davini et al. 2012------------------------#
@@ -293,6 +324,7 @@ miles_block_fast <- # nolint
     # which fieds to plot/save
     fieldlist <- c(
       "TM90",
+      "DA98",
       "InstBlock",
       "ExtraBlock",
       "Z500",
@@ -307,6 +339,7 @@ miles_block_fast <- # nolint
     )
     full_fieldlist <- c(
       "TM90",
+      "DA98",
       "InstBlock",
       "ExtraBlock",
       "Z500",
@@ -348,74 +381,79 @@ miles_block_fast <- # nolint
 
     for (var in fieldlist) {
       # name of the var
+      # if (var == "TM90") {
+      #   longvar <- "Tibaldi-Molteni 1990 Instantaneous Blocking frequency"
+      #   unit <- "%"
+      #   field <- tm90
+      #   full_field <- tottm90
+      # }
+
       if (var == "TM90") {
+        # dim_ncdf <- list(dims$x, t = dims$tclim)
+        # dim_fullncdf <- list(dims$x, t = dims$t)
         longvar <- "Tibaldi-Molteni 1990 Instantaneous Blocking frequency"
         unit <- "%"
-        field <- tm90
-        full_field <- tottm90
-      }
-      if (var == "InstBlock") {
+        field <- TM90
+        full_field <- totTM90
+      } else if (var == "DA98") {
+        # dim_ncdf <- list(dims$x, t = dims$tclim)
+        # dim_fullncdf <- list(dims$x, t = dims$t)
+        longvar <- "D'Andrea et al 1998 Instantaneous Blocking frequency"
+        unit <- "%"
+        field <- DA98
+        full_field <- totDA98
+      } else if (var == "InstBlock") {
         longvar <- "Instantaneous Blocking frequency"
         unit <- "%"
         field <- frequency
         full_field <- totblocked
-      }
-      if (var == "ExtraBlock") {
+      } else if (var == "ExtraBlock") {
         longvar <- "Instantaneous Blocking frequency (GHGS2)"
         unit <- "%"
         field <- frequency2
         full_field <- totblocked2
-      }
-      if (var == "Z500") {
+      } else if (var == "Z500") {
         longvar <- "Geopotential Height"
         unit <- "m"
         field <- z500mean
         full_field <- z500
-      }
-      if (var == "BI") {
+      } else if (var == "BI") {
         longvar <- "BI index"
         unit <- ""
         field <- bi
         full_field <- totbi
-      }
-      if (var == "MGI") {
+      } else if (var == "MGI") {
         longvar <- "MGI index"
         unit <- ""
         field <- mgi
         full_field <- totmeridional
-      }
-      if (var == "ACN") {
+      } else if (var == "ACN") {
         longvar <- "Anticyclonic RWB frequency"
         unit <- "%"
         field <- acn
         full_field <- totrwb / 10
         full_field[full_field == (-1)] <- NA
-      }
-      if (var == "CN") {
+      } else if (var == "CN") {
         longvar <- "Cyclonic RWB frequency"
         unit <- "%"
         field <- cn
         full_field <- totrwb / 10
         full_field[full_field == (1)] <- NA
-      }
-      if (var == "BlockEvents") {
+      } else if (var == "BlockEvents") {
         longvar <- "Blocking Events frequency"
         unit <- "%"
         field <- block$percentage
         full_field <- block$track
-      }
-      if (var == "LongBlockEvents") {
+      } else if (var == "LongBlockEvents") {
         longvar <- "10-day Blocking Events frequency"
         unit <- "%"
         field <- longblock$percentage
         full_field <- longblock$track
-      }
-      if (var == "DurationEvents") {
+      } else if (var == "DurationEvents") {
         longvar <- "Blocking Events duration"
         unit <- "days"
         field <- block$duration
-      }
-      if (var == "NumberEvents") {
+      } else if (var == "NumberEvents") {
         longvar <- "Blocking Events number"
         unit <- ""
         field <- block$nevents
@@ -425,7 +463,8 @@ miles_block_fast <- # nolint
       field[is.nan(field)] <- NA
 
       # variable definitions
-      if (var == "TM90") {
+      # if (var == "TM90") {
+      if (var %in% c("TM90", "DA98")) {
         var_ncdf <- ncvar_def(
           var,
           unit,
