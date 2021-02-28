@@ -1416,12 +1416,14 @@ begin
   res@mpOutlineOn = True
   res@mpCenterLonF = 0.
   res@mpPerimDrawOrder = "PostDraw"
+  res@mpOutlineDrawOrder = "Draw"
   res@gsnDraw      = False
   res@gsnFrame     = False
   res@cnLevelSelectionMode = "ExplicitLevels"
   res@cnLineLabelsOn = False
   res@cnFillOn        = True
   res@cnLinesOn       = False
+  res@cnFillDrawOrder = "PreDraw"
   res@lbLabelBarOn    = False
 
   res@gsnCenterStringOrthogonalPosF = 0.02
@@ -1497,16 +1499,39 @@ begin
   res2@cnFillPatterns = (/6, 0/);(/17,0/)
   res2@cnLevels = 0.5
 ;
-;  res3 = True
-;  res3@gsnShadeFillType = "pattern"
-;  res3@gsnShadeLow      = 6
-;  res3@gsnShadeFillScaleF = 1. 
-  oplot = new(3,graphic)
+;  oplot = new(3,graphic)
+  xdummy = new(3*product(dimsizes(nam_patterns_obs_map))/4, graphic)
+  idum = 0
+  res_marker = True
+  res_marker@gsMarkerIndex = 5
+  res_marker@gsMarkerSizeF = 0.002
+  res_marker@gsMarkerThicknessF = 0.5
+  res_marker@gsMarkerOpacityF = 0.6
   do gg = 0,2
-    oplot(gg) = gsn_csm_contour(wks,obs_significance(gg,:,:),res2)
-;    oplot(gg) = gsn_contour_shade(oplot(gg), 1., 0., res3)
-    overlay(plot(gg),oplot(gg))
+;    oplot(gg) = gsn_csm_contour(wks,obs_significance(gg,:,:),res2)
+;    overlay(plot(gg),oplot(gg))
+    do j = 0, dimsizes(obs_significance&lat)-1
+      if (mod(j,2).eq.0) then
+        continue
+      end if
+      rr = (90.-abs(obs_significance&lat(j)))^2/70.^2
+      iinc = toint(2./rr) ; round(2./rr, 3)
+;      if (mod(j,4).eq.1.and.mod(i,iinc).eq.1) then
+;        i0 = iinc - 1
+;      elseif (mod(j,4).eq.3.and.mod(i,ii).eq.0) then
+;        i0 = iinc - 2
+;      end if
+      i0 = mod(j/2, iinc)
+      do i = i0, dimsizes(obs_significance&lon)-1, iinc
+        if (obs_significance(gg, j, i).lt.0.5) then
+          xdummy(idum) = gsn_add_polymarker(wks, plot(gg), obs_significance&lon(i), \
+                                            obs_significance&lat(j), res_marker)
+          idum = idum + 1
+        end if
+      end do
+    end do
   end do
+  delete(rr)
 
   res2@cnFillPatterns = (/3,0/) ;(/11,0/)
   res2@cnLevels = 0.5
@@ -1517,6 +1542,13 @@ begin
   overlay(plot(4),oplot4)
   oplot5 = gsn_csm_contour(wks,mme_sam_sign_C6,res2)
   overlay(plot(5),oplot5)
+
+  ; Add EOF domain to the NAO maps
+  res_domain = True
+  res_domain@gsLineThicknessF = 2.
+  res_domain@tfPolyDrawOrder = "PostDraw"
+  nao_domain_obs = gsn_add_polyline(wks, plot(1), (/-90., 40., 40., -90., -90./), (/20., 20., 80., 80., 20./), res_domain)
+  nao_domain_model = gsn_add_polyline(wks, plot(4), (/-90., 40., 40., -90., -90./), (/20., 20., 80., 80., 20./), res_domain)
 
   panres = True
   panres@gsnPanelTop = 0.94
@@ -1538,7 +1570,7 @@ begin
   panres@txFontHeightF = 0.018;0.022
   panres@gsnFrame = False
   gsn_panel(wks,plot,(/2,3/),panres)
-
+  
 ;- - - - - - - - - - - - - - - - - -
 ; Taylor plots, panels 7-9
 ;
@@ -1588,6 +1620,7 @@ begin
   delete(tres@tiYAxisString)
   tplot(0) = taylor_diagram(wks, nam_taylor_stats_C6(:,1:1), nam_taylor_stats_C6(:,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot(2) = taylor_diagram3(wks, sam_taylor_stats_C6(:,1:1), sam_taylor_stats_C6(:,0:0), tres)
 
   colors2 = new((/dimsizes(nao_taylor_stats_C5(:,0))/),integer)
@@ -1598,6 +1631,7 @@ begin
   tres@Markers := markers2
   tres@tfPolyDrawOrder = "PreDraw"
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 0.5, 1.5 /)
   tplot_C5(1) = taylor_diagram(wks, nao_taylor_stats_C5(:,1:1), nao_taylor_stats_C5(:,0:0), tres)
   delete(tres@tiYAxisString)
   tplot_C5(0) = taylor_diagram(wks, nam_taylor_stats_C5(:,1:1), nam_taylor_stats_C5(:,0:0), tres)
@@ -1617,10 +1651,12 @@ begin
   tres@Colors          := colors       ; marker colors
   tres@Markers         := marker
   tres@gsMarkerSizeF   = 0.008
+  tres@stnRad         = (/ 0.5, 1.5 /)
   tplot2(1) = taylor_diagram(wks, nao_taylor_stats_obs(:,1:1), nao_taylor_stats_obs(:,0:0), tres)
   delete(tres@tiYAxisString)
   tplot2(0) = taylor_diagram(wks, nam_taylor_stats_obs(:,1:1), nam_taylor_stats_obs(:,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot2(2) = taylor_diagram3(wks, sam_taylor_stats_obs(:,1:1), sam_taylor_stats_obs(:,0:0), tres)
   do gg =0,2
      overlay(tplot_C5(gg),tplot2(gg))
@@ -1656,10 +1692,12 @@ begin
   tres@Colors := 2
   tres@Markers:= 16
 ;  tres@gsMarkerThicknessF = 2.0
+  tres@stnRad         = (/ 0.5, 1.5 /)
   tplot3b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip5EM(0:0,1:1),tay_stats_hist_nao_cmip5EM(0:0,0:0), tres)
   delete(tres@tiYAxisString)
   tplot3b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip5EM(0:0,1:1),tay_stats_hist_nam_cmip5EM(0:0,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot3b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip5EM(0:0,1:1),tay_stats_hist_sam_cmip5EM(0:0,0:0), tres)
   do gg = 0,2
      overlay(tplot_C5(gg),tplot3b(gg))
@@ -1678,10 +1716,12 @@ begin
   tres@Colors := 3
   tres@Markers:= 16
 ;  tres@gsMarkerThicknessF = 2.0
+  tres@stnRad         = (/ 0.5, 1.5 /)
   tplot4b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6AEM(0:0,1:1),tay_stats_hist_nao_cmip6AEM(0:0,0:0), tres)
   delete(tres@tiYAxisString)
   tplot4b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6AEM(0:0,1:1),tay_stats_hist_nam_cmip6AEM(0:0,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot4b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6AEM(0:0,1:1),tay_stats_hist_sam_cmip6AEM(0:0,0:0), tres)
   do gg = 0,2
      overlay(tplot_C5(gg),tplot4b(gg))
@@ -1700,10 +1740,12 @@ begin
   tres@Colors := 9
   tres@Markers:= 16
 ;  tres@gsMarkerThicknessF = 2.0
+  tres@stnRad         = (/ 0.5, 1.5 /)
   tplot5b(1) = taylor_diagram(wks, tay_stats_hist_nao_cmip6EM(0:0,1:1),tay_stats_hist_nao_cmip6EM(0:0,0:0), tres)
   delete(tres@tiYAxisString)
   tplot5b(0) = taylor_diagram(wks, tay_stats_hist_nam_cmip6EM(0:0,1:1),tay_stats_hist_nam_cmip6EM(0:0,0:0), tres)
   tres@tiYAxisString = ""
+  tres@stnRad         = (/ 2, 3 /)
   tplot5b(2) = taylor_diagram3(wks, tay_stats_hist_sam_cmip6EM(0:0,1:1),tay_stats_hist_sam_cmip6EM(0:0,0:0), tres)
   do gg = 0,2
      overlay(tplot_C5(gg),tplot5b(gg))
@@ -2036,8 +2078,18 @@ begin
   x2 = 0.22
   y1 = 0.47 ; 0.475
   y2 = 0.49 ; 0.485
-  gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres)
+;  gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
+  do j = 0, 2, 2
+    do i = 0, 2
+      gsn_polymarker_ndc(wks, x1+(i+0.5)*(x2-x1)/3., y1+(j+0.5)*(y2-y1)/3., res_marker)
+    end do
+  end do
+  do j = 1, 1
+    do i = 0, 1
+      gsn_polymarker_ndc(wks, x1+(i+1.)*(x2-x1)/3., y1+(j+0.5)*(y2-y1)/3., res_marker)
+    end do
+  end do
 ;  gsn_text_ndc(wks," not significant~C~ at 5% level",x2+0.005,0.48,tlres)
   gsn_text_ndc(wks," not significant~C~ at 10% level",x2+0.005,0.48,tlres)
 

@@ -530,15 +530,16 @@ begin
     rxy@tiYAxisString     = "Standardized Deviations (Normalized)"
   end if
   rxy@tiYAxisFontHeightF= FontHeightF                        ; default=0.025 
+  rxy@tiYAxisOffsetXF   = 0.001
   
   rxy@tmXBMode          = "Explicit" 
   rxy@tmXBValues        = (/0.0,0.25,0.50,0.75,1.00,1.25,1.5/)    ; major tm
                                                                   ; default  "OBS" or "REF"
  ;rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75","REF" ,"1.25","1.50"/)
-  rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75","REF" ,"1.25","1.50"/)
+  rxy@tmXBLabels        = (/"0","0.25","0.5","0.75","REF" ,"1.25","1.5"/)
   if (rOpts .and. isatt(rOpts,"OneX") )  then                     ; eg: rOpts@OneX="1.00" 
      ;rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50"/)
-      rxy@tmXBLabels        = (/"    ","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50"/)
+      rxy@tmXBLabels        = (/"    ","0.25","0.5","0.75",rOpts@OneX,"1.25","1.5"/)
   end if
 
   rxy@tmXBMajorLengthF  = 0.015      ; default=0.02 for a vpHeightF=0.6
@@ -551,7 +552,7 @@ begin
   rxy@tmYLMajorLengthF  = rxy@tmXBMajorLengthF
   rxy@tmYLLabelFontHeightF = FontHeightF
   rxy@tmYLMode          = "Explicit" 
-  rxy@tmYLValues        = (/0.0,0.25,0.50, 0.75, 1.00, 1.25, 1.5/) ; major tm
+  rxy@tmYLValues        = (/0, 0.25, 0.5, 0.75, 1., 1.25, 1.5/) ; major tm
   rxy@tmYLLabels        = rxy@tmYLValues
   rxy@trYMaxF           = xyMax_Panel
 
@@ -571,7 +572,7 @@ begin
                                             ; create outer 'correlation axis'
   npts    = 200                        ; arbitrary
   xx      = fspan(xyMin,xyMax,npts) 
-  yy      = sqrt(xyMax^2 - xx^2    )   ; outer correlation line (xyMax)
+  yy      = sqrt(xyMax^2 - xx^2)   ; outer correlation line (xyMax)
 
   sLabels = (/"0.1","0.2","0.3","0.4","0.5","0.6" \ ; correlation labels
              ,"0.7","0.8","0.9","0.95","0.99"/)  ;,"1.0"     /); also, major tm
@@ -638,14 +639,14 @@ begin
 ; Correlation labels
 ; ----------------------------------------------------------------
   radC    = xyMax                                  ; for correlation labels
-  xC      = radC*cos(angC*rad)
-  yC      = radC*sin(angC*rad)
+;  xC      = radC*cos(angC*rad)
+;  yC      = radC*sin(angC*rad)
 ; added to get some separation
-  xC      = xC + 0.020*cos(rad*angC)
-  yC      = yC + 0.060*sin(rad*angC)
+;  xC      = xC + 0.020*cos(rad*angC)
+;  yC      = yC + 0.060*sin(rad*angC)
 
-  xC(:5) = xC(:5) - 0.01
-  yC(:5) = yC(:5) + 0.01
+;  xC(:5) = xC(:5) - 0.01
+;  yC(:5) = yC(:5) + 0.01
 
   txRes               = True                      ; text mods desired
   txRes@txFontHeightF = FontHeightF               ; match YL 
@@ -667,7 +668,8 @@ begin
   plRes               = True
   plRes@gsLineThicknessF =  1. ;2.
   
-  txRes@txJust        = "CenterLeft"              ; Default="CenterCenter".
+
+  txRes@txJust        = "BottomLeft" ; Default="CenterCenter".
   txRes@txFontHeightF = FontHeightF               ; match YL 
  ;txRes@txBackgroundFillColor = "white"
 
@@ -681,11 +683,16 @@ begin
 
   do i=0,dimsizes(sLabels)-1                      ; Loop to draw strings
     txRes@txAngleF = angC(i)
-    dum5(i) = gsn_add_text(wks, taylor, sLabels(i),xC(i),yC(i),txRes) ; cor label
+;    dum5(i) = gsn_add_text(wks, taylor, sLabels(i),xC(i),yC(i),txRes) ; cor label
     xTM(0)   = xyMax*cos(angC(i)*rad)             ; major tickmarks at
     yTM(0)   = xyMax*sin(angC(i)*rad)             ; correlation labels
-    xTM(1)   = radTM*cos(angC(i)*rad)             
+    xTM(1)   = radTM*cos(angC(i)*rad)
     yTM(1)   = radTM*sin(angC(i)*rad)
+    xC = xTM(0)
+    yC = yTM(0)
+    yC = yC - 0.02*cos(angC(i)*rad)
+    xC = xC - 0.02*sin(angC(i)*rad)
+    dum5(i) = gsn_add_text(wks, taylor, " "+sLabels(i), xC, yC, txRes) ; cor label
     dum6(i) = gsn_add_polyline(wks,taylor,xTM,yTM,plRes)
   end do
                                                   ; minor tm locations
@@ -1037,7 +1044,7 @@ begin
   rxy@tmXBMode          = "Explicit" 
   rxy@tmXBValues        = (/0.0, 0.50, 1.00, 1.5,2.0,2.5,3.0,3.50/)    ; major tm
                                                                   ; default  "OBS" or "REF"
-  rxy@tmXBLabels        = (/"0","0.5","REF","1.5","2.0","2.5","3.0","3.5"/)
+  rxy@tmXBLabels        = (/"0","0.5","REF","1.5","2","2.5","3","3.5"/)
   if (rOpts .and. isatt(rOpts,"OneX") )  then                     ; eg: rOpts@OneX="1.00" 
      ;rxy@tmXBLabels        = (/"0.00","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50"/)
       rxy@tmXBLabels        = (/"    ","0.25","0.50","0.75",rOpts@OneX,"1.25","1.50","1.75","2.0","2.25","2.5","2.75","3.0","3.25","3.50"/)
@@ -1053,7 +1060,7 @@ begin
   rxy@tmYLMajorLengthF  = rxy@tmXBMajorLengthF
   rxy@tmYLLabelFontHeightF = FontHeightF
   rxy@tmYLMode          = "Explicit" 
-  rxy@tmYLValues        = (/0.0, 0.50, 1.00, 1.5,2.0,2.5,3.0,3.50/) ; major tm
+  rxy@tmYLValues        = (/0., 0.5, 1., 1.5,2.,2.5,3.,3.5/) ; major tm
   rxy@tmYLLabels        = rxy@tmYLValues
   rxy@trYMaxF           = xyMax_Panel
 
@@ -1075,7 +1082,7 @@ begin
   xx      = fspan(xyMin,xyMax,npts) 
   yy      = sqrt(xyMax^2 - xx^2    )   ; outer correlation line (xyMax)
 
-  sLabels = (/"    0.0","0.1","0.2","0.3","0.4","0.5","0.6" \ ; correlation labels
+  sLabels = (/"0.1","0.2","0.3","0.4","0.5","0.6" \ ; correlation labels
              ,"0.7","0.8","0.9","0.95","0.99"/)    ;,"   1.0"     /); also, major tm
   cLabels = stringtofloat(sLabels)
   rad     = 4.*atan(1.0)/180.
@@ -1141,14 +1148,14 @@ begin
 ; Correlation labels
 ; ----------------------------------------------------------------
   radC    = xyMax                                  ; for correlation labels
-  xC      = radC*cos(angC*rad)+.025
-  yC      = radC*sin(angC*rad)+.005
+;  xC      = radC*cos(angC*rad)+.025
+;  yC      = radC*sin(angC*rad)+.005
 ; added to get some separation
-  xC      = xC + 0.020*cos(rad*angC)
-  yC      = yC + 0.120*sin(rad*angC)
+;  xC      = xC + 0.020*cos(rad*angC)
+;  yC      = yC + 0.120*sin(rad*angC)
 
-  xC(:6) = xC(:6) - 0.05
-  yC(:6) = yC(:6) + 0.05
+;  xC(:6) = xC(:6) - 0.05
+;  yC(:6) = yC(:6) + 0.05
 
   txRes               = True                      ; text mods desired
   txRes@txFontHeightF = FontHeightF               ; match YL 
@@ -1167,9 +1174,9 @@ begin
 ;;dum0 = gsn_add_text(wks,taylor,"OBSERVED",1.00,0.075,txRes)
 
   plRes               = True
-  plRes@gsLineThicknessF = 0.5 ;2.
+  plRes@gsLineThicknessF = 1. ;2.
   
-  txRes@txJust        = "CenterLeft"              ; Default="CenterCenter".
+  txRes@txJust        = "BottomLeft" ; Default="CenterCenter"
   txRes@txFontHeightF = FontHeightF               ; match YL 
  ;txRes@txBackgroundFillColor = "white"
 
@@ -1184,11 +1191,16 @@ begin
   do i=0,dimsizes(sLabels)-1                      ; Loop to draw strings
 ;    print(""+sLabels(i)+" "+xC(i)+" "+yC(i))
     txRes@txAngleF = angC(i)
-    dum5(i) = gsn_add_text(wks, taylor, sLabels(i),xC(i),yC(i),txRes) ; cor label
+;    dum5(i) = gsn_add_text(wks, taylor, sLabels(i),xC(i),yC(i),txRes) ; cor label
     xTM(0)   = xyMax*cos(angC(i)*rad)             ; major tickmarks at
     yTM(0)   = xyMax*sin(angC(i)*rad)             ; correlation labels
     xTM(1)   = radTM*cos(angC(i)*rad)             
     yTM(1)   = radTM*sin(angC(i)*rad)
+    xC = xTM(0)
+    yC = yTM(0)
+    yC = yC - 0.02*cos(angC(i)*rad)
+    xC = xC - 0.02*sin(angC(i)*rad)
+    dum5(i) = gsn_add_text(wks, taylor, " "+sLabels(i), xC, yC, txRes) ; cor label
     dum6(i) = gsn_add_polyline(wks,taylor,xTM,yTM,plRes)
   end do
                                                   ; minor tm locations
