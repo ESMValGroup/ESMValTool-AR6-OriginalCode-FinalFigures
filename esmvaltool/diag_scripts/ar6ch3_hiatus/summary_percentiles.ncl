@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210227 kosaka_yu: added provenance.
 ;    20200914 kosaka_yu: revised to account for weighting in percentiles.
 ;    20191203 kosaka_yu: written.
 ;
@@ -62,6 +63,7 @@ begin
     do n = 0, ndirs - 1
       path_obs = input_dirs(n)+"trendGMST_"+obs_datasets(ii)+"_OBS.txt"
       if (fileexists(path_obs)) then
+        paths_all = path_obs
         trend_obs_list = read_GMtrend_as_list(path_obs)
         if (ListCount(trend_obs_list).gt.1) then
           trend_obs_array = list_to_array(trend_obs_list)
@@ -127,6 +129,7 @@ begin
             ipath = input_dirs(n)+"trendGSAT_"+masking+"_"+cmip+".txt"
           end if
           if (fileexists(ipath)) then
+            paths_all := array_append_record(paths_all, ipath, 0)
             if (isvar("paths")) then
               pathtmp = array_append_record(paths, ipath, 0)
               delete(paths)
@@ -195,5 +198,11 @@ begin
 
     end do
 
+    log_provenance(ofile, "n/a", "percentile values of GMST/GSAT trend", \
+                   "trend", "global", "other", "kosaka_yu", "", paths_all)
+                   
+    leave_msg(DIAG_SCRIPT, "")
+
+    delete(paths_all)
   end do  
 end

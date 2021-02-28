@@ -1,4 +1,4 @@
-; draw_hiatus
+; draw
 ; ############################################################################
 ; Author: Yu Kosaka (RCAST, U. Tokyo, Japan)
 ; IPCC AR6 Chapter 3
@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210227 kosaka_yu: added netcdf output and provenance.
 ;    20210215 kosaka_yu: revised figure details
 ;    20210204 kosaka_yu: updated for the new recipe structure
 ;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim.
@@ -250,30 +251,9 @@ begin
 ;    do_histogram = False
 ;  end if
   
-;  color_cmip = "orange"
-;  color_cmip6 = "coral2"
-;  color_cmip5 = "goldenrod2"
-;  color_cmip_mean = "white"
-;  color_cmip_selected = "orange4"
-;  color_cmip6_selected = "coral4"
-;  color_cmip5_selected = "darkorange4"
-;  color_obs_ens = (/ "darkorchid", "deepskyblue3"/)
-;  color_obs_single = (/ "blue3", "darkgreen", "darkslategray", "darkseagreen" /)
-;  pdf_opacity = 0.5
-;  color_cmip = "seagreen"
-;  color_cmip6 = "deepskyblue2"
-;  color_cmip5 = "green3" ;"lightseagreen"
-;  color_cmip_mean = "white"
-;  color_cmip_selected = "navyblue"
-;  color_cmip6_selected = "navyblue"
-;  color_cmip5_selected = "navyblue"
-;  color_obs_ens = (/ "mediumorchid", "mediumturquoise"/)
-;  color_obs_single = (/ "red3", "gold4", "orangered4", "coral4" /)
-;  pdf_opacity = 0.2
-
   color_cmip = "seagreen"
   color_cmip6 = (/204., 35., 35./)/255. 
-  color_cmip5 = "grey80" ;(/37., 81., 204./)/255. 
+  color_cmip5 = "grey80"
   color_cmip_mean = color_cmip
   color_cmip6_mean = color_cmip6
   color_cmip5_mean = color_cmip5
@@ -283,9 +263,7 @@ begin
   color_cmip5_legend = "grey50"
   color_cmip6_legend = color_cmip6
   color_obs_ens = (/ "grey40", "black"/)
-;  color_obs_single = tofloat((/(/54, 156, 232/),  (/36, 147, 126/), \
-;                               (/127, 68, 170/), (/237, 128, 55/), (/48, 79, 191/) /))/255.
-    color_obs_single = tofloat((/(/48, 79, 191/), (/36, 147, 126/), \
+  color_obs_single = tofloat((/(/48, 79, 191/), (/36, 147, 126/), \
                                (/127, 68, 170/), (/237, 128, 55/), (/54, 156, 232/)/))/255.
   opacity_pdf_cmip5 = 0.7
   opacity_pdf_cmip6 = 0.15 ;0.2
@@ -314,13 +292,31 @@ begin
     
   do ii = 0, dimsizes(files)-1
     if (isStrSubset(files(ii), "HiatusTrendPattern_composite.nc")) then
+      if (isdefined("paths_all")) then
+        tmp = paths_all
+        delete(paths_all)
+        paths_all = array_append_record(tmp, files(ii), 0)
+        delete(tmp)
+      else
+        paths_all = files(ii)
+      end if
       f = addfile(files(ii), "r")
       TstrendCMIPHiatus = f->trend
       TstrendCMIPHiatus = TstrendCMIPHiatus * scale
+      TstrendCMIPHiatus@units = str_sub_str(TstrendCMIPHiatus, "year", toint(scale)+" years")
     elseif (isStrSubset(files(ii), "PostTrendPattern_composite.nc")) then
+      if (isdefined("paths_all")) then
+        tmp = paths_all
+        delete(paths_all)
+        paths_all = array_append_record(tmp, files(ii), 0)
+        delete(tmp)
+      else
+        paths_all = files(ii)
+      end if
       f = addfile(files(ii), "r")
       TstrendCMIPPost = f->trend
-      TstrendCMIPPost = TstrendCMIPPost * scale      
+      TstrendCMIPPost = TstrendCMIPPost * scale
+      TstrendCMIPPost@units = str_sub_str(TstrendCMIPPost, "year", toint(scale)+" years")
     end if
   end do
 
@@ -366,6 +362,14 @@ begin
     end if
     delete(filename)
   end do
+  if (isdefined("paths_all")) then
+    tmp = paths_all
+    delete(paths_all)
+    paths_all = array_append_record(tmp, array_append_record(ifileCMIP5, ifileCMIP6, 0), 0)
+    delete(tmp)
+  else
+    paths_all = array_append_record(ifileCMIP5, ifileCMIP6, 0)
+  end if
   GMSTtrendCMIP5 = read_GMtrend_as_list(ifileCMIP5)
   GMSTtrendCMIP6 = read_GMtrend_as_list(ifileCMIP6)
   delete([/ifileCMIP5, ifileCMIP6/])
@@ -389,6 +393,14 @@ begin
     end if
     delete(filename)
   end do
+  if (isdefined("paths_all")) then
+    tmp = paths_all
+    delete(paths_all)
+    paths_all = array_append_record(tmp, array_append_record(ifileCMIP5, ifileCMIP6, 0), 0)
+    delete(tmp)
+  else
+    paths_all = array_append_record(ifileCMIP5, ifileCMIP6, 0)
+  end if
   GSATtrendCMIP5 = read_GMtrend_as_list(ifileCMIP5)
   GSATtrendCMIP6 = read_GMtrend_as_list(ifileCMIP6)
   delete([/ifileCMIP5, ifileCMIP6/])
@@ -410,6 +422,14 @@ begin
     filename = str_get_field(files(ii), str_fields_count(files(ii), "/"), "/")
     if ((/isStrSubset(filename, "trendGMST_").or.isStrSubset(filename, "trendGSAT_")/) \
         .and.isStrSubset(filename, "_OBS.txt")) then
+      if (isdefined("paths_all")) then
+        tmp = paths_all
+        delete(paths_all)
+        paths_all = array_append_record(tmp, files(ii), 0)
+        delete(tmp)
+      else
+        paths_all = files(ii)
+      end if
       tmp = read_GMtrend_as_list(files(ii))
       if (any(tmp[0]@dataset.eq.reanalyses)) then
         if (.not.isStrSubset(filename, "trend"+GST).or. \
@@ -456,7 +476,6 @@ begin
     delete(filename)
   end do
 
-                         
 ; ======================================================================
 ;
 ;                       2. Make PDFs of GST trends
@@ -470,6 +489,7 @@ begin
   if (isdefined("GSTtrendObs")) then
     do ii = 0, ListCount(GSTtrendObs)-1
       GSTtrendObs[ii] = GSTtrendObs[ii] * scale
+      GSTtrendObs[ii]@units = "K per "+toint(scale)+" years"
       if (dimsizes(GSTtrendObs[ii]).gt.1) then
         if (.not.isdefined("PDFhiatusObs")) then
           PDFhiatusObs = NewList("fifo")
@@ -504,10 +524,11 @@ begin
                             nbins)
   resPDF@bin_bounds = fspan(resPDF@bin_min, resPDF@bin_max, nbins + 1)
 
-print("trend (K/decade):     hiatus    post-hiatus")
+  print("trend (K/decade):     hiatus    post-hiatus")
   if (isvar("GMSTtrendCMIP5")) then
     GMSTtrendCMIP5Hiatus = list_to_array(GMSTtrendCMIP5)
     GMSTtrendCMIP5Hiatus = GMSTtrendCMIP5Hiatus * scale
+    GMSTtrendCMIP5Hiatus@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GMSTtrendCMIP5, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GMSTtrendCMIP5Hiatus), model@_FillValue, model)
@@ -539,6 +560,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
     
     GMSTtrendCMIP5Post = metadata_att_as_array(GMSTtrendCMIP5, "trend_post")
     GMSTtrendCMIP5Post = GMSTtrendCMIP5Post * scale
+    GMSTtrendCMIP5Post@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GMSTtrendCMIP5, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GMSTtrendCMIP5Post), model@_FillValue, model)
@@ -593,6 +615,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
   if (isvar("GSATtrendCMIP5")) then
     GSATtrendCMIP5Hiatus = list_to_array(GSATtrendCMIP5)
     GSATtrendCMIP5Hiatus = GSATtrendCMIP5Hiatus * scale
+    GSATtrendCMIP5Hiatus@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GSATtrendCMIP5, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GSATtrendCMIP5Hiatus), model@_FillValue, model)
@@ -626,6 +649,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
     
     GSATtrendCMIP5Post = metadata_att_as_array(GSATtrendCMIP5, "trend_post")
     GSATtrendCMIP5Post = GSATtrendCMIP5Post * scale
+    GSATtrendCMIP5Post@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GSATtrendCMIP5, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GSATtrendCMIP5Post), model@_FillValue, model)
@@ -685,6 +709,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
   if (isvar("GMSTtrendCMIP6")) then
     GMSTtrendCMIP6Hiatus = list_to_array(GMSTtrendCMIP6)
     GMSTtrendCMIP6Hiatus = GMSTtrendCMIP6Hiatus * scale
+    GMSTtrendCMIP6Hiatus@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GMSTtrendCMIP6, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GMSTtrendCMIP6Hiatus), model@_FillValue, model)
@@ -717,6 +742,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
     
     GMSTtrendCMIP6Post = metadata_att_as_array(GMSTtrendCMIP6, "trend_post")
     GMSTtrendCMIP6Post = GMSTtrendCMIP6Post * scale
+    GMSTtrendCMIP6Post@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GMSTtrendCMIP6, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GMSTtrendCMIP6Post), model@_FillValue, model)
@@ -775,6 +801,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
   if (isvar("GSATtrendCMIP6")) then
     GSATtrendCMIP6Hiatus = list_to_array(GSATtrendCMIP6)
     GSATtrendCMIP6Hiatus = GSATtrendCMIP6Hiatus * scale
+    GSATtrendCMIP6Hiatus@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GSATtrendCMIP6, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GSATtrendCMIP6Hiatus), model@_FillValue, model)
@@ -807,6 +834,7 @@ print("trend (K/decade):     hiatus    post-hiatus")
     
     GSATtrendCMIP6Post = metadata_att_as_array(GSATtrendCMIP6, "trend_post")
     GSATtrendCMIP6Post = GSATtrendCMIP6Post * scale
+    GSATtrendCMIP6Post@units = "K per "+toint(scale)+" years"
     model = metadata_att_as_array(GSATtrendCMIP6, "dataset")
     model@_FillValue = ""
     model = where(ismissing(GSATtrendCMIP6Post), model@_FillValue, model)
@@ -1666,7 +1694,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
       polyres@gsFillOpacityF = opacity_selected_pdf
       dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
       idummy = idummy + 1    
-;      dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a) that~C~     extend to "+str_get_field(post_period, 2, "-"), x, ylabel-ilabel*ylabeli, txres)
       txres@txFontOpacityF = 0.7
       dummy(idummy) = gsn_add_text(wks, pdfs(1), "selected in (a)", x, ylabel-ilabel*ylabeli, txres)
       idummy = idummy + 1
@@ -1691,9 +1718,18 @@ print("trend (K/decade):     hiatus    post-hiatus")
   do ii = 0, dimsizes(input_dir)-1
     path = input_dir(ii)+"HiatusTrendPattern_unblended_unmasked_OBS_"+obs_dataset_pattern+".nc"
     if (fileexists(path)) then
+      if (isdefined("paths_all")) then
+        tmp = paths_all
+        delete(paths_all)
+        paths_all = array_append_record(tmp, path, 0)
+        delete(tmp)
+      else
+        paths_all = path
+      end if
       f = addfile(path, "r")
       TstrendObsHiatus = f->trend
       TstrendObsHiatus = TstrendObsHiatus * scale
+      TstrendObsHiatus@units = str_sub_str(TstrendObsHiatus@units, "per year", "per "+toint(scale)+" years")
       break
     end if
   end do
@@ -1747,12 +1783,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
   resTs@res_tiMainFont = "helvetica"
   resTs@res_tiMainFontHeightF = 0.017
   resTs@res_tiMainOffsetYF = -0.012
-;  resTs@res_tmXTOn = False
-;  resTs@res_tmYROn = False
- ; resTs@res_tmXBLabelFontHeightF = 0.008
- ; resTs@res_tmYLLabelFontHeightF = 0.008
-;  resTs@res_gsnLeftString = ""
-;  resTs@res_gsnRightString = ""
   resTs@res_mpPerimLineThicknessF = 0.
   resTs@res_mpLimbLineThicknessF = 0.
   resTs@res_mpPerimOn = False
@@ -1760,9 +1790,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
   resTs@res_tmXBMajorThicknessF =  resTs@res_tmBorderThicknessF
   resTs@res_tmYLMajorThicknessF =  resTs@res_tmBorderThicknessF
   resTs@res_tmXBMinorThicknessF =  resTs@res_tmBorderThicknessF/2.
-;  resTs@res_cnLevelSelectionMode = "ExplicitLevels"
-;  resTs@res_cnLevels = (/ -1.3, -0.9, -0.6, -0.4, -0.3, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.3, 0.4, 0.6, 0.9, 1.3 /)
-;  resTs@res_cnLevels = (/ -0.9, -0.4, -0.2, -0.1, -0.05, 0.05, 0.1, 0.2, 0.4, 0.9 /)
   resTs@res_cnLevelSelectionMode = "ManualLevels"
   resTs@res_cnMinLevelValF = -1.05 ;-0.95 ; -1.05
   resTs@res_cnMaxLevelValF = 1.05 ;0.95 ; 1.05
@@ -1787,7 +1814,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
   sres@cnFillOpacityF = 0.4
   sres@cnLevelSelectionMode = "ExplicitLevels"
   sres@cnLevels = (/ 0.9 /)
-;  sres@cnFillPatterns = (/ -1, 17 /)
   sres@cnFillPatterns = (/ 17, -1 /)
   sres@cnFillOpacityF = 0.1
   sres@cnFillColor = "grey30"
@@ -1796,8 +1822,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
   sres@lbLabelBarOn   = False
   sres@gsnAddCyclic = True
   
-;  resTs@res_tiMainString = "(c) "+hiatus_period+" "+\
-;                           str_sub_str(obs_dataset_pattern, "_", " ")+" trend"
   resTs@res_tiMainString = "(c) "+str_sub_str(obs_dataset_pattern, "_", " ")
   resTs@res_vpXF = vpX(2)
   resTs@res_vpYF = vpY(2)
@@ -1806,9 +1830,25 @@ print("trend (K/decade):     hiatus    post-hiatus")
   copy_VarAtts(resTs, TstrendObsHiatus)
   patterns( 0 ) = contour_map(wks, TstrendObsHiatus, "")
   if (draw_sig) then
-    plot = gsn_csm_contour(wks, sigTstrendObsHiatus, sres)
-    overlay( patterns( 0 ), plot )
+;    plot = gsn_csm_contour(wks, sigTstrendObsHiatus, sres)
+;    overlay( patterns( 0 ), plot )
 
+    xdummy = new(product(dimsizes(sigTstrendObsHiatus)), "graphic")
+    idum = 0
+    markerres = True
+    markerres@gsMarkerIndex = 5
+    markerres@gsMarkerSizeF = 0.002
+    markerres@gsMarkerOpacityF = 0.4
+    do j = 0, dimsizes(TstrendObsHiatus&lat)-1
+      do i = 0, dimsizes(TstrendObsHiatus&lon)-1
+        if (.not.ismissing(sigTstrendObsHiatus(j,i)).and.sigTstrendObsHiatus(j,i).lt.0.9) then
+          xdummy(idum) = gsn_add_polymarker(wks, patterns(0), TstrendObsHiatus&lon(i), \
+                                            TstrendObsHiatus&lat(j), markerres)
+          idum = idum + 1
+        end if
+      end do
+    end do
+        
     plres = True
     x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
     x1 = x2 - resTs@res_vpWidthF * 0.07
@@ -1818,17 +1858,23 @@ print("trend (K/decade):     hiatus    post-hiatus")
     y2 = y3 - resTs@res_vpHeightF * 0.07
     y1 = y2
     y4 = y3
-    plres = True
-    plres@gsFillScaleF = sres@cnFillScaleF
-;    plres@gsFillIndex = sres@cnFillPatterns(1)
-    plres@gsFillIndex = sres@cnFillPatterns(0)
-    plres@gsFillOpacityF = sres@cnFillOpacityF
-    plres@gsFillColor = sres@cnFillColor
     lres = True
     lres@gsLineDashPattern = 0
     lres@gsLineThicknessF = 1.
-    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
     gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
+;    plres = True
+;    plres@gsFillScaleF = sres@cnFillScaleF
+;    plres@gsFillIndex = sres@cnFillPatterns(0)
+;    plres@gsFillOpacityF = sres@cnFillOpacityF
+;    plres@gsFillColor = sres@cnFillColor
+;    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
+    do i = 0, 3
+      do j = 0, 2
+        x = x1 + (i+0.5)*(x2-x1)/4.
+        y = y2 + (j+0.5)*(y3-y2)/3. 
+        gsn_polymarker_ndc(wks, x, y, markerres)
+      end do
+    end do
     txres@txFontColor := "black"
     txres@txJust = "TopRight"
     gsn_text_ndc(wks, "not significant~C~  at "+toint((1.-sres@cnLevels(0))*100.)+"% level", x2, y2-0.005, txres)
@@ -1836,7 +1882,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
 
 ; -------------------------------------
 ; Plot composite trend pattern
-;  resTs@res_tiMainString = "(d) "+hiatus_period+" "+str_upper(composite_project)+" trend composite"
   resTs@res_tiMainString = "(d) "+str_upper(composite_project)+" composite"
   resTs@res_vpXF = vpX(3)
   resTs@res_vpYF = vpY(3)
@@ -1845,39 +1890,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
   resTs@res_lbLabelBarOn = True
   copy_VarAtts(resTs, TstrendCMIPHiatus)
   patterns( 1 ) = contour_map(wks, TstrendCMIPHiatus, "")
-
-;  if (isatt(TstrendCMIPHiatus, "frac_sign_match")) then
-;    draw_sign_match = True
-;    sign_match = TstrendCMIPHiatus
-;    sign_match = reshape(TstrendCMIPHiatus@frac_sign_match, dimsizes(TstrendCMIPHiatus))
-;    sign_match@long_name = ""
-;    sign_match@units = ""
-;    sres@cnLevels = (/ 0.8 /)
-;    sres@cnFillPatterns = (/ 6, -1 /)
-;    plot = gsn_csm_contour(wks, sign_match, sres)
-;    overlay( patterns( 1 ), plot )
-;
-;    plres = True
-;    x2 = resTs@res_vpXF + resTs@res_vpWidthF*0.98
-;    x1 = x2 - resTs@res_vpWidthF * 0.07
-;    x3 = x2
-;    x4 = x1
-;    y3 = resTs@res_vpYF - resTs@res_vpHeightF*0.93
-;    y2 = y3 - resTs@res_vpHeightF * 0.07
-;    y1 = y2
-;    y4 = y3
-;    plres = True
-;    plres@gsFillScaleF = sres@cnFillScaleF
-;    plres@gsFillIndex = sres@cnFillPatterns(0)
-;    lres = True
-;    lres@gsLineDashPattern = 0
-;    lres@gsLineThicknessF = 1.
-;    gsn_polygon_ndc(wks, (/x1, x2, x3, x4/), (/y1, y2, y3, y4/), plres)
-;    gsn_polyline_ndc(wks, (/x1, x2, x3, x4, x1/), (/y1, y2, y3, y4, y1/), lres)
-;    txres@txFontColor := "black"
-;    txres@txJust = "TopRight"
-;    gsn_text_ndc(wks, "Sign agreement < "+(sres@cnLevels(0)*100)+"%", x2, y2-0.005, txres)
-;  end if
   
   composite_projects = str_get_field(composite_member_names, 1, " ")
   composite_models = str_get_field(composite_member_names, 2, " ")
@@ -1940,7 +1952,6 @@ print("trend (K/decade):     hiatus    post-hiatus")
     txres@txFontOpacityF = txres@txFontOpacityF * opacity_selected_pdf / opacity_pdf_cmip5
     gsn_text_ndc(wks, TstrendCMIPHiatus@nmembers_CMIP5+" runs", xlabel, ylabel-ilabel*ylabeli, txres)
     ilabel = ilabel + 1
-;    ilabel = ilabel + 1
   end if
 
   txres@txFontColor := "black"
@@ -1955,5 +1966,115 @@ print("trend (K/decade):     hiatus    post-hiatus")
   draw(pdfs)
   draw(patterns)
   frame(wks)
+
+
+; Output netcdf
+  if (config_user_info@write_netcdf) then
+    out_dir =  config_user_info@work_dir + "/"
+    system("mkdir -p "+out_dir)
+    nc_outfile = out_dir+"hiatus_and_posthiatus_trends.nc"
+    if (fileexists(nc_outfile)) then
+      system("rm -f "+nc_outfile)
+    end if
+    nc_outfile@existing = "append"
+
+    do ii = 0, ListCount(GSTtrendObs)-1
+      GSTtrendObs[ii]@var = GSTtrendObs[ii]@GST+"_trend_"+GSTtrendObs[ii]@dataset+"_hiatus"
+      GSTtrendObs[ii]@diag_script = DIAG_SCRIPT
+      GSTtrendObs[ii]!0 = "ensemble_"+GSTtrendObs[ii]@dataset
+      GSTtrendObs[ii]&$GSTtrendObs[ii]!0$ = ispan(1, dimsizes(GSTtrendObs[ii]), 1)
+      delete(GSTtrendObs[ii]@trend_post)
+      delete(GSTtrendObs[ii]@eyear_post)
+      delete(GSTtrendObs[ii]@syear_post)
+      delete(GSTtrendObs[ii]@post_period)
+      ncdf_outfile = ncdf_write(GSTtrendObs[ii], nc_outfile)
+    end do
+    
+    GMSTtrendCMIP5Hiatus!0 = "ensemble_cmip5"
+    GMSTtrendCMIP5Hiatus&ensemble_cmip5 = ispan(1, dimsizes(GMSTtrendCMIP5Hiatus), 1)
+    GMSTtrendCMIP5Hiatus@var = "GMST_trend_CMIP5_hiatus"
+    GMSTtrendCMIP5Hiatus@ensemble = str_join(metadata_att_as_array(GMSTtrendCMIP5, "dataset") \
+                                    +"/"+metadata_att_as_array(GMSTtrendCMIP5, "ensemble"), ",")
+    GMSTtrendCMIP5Hiatus@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GMSTtrendCMIP5Hiatus, nc_outfile)
+
+    GMSTtrendCMIP5Post!0 = "ensemble_cmip5"
+    GMSTtrendCMIP5Post&ensemble_cmip5 = ispan(1, dimsizes(GMSTtrendCMIP5Post), 1)
+    GMSTtrendCMIP5Post@var = "GMST_trend_CMIP5_posthiatus"
+    GMSTtrendCMIP5Post@ensemble = str_join(metadata_att_as_array(GMSTtrendCMIP5, "dataset") \
+                                  +"/"+metadata_att_as_array(GMSTtrendCMIP5, "ensemble"), ",")
+    GMSTtrendCMIP5Post@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GMSTtrendCMIP5Post, nc_outfile)
+
+    GMSTtrendCMIP6Hiatus!0 = "ensemble_cmip6"
+    GMSTtrendCMIP6Hiatus&ensemble_cmip6 = ispan(1, dimsizes(GMSTtrendCMIP6Hiatus), 1)
+    GMSTtrendCMIP6Hiatus@var = "GMST_trend_CMIP6_hiatus"
+    GMSTtrendCMIP6Hiatus@ensemble = str_join(metadata_att_as_array(GMSTtrendCMIP6, "dataset") \
+                                     +"/"+metadata_att_as_array(GMSTtrendCMIP6, "ensemble"), ",")
+    GMSTtrendCMIP6Hiatus@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GMSTtrendCMIP6Hiatus, nc_outfile)
+
+    GMSTtrendCMIP6Post!0 = "ensemble_cmip6"
+    GMSTtrendCMIP6Post&ensemble_cmip6 = ispan(1, dimsizes(GMSTtrendCMIP6Post), 1)
+    GMSTtrendCMIP6Post@var = "GMST_trend_CMIP6_posthiatus"
+    GMSTtrendCMIP6Post@ensemble = str_join(metadata_att_as_array(GMSTtrendCMIP6, "dataset") \
+                                   +"/"+metadata_att_as_array(GMSTtrendCMIP6, "ensemble"), ",")
+    GMSTtrendCMIP6Post@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GMSTtrendCMIP6Post, nc_outfile)
+
+    GSATtrendCMIP5Hiatus!0 = "ensemble_cmip5"
+    GSATtrendCMIP5Hiatus&ensemble_cmip5 = ispan(1, dimsizes(GSATtrendCMIP5Hiatus), 1)
+    GSATtrendCMIP5Hiatus@var = "GSAT_trend_CMIP5_hiatus"
+    GSATtrendCMIP5Hiatus@ensemble = str_join(metadata_att_as_array(GSATtrendCMIP5, "dataset") \
+                                    +"/"+metadata_att_as_array(GSATtrendCMIP5, "ensemble"), ",")
+    GSATtrendCMIP5Hiatus@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GSATtrendCMIP5Hiatus, nc_outfile)
+    
+    GSATtrendCMIP5Post!0 = "ensemble_cmip5"
+    GSATtrendCMIP5Post&ensemble_cmip5 = ispan(1, dimsizes(GSATtrendCMIP5Post), 1)
+    GSATtrendCMIP5Post@var = "GSAT_trend_CMIP5_posthiatus"
+    GSATtrendCMIP5Post@ensemble = str_join(metadata_att_as_array(GSATtrendCMIP5, "dataset") \
+                                   +"/"+metadata_att_as_array(GSATtrendCMIP5, "ensemble"), ",")
+    GSATtrendCMIP5Post@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GSATtrendCMIP5Post, nc_outfile)
+
+    GSATtrendCMIP6Hiatus!0 = "ensemble_cmip6"
+    GSATtrendCMIP6Hiatus&ensemble_cmip6 = ispan(1, dimsizes(GSATtrendCMIP6Hiatus), 1)
+    GSATtrendCMIP6Hiatus@var = "GSAT_trend_CMIP6_hiatus"
+    GSATtrendCMIP6Hiatus@ensemble = str_join(metadata_att_as_array(GSATtrendCMIP6, "dataset") \
+                                     +"/"+metadata_att_as_array(GSATtrendCMIP6, "ensemble"), ",")
+    GSATtrendCMIP6Hiatus@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GSATtrendCMIP6Hiatus, nc_outfile)
+
+    GSATtrendCMIP6Post!0 = "ensemble_cmip6"
+    GSATtrendCMIP6Post&ensemble_cmip6 = ispan(1, dimsizes(GSATtrendCMIP6Post), 1)
+    GSATtrendCMIP6Post@var = "GSAT_trend_CMIP6_posthiatus"
+    GSATtrendCMIP6Post@ensemble = str_join(metadata_att_as_array(GSATtrendCMIP6, "dataset") \
+                                  +"/"+metadata_att_as_array(GSATtrendCMIP6, "ensemble"), ",")
+    GSATtrendCMIP6Post@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(GSATtrendCMIP6Post, nc_outfile)
+
+    tmp = (/TstrendObsHiatus/)
+    copy_VarCoords(TstrendObsHiatus, tmp)
+    tmp@var = "Ts_trend_"+obs_dataset_pattern+"_hiatus"
+    tmp@diag_script = DIAG_SCRIPT
+    tmp@sig = TstrendObsHiatus@sig
+    tmp@units = TstrendObsHiatus@units
+    ncdf_outfile = ncdf_write(tmp, nc_outfile)
+
+    tmp := (/TstrendCMIPHiatus/)
+    copy_VarCoords(TstrendCMIPHiatus, tmp)
+    tmp@ensemble = str_sub_str(str_sub_str(str_sub_str(str_sub_str(TstrendCMIPHiatus@dataset, "CMIP6 ", ""), "CMIP5", ""), ", ", ","), " ", "/")
+    tmp@var = "Ts_trend_"+str_upper(str_sub_str(TstrendCMIPHiatus@project,"+","_"))+"_composite_hiatus"
+    tmp@diag_script = DIAG_SCRIPT
+    ncdf_outfile = ncdf_write(tmp, nc_outfile)
+  end if
+
+; Log provenance
+  log_provenance(nc_outfile, wks@fullname, \
+                 "near surface temperature trends for the early 21c slow warming and post-slow warming periods", \
+                 "trend", "global", (/"histogram", "geo"/), "kosaka_yu", "", paths_all)
+
+  leave_msg(DIAG_SCRIPT, "")
   
 end

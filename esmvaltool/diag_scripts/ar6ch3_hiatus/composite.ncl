@@ -1,4 +1,4 @@
-; calc_composite
+; composite
 ; ############################################################################
 ; Author: Yu Kosaka (RCAST, U. Tokyo, Japan)
 ; IPCC AR6 Chapter 3
@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210227 kosaka_yu: added provenance.
 ;    20210203 kosaka_yu: updated for the new recipe structure
 ;    20200925 kosaka_yu: revised to add sign consistency.
 ;    20200914 kosaka_yu: revised to weighting based on the ensemble size.
@@ -323,6 +324,15 @@ begin
           if (.not.fileexists(path)) then
             continue
           end if
+          if (isdefined("paths_hiatus_cmip5")) then
+            tmp = paths_hiatus_cmip5
+            delete(paths_hiatus_cmip5)
+            paths_hiatus_cmip5 = array_append_record(tmp, path, 0)
+            delete(tmp)
+          else
+            paths_hiatus_cmip5 = path
+          end if
+          
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP5[ii]@weight_hiatus
@@ -357,6 +367,15 @@ begin
           if (.not.fileexists(path)) then
             continue
           end if
+          if (isdefined("paths_post_cmip5")) then
+            tmp = paths_post_cmip5
+            delete(paths_post_cmip5)
+            paths_post_cmip5 = array_append_record(tmp, path, 0)
+            delete(tmp)
+          else
+            paths_post_cmip5 = path
+          end if
+
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP5[ii]@weight_post
@@ -398,6 +417,15 @@ begin
           if (.not.fileexists(path)) then
             continue
           end if
+          if (isdefined("paths_hiatus_cmip6")) then
+            tmp = paths_hiatus_cmip6
+            delete(paths_hiatus_cmip6)
+            paths_hiatus_cmip6 = array_append_record(tmp, path, 0)
+            delete(tmp)
+          else
+            paths_hiatus_cmip6 = path
+          end if
+
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP6[ii]@weight_hiatus
@@ -432,6 +460,15 @@ begin
           if (.not.fileexists(path)) then
             continue
           end if
+          if (isdefined("paths_post_cmip6")) then
+            tmp = paths_post_cmip6
+            delete(paths_post_cmip6)
+            paths_post_cmip6 = array_append_record(tmp, path, 0)
+            delete(tmp)
+          else
+            paths_post_cmip6 = path
+          end if
+
           f = addfile(path, "r")
           trend = f->trend
           wgt = trendGSThiatusCMIP6[ii]@weight_post
@@ -515,6 +552,15 @@ begin
 ;    compositeHiatusTrendPattern@frac_sign_match = signConsistency
     nc_filename = work_dir + "HiatusTrendPattern_composite.nc"
     nc_outfile = ncdf_write(compositeHiatusTrendPattern, nc_filename)
+    if (composite_dataset.eq."cmip5") then
+      paths_hiatus = paths_hiatus_cmip5
+    elseif (composite_dataset.eq."cmip6") then
+      paths_hiatus = paths_hiatus_cmip6
+    elseif (composite_dataset.eq."cmip5+6") then
+      paths_hiatus = array_append_record(paths_hiatus_cmip5, paths_hiatus_cmip6, 0)
+    end if
+    log_provenance(nc_filename, "n/a", "composited near surface temperature trend", \
+                   "trend", "global", "other", "kosaka_yu", "", paths_hiatus)
   end if
 
   if (isdefined("compositePostTrendPattern")) then
@@ -553,6 +599,15 @@ begin
 ;    compositePostTrendPattern@frac_sign_match = signConsistency
     nc_filename = work_dir + "PostTrendPattern_composite.nc"
     nc_outfile = ncdf_write(compositePostTrendPattern, nc_filename)
+    if (composite_dataset.eq."cmip5") then
+      paths_post = paths_post_cmip5
+    elseif (composite_dataset.eq."cmip6") then
+      paths_post = paths_post_cmip6
+    elseif (composite_dataset.eq."cmip5+6") then
+      paths_post = array_append_record(paths_post_cmip5, paths_post_cmip6, 0)
+    end if
+    log_provenance(nc_filename, "n/a", "composited near surface temperature trend", \
+                   "trend", "global", "other", "kosaka_yu", "", paths_post)
   end if
   
 end

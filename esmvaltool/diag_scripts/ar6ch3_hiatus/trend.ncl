@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210227 kosaka_yu: added provenance.
 ;    20210203 kosaka_yu: updated for the new recipe structure
 ;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim
 ;    20200917 kosaka_yu: added statistical significance to the trend maps
@@ -404,6 +405,7 @@ begin
       error_msg("f", DIAG_SCRIPT, "", "masking_dataset_GMST = "+masking_dataset_GMST+" not found.")
     end if
     maskTsGlobalmean = read_data(info)
+    maskTsGlobalmean@filename = info@filename
     delete([/infoDummy, atts, info/])
     maskTsGlobalmean&time = cd_calendar(maskTsGlobalmean&time, -1)
     do_maskGlobalmean_post = False
@@ -443,6 +445,7 @@ begin
       error_msg("f", DIAG_SCRIPT, "", "masking_dataset_pattern = "+masking_dataset_pattern+" not found.")
     end if
     maskTsPattern = read_data(info)
+    maskTsPattern@filename = info@filename
     delete([/infoDummy, atts, info, opt/])
     maskTsPattern&time = cd_calendar(maskTsPattern&time, -1)
     do_maskPattern_post = False
@@ -773,13 +776,13 @@ begin
         infoSAT@end_year = infoSAT2@end_year
         delete(SAT2)
       end if
-      delete(infoSAT2)
+;      delete(infoSAT2)
     end if
 ;   SST
+    if (isdefined("infoSST2")) then
+      delete(infoSST2)
+    end if
     if (isdefined("infoSST")) then
-      if (isdefined("infoSST2")) then
-        delete(infoSST2)
-      end if
       infoDummy = infoSST
       infoDummy@start_year = infoSST@end_year + 1
       infoSST2 = get_info_match(infoDummy, infoTos, \
@@ -803,13 +806,13 @@ begin
         infoSST@end_year = infoSST2@end_year
         delete(SST2)
       end if
-      delete(infoSST2)
+;      delete(infoSST2)
     end if
 ;   ICE
+    if (isdefined("infoICE2")) then
+      delete(infoICE2)
+    end if
     if (isdefined("infoICE")) then
-      if (isdefined("infoICE2")) then
-        delete(infoICE2)
-      end if
       infoDummy = infoICE
       infoDummy@start_year = infoICE@end_year + 1
       if (ICEvar .eq. "sic") then
@@ -850,7 +853,7 @@ begin
         infoICE@end_year = infoICE2@end_year
         delete(ICE2)
       end if
-      delete(infoICE2)
+;      delete(infoICE2)
     end if
 
 ; Scale ICE data to [0, 1]
@@ -938,6 +941,13 @@ begin
       trendSAThiatus@var = "trend"
       nc_filename = work_dir + "HiatusTrendPattern_unblended_unmasked_"+set_output_tail(infoSAT)+".nc"
       nc_outfile = ncdf_write(trendSAThiatus, nc_filename)      
+      if (isvar("infoSAT2").and.infoSAT2) then
+        log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                       "kosaka_yu", "", (/infoSAT@filename, infoSAT2@filename/))
+      else
+        log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                       "kosaka_yu", "", infoSAT@filename)
+      end if
       delete(trendSAThiatus)
 
       has_post = False
@@ -951,6 +961,13 @@ begin
         trendSATpost@var = "trend"
         nc_filename = work_dir + "PostTrendPattern_unblended_unmasked_"+set_output_tail(infoSAT)+".nc"
         nc_outfile = ncdf_write(trendSATpost, nc_filename)      
+        if (isvar("infoSAT2").and.infoSAT2) then
+          log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                         "kosaka_yu", "", (/infoSAT@filename, infoSAT2@filename/))
+        else
+          log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                         "kosaka_yu", "", infoSAT@filename)
+        end if
         delete(trendSATpost)
       end if
 
@@ -961,8 +978,18 @@ begin
         trendTshiatus@var = "trend"
         nc_filename = work_dir + "HiatusTrendPattern_blended_unmasked_"+set_output_tail(infoSAT)+".nc"
         nc_outfile = ncdf_write(trendTshiatus, nc_filename)      
+        if (isvar("infoSAT2").and.infoSAT2) then
+          log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                         "trend", "global", "other", "kosaka_yu", "", \
+                         (/infoSAT@filename, infoSAT2@filename, infoSST@filename, infoSST2@filename, \
+                           infoICE@filename, infoICE2@filename, infoFrac@filename /))
+        else
+          log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                         "trend", "global", "other", "kosaka_yu", "", \
+                         (/infoSAT@filename, infoSST@filename, infoICE@filename, infoFrac@filename/))
+        end if
         delete(trendTshiatus)
-      
+        
         has_post = False
         if (Ts&time(dimsizes(Ts&time)-1).ge.eyear_post*100+emonth_ann) then
           has_post = True
@@ -974,6 +1001,16 @@ begin
           trendTspost@var = "trend"
           nc_filename = work_dir + "PostTrendPattern_blended_unmasked_"+set_output_tail(infoSAT)+".nc"
           nc_outfile = ncdf_write(trendTspost, nc_filename)      
+          if (isvar("infoSAT2").and.infoSAT2) then
+            log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                          "trend", "global", "other", "kosaka_yu", "", \
+                          (/infoSAT@filename, infoSAT2@filename, infoSST@filename, infoSST2@filename, \
+                            infoICE@filename, infoICE2@filename, infoFrac@filename/))
+          else
+            log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                           "trend", "global", "other", "kosaka_yu", "", \
+                           (/infoSAT@filename, infoSST@filename, infoICE@filename, infoFrac@filename/))
+          end if
           delete(trendTspost)
         end if
       end if
@@ -986,6 +1023,13 @@ begin
         trendSAThiatusMasked@var = "trend"
         nc_filename = work_dir + "HiatusTrendPattern_unblended_masked_"+set_output_tail(infoSAT)+".nc"
         nc_outfile = ncdf_write(trendSAThiatusMasked, nc_filename)      
+        if (isvar("infoSAT2").and.infoSAT2) then
+          log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                         "kosaka_yu", "", (/infoSAT@filename, infoSAT2@filename, maskTsPattern@filename/))
+        else
+          log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                         "kosaka_yu", "", (/infoSAT@filename, maskTsPattern@filename/))
+        end if
         delete(trendSAThiatusMasked)
                                           
         if (do_maskPattern_post) then
@@ -1000,6 +1044,13 @@ begin
             trendSATpostMasked@var = "trend"
             nc_filename = work_dir + "PostTrendPattern_unblended_masked_"+set_output_tail(infoSAT)+".nc"
             nc_outfile = ncdf_write(trendSATpostMasked, nc_filename)      
+            if (isvar("infoSAT2").and.infoSAT2) then
+              log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                             "kosaka_yu", "", (/infoSAT@filename, infoSAT2@filename, maskTsPattern@filename/))
+            else
+              log_provenance(nc_filename, "n/a", "SAT trend", "trend", "global", "other", \
+                             "kosaka_yu", "", (/infoSAT@filename, maskTsPattern@filename/))
+            end if
             delete(trendSATpostMasked)
           end if
         end if
@@ -1013,7 +1064,18 @@ begin
         trendTshiatusMasked@diag_script = DIAG_SCRIPT 
         trendTshiatusMasked@var = "trend"
         nc_filename = work_dir + "HiatusTrendPattern_blended_masked_"+set_output_tail(infoSAT)+".nc"
-        nc_outfile = ncdf_write(trendTshiatusMasked, nc_filename)      
+        nc_outfile = ncdf_write(trendTshiatusMasked, nc_filename)
+        if (isvar("infoSAT2").and.infoSAT2) then
+          log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                         "trend", "global", "other", "kosaka_yu", "", \
+                         (/infoSAT@filename, infoSAT2@filename, infoSST@filename, infoSST2@filename, \
+                           infoICE@filename, infoICE2@filename, infoFrac@filename, maskTsPattern@filename/))
+        else
+          log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                         "trend", "global", "other", "kosaka_yu", "", \
+                         (/infoSAT@filename, infoSST@filename, infoICE@filename, \
+                           infoFrac@filename, maskTsPattern@filename/))
+        end if 
         delete(trendTshiatusMasked)
 
         if (do_maskPattern_post) then
@@ -1027,7 +1089,18 @@ begin
             trendTspostMasked@diag_script = DIAG_SCRIPT 
             trendTspostMasked@var = "trend"
             nc_filename = work_dir + "PostTrendPattern_blended_masked_"+set_output_tail(infoSAT)+".nc"
-            nc_outfile = ncdf_write(trendSATpostMasked, nc_filename)      
+            nc_outfile = ncdf_write(trendSATpostMasked, nc_filename)
+            if (isvar("infoSAT2").and.infoSAT2) then
+              log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                             "trend", "global", "other", "kosaka_yu", "", \
+                             (/infoSAT@filename, infoSAT2@filename, infoSST@filename, infoSST2@filename, \
+                               infoICE@filename, infoICE2@filename, infoFrac@filename, maskTsPattern@filename/))
+            else
+              log_provenance(nc_filename, "n/a", "near-surface temperature trend", \
+                             "trend", "global", "other", "kosaka_yu", "", \
+                             (/infoSAT@filename, infoSST@filename, infoICE@filename, \
+                               infoFrac@filename, maskTsPattern@filename/))
+            end if 
             delete(trendTspostMasked)
           end if
         end if
@@ -1072,9 +1145,13 @@ begin
         trendGSATpost = calc_trend(GSAT, syear_post, eyear_post, method_trend, \
                                    annual, smonth_ann, emonth_ann)
         write_GMtrend(infoSAT, (/trendGSAThiatus, trendGSATpost/), False, False, GMList)
-;        delete(trendGSATpost)
       else
         write_GMtrend(infoSAT, (/trendGSAThiatus/), False, False, GMList)
+      end if
+      if (isdefined("infoSAT2").and.infoSAT2) then
+        addatt_GMtrend([/infoSAT, infoSAT2/], "filename", False, False, GMList)
+      else
+        addatt_GMtrend([/infoSAT/], "filename", False, False, GMList)
       end if
       delete([/GSAT, trendGSAThiatus/])
       
@@ -1090,9 +1167,15 @@ begin
           trendGMSTpost = calc_trend(GMST, syear_post, eyear_post, method_trend, \
                                      annual, smonth_ann, emonth_ann)
           write_GMtrend(infoSAT, (/trendGMSThiatus, trendGMSTpost/), True, False, GMList)
-;          delete(trendGMSTpost)
         else
           write_GMtrend(infoSAT, (/trendGMSThiatus/), True, False, GMList)
+        end if
+        if (isdefined("infoSAT2").and.infoSAT2) then
+          addatt_GMtrend([/infoSAT, infoSAT2, infoSST, infoSST2, infoICE, infoICE2, infoFrac/], \
+                         "filename", True, False, GMList)
+        else
+          addatt_GMtrend([/infoSAT, infoSST, infoICE, infoFrac/], \
+                         "filename", True, False, GMList)
         end if
         delete([/GMST, trendGMSThiatus/])
       end if
@@ -1122,6 +1205,11 @@ begin
             write_GMtrend(infoSAT, (/trendGSAThiatusMasked/), False, True, GMList)
           end if
         end if
+        if (isdefined("infoSAT2").and.infoSAT2) then
+          addatt_GMtrend([/infoSAT, infoSAT2, maskTsGlobalmean/], "filename", False, True, GMList)
+        else
+          addatt_GMtrend([/infoSAT, maskTsGlobalmean/], "filename", False, True, GMList)
+        end if
         delete([/GSATmasked, trendGSAThiatusMasked/])
       end if
 
@@ -1150,6 +1238,13 @@ begin
             write_GMtrend(infoSAT, (/trendGMSThiatusMasked/), True, True, GMList)
           end if
         end if
+        if (isdefined("infoSAT2").and.infoSAT2) then
+          addatt_GMtrend([/infoSAT, infoSAT2, infoSST, infoSST2, infoICE, infoICE2, infoFrac, maskTsGlobalmean/], \
+                         "filename", True, True, GMList)
+        else
+          addatt_GMtrend([/infoSAT, infoSST, infoICE, infoFrac, maskTsGlobalmean/], \
+                         "filename", True, True, GMList)
+        end if
         delete([/GMSTmasked, trendGMSThiatusMasked/])
       end if
       
@@ -1169,6 +1264,35 @@ begin
     if (isdefined("frac")) then
       delete([/infoFrac, Fracvar, frac/])
     end if
-
+    if (isdefined("infoSAT2")) then
+      delete(infoSAT2)
+    end if
+    if (isdefined("infoSST2")) then
+      delete(infoSST2)
+    end if
+    if (isdefined("infoICE2")) then
+      delete(infoICE2)
+    end if
+    
   end do
+
+  do ii = 0, ListCount(GMList)-1
+    if (isatt(GMList[ii], "ofile_GSATunmasked")) then
+      log_provenance(GMList[ii]@ofile_GSATunmasked, "n/a", "GSAT trend, unmasked", \
+                     "trend", "global", "other", "kosaka_yu", "", str_split(GMList[ii]@filename_GSATunmasked, ","))
+    end if
+    if (isatt(GMList[ii], "ofile_GMSTunmasked")) then
+      log_provenance(GMList[ii]@ofile_GMSTunmasked, "n/a", "GMST trend, unmasked", \
+                     "trend", "global", "other", "kosaka_yu", "", str_split(GMList[ii]@filename_GMSTunmasked, ","))
+    end if
+    if (isatt(GMList[ii], "ofile_GSATmasked")) then
+      log_provenance(GMList[ii]@ofile_GSATmasked, "n/a", "GSAT trend, masked", \
+                     "trend", "global", "other", "kosaka_yu", "", str_split(GMList[ii]@filename_GSATmasked, ","))
+    end if
+    if (isatt(GMList[ii], "ofile_GMSTmasked")) then
+      log_provenance(GMList[ii]@ofile_GMSTmasked, "n/a", "GMST trend, masked", \
+                     "trend", "global", "other", "kosaka_yu", "", str_split(GMList[ii]@filename_GMSTmasked, ","))
+    end if
+  end do
+  
 end

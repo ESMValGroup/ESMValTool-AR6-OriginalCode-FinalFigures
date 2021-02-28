@@ -1167,7 +1167,7 @@ diagnostics:
       siconca_s_gngngn:
         <<: *siconca_setting
         exp: ssp245
-        start_year: 2025
+        start_year: 2015
         end_year: 2026
         additional_datasets: *cmip6_siconca_models_s_gngngn
       tasa_obs:
