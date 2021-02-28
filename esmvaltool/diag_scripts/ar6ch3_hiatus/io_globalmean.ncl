@@ -144,6 +144,55 @@ begin
   
 end
 
+procedure addatt_GMtrend(infos, att, blending, masking, OutList)
+local n, ii, key, oatt, tmp, tmp2
+begin
+  if (any(infos[0]@project.eq.(/"CMIP5", "CMIP6"/))) then
+    key = "project"
+  else
+    key = "dataset"
+  end if
+  do ii = 0, ListCount(OutList)-1
+    if (OutList[ii].eq.infos[0]@$key$) then
+      n = ii
+      break
+    end if
+  end do
+  if (OutList[n].ne.infos[0]@$key$) then
+    error_msg("f", DIAG_SCRIPT, "addatt_GM", "No matching output found for "+infos[0]@$key$)
+  end if
+
+  if (.not.blending.and..not.masking) then
+    oatt = att+"_GSATunmasked"
+  elseif (blending.and..not.masking) then
+    oatt = att+"_GMSTunmasked"
+  elseif (.not.blending.and.masking) then
+    oatt = att+"_GSATmasked"
+  elseif (blending.and.masking) then
+    oatt = att+"_GMSTmasked"
+  end if
+
+  do ii = 0, ListCount(infos)-1
+    if (isatt(OutList[n], oatt)) then
+      tmp = OutList[n]@$oatt$
+      if (isstring(tmp)) then
+        tmp2 = str_split(tmp, ",")
+        if (all(tmp.ne.infos[ii]@$att$)) then
+          delete(OutList[n]@$oatt$)
+          OutList[n]@$oatt$ = str_join(array_append_record(tmp2, infos[ii]@$att$, 0), ",")
+        end if
+        delete(tmp2)
+      else
+        delete(OutList[n]@$oatt$)
+        OutList[n]@$oatt$ = array_append_record(tmp, infos[ii]@$att$, 0)
+      end if
+      delete(tmp)
+    else
+      OutList[n]@$oatt$ = infos[ii]@$att$
+    end if
+  end do
+end
+
 function read_GMtrend_as_list(paths)
 local paths, path, head, data, dims, n, x, y, hiatus_period, post_period, add_post, \
       syear_hiatus, eyear_hiatus, syear_post, eyear_post, ii, jj, kk
