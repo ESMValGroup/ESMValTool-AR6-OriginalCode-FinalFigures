@@ -1607,7 +1607,7 @@ begin
       xmarker(1) = xmarker(1)-0.01
       xmarker(2) = xmarker(2)-0.01
       xmarker(3) = xmarker(3)+0.01
-      ymarker(0) = ymarker(2)+(ymarker(0)-ymarker(2))*0.45
+      ymarker(0) = ymarker(2)+(ymarker(0)-ymarker(2 ))*0.45
       ymarker(1) = ymarker(0)
       dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
       idummy = idummy + 1    
@@ -1682,7 +1682,7 @@ begin
     ymarker = (/y, y, y-ylabeli*0.75, y-ylabeli*0.75/)
     dummy(idummy) = gsn_add_polygon(wks, pdfs(1), xmarker, ymarker, polyres)
     idummy = idummy + 1
-    dummy(idummy) = gsn_add_text(wks, pdfs(1), "histogram", x, ylabel-ilabel*ylabeli, txres)
+    dummy(idummy) = gsn_add_text(wks, pdfs(1), GST+" histogram", x, ylabel-ilabel*ylabeli, txres)
     idummy = idummy + 1
     ilabel = ilabel + 1.
     if (isStrSubset(composite_project, "cmip5")) then
