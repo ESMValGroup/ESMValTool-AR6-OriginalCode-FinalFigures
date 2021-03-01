@@ -17,6 +17,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210227-Yu Kosaka: revised figure details
 ;   20210211-Yu Kosaka: changed stippling to cross marks
 ;   20210116-Yu Kosaka: adapt Adam's updates script to the ESMValTool
 ;   20200727-Soufiane Karmouche: adapt Adam's scipt to the ESMValTool
@@ -1903,20 +1904,20 @@ begin
      dum_obs(2,gg) = gsn_add_polyline(wks,bplot(2),(/sam_trends_obs(gg),sam_trends_obs(gg)/),(/0,100/),polyres)
   end do
 
-  qsort(nao_trends_C6)
-  qsort(nao_trends_A6)
+;  qsort(nao_trends_C6)
+;  qsort(nao_trends_A6)
 
-  print("NAO observations: "+nao_trends_obs)
-  print("NAO Hist: "+nao_trends_C6)
-  print("NAO AMIP: "+nao_trends_A6)
+;  print("NAO observations: "+nao_trends_obs)
+;  print("NAO Hist: "+nao_trends_C6)
+;  print("NAO AMIP: "+nao_trends_A6)
 
-  qsort(nam_trends_C6)
-  qsort(nam_trends_A6)
+;  qsort(nam_trends_C6)
+;  qsort(nam_trends_A6)
 
 
-  print("NAM Hist: "+nam_trends_C6)
-  print("NAM AMIP: "+nam_trends_A6)
-  print("NAM observations: "+nam_trends_obs)
+;  print("NAM Hist: "+nam_trends_C6)
+;  print("NAM AMIP: "+nam_trends_A6)
+;  print("NAM observations: "+nam_trends_obs)
 
   gres = True
   gres@ItemSpacePercent = 2.
@@ -1959,6 +1960,117 @@ begin
   panres2@gsnPanelDebug = False
   panres2@gsnPanelYF = (/.425,.425,.425,.1675,.1675,.1675/)
   gsn_panel(wks,(/tplot_C5(0),tplot_C5(1),tplot_C5(2),bplot(0),bplot(1),bplot(2)/),(/2,3/),panres2)
+
+; Output trend statistics
+  otable = outpath + "trend_percentiles_nam_nao_sam.txt"
+  hlist = "================================================= NAM ======================================================"
+  write_table(otable, "w", [/hlist/], "%s")
+  hlist = ""
+  write_table(otable, "a", [/hlist/], "%s")
+
+  fmt = "%8.5f"
+  do gg = 0,dimsizes(nam_trends_obs&E)-1
+    hlist = "Observations   : "+sprintf(fmt, nam_trends_obs(gg))
+    write_table(otable, "a", [/hlist/], "%s")
+  end do
+  hlist = "CMIP6 MME mean : "+sprintf(fmt, nam_trends_mme_C6T)
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "CMIP5 MME mean : "+sprintf(fmt, nam_trends_mme_C5T)
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "AMIP  MME mean : "+sprintf(fmt, nam_trends_mme_A6T)
+  write_table(otable, "a", [/hlist/], "%s")
+      
+  hlist = "                        min      5%       10%      20%    median     mean     80%      90%      95%      max "
+  write_table(otable, "a", [/hlist/], "%s")
+  xlist = [/"", ""/]
+  xlist[0] = "CMIP6"
+  xlist[1] = sprintf(fmt, min(nam_trends_C6))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.05))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.1))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.2))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.5))+" " \
+  +sprintf(fmt, weighted_mean(nam_trends_C6, weights_C6))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.8))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.9))+" " \
+  +sprintf(fmt, weighted_percentile(nam_trends_C6, weights_C6, 0.95))+" " \
+  +sprintf(fmt, max(nam_trends_C6))
+  write_table(otable, "a", xlist, "%-21s%s")
+
+  hlist = ""
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "================================================= NAO ======================================================"
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = ""
+  write_table(otable, "a", [/hlist/], "%s")
+
+  fmt = "%8.5f"
+  do gg = 0,dimsizes(nao_trends_obs&E)-1
+    hlist = "Observations   : "+sprintf(fmt, nao_trends_obs(gg))
+    write_table(otable, "a", [/hlist/], "%s")
+  end do
+  hlist = "CMIP6 MME mean : "+sprintf(fmt, nao_trends_mme_C6T)
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "CMIP5 MME mean : "+sprintf(fmt, nao_trends_mme_C5T)
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "AMIP  MME mean : "+sprintf(fmt, nao_trends_mme_A6T)
+  write_table(otable, "a", [/hlist/], "%s")
+      
+  hlist = "                        min      5%       10%      20%    median     mean     80%      90%      95%      max "
+  write_table(otable, "a", [/hlist/], "%s")
+  xlist = [/"", ""/]
+  xlist[0] = "CMIP6"
+  xlist[1] = sprintf(fmt, min(nao_trends_C6))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.05))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.1))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.2))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.5))+" " \
+  +sprintf(fmt, weighted_mean(nao_trends_C6, weights_C6))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.8))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.9))+" " \
+  +sprintf(fmt, weighted_percentile(nao_trends_C6, weights_C6, 0.95))+" " \
+  +sprintf(fmt, max(nao_trends_C6))
+  write_table(otable, "a", xlist, "%-21s%s")
+
+  hlist = ""
+  write_table(otable, "a", [/hlist/], "%s")
+  
+  hlist = "================================================= SAM ======================================================"
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = ""
+  write_table(otable, "a", [/hlist/], "%s")
+
+  fmt = "%8.5f"
+  do gg = 0,dimsizes(sam_trends_obs&E)-1
+    hlist = "Observations   : "+sprintf(fmt, sam_trends_obs(gg))
+    write_table(otable, "a", [/hlist/], "%s")
+  end do
+  hlist = "CMIP6 MME mean : "+sprintf(fmt, sam_trends_mme_C6T)
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "CMIP5 MME mean : "+sprintf(fmt, sam_trends_mme_C5T)
+  write_table(otable, "a", [/hlist/], "%s")
+  hlist = "AMIP  MME mean : "+sprintf(fmt, sam_trends_mme_A6T)
+  write_table(otable, "a", [/hlist/], "%s")
+      
+  hlist = "                        min      5%       10%      20%    median     mean     80%      90%      95%      max "
+  write_table(otable, "a", [/hlist/], "%s")
+  xlist = [/"", ""/]
+  xlist[0] = "CMIP6"
+  xlist[1] = sprintf(fmt, min(sam_trends_C6))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.05))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.1))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.2))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.5))+" " \
+  +sprintf(fmt, weighted_mean(sam_trends_C6, weights_C6))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.8))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.9))+" " \
+  +sprintf(fmt, weighted_percentile(sam_trends_C6, weights_C6, 0.95))+" " \
+  +sprintf(fmt, max(sam_trends_C6))
+  write_table(otable, "a", xlist, "%-21s%s")
+
+  hlist = ""
+  write_table(otable, "a", [/hlist/], "%s")
+
+  
 ;- - - - - - - - - - - - - - - - - - - - - - -
 ; Set titles for panels 7-12
 ;
