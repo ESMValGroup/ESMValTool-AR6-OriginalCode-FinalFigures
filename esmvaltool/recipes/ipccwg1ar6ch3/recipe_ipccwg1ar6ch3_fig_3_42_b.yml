@@ -937,28 +937,28 @@ diagnostics:
       - {dataset: ERA-Interim, project: OBS6, type: reanaly,
          version: 1, tier: 3}
     scripts:
-      #grading:
-        #<<: *grading_settings
-      grading: &grading_settings
-        script: perfmetrics/main.ncl
-        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-        plot_type: cycle_latlon
-        # Time average ('opt' argument of time_operations.ncl)
-        time_avg: monthlyclim
-        # Region ('global', 'trop', 'nhext', 'shext')
-        region: global
-        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
-        plot_stddev: ref_model
-        # Plot legend in a separate file
-        legend_outside: true
-        # Plot style
-        styleset: CMIP5
-        # Calculate grading
-        calc_grading: true
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
+      grading:
+        <<: *grading_settings
+      #grading: &grading_settings
+      #  script: perfmetrics/main.ncl
+      #  # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
+      #  plot_type: cycle_latlon
+      #  # Time average ('opt' argument of time_operations.ncl)
+      #  time_avg: monthlyclim
+      #  # Region ('global', 'trop', 'nhext', 'shext')
+      #  region: global
+      #  # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
+      #  plot_stddev: ref_model
+      #  # Plot legend in a separate file
+      #  legend_outside: true
+      #  # Plot style
+      #  styleset: CMIP5
+      #  # Calculate grading
+      #  calc_grading: true
+      #  # Metric ('RMSD', 'BIAS', taylor')
+      #  metric: [RMSD]
+      #  # Normalization ('mean', 'median', 'centered_median', 'none')
+      #  normalization: [centered_median]
 
 
 
