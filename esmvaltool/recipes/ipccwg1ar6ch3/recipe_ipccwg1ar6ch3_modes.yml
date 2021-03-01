@@ -20,11 +20,16 @@ documentation:
 
 
 preprocessors:
- temp_tr:
+ psl_am:
    regrid:
       target_grid: 2x5
       lon_offset: True
       lat_offset: False
+      scheme: linear
+
+  temp_tr:
+   regrid:
+      target_grid: 2x2
       scheme: linear
 
  enso:
@@ -246,7 +251,7 @@ diagnostics:
     variables:
       psl_obs:
         short_name: psl
-        preprocessor: temp_tr
+        preprocessor: psl_am
         reference_dataset: ERA5
         mip: Amon
         start_year: 1957
@@ -277,7 +282,7 @@ diagnostics:
     variables:
       psl_hist: &var_def_2
         short_name: psl
-        preprocessor: temp_tr
+        preprocessor: psl_am
         reference_dataset: ERA5
         mip: Amon
         project: CMIP6
