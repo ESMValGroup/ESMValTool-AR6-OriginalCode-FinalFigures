@@ -104,10 +104,22 @@ begin
 
   enter_msg(DIAG_SCRIPT, "")
 
+  vars = metadata_att_as_array(variable_info, "short_name")
+
   ; Get variables and datasets
   var0 = variable_info[0]@short_name
   info_items = select_metadata_by_name(input_file_info, var0)
   nDatasets = ListCount(info_items)
+
+  if (dimsizes(vars) .gt. 1) then
+    var1 = variable_info[1]@short_name
+    info_items_1 = select_metadata_by_name(input_file_info, var1)
+    cnt = ListCount(info_items_1)
+    do ii = 0, cnt - 1
+      ListAppend(info_items, info_items_1[ii])
+    end do
+    nDatasets = ListCount(info_items)
+  end if
 
   ; Check required diag_script_info attributes
   exit_if_missing_atts(diag_script_info, (/"plot_type", "time_avg", "region"/))
@@ -212,8 +224,8 @@ begin
     datasetnames = new_datasetnames
     delete(new_datasetnames)
   end if
-  ; Save projects
-  projectnames = metadata_att_as_array(info_items, "project")
+  ;; Save projects
+  ;projectnames = metadata_att_as_array(info_items, "project")
 
   ; Save list of preproc files for provenance in collect.ncl
   preproc_files = metadata_att_as_array(info_items, "filename")
@@ -260,6 +272,8 @@ begin
     grading!3 = "reference"
     grading&diagnostics = \
       variable_info[0]@diagnostic + "-" + diag_script_info@region
+printVarSummary(datasetnames)
+print("ref_inds = " + ref_inds)
     grading&models = remove_index(datasetnames, ref_inds)
     if (isdim(grading, "reference")) then
       grading&reference = datasetnames(ref_inds)
