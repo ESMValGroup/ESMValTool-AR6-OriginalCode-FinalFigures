@@ -34,15 +34,12 @@ documentation:
 
 datasets:
   - {project: CMIP5, dataset: bcc-csm1-1, ensemble: r1i1p1, exp: past1000, end_year: 1849}
-  - {project: CMIP5, dataset: bcc-csm1-1, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
-  - {project: CMIP5, dataset: bcc-csm1-1, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
+  - {project: CMIP5, dataset: bcc-csm1-1, ensemble: r1i1p1, exp: past1000, start_year: 1850, end_year: 2000}
   - {project: CMIP5, dataset: IPSL-CM5A-LR, ensemble: r1i1p1, exp: past1000, end_year: 1849}
   - {project: CMIP5, dataset: IPSL-CM5A-LR, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
-  - {project: CMIP5, dataset: IPSL-CM5A-LR, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
   - {project: CMIP5, dataset: FGOALS-gl, ensemble: r1i1p1, exp: past1000, start_year: 1000, end_year: 1999}
   - {project: CMIP5, dataset: FGOALS-s2, ensemble: r1i1p1, exp: past1000, end_year: 1849}
   - {project: CMIP5, dataset: FGOALS-s2, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
-  - {project: CMIP5, dataset: FGOALS-s2, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
   - {project: CMIP5, dataset: MIROC-ESM, ensemble: r1i1p1, exp: past1000, end_year: 1849}
   - {project: CMIP5, dataset: MIROC-ESM, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
   - {project: CMIP5, dataset: MIROC-ESM, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
@@ -50,40 +47,26 @@ datasets:
   - {project: CMIP5, dataset: MPI-ESM-P, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
   - {project: CMIP5, dataset: MRI-CGCM3, ensemble: r1i1p1, exp: past1000, end_year: 1849}
   - {project: CMIP5, dataset: MRI-CGCM3, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
-  - {project: CMIP5, dataset: MRI-CGCM3, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
   - {project: CMIP5, dataset: CCSM4, ensemble: r1i1p1, exp: past1000, end_year: 1849}
   - {project: CMIP5, dataset: CCSM4, ensemble: r1i1p1, exp: historical, start_year: 1850, end_year: 2005}
-  - {project: CMIP5, dataset: CCSM4, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
   - {project: CMIP5, dataset: GISS-E2-R, ensemble: r1i1p121, exp: past1000, end_year: 1850}
   - {project: CMIP5, dataset: GISS-E2-R, ensemble: r1i1p121, exp: historical, start_year: 1851, end_year: 2005}
-#  - {project: CMIP5, dataset: bcc-csm1-1, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: IPSL-CM5A-LR, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: FGOALS-gl, ensemble: r1i1p1, exp: past1000, end_year: 1999}
-#  - {project: CMIP5, dataset: FGOALS-s2, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: MIROC-ESM, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: MPI-ESM-P, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: MRI-CGCM3, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: CCSM4, ensemble: r1i1p1, exp: [past1000, historical]}
-#  - {project: CMIP5, dataset: GISS-E2-R, ensemble: r1i1p121, exp: [past1000, historical]}
 
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: past1000, end_year: 1849, grid: gn}
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: historical, start_year: 1850, end_year: 2014, grid: gn}
-  - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: ssp245, start_year: 2015, grid: gn}
   - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: past1000, end_year: 1849, grid: gn}
   - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: historical, start_year: 1850, end_year: 2014, grid: gn}
-  - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: ssp245, start_year: 2015, grid: gn}
   - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, exp: past1000, end_year: 1849, grid: gr}
   - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, exp: historical, start_year: 1850, end_year: 2014, grid: gr}
   
 preprocessors:
 
-  pp_2deg:
+  pp_5deg:
     regrid:
-      target_grid: 2x2
+      target_grid: 2x5
+      lat_offset: False
       scheme: linear
     zonal_statistics:
-      operator: mean
-    annual_statistics:
       operator: mean
 
 diagnostics:
@@ -92,12 +75,10 @@ diagnostics:
     description: draw time series of the SAM index
     variables:
       psl:
-        preprocessor: pp_2deg
+        preprocessor: pp_5deg
         mip: Amon
-        field: T2MS
-        frequency: mon
         start_year: 950
-        end_year: 2050
+        end_year: 2014
         
     scripts:
       draw_samindex_millenium:

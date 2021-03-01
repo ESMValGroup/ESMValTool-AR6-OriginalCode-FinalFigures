@@ -258,15 +258,17 @@ begin
     ; ------------------------------------------------------------------
 
     ; create array for statistics
-    model_arr_stat = new((/4, 3, ntime/), double)
+    model_arr_stat = new((/5, 3, ntime/), double)
     model_arr_stat!0 = "exp"
     model_arr_stat!1 = "stat"
     model_arr_stat!2 = "time"
-    model_arr_stat&exp = (/"exp1", "exp2", "exp3", "exp4"/)
+    model_arr_stat&exp = (/"exp1", "exp2", "exp3", "exp4", "ref"/)
     model_arr_stat&time = time
     model_arr_stat&stat = (/"mean", "min", "max"/)
     ;model_arr_stat@_FillValue = 1e+20
     ;model_arr_stat = model_arr_stat@_FillValue
+
+    model_arr_stat(4, 0, :) = (/ref_arr/)
 
     do iexp = 0, nexp - 1
 
@@ -470,7 +472,8 @@ begin
     ; output to NetCDF
     ; *************************************
 
-    out_path1 = out_path + "tas_" + anom + "_damip_" + header + ".nc"
+    out_path1 = out_path + "tas_" + anom + "_damip_" + header + "_" + \
+                ivar + ".nc"
     model_arr_stat@ncdf = out_path
     model_arr_stat@diag_script = DIAG_SCRIPT
     model_arr_stat@var = var0
@@ -511,7 +514,7 @@ begin
       res@tiYAxisString = ""
     end if
 
-    plots(ivar) = gsn_csm_xy(wks, time, model_arr_stat(:, 0, :), res)  ; create plot
+    plots(ivar) = gsn_csm_xy(wks, time, model_arr_stat(0:4, 0, :), res)  ; create plot
 
     res@pmLegendDisplayMode = "Never"
 

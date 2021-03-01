@@ -144,7 +144,7 @@ datasets:
   - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6} # different ensembles
-  - {dataset: CAS-ESM2-0, institute: CAS, ensemble: r1i1p1f1, grid: gn, project: CMIP6} # different ensembles
+  #- {dataset: CAS-ESM2-0, institute: CAS, ensemble: r1i1p1f1, grid: gn, project: CMIP6} # rejected
   - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CESM2-FV2, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CESM2-WACCM, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
@@ -156,9 +156,9 @@ datasets:
   - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr, project: CMIP6}
-  - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
+  #- {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
   #- {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #850hPa strange
-  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} 
+  #- {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
   #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
   #- {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
   #- {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -179,7 +179,7 @@ datasets:
   #- {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg, clt
   - {dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   - {dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
-  #- {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
+  #- {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr, zg: strange values
   #- {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut, rlutcs, clt
   - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn, project: CMIP6}
@@ -238,6 +238,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -277,6 +279,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -310,6 +314,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -345,6 +351,8 @@ diagnostics:
       - {dataset: HadCM3} #no hus
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -377,6 +385,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -408,6 +418,8 @@ diagnostics:
       - {dataset: HadCM3} #no hus
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -438,6 +450,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -472,6 +486,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -489,8 +505,10 @@ diagnostics:
     variables:
       clt:
         <<: *var_settings
-        reference_dataset: ESACCI-CLOUD
-        alternative_dataset: PATMOS-x
+        reference_dataset: MODIS
+        #reference_dataset: ESACCI-CLOUD
+        alternative_dataset: ESACCI-CLOUD
+        #alternative_dataset: PATMOS-x
     additional_datasets:
       - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
       - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO} #no hus, zg, ta, ua
@@ -508,6 +526,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -515,7 +535,9 @@ diagnostics:
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
       - {dataset: ESACCI-CLOUD, project: OBS, type: sat,
          version: AVHRR-fv3.0, tier: 2, start_year: 1982}
-      - {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2, start_year: 1982}
+      #- {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2, start_year: 1982}
+      - {dataset: MODIS, project: obs4mips, level: L3, version: C5,
+         start_year: 2001, end_year: 2010, tier: 1}
 
   hus400:
     <<: *corr_diag
@@ -537,6 +559,8 @@ diagnostics:
       - {dataset: GISS-E2-R-CC} #no psl
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut
       - {dataset: AIRS, project: obs4mips, level: L3,
@@ -567,11 +591,13 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
-      - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
+      #- {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #strange field
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut
       - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}
@@ -602,6 +628,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -674,6 +702,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -709,6 +739,8 @@ diagnostics:
       - {dataset: HadCM3} #no hus
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -744,6 +776,8 @@ diagnostics:
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
@@ -777,7 +811,9 @@ diagnostics:
       - {dataset: HadCM3} #no hus
       - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
-      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
+      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+      #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
@@ -795,19 +831,20 @@ diagnostics:
       cor_collect:
         script: ipcc_ar6/corr_pattern_collect.ncl
         ancestors: ['*/pattern_cor']
-        diag_order: ['tas', 'pr', 'rlut', 'rsut', 'lwcre', 'swcre', 'psl', 'ts', 
-                     'clt', 'hus400', 'zg500', 'ta200', 'ta850', 'ua200', 'ua850', 
-                     'va200', 'va850']
-        labels: ['   Near-Surface ~C~ Air Temperature', 'Precipitation', 
+        diag_order: ['ts', 'tas', 'pr', 'clt', 'hus400', 'rlut', 'rsut', 'lwcre', 
+                     'swcre', 'psl',  'zg500', 'ua200', 'ua850', 
+                     'va200', 'va850', 'ta200', 'ta850']
+        labels: ['    Surface ~C~ Temperature',
+                 '   Near-Surface ~C~ Air Temperature', 'Precipitation', 
+                 'Total Cloud ~C~     Cover',
+                 ' Specific ~C~ Humidity ~C~  400hPa', 
                  'TOA Outgoing ~C~   Longwave ~C~    Radiation', 
                  'TOA Outgoing ~C~   Shortwave ~C~    Radiation', 
                  ' TOA Longwave ~C~ Cloud Radiative ~C~         Effect', 
                  ' TOA Shortwave ~C~ Cloud Radiative ~C~         Effect', 
-                 'Sea Level ~C~ Pressure', '    Surface ~C~ Temperature', 
-                 'Total Cloud ~C~     Cover',
-                 ' Specific ~C~ Humidity ~C~  400hPa', 
+                 'Sea Level ~C~ Pressure',
                  'Geopotential ~C~     Height ~C~    500hPa', 
-                 'Temperature ~C~    200hPa', 'Temperature ~C~     850hPa', 
                  'Eastward Wind ~C~      200hPa', 'Eastward Wind ~C~       850hPa', 
                  'Northward Wind ~C~       200hPa', 
-                 'Northward Wind ~C~       850hPa']
+                 'Northward Wind ~C~       850hPa',
+                 'Temperature ~C~    200hPa', 'Temperature ~C~     850hPa']
