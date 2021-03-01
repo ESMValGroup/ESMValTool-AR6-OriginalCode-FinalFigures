@@ -239,7 +239,7 @@ begin
   do ivar = 0, npanels-1
 
     ; create array for statistics
-    model_arr_stat = new((/2, 3, ntime/), double)
+    model_arr_stat = new((/3, 3, ntime/), double)
     model_arr_stat!0 = "exp"
     model_arr_stat!1 = "stat"
     model_arr_stat!2 = "time"
@@ -510,7 +510,10 @@ begin
         model_arr_ref(0, :) = wgt_runave_n_Wrap(model_arr_ref(0, :), wgt, 1, 0)
         model_arr_ref(1, :) = wgt_runave_n_Wrap(model_arr_ref(1, :), wgt, 1, 0)
         model_arr_ref(2, :) = wgt_runave_n_Wrap(model_arr_ref(2, :), wgt, 1, 0)
+
+        model_arr_stat(3, 0, :) = model_arr_ref(0, :)
       end if
+
 
 
       ; --------------------------------------------------------------------

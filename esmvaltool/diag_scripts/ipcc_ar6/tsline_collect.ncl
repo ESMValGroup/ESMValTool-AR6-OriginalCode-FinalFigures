@@ -130,7 +130,7 @@ begin
   ; -----------------------------------------------
 
   input_files = diag_script_info@input_files + "/" + \
-    "tsline_mm_tas_" + anom + "_stat.nc"
+    "tsline_mm_siconc_" + anom + "_stat.nc"
     ;"tsline_mm_" + var0 + "_" + anom + "_stat.nc"
     ;"extent_" + var0 + "_Antarctic_September_1950-2014.nc"
   input_files := tostring(input_files)
@@ -194,13 +194,15 @@ print(input_files)
     idx2 = ind(date(dimsizes(date) - 1).eq.data_mean&time)
     delete(date)
 
-    data_mean(ii_n, idx1:idx2)  = (/data_temp(:, 0)/)
+printVarSummary(data_mean)
+printVarSummary(data_temp)
+    data_mean(ii_n, idx1:idx2)  = (/data_temp(0, :)/)
     data_mean&experiment(ii_n) = data_temp@experiment
 
     if (ii .eq. 0) then
       data_mean@units = data_temp@units
       if (isatt(diag_script_info, "ref")) then
-        data_ref(0, idx1:idx2)  = (/data_temp(:, 9)/)
+        data_ref(0, idx1:idx2)  = (/data_temp(3, :)/)
         data_ref&dataset(0) = diag_script_info@ref
       end if
     end if
@@ -212,8 +214,8 @@ print(input_files)
     ;; not working: rmsd of mmm to obs
     ;; data_stat(0, ii_n, idx1:idx2) = sqrt(dim_avg_n_Wrap((data_temp(:, 0) - data_temp(:, 9)) ^ 2, 0))
     ;stddev
-    data_stat(0, ii_n, idx1:idx2) = data_temp(:, 0) - data_temp(:, 1)
-    data_stat(1, ii_n, idx1:idx2) = data_temp(:, 0) + data_temp(:, 1)
+    data_stat(0, ii_n, idx1:idx2) = data_temp(0, :) - data_temp(1, :)
+    data_stat(1, ii_n, idx1:idx2) = data_temp(0, :) + data_temp(1, :)
     ;minmax
     ;data_stat(0, ii_n, idx1:idx2) = data_temp(:, 3) 
     ;data_stat(1, ii_n, idx1:idx2) = data_temp(:, 8) 
