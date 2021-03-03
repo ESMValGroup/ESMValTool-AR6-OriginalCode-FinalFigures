@@ -18,6 +18,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210301-Yu Kosaka: revised figure details
 ;   20210205-Yu Kosaka: minor revision in figure legend
 ;   20210131-Yu Kosaka: revised from monthly to annual mean data
 ;   20210117-Yu Kosaka: adapt Adam's updates script to the ESMValTool
@@ -1126,11 +1127,33 @@ begin
   res@gsnCenterString = "(b) CMIP6 Hist MME"
   plot(1) = gsn_csm_contour_map(wks,mme_ipo,res)
 
-  res2@cnFillScaleF        = 1. ; 0.4
-  res2@cnFillPatterns = (/17,0/)
-  res2@cnLevels = 0.5
-  oplot = gsn_csm_contour(wks,sig(0,:,:),res2)
-  overlay(plot(0),oplot)
+;  res2@cnFillScaleF        = 1. ; 0.4
+;  res2@cnFillPatterns = (/17,0/)
+;  res2@cnLevels = 0.5
+;  oplot = gsn_csm_contour(wks,sig(0,:,:),res2)
+;  overlay(plot(0),oplot)
+  res_marker = True
+  res_marker@gsMarkerIndex = 5
+  res_marker@gsMarkerSizeF = 0.0014
+  res_marker@gsMarkerThicknessF = 0.5
+  res_marker@gsMarkerOpacityF = 0.6
+  xdummy = new(product(dimsizes(sig(0, :, :))), graphic)
+  idum = 0
+  do j = 0, dimsizes(sig&lat)-1, 2
+    if (mod(j,4).eq.0) then
+      i0 = 0
+    else
+      i0 = 1
+    end if
+    do i = i0, dimsizes(sig&lon)-1, 2
+      if (.not.ismissing(sig(0, j, i)).and.sig(0, j, i).lt.0.5) then
+        xdummy(idum) = gsn_add_polymarker(wks, plot(0), sig&lon(i), \
+                                          sig&lat(j), res_marker)
+        idum = idum + 1
+      end if
+    end do
+  end do
+  
   res2@cnFillPatterns = (/3,0/)
   res2@cnLevels = 0.5
   res2@cnFillScaleF        = 0.8  ; 0.7
@@ -1619,13 +1642,24 @@ begin
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
   gsn_text_ndc(wks," < 80% of runs~C~ match MME sign",x2+0.004,0.62,tlres)
 
-  pmres = pmres0
-  pmres@gsFillScaleF = 0.8  ; 0.55
-  pmres@gsFillIndex = 17
+;  pmres = pmres0
+;  pmres@gsFillScaleF = 0.8  ; 0.55
+;  pmres@gsFillIndex = 17
   x1 = 0.047
   x2 = 0.071
-  gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres)
+;  gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
+  do j = 0, 2
+    if (any(j.eq.(/0,2/))) then
+      do i = 0, 2
+        gsn_polymarker_ndc(wks, x1+(i+0.5)*(x2-x1)/3., y1+(j+0.5)*(y2-y1)/3., res_marker)
+      end do
+    else
+      do i = 0, 1
+        gsn_polymarker_ndc(wks, x1+(i+1.)*(x2-x1)/3., y1+(j+0.5)*(y2-y1)/3., res_marker)
+      end do
+    end if
+  end do
   gsn_text_ndc(wks," not significant~C~ at 10% level",x2+0.004,0.62,tlres)
 
   frame(wks)
