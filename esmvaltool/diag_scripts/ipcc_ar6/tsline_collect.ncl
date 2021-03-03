@@ -256,21 +256,36 @@ print(data_temp)
   ; NetCDF Output
   ; -------------------------------------------
 
+print("ntime = " + ntime)
+  model_arr  = new((/3, 3, ntime/), double)
+  model_arr!0 = "experiment"
+  model_arr!1 = "stat"
+  model_arr!2 = "time"
+  model_arr&experiment = (/"exp1", "exp2", "ref"/)
+  model_arr&stat = (/"mean", "stat1", "stat2"/)
+  model_arr&time = time
+  model_arr@var = var0
+
+  model_arr(0:1, 0, :) = (/data_mean/)
+  model_arr(0:1, 1, :) = (/data_stat(0, :, :)/)
+  model_arr(0:1, 2, :) = (/data_stat(1, :, :)/)
+  model_arr(2, 0, :) = (/data_ref/)
+
   out_path = config_user_info@work_dir
   system("mkdir -p " + out_path)
   out_path1 = out_path + "tsline_collect_" + var0 + ".nc"
-  data_mean@ncdf = out_path
-  data_mean@diag_script = DIAG_SCRIPT
-  data_mean@var = var0
-  ncdf_outfile = ncdf_write(data_mean, out_path1)
+  model_arr@ncdf = out_path
+  model_arr@diag_script = DIAG_SCRIPT
+  model_arr@var = var0
+  ncdf_outfile = ncdf_write(model_arr, out_path1)
 
-  if (isatt(diag_script_info, "ref")) then
-    out_path1 = out_path + "tsline_collect_" + var0 + "_ref.nc"
-    data_ref@ncdf = out_path
-    data_ref@diag_script = DIAG_SCRIPT
-    data_ref@var = var0
-    ncdf_outfile = ncdf_write(data_ref, out_path1)
-  end if
+  ;if (isatt(diag_script_info, "ref")) then
+  ;  out_path1 = out_path + "tsline_collect_" + var0 + "_ref.nc"
+  ;  data_ref@ncdf = out_path
+  ;  data_ref@diag_script = DIAG_SCRIPT
+  ;  data_ref@var = var0
+  ;  ncdf_outfile = ncdf_write(data_ref, out_path1)
+  ;end if
 
   ; -------------------------------------------
   ; Plotting

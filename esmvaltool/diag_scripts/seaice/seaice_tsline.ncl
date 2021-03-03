@@ -322,6 +322,11 @@ print("year = " + year)
       delete(sic_sum_area)
       sic_sum_area = tmp
       delete(tmp)
+    else
+      sic_sum_ext!0 = "year"
+      sic_sum_ext&year = time
+      sic_sum_area!0 = "year"
+      sic_sum_area&year = time
     end if
 
     ; Match time coordinate

@@ -243,7 +243,7 @@ begin
     model_arr_stat!0 = "exp"
     model_arr_stat!1 = "stat"
     model_arr_stat!2 = "time"
-    model_arr_stat&exp = (/"exp1", "exp2"/)
+    model_arr_stat&exp = (/"exp1", "exp2", "ref"/)
     model_arr_stat&time = time
     model_arr_stat&stat = (/"mean", "min", "max"/)
 
@@ -511,7 +511,7 @@ begin
         model_arr_ref(1, :) = wgt_runave_n_Wrap(model_arr_ref(1, :), wgt, 1, 0)
         model_arr_ref(2, :) = wgt_runave_n_Wrap(model_arr_ref(2, :), wgt, 1, 0)
 
-        model_arr_stat(3, 0, :) = model_arr_ref(0, :)
+        model_arr_stat(2, :, :) = (/model_arr_ref(:, :)/)
       end if
 
 
