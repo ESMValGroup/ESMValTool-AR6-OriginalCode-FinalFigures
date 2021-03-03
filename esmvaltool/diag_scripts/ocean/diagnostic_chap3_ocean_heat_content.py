@@ -433,7 +433,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 if dataset.lower().find('ukesm')>-1:
                     color_dict[dataset] = 'purple'
 
-    if plot_style in ['mono', '5-95']:
+    if plot_style in ['mono', '5-95', '10-90']:
         color_dict={}
     color_dict['Observations'] = 'black'
 
@@ -574,7 +574,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             maxs = [np.max(fill_betweens[subplot][t]) for t in times]
             axes[subplot].fill_between(times, mins, maxs, color='grey', alpha=0.5)
 
-    elif plot_style=='5-95': # plot between 5-95 percentiles, weighted such that each model gets an even vote.
+    elif plot_style in[ '10-90', '5-95']: # plot between 5-95 percentiles, weighted such that each model gets an even vote.
         fill_betweens = {subplot:{} for subplot in axes.keys()}
         weights = {subplot:{} for subplot in axes.keys()}
 
@@ -618,7 +618,10 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 t_weights = [] # list of datasets.
                 for dset in weights[subplot][t]:
                     t_weights.append(1./float(counts[dset]))
-                [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights)
+                if plot_style in[ '5-95']:
+                    [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights)
+                elif plot_style in[ '10-90']:
+                    [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.10, 0.5, 0.90], sample_weight=t_weights)
                 pc5s.append(pc5)
                 if median:
                     pc50s.append(pc50)
@@ -628,7 +631,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                    pc50s.append(mean)
                 pc95s.append(pc95)
                 print(pc5, pc50, pc95)
-            print('5-95:', pc5s, pc95s)
+            print(plot_style, ':', pc5s, pc95s)
             axes[subplot].fill_between(times, pc5s, pc95s, color=CMIP6_red, alpha=0.35, edgecolor=None)
             axes[subplot].plot(times, pc50s, c=CMIP6_red, lw=1.5, zorder=2)
 
@@ -759,9 +762,12 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
 
             upper_sigma = []
             lower_sigma = []
+
+            scaling_factor_99 = 2.57583 # % Raise error estimates to 99% C.I assuming normal distribution
+            scaling_factor_90 = 1.64485 # Raise error estimates to 90 percentile
             for center, sigma in zip(centers, sigmas):
-                lower_sigma.append(center - 1.6*sigma)
-                upper_sigma.append(center + 1.6*sigma)
+                lower_sigma.append(center - scaling_factor_90*sigma)
+                upper_sigma.append(center + scaling_factor_90*sigma)
 
 
             axes[subplot].plot(np.array(times),
@@ -773,7 +779,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             axes[subplot].fill_between(np.array(times), np.array(lower_sigma), np.array(upper_sigma), color='black', alpha=0.35, edgecolor=None)
 
     legend_fs = 9
-    if plot_style in ['all_one', 'mono', '5-95']:leg_size=2
+    if plot_style in ['all_one', 'mono', '5-95', '10-90',]:leg_size=2
     else:
         leg_size = len(datasets)
 
@@ -794,16 +800,15 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
         if show_UKESM:
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
-    if plot_style in ['5-95', ]:
-        #axleg.plot([], [], c=CMIP6_red, lw=5, ls='-', alpha=0.85, label='CMIP6')
+    if plot_style in ['5-95', '10-90',]:
         axleg.plot([], [],
                    c=CMIP6_red, lw=1.5, ls='-',
                    marker='s', markerfacecolor=(0.80, 0.137, 0.137, 0.35), markeredgewidth=0., markersize = 11,
-                   label='CMIP6 mean and 5-95 percentile range')
+                   label='CMIP6 mean and '+plot_style+' percentile range')
 
         if all_obs_sigma:
             #sigma_label = 'Observations '+r'$\pm 1.6 \sigma$'
-            sigma_label = 'Observations mean and 5-95 percentile range'
+            sigma_label = 'Observations mean and 10-90 percentile range'
 
             axleg.plot([], [], c='black', lw=1.5,ls='-',
                        marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11,
@@ -2858,7 +2863,6 @@ def calc_halo_multimodel_mean(cfg, metadatas, dyn_fns,
         # Calculatge the individual model mean
         for dataset in datasets.keys():
             cube_list[dataset] = {}
-
             for (project, dataset_itr, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
                 print( (project, dataset_itr, exp, ensemble, dyn_type, region, trend))
                 if dataset != dataset_itr: continue
@@ -2926,6 +2930,11 @@ def calc_halo_multimodel_mean(cfg, metadatas, dyn_fns,
             print('Regridding', dataset, trend, exp, region, cube_list[dataset].shape)
             cube_list[dataset] = regrid_to_1x1( cube_list[dataset])
 
+            # Save the single model mean:
+            single_model_mean_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
+            single_model_mean_fn += '_'.join(['single_model',dataset, plot_trend, plot_exp, plot_dyn, plot_region,  time_range_str])+'.nc'
+            iris.save(cube_list[dataset], single_model_mean_fn)
+
         # Take mean of several cubes
         cube_list = [c for exp, c in cube_list.items()]
         mean_cube = make_mean_of_cube_list_notime(cube_list)
@@ -2934,7 +2943,6 @@ def calc_halo_multimodel_mean(cfg, metadatas, dyn_fns,
         iris.save(mean_cube, multimodel_mean_fn)
 
     return multimodel_mean_fn
-
 
 
 def calc_halo_multimodel_aggrement(cfg,
@@ -2951,24 +2959,47 @@ def calc_halo_multimodel_aggrement(cfg,
     """
     Calculate the model-obs aggrement for hatching plots.
     """
-
     time_range_str = '-'.join([str(t) for t in time_range])
-    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str]
-    multimodel_mean_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
-    multimodel_mean_fn += '_'.join(unique_id)+'.nc'
+    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str, ]
+    multimodel_agreement_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_agreement_map'])
+    multimodel_aggreement_fn += '_'.join(unique_id)+'.nc'
 
-    if os.path.exists(multimodel_mean_fn):
-        mean_cube = iris.load_cube(multimodel_mean_fn)
+    obs_cubes = iris.load_raw(obs_file)
+    #obs_files = [,
+                 #'
+                 # '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc', ]
+    if obs_file == '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':
+        obs_key == 'DWv1'
+    elif obs_file == '210201_EN4.2.1.g10_annual_steric_1950-2019':
+        obs_key == 'EN4'
+    elif obs_file == '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':
+        obs_key == 'Ishii'
     else:
-        cube_list = {}
-        datasets = {}
-        for (project, dataset, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
-            datasets[dataset] = True
+        assert 0
 
-        # Calculatge the individual model mean
-        for dataset in datasets.keys():
-            cube_list[dataset] = {}
+    if plot_dyn == 'halo':
+        obs_cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
+        obs_cube = regrid_to_1x1(obs_cube)
+    else:
+        assert 0
 
+    if os.path.exists(multimodel_agreement_fn):
+        return multimodel_agreement_fn
+
+    cube_list = {}
+    datasets = {}
+    for (project, dataset, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
+        datasets[dataset] = True
+
+    # Calculatge the individual model mean
+    for dataset in datasets.keys():
+        cube_list[dataset] = {}
+        # Save the single model mean:
+        single_model_mean_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_map'])
+        single_model_mean_fn += '_'.join(['single_model',dataset, plot_trend, plot_exp, plot_dyn, plot_region,  time_range_str])+'.nc'
+        if os.path.exists(single_model_mean_fn):
+            cube_list[dataset] = iris.load_cube(single_model_mean_fn)
+        else:
             for (project, dataset_itr, exp, ensemble, dyn_type, region, trend), fn in dyn_fns.items():
                 print( (project, dataset_itr, exp, ensemble, dyn_type, region, trend))
                 if dataset != dataset_itr: continue
@@ -2991,17 +3022,24 @@ def calc_halo_multimodel_aggrement(cfg,
 
             # regrid to a common grid:
             print('Regridding', dataset, trend, exp, region, cube_list[dataset].shape)
-            cube_list[dataset] = regrid_to_1x1( cube_list[dataset])
+            cube_list[dataset] = regrid_to_1x1(cube_list[dataset])
 
-        # Take mean of several cubes
-        cube_list = [c for exp, c in cube_list.items()]
-        mean_cube = make_mean_of_cube_list_notime(cube_list)
+            # Save the single model mean:
+            iris.save(cube_list[dataset], single_model_mean_fn)
 
+        # The out array is the fraction of models which aggree with the obs.
+        out_cube=cube_list[0].copy()
+        mask = out_cube.data.mask
+        out_cube.data *= 0
+        for dataset, cube in cube_list.items():
+            data = np.clip(np.sign(cube.data * obs_cube.data), 0., 1.)
+            out_cube.data += data
+
+        out_cube.data = out_cube.data/float(len(datasets))
         # Save cube:
-        iris.save(mean_cube, multimodel_mean_fn)
+        iris.save(out_cube, multimodel_agreement_fn)
 
-    return multimodel_mean_fn
-
+    return multimodel_agreement_fn
 
 
 
@@ -3217,20 +3255,6 @@ def plot_halo_multipane(
     cbar_ticks = np.arange(-1.5, 1.75, 0.25)
 #    plot_range=[-2.05, 2.05]
 
-    for sbp, obs_file in zip(subplots, obs_files ):
-        fig, axes[sbp] = plot_halo_obs_mean(
-            cfg,
-            metadatas,
-            plot_dyn = 'halo',
-            subplot=sbp,
-            depth_range='2000m',
-            plot_range=plot_range,
-            nbins=nbins,
-            obs_file=obs_file,
-            fig=fig,
-#            ax=sbp,
-        )
-
     # model pane ( C3)
     # Load data
     multimodel_mean_fn = calc_halo_multimodel_mean(
@@ -3241,6 +3265,31 @@ def plot_halo_multipane(
         plot_region = 'Global',
         time_range = time_range,
     )
+
+    for sbp, obs_file in zip(subplots, obs_files ):
+        agreement_fn = calc_halo_multimodel_aggrement(
+            cfg, metadatas,
+            slr_fns,
+            obs_file
+            plot_trend = 'detrended',
+            plot_dyn = 'halo',
+            plot_exp = plot_exp,
+            plot_region = 'Global',
+            time_range = time_range,
+        )
+        fig, axes[sbp] = plot_halo_obs_mean(
+            cfg,
+            metadatas,
+            plot_dyn = 'halo',
+            subplot=sbp,
+            depth_range='2000m',
+            plot_range=plot_range,
+            nbins=nbins,
+            obs_file=obs_file,
+            fig=fig,
+            agreement_fn=agreement_fn,
+        )
+
     for pane in cmip_subplots:
         # make plot: (c3)
         fig, axes[pane], qplot = make_multimodel_halosteric_salinity_trend(
@@ -3331,7 +3380,16 @@ def plot_halo_multipane(
        fig.add_artist(line2)
        plt.figtext(linex + 0.0050, liney2, 'CMIP6 multi-model mean halosteric trend', fontsize=10, ha='left', va='top')
 
-
+    # Add pane label:
+    lefts = []
+    tops = []
+    scripts = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)']
+    panes = [scatter1, scatter2, ax0, ax1,ax2,ax3]
+    for pane, script in zip(panes,scripts):
+        pane.text(0.01, 0.99, script,
+            horizontalalignment='left',
+            verticalalignment='top',
+            transform=pane.transAxes)
 
     # Determine image filename
     filename = '_'.join(['halosteric_multipane', plot_exp, time_range_str ]).replace('/', '_')
@@ -3356,7 +3414,8 @@ def plot_halo_obs_mean(
         nbins=20,
         obs_file='DurackandWijffels10_V1.0_50yr',
 #        ax = None,
-        fig = None
+        fig = None,
+        agreement_fn=None,
         ):
     """
     make the observational halosteric observation plot.
@@ -3453,6 +3512,18 @@ def plot_halo_obs_mean(
 
     try: plt.gca().coastlines()
     except: pass
+
+    if agreement_fn:
+        model_cube = iris.load_cube(agreement_fn)
+        max_lat = 70.
+        model_cube = model_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
+        model_cube.data = np.ma.masked_where(model_cube.data.mask + model_cube.data>0.8, model_cube.data )
+        hatchplot = iris.plot.contourf(
+            model_cube,
+            colors='none',
+            hatches=['/', ],
+            extend='lower',
+            )
 
     # Saving files:
     if subplot==111:
@@ -4340,7 +4411,7 @@ def sea_surface_salinity_plot(
         ref_file = None,
         ref_file_2 = None,
         obs_key='DW1970',
-        calc_trend = True
+        annual_mean = 'total', # ['total', 'annual', 'decadal',]
     ):
     """
     Make a multi-pane plot of the Sea Surface salinity.
@@ -4371,8 +4442,8 @@ def sea_surface_salinity_plot(
     linestyles = ['-' for thres in thresholds]
     colours = ['k' for thres in thresholds]
     linewidths = [1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5, 1., 0.5,]
-
-    if calc_trend:
+    white_contours = False
+    if white_contours:
         thresholds_white = np.arange(-2, 2.25, 0.25)
         change_ticks = [-0.2, -0.1, 0., 0.1, 0.2]
         linestyles_white = ['-' for thres in thresholds_white]
@@ -4411,29 +4482,39 @@ def sea_surface_salinity_plot(
     if ref_file_2 not in [None, (None,)]:
         black_con_cube = ref_cube_2
 
-    if calc_trend:
+    if annual_mean == 'annual': #['total', 'annual', 'decadal',]:
         obs_change_cube.data = (obs_change_cube.data/obs_denom)*1000.
         print('calc_trend:', obs_change_cube.data.min(), obs_change_cube.data.max())
 
-    #change_nspace_50 =  np.linspace(-11.5, 11.5, 24)
-    #change_nspace_70 =  np.linspace(-13, 13 , 16, endpoint=True)
-    change_nspace_50 =  np.linspace(-11., 11., 12)
-    change_nspace_70 =  np.linspace(-11., 11., 12)
+        change_nspace_50 =  np.linspace(-11., 11., 12)
+        change_nspace_70 =  np.linspace(-11., 11., 12)
+    elif annual_mean == 'total':
+        change_nspace_50 =  np.linspace(-0.1, 0.1, 11)*5.
+        change_nspace_70 =  np.linspace(-0.1, 0.1, 11)*5.
+    elif annual_mean == 'decadal':
+        obs_change_cube.data = (obs_change_cube.data/obs_denom)*10.
+
+        change_nspace_50 =  np.linspace(-0.1, 0.1, 11)*0.5
+        change_nspace_70 =  np.linspace(-0.1, 0.1, 11)*0.5
+
+        print('calc_trend:', obs_change_cube.data.min(), obs_change_cube.data.max())
+    else: assert 0
 
     if fig_type=='obs_change': # pane a (221, 211, also white contours)
         cube = obs_change_cube
         #nspace = np.linspace(-0.2, 0.2 , 22, endpoint=True)
         if obs_key=='DW1950':
             nspace = change_nspace_50
+            label = "Observations (1950-2019)"
+
         if obs_key=='DW1970':
             nspace = change_nspace_70
+            label = "Observations (1970-2019)"
+
         print(obs_key, nspace, cube.data.min(), cube.data.max())
-        #assert 0
         cmap=diagtools.misc_div
         #abel= obs_key+' trend ('+obs_time_str+')'
         # label = "Durack & Wijffels (1950-2019)"
-        label = "Observations (1950-2019)"
-
 
     elif fig_type=='obs_mean': # pane b (222, also contours)
         cube = obs_mean_cube
@@ -4457,15 +4538,23 @@ def sea_surface_salinity_plot(
     elif fig_type=='model_change': # pane 4 (224)
         cube = mean_cube
         cube.data = mean_cube.data - ref_cube.data
-        denom = 1000./(time_range[1]-time_range[0] +1.)
-        cube.data = cube.data * denom
+        if annual_mean=='annual':
+            denom = 1000./(time_range[1]-time_range[0] +1.)
+            cube.data = cube.data * denom
+        if annual_mean=='decadal':
+            denom = 10./(time_range[1]-time_range[0] +1.)
+            cube.data = cube.data * denom
+
         if obs_key=='DW1950':
             nspace = change_nspace_50
         if obs_key=='DW1970':
             nspace = change_nspace_70
         cmap=diagtools.misc_div
         #label= 'CMIP6 trend ('+time_range_str+')'
-        label = "CMIP6 historical multi-model mean (1950-2014)"
+        if obs_key=='DW1950':
+            label = "CMIP6 historical multi-model mean (1950-2014)"
+        if obs_key=='DW1970':
+            label = "CMIP6 historical multi-model mean (1970-2014)"
     else:
         print("Fig type not recognised", fig_type)
         assert 0
@@ -4479,7 +4568,6 @@ def sea_surface_salinity_plot(
     if isinstance(subplot, int) and subplot==111:
         ax = fig.add_subplot(subplot, projection=proj)
     else:
-        # ax=subplot
         plt.sca(ax)
 
     lat_constraint = iris.Constraint(
@@ -4491,19 +4579,12 @@ def sea_surface_salinity_plot(
     cube.extract(lat_constraint)
     black_con_cube.extract(lat_constraint)
 
-    #if fig_type=='mean':
-    #    cmap=diagtools.misc_seq
-    #    nspace = np.linspace(
-    #        cube.data.min(),
-    #        cube.data.max(), 22, endpoint=True)
-
-    #if fig_type=='trend':
-    #    cmap=diagtools.misc_div
-    #    plot_max = np.max([cube.data.max(), np.abs(cube.data.min())])
-    #    nspace = np.linspace(-plot_max, plot_max, 22, endpoint=True)
     clip = True
     if clip:
-        cube.data = np.ma.clip(cube.data, nspace.min(), nspace.max())
+        print('clip -pre',cube.data.min(), cube.data.max(), nspace.min(), nspace.max())
+        cube.data = np.ma.clip(cube.data, nspace.min()*0.9999, nspace.max()*0.9999)
+        print('clip -post',cube.data.min(), cube.data.max(), nspace.min(), nspace.max())
+        #assert 0
 
     print(fig_type, subplot, cube.data.shape, )
     qplot = iris.plot.contourf(
@@ -4528,7 +4609,7 @@ def sea_surface_salinity_plot(
                  extend='both',
                  )
         ax.clabel(black_con, levels, inline=True, fontsize=8, fmt = '%1.0f')
-    white_contours = False
+
     if white_contours:
         white_con = iris.plot.contour(obs_change_cube,
                  thresholds_white,
@@ -4556,7 +4637,7 @@ def sea_surface_salinity_plot(
             plt.savefig(path, dpi=200)
         plt.close()
     else:
-        return fig, ax, qplot
+        return fig, ax, qplot, nspace
 
 def sea_surface_salinity_multipane(
     cfg,
@@ -4564,7 +4645,8 @@ def sea_surface_salinity_multipane(
     plot_type = '2_pane',
     start_year = 1970,
     end_year = 2014,
-    obs_key='DW1970'
+    obs_key='DW1970',
+    annual_mean=False,
     ):
     """
     Plot the multipane sea surface salinity plot.
@@ -4617,7 +4699,7 @@ def sea_surface_salinity_multipane(
                 print('cant find:', ref_file)
                 assert 0
 
-        fig, axes[subplot], qplots[subplot] = sea_surface_salinity_plot(
+        fig, axes[subplot], qplots[subplot], nspace = sea_surface_salinity_plot(
                 cfg,
                 fn,
                 'so',
@@ -4629,6 +4711,7 @@ def sea_surface_salinity_multipane(
                 obs_key=obs_key,
                 ref_file=ref_file,
                 ref_file_2 = ref_file_2,
+                annual_mean = annual_mean,
            )
 
     if plot_type == '2_pane':
@@ -4650,27 +4733,33 @@ def sea_surface_salinity_multipane(
         fig.colorbar(qplots[212], ax=[axes[212], ], location='right',label='Error in PSU') #, ticks=cbar_ticks)
 
     if plot_type == 'trends_only':
-        fig.suptitle('Observed and modelled near surface salinity trends', y=0.93, fontweight='bold')
+        fig.suptitle('Observed and modelled near-surface salinity trends', y=0.93, fontweight='bold')
         # cbar_ticks = np.linspace(-10., 10., 11, )
         # cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label='mPSS-78 yr'+r'$^{-1}$', ticks=cbar_ticks)
         #cbar.remove()
 #       plt.tight_layout()
         #plt.draw()
         #cbar = fig.colorbar(qplots[212], ax=[axes[211],axes[212] ], location='right',label='Near-Surface Salinity trends, mPSS-78/yr', ticks=cbar_ticks)
+        cbar_ticks = nspace
+        if annual_mean == 'annual':
+            #cbar_ticks = np.linspace(-10., 10., 11, )
+            #cbar_label = 'mPSS-78 yr'+r'$^{-1}$'
+            cbar_label = 'mg kg'+r'$^{-1}$'+' yr'+r'$^{-1}$'
+        elif annual_mean == 'decadal':
+            #cbar_ticks = np.linspace(-0.1, 0.1, 11, ) *5.
+            cbar_label = 'PSS-78 decade'+r'$^{-1}$'
 
-        cbar_ticks = np.linspace(-10., 10., 11, )
-        #cbar_label = 'mPSS-78 yr'+r'$^{-1}$'
-        cbar_label = 'mg kg'+r'$^{-1}$'+' yr'+r'$^{-1}$'
-
-        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label=cbar_label, ticks=cbar_ticks,pad=0.05, shrink=0.65)
+        else:
+            #cbar_ticks = np.linspace(-0.1, 0.1, 11, ) *5.
+            cbar_label = 'PSS-78' # yr'+r'$^{-1}$'
+        cbar = fig.colorbar(qplots[211], ax=[axes[211],axes[212] ], location='bottom',label=cbar_label, ticks=cbar_ticks,pad=0.05, shrink=0.775)
 
         axleg = plt.axes([0.05, 0.14, 0.9, 0.02])
 #        plt.tight_layout()
 
         axleg.axis('off')
-
-        #contour_label = 'Near surface climatogical salinity, PSS-78'
-        contour_label = 'Near surface climatogical salinity, g kg'+r'$^{-1}$'
+        contour_label = 'Near-surface climatological mean salinity, PSS-78'
+            #contour_label = 'Near surface climatogical salinity, g kg'+r'$^{-1}$'
 
         axleg.plot([], [], c='black', lw=1.5,ls='-',label=contour_label)
 
@@ -4687,7 +4776,7 @@ def sea_surface_salinity_multipane(
         legd.draw_frame(False)
         legd.get_frame().set_alpha(0.)
 
-    unique_id = ['salinity', plot_type, time_range_str, obs_key]
+    unique_id = ['salinity', plot_type, time_range_str, obs_key, annual_mean]
     filename = '_'.join(unique_id).replace('/', '_')
     path = diagtools.folder([cfg['plot_dir'], 'sea_surface_salinity_plot']) + filename
     path = path.replace(' ', '') + diagtools.get_image_format(cfg)
@@ -5010,7 +5099,7 @@ def calc_pi_trend(cfg, metadatas, filename, method='linear regression', overwrit
         plt.title('Slopes')
 
         fig.add_subplot(212)
-        plt.hist(list(intercepts.values()), bins=15, color='blue')
+        plt.hist(list(intercepts.values()), bins=1111115, color='blue')
         plt.title('Intercepts')
 
         path = diagtools.folder([cfg['plot_dir'], 'pi_trend'])
@@ -5113,9 +5202,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SS = 0#True  #True
-    do_SLR = 0 # e  #False
-    do_OHC = True #False #True  #True
+    do_SS = 0 # True  #True
+    do_SLR = True#  #False
+    do_OHC = 0 # True #False #True  #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -5191,7 +5280,8 @@ def main(cfg):
         #    ref_file=ss_files[1950]
         #)
         plot_types = ['trends_only',] # '2_pane', '4_pane', 'CMIP_only']
-        for plot_type,start_year in itertools.product(plot_types, [1950, 1970]):
+        annual_means = ['total', 'annual', 'decadal',]
+        for plot_type,start_year, annual_mean in itertools.product(plot_types, [1950, 1970], annual_means):
             if start_year == 1950:
                 obs_key='DW1950'
             if start_year == 1970:
@@ -5203,6 +5293,7 @@ def main(cfg):
                 start_year = start_year,
                 end_year = 2014,
                 obs_key=obs_key,
+                annual_mean=annual_mean,
             )
     if do_SLR == do_OHC == False:
         return
@@ -5620,6 +5711,8 @@ def main(cfg):
     multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=[1995.,2014.])
 
     multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=1971.)
+
+    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='10-90', show_UKESM=False, relative_to=[1995.,2014.])
 
     #multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
 
