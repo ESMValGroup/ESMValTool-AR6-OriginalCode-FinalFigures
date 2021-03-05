@@ -5,6 +5,8 @@ import os
 import xarray as xr
 from pprint import pformat
 from scipy.stats import t
+import esmvaltool.diag_scripts.shared.plot as eplot
+
 
 import numpy
 import detatt_mk as da
@@ -29,50 +31,11 @@ def attrib_warming(beta,betaCI,dec_warming,ci90_dec_warming,ci90_beta_obs=0.):
   return (attrib_warming,numpy.sort(attrib_range))
 
 
-def merge_noaa(auxiliary_data_dir,work_dir):
-#Merge NOAAGlobalTemp with HadCRUT4 over the period 1850-1879, since NOAAGlobalTemp starts in 1880. Note that climatology period for HadCRUT4 is 1961-1990 whereas NOAAGlobalTemp is 1971-2000.
-  hadcrut4=xr.open_dataset(auxiliary_data_dir+'/HadCRUT.4.6.0.0.median.nc')
-  noaa=xr.open_dataset(auxiliary_data_dir+'/NOAAGlobalTemp_v5.0.0_gridded_s188001_e202002_c20200308T133325.nc')
-  noaa=noaa.rename({'lon': 'longitude','lat': 'latitude','anom': 'temperature_anomaly'})
-  noaa=noaa.squeeze(drop=True)
-#Reorder longitudes to match HadCRUT4.
-  index=numpy.arange(-36,36,1)
-  index[0:36]=index[0:36]+72
-  noaa.temperature_anomaly.values=noaa.temperature_anomaly.values[:,:,index]
-  noaa.longitude.values=hadcrut4.longitude.values
-  noaa=noaa.interp_like(hadcrut4) #Done purely to change start time to 1850.
-  #Rebase HadCRUT4 relative to 1971-2000.
-  had4_base=hadcrut4.temperature_anomaly.values[(1971-1850)*12:(2001-1850)*12,:,:]
-  for m in range(12):
-    norm = numpy.nanmean(had4_base[m::12,:,:],axis=0)
-    hadcrut4.temperature_anomaly.values[m::12,:,:] = hadcrut4.temperature_anomaly.values[m::12,:,:] - norm
-  #Concatenate HadCRUT4 1850-1879 and NOAA 1880 onwards.
-  noaa.temperature_anomaly.values[0:(1880-1850)*12,:,:]=hadcrut4.temperature_anomaly.values[0:(1880-1850)*12,:,:]
-  noaa=noaa.fillna(-1.0e30)
-  #Write out to new file with xarray.
-  noaa.to_netcdf(work_dir+'/NOAA_merged.nc')
-  return()
 
-
-def merge_giss(auxiliary_data_dir,work_dir):
-#Merge GISSTemp with HadCRUT4 over the period 1850-1879, since GISSTemp starts in 1880.
-  hadcrut4=xr.open_dataset(auxiliary_data_dir+'/HadCRUT.4.6.0.0.median.nc')
-  giss=xr.open_dataset(auxiliary_data_dir+'/gistemp1200_GHCNv4_ERSSTv5.nc')
-  giss=giss.rename({'lon': 'longitude','lat': 'latitude','tempanomaly': 'temperature_anomaly'})
-  giss=giss.interp_like(hadcrut4)
-  #Rebase HadCRUT4 relative to 1951-1980.
-  had4_base=hadcrut4.temperature_anomaly.values[(1951-1850)*12:(1981-1850)*12,:,:]
-  for m in range(12):
-    norm = numpy.nanmean(had4_base[m::12,:,:],axis=0)
-    hadcrut4.temperature_anomaly.values[m::12,:,:] = hadcrut4.temperature_anomaly.values[m::12,:,:] - norm
-  #Concatenate HadCRUT4 1850-1879 and GISSTemp 1880 onwards.
-  giss.temperature_anomaly.values[0:(1880-1850)*12,:,:]=hadcrut4.temperature_anomaly.values[0:(1880-1850)*12,:,:]
-  giss=giss.fillna(-1.0e30)
-  #Write out to new file with xarray.
-  giss.to_netcdf(work_dir+'/GISS_merged.nc')
-  return()
   
 def main(cfg):
+    st_file = eplot.get_path_to_mpl_style(cfg.get('mpl_style'))
+    plt.style.use(st_file)
     plt.ioff() #Turn off interactive plotting.
     font = {'size'   : 5}
     matplotlib.rc('font', **font)
@@ -120,7 +83,7 @@ def main(cfg):
     shade_cols=numpy.array([[128,128,128,128],[204,174,113,128],[191,191,191,128],[67,147,195,128],[223,237,195,128],[255,150,150,128],[150,255,150,128],[150,150,255,128],[91,174,178,128]])/256.
     if exp_flag=='GHG':
       experiments=['historical-ssp245','hist-nat','hist-GHG','hist-aer','hist-CO2','hist-stratO3','hist-volc','hist-sol','hist-nat-ssp245-nat','hist-GHG-ssp245-GHG','hist-aer-ssp245-aer']
-      label=['OTH','NAT','GHG']
+      label=['Aerosols','Natural forcings','Greenhouse gases']
       cols=colors[[3,4,2],:]
     else:
       label=['GHG','NAT','AER']
@@ -139,6 +102,7 @@ def main(cfg):
     nens_max=100
     mean_diag=numpy.zeros((ldiag,nexp,nmodel))
     mean_dec_warming=numpy.zeros((nexp,nmodel))
+    mean_ann_trend=numpy.zeros((nexp,nmodel))
     ci90_dec_warming=numpy.zeros((nexp,nmodel))
     anom=numpy.zeros((ldiag,anom_max))
     anom_mod=numpy.zeros((anom_max))
@@ -167,6 +131,7 @@ def main(cfg):
             ens_sizes[experiment,mm]=nens
             exp_diags=numpy.zeros((ldiag,nens))
             exp_dec_warming=numpy.zeros(nens)
+            exp_ann_trend=numpy.zeros(nens)
         
             for ee, ensemble in enumerate(grouped_exp_input_data):
                 logger.info("** Processing ensemble %s", ensemble)
@@ -176,14 +141,22 @@ def main(cfg):
                     files.append(attributes['filename'])
                 logger.info("*************** Files for blend and mask %s", files)
                 dec_warming=[]
+                ann_warming=[]
                 obs_dec_warming=[]
                 #Calculate the diagnostic used for attribution from an individual simulation.
-                (exp_diags[:,ee],had4_diag)=ncbm.ncblendmask_esmval('max', files[0],files[1],files[2],sftlf_file,obs_file,dec_warming,obs_dec_warming,0,0,diag_name,obs,ensobs,ensobs_diag,ensobs_dec_warming)
+                (exp_diags[:,ee],had4_diag)=ncbm.ncblendmask_esmval('max', files[0],files[1],files[2],sftlf_file,obs_file,dec_warming,obs_dec_warming,ann_warming,0,diag_name,obs,ensobs,ensobs_diag,ensobs_dec_warming)
                 ensobs='' #Set to empty string so that ensemble obs diagnostics are only calculated on the first iteration.
                 exp_dec_warming[ee]=dec_warming[0]
-            #Average diagnostic and warming in 2010-2019 vs 1850-1899 GSAT over ensemble members.
+                tt=[1,2,3,4,5,6,7,8,9,10]
+                print ("Linear trend numbers",tt,ann_warming[0][2010-1850:2020-1850])
+                coef=numpy.polyfit(tt,ann_warming[0][2010-1850:2020-1850],1)
+                print ("Linear trend numbers",coef)
+                exp_ann_trend[ee]=coef[0]
+                #Average diagnostic and warming in 2010-2019 vs 1850-1899 GSAT over ensemble members.
             mean_diag[:,experiment,mm]=numpy.mean(exp_diags,axis=1)
             mean_dec_warming[experiment,mm]=numpy.mean(exp_dec_warming)
+            mean_ann_trend[experiment,mm]=numpy.mean(exp_ann_trend)
+           
             if nens==1:
                 ci90_dec_warming[experiment,mm]=ci90_dec_warming[numpy.nonzero(ci90_dec_warming*(ens_sizes**0.5))].mean() #use mean of CIs already calculated, corrected for ensemble size if ensemble size is 1.
             else:        
@@ -251,6 +224,7 @@ def main(cfg):
       plt.figure(0,figsize=[180*mm_conv,180*mm_conv]) 
     else:
       plt.figure(0,figsize=[180*mm_conv,120*mm_conv]) 
+    plt.title("Model-by-model regression coefficients and attributable warming estimates")
 
     #Main attribution analysis.      
     att_out={}
@@ -294,12 +268,11 @@ def main(cfg):
             if att_out[dataset]['betaCI'][pat,1]<att_out[dataset]['beta'][pat]:
                 att_out[dataset]['betaCI'][pat,1]=1000.
                 
-                
         if mm_attrib == 0:
-            ant='ANT'
-            nat='NAT'
-            ghg=exp_flag #Set to GHG or AER.
-            oth='OTH'
+            ant='Anthropogenic'
+            nat='Natural'
+            ghg='Greenhouse gases'
+            oth='Other anthropogenic'
         else:
             ant=None
             nat=None
@@ -376,6 +349,9 @@ def main(cfg):
     att_out[dataset]=da.tls(xr[:,0:2],yr,cn1,ne=neff[[0,1]],cn2=cn2,flag_2S=1,RCT_flag=rcplot)
     att_out3[dataset]=da.tls(xr[:,0:3],yr,cn1,ne=neff[[0,1,2]],cn2=cn2,flag_3S=1,RCT_flag=rcplot)
     multim_mean_dec_warming=numpy.mean(mean_dec_warming[:,model_indices],axis=1)
+    multim_mean_ann_trend=numpy.mean(mean_ann_trend[:,model_indices],axis=1)
+    print ('mean_ann_trend[0,:] (historical)', mean_ann_trend[0,:])
+    print ('mean_ann_trend[1,:] (hist-nat)', mean_ann_trend[1,:])
 #Compute uncertainty in attributable warming based on spread in ratio of GSAT to GMST warming across models.
     if diag_name[0:4]=='hemi':
       nlat=2
@@ -385,6 +361,8 @@ def main(cfg):
     multim_mean_dec_warming_gmst=numpy.mean(mean_dec_warming_gmst[:,model_indices],axis=1)
     #Define uncertainty in multi-model mean warming to 2010-2019 based on spread in ratio of GSAT to GMST increase across models.
     multim_ci90_dec_warming=numpy.std(mean_dec_warming/mean_dec_warming_gmst,ddof=1,axis=1)*t.ppf(0.95,nmodel-1)*numpy.mean(mean_dec_warming_gmst,axis=1)
+    #Similar calculation for ratio of GSAT trend to GMST increase.
+    multim_ci90_ann_trend=numpy.std(mean_ann_trend/mean_dec_warming_gmst,ddof=1,axis=1)*t.ppf(0.95,nmodel-1)*numpy.mean(mean_ann_trend,axis=1)
 
     if pool_int_var: #Only plot multi model results if pooling internal var.
 
@@ -459,6 +437,15 @@ def main(cfg):
       [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][0],att_out3[dataset]['betaCI'][0,:],multim_mean_dec_warming_gmst[0]-multim_mean_dec_warming_gmst[1]-multim_mean_dec_warming_gmst[2],0.,ci90_beta_obs3[0])
       print ('OTH:',att_warming_range)
         
+
+#Attributable warming ranges for 2010-2019 trends.
+      print ('Two-way attributable warming - 2010-2019 trends')
+      print ('multim_mean_ann_trend',multim_mean_ann_trend)
+      print ('Trend terms',att_out[dataset]['beta'][0],att_out[dataset]['betaCI'][0,:],multim_mean_ann_trend[0]-multim_mean_ann_trend[1],(multim_ci90_ann_trend[0]**2+multim_ci90_ann_trend[1]**2)**0.5,ci90_beta_obs2[0])
+      [att_warming,att_warming_range]=attrib_warming(att_out[dataset]['beta'][0],att_out[dataset]['betaCI'][0,:],multim_mean_ann_trend[0]-multim_mean_ann_trend[1],(multim_ci90_ann_trend[0]**2+multim_ci90_ann_trend[1]**2)**0.5,ci90_beta_obs2[0])
+      print ('ANT:',att_warming,att_warming_range)
+      [att_warming,att_warming_range]=attrib_warming(att_out[dataset]['beta'][1],att_out[dataset]['betaCI'][1,:],multim_mean_ann_trend[1],multim_ci90_ann_trend[1],ci90_beta_obs2[1])
+      print ('NAT:',att_warming,att_warming_range)
       
     nmodel_attrib=mm_attrib
       
@@ -473,16 +460,17 @@ def main(cfg):
 
     for ff in [topleft,topright]:
         plt.subplot(ff)
-        plt.plot([0,nmodel_attrib+2],[1,1],color='black',linewidth=1,ls=':')
+        plt.plot([0,nmodel_attrib+2],[1,1],color='black',linewidth=0.5,ls=':',zorder=-1)
         if ff == topleft: plt.ylabel('Regression coefficients')#,size='x-small')
-        plt.plot([0,nmodel_attrib+2],[0,0],color='black',linewidth=1,ls='--')
+        plt.plot([0,nmodel_attrib+2],[0,0],color='black',linewidth=0.5,ls='--',zorder=-1)
         if pool_int_var:
           plt.axis([0,nmodel_attrib+2,-1,3])
           plt.xticks(list(range(1,nmodel_attrib+2)),[''])
         else:
           plt.axis([0,nmodel_attrib+1,-1,3])
           plt.xticks(list(range(1,nmodel_attrib+1)),[''])
-        plt.legend(loc="upper left")
+        plt.minorticks_off()
+        plt.legend(loc="upper left",frameon=False)
         plt.text (-2.5,3.5,panel_labels[panel_counter],fontsize =7,fontweight='bold', va='center', ha='center')
         panel_counter=panel_counter+1
 
@@ -506,19 +494,20 @@ def main(cfg):
       
     for ff in [bottomleft,bottomright]:
         plt.subplot(ff)
-        plt.plot([0,nmodel_attrib+2],[obs_warming,obs_warming],color='black',linewidth=1,label='Had4 GSAT')
+        obs_line,=plt.plot([0,nmodel_attrib+2],[obs_warming,obs_warming],color='black',linewidth=1,label='Observations',zorder=-1)
         if ff == bottomleft: plt.ylabel('Attributable change 2010-2019 vs 1850-1900 ($^\circ$C)')#,size='x-small') 
-        plt.plot([0,nmodel_attrib+2],[0,0],color='black',linewidth=1,ls='--')
+        plt.plot([0,nmodel_attrib+2],[0,0],color='black',linewidth=0.5,ls='--',zorder=-1)
         if pool_int_var:
           plt.axis([0,nmodel_attrib+2,-2,3])
           plt.xticks(list(range(1,nmodel_attrib+2)),model_names,rotation=30.,ha="right")
         else:
           plt.axis([0,nmodel_attrib+1,-2,3])
           plt.xticks(list(range(1,nmodel_attrib+1)),model_names[0:nmodel_attrib],rotation=30.,ha="right")
+        plt.legend(handles=[obs_line],loc="upper left",frameon=False)
 
+        plt.minorticks_off()
         plt.text (-2,3.3,panel_labels[panel_counter],fontsize =7,fontweight='bold', va='center', ha='center')
         panel_counter=panel_counter+1
-
 
     pool_flag='' if pool_int_var else '_not_pooled'
     uncert_flag='__simple_uncert' if simple_uncert else ''
