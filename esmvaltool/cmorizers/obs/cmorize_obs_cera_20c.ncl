@@ -23,6 +23,7 @@
 ;   v10.1901-2010.ens{0-9}.nc
 ;
 ; Modification history
+;    20201012-yu_kosaka: bug fix.
 ;    20201007-yu_kosaka: added ua and va.
 ;    20200930-yu_kosaka: written based on cmorize_obs_era_20c.ncl.
 ;
@@ -193,7 +194,7 @@ begin
                    MIP(vv), VAR(vv), DATESTR/), "_") + ".nc"
 
       ; Add height coordinate to tas variable (required by the new backend)
-      if (VAR(vv).eq."tas") then
+      if (any(VAR(vv).eq.(/"tas", "uas", "vas"/))) then
         output@coordinates = "height"
       end if
 
