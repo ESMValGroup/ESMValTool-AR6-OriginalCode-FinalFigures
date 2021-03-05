@@ -9,14 +9,15 @@
 ;    https://www.esrl.noaa.gov/psd/data/gridded/data.cmap.html
 ;
 ; Last access
-;    2019/10/11
+;    2020/05/13
 ;
 ; Download and processing instructions
 ;    Download "precip.mon.mean.nc" of Standard Monthly
 ;
 ; Modification history
-;    20190226 kosaka_yu: written
+;    20200513 kosaka_yu: updated data
 ;    20191011 kosaka_yu: updated for ESMValTool 2.0.0b2
+;    20190226 kosaka_yu: written
 ;
 ; ############################################################################
 loadscript(getenv("esmvaltool_root") + \
@@ -36,7 +37,7 @@ begin
 
   ; Period
   YEAR1 = 1979
-  YEAR2 = 2018
+  YEAR2 = 2019
 
   ; MIPS
   MIPS = (/"Amon"/)
@@ -51,8 +52,10 @@ begin
   NAME = (/"precip"/)
 
   ; CMOR table
-  CMOR_TABLE = getenv("esmvaltool_root") + \
-    "/cmor/tables/cmip5/Tables/CMIP5_" + MIPS
+;  CMOR_TABLE = getenv("esmvaltool_root") + \
+;    "/cmor/tables/cmip5/Tables/CMIP5_" + MIPS
+  CMOR_TABLE = getenv("cmor_tables") + \
+    "/cmip5/Tables/CMIP5_" + MIPS
 
 end
 
@@ -99,7 +102,7 @@ begin
       +"doi:10.1175/1520-0477(1997)078<2539:GPAYMA>2.0.CO;2, 1997", "")
 
     ; Outfile
-    fout = output_dir_path + "OBS_" + OBSNAME + "_L3_V1902_" + MIPS(vID) + \  ;; L3 correct?
+    fout = output_dir_path + "OBS_" + OBSNAME + "_L3_V2005_" + MIPS(vID) + \  ;; L3 correct?
       "_" + VARS(vID) + "_" + YEAR1 + "01-" + YEAR2 + "12.nc"
 
     ; Write variable
