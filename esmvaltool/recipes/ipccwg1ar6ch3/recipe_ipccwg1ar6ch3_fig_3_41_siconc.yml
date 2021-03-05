@@ -38,55 +38,56 @@ diagnostics:
         start_year: 1950
         end_year: 2014
         additional_datasets: &siconc_datasets
-          - {dataset: ACCESS-CM2, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: ACCESS-ESM1-5, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
           #- {dataset: BCC-ESM1, ensemble: r2i1p1f1, grid: gn} #no areacello
           #- {dataset: BCC-CSM2-MR, grid: gn} #no areacello
           #- {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn} #no areacello
           #- {dataset: CanESM5, grid: gn} #in sie_sh, areacello not conformal
-          - {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
           #- {dataset: CESM2, grid: gn} #in sie_sh, areacello not conformal
-          - {dataset: CESM2-FV2, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
           #- {dataset: CESM2-WACCM, ensemble: r2i1p1f1, grid: gn} #no areacello
-          - {dataset: CESM2-WACCM-FV2, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn}
           #- {dataset: CIESM, ensemble: r2i1p1f1, grid: gn} #preprocessor fails
           #- {dataset: CMCC-CM2-HR4, grid: gn} #in sie_sh, areacello not conformal
           #- {dataset: CMCC-CM2-SR5, grid: gn} #in sie_sh, areacello not conformal
-          #- {dataset: CMCC-ESM2, grid: gn}
-          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gn}
-          #- {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2} #rejected
-          - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2, grid: gn}
+          #- {dataset: CMCC-ESM2, grid: gn} #no areacello
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gn}
           #- {dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr} #no areacello
           #- {dataset: EC-Earth3, grid: gn} #concatinate error
-          #- {dataset: EC-Earth3-AerChem, grid: gn}
-          #- {dataset: EC-Earth3-CC, grid: gn}
-          #- {dataset: EC-Earth3-Veg, grid: gn} #concatinate error
-          #- {dataset: EC-Earth3-Veg-LR, ensemble: r2i1p1f1, grid: gn} #no areacello
-          #- {dataset: FGOALS-f3-L, ensemble: r2i1p1f1, grid: gn} #no areacello
+          #- {dataset: EC-Earth3-AerChem, grid: gn} #no areacello
+          #- {dataset: EC-Earth3-CC, grid: gn} ##no areacello
+          - {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1, grid: gn} #concatinate error
+          #- {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gn} #no areacello
+          #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gn} #preprocessor fails
           #- {dataset: FGOALS-g3, grid: gn} #strange areacello
-          - {dataset: FIO-ESM-2-0, ensemble: r2i1p1f1, grid: gn}
-          #- {dataset: GFDL-CM4, grid: gn} # no areacello 
-          #- {dataset: GFDL-ESM4, ensemble: r3i1p1f1, grid: gn} #no areacello
+          - {dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+          #- {dataset: GFDL-CM4, grid: gn} # preprocessor fails
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gn} #no areacello
           #- {dataset: GISS-E2-1-H, ensemble: r1i1p1f2, grid: gr} #no areacello
           #- {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn} #no areacello
           #- {dataset: HadGEM3-GC31-MM, ensemble: r2i1p1f3, grid: gn} #no areacello
           #- {dataset: INM-CM4-8, grid: gr1} # no areacello 
           #- {dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1} #no areacello
           #- {dataset: IPSL-CM5A2-INCA, grid: gn} #rejected
-          #- {dataset: IPSL-CM6A-LR, ensemble: r13i1p1f1, grid: gn}
+          #- {dataset: IPSL-CM6A-LR, ensemble: r13i1p1f1, grid: gn} #error areacello
           #- {dataset: KIOST-ESM, grid: gn}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r2i1p1f2, grid: gn}
-          - {dataset: MPI-ESM-1-2-HAM, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1, grid: gn} 
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn} 
           #- {dataset: NESM3, ensemble: r2i1p1f1, grid: gn} #no areacello
-          - {dataset: NorCPM1, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: NorCPM1, ensemble: r10i1p1f1, grid: gn}
           #- {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn} #in sie_sh, areacello not conformal
           #- {dataset: NorESM2-MM, ensemble: r2i1p1f1, grid: gn} #in sie_sh, areacello not conformal
           #- {dataset: NorESM2-MM, grid: gn} #Failed to run concatenate
-          #- {dataset: TaiESM1, grid: gn} #no data
+          #- {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn} #preprocessor fails
+          #- {dataset: TaiESM1, grid: gn} #no areacello
           #- {dataset: UKESM1-0-LL, ensemble: r2i1p1f2, grid: gn} #no areacello
           - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
       areacello:
@@ -96,106 +97,57 @@ diagnostics:
         ensemble: r1i1p1f1
         additional_datasets:
           #<<: *siconc_datasets
-          - {dataset: ACCESS-CM2, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: ACCESS-ESM1-5, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
           #- {dataset: BCC-ESM1, ensemble: r2i1p1f1, grid: gn} #no areacello
           #- {dataset: BCC-CSM2-MR, grid: gn} #no areacello
           #- {dataset: CAMS-CSM1-0, ensemble: r2i1p1f1, grid: gn} #no areacello
           #- {dataset: CanESM5, grid: gn} #in sie_sh, areacello not conformal
-          - {dataset: CanESM5-CanOE, ensemble: r2i1p2f1, grid: gn}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
           #- {dataset: CESM2, grid: gn} #in sie_sh, areacello not conformal
-          - {dataset: CESM2-FV2, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
           #- {dataset: CESM2-WACCM, ensemble: r2i1p1f1, grid: gn} #no areacello
-          - {dataset: CESM2-WACCM-FV2, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn}
           #- {dataset: CIESM, ensemble: r2i1p1f1, grid: gn} #preprocessor fails
           #- {dataset: CMCC-CM2-HR4, grid: gn} #in sie_sh, areacello not conformal
           #- {dataset: CMCC-CM2-SR5, grid: gn} #in sie_sh, areacello not conformal
-          #- {dataset: CMCC-ESM2, grid: gn}
-          - {dataset: CNRM-CM6-1, ensemble: r2i1p1f2, grid: gn}
-          #- {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2} #rejected
-          - {dataset: CNRM-ESM2-1, ensemble: r2i1p1f2, grid: gn}
+          #- {dataset: CMCC-ESM2, grid: gn} #no areacello
+          - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
+          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gn}
           #- {dataset: E3SM-1-0, ensemble: r2i1p1f1, grid: gr} #no areacello
           #- {dataset: EC-Earth3, grid: gn} #concatinate error
-          #- {dataset: EC-Earth3-AerChem, grid: gn}
-          #- {dataset: EC-Earth3-CC, grid: gn}
-          #- {dataset: EC-Earth3-Veg, grid: gn} #concatinate error
-          #- {dataset: EC-Earth3-Veg-LR, ensemble: r2i1p1f1, grid: gn} #no areacello
-          #- {dataset: FGOALS-f3-L, ensemble: r2i1p1f1, grid: gn} #no areacello
+          #- {dataset: EC-Earth3-AerChem, grid: gn} #no areacello
+          #- {dataset: EC-Earth3-CC, grid: gn} ##no areacello
+          - {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1, grid: gn} #concatinate error
+          #- {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gn} #no areacello
+          #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gn} #preprocessor fails
           #- {dataset: FGOALS-g3, grid: gn} #strange areacello
-          - {dataset: FIO-ESM-2-0, ensemble: r2i1p1f1, grid: gn}
-          #- {dataset: GFDL-CM4, grid: gn} # no areacello 
-          #- {dataset: GFDL-ESM4, ensemble: r3i1p1f1, grid: gn} #no areacello
+          - {dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+          #- {dataset: GFDL-CM4, grid: gn} # preprocessor fails
+          - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gn} #no areacello
           #- {dataset: GISS-E2-1-H, ensemble: r1i1p1f2, grid: gr} #no areacello
           #- {dataset: HadGEM3-GC31-LL, ensemble: r3i1p1f3, grid: gn} #no areacello
           #- {dataset: HadGEM3-GC31-MM, ensemble: r2i1p1f3, grid: gn} #no areacello
           #- {dataset: INM-CM4-8, grid: gr1} # no areacello 
           #- {dataset: INM-CM5-0, ensemble: r2i1p1f1, grid: gr1} #no areacello
           #- {dataset: IPSL-CM5A2-INCA, grid: gn} #rejected
-          #- {dataset: IPSL-CM6A-LR, ensemble: r13i1p1f1, grid: gn}
+          #- {dataset: IPSL-CM6A-LR, ensemble: r13i1p1f1, grid: gn} #error areacello
           #- {dataset: KIOST-ESM, grid: gn}
-          - {dataset: MIROC6, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r2i1p1f2, grid: gn}
-          - {dataset: MPI-ESM-1-2-HAM, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MPI-ESM1-2-HR, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MPI-ESM1-2-LR, ensemble: r2i1p1f1, grid: gn}
-          - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1, grid: gn} 
+          - {dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn} 
           #- {dataset: NESM3, ensemble: r2i1p1f1, grid: gn} #no areacello
-          - {dataset: NorCPM1, ensemble: r2i1p1f1, grid: gn}
+          - {dataset: NorCPM1, ensemble: r10i1p1f1, grid: gn}
           #- {dataset: NorESM2-LM, ensemble: r2i1p1f1, grid: gn} #in sie_sh, areacello not conformal
           #- {dataset: NorESM2-MM, ensemble: r2i1p1f1, grid: gn} #in sie_sh, areacello not conformal
           #- {dataset: NorESM2-MM, grid: gn} #Failed to run concatenate
-          #- {dataset: TaiESM1, grid: gn} #no data
+          #- {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn} #preprocessor fails
+          #- {dataset: TaiESM1, grid: gn} #no areacello
           #- {dataset: UKESM1-0-LL, ensemble: r2i1p1f2, grid: gn} #no areacello
-          #
-          #- {dataset: ACCESS-CM2, grid: gn}
-          #- {dataset: ACCESS-ESM1-5, grid: gn}
-          ##- {dataset: CanESM5, grid: gn} in sie_sh, areacello not conformal
-          ##- {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1} #rejected
-          ##- {dataset: CESM2, grid: gr} #in sie_sh, areacello not conformal
-          #- {dataset: CESM2-FV2, grid: gn}
-          ##- {dataset: CESM2-WACCM-FV2, grid: gn} #rejected
-          ##- {dataset: CMCC-CM2-HR4, grid: gn} #in sie_sh, areacello not conformal
-          ##- {dataset: CMCC-CM2-SR5, grid: gn} #in sie_sh, areacello not conformal
-          #- {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
-          #- {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
-          #- {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
-          ##- {dataset: EC-Earth3, grid: gn, ensemble: r4i1p1f1} #concatinate error
-          ##- {dataset: EC-Earth3-Veg, grid: gn, ensemble: r4i1p1f1} #concatinate error
-          ##- {dataset: FGOALS-f3-L, grid: gn}
-          ##- {dataset: FGOALS-g3, grid: gn} #strange areacello
-          #- {dataset: FIO-ESM-2-0, grid: gn}
-          ##- {dataset: GFDL-CM4, grid: gn}
-          ##- {dataset: GFDL-ESM4, grid: gn} #rejected
-          ##- {dataset: IPSL-CM6A-LR, grid: gn, ensemble: r13i1p1f1}
-          #- {dataset: MIROC6, grid: gn}
-          #- {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
-          #- {dataset: MPI-ESM-1-2-HAM, grid: gn}
-          ##- {dataset: MPI-ESM1-2-HR, grid: gn} #rejected
-          #- {dataset: MPI-ESM1-2-LR, grid: gn}
-          ##- {dataset: MRI-ESM2-0, grid: gn} #rejected
-          #- {dataset: NorCPM1, grid: gn, institute: NCC}
-          ##- {dataset: NorESM2-MM, grid: gn} #Failed to run concatenate
-      #siconca:
-      #  <<: *var_def
-      #  additional_datasets:
-      #    - {dataset: CAMS-CSM1-0, grid: gn}
-      #    - {dataset: CESM2, grid: gn}
-      #    - {dataset: CESM2-WACCM, grid: gn, institute: NCAR}
-      #    - {dataset: CNRM-CM6-1, grid: gn, ensemble: r1i1p1f2}
-      #    - {dataset: CNRM-CM6-1-HR, grid: gn, ensemble: r1i1p1f2}
-      #    - {dataset: CNRM-ESM2-1, grid: gn, ensemble: r1i1p1f2}
-      #    - {dataset: EC-Earth3, grid: gn, ensemble: r22i1p1f1}
-      #    - {dataset: EC-Earth3-Veg, grid: gn}
-      #    - {dataset: GISS-E2-1-G, grid: gr}
-      #    - {dataset: GISS-E2-1-G-CC, grid: gr}
-      #    - {dataset: GISS-E2-1-H, grid: gr}
-      #    - {dataset: MPI-ESM-1-2-HAM, grid: gn}
-      #    - {dataset: MPI-ESM1-2-HR, grid: gn}
-      #    - {dataset: MPI-ESM1-2-LR, grid: gn}
-      #    - {dataset: MRI-ESM2-0, grid: gn}
-      #    - {dataset: SAM0-UNICON, grid: gn}
-      #    - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
-      #    - {dataset: HadISST, project: OBS6, type: reanaly, version: 1, tier: 2}
     scripts: &sic_diag
       sie_nh: &sic_nh_settings
         script: seaice/seaice_tsline.ncl

@@ -96,9 +96,9 @@ diagnostics:
       #- {dataset: CESM2-FV2, grid: gn, ensemble: r1i1p1f1, institute: NCAR, project: CMIP6}
       #- {dataset: CESM2-WACCM, grid: gn, ensemble: r1i1p1f1, institute: NCAR, project: CMIP6}
       #- {dataset: CESM2-WACCM-FV2, grid: gn, ensemble: r1i1p1f1, institute: NCAR, project: CMIP6}
-      - { dataset: CMCC-ESM2, grid: gn, ensemble: r1i1p1f1, project: CMIP6 }
+      #- {dataset: CMCC-ESM2, grid: gn, ensemble: r1i1p1f1, project: CMIP6 }
       - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r7i1p1f2, project: CMIP6}
-      - { dataset: EC-Earth3-CC, grid: gr, ensemble: r1i1p1f1, project: CMIP6 }
+      #- {dataset: EC-Earth3-CC, grid: gr, ensemble: r1i1p1f1, project: CMIP6 }
       #- {dataset: GISS-E2-1-G, grid: gn, ensemble: r10i1p1f1}
       #- {dataset: INM-CM4-8, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
       #- {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
@@ -285,10 +285,10 @@ diagnostics:
       - {dataset: NorESM2-MM, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: UKESM1-0-LL, grid: gn, ensemble: r2i1p1f2, project: CMIP6}
 
-      - {dataset: FLUXCOM, project: OBS, type: reanaly,
-         version: ANN-v1, tier: 3}
       - {dataset: MTE, project: OBS, type: reanaly,
          version: May12, tier: 3, start_year: 1982}
+      - {dataset: FLUXCOM, project: OBS, type: reanaly,
+         version: ANN-v1, tier: 3}
     scripts:
       grading:
         <<: *grading_settings
@@ -435,12 +435,12 @@ diagnostics:
       - {dataset: NorESM2-MM, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: UKESM1-0-LL, grid: gn, ensemble: r2i1p1f2, project: CMIP6}
 
+      - {dataset: Landschuetzer2016, project: OBS, type: clim,
+         version: v2016, tier: 2}
       - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1,
          tier: 2, start_year: 1986}
 #      - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly,
 #         version: 2018, tier: 3, start_year: 1985}
-      - {dataset: Landschuetzer2016, project: OBS, type: clim,
-         version: v2016, tier: 2}
     scripts:
       grading:
         <<: *grading_settings
@@ -499,10 +499,10 @@ diagnostics:
       - {dataset: CESM2, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: CESM2-FV2, grid: gn, ensemble: r1i1p1f1, institute: NCAR, project: CMIP6}
       - {dataset: CESM2-WACCM, grid: gn, ensemble: r1i1p1f1, institute: NCAR, project: CMIP6}
-      - { dataset: CMCC-ESM2, grid: gn, ensemble: r1i1p1f1, project: CMIP6 }
+      #- {dataset: CMCC-ESM2, grid: gn, ensemble: r1i1p1f1, project: CMIP6 }
       - {dataset: CESM2-WACCM-FV2, grid: gn, ensemble: r1i1p1f1, institute: NCAR, project: CMIP6}
       - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r7i1p1f2, project: CMIP6}
-      - { dataset: EC-Earth3-CC, grid: gr, ensemble: r1i1p1f1, project: CMIP6 }
+      #- {dataset: EC-Earth3-CC, grid: gr, ensemble: r1i1p1f1, project: CMIP6 }
       #- {dataset: GISS-E2-1-G, grid: gn, ensemble: r10i1p1f1}
       - {dataset: INM-CM4-8, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}
       - {dataset: INM-CM5-0, grid: gr1, ensemble: r1i1p1f1, project: CMIP6}

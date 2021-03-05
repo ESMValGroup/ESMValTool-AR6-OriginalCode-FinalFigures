@@ -18,42 +18,42 @@ documentation:
 
 preprocessors:
 
-  pp850:
+  pp850_1x1:
     extract_levels:
       levels: 85000
       scheme: linear
     regrid:
-      target_grid: reference_dataset
+      target_grid: 1x1
       scheme: linear
     mask_fillvalues:
       threshold_fraction: 0.95
 
-  pp500:
+  pp500_1x1:
     extract_levels:
       levels: 50000
       scheme: linear
     regrid:
-      target_grid: reference_dataset
+      target_grid: 1x1
       scheme: linear
     mask_fillvalues:
       threshold_fraction: 0.95
 
-  pp400:
+  pp400_1x1:
     extract_levels:
       levels: 40000
       scheme: linear
     regrid:
-      target_grid: reference_dataset
+      target_grid: 1x1
       scheme: linear
     mask_fillvalues:
       threshold_fraction: 0.95
 
-  pp200:
+  pp200_1x1:
     extract_levels:
       levels: 19900
       scheme: linear
     regrid:
-      target_grid: reference_dataset
+      target_grid: 1x1
       scheme: linear
     mask_fillvalues:
       threshold_fraction: 0.95
@@ -159,7 +159,6 @@ datasets:
   - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CanESM5, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn, project: CMIP6} # different ensembles
-  #- {dataset: CAS-ESM2-0, institute: CAS, ensemble: r1i1p1f1, grid: gn, project: CMIP6} # rejected
   - {dataset: CESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CESM2-FV2, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
   - {dataset: CESM2-WACCM, institute: NCAR, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
@@ -177,7 +176,7 @@ datasets:
   #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
   #- {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
   #- {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-  #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va, clt
+  - {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va, clt
   - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   - {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
@@ -221,74 +220,80 @@ diagnostics:
   # Perfmetrics of atmosphere vars for CMIP3, CMIP5, CMIP6
   # **********************************************************************
 
-  clt: &perf_diag
+#  clt: &perf_diag
+#    description: Calculate space-time root mean square error
+#    variables:
+#      clt: &perf_var
+#        preprocessor: ppNOLEV1
+#        reference_dataset: ESACCI-CLOUD
+#        alternative_dataset: PATMOS-x
+#        mip: Amon
+#        project: CMIP5
+#        exp: historical
+#        ensemble: r1i1p1
+#        start_year: 1980
+#        end_year: 1999
+#    additional_datasets:
+#      - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
+#      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO} #no hus, zg, ta, ua
+#      - {dataset: CanESM2} #no rsut
+#      - {dataset: CESM1-CAM5-1-FV2} #no va
+#      - {dataset: CMCC-CESM} #no psl
+#      - {dataset: CMCC-CMS} #no rsutcs
+#      - {dataset: EC-EARTH, ensemble: r6i1p1} #no rsut, ts, hus, zg
+#      - {dataset: FGOALS-s2} #no pr, ua, va
+#      - {dataset: GISS-E2-H, ensemble: r1i1p2} #no hus
+#      - {dataset: GISS-E2-H-CC} #no psl
+#      - {dataset: GISS-E2-R, ensemble: r1i1p2} #no hus, zg
+#      - {dataset: GISS-E2-R-CC} #no psl
+#      - {dataset: HadCM3} #no hus
+#      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
+#      - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
+#      - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
+#      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+#      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
+#      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
+#      - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+#      - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+#      - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
+#      - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
+#      - {dataset: ESACCI-CLOUD, project: OBS, type: sat,
+#         version: AVHRR-fv3.0, tier: 2, start_year: 1982}
+#      - {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2, start_year: 1982}
+#
+#    scripts:
+#      grading: &grading_settings
+#        script: perfmetrics/main.ncl
+#        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
+#        plot_type: cycle_latlon
+#        # Time average ('opt' argument of time_operations.ncl)
+#        time_avg: monthlyclim
+#        # Region ('global', 'trop', 'nhext', 'shext')
+#        region: global
+#        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
+#        plot_stddev: ref_model
+#        # Plot legend in a separate file
+#        legend_outside: true
+#        # Plot style
+#        styleset: CMIP5
+#        # Calculate grading
+#        calc_grading: true
+#        # Metric ('RMSD', 'BIAS', taylor')
+#        metric: [RMSD]
+#        # Normalization ('mean', 'median', 'centered_median', 'none')
+#        normalization: [centered_median]
+
+  tas: &perf_diag
     description: Calculate space-time root mean square error
     variables:
-      clt: &perf_var
-        preprocessor: ppNOLEV1
-        reference_dataset: ESACCI-CLOUD
-        alternative_dataset: PATMOS-x
+      tas: &perf_var
+        preprocessor: ppNOLEV1x1 #ppNOLEV1
         mip: Amon
         project: CMIP5
         exp: historical
         ensemble: r1i1p1
         start_year: 1980
         end_year: 1999
-    additional_datasets:
-      - {<<: *cmip3, dataset: bccr_bcm2_0,  institute: BCCR}
-      - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO} #no hus, zg, ta, ua
-      - {dataset: CanESM2} #no rsut
-      - {dataset: CESM1-CAM5-1-FV2} #no va
-      - {dataset: CMCC-CESM} #no psl
-      - {dataset: CMCC-CMS} #no rsutcs
-      - {dataset: EC-EARTH, ensemble: r6i1p1} #no rsut, ts, hus, zg
-      - {dataset: FGOALS-s2} #no pr, ua, va
-      - {dataset: GISS-E2-H, ensemble: r1i1p2} #no hus
-      - {dataset: GISS-E2-H-CC} #no psl
-      - {dataset: GISS-E2-R, ensemble: r1i1p2} #no hus, zg
-      - {dataset: GISS-E2-R-CC} #no psl
-      - {dataset: HadCM3} #no hus
-      - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-      - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
-      - {dataset: E3SM-1-1, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #va850 strange
-      - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
-      - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
-      - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
-      - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
-      - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
-      - {dataset: ESACCI-CLOUD, project: OBS, type: sat,
-         version: AVHRR-fv3.0, tier: 2, start_year: 1982}
-      - {dataset: PATMOS-x, project: OBS, type: sat, version: NOAA, tier: 2, start_year: 1982}
-
-    scripts:
-      grading: &grading_settings
-        script: perfmetrics/main.ncl
-        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-        plot_type: cycle_latlon
-        # Time average ('opt' argument of time_operations.ncl)
-        time_avg: monthlyclim
-        # Region ('global', 'trop', 'nhext', 'shext')
-        region: global
-        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
-        plot_stddev: ref_model
-        # Plot legend in a separate file
-        legend_outside: true
-        # Plot style
-        styleset: CMIP5
-        # Calculate grading
-        calc_grading: true
-        # Metric ('RMSD', 'BIAS', taylor')
-        metric: [RMSD]
-        # Normalization ('mean', 'median', 'centered_median', 'none')
-        normalization: [centered_median]
-
-  tas:
-    <<: *perf_diag
-    variables:
-      tas:
-        <<: *perf_var
         reference_dataset: ERA5  #ERA-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -315,20 +320,41 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut
       - {dataset: ERA5, project: OBS6, type: reanaly, version: 1, tier: 3}
       - {dataset: NCEP, project: OBS, type: reanaly, version: 1, tier: 2}      
+    scripts:
+      grading: &grading_settings
+        script: perfmetrics/main.ncl
+        # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
+        plot_type: cycle_latlon
+        # Time average ('opt' argument of time_operations.ncl)
+        time_avg: monthlyclim
+        # Region ('global', 'trop', 'nhext', 'shext')
+        region: global
+        # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
+        plot_stddev: ref_model
+        # Plot legend in a separate file
+        legend_outside: true
+        # Plot style
+        styleset: CMIP5
+        # Calculate grading
+        calc_grading: true
+        # Metric ('RMSD', 'BIAS', taylor')
+        metric: [RMSD]
+        # Normalization ('mean', 'median', 'centered_median', 'none')
+        normalization: [centered_median]
+
 
   ts:
     <<: *perf_diag
     variables:
       ts:
         <<: *perf_var
-        preprocessor: ppNOLEV1x1
         reference_dataset: ESACCI-SST
         alternative_dataset: HadISST
     additional_datasets:
@@ -354,7 +380,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -368,6 +394,7 @@ diagnostics:
     variables:
       pr:
         <<: *perf_var
+        preprocessor: ppNOLEV1
         reference_dataset: GPCP-SG
         alternative_dataset: GHCN
     additional_datasets:
@@ -393,11 +420,11 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut
-      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.2, tier: 1}
+      - {dataset: GPCP-SG, project: obs4mips, level: L3, version: v2.3, tier: 1}
       - {dataset: GHCN, project: OBS, type: ground, version: 1, tier: 2}
 
   zg500:
@@ -405,7 +432,7 @@ diagnostics:
     variables:
       zg:
         <<: *perf_var
-        preprocessor: pp500
+        preprocessor: pp500_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -439,6 +466,7 @@ diagnostics:
     variables:
       psl:
         <<: *perf_var
+        preprocessor: ppNOLEV1
         reference_dataset: JRA-55
         alternative_dataset: ERA5
     additional_datasets:
@@ -462,7 +490,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -474,6 +502,7 @@ diagnostics:
     <<: *perf_diag
     variables:
       lwcre:
+        preprocessor: ppNOLEV1
         reference_dataset: CERES-EBAF
         derive: true
         force_derivation: false
@@ -594,7 +623,7 @@ diagnostics:
     variables:
       hus:
         <<: *perf_var
-        preprocessor: pp400
+        preprocessor: pp400_1x1
         reference_dataset: AIRS
         alternative_dataset: ERA5 #-Interim
     additional_datasets:
@@ -661,7 +690,7 @@ diagnostics:
     variables:
       ua:
         <<: *perf_var
-        preprocessor: pp200
+        preprocessor: pp200_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -686,7 +715,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -700,7 +729,7 @@ diagnostics:
     variables:
       va:
         <<: *perf_var
-        preprocessor: pp850
+        preprocessor: pp850_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -735,7 +764,7 @@ diagnostics:
     variables:
       ua:
         <<: *perf_var
-        preprocessor: pp850
+        preprocessor: pp850_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -759,7 +788,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -772,7 +801,7 @@ diagnostics:
     variables:
       va:
         <<: *perf_var
-        preprocessor: pp200
+        preprocessor: pp200_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -808,7 +837,7 @@ diagnostics:
     variables:
       ta:
         <<: *perf_var
-        preprocessor: pp850
+        preprocessor: pp850_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -831,7 +860,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -844,7 +873,7 @@ diagnostics:
     variables:
       ta:
         <<: *perf_var
-        preprocessor: pp200
+        preprocessor: pp200_1x1
         reference_dataset: ERA5 #-Interim
         alternative_dataset: NCEP
     additional_datasets:
@@ -870,7 +899,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -897,15 +926,17 @@ diagnostics:
         project_order: ['CMIP3', 'CMIP5', 'CMIP6'] 
         caption: "                                            Relative model performance ~C~ ~Z75~ CMIP3                                                       CMIP5                                                                               CMIP6                         "
         # Sort diagnostics in a specific order (name = 'diagnositic'-'region')
-        diag_order: ['ta850-global', 'ta200-global', 'va850-global',
-                     'va200-global', 'ua850-global', 'ua200-global',
-                     'zg500-global', 'psl-global', 'swcre-global',
-                     'lwcre-global', 'rsut-global','rlut-global',
-                     'hus400-global', 'clt-global', 'tas-global', 'ts-global']
-        diag_label: ['temperature 850hPa', 'temperature 200hPa', 'northward wind 850hPa', 
-                     'northward wind 200hPa', ' eastward wind 850hPa', 'eastward wind 200hPa', 
-                     'geopotential height 500hPa', 'sea level pressure', 
-                     'TOA shortwave cloud radiative effect', 'TOA longwave cloud radiative effect',
-                     'TOA outgoing shortwave radiation', 'TOA outgoing longwave radiation', 
-                     'specific humidity 400hPa', 'cloud cover', 'near-surface temperature', 
-                     'surface temperature']
+        diag_order: ['hus400-global', 'zg500-global',
+                     'va200-global', 'va850-global', 'ua200-global', 'ua850-global',
+                     'ta200-global', 'ta850-global', 
+                     'ts-global', 'psl-global',
+                     'lwcre-global', 'swcre-global', 'rlut-global', 'rsut-global',
+                     'pr-global', 'tas-global']
+        diag_label: ['Specific Humidity 400 hPa', 'Geopotential Height 500 hPa', 
+                     'Northward Wind 200 hPa', 'Northward Wind 850 hPa',
+                     'Eastward Wind 200 hPa', 'Eastward Wind 850 hPa',
+                     'Temperature 200h Pa', 'Temperature 850h Pa',
+                     'Surface Temperature', 'Sea Level Pressure',
+                     'TOA Longwave Cloud Radiative Effect', 'TOA Shortwave Cloud Radiative Effect',
+                     'TOA Outgoing Longwave Radiation', 'TOA Outgoing Shortwave Radiation', 
+                     'Precipitation', 'Near-Surface Temperature'] 

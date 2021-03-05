@@ -790,7 +790,8 @@ begin
     ; mark improvements in panel 0
     ;resb@cnFillPatterns = (/-1, 3, 3/)
     resb@cnFillPatterns = (/-1, 17, 17/)
-    ; plot diamonds
+    resb@cnFillScaleF = 1.
+    ; plot stiplling
     if all(to_plot_improve(:, :) .eq. 1) then
       to_plot_improve(0, 0) = 0
     end if
