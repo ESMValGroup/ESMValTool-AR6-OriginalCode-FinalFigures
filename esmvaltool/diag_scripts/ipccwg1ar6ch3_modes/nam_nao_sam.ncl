@@ -17,6 +17,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210306-Yu Kosaka: added provenance
 ;   20210227-Yu Kosaka: revised figure details
 ;   20210211-Yu Kosaka: changed stippling to cross marks
 ;   20210116-Yu Kosaka: adapt Adam's updates script to the ESMValTool
@@ -150,263 +151,245 @@ begin
     file_type = "ps"
   end if
 
+  outpath = config_user_info@plot_dir
+  ofile = outpath + "nam_nao_sam"
+
 
   seas = "djf"    ; djf or jja
 ;----------------------------------------------------------
   pi=4.*atan(1.0)
   rad=(pi/180.)
 ;----------------------------------------------------------
-  ;--------------------------------------------------------
-  ; process observational data
-  ;--------------------------------------------------------
 
-    iref_obs_datasets = ind(obs_datasets.eq.diag_script_info@reference_dataset)
-    iobs_datasets = ispan(0, dim_obs-1, 1)
-    iobs_datasets(0) = iref_obs_datasets
-    iobs_datasets(iref_obs_datasets) = 0
-    do ii = 0, dim_obs - 1
-      iobs = iobs_datasets(ii)
+;--------------------------------------------------------
+; process observational data
+;--------------------------------------------------------
+
+  iref_obs_datasets = ind(obs_datasets.eq.diag_script_info@reference_dataset)
+  iobs_datasets = ispan(0, dim_obs-1, 1)
+  iobs_datasets(0) = iref_obs_datasets
+  iobs_datasets(iref_obs_datasets) = 0
+  do ii = 0, dim_obs - 1
+    iobs = iobs_datasets(ii)
       
-        log_info(obs_datasets(iobs))
+    log_info(obs_datasets(iobs))
         
-        ; Read observational data
-        arrF := read_data(obs[iobs])
-        arrF&time = cd_calendar(arrF&time,1)
+    ; Read observational data
+    arrF := read_data(obs[iobs])
+    arrF&time = cd_calendar(arrF&time,1)
 
-        if (ii.eq.0) then    ; keep for regridding and taylor diagrams calculations
-           lat = arrF&lat
-           lat!0 = "lat"
-           lat&lat = lat
-           w = cos(rad*lat)
-           w!0 = "lat"
-           w&lat = lat
+    if (ii.eq.0) then    ; keep for regridding and taylor diagrams calculations
+      lat = arrF&lat
+      lat!0 = "lat"
+      lat&lat = lat
+      w = cos(rad*lat)
+      w!0 = "lat"
+      w&lat = lat
+    end if
+    do hh = 0,2     ; nam, nao, sam
+      if (hh.le.1) then
+        arr := arrF
+      else
+        arr := arrF({197901:},:,:)
+      end if
+      arr = rmMonAnnCycTLL(arr)
+      temp3 := runave_n_Wrap(arr,3,0,0)
+      temp3(0,:,:) = (/ dim_avg_n(arr(:1,:,:),0) /)
+      if (seas.eq."djf") then
+        arr_seas := temp3(0::12,:,:)
+      end if
+      if (seas.eq."jja") then
+        arr_seas := temp3(6::12,:,:)
+      end if
+
+      arr_seas_CW := SqrtCosWeight(arr_seas)
+      arr_seas_CW_LF := lonFlip(arr_seas_CW) ; for NAO
+
+      if (hh.eq.0) then   ; NAM
+        evecv := eofunc(arr_seas_CW({lat|20:},lon|:,time|:),2,75)
+        pcts  := eofunc_ts(arr_seas_CW({lat|20:},lon|:,time|:),evecv,False)
+
+        finarr_nam_pcvar := evecv@pcvar(0)
+        finarr_nam_pc := dim_standardize(pcts(0,:),0)
+        finarr_nam := regCoef_n(finarr_nam_pc,arr_seas,0,0)
+        finarr_namC := escorc_n(finarr_nam_pc,arr_seas,0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_nam)
+        copy_VarMeta(arr_seas(0,:,:),finarr_namC)
+
+        if (.not.ismissing(finarr_nam({85},{5}))) then
+          if (finarr_nam({85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
+            finarr_nam = finarr_nam*-1.
+            finarr_namC = finarr_namC*-1.
+            finarr_nam_pc = finarr_nam_pc*-1.
+          end if
         end if
-        do hh = 0,2     ; nam, nao, sam
-           if (hh.le.1) then
-              arr := arrF
-           else
-              arr := arrF({197901:},:,:)
-           end if
-           arr = rmMonAnnCycTLL(arr)
-           temp3 := runave_n_Wrap(arr,3,0,0)
-           temp3(0,:,:) = (/ dim_avg_n(arr(:1,:,:),0) /)
-           if (seas.eq."djf") then
-              arr_seas := temp3(0::12,:,:)
-           end if
-           if (seas.eq."jja") then
-              arr_seas := temp3(6::12,:,:)
-           end if
+        reg_fld := finarr_nam
+        cor_fld := finarr_namC
 
-           arr_seas_CW := SqrtCosWeight(arr_seas)
-           arr_seas_CW_LF := lonFlip(arr_seas_CW) ; for NAO
+        sig := arr_seas(:2,:,:)
+        sig = sig@_FillValue
+      end if
+      if (hh.eq.1) then   ; NAO
+        evecv := eofunc(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),2,75)
+        pcts  := eofunc_ts(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),evecv,False)
 
-           if (hh.eq.0) then   ; NAM
-              evecv := eofunc(arr_seas_CW({lat|20:},lon|:,time|:),2,75)
-              pcts  := eofunc_ts(arr_seas_CW({lat|20:},lon|:,time|:),evecv,False)
+        finarr_nao_pcvar := evecv@pcvar(0)
+        finarr_nao_pc := dim_standardize(pcts(0,:),0)
+        finarr_nao := regCoef_n(finarr_nao_pc,arr_seas,0,0)
+        finarr_naoC := escorc_n(finarr_nao_pc,arr_seas,0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_nao)
+        copy_VarMeta(arr_seas(0,:,:),finarr_naoC)
 
-              finarr_nam_pcvar := evecv@pcvar(0)
-              finarr_nam_pc := dim_standardize(pcts(0,:),0)
-              finarr_nam := regCoef_n(finarr_nam_pc,arr_seas,0,0)
-              finarr_namC := escorc_n(finarr_nam_pc,arr_seas,0,0)
-              copy_VarMeta(arr_seas(0,:,:),finarr_nam)
-              copy_VarMeta(arr_seas(0,:,:),finarr_namC)
+        if (.not.ismissing(finarr_nao({70},{350}))) then
+          if (finarr_nao({70},{350}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
+            finarr_nao = finarr_nao*-1.
+            finarr_naoC = finarr_naoC*-1.
+            finarr_nao_pc = finarr_nao_pc*-1.
+          end if
+        end if
+        reg_fld := finarr_nao
+        cor_fld := finarr_naoC               
+      end if
+      if (hh.eq.2) then   ; SAM
+        evecv := eofunc(arr_seas_CW({lat|:-20},lon|:,time|:),2,75)
+        pcts  := eofunc_ts(arr_seas_CW({lat|:-20},lon|:,time|:),evecv,False)
 
-              if (.not.ismissing(finarr_nam({85},{5}))) then
-                 if (finarr_nam({85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
-                    finarr_nam = finarr_nam*-1.
-                    finarr_namC = finarr_namC*-1.
-                    finarr_nam_pc = finarr_nam_pc*-1.
-                 end if
-              end if
-              reg_fld := finarr_nam
-              cor_fld := finarr_namC
+        finarr_sam_pcvar := evecv@pcvar(0)
+        finarr_sam_pc := dim_standardize(pcts(0,:),0)
+        finarr_sam := regCoef_n(finarr_sam_pc,arr_seas,0,0)
+        finarr_samC := escorc_n(finarr_sam_pc,arr_seas,0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_sam)
+        copy_VarMeta(arr_seas(0,:,:),finarr_samC)
 
-              sig := arr_seas(:2,:,:)
-              sig = sig@_FillValue
-           end if
-           if (hh.eq.1) then   ; NAO
-              evecv := eofunc(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),2,75)
-              pcts  := eofunc_ts(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),evecv,False)
+        if (.not.ismissing(finarr_sam({-85},{5}))) then
+          if (finarr_sam({-85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
+            finarr_sam = finarr_sam*-1.
+            finarr_samC = finarr_samC*-1.
+            finarr_sam_pc = finarr_sam_pc*-1.
+          end if
+        end if
+        reg_fld := finarr_sam
+        cor_fld := finarr_samC 
+      end if
 
-              finarr_nao_pcvar := evecv@pcvar(0)
-              finarr_nao_pc := dim_standardize(pcts(0,:),0)
-              finarr_nao := regCoef_n(finarr_nao_pc,arr_seas,0,0)
-              finarr_naoC := escorc_n(finarr_nao_pc,arr_seas,0,0)
-              copy_VarMeta(arr_seas(0,:,:),finarr_nao)
-              copy_VarMeta(arr_seas(0,:,:),finarr_naoC)
+      prob_rtest=(/ rtest(cor_fld,dimsizes(arr_seas&time),0) /)
+      copy_VarMeta(arr_seas(0,:,:),prob_rtest)
+      prob_rtest=where(arr_seas(0,:,:).eq.arr_seas@_FillValue,prob_rtest@_FillValue,prob_rtest)
 
-              if (.not.ismissing(finarr_nao({70},{350}))) then
-                 if (finarr_nao({70},{350}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
-                    finarr_nao = finarr_nao*-1.
-                    finarr_naoC = finarr_naoC*-1.
-                    finarr_nao_pc = finarr_nao_pc*-1.
-                 end if
-              end if
-              reg_fld := finarr_nao
-              cor_fld := finarr_naoC               
-           end if
-           if (hh.eq.2) then   ; SAM
-              evecv := eofunc(arr_seas_CW({lat|:-20},lon|:,time|:),2,75)
-              pcts  := eofunc_ts(arr_seas_CW({lat|:-20},lon|:,time|:),evecv,False)
+      siglev = 0.10
+      sig(hh,:,:) = where(prob_rtest.gt.siglev, 0., 1.)
+      delete([/siglev,prob_rtest,reg_fld,cor_fld/])
+    end do
 
-              finarr_sam_pcvar := evecv@pcvar(0)
-              finarr_sam_pc := dim_standardize(pcts(0,:),0)
-              finarr_sam := regCoef_n(finarr_sam_pc,arr_seas,0,0)
-              finarr_samC := escorc_n(finarr_sam_pc,arr_seas,0,0)
-              copy_VarMeta(arr_seas(0,:,:),finarr_sam)
-              copy_VarMeta(arr_seas(0,:,:),finarr_samC)
-
-              if (.not.ismissing(finarr_sam({-85},{5}))) then
-                 if (finarr_sam({-85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
-                    finarr_sam = finarr_sam*-1.
-                    finarr_samC = finarr_samC*-1.
-                    finarr_sam_pc = finarr_sam_pc*-1.
-                 end if
-              end if
-              reg_fld := finarr_sam
-              cor_fld := finarr_samC 
-           end if
-
-;           print("Significance by rtest plus false rate detection")
-           prob_rtest=(/ rtest(cor_fld,dimsizes(arr_seas&time),0) /)
-           copy_VarMeta(arr_seas(0,:,:),prob_rtest)
-           prob_rtest=where(arr_seas(0,:,:).eq.arr_seas@_FillValue,prob_rtest@_FillValue,prob_rtest)
-
-;           npts=num(.not.ismissing(ndtooned(arr_seas(0,:,:))))
-; 
-;           siglev = 0.05
-;
-;           frac = fspan(1, npts, npts)
-;           scale=1
-;           frac = (/ (frac/npts)* scale * siglev /)
-;           prob_rtest_fdr=prob_rtest
-;
-;           prob_rtest_1d=ndtooned(prob_rtest)
-;           prob_rtest_1d_nomiss=prob_rtest_1d(ind(.not.ismissing(prob_rtest_1d)))
-; 
-;           sig_fdr = prob_rtest_1d_nomiss
-;           ip = dim_pqsort(sig_fdr, 2)
-;           sig_fdr = where(sig_fdr .gt. frac, sig_fdr@_FillValue, sig_fdr)
-;           if (all(ismissing(sig_fdr))) then
-;             pval_fdr = 0.
-;           else
-;             pval_fdr = (/ max(sig_fdr) /)
-;           end if
-;           prob_rtest_fdr =  (/ where(prob_rtest.gt. pval_fdr, 0, 1.) /) 
-;           sig(hh,:,:) = (/ prob_rtest_fdr /)
-;           delete([/prob_rtest_fdr,pval_fdr,sig_fdr,ip,prob_rtest_1d,frac,scale,siglev,npts,prob_rtest,reg_fld,cor_fld,prob_rtest_1d_nomiss/])
-
-           siglev = 0.10
-           sig(hh,:,:) = where(prob_rtest.gt.siglev, 0., 1.)
-           delete([/siglev,prob_rtest,reg_fld,cor_fld/])
-        end do
-
-        if (ii.eq.0) then
-           fn = out_path + "nam_nao_sam.obs."+syearA+"-"+eyearA+".nc"
-           print("fn = " + fn)
-           system("rm -f " + fn)
-           z = addfile(fn,"c")
-           z@source = systemfunc("pwd")+"/"+get_script_name()
-           sig!0 = "stat"
-           sig&stat = ispan(0,2,1)  
-           z->pattern_significance = sig     ; represents significance for NAM, NAO and SAM obs
+    if (ii.eq.0) then
+      fn = out_path + "nam_nao_sam.obs."+syearA+"-"+eyearA+".nc"
+      print("fn = " + fn)
+      system("rm -f " + fn)
+      z = addfile(fn,"c")
+      z@source = systemfunc("pwd")+"/"+get_script_name()
+      sig!0 = "stat"
+      sig&stat = ispan(0,2,1)  
+      z->pattern_significance = sig     ; represents significance for NAM, NAO and SAM obs
            
-           nam_patterns = arr_seas(:dimsizes(obs_datasets)-1,:,:)
-           nam_patterns!0 = "E"
-           nam_patterns&E = ispan(0,dimsizes(obs_datasets)-1,1)
-           nam_patterns = nam_patterns@_FillValue
-           sam_patterns = nam_patterns
-           nao_patterns = nam_patterns
+      nam_patterns = arr_seas(:dimsizes(obs_datasets)-1,:,:)
+      nam_patterns!0 = "E"
+      nam_patterns&E = ispan(0,dimsizes(obs_datasets)-1,1)
+      nam_patterns = nam_patterns@_FillValue
+      sam_patterns = nam_patterns
+      nao_patterns = nam_patterns
 
-           nam_timeseries = new((/dimsizes(obs_datasets),dimsizes(finarr_nam_pc)/),float)
-           nam_timeseries!0 = "E"
-           nam_timeseries&E = nam_patterns&E
-           nam_timeseries!1 = "time"
-           nam_timeseries&time = ispan(1958,2014,1)
-           ;nam_timeseries&time = nam_patterns&time
-           nam_timeseries = nam_timeseries@_FillValue
-           sam_timeseries = nam_timeseries(:,{1979:})
-           sam_timeseries!1 = "time2"
-           nao_timeseries = nam_timeseries
+      nam_timeseries = new((/dimsizes(obs_datasets),dimsizes(finarr_nam_pc)/),float)
+      nam_timeseries!0 = "E"
+      nam_timeseries&E = nam_patterns&E
+      nam_timeseries!1 = "time"
+      nam_timeseries&time = ispan(1958,2014,1)
+      nam_timeseries = nam_timeseries@_FillValue
+      sam_timeseries = nam_timeseries(:,{1979:})
+      sam_timeseries!1 = "time2"
+      nao_timeseries = nam_timeseries
+      
+      nam_pcvari = nam_timeseries(:,0)
+      sam_pcvari = nam_pcvari
+      nao_pcvari = nam_pcvari
+      nam_pc_trends = nam_pcvari
+      sam_pc_trends = nam_pcvari
+      nao_pc_trends = nam_pcvari
 
-           nam_pcvari = nam_timeseries(:,0)
-           sam_pcvari = nam_pcvari
-           nao_pcvari = nam_pcvari
-           nam_pc_trends = nam_pcvari
-           sam_pc_trends = nam_pcvari
-           nao_pc_trends = nam_pcvari
+      nam_tay_stat = new((/dimsizes(obs_datasets),3/),double)
+      nam_tay_stat!0 = "E"
+      nam_tay_stat&E = nam_patterns&E
+      nam_tay_stat!1 = "stat"
+      nam_tay_stat&stat = ispan(0,2,1)
+      nao_tay_stat = nam_tay_stat
+      sam_tay_stat = nam_tay_stat
 
-           nam_tay_stat = new((/dimsizes(obs_datasets),3/),double)
-           nam_tay_stat!0 = "E"
-           nam_tay_stat&E = nam_patterns&E
-           nam_tay_stat!1 = "stat"
-           nam_tay_stat&stat = ispan(0,2,1)
-           nao_tay_stat = nam_tay_stat
-           sam_tay_stat = nam_tay_stat
+      nam_patterns(ii,:,:)  = (/ finarr_nam /)
+      nao_patterns(ii,:,:)  = (/ finarr_nao /)
+      sam_patterns(ii,:,:)  = (/ finarr_sam /)
+    else
+      nam_patterns(ii,:,:)  = linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0)
+      nam_tay_stat(ii,:) = (/ taylor_stats(nam_patterns(ii,{20:},:), nam_patterns(0,{20:},:), w({20:}), 0)  /)
 
-           nam_patterns(ii,:,:)  = (/ finarr_nam /)
-           nao_patterns(ii,:,:)  = (/ finarr_nao /)
-           sam_patterns(ii,:,:)  = (/ finarr_sam /)
-        else
-           nam_patterns(ii,:,:)  = linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0)
-           nam_tay_stat(ii,:) = (/ taylor_stats(nam_patterns(ii,{20:},:), nam_patterns(0,{20:},:), w({20:}), 0)  /)
+      nao_patterns(ii,:,:)  = linint2_Wrap(finarr_nao&lon,finarr_nao&lat,finarr_nao,True,nao_patterns&lon,nao_patterns&lat,0)
+      nao_Flip   := lonFlip(nao_patterns)
+      nao_tay_stat(ii,:) = (/ taylor_stats(nao_Flip(ii,{20:80},{-90:40}), nao_Flip(0,{20:80},{-90:40}), w({20:80}), 0)  /)
 
-           nao_patterns(ii,:,:)  = linint2_Wrap(finarr_nao&lon,finarr_nao&lat,finarr_nao,True,nao_patterns&lon,nao_patterns&lat,0)
-           nao_Flip   := lonFlip(nao_patterns)
-           nao_tay_stat(ii,:) = (/ taylor_stats(nao_Flip(ii,{20:80},{-90:40}), nao_Flip(0,{20:80},{-90:40}), w({20:80}), 0)  /)
+      sam_patterns(ii,:,:)  = linint2_Wrap(finarr_sam&lon,finarr_sam&lat,finarr_sam,True,sam_patterns&lon,sam_patterns&lat,0)
+      sam_tay_stat(ii,:) = (/ taylor_stats(sam_patterns(ii,{:-20},:), sam_patterns(0,{:-20},:), w({:-20}), 0)  /)
+    end if
+    tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nam_pc)-1,1),finarr_nam_pc,False,True,0)
+    nam_pc_trends(ii) = (/ tttt@slope*dimsizes(finarr_nam_pc)  /)
+    tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nao_pc)-1,1),finarr_nao_pc,False,True,0)
+    nao_pc_trends(ii) = (/ tttt@slope*dimsizes(finarr_nao_pc)  /)
+    tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc)-1,1),finarr_sam_pc,False,True,0)
+    sam_pc_trends(ii) = (/ tttt@slope*dimsizes(finarr_sam_pc)  /)
 
-           sam_patterns(ii,:,:)  = linint2_Wrap(finarr_sam&lon,finarr_sam&lat,finarr_sam,True,sam_patterns&lon,sam_patterns&lat,0)
-           sam_tay_stat(ii,:) = (/ taylor_stats(sam_patterns(ii,{:-20},:), sam_patterns(0,{:-20},:), w({:-20}), 0)  /)
-        end if
-        tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nam_pc)-1,1),finarr_nam_pc,False,True,0)
-        nam_pc_trends(ii) = (/ tttt@slope*dimsizes(finarr_nam_pc)  /)
-        tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nao_pc)-1,1),finarr_nao_pc,False,True,0)
-        nao_pc_trends(ii) = (/ tttt@slope*dimsizes(finarr_nao_pc)  /)
-        tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc)-1,1),finarr_sam_pc,False,True,0)
-        sam_pc_trends(ii) = (/ tttt@slope*dimsizes(finarr_sam_pc)  /)
+    nam_timeseries(ii,:) = (/ finarr_nam_pc /)
+    nao_timeseries(ii,:) = (/ finarr_nao_pc /)
+    sam_timeseries(ii,:) = (/ finarr_sam_pc /)
 
-        nam_timeseries(ii,:) = (/ finarr_nam_pc /)
-        nao_timeseries(ii,:) = (/ finarr_nao_pc /)
-        sam_timeseries(ii,:) = (/ finarr_sam_pc /)
+    nam_pcvari(ii) = (/ finarr_nam_pcvar /)
+    nao_pcvari(ii) = (/ finarr_nao_pcvar /)
+    sam_pcvari(ii) = (/ finarr_sam_pcvar /)
+  end do
 
-        nam_pcvari(ii) = (/ finarr_nam_pcvar /)
-        nao_pcvari(ii) = (/ finarr_nao_pcvar /)
-        sam_pcvari(ii) = (/ finarr_sam_pcvar /)
-        ;print("Done with "+iobs+" our of "+nens+", "+model(iobs))
-     end do
+  z->nam_patterns = nam_patterns
+  z->nao_patterns = nao_patterns
+  z->sam_patterns = sam_patterns
+  z->nam_timeseries = nam_timeseries
+  z->nao_timeseries = nao_timeseries
+  z->sam_timeseries = sam_timeseries
+  z->nam_tay_stat = nam_tay_stat
+  z->nao_tay_stat = nao_tay_stat
+  z->sam_tay_stat = sam_tay_stat
+  z->nam_pc_trends = nam_pc_trends
+  z->nao_pc_trends = nao_pc_trends
+  z->sam_pc_trends = sam_pc_trends
+  z->nam_pcvari    = nam_pcvari
+  z->nao_pcvari    = nao_pcvari
+  z->sam_pcvari    = sam_pcvari
+  obs_datasets = obs_datasets(iobs_datasets)
+  iref_obs_datasets = ind(obs_datasets.eq.diag_script_info@reference_dataset)
+  z@datasets = obs_datasets
+  delete(z)
+  delete(iobs_datasets)
 
-     z->nam_patterns = nam_patterns
-     z->nao_patterns = nao_patterns
-     z->sam_patterns = sam_patterns
-     z->nam_timeseries = nam_timeseries
-     z->nao_timeseries = nao_timeseries
-     z->sam_timeseries = sam_timeseries
-     z->nam_tay_stat = nam_tay_stat
-     z->nao_tay_stat = nao_tay_stat
-     z->sam_tay_stat = sam_tay_stat
-     z->nam_pc_trends = nam_pc_trends
-     z->nao_pc_trends = nao_pc_trends
-     z->sam_pc_trends = sam_pc_trends
-     z->nam_pcvari    = nam_pcvari
-     z->nao_pcvari    = nao_pcvari
-     z->sam_pcvari    = sam_pcvari
-     obs_datasets = obs_datasets(iobs_datasets)
-     iref_obs_datasets = ind(obs_datasets.eq.diag_script_info@reference_dataset)
-     z@datasets = obs_datasets
-     delete(z)
-     delete(iobs_datasets)
-     ;end if
-     z = addfile(fn,"r")
-     nam_taylor_stats_obs = z->nam_tay_stat
-     nao_taylor_stats_obs = z->nao_tay_stat
-     sam_taylor_stats_obs = z->sam_tay_stat
-     nam_trends_obs = z->nam_pc_trends
-     nao_trends_obs = z->nao_pc_trends
-     sam_trends_obs = z->sam_pc_trends
-     nam_patterns_obs = z->nam_patterns(0,:,:)
-     nao_patterns_obs = z->nao_patterns(0,:,:)
-     sam_patterns_obs = z->sam_patterns(0,:,:)
-     obs_significance = z->pattern_significance
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Observed patterns, time series, trends and taylor statitics of NAM/NAO/SAM based on EOF", \
+                 (/"eof","anomaly","var","trend"/), (/"nhext", "shext"/), (/"polar", "taylor", "probability"/), \
+                 "kosaka_yu", "", metadata_att_as_array(obs, "filename"))
+  
+  z = addfile(fn,"r")
+  nam_taylor_stats_obs = z->nam_tay_stat
+  nao_taylor_stats_obs = z->nao_tay_stat
+  sam_taylor_stats_obs = z->sam_tay_stat
+  nam_trends_obs = z->nam_pc_trends
+  nao_trends_obs = z->nao_pc_trends
+  sam_trends_obs = z->sam_pc_trends
+  nam_patterns_obs = z->nam_patterns(0,:,:)
+  nao_patterns_obs = z->nao_patterns(0,:,:)
+  sam_patterns_obs = z->sam_patterns(0,:,:)
+  obs_significance = z->pattern_significance
 
 ;-------------------------------------------------------------
 ; NAM/NAO/SAM for CMIP6 historical simulations
@@ -445,149 +428,141 @@ begin
     arrF := read_data(hist_cmip6[gg])
     arrF&time = cd_calendar(arrF&time,1)
 
-    if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ;
-      continue
+;    if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ;
+;      continue
+;    end if
+
+    do hh = 0,2     ; nam, nao, sam
+      if (hh.le.1) then
+        arr := arrF
+      else
+        arr := arrF({197901:},:,:)
+      end if
+      arr = rmMonAnnCycTLL(arr)
+      temp := runave_n_Wrap(arr,3,0,0)
+      temp(0,:,:) = (/ dim_avg_n(arr(:1,:,:),0) /)
+      if (seas.eq."djf") then
+        arr_seas := temp(0::12,:,:)
+      end if
+      if (seas.eq."jja") then
+        arr_seas := temp(6::12,:,:)
+      end if
+      arr_seas_CW := SqrtCosWeight(arr_seas)
+      arr_seas_CW_LF := lonFlip(arr_seas_CW) ; for NAO
+      if (hh.eq.0) then   ; NAM
+        evecv := eofunc(arr_seas_CW({lat|20:},lon|:,time|:),2,75)
+        pcts  := eofunc_ts(arr_seas_CW({lat|20:},lon|:,time|:),evecv,False)
+        
+        finarr_nam_pcvar := evecv@pcvar(0)
+        finarr_nam_pc := dim_standardize(pcts(0,:),0)
+        finarr_nam := regCoef_n(finarr_nam_pc,arr_seas,0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_nam)
+
+        if (.not.ismissing(finarr_nam({85},{5}))) then
+          if (finarr_nam({85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
+            finarr_nam = finarr_nam*-1.
+            finarr_nam_pc = finarr_nam_pc*-1.
+          end if
+        end if
+      end if
+      if (hh.eq.1) then   ; NAO
+        evecv := eofunc(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),2,75)
+        pcts  := eofunc_ts(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),evecv,False)
+
+        finarr_nao_pcvar := evecv@pcvar(0)
+        finarr_nao_pc := dim_standardize(pcts(0,:),0)
+        finarr_nao := regCoef_n(finarr_nao_pc,arr_seas,0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_nao)
+        
+        if (.not.ismissing(finarr_nao({70},{350}))) then
+          if (finarr_nao({70},{350}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
+            finarr_nao = finarr_nao*-1.
+            finarr_nao_pc = finarr_nao_pc*-1.
+          end if
+        end if
+      end if
+      if (hh.eq.2) then   ; SAM
+        evecv := eofunc(arr_seas_CW({lat|:-20},lon|:,time|:),2,75)
+        pcts  := eofunc_ts(arr_seas_CW({lat|:-20},lon|:,time|:),evecv,False)
+        finarr_sam_pcvar := evecv@pcvar(0)
+        finarr_sam_pc := dim_standardize(pcts(0,:),0)
+        finarr_sam := regCoef_n(finarr_sam_pc,arr_seas,0,0)
+        copy_VarMeta(arr_seas(0,:,:),finarr_sam)
+
+        if (.not.ismissing(finarr_sam({-85},{5}))) then
+          if (finarr_sam({-85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
+            finarr_sam = finarr_sam*-1.
+            finarr_sam_pc = finarr_sam_pc*-1.
+          end if
+        end if
+      end if
+    end do
+
+    if (gg.eq.0) then
+      nao_patterns_obs_lf = lonFlip(nao_patterns_obs)
+      nam_patterns := new((/nens,dimsizes(nam_patterns_obs&lat),dimsizes(nam_patterns_obs&lon)/),typeof(nam_patterns_obs))
+      nam_patterns!0 = "E"
+      nam_patterns&E = ispan(0,nens-1,1)
+      nam_patterns!1 = "lat"
+      nam_patterns&lat = nam_patterns_obs&lat
+      nam_patterns!2 = "lon"
+      nam_patterns&lon = nam_patterns_obs&lon
+      nam_patterns = nam_patterns@_FillValue
+      sam_patterns := nam_patterns
+      nao_patterns := nam_patterns
+      
+      nam_timeseries := new((/nens,dimsizes(finarr_nam_pc)/),float)
+      nam_timeseries!0 = "E"
+      nam_timeseries&E = nam_patterns&E
+      nam_timeseries!1 = "time"
+      nam_timeseries&time = ispan(1958,2014,1)
+      nam_timeseries = nam_timeseries@_FillValue
+      sam_timeseries := nam_timeseries(:,{1979:})
+      sam_timeseries!1 = "time2"
+      nao_timeseries := nam_timeseries
+      nam_pcvari := nam_timeseries(:,0)
+      sam_pcvari := nam_pcvari
+      nao_pcvari := nam_pcvari
+      nam_pc_trends := nam_pcvari
+      sam_pc_trends := nam_pcvari
+      nao_pc_trends := nam_pcvari
+
+      nam_tay_stat := new((/nens,3/),double)
+      nam_tay_stat!0 = "E"
+      nam_tay_stat&E = nam_patterns&E
+      nam_tay_stat!1 = "stat"
+      nam_tay_stat&stat = ispan(0,2,1)
+      nao_tay_stat := nam_tay_stat
+      sam_tay_stat := nam_tay_stat
+      ensemble_assign!0 = "E"
+      ensemble_assign&E = nam_patterns&E
     end if
 
-     do hh = 0,2     ; nam, nao, sam
-        if (hh.le.1) then
-           arr := arrF
-        else
-           arr := arrF({197901:},:,:)
-        end if
-        arr = rmMonAnnCycTLL(arr)
-        temp := runave_n_Wrap(arr,3,0,0)
-        temp(0,:,:) = (/ dim_avg_n(arr(:1,:,:),0) /)
-        if (seas.eq."djf") then
-           arr_seas := temp(0::12,:,:)
-        end if
-        if (seas.eq."jja") then
-           arr_seas := temp(6::12,:,:)
-        end if
-        arr_seas_CW := SqrtCosWeight(arr_seas)
-        arr_seas_CW_LF := lonFlip(arr_seas_CW) ; for NAO
-        if (hh.eq.0) then   ; NAM
-           evecv := eofunc(arr_seas_CW({lat|20:},lon|:,time|:),2,75)
-           pcts  := eofunc_ts(arr_seas_CW({lat|20:},lon|:,time|:),evecv,False)
+    nam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0) /)
+    nam_tay_stat(gg,:) = (/ taylor_stats(nam_patterns(gg,{20:},:), nam_patterns_obs({20:},:), w({20:}), 0)  /)
 
-           finarr_nam_pcvar := evecv@pcvar(0)
-           finarr_nam_pc := dim_standardize(pcts(0,:),0)
-           finarr_nam := regCoef_n(finarr_nam_pc,arr_seas,0,0)
-           copy_VarMeta(arr_seas(0,:,:),finarr_nam)
+    nao_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nao&lon,finarr_nao&lat,finarr_nao,True,nao_patterns&lon,nao_patterns&lat,0) /)
+    nao_Flip   := lonFlip(nao_patterns(gg,:,:))
+    nao_tay_stat(gg,:) = (/ taylor_stats(nao_Flip({20:80},{-90:40}), nao_patterns_obs_lf({20:80},{-90:40}), w({20:80}), 0)  /)
 
-           if (.not.ismissing(finarr_nam({85},{5}))) then
-               if (finarr_nam({85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
-                 finarr_nam = finarr_nam*-1.
-                 finarr_nam_pc = finarr_nam_pc*-1.
-               end if
-           end if
-        end if
-        if (hh.eq.1) then   ; NAO
-           evecv := eofunc(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),2,75)
-           pcts  := eofunc_ts(arr_seas_CW_LF({lat|20:80},{lon|-90:40},time|:),evecv,False)
+    sam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_sam&lon,finarr_sam&lat,finarr_sam,True,sam_patterns&lon,sam_patterns&lat,0) /)
+    sam_tay_stat(gg,:) = (/ taylor_stats(sam_patterns(gg,{:-20},:), sam_patterns_obs({:-20},:), w({:-20}), 0)  /)
 
-           finarr_nao_pcvar := evecv@pcvar(0)
-           finarr_nao_pc := dim_standardize(pcts(0,:),0)
-           finarr_nao := regCoef_n(finarr_nao_pc,arr_seas,0,0)
-           copy_VarMeta(arr_seas(0,:,:),finarr_nao)
+    tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nam_pc)-1,1),finarr_nam_pc,False,True,0)
+    nam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nam_pc)  /)
+    tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nao_pc)-1,1),finarr_nao_pc,False,True,0)
+    nao_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nao_pc)  /)
+    tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc)-1,1),finarr_sam_pc,False,True,0)
+    sam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_sam_pc)  /)
 
-           if (.not.ismissing(finarr_nao({70},{350}))) then
-              if (finarr_nao({70},{350}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
-                 finarr_nao = finarr_nao*-1.
-                 finarr_nao_pc = finarr_nao_pc*-1.
-              end if
-           end if
-        end if
-        if (hh.eq.2) then   ; SAM
-           evecv := eofunc(arr_seas_CW({lat|:-20},lon|:,time|:),2,75)
-           pcts  := eofunc_ts(arr_seas_CW({lat|:-20},lon|:,time|:),evecv,False)
-           finarr_sam_pcvar := evecv@pcvar(0)
-           finarr_sam_pc := dim_standardize(pcts(0,:),0)
-           finarr_sam := regCoef_n(finarr_sam_pc,arr_seas,0,0)
-           copy_VarMeta(arr_seas(0,:,:),finarr_sam)
+    nam_timeseries(gg,:) = (/ finarr_nam_pc /)
+    nao_timeseries(gg,:) = (/ finarr_nao_pc /)
+    sam_timeseries(gg,:) = (/ finarr_sam_pc /)
 
-           if (.not.ismissing(finarr_sam({-85},{5}))) then
-              if (finarr_sam({-85},{5}).ge.0) then  ; arbitrary attempt to make all plots have the same sign..
-                 finarr_sam = finarr_sam*-1.
-                 finarr_sam_pc = finarr_sam_pc*-1.
-              end if
-           end if
-        end if
-     end do
-
-     if (gg.eq.0) then
-        nao_patterns_obs_lf = lonFlip(nao_patterns_obs)
-        nam_patterns := new((/nens,dimsizes(nam_patterns_obs&lat),dimsizes(nam_patterns_obs&lon)/),typeof(nam_patterns_obs))
-        nam_patterns!0 = "E"
-        nam_patterns&E = ispan(0,nens-1,1)
-        nam_patterns!1 = "lat"
-        nam_patterns&lat = nam_patterns_obs&lat
-        nam_patterns!2 = "lon"
-        nam_patterns&lon = nam_patterns_obs&lon
-        nam_patterns = nam_patterns@_FillValue
-        sam_patterns := nam_patterns
-        nao_patterns := nam_patterns
-
-        nam_timeseries := new((/nens,dimsizes(finarr_nam_pc)/),float)
-        nam_timeseries!0 = "E"
-        nam_timeseries&E = nam_patterns&E
-        nam_timeseries!1 = "time"
-        nam_timeseries&time = ispan(1958,2014,1)
-        nam_timeseries = nam_timeseries@_FillValue
-        sam_timeseries := nam_timeseries(:,{1979:})
-        sam_timeseries!1 = "time2"
-        nao_timeseries := nam_timeseries
-        nam_pcvari := nam_timeseries(:,0)
-        sam_pcvari := nam_pcvari
-        nao_pcvari := nam_pcvari
-        nam_pc_trends := nam_pcvari
-        sam_pc_trends := nam_pcvari
-        nao_pc_trends := nam_pcvari
-
-        nam_tay_stat := new((/nens,3/),double)
-        nam_tay_stat!0 = "E"
-        nam_tay_stat&E = nam_patterns&E
-        nam_tay_stat!1 = "stat"
-        nam_tay_stat&stat = ispan(0,2,1)
-        nao_tay_stat := nam_tay_stat
-        sam_tay_stat := nam_tay_stat
-        ensemble_assign!0 = "E"
-        ensemble_assign&E = nam_patterns&E
-     end if
-
-
-     nam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nam&lon,finarr_nam&lat,finarr_nam,True,nam_patterns&lon,nam_patterns&lat,0) /)
-     nam_tay_stat(gg,:) = (/ taylor_stats(nam_patterns(gg,{20:},:), nam_patterns_obs({20:},:), w({20:}), 0)  /)
-
-     nao_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_nao&lon,finarr_nao&lat,finarr_nao,True,nao_patterns&lon,nao_patterns&lat,0) /)
-     nao_Flip   := lonFlip(nao_patterns(gg,:,:))
-     nao_tay_stat(gg,:) = (/ taylor_stats(nao_Flip({20:80},{-90:40}), nao_patterns_obs_lf({20:80},{-90:40}), w({20:80}), 0)  /)
-
-     sam_patterns(gg,:,:)  = (/ linint2_Wrap(finarr_sam&lon,finarr_sam&lat,finarr_sam,True,sam_patterns&lon,sam_patterns&lat,0) /)
-     sam_tay_stat(gg,:) = (/ taylor_stats(sam_patterns(gg,{:-20},:), sam_patterns_obs({:-20},:), w({:-20}), 0)  /)
-
-     tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nam_pc)-1,1),finarr_nam_pc,False,True,0)
-     nam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nam_pc)  /)
-     tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_nao_pc)-1,1),finarr_nao_pc,False,True,0)
-     nao_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nao_pc)  /)
-     tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc)-1,1),finarr_sam_pc,False,True,0)
-     sam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_sam_pc)  /)
-;    print(nam_pc_trends(gg)+"  "+nao_pc_trends(gg)+"  "+sam_pc_trends(gg))
-
-
-;     printVarSummary(finarr_sam_pc)
-;     printVarSummary(finarr_nam_pc)
-;     printVarSummary(finarr_nao_pc)
-
-     nam_timeseries(gg,:) = (/ finarr_nam_pc /)
-     nao_timeseries(gg,:) = (/ finarr_nao_pc /)
-     sam_timeseries(gg,:) = (/ finarr_sam_pc /)
-
-     nam_pcvari(gg) = (/ finarr_nam_pcvar /)
-     nao_pcvari(gg) = (/ finarr_nao_pcvar /)
-     sam_pcvari(gg) = (/ finarr_sam_pcvar /)
-     print("Done with "+gg+" out of "+nens+", "+model(gg))
-
+    nam_pcvari(gg) = (/ finarr_nam_pcvar /)
+    nao_pcvari(gg) = (/ finarr_nao_pcvar /)
+    sam_pcvari(gg) = (/ finarr_sam_pcvar /)
+    print("Done with "+gg+" out of "+nens+", "+model(gg))
   end do
   fn = out_path + "nam_nao_sam.hist."+syearA+"-"+eyearA+".cmip6.nc"
   system("rm -f " + fn)
@@ -616,6 +591,11 @@ begin
   delete([/nam_pc_trends, nao_pc_trends, sam_pc_trends/])
   delete([/nam_pcvari, nao_pcvari, sam_pcvari/])
 
+  log_provenance(fn,  ofile+"."+file_type, \
+                 "CMIP6 historical patterns, time series, trends and taylor statitics of NAM/NAO/SAM based on EOF", \
+                 (/"eof","anomaly","var","trend"/), (/"nhext", "shext"/), (/"polar", "taylor", "probability"/), \
+                 "kosaka_yu", "", metadata_att_as_array(hist_cmip6, "filename"))
+
   fn = out_path + "nam_nao_sam.hist."+syearA+"-"+eyearA+".cmip6.nc"  
   z = addfile(fn,"r")
   nam_taylor_stats_C6 = z->nam_tay_stat
@@ -629,7 +609,6 @@ begin
   sam_patterns_C6 = z->sam_patterns
   ensemble_assign_C6 := z->ensemble_assign
 
-;  cmip6_num = dimsizes(nam_trends)
   cmip6_num = dimsizes(ind(.not.ismissing(nam_trends_C6)))
   
   taylor_nam_ratio_C6  = nam_taylor_stats_C6(:,1:1)
@@ -690,7 +669,6 @@ begin
      end if
      weights_C6(wind) = 1./dimsizes(wind)
   end do
-;  print(ensemble_assign+" "+weights_C6)
 
   nam_trends_mme_C6T = dim_avg(nam_trends_mme_C6)
   nao_trends_mme_C6T = dim_avg(nao_trends_mme_C6)
@@ -700,15 +678,10 @@ begin
   mme_nao_C6 := dim_avg_n_Wrap(nao_em_C6,0)
   mme_sam_C6 := dim_avg_n_Wrap(sam_em_C6,0)
 
-;  nao_patterns_obsLF = lonFlip(nao_patterns_obs)
-;  mme_naoLF_C6 = lonFlip(mme_nao_C6)
 
   tay_stats_hist_nam_cmip6EM = new((/1,3/),double)
-;  tay_stats_hist_nam_cmip6EM = (/ taylor_stats(mme_nam_C6({20:},:), nam_patterns_obs({20:},:), w({20:}), 0) /)
   tay_stats_hist_nao_cmip6EM = new((/1,3/),double)
-;  tay_stats_hist_nao_cmip6EM = (/ taylor_stats(mme_naoLF_C6({20:80},{-90:40}), nao_patterns_obsLF({20:80},{-90:40}), w({20:80}), 0) /)
   tay_stats_hist_sam_cmip6EM = new((/1,3/),double)
-;  tay_stats_hist_sam_cmip6EM = (/ taylor_stats(mme_sam_C6({:-20},:), sam_patterns_obs({:-20},:), w({:-20}), 0) /)
 
   tay_stats_hist_nam_cmip6EM(0,0) = (/ ((2.71828^(2*dim_avg(tay_patcor_nam_C6))-1)/ ((2.71828^(2*dim_avg(tay_patcor_nam_C6))+1))) /)   ; convert back from z-space
   tay_stats_hist_nam_cmip6EM(0,1) = (/ dim_avg(tay_ratio_nam_C6) /)
@@ -831,9 +804,9 @@ begin
      arrF := read_data(amip_cmip6[gg])
      arrF&time = cd_calendar(arrF&time,1)
 
-     if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ; 
-        continue
-     end if
+;     if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ; 
+;        continue
+;     end if
 
      do hh = 0,2     ; nam, nao, sam
         if (hh.le.1) then
@@ -960,7 +933,6 @@ begin
      nao_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nao_pc)  /)
      tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc)-1,1),finarr_sam_pc,False,True,0)
      sam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_sam_pc)  /)  
-;     print(nam_pc_trends(gg)+"  "+nao_pc_trends(gg)+"  "+sam_pc_trends(gg))
 
      nam_timeseries(gg,:) = (/ finarr_nam_pc /)
      nao_timeseries(gg,:) = (/ finarr_nao_pc /)
@@ -998,7 +970,12 @@ begin
   delete([/nam_tay_stat, nao_tay_stat, sam_tay_stat/])
   delete([/nam_pc_trends, nao_pc_trends, sam_pc_trends/])
   delete([/nam_pcvari, nao_pcvari, sam_pcvari/])
-  
+
+  log_provenance(fn,  ofile+"."+file_type, \
+                 "CMIP6 AMIP patterns, time series, trends and taylor statitics of NAM/NAO/SAM based on EOF", \
+                 (/"eof","anomaly","var","trend"/), (/"nhext", "shext"/), (/"polar", "taylor", "probability"/), \
+                 "kosaka_yu", "", metadata_att_as_array(amip_cmip6, "filename"))
+
   y = addfile(fn,"r")
   nam_taylor_stats_A6 = y->nam_tay_stat
   nao_taylor_stats_A6 = y->nao_tay_stat
@@ -1011,7 +988,6 @@ begin
   sam_patterns_A6 = y->sam_patterns
   ensemble_assign_A6 := y->ensemble_assign
 
-;  cmip6A_num = dimsizes(nam_trendsA)
   cmip6A_num = dimsizes(ind(.not.ismissing(nam_trends_A6)))
 
   taylor_nam_ratio_A6  = nam_taylor_stats_A6(:,1:1)
@@ -1079,15 +1055,9 @@ begin
   mme_nao_A6 = dim_avg_n_Wrap(nao_em_A6,0)
   mme_sam_A6 = dim_avg_n_Wrap(sam_em_A6,0)
 
-;  nao_patterns_obsLF = lonFlip(nao_patterns_obs)
-;  mme_naoLF_A6 = lonFlip(mme_nao_A6)
-
   tay_stats_hist_nam_cmip6AEM = new((/1,3/),double)
-;  tay_stats_hist_nam_cmip6EM = (/ taylor_stats(mme_nam_A6({20:},:), nam_patterns_obs({20:},:), w({20:}), 0) /)
   tay_stats_hist_nao_cmip6AEM = new((/1,3/),double)
-;  tay_stats_hist_nao_cmip6EM = (/ taylor_stats(mme_naoLF_A6({20:80},{-90:40}), nao_patterns_obsLF({20:80},{-90:40}), w({20:80}), 0) /)
   tay_stats_hist_sam_cmip6AEM = new((/1,3/),double)
-;  tay_stats_hist_sam_cmip6EM = (/ taylor_stats(mme_sam_A6({:-20},:), sam_patterns_obs({:-20},:), w({:-20}), 0) /)
 
   tay_stats_hist_nam_cmip6AEM(0,0) = (/ ((2.71828^(2*dim_avg(tay_patcor_nam_A6))-1)/ ((2.71828^(2*dim_avg(tay_patcor_nam_A6))+1))) /)   ; convert back from z-space
   tay_stats_hist_nam_cmip6AEM(0,1) = (/ dim_avg(tay_ratio_nam_A6) /)
@@ -1133,9 +1103,9 @@ begin
     arrF := read_data(hist_cmip5[gg])
     arrF&time = cd_calendar(arrF&time,1)
 
-    if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ;
-        continue
-    end if
+;    if (gg.ge.1.and.isatt(arrF,"is_all_missing")) then   ;
+;        continue
+;    end if
 
     do hh = 0,2     ; nam, nao, sam
        if (hh.le.1) then
@@ -1263,7 +1233,6 @@ begin
     nao_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_nao_pc)  /)
     tttt := dtrend_msg_n(ispan(0,dimsizes(finarr_sam_pc)-1,1),finarr_sam_pc,False,True,0)
     sam_pc_trends(gg) = (/ tttt@slope*dimsizes(finarr_sam_pc)  /)
-    ;        print(nam_pc_trends(gg)+"  "+nao_pc_trends(gg)+"  "+sam_pc_trends(gg))
 
     nam_timeseries(gg,:) = (/ finarr_nam_pc /)
     nao_timeseries(gg,:) = (/ finarr_nao_pc /)
@@ -1303,8 +1272,12 @@ begin
   delete([/nam_pcvari, nao_pcvari, sam_pcvari/])
   ;delete([/z/])
 
+  log_provenance(fn,  ofile+"."+file_type, \
+                 "CMIP5 historical patterns, time series, trends and taylor statitics of NAM/NAO/SAM based on EOF", \
+                 (/"eof","anomaly","var","trend"/), (/"nhext", "shext"/), (/"polar", "taylor", "probability"/), \
+                 "kosaka_yu", "", metadata_att_as_array(hist_cmip5, "filename"))
+  
   z = addfile(fn,"r")
-
   nam_taylor_stats_C5 = z->nam_tay_stat
   nao_taylor_stats_C5 = z->nao_tay_stat
   sam_taylor_stats_C5 = z->sam_tay_stat
@@ -1328,7 +1301,6 @@ begin
   nao_trends_C5 = z->nao_pc_trends
   sam_trends_C5 = z->sam_pc_trends
 
-;  cmip5_num = dimsizes(nam_trends_C5)
   cmip5_num = dimsizes(ind(.not.ismissing(nam_trends_C5)))
 
   nam_em_C5 := nam_patterns_C5(:max(ea_c5)-1,:,:)
@@ -1387,14 +1359,9 @@ begin
   mme_sam_C5 := dim_avg_n_Wrap(sam_em_C5,0)
   delete([/nam_trends_mme_C5,nao_trends_mme_C5,sam_trends_mme_C5/])
 
-;  mme_nao_C5LF = lonFlip(mme_nao_C5)
-
   tay_stats_hist_nam_cmip5EM = new((/1,3/),double)
-;  tay_stats_hist_nam_cmip5EM = (/ taylor_stats(mme_nam_C5({20:},:), nam_patterns_obs({20:},:), w({20:}), 0) /)
   tay_stats_hist_nao_cmip5EM = new((/1,3/),double)
-;  tay_stats_hist_nao_cmip5EM = (/ taylor_stats(mme_nao_C5LF({20:80},{-90:40}), nao_patterns_obsLF({20:80},{-90:40}), w({20:80}), 0) /)
   tay_stats_hist_sam_cmip5EM = new((/1,3/),double)
-;  tay_stats_hist_sam_cmip5EM = (/ taylor_stats(mme_sam_C5({:-20},:), sam_patterns_obs({:-20},:), w({:-20}), 0) /)
 
   tay_stats_hist_nam_cmip5EM(0,0) = (/ ((2.71828^(2*dim_avg(tay_patcor_nam_C5))-1)/ ((2.71828^(2*dim_avg(tay_patcor_nam_C5))+1))) /)   ; convert back from z-space
   tay_stats_hist_nam_cmip5EM(0,1) = (/ dim_avg(tay_ratio_nam_C5) /)
@@ -1404,8 +1371,6 @@ begin
   tay_stats_hist_sam_cmip5EM(0,1) = (/ dim_avg(tay_ratio_sam_C5) /)
 
 ;=====================================================================================================
-  outpath = config_user_info@plot_dir
-  ofile = outpath + "nam_nao_sam"
 
   wks = gsn_open_wks(file_type, ofile)
 
@@ -1450,7 +1415,6 @@ begin
   mme_sam_C6_map = mme_sam_C6
   mme_sam_C6_map = mme_sam_C6_map / 100.
   
-;  cmap0 = read_colormap_file("$diag_scripts/ipccwg1ar6ch3_modes/AR6_colormaps_NCL/temp_div_12.rgb")
   cmap0 = read_colormap_file("$diag_scripts/shared/plot/rgb/ipcc-ar6_temperature_div_12.rgb")
   res@cnFillColors = cmap0
 
