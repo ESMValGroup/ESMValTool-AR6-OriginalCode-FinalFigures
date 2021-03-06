@@ -401,7 +401,7 @@ diagnostics:
           - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5612}
           - {dataset: E3SM-1-0, grid: gr, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: E3SM-1-1, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
-          - {dataset: E3SM-1-1-ECA, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
+          #- {dataset: E3SM-1-1-ECA, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: EC-Earth3, grid: gr, ensemble: r1i1p1f1, start_year: 2259, end_year: 2321}
           - {dataset: EC-Earth3-LR, grid: gr, ensemble: r1i1p1f1, start_year: 2219, end_year: 2281}
           - {dataset: EC-Earth3-Veg, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
