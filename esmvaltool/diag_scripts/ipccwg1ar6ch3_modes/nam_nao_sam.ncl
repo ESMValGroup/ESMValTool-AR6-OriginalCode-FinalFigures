@@ -1798,7 +1798,7 @@ begin
   bplot = new(3,graphic)
   bres@tfPolyDrawOrder = "PreDraw"
   bres@tiYAxisString = "" ;"% of simulations"
-  bres@tiXAxisString = "(hPa 10yr~S~-1~N~)"
+  bres@tiXAxisString = "(decade~S~-1~N~)"
   bplot(1) = gsn_csm_xy(wks, nao_h&time, nao_h, bres)
   bres@tiYAxisString = "% of simulations"
   bplot(0) = gsn_csm_xy(wks, nam_h&time, nam_h, bres)
