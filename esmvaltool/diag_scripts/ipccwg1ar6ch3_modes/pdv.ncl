@@ -18,6 +18,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210306-Yu Kosaka: added provenance
 ;   20210301-Yu Kosaka: revised figure details
 ;   20210205-Yu Kosaka: minor revision in figure legend
 ;   20210131-Yu Kosaka: revised from monthly to annual mean data
@@ -131,6 +132,9 @@ begin
     file_type = "ps"
   end if
 
+  outpath = config_user_info@plot_dir
+  ofile = outpath + "pdv"
+  
   ; setting constants
   fca = 1./ 10.       ; 10 year low pass
   fcb = 0.
@@ -298,6 +302,11 @@ begin
   delete([/z/])
   delete(iobs_datasets)
   delete([/tpi_lp_write, tpi_write, tay_stat, ipo_pattern_obs, ipo_pattern_sig_obs/])
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Observed patterns, time series, and taylor statitics of PDV", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(obs, "filename"))
   
   z = addfile(fn,"r")
   ipo_obs = z->ipo_pattern_obs(0,:,:)
@@ -419,6 +428,11 @@ begin
   delete([/z/])
   delete([/finarr, tpi_write, tpi_lp_write, tay_stat, ensemble_assign/])
   
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of PDV in CMIP6 historical", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(hist_cmip6, "filename"))
+
   z = addfile(fn,"r")
   ipo_hist = z->ipo_model_pattern
   tpi_hist = z->tpi
@@ -526,6 +540,11 @@ begin
   tay_stats_piControl = tay_stat
   delete([/tpi_write,finarr,tpi_lp_write,tay_stat/])
 
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of PDV in CMIP6 piControl", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(piControl_cmip6, "filename"))
+                 
   z = addfile(fn,"r")
   tpi_piControl = z->tpi
   tpi_lp_piControl = z->tpi_lp
@@ -632,7 +651,12 @@ begin
   z->ensemble_assign = ensemble_assign_C5
   delete([/z/])
   delete([/finarr, tpi_write, tpi_lp_write, tay_stat, ensemble_assign_C5/])
-  
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of PDV in CMIP5 historical", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(hist_cmip5, "filename"))
+                 
   z = addfile(fn,"r")
   tpi_lp_hist_C5 = z->tpi_lp
   tpi_hist_C5    = z->tpi
@@ -720,7 +744,12 @@ begin
   z->tpi_lp   = tpi_lp_write
   z->tay_stats = tay_stat
   delete([/z/])
-  
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of PDV in CMIP5 piControl", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(piControl_cmip5, "filename"))
+                 
   z = addfile(fn,"r")
   tpi_piControl_C5 = z->tpi
   tpi_lp_piControl_C5 = z->tpi_lp
@@ -1066,9 +1095,6 @@ begin
   ;--------------------------------------------------------
   ;Plotting
   ;--------------------------------------------------------
-
-  outpath = config_user_info@plot_dir
-  ofile = outpath + "pdv"
 
   wks = gsn_open_wks(file_type, ofile)
 
@@ -1665,5 +1691,4 @@ begin
   frame(wks)
   delete(wks)
 
-  system("convert -density 216 -trim +repage -border 10 -bordercolor white -flatten "+ofile+"."+file_type+" "+ofile+".png")
 end
