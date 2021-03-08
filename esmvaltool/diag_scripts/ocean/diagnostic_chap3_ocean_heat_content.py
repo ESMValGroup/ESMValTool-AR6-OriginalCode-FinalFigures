@@ -50,6 +50,8 @@ import csv
 
 from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
+import matplotlib.patches as mpatches
+
 import cartopy.crs as ccrs
 
 from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
@@ -2960,31 +2962,30 @@ def calc_halo_multimodel_aggrement(cfg,
     Calculate the model-obs aggrement for hatching plots.
     """
     time_range_str = '-'.join([str(t) for t in time_range])
-    unique_id = [plot_dyn, plot_exp, method, plot_region, 'mean', time_range_str, ]
-    multimodel_agreement_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_agreement_map'])
-    multimodel_aggreement_fn += '_'.join(unique_id)+'.nc'
 
-    obs_cubes = iris.load_raw(obs_file)
-    #obs_files = [,
-                 #'
-                 # '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc', ]
-    if obs_file == '210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc':
-        obs_key == 'DWv1'
-    elif obs_file == '210201_EN4.2.1.g10_annual_steric_1950-2019':
-        obs_key == 'EN4'
-    elif obs_file == '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc':
-        obs_key == 'Ishii'
-    else:
-        assert 0
+    # Load the observational data.
+    aux_file, obs_key = get_obs_halo_file(cfg, obs_file)
+
+    obs_cubes = iris.load_raw(aux_file)
+    unique_id = [plot_dyn, plot_exp, method, plot_region, 'agreenent',obs_key, time_range_str, ]
+    agreement_fn = diagtools.folder([cfg['work_dir'], 'multimodel_halosteric_agreement_map'])
+    agreement_fn += '_'.join(unique_id)+'.nc'
 
     if plot_dyn == 'halo':
+        print(obs_file, obs_key, ':', aux_file)
+        obs_cubes = iris.load_raw(aux_file)
+        print(obs_cubes)
         obs_cube = obs_cubes.extract(iris.Constraint(name='steric_height_halo_anom_depthInterp'))[0]
+        print(obs_cube)
+        obs_cube = obs_cube[17, :, :]
+        print(obs_cube)
+        print(obs_cube.data.shape)
         obs_cube = regrid_to_1x1(obs_cube)
     else:
         assert 0
 
-    if os.path.exists(multimodel_agreement_fn):
-        return multimodel_agreement_fn
+    if os.path.exists(agreement_fn):
+        return agreement_fn
 
     cube_list = {}
     datasets = {}
@@ -3027,19 +3028,31 @@ def calc_halo_multimodel_aggrement(cfg,
             # Save the single model mean:
             iris.save(cube_list[dataset], single_model_mean_fn)
 
-        # The out array is the fraction of models which aggree with the obs.
-        out_cube=cube_list[0].copy()
-        mask = out_cube.data.mask
-        out_cube.data *= 0
-        for dataset, cube in cube_list.items():
-            data = np.clip(np.sign(cube.data * obs_cube.data), 0., 1.)
-            out_cube.data += data
+    # The out array is the fraction of models which aggree with the obs.
+    out_cube=cube_list[dataset].copy()
+    mask = out_cube.data.mask
+    out_cube.data *= 0
 
-        out_cube.data = out_cube.data/float(len(datasets))
-        # Save cube:
-        iris.save(out_cube, multimodel_agreement_fn)
+    # calculating agreement
+    for dataset, cube in cube_list.items():
+        print('calculating agreement', dataset, out_cube.data.shape, obs_cube.data.shape, out_cube.data.min(),out_cube.data.max(), out_cube.data.mean() )
+        data = np.clip(np.sign(cube.data * obs_cube.data), 0., 1.)
+        out_cube.data += data
 
-    return multimodel_agreement_fn
+    # normalising to 0-1 range. ie, 0: no models agree with obs, 1: all models agree with obs sign.
+    out_cube.data = out_cube.data/float(len(datasets))
+    out_cube.data = np.ma.masked_where(mask, out_cube.data)
+
+    # Save cube:
+    iris.save(out_cube, multimodel_agreement_fn)
+
+    single_pane_map_plot(
+            cfg,
+            metadatas[fn],
+            out_cube  ,
+            key='multi_model_agrement_with_'+obs_key,
+            )
+    return agreement_fn
 
 
 
@@ -3182,7 +3195,7 @@ def plot_halo_multipane(
                  '210201_EN4.2.1.g10_annual_steric_1950-2019',
                  '210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc', ]
 
-
+    do_hatching = False 
     reverse = True
     if reverse and len(obs_files) == 2:
         gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 2], wspace=0.06)
@@ -3201,7 +3214,7 @@ def plot_halo_multipane(
         cmip_subplots = [ax2,]
         cbar_axes = [ax0, ax1, ax2]
         fig.set_size_inches(10, 7)
-
+    
     if reverse and len(obs_files) == 3:
         #fig.set_size_inches(9,  7)
         fig.set_size_inches(10,  9)
@@ -3209,7 +3222,13 @@ def plot_halo_multipane(
         gs = matplotlib.gridspec.GridSpec(1, 2, width_ratios=[1, 1.200], wspace=0.01)
         linex = 1./2.2 +0.012
         gs0 = gs[0].subgridspec(3, 1, height_ratios=[1,1,0.04], hspace=0.3 ) # scatters
-        gs1 = gs[1].subgridspec(5, 1, height_ratios=[1,1,1, 0.15, 1],hspace=0.06 ) # maps
+ 
+        if do_hatching:
+            gs1 = gs[1].subgridspec(6, 1, height_ratios=[1,1,1, 0.15, 1, 0.15],hspace=0.06 ) # maps
+
+        else:
+            gs1 = gs[1].subgridspec(5, 1, height_ratios=[1,1,1, 0.15, 1,],hspace=0.06 ) # maps
+
         #scatters
         scatter1=fig.add_subplot(gs0[0,0])
         scatter2=fig.add_subplot(gs0[1,0])
@@ -3222,7 +3241,17 @@ def plot_halo_multipane(
         ax3 = fig.add_subplot(gs1[4, 0], projection=proj)
         ax4 = fig.add_subplot(gs1[3, 0])
         ax4.axis('off')
+        if do_hatching:
+            ax5 = fig.add_subplot(gs1[5, 0]) # hatching legend.
+            ax5.axis('off')
+            circ1 = mpatches.Patch( facecolor='white', hatch ='//////', label='Low model agreement (<80%)')
+            circ2 = mpatches.Patch( facecolor='white', ec='black', hatch=None, label='High model agreement ('+r'$\geq$'+'80%)')
+#            hatch_leg = ax5.legend(bbox_to_anchor=(1.05, 1), handles = [circ1,circ2],loc='center')
+            hatch_leg = ax5.legend(handles = [circ1,circ2],loc=(0.09, -1.15))
 
+            hatch_leg.draw_frame(False)
+            hatch_leg.get_frame().set_alpha(0.)
+ 
         subplots = [ax0, ax1, ax2]
         cmip_subplots = [ax3,]
         cbar_axes = [ax0, ax1, ax2, ax4, ax3]
@@ -3267,16 +3296,19 @@ def plot_halo_multipane(
     )
 
     for sbp, obs_file in zip(subplots, obs_files ):
-        agreement_fn = calc_halo_multimodel_aggrement(
-            cfg, metadatas,
-            slr_fns,
-            obs_file
-            plot_trend = 'detrended',
-            plot_dyn = 'halo',
-            plot_exp = plot_exp,
-            plot_region = 'Global',
-            time_range = time_range,
-        )
+        if do_hatching:
+            agreement_fn = calc_halo_multimodel_aggrement(
+                cfg, metadatas,
+                slr_fns,
+                obs_file,
+                plot_trend = 'detrended',
+                plot_dyn = 'halo',
+                plot_exp = plot_exp,
+                plot_region = 'Global',
+                time_range = time_range,
+            )
+        else:
+            agreement_fn = None
         fig, axes[sbp] = plot_halo_obs_mean(
             cfg,
             metadatas,
@@ -3307,15 +3339,6 @@ def plot_halo_multipane(
             fig=fig,
             subplot = pane,
         )
-    #qplot.keys()
-#    cmap='coolwarm'
-#    nspace = np.linspace(-2., 2, 15, endpoint=True)
-#    mapable = matplotlib.cm.ScalarMappable(norm=nspace,cmap=cmap)
-#    if reverse:
-#        fig.colorbar(qplot, ax=cbar_axes, location='right',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
-#    else:
-#        fig.colorbar(qplot, ax=cbar_axes, location='left',label='Trend, mm yr'+r'$^{-1}$', ticks=cbar_ticks)
-
     #rhs:
     # Halosteric trend scatter:
     fig, axes[scatter1] = plot_slr_regional_scatter(cfg, metadatas, slr_fns,
@@ -3346,8 +3369,6 @@ def plot_halo_multipane(
 #    nspace = np.linspace(-2., 2, 15, endpoint=True)
 #    cbar = plt.colorbar(cax=cax,cmap=cmap, )
 #    cbar.set_clim(-2.0, 2.0)
-
-    #plt.tight_layout()
 
     time_range_str = '-'.join([str(t) for t in time_range])
 
@@ -3405,21 +3426,8 @@ def plot_halo_multipane(
     plt.close()
 
 
-def plot_halo_obs_mean(
-        cfg, metadatas,
-        plot_dyn = 'halo',
-        subplot=111,
-        depth_range='2000m',
-        plot_range=[-2., 2],
-        nbins=20,
-        obs_file='DurackandWijffels10_V1.0_50yr',
-#        ax = None,
-        fig = None,
-        agreement_fn=None,
-        ):
-    """
-    make the observational halosteric observation plot.
-    """
+def get_obs_halo_file(cfg, obs_file):
+
     # Load the observational data.
     if obs_file=='DurackandWijffels10_V1.0_50yr':
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/141013_DurackandWijffels10_V1.0_50yr_steric_1950-2000_0-2000db.nc'
@@ -3451,6 +3459,26 @@ def plot_halo_obs_mean(
         aux_file = cfg['auxiliary_data_dir']+'/DurackFiles/210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc'
         legend_txt = 'Ishii'
 
+    return aux_file, legend_txt
+
+
+def plot_halo_obs_mean(
+        cfg, metadatas,
+        plot_dyn = 'halo',
+        subplot=111,
+        depth_range='2000m',
+        plot_range=[-2., 2],
+        nbins=20,
+        obs_file='DurackandWijffels10_V1.0_50yr',
+#        ax = None,
+        fig = None,
+        agreement_fn=None,
+        ):
+    """
+    make the observational halosteric observation plot.
+    """
+    # Load the observational data.
+    aux_file, legend_txt = get_obs_halo_file(cfg, obs_file)
 
     print('opening:', aux_file)
     obs_cubes = iris.load_raw(aux_file)
@@ -3510,20 +3538,31 @@ def plot_halo_obs_mean(
         plt.title(title)
         cbar = plt.colorbar(orientation='horizontal')
 
-    try: plt.gca().coastlines()
-    except: pass
-
     if agreement_fn:
         model_cube = iris.load_cube(agreement_fn)
         max_lat = 70.
+        cube = regrid_to_1x1(cube)
         model_cube = model_cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
-        model_cube.data = np.ma.masked_where(model_cube.data.mask + model_cube.data>0.8, model_cube.data )
+        cube = cube.intersection(longitude=(central_longitude-180., central_longitude+180.), latitude=(-max_lat, max_lat))
+
+        print('shapes:', model_cube.data.shape, cube.data.shape, model_cube.data.min(), model_cube.data.max(), '-', agreement_fn)
+        model_cube.data.mask = False
+        # model_cube.data[np.abs(cube.data)<0.12] = 1.1
+        #model_cube.data = np.ma.masked_where(cube.data.mask + model_cube.data.mask + (model_cube.data>0.8), model_cube.data)
+        #levels=[0.5, ]
+        #iris.plot.contour(model_cube, levels, colors='black', linestyles='-')
+
         hatchplot = iris.plot.contourf(
             model_cube,
             colors='none',
-            hatches=['/', ],
-            extend='lower',
+            levels=[-0.1, 0.8,], 
+            hatches=['//////',],
+            lw=0.4,
+            extend='min',
             )
+
+    try: plt.gca().coastlines()
+    except: pass
 
     # Saving files:
     if subplot==111:
