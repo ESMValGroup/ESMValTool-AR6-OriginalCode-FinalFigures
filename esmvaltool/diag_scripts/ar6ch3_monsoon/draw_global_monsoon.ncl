@@ -440,7 +440,10 @@ begin
       resPr@res_cnLevels = (/-1000, -800, -600, -400, -200, \
                             200, 400, 600, 800, 1000/)
     end if
-    resPr@res_cnFillPalette = "AR6_Precip_11"
+    pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                             + "ipcc-ar6_precipitation_11.rgb")
+
+    resPr@res_cnFillPalette = pal
 
     if (drawUV) then
       resUV := True
