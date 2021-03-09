@@ -76,8 +76,8 @@ diagnostics:
           - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-nat,ssp245-nat]}
           - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-nat,ssp245-nat]}
           - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-GHG,ssp245-GHG]}
-          - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
-          - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
+#          - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
+#          - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:6)i1p1f2"}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:10)i1p1f2", exp: hist-GHG}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:10)i1p1f2", exp: hist-aer}
@@ -172,8 +172,8 @@ diagnostics:
           - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-nat,ssp245-nat]}
           - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-nat,ssp245-nat]}
           - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-GHG,ssp245-GHG]}
-          - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
-          - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
+#          - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
+#          - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:6)i1p1f2"}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:10)i1p1f2", exp: hist-GHG}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:10)i1p1f2", exp: hist-aer}
@@ -269,8 +269,8 @@ diagnostics:
           - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-nat,ssp245-nat]}
           - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-nat,ssp245-nat]}
           - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-GHG,ssp245-GHG]}
-          - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
-          - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
+#          - {dataset: CESM2, ensemble: "r1i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
+#          - {dataset: CESM2, ensemble: "r3i1p1f1", grid: gn, exp: [hist-aer,ssp245-aer]}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:6)i1p1f2"}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:10)i1p1f2", exp: hist-GHG}
           - {dataset: CNRM-CM6-1, ensemble: "r(1:10)i1p1f2", exp: hist-aer}

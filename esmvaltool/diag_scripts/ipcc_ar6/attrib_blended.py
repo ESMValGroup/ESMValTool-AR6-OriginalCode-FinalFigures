@@ -83,7 +83,7 @@ def main(cfg):
     shade_cols=numpy.array([[128,128,128,128],[204,174,113,128],[191,191,191,128],[67,147,195,128],[223,237,195,128],[255,150,150,128],[150,255,150,128],[150,150,255,128],[91,174,178,128]])/256.
     if exp_flag=='GHG':
       experiments=['historical-ssp245','hist-nat','hist-GHG','hist-aer','hist-CO2','hist-stratO3','hist-volc','hist-sol','hist-nat-ssp245-nat','hist-GHG-ssp245-GHG','hist-aer-ssp245-aer']
-      label=['Aerosols','Natural forcings','Greenhouse gases']
+      label=['Aerosols','Natural','GHGs']
       cols=colors[[3,4,2],:]
     else:
       label=['GHG','NAT','AER']
@@ -224,7 +224,7 @@ def main(cfg):
       plt.figure(0,figsize=[180*mm_conv,180*mm_conv]) 
     else:
       plt.figure(0,figsize=[180*mm_conv,120*mm_conv]) 
-    plt.title("Model-by-model regression coefficients and attributable warming estimates")
+    plt.suptitle("Model-by-model regression coefficients and attributable warming estimates",size="12")
 
     #Main attribution analysis.      
     att_out={}
@@ -271,7 +271,7 @@ def main(cfg):
         if mm_attrib == 0:
             ant='Anthropogenic'
             nat='Natural'
-            ghg='Greenhouse gases'
+            ghg='GHGs'
             oth='Other anthropogenic'
         else:
             ant=None
@@ -290,8 +290,8 @@ def main(cfg):
             bottomright=224
 #2-way regression coefficients.
         plt.subplot(topleft)
-        plt.plot([mm_attrib+0.9,mm_attrib+0.9],numpy.transpose(att_out[dataset]['betaCI'][0,:]),color=colors[1,:],linewidth=2,label=ant)
-        plt.plot([mm_attrib+1.1,mm_attrib+1.1],numpy.transpose(att_out[dataset]['betaCI'][1,:]),color=colors[4,:],linewidth=2,label=nat)
+        plt.plot([mm_attrib+0.9,mm_attrib+0.9],numpy.transpose(att_out[dataset]['betaCI'][0,:]),color=colors[1,:],linewidth=2,label=ant,solid_capstyle='butt')
+        plt.plot([mm_attrib+1.1,mm_attrib+1.1],numpy.transpose(att_out[dataset]['betaCI'][1,:]),color=colors[4,:],linewidth=2,label=nat,solid_capstyle='butt')
         plt.plot([mm_attrib+0.9],att_out[dataset]['beta'][0],color=colors[1,:],marker='+')
         plt.plot([mm_attrib+1.1],att_out[dataset]['beta'][1],color=colors[4,:],marker='+')
         if rcplot:
@@ -300,19 +300,19 @@ def main(cfg):
 #2-way attributable warming.
         plt.subplot(bottomleft)
         [att_warming,att_warming_range]=attrib_warming(att_out[dataset]['beta'][0],att_out[dataset]['betaCI'][0,:],mean_dec_warming[0,mm]-mean_dec_warming[1,mm],(ci90_dec_warming[0,mm]**2+ci90_dec_warming[1,mm]**2)**0.5)
-        plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_warming_range,color=colors[1,:],linewidth=2,label=ant)
+        plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_warming_range,color=colors[1,:],linewidth=2,label=ant,solid_capstyle='butt')
         plt.plot(mm_attrib+0.9,att_warming,color=colors[1,:],marker='+')
         [att_warming,att_warming_range]=attrib_warming(att_out[dataset]['beta'][1],att_out[dataset]['betaCI'][1,:],mean_dec_warming[1,mm],ci90_dec_warming[1,mm])
-        plt.plot  ([mm_attrib+1.1,mm_attrib+1.1],att_warming_range,color=colors[4,:],linewidth=2,label=nat)
+        plt.plot  ([mm_attrib+1.1,mm_attrib+1.1],att_warming_range,color=colors[4,:],linewidth=2,label=nat,solid_capstyle='butt')
         plt.plot(mm_attrib+1.1,att_warming,color=colors[4,:],marker='+')
         if simple_uncert:
-          plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_out[dataset]['betaCI'][0,:]*(mean_dec_warming[0,mm]-mean_dec_warming[1,mm]),color=colors[1,:],marker='_',linestyle='None')
+          plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_out[dataset]['betaCI'][0,:]*(mean_dec_warming[0,mm]-mean_dec_warming[1,mm]),color=colors[1,:],marker='_',linestyle='None',solid_capstyle='butt')
           plt.plot  ([mm_attrib+1.1,mm_attrib+1.1],att_out[dataset]['betaCI'][1,:]*mean_dec_warming[1,mm],color=colors[4,:],marker='_',linestyle='None')
 #3-way regression coefficients.
         plt.subplot(topright)
-        plt.plot([mm_attrib+0.8,mm_attrib+0.8],numpy.transpose(att_out3[dataset]['betaCI'][2,:]),color=cols[2,:],linewidth=2,label=label[2])
-        plt.plot([mm_attrib+1.0,mm_attrib+1.0],numpy.transpose(att_out3[dataset]['betaCI'][1,:]),color=cols[1,:],linewidth=2,label=label[1])    
-        plt.plot([mm_attrib+1.2,mm_attrib+1.2],numpy.transpose(att_out3[dataset]['betaCI'][0,:]),color=cols[0,:],linewidth=2,label=label[0])
+        plt.plot([mm_attrib+0.8,mm_attrib+0.8],numpy.transpose(att_out3[dataset]['betaCI'][2,:]),color=cols[2,:],linewidth=2,label=label[2],solid_capstyle='butt')
+        plt.plot([mm_attrib+1.0,mm_attrib+1.0],numpy.transpose(att_out3[dataset]['betaCI'][1,:]),color=cols[1,:],linewidth=2,label=label[1],solid_capstyle='butt')    
+        plt.plot([mm_attrib+1.2,mm_attrib+1.2],numpy.transpose(att_out3[dataset]['betaCI'][0,:]),color=cols[0,:],linewidth=2,label=label[0],solid_capstyle='butt')
         plt.plot([mm_attrib+0.8],att_out3[dataset]['beta'][2],color=cols[2,:],marker='+')
         plt.plot([mm_attrib+1.0],att_out3[dataset]['beta'][1],color=cols[1,:],marker='+')
         plt.plot([mm_attrib+1.2],att_out3[dataset]['beta'][0],color=cols[0,:],marker='+')
@@ -323,16 +323,16 @@ def main(cfg):
 #3-way attributable warming.
         plt.subplot(bottomright)
         [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][2],att_out3[dataset]['betaCI'][2,:],mean_dec_warming[2,mm],ci90_dec_warming[2,mm])
-        plt.plot([mm_attrib+0.8,mm_attrib+0.8],att_warming_range,color=cols[2,:],linewidth=2,label=label[2])
+        plt.plot([mm_attrib+0.8,mm_attrib+0.8],att_warming_range,color=cols[2,:],linewidth=2,label=label[2],solid_capstyle='butt')
         plt.plot(mm_attrib+0.8,att_warming,color=cols[2,:],marker='+')
 
         
         [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][1],att_out3[dataset]['betaCI'][1,:],mean_dec_warming[1,mm],ci90_dec_warming[1,mm])
-        plt.plot([mm_attrib+1.0,mm_attrib+1.0],att_warming_range,color=cols[1,:],linewidth=2,label=label[1])
+        plt.plot([mm_attrib+1.0,mm_attrib+1.0],att_warming_range,color=cols[1,:],linewidth=2,label=label[1],solid_capstyle='butt')
         plt.plot(mm_attrib+1.0,att_warming,color=cols[1,:],marker='+')
         
         [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][0],att_out3[dataset]['betaCI'][0,:],mean_dec_warming[0,mm]-mean_dec_warming[1,mm]-mean_dec_warming[2,mm],(ci90_dec_warming[0,mm]**2+ci90_dec_warming[1,mm]**2+ci90_dec_warming[2,mm]**2)**0.5)
-        plt.plot([mm_attrib+1.2,mm_attrib+1.2],att_warming_range,color=cols[0,:],linewidth=2,label=label[0])
+        plt.plot([mm_attrib+1.2,mm_attrib+1.2],att_warming_range,color=cols[0,:],linewidth=2,label=label[0],solid_capstyle='butt')
         plt.plot(mm_attrib+1.2,att_warming,color=cols[0,:],marker='+')
         if simple_uncert:
           plt.plot([mm_attrib+0.8,mm_attrib+0.8],att_out3[dataset]['betaCI'][2,:]*mean_dec_warming[2,mm],color=cols[2,:],marker='_',linestyle='None')
@@ -368,8 +368,8 @@ def main(cfg):
 
       #2-way regression coefficients.
       plt.subplot(topleft)
-      plt.plot([mm_attrib+0.9,mm_attrib+0.9],numpy.transpose(att_out[dataset]['betaCI'][0,:]),color=colors[1,:],linewidth=2,label=ant)
-      plt.plot([mm_attrib+1.1,mm_attrib+1.1],numpy.transpose(att_out[dataset]['betaCI'][1,:]),color=colors[4,:],linewidth=2,label=nat)
+      plt.plot([mm_attrib+0.9,mm_attrib+0.9],numpy.transpose(att_out[dataset]['betaCI'][0,:]),color=colors[1,:],linewidth=2,label=ant,solid_capstyle='butt')
+      plt.plot([mm_attrib+1.1,mm_attrib+1.1],numpy.transpose(att_out[dataset]['betaCI'][1,:]),color=colors[4,:],linewidth=2,label=nat,solid_capstyle='butt')
       plt.plot([mm_attrib+0.9],att_out[dataset]['beta'][0],color=colors[1,:],marker='+')
       plt.plot([mm_attrib+1.1],att_out[dataset]['beta'][1],color=colors[4,:],marker='+')
       if rcplot:
@@ -379,23 +379,23 @@ def main(cfg):
       plt.subplot(bottomleft)
       print ('Two-way attributable warming')
       [att_warming,att_warming_range]=attrib_warming(att_out[dataset]['beta'][0],att_out[dataset]['betaCI'][0,:],multim_mean_dec_warming[0]-multim_mean_dec_warming[1],(multim_ci90_dec_warming[0]**2+multim_ci90_dec_warming[1]**2)**0.5,ci90_beta_obs2[0])
-      plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_warming_range,color=colors[1,:],linewidth=2,label=ant)
+      plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_warming_range,color=colors[1,:],linewidth=2,label=ant,solid_capstyle='butt')
       plt.plot(mm_attrib+0.9,att_warming,color=colors[1,:],marker='+')
       print ('ANT:',att_warming_range)
       [att_warming,att_warming_range]=attrib_warming(att_out[dataset]['beta'][1],att_out[dataset]['betaCI'][1,:],multim_mean_dec_warming[1],multim_ci90_dec_warming[1],ci90_beta_obs2[1])
-      plt.plot  ([mm_attrib+1.1,mm_attrib+1.1],att_warming_range,color=colors[4,:],linewidth=2,label=nat)
+      plt.plot  ([mm_attrib+1.1,mm_attrib+1.1],att_warming_range,color=colors[4,:],linewidth=2,label=nat,solid_capstyle='butt')
       plt.plot(mm_attrib+1.1,att_warming,color=colors[4,:],marker='+')
       print ('NAT:',att_warming_range)
       if simple_uncert:
-        plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_out[dataset]['betaCI'][0,:]*(multim_mean_dec_warming[0]-multim_mean_dec_warming[1]),color=colors[1,:],marker='_',linestyle='None')
+        plt.plot([mm_attrib+0.9,mm_attrib+0.9],att_out[dataset]['betaCI'][0,:]*(multim_mean_dec_warming[0]-multim_mean_dec_warming[1]),color=colors[1,:],marker='_',linestyle='None',solid_capstyle='butt')
         plt.plot  ([mm_attrib+1.1,mm_attrib+1.1],att_out[dataset]['betaCI'][1,:]*multim_mean_dec_warming[1],color=colors[4,:],marker='_',linestyle='None')
 
 
   #3-way regression coefficients.
       plt.subplot(topright)
-      plt.plot([mm_attrib+0.8,mm_attrib+0.8],numpy.transpose(att_out3[dataset]['betaCI'][2,:]),color=cols[2,:],linewidth=2)
-      plt.plot([mm_attrib+1.0,mm_attrib+1.0],numpy.transpose(att_out3[dataset]['betaCI'][1,:]),color=cols[1,:],linewidth=2)    
-      plt.plot([mm_attrib+1.2,mm_attrib+1.2],numpy.transpose(att_out3[dataset]['betaCI'][0,:]),color=cols[0,:],linewidth=2)
+      plt.plot([mm_attrib+0.8,mm_attrib+0.8],numpy.transpose(att_out3[dataset]['betaCI'][2,:]),color=cols[2,:],linewidth=2,solid_capstyle='butt')
+      plt.plot([mm_attrib+1.0,mm_attrib+1.0],numpy.transpose(att_out3[dataset]['betaCI'][1,:]),color=cols[1,:],linewidth=2,solid_capstyle='butt')    
+      plt.plot([mm_attrib+1.2,mm_attrib+1.2],numpy.transpose(att_out3[dataset]['betaCI'][0,:]),color=cols[0,:],linewidth=2,solid_capstyle='butt')
       plt.plot([mm_attrib+0.8],att_out3[dataset]['beta'][2],color=cols[2,:],marker='+')
       plt.plot([mm_attrib+1.0],att_out3[dataset]['beta'][1],color=cols[1,:],marker='+')
       plt.plot([mm_attrib+1.2],att_out3[dataset]['beta'][0],color=cols[0,:],marker='+')
@@ -407,15 +407,15 @@ def main(cfg):
       print ('Three-way attributable warming')
       plt.subplot(bottomright)
       [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][2],att_out3[dataset]['betaCI'][2,:],multim_mean_dec_warming[2],multim_ci90_dec_warming[2],ci90_beta_obs3[2])
-      plt.plot([mm_attrib+0.8,mm_attrib+0.8],att_warming_range,color=cols[2,:],linewidth=2)
+      plt.plot([mm_attrib+0.8,mm_attrib+0.8],att_warming_range,color=cols[2,:],linewidth=2,solid_capstyle='butt')
       plt.plot(mm_attrib+0.8,att_warming,color=cols[2,:],marker='+')
       print (exp_flag,att_warming_range)
       [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][1],att_out3[dataset]['betaCI'][1,:],multim_mean_dec_warming[1],multim_ci90_dec_warming[1],ci90_beta_obs3[1])
-      plt.plot([mm_attrib+1.0,mm_attrib+1.0],att_warming_range,color=cols[1,:],linewidth=2)    
+      plt.plot([mm_attrib+1.0,mm_attrib+1.0],att_warming_range,color=cols[1,:],linewidth=2,solid_capstyle='butt')    
       plt.plot(mm_attrib+1.0,att_warming,color=cols[1,:],marker='+')
       print ('NAT:',att_warming_range)
       [att_warming,att_warming_range]=attrib_warming(att_out3[dataset]['beta'][0],att_out3[dataset]['betaCI'][0,:],multim_mean_dec_warming[0]-multim_mean_dec_warming[1]-multim_mean_dec_warming[2],(multim_ci90_dec_warming[0]**2+multim_ci90_dec_warming[1]**2+multim_ci90_dec_warming[2]**2)**0.5,ci90_beta_obs3[0])
-      plt.plot([mm_attrib+1.2,mm_attrib+1.2],att_warming_range,color=cols[0,:],linewidth=2)
+      plt.plot([mm_attrib+1.2,mm_attrib+1.2],att_warming_range,color=cols[0,:],linewidth=2,solid_capstyle='butt')
       plt.plot(mm_attrib+1.2,att_warming,color=cols[0,:],marker='+')
       print ('OTH:',att_warming_range)
       if simple_uncert:
@@ -470,7 +470,10 @@ def main(cfg):
           plt.axis([0,nmodel_attrib+1,-1,3])
           plt.xticks(list(range(1,nmodel_attrib+1)),[''])
         plt.minorticks_off()
-        plt.legend(loc="upper left",frameon=False)
+        if ff== topleft:
+          plt.legend(loc="upper left",frameon=False)
+        else:
+          plt.legend(loc="upper right",frameon=False)
         plt.text (-2.5,3.5,panel_labels[panel_counter],fontsize =7,fontweight='bold', va='center', ha='center')
         panel_counter=panel_counter+1
 
@@ -494,7 +497,7 @@ def main(cfg):
       
     for ff in [bottomleft,bottomright]:
         plt.subplot(ff)
-        obs_line,=plt.plot([0,nmodel_attrib+2],[obs_warming,obs_warming],color='black',linewidth=1,label='Observations',zorder=-1)
+        obs_line,=plt.plot([0,nmodel_attrib+2],[obs_warming,obs_warming],color='black',linewidth=1,label='Observed warming',zorder=-1)
         if ff == bottomleft: plt.ylabel('Attributable change 2010-2019 vs 1850-1900 ($^\circ$C)')#,size='x-small') 
         plt.plot([0,nmodel_attrib+2],[0,0],color='black',linewidth=0.5,ls='--',zorder=-1)
         if pool_int_var:
@@ -503,7 +506,7 @@ def main(cfg):
         else:
           plt.axis([0,nmodel_attrib+1,-2,3])
           plt.xticks(list(range(1,nmodel_attrib+1)),model_names[0:nmodel_attrib],rotation=30.,ha="right")
-        plt.legend(handles=[obs_line],loc="upper left",frameon=False)
+        if ff==bottomleft: plt.legend(handles=[obs_line],loc="upper left",frameon=False)
 
         plt.minorticks_off()
         plt.text (-2,3.3,panel_labels[panel_counter],fontsize =7,fontweight='bold', va='center', ha='center')

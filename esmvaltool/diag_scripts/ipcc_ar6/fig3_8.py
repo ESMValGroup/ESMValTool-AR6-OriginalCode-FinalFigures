@@ -100,9 +100,9 @@ def main(cfg):
     min_ribes=[-99,0.89,1.12,-0.69,0.04,-0.18]
     max_ribes=[-99,1.17,1.76,-0.12,0.08,0.14]
     mean_ribes=[-99,1.03,1.44,-0.40,0.06,-0.02]
-    min_haustein=[-99,0.911,-99,-99,-0.001,-99]
-    max_haustein=[-99,1.157,-99,-99,0.062,-99]
-    mean_haustein=[-99,1.013,1.199,-0.186,0.025,-99]
+    min_haustein=[-99,0.941,-99,-99,0.001,-99]
+    max_haustein=[-99,1.222,-99,-99,0.069,-99]
+    mean_haustein=[-99,1.064,1.259,-0.195,0.026,-99]
     min_gillett=[-99,0.92,1.06,-0.71,-0.02,-99]
     max_gillett=[-99,1.30,1.94,-0.03,0.05,-99]
     mean_gillett=[-99,1.11,1.50,-0.37,0.01,-99]
@@ -234,21 +234,22 @@ def main(cfg):
 
     for bar in range(nbar):        
         plt.fill_between([xpos[bar]-0.45,xpos[bar]+0.45],[min_assess[bar],min_assess[bar]],[max_assess[bar],max_assess[bar]],color=shade_cols[bar,:])
-        plt.plot([xpos[bar]-0.34,xpos[bar]-0.34],[min_ribes[bar],max_ribes[bar]],color=cols[bar,:],label=lbl[0],linewidth=4)
+        plt.plot([xpos[bar]-0.34,xpos[bar]-0.34],[min_ribes[bar],max_ribes[bar]],color=cols[bar,:],label=lbl[0],linewidth=4,solid_capstyle='butt')
         plt.plot([xpos[bar]-0.34],[mean_ribes[bar]],color=cols[bar,:],marker='+',linewidth=2)
-        plt.plot([xpos[bar]-0.17,xpos[bar]-0.17],[min_haustein[bar],max_haustein[bar]],color=cols[bar,:],linewidth=3,label=lbl[1])
+        plt.plot([xpos[bar]-0.17,xpos[bar]-0.17],[min_haustein[bar],max_haustein[bar]],color=cols[bar,:],linewidth=3,label=lbl[1],solid_capstyle='butt')
         plt.plot([xpos[bar]-0.17],[mean_haustein[bar]],color=cols[bar,:],marker='+',linewidth=2)
-        plt.plot([xpos[bar],xpos[bar]],[min_gillett[bar],max_gillett[bar]],color=cols[bar,:],linewidth=2,label=lbl[2])
+        plt.plot([xpos[bar],xpos[bar]],[min_gillett[bar],max_gillett[bar]],color=cols[bar,:],linewidth=2,label=lbl[2],solid_capstyle='butt')
         plt.plot([xpos[bar]],[mean_gillett[bar]],color=cols[bar,:],marker='+',linewidth=2)
 #        plt.plot([xpos[bar]+0.075,xpos[bar]+0.075],[min_jenkins[bar],max_jenkins[bar]],color=cols[bar,:],linewidth=2)
 #        plt.plot([xpos[bar]+0.075],[mean_jenkins[bar]],color=cols[bar,:],marker='+',linewidth=2)
-        plt.plot([xpos[bar]+0.17,xpos[bar]+0.17],[min_ch7[bar],max_ch7[bar]],color=cols[bar,:],label=lbl[3],linewidth=1)
+        plt.plot([xpos[bar]+0.17,xpos[bar]+0.17],[min_ch7[bar],max_ch7[bar]],color=cols[bar,:],label=lbl[3],linewidth=1,solid_capstyle='butt')
         plt.plot([xpos[bar]+0.17],[mean_ch7[bar]],color=cols[bar,:],marker='+',linewidth=1)
         lbl=['','','','','','']
 
     plt.plot([-10,10],[0,0],color='gray',linewidth=0.5,zorder=-1)
     plt.axis([-1,nbar,-1.5,2.5])
-    ax.tick_params(axis='x', which='minor', bottom=False)
+    plt.minorticks_off()
+
     plt.xticks(list(range(0,nbar)),labels, size='small',rotation=30.,ha="right")
     plt.ylabel('Attributable change in GSAT, 2010-2019 vs 1850-1900 ($^\circ$C)')
 #    plt.xlabel('Forcing')
@@ -262,14 +263,14 @@ def main(cfg):
     plt.legend(loc="upper right",prop={'size':9},bbox_to_anchor=(1.45, 1),frameon=False)
 
 # Add notation to show that OANT and GHG add to ANT.
-    plt.arrow(1,-1.2,0,1.5,color="black")
-    plt.plot([1,2.5,2.5],[-1.2,-1.2,-1.1],color="black")
-    plt.plot([1.5,1.5,3.5,3.5],[-1,-1.1,-1.1,-1],color="black")
+    plt.arrow(1,-1.2,0,0.2,color="gray",head_width=0.06)
+    plt.plot([1,2.5,2.5],[-1.2,-1.2,-1.1],color="gray")
+    plt.plot([1.55,1.55,3.45,3.45],[-1,-1.1,-1.1,-1],color="gray")
     
     plt.tight_layout()
 
 
-    plt.savefig('/home/rng/plots/esmvaltool/fig3_8.pdf')
+    plt.savefig('/home/rng/plots/esmvaltool/fig3_8.png')
 
     plt.close()
 
