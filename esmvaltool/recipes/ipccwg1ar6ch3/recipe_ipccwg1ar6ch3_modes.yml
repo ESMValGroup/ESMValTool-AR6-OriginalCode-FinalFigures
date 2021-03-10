@@ -780,8 +780,6 @@ diagnostics:
           - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, exp: piControl, start_year: 2050, end_year: 2164}
           # OBSERVATIONS:
           - {dataset: ERSSTv5, project: OBS, type: reanaly, version: 1, tier: 2}
-          #- {dataset: ERSSTv3b, project: OBS, type: reanaly, version: 1, tier: 2}
-          - {dataset: ERSSTv4, project: OBS, type: reanaly, version: 1, tier: 2}
           - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
       ts_cmip5:
         <<: *var_def_3

@@ -159,7 +159,8 @@ begin
   do ii = 0, dim_obs - 1
     iobs = iobs_datasets(ii)
     
-    log_info(obs_datasets(iobs))
+    obs_datasets(ii) = obs[iobs]@dataset 
+    log_info(obs_datasets(ii))
 
     ; Read observational data
     arr = read_data(obs[iobs])
@@ -593,7 +594,7 @@ begin
     delete(arr)
     arr = tmp
     delete(tmp)
-
+    
     coswgt  := cos(rad*arr&lat)
     coswgt!0 = "lat"
     coswgt&lat= arr&lat
@@ -912,7 +913,8 @@ begin
 
   
   ;--------------------------------------------------------
-  ; CMIP6 piControl autocorrelation box plot statistics (no need to do weighting for statistics, 1 piControl per model)
+  ; CMIP6 piControl autocorrelation box plot statistics
+  ; (no need to do weighting for statistics, 1 piControl per model)
   ;--------------------------------------------------------
 
   temp_ac := esacr(tpi_lp_piControl,10)
@@ -944,6 +946,27 @@ begin
   stddev_tpi_piControl_B    = boxplot_stat2(dim_stddev(tpi_piControl))
   stddev_tpi_piControl_B(2) = avg(dim_stddev(tpi_piControl))
 
+
+  
+  var_tpi_obs = dim_variance(tpi_obs)
+  dof_obs := dim_num(.not.ismissing(tpi_obs))
+  var_tpi_hist := variance(tpi_hist)
+  dof_hist := num(.not.ismissing(tpi_hist))
+  do ii = 0, dimsizes(var_tpi_obs)-1
+    fsig = ftest(var_tpi_obs(ii), dof_obs(ii), var_tpi_hist, dof_hist, 0)
+    print("CMIP6 historical, unfiltered, "+obs_datasets(ii)+": p = "+fsig)
+  end do
+  
+  var_tpi_obs = dim_variance(tpi_lp_obs)
+  dof_obs := dim_num(.not.ismissing(tpi_lp_obs))/10.
+  var_tpi_hist := variance(tpi_lp_hist)
+  dof_hist := num(.not.ismissing(tpi_lp_hist))/10.
+  do ii = 0, dimsizes(var_tpi_obs)-1
+    fsig = ftest(var_tpi_obs(ii), dof_obs(ii), var_tpi_hist, dof_hist, 0)
+    print("CMIP6 historical, filtered,   "+obs_datasets(ii)+": p = "+fsig)
+  end do
+
+  
   ;--------------------------------------------------------
   ; CMIP5 historical autocorrelation box plot statistics
   ;--------------------------------------------------------
@@ -992,6 +1015,30 @@ begin
   stddev_tpi_hist_B_C5 =(/weighted_percentile(temp_sd,weights_C5,.05),weighted_percentile(temp_sd,weights_C5,.25),weighted_mean(temp_sd,weights_C5),weighted_percentile(temp_sd,weights_C5,.75),weighted_percentile(temp_sd,weights_C5,.95)/)
   stddev_tpi_piControl_B_C5 =  boxplot_stat2(dim_stddev(tpi_piControl_C5))
   stddev_tpi_piControl_B_C5(2) =  avg(dim_stddev(tpi_piControl_C5))
+
+
+  
+  var_tpi_obs = dim_variance(tpi_obs)
+  dof_obs := dim_num(.not.ismissing(tpi_obs))
+  var_tpi_hist := variance(tpi_hist_C5)
+  dof_hist := num(.not.ismissing(tpi_hist_C5))
+    print("CMIP5 historical, unfiltered : var = "+var_tpi_hist)
+  do ii = 0, dimsizes(var_tpi_obs)-1
+    fsig = ftest(var_tpi_obs(ii), dof_obs(ii), var_tpi_hist, dof_hist, 0)
+    print("CMIP5 historical, unfiltered, "+obs_datasets(ii)+": var = "+var_tpi_obs(ii)+" p = "+fsig)
+  end do
+
+  var_tpi_obs = dim_variance(tpi_lp_obs)
+  dof_obs := dim_num(.not.ismissing(tpi_lp_obs))/10.
+  var_tpi_hist := variance(tpi_lp_hist_C5)
+  dof_hist := num(.not.ismissing(tpi_lp_hist_C5))/10.
+  print("CMIP5 historical, filtered   : var = "+var_tpi_hist)
+  do ii = 0, dimsizes(var_tpi_obs)-1
+    fsig = ftest(var_tpi_obs(ii), dof_obs(ii), var_tpi_hist, dof_hist, 0)
+    print("CMIP5 historical, filtered,   "+obs_datasets(ii)+": var = "+var_tpi_obs(ii)+" p = "+fsig)
+  end do
+
+
   
   ;--------------------------------------------------------
   ; Preparation for box plots
