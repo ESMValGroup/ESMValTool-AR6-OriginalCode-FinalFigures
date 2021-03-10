@@ -36,13 +36,16 @@ datasets:
   - {dataset: CIESM}
   - {dataset: CMCC-CM2-HR4, grid: gn}
   - {dataset: CMCC-CM2-SR5, grid: gn}
+  - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn}
   - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
   - {dataset: E3SM-1-0}
   # - {dataset: E3SM-1-1, institute: E3SM-Project} # strange outliers
   - {dataset: E3SM-1-1-ECA, institute: E3SM-Project}
-  # - {dataset: EC-Earth3} # empty folder
+  - {dataset: EC-Earth3} # empty folder
+  - {dataset: EC-Earth3-AerChem}
+  - {dataset: EC-Earth3-CC}
   - {dataset: EC-Earth3-Veg}
   - {dataset: EC-Earth3-Veg-LR}
   - {dataset: FGOALS-f3-L}
@@ -51,12 +54,14 @@ datasets:
   - {dataset: GFDL-CM4, grid: gr1}
   - {dataset: GFDL-ESM4, grid: gr1}
   - {dataset: GISS-E2-1-G, grid: gn}
+  - {dataset: GISS-E2-1-G-CC, grid: gn}
   - {dataset: GISS-E2-1-H, grid: gn}
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
   - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
   - {dataset: IITM-ESM, grid: gn}
   - {dataset: INM-CM4-8, grid: gr1}
   - {dataset: INM-CM5-0, grid: gr1}
+  - {dataset: IPSL-CM5A2-INCA}
   - {dataset: IPSL-CM6A-LR}
   - {dataset: KACE-1-0-G}
   - {dataset: KIOST-ESM, grid: gr1}
@@ -68,7 +73,7 @@ datasets:
   - {dataset: MPI-ESM1-2-LR, grid: gn}
   - {dataset: MRI-ESM2-0, grid: gn}
   - {dataset: NESM3, grid: gn}
-  # - {dataset: NorCPM1, grid: gn, institute: NCC} # empty directory
+  - {dataset: NorCPM1, grid: gn, institute: NCC} # empty directory
   - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: NorESM2-MM, grid: gn, institute: NCC}
   - {dataset: SAM0-UNICON, grid: gn}

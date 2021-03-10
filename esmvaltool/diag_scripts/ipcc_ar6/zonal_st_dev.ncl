@@ -212,7 +212,7 @@ begin
   res@xyDashPatterns    = dashes
   res@gsnDraw           = False   ; don't draw yet
   res@gsnFrame          = False   ; don't advance frame yet
-  res@tiMainFontHeightF = .025    ; font height
+  res@tiMainFontHeightF = .02    ; font height
   res@gsnMaximize       = True
   res@vpHeightF = 0.4
   res@vpWidthF = 0.8
@@ -233,7 +233,7 @@ begin
   res@trYMinF  = min(model_arr) - 0.05 * (max(model_arr) - min(model_arr))
   res@trYMaxF  = max(model_arr) + 0.05 * (max(model_arr) - min(model_arr))
 
-  res@tiMainString = "Temporal variability of Near-Surface Air Temperature"
+  res@tiMainString = "Temporal Variability of Near-Surface Air Temperature"
   res@tiXAxisString = "Latitude"
 
   if (model_arr@units .eq. "degC") then
@@ -278,7 +278,7 @@ begin
 
     lgres                    = True
     lgres@lgItemType         = "Lines"   ; show lines only (default)
-    lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+    lgres@lgLabelFontHeightF = 1.0       ; set the legend label font thickness
     lgres@vpWidthF           = 0.15      ; width of legend (NDC)
     lgres@vpHeightF          = 0.7       ; height of legend (NDC)
     lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
