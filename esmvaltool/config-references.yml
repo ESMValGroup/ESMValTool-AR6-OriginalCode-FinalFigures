@@ -242,10 +242,10 @@ authors:
     name: Kalverla, Peter
     institute: NLeSC, Netherlands
     orcid: https://orcid.org/0000-0002-5025-7862
-karmouche_soufiane:
-  name: Karmouche, Soufiane
-  institute: University of Bremen, Germany
-  orcid:
+  karmouche_soufiane:
+    name: Karmouche, Soufiane
+    institute: University of Bremen, Germany
+    orcid:
   kindermann_stephan:
     name: Kindermann, Stephan
     institute: DKRZ, Germany
@@ -256,8 +256,8 @@ karmouche_soufiane:
     orcid: https://orcid.org/0000-0001-5681-1986
   kosaka_yu:
     name: Kosaka, Yu
-    institute:
-    orcid:
+    institute: RCAST, University of Tokyo, Japan
+    orcid: https://orcid.org/0000-0001-5575-4668
   krasting_john:
     name: Krasting, John
     institute: NOAA, USA
