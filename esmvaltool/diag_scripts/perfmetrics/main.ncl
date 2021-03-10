@@ -245,6 +245,7 @@ begin
     nobs = 2
     alt_ind = ind(datasetnames.eq.variable_info[0]@alternative_dataset)
     ref_inds := (/ref_ind, alt_ind/)
+print("alt_ind = " + alt_ind)
   end if
 
   ; Create output plot directory

@@ -19,12 +19,15 @@ begin
     modidx := array_append_record(ref_ind, modidx(ind(modidx.ne.ref_ind)), 0)
   end if
 
+print("ref_ind = " + ref_ind)
+print(datasetnames(modidx))
+
   annots = project_style(info_items, diag_script_info, "annots")
 
   ; Loop over datasets
-  do ii = 0, dimsizes(modidx) - 1
+  do ii_modidx = 0, dimsizes(modidx) - 1
 
-    imod = modidx(ii)
+    imod = modidx(ii_modidx)
 
     log_debug("Processing " + datasetnames(imod))
 
@@ -76,11 +79,13 @@ begin
     delete(var_avg)
 
     ; Store all models in one array
-    if(ii .eq. 0) then
+    if(ii_modidx .eq. 0) then
       var_all_mod = new(array_append_record(dimsizes(var_all), \
                                             dimsizes(grading&models), 0), float)
       var_all_mod!4 = "models"
       var_all_mod&models = grading&models
+print(grading&models)
+printVarSummary(var_all_mod)
       copy_VarAtts(diag_script_info, var_all_mod)
     end if
     if (l_altern) then
@@ -88,6 +93,7 @@ begin
         var_all_mod(:,:,:,:,imod) = var_all
       end if
     else
+print("imod = " + imod)
       if (imod.ne.ref_ind) then
         var_all_mod(:,:,:,:,imod) = var_all
       end if
@@ -162,6 +168,7 @@ begin
         grading(met, 0, imod, 0) = \
           calculate_metric(var_all(:, :, :, 0), var_ref(:, :, :, 0), \
                            diag_script_info@metric(met))
+print("grading = " + grading(met, 0, imod, 0))
         if (l_altern) then
           grading(met, 0, imod, 1) = \
             calculate_metric(var_all(:, :, :, 0), var_alt(:, :, :, 0), \
