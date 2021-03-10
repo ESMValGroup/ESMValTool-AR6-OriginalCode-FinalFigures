@@ -56,8 +56,8 @@ datasets:
   - {project: CMIP6, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, exp: historical, start_year: 1850, end_year: 2014, grid: gn}
   - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: past1000, end_year: 1849, grid: gn}
   - {project: CMIP6, dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: historical, start_year: 1850, end_year: 2014, grid: gn}
-  - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, exp: past1000, end_year: 1849, grid: gr}
-  - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, exp: historical, start_year: 1850, end_year: 2014, grid: gr}
+#  - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, exp: past1000, end_year: 1849, grid: gr}
+#  - {project: CMIP6, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, exp: historical, start_year: 1850, end_year: 2014, grid: gr}
   
 preprocessors:
 
