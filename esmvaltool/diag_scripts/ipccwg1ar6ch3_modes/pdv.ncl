@@ -1022,18 +1022,20 @@ begin
   dof_obs := dim_num(.not.ismissing(tpi_obs))
   var_tpi_hist := variance(tpi_hist_C5)
   dof_hist := num(.not.ismissing(tpi_hist_C5))
+    print("CMIP5 historical, unfiltered : var = "+var_tpi_hist)
   do ii = 0, dimsizes(var_tpi_obs)-1
     fsig = ftest(var_tpi_obs(ii), dof_obs(ii), var_tpi_hist, dof_hist, 0)
-    print("CMIP5 historical, unfiltered, "+obs_datasets(ii)+": p = "+fsig)
+    print("CMIP5 historical, unfiltered, "+obs_datasets(ii)+": var = "+var_tpi_obs(ii)+" p = "+fsig)
   end do
 
   var_tpi_obs = dim_variance(tpi_lp_obs)
   dof_obs := dim_num(.not.ismissing(tpi_lp_obs))/10.
   var_tpi_hist := variance(tpi_lp_hist_C5)
   dof_hist := num(.not.ismissing(tpi_lp_hist_C5))/10.
+  print("CMIP5 historical, filtered   : var = "+var_tpi_hist)
   do ii = 0, dimsizes(var_tpi_obs)-1
     fsig = ftest(var_tpi_obs(ii), dof_obs(ii), var_tpi_hist, dof_hist, 0)
-    print("CMIP5 historical, filtered,   "+obs_datasets(ii)+": p = "+fsig)
+    print("CMIP5 historical, filtered,   "+obs_datasets(ii)+": var = "+var_tpi_obs(ii)+" p = "+fsig)
   end do
 
 
