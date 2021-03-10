@@ -158,8 +158,8 @@ begin
   iobs_datasets(iref_obs_datasets) = 0
   do ii = 0, dim_obs - 1
     iobs = iobs_datasets(ii)
-
-    obs_datasets(ii) = obs[iobs]@dataset
+    
+    obs_datasets(ii) = obs[iobs]@dataset 
     log_info(obs_datasets(ii))
 
     ; Read observational data
