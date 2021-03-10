@@ -512,6 +512,7 @@ begin
         model_arr_ref(2, :) = wgt_runave_n_Wrap(model_arr_ref(2, :), wgt, 1, 0)
 
         model_arr_stat(2, :, :) = (/model_arr_ref(:, :)/)
+print("store ref model")
       end if
 
 
@@ -534,6 +535,8 @@ begin
 
     end do
 
+    model_arr_stat(2, :, :) = (/model_arr_ref(:, :)/)
+print("store ref model")
 
     ; *************************************
     ; output to NetCDF

@@ -176,7 +176,7 @@ datasets:
   #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
   #- {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
   #- {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-  - {dataset: EC-Earth3-Veg, ensemble: r4i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va, clt
+  #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va, clt
   - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr, project: CMIP6}
   - {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
@@ -320,7 +320,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -380,7 +380,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -420,7 +420,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut
@@ -456,6 +456,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #no clt, rsut
       - {dataset: ERA5, project: OBS6, type: reanaly, version: v1, tier: 3}
@@ -490,7 +491,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -532,6 +533,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -570,6 +572,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -610,7 +613,8 @@ diagnostics:
       - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #ta850 strange
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -679,6 +683,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -715,7 +720,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -752,6 +757,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -788,7 +794,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -825,6 +831,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
+      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -860,7 +867,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr
@@ -899,7 +906,7 @@ diagnostics:
       - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no hus
       - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
       - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus
-      #- {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
+      - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr, project: CMIP6} # no rlut, rsut, hus, zg, va
       - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn, project: CMIP6} #no hus
       - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr, project: CMIP6} #no hus, zg
       - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1, project: CMIP6} #no pr

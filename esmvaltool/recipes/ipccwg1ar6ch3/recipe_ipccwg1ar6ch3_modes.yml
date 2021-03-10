@@ -77,28 +77,33 @@ diagnostics:
           - {dataset: BCC-CSM2-MR, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1, grid: gn}
-          - {dataset: CAS-ESM2-0, ensemble: r(1:4)i1p1f1, grid: gn}
+          - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f2, grid: gn}
+          #- {dataset: CAS-ESM2-0, ensemble: r(1:4)i1p1f1, grid: gn} #rejected
+          - {dataset: CanESM5, ensemble: r(1:25)i1p1f1, grid: gn}
+          - {dataset: CanESM5, ensemble: r(1:40)i1p2f1, grid: gn}
+          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
           - {dataset: CESM2, ensemble: r(1:11)i1p1f1, grid: gn}
           - {dataset: CESM2-FV2, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: CESM2-WACCM-FV2, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: CIESM, ensemble: r(1:3)i1p1f1, grid: gr}
+          - {dataset: CMCC-CM2-HR4, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn}
           - {dataset: CNRM-CM6-1, ensemble: r(1:30)i1p1f2, grid: gr}
+          - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
           - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2, grid: gr}
-          - {dataset: CNRM-ESM2-1, ensemble: r(7:10)i1p1f2, grid: gr}
-          - {dataset: CanESM5, ensemble: r(1:40)i1p2f1, grid: gn}
-          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
+          - {dataset: CNRM-ESM2-1, ensemble: r(7:11)i1p1f2, grid: gr}
           - {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, grid: gr}
           - {dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr}
           - {dataset: E3SM-1-1-ECA, ensemble: r1i1p1f1, grid: gr}
           - {dataset: EC-Earth3, ensemble: r(1:4)i1p1f1, grid: gr}
           - {dataset: EC-Earth3, ensemble: r(6:7)i1p1f1, grid: gr}
-          - {dataset: EC-Earth3, ensemble: r9i1p1f1, grid: gr}
-          - {dataset: EC-Earth3, ensemble: r(10:25)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(9:25)i1p1f1, grid: gr}
           - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr}
           - {dataset: EC-Earth3-AerChem, ensemble: r4i1p1f1, grid: gr}
           - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr}
           - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1, grid: gr}
-          #- {dataset: EC-Earth3-Veg, ensemble: r10i1p1f1, grid: gr} # missing some years
           - {dataset: EC-Earth3-Veg, ensemble: r12i1p1f1, grid: gr}
           - {dataset: EC-Earth3-Veg, ensemble: r14i1p1f1, grid: gr}
           - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1, grid: gr}
@@ -107,20 +112,29 @@ diagnostics:
           - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
           - {dataset: GFDL-ESM4, ensemble: r(1:3)i1p1f1, grid: gr1}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:9)i1p1f1, grid: gn}
           - {dataset: GISS-E2-1-G, ensemble: r(1:11)i1p1f2, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:5)i1p1f3, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:6)i1p3f1, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(8:10)i1p3f1, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:4)i1p5f1, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(6:10)i1p5f1, grid: gn}
           - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
           - {dataset: GISS-E2-1-H, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: GISS-E2-1-H, ensemble: r(1:5)i1p1f2, grid: gn}
           - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
           - {dataset: HadGEM3-GC31-MM, ensemble: r(1:4)i1p1f3, grid: gn}
           - {dataset: IITM-ESM, ensemble: r1i1p1f1, grid: gn}
           - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
           - {dataset: INM-CM5-0, ensemble: r(1:10)i1p1f1, grid: gr1}
+          - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gr}
           - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1, grid: gr}
           - {dataset: KACE-1-0-G, ensemble: r(1:3)i1p1f1, grid: gr}
           - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1}
           - {dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r(1:10)i1p1f2, grid: gn}
+          - {dataset: MCM-UA-1-0, ensemble: r1i1p1f2, grid: gn}
           - {dataset: MIROC6, ensemble: r(1:50)i1p1f1, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r(1:10)i1p1f2, grid: gn}
           - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1, grid: gn}
           - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
@@ -128,12 +142,10 @@ diagnostics:
           - {dataset: NESM3, ensemble: r(1:5)i1p1f1, grid: gn}
           - {dataset: NorCPM1, ensemble: r(1:30)i1p1f1, grid: gn}
           - {dataset: NorESM2-LM, ensemble: r(1:3)i1p1f1, grid: gn}
-          - {dataset: NorESM2-MM, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: NorESM2-MM, ensemble: r(1:2)i1p1f1, grid: gn}
           - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
           - {dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
-          - {dataset: UKESM1-0-LL, ensemble: r(5:7)i1p1f3, grid: gn}
-          - {dataset: UKESM1-0-LL, ensemble: r(8:14)i1p1f2, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r(16:19)i1p1f2, grid: gn}
           # OBSERVATIONS:
           - {dataset: 20CRv3, project: OBS, type: reanaly, version: mean, tier: 2, start_year:  1958, end_year:  2014}
@@ -145,12 +157,12 @@ diagnostics:
         additional_datasets:
           - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
           - {dataset: CAMS-CSM1-0, ensemble: r(1:3)i1p1f1, grid: gn}
-          - {dataset: CESM2, ensemble: r(1:3)i1p1f1, grid: gn}
-          - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
-          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
           - {dataset: CanESM5, ensemble: r(1:3)i1p2f1, grid: gn}
           - {dataset: CanESM5, ensemble: r5i1p2f1, grid: gn}
           - {dataset: CanESM5, ensemble: r(7:10)i1p2f1, grid: gn}
+          - {dataset: CESM2, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
           - {dataset: FGOALS-f3-L, ensemble: r(1:3)i1p1f1, grid: gr}
           - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: GFDL-CM4, ensemble: r(2:3)i1p1f1, grid: gr1}
@@ -171,7 +183,7 @@ diagnostics:
           - {dataset: CCSM4, ensemble: r(1:6)i1p1}
           - {dataset: CESM1-BGC, ensemble: r1i1p1}
           - {dataset: CESM1-CAM5, ensemble: r(1:3)i1p1}
-          - {dataset: CESM1-CAM5-1-FV2, ensemble: r(1:4)i1p1}
+          #- {dataset: CESM1-CAM5-1-FV2, ensemble: r(1:4)i1p1}
           - {dataset: CESM1-FASTCHEM, ensemble: r(1:3)i1p1}
           - {dataset: CESM1-WACCM, ensemble: r(1:4)i1p1}
           - {dataset: CMCC-CESM, ensemble: r1i1p1}
@@ -180,15 +192,15 @@ diagnostics:
           - {dataset: CNRM-CM5, ensemble: r(1:10)i1p1}
           - {dataset: CNRM-CM5-2, ensemble: r1i1p1}
           - {dataset: CSIRO-Mk3-6-0, ensemble: r(1:10)i1p1}
-          - {dataset: CSIRO-Mk3L-1-2, ensemble: r(1:3)i2p1}
+          #- {dataset: CSIRO-Mk3L-1-2, ensemble: r(1:3)i2p1}
           #- {dataset: CanCM4, ensemble: r(1:10)i1p1} missing 1958-1960
           - {dataset: CanESM2, ensemble: r(1:5)i1p1}
           - {dataset: EC-EARTH, ensemble: r(1:2)i1p1}
           - {dataset: EC-EARTH, ensemble: r6i1p1}
           - {dataset: EC-EARTH, ensemble: r(8:9)i1p1}
-          - {dataset: EC-EARTH, ensemble: r(11:14)i1p1}
+          - {dataset: EC-EARTH, ensemble: r(12:14)i1p1}
           - {dataset: FGOALS-g2, ensemble: r(1:5)i1p1}
-          - {dataset: FGOALS-s2, ensemble: r(1:3)i1p1}
+          - {dataset: FGOALS-s2, ensemble: r(2:3)i1p1}
           - {dataset: FIO-ESM, ensemble: r(1:3)i1p1}
           - {dataset: GFDL-CM2p1, ensemble: r(1:10)i1p1}
           - {dataset: GFDL-CM3, ensemble: r(1:3)i1p1}
@@ -297,42 +309,34 @@ diagnostics:
           - {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
           - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
           - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1, grid: gn}
-          #- {dataset: CESM2, ensemble: r(1:4)i1p1f1, grid: gn} #concatenation failure
-          - {dataset: CESM2, ensemble: r10i1p1f1, grid: gn}
-          #- {dataset: CESM2-WACCM, ensemble: r(1:3)3i1p1f1, grid: gn} #concatenation failure
+          - {dataset: CanESM5, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: CanESM5, ensemble: r(1:10)i1p2f1, grid: gn}
+          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
+          #- {dataset: CESM2, ensemble: r1i1p1f1, grid: gn} #concatenation failure
+          #- {dataset: CESM2, ensemble: r4i1p1f1, grid: gn} #concatenation failure
+          - {dataset: CESM2, ensemble: r(10:11)i1p1f1, grid: gn}
+          #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1, grid: gn} #concatenation failure
           - {dataset: CIESM, ensemble: r1i1p1f1, grid: gr}
           - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
           - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
-          - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2, grid: gr}
+          - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r(3:5)i1p1f2, grid: gr}
           - {dataset: CNRM-ESM2-1, ensemble: r(7:10)i1p1f2, grid: gr}
-          - {dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn}
-          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
-          - {dataset: EC-Earth3, ensemble: r(1:2)i1p1f1, grid: gr}
-          - {dataset: EC-Earth3, ensemble: r4i1p1f1, grid: gr}
-          - {dataset: EC-Earth3, ensemble: r(6:7)i1p1f1, grid: gr}
-          - {dataset: EC-Earth3, ensemble: r(9:10)i1p1f1, grid: gr}
-          #- {dataset: EC-Earth3, ensemble: r11i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r12i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r13i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r14i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r15i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r16i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r17i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r18i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r19i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r20i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r21i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r22i1p1f1, grid: gr} #concatenation failure
-          #- {dataset: EC-Earth3, ensemble: r24i1p1f1, grid: gr} #concatenation failure
-          - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1, grid: gr}
-          - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1, grid: gr}
-          - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1, grid: gr}
+          #- {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r(3:6)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r12i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r14i1p1f1, grid: gr}
           - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
-          - {dataset: FGOALS-g3, ensemble: r(1:4)i1p1f1, grid: gn}
+          - {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
           - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
           - {dataset: GFDL-ESM4, ensemble: r(1:3)i1p1f1, grid: gr1}
-          - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f2, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:6)i1p1f2, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r8i1p1f2, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r10i1p1f2, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:5)i1p3f1, grid: gn}
           - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
           - {dataset: IITM-ESM, ensemble: r1i1p1f1, grid: gn}
           - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
@@ -345,17 +349,16 @@ diagnostics:
           - {dataset: KACE-1-0-G, ensemble: r(1:3)i1p1f1, grid: gr}
           - {dataset: KIOST-ESM, ensemble: r1i1p1f1, grid: gr1}
           - {dataset: MCM-UA-1-0, ensemble: r1i1p1f2, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r(1:7)i1p1f2, grid: gn}
-          - {dataset: MIROC-ES2L, ensemble: r(9:10)i1p1f2, grid: gn}
-          - {dataset: MIROC6, ensemble: r(1:10)i1p1f1, grid: gn}
-          - {dataset: MPI-ESM1-2-HR, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: MIROC6, ensemble: r(1:50)i1p1f1, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r(3:4)i1p1f2, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r(8:9)i1p1f2, grid: gn}
           - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
           - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
           - {dataset: NESM3, ensemble: r(1:2)i1p1f1, grid: gn}
           #- {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn} # fix metadata error
-          - {dataset: NorESM2-LM, ensemble: r(2:3)i1p1f1, grid: gn}
+          - {dataset: NorESM2-LM, ensemble: r(1:3)i1p1f1, grid: gn}
           - {dataset: NorESM2-MM, ensemble: r(1:2)i1p1f1, grid: gn}
-          - {dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
           - {dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
@@ -387,22 +390,23 @@ diagnostics:
           - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: BCC-ESM1, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: CAMS-CSM1-0, grid: gn, ensemble: r1i1p1f1, start_year: 2900, end_year: 2962}
-          - {dataset: CAS-ESM2-0, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
+          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5612}
+          - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5612}
           - {dataset: CESM2, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: CESM2-FV2, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: CESM2-WACCM, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: CESM2-WACCM-FV2, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: CIESM, grid: gr, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: CMCC-CM2-SR5, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
+          - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 1912}
           - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2, start_year: 1850, end_year: 1912}
           - {dataset: CNRM-CM6-1-HR, grid: gr, ensemble: r1i1p1f2, start_year: 1850, end_year: 1912}
           - {dataset: CNRM-ESM2-1, grid: gr, ensemble: r1i1p1f2, start_year: 1850, end_year: 1912}
-          - {dataset: CanESM5, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5612}
-          - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 5612}
           - {dataset: E3SM-1-0, grid: gr, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: E3SM-1-1, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
-          - {dataset: E3SM-1-1-ECA, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
+          #- {dataset: E3SM-1-1-ECA, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: EC-Earth3, grid: gr, ensemble: r1i1p1f1, start_year: 2259, end_year: 2321}
+          - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 1912}
           - {dataset: EC-Earth3-LR, grid: gr, ensemble: r1i1p1f1, start_year: 2219, end_year: 2281}
           - {dataset: EC-Earth3-Veg, grid: gr, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: EC-Earth3-Veg-LR, grid: gr, ensemble: r1i1p1f1, start_year: 2300, end_year: 2362}
@@ -424,8 +428,8 @@ diagnostics:
           - {dataset: KACE-1-0-G, grid: gr, ensemble: r1i1p1f1, start_year: 2000, end_year: 2062}
           - {dataset: KIOST-ESM, grid: gr1, ensemble: r1i1p1f1, start_year: 2689, end_year: 2751}
           - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
-          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2, start_year: 1850, end_year: 1912}
           - {dataset: MIROC6, grid: gn, ensemble: r1i1p1f1, start_year: 3200, end_year: 3262}
+          - {dataset: MIROC-ES2L, grid: gn, ensemble: r1i1p1f2, start_year: 1850, end_year: 1912}
           - {dataset: MPI-ESM-1-2-HAM, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: MPI-ESM1-2-HR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
           - {dataset: MPI-ESM1-2-LR, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1912}
@@ -433,7 +437,7 @@ diagnostics:
           - {dataset: NESM3, grid: gn, ensemble: r1i1p1f1, start_year: 500, end_year: 562}
           - {dataset: NorCPM1, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: NorESM1-F, grid: gn, ensemble: r1i1p1f1, start_year: 1501, end_year: 1563}
-          - {dataset: NorESM2-LM, grid: gn, ensemble: r1i1p1f1, start_year: 1600, end_year: 1662}
+          #- {dataset: NorESM2-LM, grid: gn, ensemble: r1i1p1f1, start_year: 1600, end_year: 1662}
           - {dataset: NorESM2-MM, grid: gn, ensemble: r1i1p1f1, start_year: 1200, end_year: 1262}
           - {dataset: SAM0-UNICON, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 63}
           - {dataset: TaiESM1, grid: gn, ensemble: r1i1p1f1, start_year: 201, end_year: 263}
@@ -464,12 +468,13 @@ diagnostics:
         exp: hist-aer
         additional_datasets:
           - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r(1:3)i1p1f1}
-          - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:2)i1p1f1}
+          - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:3)i1p1f1}
           #- {dataset: BCC-CSM2-MR, grid: gn, ensemble: r3i1p1f1} # fix metadata error
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:15)i1p1f1}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:15)i1p2f1}
           #- {dataset: CESM2, grid: gn, ensemble: r1i1p1f1} # until 2014 only
           #- {dataset: CESM2, grid: gn, ensemble: r3i1p1f1} # until 2014 only
           - {dataset: CNRM-CM6-1, grid: gr, ensemble: r(1:10)i1p1f2}
-          - {dataset: CanESM5, grid: gn, ensemble: r(1:15)i1p1f1}
           - {dataset: FGOALS-g3, grid: gn, ensemble: r(1:3)i1p1f1}
           - {dataset: GFDL-ESM4,  grid: gr1, ensemble: r1i1p1f1}
           - {dataset: GISS-E2-1-G,  grid: gn, ensemble: r(1:5)i1p3f1, exp: [hist-aer, ssp245-aer]}
@@ -505,10 +510,11 @@ diagnostics:
         additional_datasets:
           - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r(1:3)i1p1f1}
           - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p1f1}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p2f1}
           #- {dataset: CESM2, grid: gn, ensemble: r(1:3)i1p1f1} until 2014 only
           - {dataset: CNRM-CM6-1, grid: gr, ensemble: r1i1p1f2}
           - {dataset: CNRM-CM6-1, grid: gr, ensemble: r(3:10)i1p1f2}
-          - {dataset: CanESM5, grid: gn, ensemble: r(1:10)i1p1f1}
           - {dataset: FGOALS-g3, grid: gn, ensemble: r(1:3)i1p1f1}
           - {dataset: GFDL-ESM4,  grid: gr1, ensemble: r1i1p1f1}
           - {dataset: GISS-E2-1-G,  grid: gn, ensemble: r(1:5)i1p1f1, exp: [hist-GHG, ssp245-GHG]}
@@ -516,7 +522,7 @@ diagnostics:
           - {dataset: IPSL-CM6A-LR, grid: gr, ensemble: r(1:10)i1p1f1}
           - {dataset: MIROC6, grid: gn, ensemble: r(1:3)i1p1f1}
           - {dataset: MRI-ESM2-0,  grid: gn, ensemble: r(1:5)i1p1f1}
-          - {dataset: NorESM2-LM,  grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: NorESM2-LM,  grid: gn, ensemble: r(2:3)i1p1f1}
     scripts:
       diag_hist-GHG_djf:
         <<: *diag_calc_hist
@@ -540,11 +546,12 @@ diagnostics:
         <<: *var_def_2
         exp: hist-nat
         additional_datasets:
-          - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r1i1p1f1}
+          - {dataset: ACCESS-ESM1-5, grid: gn, ensemble: r(1:3)i1p1f1}
           - {dataset: BCC-CSM2-MR, grid: gn, ensemble: r(1:3)i1p1f1}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p1f1}
+          - {dataset: CanESM5, grid: gn, ensemble: r(1:25)i1p2f1}
           #- {dataset: CESM2, grid: gn, ensemble: r(1:3)i1p1f1} # until 2014 only
           - {dataset: CNRM-CM6-1, grid: gr, ensemble: r(1:10)i1p1f2}
-          - {dataset: CanESM5, grid: gn, ensemble: r(1:15)i1p2f1}
           - {dataset: FGOALS-g3, grid: gn, ensemble: r1i1p1f1}
           - {dataset: GFDL-ESM4,  grid: gr1, ensemble: r(1:3)i1p1f1}
           - {dataset: GISS-E2-1-G,  grid: gn, ensemble: r(1:5)i1p1f2, exp: [hist-nat, ssp245-nat]}
@@ -643,7 +650,8 @@ diagnostics:
           - {dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1}
           - {dataset: ACCESS-CM2, exp: piControl, start_year: 950, end_year: 1064}
           - {dataset: ACCESS-ESM1-5, ensemble: r(1:6)i1p1f1}
-          - {dataset: ACCESS-ESM1-5, ensemble: r(8:10)i1p1f1}
+          - {dataset: ACCESS-ESM1-5, ensemble: r(8:11)i1p1f1}
+          - {dataset: ACCESS-ESM1-5, ensemble: r(13:20)i1p1f1}
           - {dataset: ACCESS-ESM1-5, exp: piControl, start_year: 101, end_year: 215}
           #- {dataset: AWI-CM-1-1-MR, ensemble: r(1:5)i1p1f1} # preprocessor failure; all member?
           #- {dataset: AWI-CM-1-1-MR, exp: piControl, start_year: 2401, end_year: 2515}
@@ -651,13 +659,19 @@ diagnostics:
           #- {dataset: AWI-ESM-1-1-LR, exp: piControl, start_year: 1855, end_year: 1969} # too short
           - {dataset: BCC-CSM2-MR, ensemble: r(1:3)i1p1f1}
           - {dataset: BCC-CSM2-MR, exp: piControl, start_year: 1850, end_year: 1964}
-          #- {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1} # preprocessor failure; all member?
-          #- {dataset: BCC-ESM1, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1} # preprocessor failure; all member?
+          - {dataset: BCC-ESM1, exp: piControl, start_year: 1850, end_year: 1964}
           - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
+          - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f2}
           - {dataset: CAMS-CSM1-0, exp: piControl, start_year: 2900, end_year: 3014}
+          - {dataset: CanESM5, ensemble: r(1:25)i1p1f1}
+          - {dataset: CanESM5, ensemble: r(1:40)i1p2f1}
+          - {dataset: CanESM5, ensemble: r1i1p2f1, exp: piControl, start_year: 5550, end_year: 5664} 
+          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
+          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, exp: piControl, start_year: 5550, end_year: 5664} 
           #- {dataset: CAS-ESM2-0, ensemble: r(1:4)i1p1f1}
           #- {dataset: CAS-ESM2-0, exp: piControl, start_year: 1855, end_year: 1969} # too short
-          - {dataset: CESM2, ensemble: r(1:10)i1p1f1}
+          - {dataset: CESM2, ensemble: r(1:11)i1p1f1}
           - {dataset: CESM2, exp: piControl, start_year: 1, end_year: 115}
           - {dataset: CESM2-FV2, ensemble: r(1:3)i1p1f1}
           - {dataset: CESM2-FV2, exp: piControl, start_year: 1, end_year: 115}
@@ -667,22 +681,18 @@ diagnostics:
           - {dataset: CESM2-WACCM-FV2, exp: piControl, start_year: 1, end_year: 115} 
           - {dataset: CIESM, ensemble: r(1:3)i1p1f1}
           - {dataset: CIESM, exp: piControl, start_year: 1, end_year: 115}
-          #- {dataset: CMCC-CM2-HR4}
+          #- {dataset: CMCC-CM2-HR4, ensemble: r1i1p1f1}
           #- {dataset: CMCC-CM2-HR4, exp: piControl}
           - {dataset: CMCC-CM2-SR5}
           - {dataset: CMCC-CM2-SR5, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: CNRM-CM6-1, ensemble: r(1:20)i1p1f2}
+          - {dataset: CMCC-ESM2, ensemble: r1i1p1f1}
+          - {dataset: CMCC-ESM2, grid: gn, start_year: 1850, end_year: 1964}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:30)i1p1f2}
           - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964} 
           - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
           - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964} 
-          - {dataset: CNRM-ESM2-1, ensemble: r(1:10)i1p1f2}
+          - {dataset: CNRM-ESM2-1, ensemble: r(1:11)i1p1f2}
           - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964} 
-          - {dataset: CanESM5, ensemble: r(1:12)i1p2f1}
-          - {dataset: CanESM5, ensemble: r14i1p2f1}
-          - {dataset: CanESM5, ensemble: r(16:25)i1p2f1}
-          - {dataset: CanESM5, ensemble: r1i1p2f1, exp: piControl, start_year: 5550, end_year: 5664} 
-          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
-          - {dataset: CanESM5-CanOE, ensemble: r1i1p2f1, exp: piControl, start_year: 5550, end_year: 5664} 
           - {dataset: E3SM-1-0, grid: gr, ensemble: r(1:5)i1p1f1}
           - {dataset: E3SM-1-0, grid: gr, exp: piControl, start_year: 1, end_year: 115} 
           - {dataset: E3SM-1-1, grid: gr}
@@ -697,7 +707,8 @@ diagnostics:
           - {dataset: EC-Earth3, exp: piControl, start_year: 2259, end_year: 2373}
           #- {dataset: EC-Earth3-LR} 
           #- {dataset: EC-Earth3-LR, exp: piControl, start_year: 2219, end_year: 2333} 
-          - {dataset: EC-Earth3-Veg, ensemble: r(1:5)i1p1f1}
+          - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1}
+          - {dataset: EC-Earth3-Veg, ensemble: r14i1p1f1}
           - {dataset: EC-Earth3-Veg, exp: piControl, start_year: 1850, end_year: 1964} 
           #- {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1}
           - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1}
@@ -715,15 +726,15 @@ diagnostics:
           - {dataset: GFDL-ESM4, exp: piControl, start_year: 1, end_year: 115} 
           - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f2}
           - {dataset: GISS-E2-1-G, ensemble: r1i1p1f2, exp: piControl, start_year: 7550, end_year: 7664}
-          - {dataset: GISS-E2-1-G-CC}
-          - {dataset: GISS-E2-1-G-CC, exp: piControl, start_year: 1850, end_year: 1964}
+          #- {dataset: GISS-E2-1-G-CC}
+          #- {dataset: GISS-E2-1-G-CC, exp: piControl, start_year: 1850, end_year: 1964}
           - {dataset: GISS-E2-1-H, ensemble: r(1:10)i1p1f1}
           - {dataset: GISS-E2-1-H, exp: piControl, start_year: 3180, end_year: 3294}
           #- {dataset: GISS-E2-2-G}
           #- {dataset: GISS-E2-2-G, exp: piControl, start_year: 2000, end_year: 2114}
           - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3}
           - {dataset: HadGEM3-GC31-LL, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: HadGEM3-GC31-MM, ensemble: r(1:3)i1p1f3}
+          - {dataset: HadGEM3-GC31-MM, ensemble: r(1:4)i1p1f3}
           - {dataset: HadGEM3-GC31-MM, exp: piControl, start_year: 1850, end_year: 1964}
           #- {dataset: IITM-ESM} # preprocessor failure
           #- {dataset: IITM-ESM, exp: piControl, start_year: 1926, end_year: 2040}
@@ -739,11 +750,11 @@ diagnostics:
           #- {dataset: KIOST-ESM, grid: gr1, exp: piControl}
           #- {dataset: MCM-UA-1-0, ensemble: r1i1p1f2} # preprocessor failure
           #- {dataset: MCM-UA-1-0, exp: piControl, start_year: 1, end_year: 115} # preprocessor failure
-          - {dataset: MIROC-ES2L, ensemble: r(1:3)i1p1f2}
-          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: MIROC6, ensemble: r(1:10)i1p1f1}
+          - {dataset: MIROC6, ensemble: r(1:50)i1p1f1}
           - {dataset: MIROC6, exp: piControl, start_year: 3201, end_year: 3315}
-          - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1}
+          - {dataset: MIROC-ES2L, ensemble: r(1:10)i1p1f2}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, exp: piControl, start_year: 1850, end_year: 1964}
+          - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:3)i1p1f1}
           - {dataset: MPI-ESM-1-2-HAM, exp: piControl, start_year: 1850, end_year: 1964}
           - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1}
           - {dataset: MPI-ESM1-2-HR, exp: piControl, start_year: 1850, end_year: 1964}
@@ -792,7 +803,7 @@ diagnostics:
           - {dataset: CCSM4,         exp: piControl, ensemble: r1i1p1, start_year: 850, end_year: 964}
           - {dataset: CESM1-BGC}
           - {dataset: CESM1-BGC,         exp: piControl, ensemble: r1i1p1, start_year: 101, end_year: 215}
-          - {dataset: CESM1-CAM5, ensemble: r(1:4)i1p1}
+          - {dataset: CESM1-CAM5, ensemble: r(1:3)i1p1}
           - {dataset: CESM1-CAM5,        exp: piControl, ensemble: r1i1p1, start_year: 1, end_year: 115}
           - {dataset: CESM1-CAM5-1-FV2, ensemble: r(1:4)i1p1}
           - {dataset: CESM1-FASTCHEM, ensemble: r(1:3)i1p1}
@@ -808,7 +819,7 @@ diagnostics:
           - {dataset: CNRM-CM5-2}
           - {dataset: CSIRO-Mk3-6-0, ensemble: r(1:10)i1p1}
           - {dataset: CSIRO-Mk3-6-0, exp: piControl,   start_year:  104, end_year:  218}
-          - {dataset: CSIRO-Mk3L-1-2, ensemble: r1i2p1}
+          #- {dataset: CSIRO-Mk3L-1-2, ensemble: r1i2p1}
           - {dataset: EC-EARTH, ensemble: r1i1p1}
           - {dataset: EC-EARTH, ensemble: r8i1p1}
           - {dataset: EC-EARTH, ensemble: r11i1p1}

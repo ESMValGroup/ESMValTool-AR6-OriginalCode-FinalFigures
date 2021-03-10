@@ -430,7 +430,6 @@ begin
       ind_mod := ind(datasetnames_em.ne."MultiModelMean")
       model_arr(mmm_ind, :) = dim_avg_n(model_arr_em(ind_mod,:),0) 
 
-
       ; *************************************
       ; calculate 5% and 95% quantiles
       ; *************************************

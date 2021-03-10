@@ -36,7 +36,7 @@ diagnostics:
         reference_dataset: HadISST
         ensemble: r1i1p1f1
         start_year: 1950
-        end_year: 2014
+        end_year: 2017
         additional_datasets: &siconc_datasets
           - {dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
           - {dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
@@ -235,7 +235,7 @@ diagnostics:
         time_avg: "yearly"
         stat_shading: True
         start_year: 1950
-        end_year: 2014
+        end_year: 2017
         ts_anomaly: "anom"
         ref_start: 1979
         ref_end: 1999
@@ -250,7 +250,7 @@ diagnostics:
         time_avg: "yearly"
         stat_shading: True
         start_year: 1950
-        end_year: 2014
+        end_year: 2017
         ts_anomaly: "anom"
         ref_start: 1979
         ref_end: 1999

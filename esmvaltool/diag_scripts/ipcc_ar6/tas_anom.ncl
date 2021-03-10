@@ -512,6 +512,21 @@ begin
   model_arr&time = tmp
   delete(tmp)
 
+  ;;additional calculation
+  ;tmp = dim_avg_n(model_arr_em(ind_mod, 160:169), 1)
+  ;i = 0
+  ;j = 0
+  ;do ii = 0, dimsizes(ind_mod) - 1
+  ;  if(tmp(ii) .gt. 1.21)
+  ;    i = i + 1
+  ;  end if
+  ;  if(tmp(ii) .lt. 0.88)
+  ;    j = j + 1
+  ;  end if
+  ;end do
+  ;print("higher: " + i)
+  ;print("lower: " + j)
+  ;delete(tmp)
 
   ; *************************************
   ; output to NetCDF
@@ -526,12 +541,12 @@ begin
   out_path1 = out_path + "tsline_gmst_anom_" + project0 + "_" \
               + exp0 + ".nc"
   out_path1@existing = "overwrite"
-  model_arr@ncdf = out_path
-  model_arr@experiment = project0 + "_" + exp0
-  model_arr@diag_script = DIAG_SCRIPT
-  model_arr@var = var0
-  model_arr@long_name = "Global Mean Surface Temperature"
-  ncdf_outfile = ncdf_write(model_arr, out_path1)
+  model_arr_em@ncdf = out_path
+  model_arr_em@experiment = project0 + "_" + exp0
+  model_arr_em@diag_script = DIAG_SCRIPT
+  model_arr_em@var = var0
+  model_arr_em@long_name = "Global Mean Surface Temperature"
+  ncdf_outfile = ncdf_write(model_arr_em, out_path1)
 
 
   ; *************************************
