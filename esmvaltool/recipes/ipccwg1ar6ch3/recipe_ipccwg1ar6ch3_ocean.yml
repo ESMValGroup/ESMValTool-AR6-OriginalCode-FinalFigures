@@ -72,7 +72,7 @@ models_cmip6_historical_woa: &models_cmip6_historical_woa #historical, Omon, tos
   - {dataset: CNRM-CM6-1, ensemble: r1i1p1f2}
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-  - {dataset: E3SM-1-0, grid: gr}
+  - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr}
   - {dataset: E3SM-1-1, grid: gr, institute: E3SM-Project}
   - {dataset: E3SM-1-1-ECA, grid: gr, institute: E3SM-Project}
   - {dataset: EC-Earth3} #tos: not all years available
@@ -92,6 +92,7 @@ models_cmip6_historical_woa: &models_cmip6_historical_woa #historical, Omon, tos
   #- {dataset: IITM-ESM} #sos: preprocessor fails
   - {dataset: INM-CM4-8, grid: gr1}
   - {dataset: INM-CM5-0, grid: gr1}
+  - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1, grid: gn}
   - {dataset: IPSL-CM6A-LR}
   #- {dataset: KACE-1-0-G} #no sos
   - {dataset: KIOST-ESM, grid: gr1}
@@ -170,7 +171,7 @@ models_cmip6_piControl: &models_cmip6_piControl #piControl, Omon, tos+so
   #- {dataset: NorESM2-LM, institute: NCC, start_year: 1600, end_year: 1799} #no sos
   - {dataset: NorESM2-MM, institute: NCC, start_year: 1200, end_year: 1699}
   - {dataset: SAM0-UNICON, grid: gn, start_year: 1, end_year: 700}
-  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 3059}
+  #- {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 3059} #no sos
 
 
 

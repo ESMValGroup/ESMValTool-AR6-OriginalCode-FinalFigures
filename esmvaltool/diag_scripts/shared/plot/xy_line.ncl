@@ -2006,7 +2006,7 @@ begin
 
   lgres                    = True
   lgres@lgItemType         = "Lines"   ; show lines only (default)
-  lgres@lgLabelFontHeightF = .05       ; set the legend label font thickness
+  lgres@lgLabelFontHeightF = .04       ; set the legend label font thickness
   lgres@vpWidthF           = 0.3      ; width of legend (NDC)
   lgres@vpHeightF          = 1.       ; height of legend (NDC)
   lgres@lgPerimColor       = "gray"    ; draw the box perimeter in orange
