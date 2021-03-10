@@ -414,7 +414,7 @@ def _plot_settings(cfg, axx, fig, figname, period):
     if 'common_lats' in period.keys():
         add = ' between ' + period['common_lats'] + add
 
-    axx.set_title('Trends in Water Vapor Path' + add)
+    axx.set_title('Trends in total column water vapor' + add)
     axx.set_xlabel('Trend (%/decade)')
     fig.tight_layout()
     fig.savefig(get_plot_filename(figname, cfg), dpi=300)

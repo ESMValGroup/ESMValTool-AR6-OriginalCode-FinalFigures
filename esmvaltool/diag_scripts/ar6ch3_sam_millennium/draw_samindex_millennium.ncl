@@ -432,7 +432,7 @@ begin
   txres@txJust = "TopLeft"
   legend = get_unique_values(where(cmip_phase.ne."CMIP5", model_name, "CMIP5"))
   nlegend = dimsizes(legend)
-  x = syear + 50.
+  x = syear + 200.
   dx = tofloat(eyear-syear-100)/40.
   do n = 0, nlegend-1
     if (legend(n).ne."CMIP5") then

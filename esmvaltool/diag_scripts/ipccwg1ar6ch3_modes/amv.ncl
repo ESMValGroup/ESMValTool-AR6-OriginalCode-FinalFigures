@@ -18,6 +18,7 @@
 ; Caveats
 ;
 ; Modification history
+;   20210306-Yu Kosaka: added provenance
 ;   20210301-Yu Kosaka: revised figure details
 ;   20210205-Yu Kosaka: minor revision in figure legend
 ;   20210131-Yu Kosaka: revised from monthly to annual mean data
@@ -131,6 +132,9 @@ begin
     file_type = "ps"
   end if
 
+  outpath = config_user_info@plot_dir
+  ofile = outpath + "amv"
+  
   ; setting constants
   fca = 1./ 10.       ; 10 year low pass
   fcb = 0.
@@ -286,6 +290,11 @@ begin
   z@datasets = obs_datasets
   delete([/z/])
   delete([/amv_pattern_obs, amv_timeseries_raw, amv_timeseries, tay_stat, amv_pattern_sig_obs/])
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Observed patterns, time series, and taylor statitics of AMV", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(obs, "filename"))
   
   z = addfile(fn,"r")
   amv_obs = z->amv_pattern_obs0
@@ -406,6 +415,11 @@ begin
   delete([/z/])
   delete([/amv_pattern, amv_timeseries_raw, amv_timeseries, tay_stat, ensemble_assign/])
 
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of AMV in CMIP6 historical", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(hist_cmip6, "filename"))
+  
   z = addfile(fn,"r")
   amv_hist = z->amv_pattern
   amv_tseries_lp_hist = z->amv_timeseries
@@ -517,6 +531,11 @@ begin
   z->tay_stats = tay_stat
   delete([/z/])
   delete([/amv_pattern, amv_timeseries_raw, amv_timeseries, tay_stat/])
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of AMV in CMIP6 piControl", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(piControl_cmip6, "filename"))
   
   z = addfile(fn,"r")
   amv_tseries_piControl = z->amv_timeseries_raw
@@ -633,6 +652,11 @@ begin
   z->ensemble_assign = ensemble_assign_C5
   delete([/z/])
   delete([/amv_pattern, amv_timeseries_raw, amv_timeseries, tay_stat, ensemble_assign_C5/])
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of AMV in CMIP5 historical", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(hist_cmip5, "filename"))
   
   z = addfile(fn,"r")
   amv_hist_C5 = z->amv_pattern
@@ -731,6 +755,11 @@ begin
   z->tay_stats = tay_stat
   delete([/z/])
   delete([/amv_pattern, amv_timeseries_raw, amv_timeseries, tay_stat/])
+
+  log_provenance(fn, ofile+"."+file_type, \
+                 "Patterns, time series, and taylor statitics of AMV in CMIP5 piControl", \
+                 (/"anomaly","var"/), (/"global"/), (/"geo", "taylor", "box", "times"/), \
+                 "kosaka_yu", "", metadata_att_as_array(piControl_cmip5, "filename"))
   
   z = addfile(fn,"r")
   amv_tseries_piControl_C5 = z->amv_timeseries_raw
@@ -1073,9 +1102,6 @@ begin
   ;--------------------------------------------------------
   ;Plotting
   ;--------------------------------------------------------
-
-  outpath = config_user_info@plot_dir
-  ofile = outpath + "amv"
 
   wks = gsn_open_wks(file_type, ofile)
 
@@ -1676,8 +1702,7 @@ begin
   end do
   gsn_text_ndc(wks," not significant~C~ at 10% level",x2+0.004,0.62,tlres)
   
-;
   frame(wks)
   delete(wks)
-  system("convert -density 216 -trim +repage -border 10 -bordercolor white -flatten "+ofile+"."+file_type+" "+ofile+".png")
+
 end

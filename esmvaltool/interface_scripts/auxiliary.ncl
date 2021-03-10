@@ -709,7 +709,7 @@ begin
         dimSzs = new(dimsizes(dims_new), long)
         dimUnlim = new(dimsizes(dims_new), logical)
         dimUnlim(:) = False
-        do i = 0, dimsizes(dims_new)- 1
+        do i = 0, dimsizes(dims_new) - 1
           dimSzs(i) = dimsizes(data&$dims_new(i)$)
         end do
         filedimdef(ncdf, dims_new, dimSzs, dimUnlim)

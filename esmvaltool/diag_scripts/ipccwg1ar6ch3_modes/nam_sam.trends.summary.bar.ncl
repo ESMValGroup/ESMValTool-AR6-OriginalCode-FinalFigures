@@ -6,6 +6,7 @@
 ; Description
 ;
 ; Modification history
+;   20210306-Yu Kosaka: added netcdf output and provenance
 ;   20210216-Yu Kosaka: revised figure details
 ;   20210212-Yu Kosaka: revised to get trend periods from input files
 ;   20210129-Yu Kosaka: adapt Adam's script to the ESMValTool
@@ -41,11 +42,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_obs_djfA = a->nam_trends
           sam_obs_djfA_0 = a->sam_trends0
           sam_obs_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_obs_jjaA = a->nam_trends
           sam_obs_jjaA_0 = a->sam_trends0
@@ -57,11 +68,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_ctl_djfA = a->nam_trends
           sam_ctl_djfA_0 = a->sam_trends0
           sam_ctl_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_ctl_jjaA = a->nam_trends
           sam_ctl_jjaA_0 = a->sam_trends0
@@ -72,11 +93,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_hist_djfA = a->nam_trends
           sam_hist_djfA_0 = a->sam_trends0
           sam_hist_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_hist_jjaA = a->nam_trends
           sam_hist_jjaA_0 = a->sam_trends0
@@ -88,11 +119,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histstrat_djfA = a->nam_trends
           sam_histstrat_djfA_0 = a->sam_trends0
           sam_histstrat_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histstrat_jjaA = a->nam_trends
           sam_histstrat_jjaA_0 = a->sam_trends0
@@ -104,11 +145,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histaer_djfA = a->nam_trends
           sam_histaer_djfA_0 = a->sam_trends0
           sam_histaer_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histaer_jjaA = a->nam_trends
           sam_histaer_jjaA_0 = a->sam_trends0
@@ -120,11 +171,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histghg_djfA = a->nam_trends
           sam_histghg_djfA_0 = a->sam_trends0
           sam_histghg_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histghg_jjaA = a->nam_trends
           sam_histghg_jjaA_0 = a->sam_trends0
@@ -136,11 +197,21 @@ begin
       ncpaths := systemfunc ("ls "+idirs(ii))
       do jj = 0, dimsizes(ncpaths)-1
         if (isStrSubset(str_lower(ncpaths(jj)), "_djf").or.isStrSubset(str_lower(ncpaths(jj)), ".djf.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histnat_djfA = a->nam_trends
           sam_histnat_djfA_0 = a->sam_trends0
           sam_histnat_djfA_1 = a->sam_trends1
         elseif (isStrSubset(str_lower(ncpaths(jj)), "_jja").or.isStrSubset(str_lower(ncpaths(jj)), ".jja.")) then
+          if (isvar("paths_all")) then
+            paths_all := array_append_record(paths_all, (/idirs(ii)+"/"+ncpaths(jj)/), 0)
+          else
+            paths_all := (/idirs(ii)+"/"+ncpaths(jj)/)
+          end if
           a = addfile(idirs(ii)+"/"+ncpaths(jj),"r")
           nam_histnat_jjaA = a->nam_trends
           sam_histnat_jjaA_0 = a->sam_trends0
@@ -704,7 +775,269 @@ begin
 
   gsn_panel(wks,bplot,(/2,2/),panres)
   frame(wks)
-  delete(wks)
-  system("convert -density 216 -trim +repage -border 10 -bordercolor white "+ofile+"."+file_type+" "+ofile+".png")
+
+; Output netcdf file
+  if (config_user_info@write_netcdf) then
+    out_dir =  config_user_info@work_dir + "/"
+    system("mkdir -p "+out_dir)
+    nc_outfile = out_dir+"NAM_SAM_detection_attribution.nc"
+    if (fileexists(nc_outfile)) then
+      system("rm -f "+nc_outfile)
+    end if
+    nc_outfile@existing = "append"
+
+    nam_obs_djfA@diag_script = DIAG_SCRIPT
+    nam_obs_djfA!0 = "obs_dataset"
+    nam_obs_djfA@var = "NAM_obs_DJF_"+syear_a+"_"+eyear_a
+    nam_obs_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_obs_djfA, nc_outfile)
+    sam_obs_djfA_0!0 = "obs_dataset"
+    sam_obs_djfA_0@var = "SAM_obs_DJF_"+syear_b+"_"+eyear_b
+    sam_obs_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_obs_djfA_0, nc_outfile)
+    sam_obs_djfA_1!0 = "obs_dataset"
+    sam_obs_djfA_1@var = "SAM_obs_DJF_"+syear_c+"_"+eyear_c
+    sam_obs_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_obs_djfA_1, nc_outfile)
+
+    nam_obs_jjaA!0 = "obs_dataset"
+    nam_obs_jjaA@var = "NAM_obs_JJA_"+syear_a+"_"+eyear_a
+    nam_obs_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_obs_jjaA, nc_outfile)
+    sam_obs_jjaA_0!0 = "obs_dataset"
+    sam_obs_jjaA_0@var = "SAM_obs_JJA_"+syear_b+"_"+eyear_b
+    sam_obs_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_obs_jjaA_0, nc_outfile)
+    sam_obs_jjaA_1!0 = "obs_dataset"
+    sam_obs_jjaA_1@var = "SAM_obs_JJA_"+syear_c+"_"+eyear_c
+    sam_obs_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_obs_jjaA_1, nc_outfile)
+
+    nam_ctl_djfA = nam_ctl_djfA/nam_yrs*10
+    nam_ctl_djfA!0 = "model_ctl"
+    nam_ctl_djfA@var = "NAM_piControl_DJF_"+toint(nam_yrs)+"yrs"
+    nam_ctl_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_ctl_djfA, nc_outfile)
+    sam_ctl_djfA_0 = sam_ctl_djfA_0/sam_yrs0*10
+    sam_ctl_djfA_0!0 = "model_ctl"
+    sam_ctl_djfA_0@var = "SAM_piControl_DJF_"+syear_b+"_"+eyear_b
+    sam_ctl_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_ctl_djfA_0, nc_outfile)
+    sam_ctl_djfA_1 = sam_ctl_djfA_1/sam_yrs1*10
+    sam_ctl_djfA_1!0 = "model_ctl"
+    sam_ctl_djfA_1@var = "SAM_piControl_DJF_"+syear_c+"_"+eyear_c
+    sam_ctl_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_ctl_djfA_1, nc_outfile)
+
+    nam_ctl_jjaA = nam_ctl_jjaA/nam_yrs*10
+    nam_ctl_jjaA!0 = "model_ctl"
+    nam_ctl_jjaA@var = "NAM_piControl_JJA_"+toint(nam_yrs)+"yrs"
+    nam_ctl_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_ctl_jjaA, nc_outfile)
+    sam_ctl_jjaA_0 = sam_ctl_jjaA_0/sam_yrs0*10
+    sam_ctl_jjaA_0!0 = "model_ctl"
+    sam_ctl_jjaA_0@var = "SAM_piControl_JJA_"+syear_b+"_"+eyear_b
+    sam_ctl_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_ctl_jjaA_0, nc_outfile)
+    sam_ctl_jjaA_1 = sam_ctl_jjaA_1/sam_yrs1*10
+    sam_ctl_jjaA_1!0 = "model_ctl"
+    sam_ctl_jjaA_1@var = "SAM_piControl_JJA_"+syear_c+"_"+eyear_c
+    sam_ctl_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_ctl_jjaA_1, nc_outfile)
+
+    nam_hist_djfA = nam_hist_djfA/nam_yrs*10
+    nam_hist_djfA!0 = "ensemble_hist"
+    nam_hist_djfA@var = "NAM_hist_DJF_"+syear_a+"_"+eyear_a
+    nam_hist_djfA@weight = wgt_hist
+    nam_hist_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_hist_djfA, nc_outfile)
+    sam_hist_djfA_0 = sam_hist_djfA_0/sam_yrs0*10
+    sam_hist_djfA_0!0 = "ensemble_hist"
+    sam_hist_djfA_0@var = "SAM_hist_DJF_"+syear_b+"_"+eyear_b
+    sam_hist_djfA_0@weight = wgt_hist
+    sam_hist_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_hist_djfA_0, nc_outfile)
+    sam_hist_djfA_1 = sam_hist_djfA_1/sam_yrs1*10
+    sam_hist_djfA_1!0 = "ensemble_hist"
+    sam_hist_djfA_1@var = "SAM_hist_DJF_"+syear_c+"_"+eyear_c
+    sam_hist_djfA_1@weight = wgt_hist
+    sam_hist_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_hist_djfA_1, nc_outfile)
+
+    nam_hist_jjaA = nam_hist_jjaA/nam_yrs*10
+    nam_hist_jjaA!0 = "ensemble_hist"
+    nam_hist_jjaA@var = "NAM_hist_JJA_"+syear_a+"_"+eyear_a
+    nam_hist_jjaA@weight = wgt_hist
+    nam_hist_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_hist_jjaA, nc_outfile)
+    sam_hist_jjaA_0 = sam_hist_jjaA_0/sam_yrs0*10
+    sam_hist_jjaA_0!0 = "ensemble_hist"
+    sam_hist_jjaA_0@var = "SAM_hist_JJA_"+syear_b+"_"+eyear_b
+    sam_hist_jjaA_0@weight = wgt_hist
+    sam_hist_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_hist_jjaA_0, nc_outfile)
+    sam_hist_jjaA_1 = sam_hist_jjaA_1/sam_yrs1*10
+    sam_hist_jjaA_1!0 = "ensemble_hist"
+    sam_hist_jjaA_1@var = "SAM_hist_JJA_"+syear_c+"_"+eyear_c
+    sam_hist_jjaA_1@weight = wgt_hist
+    sam_hist_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_hist_jjaA_1, nc_outfile)
+
+    nam_histghg_djfA = nam_histghg_djfA/nam_yrs*10
+    nam_histghg_djfA!0 = "ensemble_GHG"
+    nam_histghg_djfA@var = "NAM_GHG_DJF_"+syear_a+"_"+eyear_a
+    nam_histghg_djfA@weight = wgt_histghg
+    nam_histghg_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histghg_djfA, nc_outfile)
+    sam_histghg_djfA_0 = sam_histghg_djfA_0/sam_yrs0*10
+    sam_histghg_djfA_0!0 = "ensemble_GHG"
+    sam_histghg_djfA_0@var = "SAM_GHG_DJF_"+syear_b+"_"+eyear_b
+    sam_histghg_djfA_0@weight = wgt_histghg
+    sam_histghg_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histghg_djfA_0, nc_outfile)
+    sam_histghg_djfA_1 = sam_histghg_djfA_1/sam_yrs1*10
+    sam_histghg_djfA_1!0 = "ensemble_GHG"
+    sam_histghg_djfA_1@var = "SAM_GHG_DJF_"+syear_c+"_"+eyear_c
+    sam_histghg_djfA_1@weight = wgt_histghg
+    sam_histghg_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histghg_djfA_1, nc_outfile)
+
+    nam_histghg_jjaA = nam_histghg_jjaA/nam_yrs*10
+    nam_histghg_jjaA!0 = "ensemble_GHG"
+    nam_histghg_jjaA@var = "NAM_GHG_JJA_"+syear_a+"_"+eyear_a
+    nam_histghg_jjaA@weight = wgt_histghg
+    nam_histghg_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histghg_jjaA, nc_outfile)
+    sam_histghg_jjaA_0 = sam_histghg_jjaA_0/sam_yrs0*10
+    sam_histghg_jjaA_0!0 = "ensemble_GHG"
+    sam_histghg_jjaA_0@var = "SAM_GHG_JJA_"+syear_b+"_"+eyear_b
+    sam_histghg_jjaA_0@weight = wgt_histghg
+    sam_histghg_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histghg_jjaA_0, nc_outfile)
+    sam_histghg_jjaA_1 = sam_histghg_jjaA_1/sam_yrs1*10
+    sam_histghg_jjaA_1!0 = "ensemble_GHG"
+    sam_histghg_jjaA_1@var = "SAM_GHG_JJA_"+syear_c+"_"+eyear_c
+    sam_histghg_jjaA_1@weight = wgt_histghg
+    sam_histghg_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histghg_jjaA_1, nc_outfile)
+    
+    nam_histaer_djfA = nam_histaer_djfA/nam_yrs*10
+    nam_histaer_djfA!0 = "ensemble_aer"
+    nam_histaer_djfA@var = "NAM_aer_DJF_"+syear_a+"_"+eyear_a
+    nam_histaer_djfA@weight = wgt_histaer
+    nam_histaer_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histaer_djfA, nc_outfile)
+    sam_histaer_djfA_0 = sam_histaer_djfA_0/sam_yrs0*10
+    sam_histaer_djfA_0!0 = "ensemble_aer"
+    sam_histaer_djfA_0@var = "SAM_aer_DJF_"+syear_b+"_"+eyear_b
+    sam_histaer_djfA_0@weight = wgt_histaer
+    sam_histaer_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histaer_djfA_0, nc_outfile)
+    sam_histaer_djfA_1 = sam_histaer_djfA_1/sam_yrs1*10
+    sam_histaer_djfA_1!0 = "ensemble_aer"
+    sam_histaer_djfA_1@var = "SAM_aer_DJF_"+syear_c+"_"+eyear_c
+    sam_histaer_djfA_1@weight = wgt_histaer
+    sam_histaer_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histaer_djfA_1, nc_outfile)
+
+    nam_histaer_jjaA = nam_histaer_jjaA/nam_yrs*10
+    nam_histaer_jjaA!0 = "ensemble_aer"
+    nam_histaer_jjaA@var = "NAM_aer_JJA_"+syear_a+"_"+eyear_a
+    nam_histaer_jjaA@weight = wgt_histaer
+    nam_histaer_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histaer_jjaA, nc_outfile)
+    sam_histaer_jjaA_0 = sam_histaer_jjaA_0/sam_yrs0*10
+    sam_histaer_jjaA_0!0 = "ensemble_aer"
+    sam_histaer_jjaA_0@var = "SAM_aer_JJA_"+syear_b+"_"+eyear_b
+    sam_histaer_jjaA_0@weight = wgt_histaer
+    sam_histaer_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histaer_jjaA_0, nc_outfile)
+    sam_histaer_jjaA_1 = sam_histaer_jjaA_1/sam_yrs1*10
+    sam_histaer_jjaA_1!0 = "ensemble_aer"
+    sam_histaer_jjaA_1@var = "SAM_aer_JJA_"+syear_c+"_"+eyear_c
+    sam_histaer_jjaA_1@weight = wgt_histaer
+    sam_histaer_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histaer_jjaA_1, nc_outfile)
+    
+    nam_histnat_djfA = nam_histnat_djfA/nam_yrs*10
+    nam_histnat_djfA!0 = "ensemble_nat"
+    nam_histnat_djfA@var = "NAM_nat_DJF_"+syear_a+"_"+eyear_a
+    nam_histnat_djfA@weight = wgt_histnat
+    nam_histnat_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histnat_djfA, nc_outfile)
+    sam_histnat_djfA_0 = sam_histnat_djfA_0/sam_yrs0*10
+    sam_histnat_djfA_0!0 = "ensemble_nat"
+    sam_histnat_djfA_0@var = "SAM_nat_DJF_"+syear_b+"_"+eyear_b
+    sam_histnat_djfA_0@weight = wgt_histnat
+    sam_histnat_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histnat_djfA_0, nc_outfile)
+    sam_histnat_djfA_1 = sam_histnat_djfA_1/sam_yrs1*10
+    sam_histnat_djfA_1!0 = "ensemble_nat"
+    sam_histnat_djfA_1@var = "SAM_nat_DJF_"+syear_c+"_"+eyear_c
+    sam_histnat_djfA_1@weight = wgt_histnat
+    sam_histnat_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histnat_djfA_1, nc_outfile)
+
+    nam_histnat_jjaA = nam_histnat_jjaA/nam_yrs*10
+    nam_histnat_jjaA!0 = "ensemble_nat"
+    nam_histnat_jjaA@var = "NAM_nat_JJA_"+syear_a+"_"+eyear_a
+    nam_histnat_jjaA@weight = wgt_histnat
+    nam_histnat_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histnat_jjaA, nc_outfile)
+    sam_histnat_jjaA_0 = sam_histnat_jjaA_0/sam_yrs0*10
+    sam_histnat_jjaA_0!0 = "ensemble_nat"
+    sam_histnat_jjaA_0@var = "SAM_nat_JJA_"+syear_b+"_"+eyear_b
+    sam_histnat_jjaA_0@weight = wgt_histnat
+    sam_histnat_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histnat_jjaA_0, nc_outfile)
+    sam_histnat_jjaA_1 = sam_histnat_jjaA_1/sam_yrs1*10
+    sam_histnat_jjaA_1!0 = "ensemble_nat"
+    sam_histnat_jjaA_1@var = "SAM_nat_JJA_"+syear_c+"_"+eyear_c
+    sam_histnat_jjaA_1@weight = wgt_histnat
+    sam_histnat_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histnat_jjaA_1, nc_outfile)
+
+    nam_histstrat_djfA = nam_histstrat_djfA/nam_yrs*10
+    nam_histstrat_djfA!0 = "ensemble_stratO3"
+    nam_histstrat_djfA@var = "NAM_stratO3_DJF_"+syear_a+"_"+eyear_a
+    nam_histstrat_djfA@weight = wgt_histstrat
+    nam_histstrat_djfA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histstrat_djfA, nc_outfile)
+    sam_histstrat_djfA_0 = sam_histstrat_djfA_0/sam_yrs0*10
+    sam_histstrat_djfA_0!0 = "ensemble_stratO3"
+    sam_histstrat_djfA_0@var = "SAM_stratO3_DJF_"+syear_b+"_"+eyear_b
+    sam_histstrat_djfA_0@weight = wgt_histstrat
+    sam_histstrat_djfA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histstrat_djfA_0, nc_outfile)
+    sam_histstrat_djfA_1 = sam_histstrat_djfA_1/sam_yrs1*10
+    sam_histstrat_djfA_1!0 = "ensemble_stratO3"
+    sam_histstrat_djfA_1@var = "SAM_stratO3_DJF_"+syear_c+"_"+eyear_c
+    sam_histstrat_djfA_1@weight = wgt_histstrat
+    sam_histstrat_djfA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histstrat_djfA_1, nc_outfile)
+
+    nam_histstrat_jjaA = nam_histstrat_jjaA/nam_yrs*10
+    nam_histstrat_jjaA!0 = "ensemble_stratO3"
+    nam_histstrat_jjaA@var = "NAM_stratO3_JJA_"+syear_a+"_"+eyear_a
+    nam_histstrat_jjaA@weight = wgt_histstrat
+    nam_histstrat_jjaA@units = "decade^-1"
+    ncdf_outfile = ncdf_write(nam_histstrat_jjaA, nc_outfile)
+    sam_histstrat_jjaA_0 = sam_histstrat_jjaA_0/sam_yrs0*10
+    sam_histstrat_jjaA_0!0 = "ensemble_stratO3"
+    sam_histstrat_jjaA_0@var = "SAM_stratO3_JJA_"+syear_b+"_"+eyear_b
+    sam_histstrat_jjaA_0@weight = wgt_histstrat
+    sam_histstrat_jjaA_0@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histstrat_jjaA_0, nc_outfile)
+    sam_histstrat_jjaA_1 = sam_histstrat_jjaA_1/sam_yrs1*10
+    sam_histstrat_jjaA_1!0 = "ensemble_stratO3"
+    sam_histstrat_jjaA_1@var = "SAM_stratO3_JJA_"+syear_c+"_"+eyear_c
+    sam_histstrat_jjaA_1@weight = wgt_histstrat
+    sam_histstrat_jjaA_1@units = "decade^-1"
+    ncdf_outfile = ncdf_write(sam_histstrat_jjaA_1, nc_outfile)
+  end if
+
+  log_provenance(nc_outfile, ofile+"."+file_type, "NAM/SAM trends", \
+                 (/"trend"/), (/"nhext", "shext"/), "box", "kosaka_yu", "", paths_all)
+
 end
 

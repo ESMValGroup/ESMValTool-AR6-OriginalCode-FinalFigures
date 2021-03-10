@@ -245,6 +245,11 @@ begin
   z->sam_trends0 = sam_pc_trends0
   z->sam_trends1 = sam_pc_trends1
   delete(z)
+
+  log_provenance(fn, "n/a", \
+                 "Patterns, time series & trends of NAM/SAM defined with the latitudinal SLP difference in DAMIP", \
+                 (/"anomaly", "var", "trend"/), (/"nhext", "shext"/), "other", "kosaka_yu", "", \
+                 metadata_att_as_array(info_items, "filename"))
   
 end
 

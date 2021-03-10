@@ -1,0 +1,149 @@
+# ESMValTool
+# test_script.yml
+---
+documentation:
+
+  description: 
+     Regrid to 5x5 grid
+
+  authors:
+    - schurer_andrew
+
+  references:
+    - schurer20erl
+
+  projects:
+    - esmval
+
+preprocessors:
+  regrid_preprocessor:
+    regrid:
+      target_grid: 2.5x2.5
+      lon_offset: True
+      lat_offset: True
+      scheme: linear  
+
+diagnostics:
+  schurer20_figs:
+    description: Preprocess data needed for Schurer et al. (2020) figures.
+    variables:
+      pr:
+        preprocessor: regrid_preprocessor  
+        mip: Amon
+        project: CMIP6
+        exp: [historical,ssp245]
+        grid: gn
+        start_year: 1980
+        end_year: 2020
+        additional_datasets:
+          - {dataset: ERA5, project: OBS6, tier: 3, type: reanaly, version: v1}
+          - {dataset: GPCP-SG, project: OBS, tier: 2, type: atmos, version: V2.3}
+          #- {dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn} #retracted
+          - {dataset: ACCESS-CM2, ensemble: r(2:3)i1p1f1, grid: gn}
+          - {dataset: ACCESS-CM2, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 950, end_year: 1449}
+          #- {dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn} #retracted
+          - {dataset: ACCESS-ESM1-5, ensemble: r(2:10)i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r13i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r14i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r16i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r18i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, ensemble: r20i1p1f1, grid: gn}
+          - {dataset: ACCESS-ESM1-5, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 101, end_year: 1000}
+          - {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: AWI-CM-1-1-MR, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 2401, end_year: 2900}
+          - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: BCC-CSM2-MR, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2449}
+          - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: CAMS-CSM1-0, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 2900, end_year: 3399}
+          - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
+          - {dataset: CanESM5-CanOE, exp: piControl, ensemble: r1i1p2f1, grid: gn, start_year: 5550, end_year: 6050}
+          - {dataset: CanESM5, ensemble: r(1:25)i1p1f1, grid: gn}
+          - {dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn}
+          - {dataset: CanESM5, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 5201, end_year: 6200}
+          - {dataset: CanESM5, exp: piControl, ensemble: r1i1p2f1, grid: gn, start_year: 5550, end_year: 6600}
+          - {dataset: CESM2, ensemble: r4i1p1f1, grid: gn}
+          - {dataset: CESM2, ensemble: r(10:11)i1p1f1, grid: gn}
+          - {dataset: CESM2, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 0001, end_year: 1200}
+          - {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: CESM2-WACCM, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 0001, end_year: 499}
+          - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: CMCC-CM2-SR5, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2349}
+          - {dataset: CMCC-ESM2, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: CMCC-ESM2, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2099}
+          - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
+          - {dataset: CNRM-CM6-1, exp: piControl, ensemble: r1i1p1f2, grid: gr, start_year: 1850, end_year: 2349}
+          - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+          - {dataset: CNRM-CM6-1-HR, exp: piControl, ensemble: r1i1p1f2, grid: gr, start_year: 1850, end_year: 2149}
+          - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, ensemble: r(7:10)i1p1f2, grid: gr}
+          - {dataset: CNRM-ESM2-1, exp: piControl, ensemble: r1i1p1f2, grid: gr, start_year: 1850, end_year: 2349}
+          - {dataset: EC-Earth3, ensemble: r2i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r4i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(6:7)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, ensemble: r(9:25)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 2259, end_year: 2759}
+          - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r12i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, ensemble: r14i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 2349}
+          - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1, grid: gr}
+          - {dataset: EC-Earth3-Veg-LR, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 2300, end_year: 2800}
+          - {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+          - {dataset: FGOALS-f3-L, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 600, end_year: 1160}
+          - {dataset: FGOALS-g3, ensemble: r(1:4)i1p1f1, grid: gn}
+          - {dataset: FGOALS-g3, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 200, end_year: 899}
+          - {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: GFDL-CM4, exp: piControl, ensemble: r1i1p1f1, grid: gr1, start_year: 151, end_year: 650}
+          - {dataset: GFDL-ESM4, ensemble: r(1:3)i1p1f1, grid: gr1}
+          - {dataset: GFDL-ESM4, exp: piControl, ensemble: r1i1p1f1, grid: gr1, start_year: 0001, end_year: 500}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f2, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:5)i1p3f1, grid: gn}
+          - {dataset: GISS-E2-1-G, ensemble: r(1:4)i1p5f1, grid: gn}
+          - {dataset: GISS-E2-1-G, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 4150, end_year: 5000}
+          - {dataset: GISS-E2-1-G, exp: piControl, ensemble: r1i1p1f2, grid: gn, start_year: 7550, end_year: 7894}
+          - {dataset: GISS-E2-1-G, exp: piControl, ensemble: r1i1p1f3, grid: gn, start_year: 2900, end_year: 2999}
+          - {dataset: GISS-E2-1-G, exp: piControl, ensemble: r1i1p5f1, grid: gn, start_year: 2000, end_year: 2200}
+          - {dataset: GISS-E2-1-G, exp: piControl, ensemble: r2i1p1f1, grid: gn, start_year: 2900, end_year: 2999}
+          - {dataset: GISS-E2-1-G, exp: piControl, ensemble: r(101:102)i1p1f1, grid: gn, start_year: 1850, end_year: 2014}
+          - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3, grid: gn}
+          - {dataset: HadGEM3-GC31-LL, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2349}
+          - {dataset: IITM-ESM, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: IITM-ESM, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1926, end_year: 2125}
+          - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: INM-CM4-8, exp: piControl, ensemble: r1i1p1f1, grid: gr1, start_year: 1850, end_year: 2380}
+          - {dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+          - {dataset: INM-CM5-0, exp: piControl, ensemble: r1i1p1f1, grid: gr1, start_year: 1996, end_year: 3196}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(1:6)i1p1f1, grid: gr}
+          - {dataset: IPSL-CM6A-LR, ensemble: r(10:11)i1p1f1, grid: gr}
+          - {dataset: IPSL-CM6A-LR, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 1850, end_year: 3849}
+          - {dataset: IPSL-CM6A-LR, exp: piControl, ensemble: r1i2p1f1, grid: gr, start_year: 1850, end_year: 2099}
+          - {dataset: KACE-1-0-G, ensemble: r(1:3)i1p1f1, grid: gr}
+          - {dataset: KACE-1-0-G, exp: piControl, ensemble: r1i1p1f1, grid: gr, start_year: 2000, end_year: 2449}
+          - {dataset: MCM-UA-1-0, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MCM-UA-1-0, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 0001, end_year: 500}
+          - {dataset: MIROC6, ensemble: r(1:50)i1p1f1, grid: gn}
+          - {dataset: MIROC6, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 3200, end_year: 3999}
+          - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+          - {dataset: MIROC-ES2L, ensemble: r(3:5)i1p1f2, grid: gn}
+          - {dataset: MIROC-ES2L, exp: piControl, ensemble: r1i1p1f2, grid: gn, start_year: 1850, end_year: 2349}
+          - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
+          - {dataset: MPI-ESM1-2-LR, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2849}
+          - {dataset: MPI-ESM1-2-LR, exp: piControl, ensemble: r2i1p1f1, grid: gn, start_year: 1900, end_year: 1999}
+          - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
+          - {dataset: MRI-ESM2-0, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1850, end_year: 2550}
+          - {dataset: MRI-ESM2-0, exp: piControl, ensemble: r1i2p1f1, grid: gn, start_year: 1850, end_year: 2100}
+          - {dataset: NESM3, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: NESM3, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 500, end_year: 999}
+          - {dataset: NorESM2-LM, ensemble: r(1:3)i1p1f1, grid: gn}
+          - {dataset: NorESM2-LM, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1600, end_year: 2100}
+          - {dataset: NorESM2-MM, ensemble: r(1:2)i1p1f1, grid: gn}
+          - {dataset: NorESM2-MM, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 1200, end_year: 1699}
+          - {dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+          - {dataset: TaiESM1, exp: piControl, ensemble: r1i1p1f1, grid: gn, start_year: 201, end_year: 700}
+          - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn}
+          - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2, grid: gn}
+          - {dataset: UKESM1-0-LL, exp: piControl, ensemble: r1i1p1f2, grid: gn, start_year: 1960, end_year: 3839}
+
+    scripts:
+      script1:
+        script: aschurer/WetDry_timeseries_smooth_scaling1.py
