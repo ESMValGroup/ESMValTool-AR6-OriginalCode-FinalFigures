@@ -1054,7 +1054,9 @@ begin
   end do
 
   timeseries = new((/8,dimsizes(amv_tseries_hist&time)/),float)
-  timeseries(:2,:) = (/ amv_tseries_lp_obs(:2,:) /)
+;  timeseries(:2,:) = (/ amv_tseries_lp_obs(:2,:) /)
+  timeseries(:dim_obs-1,:) = (/ amv_tseries_lp_obs(:dim_obs-1,:) /)
+  
   timeseries(3,:dimsizes(mme_amv_tseries_lp_hist_C5)-6) = \
     (/ mme_amv_tseries_lp_hist_C5(:dimsizes(mme_amv_tseries_lp_hist_C5)-6) /)
   timeseries(4,:) = (/ mme_amv_tseries_lp_hist /)
@@ -1375,7 +1377,8 @@ begin
   plres3@gsLineColor = "black"
   dpl = (/0,2,3/)
   dumA = new((/4,3/),graphic)
-  do gg = 0,2
+;  do gg = 0,2
+  do gg = 0,dim_obs-1
      plres3@gsLineDashPattern = dpl(gg)
      dumA(0,gg) = gsn_add_polyline(wks,plot_blank(0),(/0.25,2.25/),(/lag1_amv_tseries_obs(gg),lag1_amv_tseries_obs(gg)/),plres3)
      dumA(1,gg) = gsn_add_polyline(wks,plot_blank(0),(/2.75,4.75/),(/lag10_amv_tseries_lp_obs(gg),lag10_amv_tseries_lp_obs(gg)/),plres3)
@@ -1545,7 +1548,7 @@ begin
   txres = True
   txres@txFontHeightF = 0.007
   txres@txJust = "CenterLeft"
-  do gg = 0, dimsizes(obs_datasets)-1
+  do gg = 0, dim_obs-1
     lres@gsLineDashPattern = dpl(gg)
     gsn_polyline_ndc(wks, (/x1,x1+0.03/),(/y1-gg*0.0125,y1-gg*0.0125/), lres)
     gsn_text_ndc(wks, obs_datasets(gg), x1+0.035, y1-gg*0.0125, txres)

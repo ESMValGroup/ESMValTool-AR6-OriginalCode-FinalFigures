@@ -1095,8 +1095,9 @@ begin
   end do
 
   timeseries = new((/8,dimsizes(tpi_hist&time)/),float)
-  timeseries(:2,:) = (/ tpi_lp_obs(:2,:) /)
-
+;  timeseries(:2,:) = (/ tpi_lp_obs(:2,:) /)
+  timeseries(:dim_obs-1,:) = (/ tpi_lp_obs(:dim_obs-1,:) /)
+  
   timeseries(3,:dimsizes(mme_tpi_lp_hist_C5)-6) = (/ mme_tpi_lp_hist_C5(:dimsizes(mme_tpi_lp_hist_C5)-6) /)
   timeseries(4,:) = (/ mme_tpi_lp_hist /)
 
@@ -1410,7 +1411,8 @@ begin
   plres3@gsLineColor = "black"
   dpl = (/0,2,3/)
   dumA = new((/4,3/),graphic)
-  do gg = 0,2
+;  do gg = 0,2
+  do gg = 0,dim_obs-1
      plres3@gsLineDashPattern = dpl(gg)
      dumA(0,gg) = gsn_add_polyline(wks,plot_blank(0),(/0.25,2.25/),(/lag1_tpi_obs(gg),lag1_tpi_obs(gg)/),plres3)
      dumA(1,gg) = gsn_add_polyline(wks,plot_blank(0),(/2.75,4.75/),(/lag10_tpi_lp_obs(gg),lag10_tpi_lp_obs(gg)/),plres3)
