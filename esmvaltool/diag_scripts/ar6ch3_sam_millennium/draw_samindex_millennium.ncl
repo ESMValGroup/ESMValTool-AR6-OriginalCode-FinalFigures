@@ -1,4 +1,4 @@
-; draw_samindex_millenium.ncl
+; draw_samindex_millennium.ncl
 ; ############################################################################
 ; Author: Yu Kosaka (RCAST, U. Tokyo, Japan)
 ; IPCC AR6 Chapter 3
@@ -321,7 +321,7 @@ begin
 ; =============================== Draw ===============================
 
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
-                "sam_millenium")
+                "sam_millennium")
   dummy = new(500, "graphic")
   idummy = 0
   
@@ -340,7 +340,7 @@ begin
   rests@tiMainFontHeightF = 0.015
   rests@tiMainOffsetYF = -0.008
 
-  rests@tiMainString = "SAM index in the last millenium"
+  rests@tiMainString = "Annual SAM index in the last millennium"
   rests@tiMainFontHeightF = 0.02
   
   rests = rests
