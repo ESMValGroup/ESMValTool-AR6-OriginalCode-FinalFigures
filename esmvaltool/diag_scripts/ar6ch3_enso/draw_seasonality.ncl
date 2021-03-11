@@ -283,7 +283,7 @@ begin
 
   wks = get_wks("dummy_for_wks", DIAG_SCRIPT, \
                 "enso_seasonality")
-  dummy   = new(500, "graphic")
+  dummy   = new(1000, "graphic")
   idummy = 0
 
   panel_width = 0.4

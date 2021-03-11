@@ -483,7 +483,7 @@ begin
   panel_width = 0.4
 ;  panel_width = 0.4*54./(tofloat(count_unique_values(models_cmip6)))
 ;  print(panel_width)
-  dummy   = new(1000, "graphic")
+  dummy   = new(2000, "graphic")
   idummy = 0
   
 ; ========================= CMIP5, CMIP6 and obs ========================
