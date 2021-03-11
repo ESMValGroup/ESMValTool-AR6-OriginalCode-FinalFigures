@@ -1094,7 +1094,7 @@ begin
   pres@gsnFrame = False
   pres@gsnPanelMainFontHeightF = 0.016
   pres@gsnPanelMainFont = "helvetica-bold"
-  pres@gsnPanelMainString = "Trend of Hadley cell's subtropical edge latitude"
+  pres@gsnPanelMainString = "Trend in Hadley cell's subtropical edge latitude"
 ;  pres@gsnPanelFigureStrings= "("+alphabet(0:dimsizes(ndtooned(plots))-1)+")"
 ;  pres@gsnPanelFigureStringsFontHeightF = 0.016
 ;  pres@gsnPanelFigureStringsPerimOn = False
@@ -1110,7 +1110,7 @@ begin
   pres@gsnPanelTop = 0.5
   pres@gsnPanelBottom = 0.2
   pres@gsnPanelMainPosYF = pres@gsnPanelTop-0.015
-  pres@gsnPanelMainString = "Trend of Walker circulation strength"
+  pres@gsnPanelMainString = "Trend in Walker circulation strength"
   gsn_panel(wks, plots(1, :), (/1, 3/), pres)
 
   txres       := True

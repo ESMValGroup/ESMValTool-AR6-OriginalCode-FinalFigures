@@ -1,5 +1,5 @@
 # ESMValTool
-# recipe_ar6ch3_sam_millenium.yml
+# recipe_ar6ch3_sam_millennium.yml
 ---
 documentation:
 
@@ -69,7 +69,7 @@ preprocessors:
 
 diagnostics:
 
-  sam_index_millenium:
+  sam_index_millennium:
     description: draw time series of the SAM index
     variables:
       psl:
@@ -79,7 +79,7 @@ diagnostics:
         end_year: 2014
         
     scripts:
-      draw_samindex_millenium:
+      draw_samindex_millennium:
         script: ar6ch3_sam_millennium/draw_samindex_millennium.ncl
         syear_ref: 1961
         eyear_ref: 1990
