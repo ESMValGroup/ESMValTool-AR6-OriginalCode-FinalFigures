@@ -781,7 +781,7 @@ diagnostics:
           # OBSERVATIONS:
           - {dataset: ERSSTv5, project: OBS, type: reanaly, version: 1, tier: 2}
           - {dataset: HadISST, project: OBS, type: reanaly, version: 1, tier: 2}
-          - {dataset: COBE-SST2, project: OBS, type: reanaly, version: 1, tier: 2}
+
       ts_cmip5:
         <<: *var_def_3
         project: CMIP5

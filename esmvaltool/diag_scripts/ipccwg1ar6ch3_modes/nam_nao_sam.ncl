@@ -1813,6 +1813,7 @@ begin
   polyres@gsLineThicknessF = 0.5
   polyres@gsLineColor = 1
   polyres@gsLineDashPattern = 2;1
+  polyres@gsLineDashSegLenF = 0.05
   dum_refline = new(3,graphic)
   do gg = 0,2
      dum_refline(gg) = gsn_add_polyline(wks,bplot(gg),(/0,0/),(/0,100/),polyres)
@@ -1856,16 +1857,22 @@ begin
 ;  print("SAM AMIP: "+dim_avg_n(sam_trendsA,0))
 
   polyres@gsLineColor = 1
-  polyres@gsLineThicknessF = 1.5
+  polyres@gsLineThicknessF = 1. ;1.5
+  polyres@gsLineDashSegLenF = 0.1
   dum_obs = new((/3,6/),graphic)
   dum_obs(1,0) = gsn_add_polyline(wks,bplot(1),(/nao_trends_obs(0),nao_trends_obs(0)/),(/0,100/),polyres)   ;jra55
   dum_obs(0,0) = gsn_add_polyline(wks,bplot(0),(/nam_trends_obs(0),nam_trends_obs(0)/),(/0,100/),polyres)
   dum_obs(2,0) = gsn_add_polyline(wks,bplot(2),(/sam_trends_obs(0),sam_trends_obs(0)/),(/0,100/),polyres)
 
   do gg = 1,dimsizes(nao_trends_obs&E)-1
-     dum_obs(1,gg) = gsn_add_polyline(wks,bplot(1),(/nao_trends_obs(gg),nao_trends_obs(gg)/),(/0,100/),polyres)
-     dum_obs(0,gg) = gsn_add_polyline(wks,bplot(0),(/nam_trends_obs(gg),nam_trends_obs(gg)/),(/0,100/),polyres)
-     dum_obs(2,gg) = gsn_add_polyline(wks,bplot(2),(/sam_trends_obs(gg),sam_trends_obs(gg)/),(/0,100/),polyres)
+    if (gg.eq.1) then
+      polyres@gsLineDashPattern = 1
+    elseif (gg.eq.2) then
+      polyres@gsLineDashPattern = 3
+    end if
+    dum_obs(1,gg) = gsn_add_polyline(wks,bplot(1),(/nao_trends_obs(gg),nao_trends_obs(gg)/),(/0,100/),polyres)
+    dum_obs(0,gg) = gsn_add_polyline(wks,bplot(0),(/nam_trends_obs(gg),nam_trends_obs(gg)/),(/0,100/),polyres)
+    dum_obs(2,gg) = gsn_add_polyline(wks,bplot(2),(/sam_trends_obs(gg),sam_trends_obs(gg)/),(/0,100/),polyres)
   end do
 
 ;  qsort(nao_trends_C6)
@@ -1897,14 +1904,24 @@ begin
   gres@YPosPercent = 0.5
   gres@XPosPercent = 20.
   lineres@lgLineColors = 1
-  lineres@lgLineThicknesses = 1.5 
+  lineres@lgLineThicknesses = 1. ;1.5 
+  lineres@lgDashIndexes = 1
+  lineres@lgLineDashSegLenF = 0.1
   textres@lgLabels = "Observations"
   simple_legend_ndc(wks,gres,lineres,textres)
 
+  polyres@gsLineDashSegLenF = 0.07
+  polyres@gsLineDashPattern = 0
+  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.007, 0.007/), polyres)
+  polyres@gsLineDashPattern = 3
+  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.003, 0.003/), polyres)
+  
   gres@XPosPercent = 32
-  lineres@lgLineColors = 5
-  lineres@lgLineThicknesses = 3
-  textres@lgLabels = "CMIP5 Hist MME ("+cmip5_num+")"
+  lineres@lgLineColors := 5
+  lineres@lgLineThicknesses := 3
+  delete(lineres@lgDashIndexes)
+  delete(lineres@lgLineDashSegLenF)
+  textres@lgLabels := "CMIP5 Hist MME ("+cmip5_num+")"
   simple_legend_ndc(wks,gres,lineres,textres)
 
   gres@XPosPercent = 48.5
@@ -2194,5 +2211,5 @@ begin
 ;  drawNDCGrid(wks)
   frame(wks)
   delete(wks)
-  system("convert -density 216 -trim +repage -border 10 -bordercolor white -flatten "+ofile+"."+file_type+" "+ofile+".png")
+  ;system("convert -density 216 -trim +repage -border 10 -bordercolor white -flatten "+ofile+"."+file_type+" "+ofile+".png")
 end
