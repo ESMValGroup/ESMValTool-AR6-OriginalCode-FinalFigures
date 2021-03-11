@@ -1912,9 +1912,9 @@ begin
 
   polyres@gsLineDashSegLenF = 0.07
   polyres@gsLineDashPattern = 0
-  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.007, 0.007/), polyres)
+  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.009, 0.009/), polyres)
   polyres@gsLineDashPattern = 3
-  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.003, 0.003/), polyres)
+  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.001, 0.001/), polyres)
   
   gres@XPosPercent = 32
   lineres@lgLineColors := 5
