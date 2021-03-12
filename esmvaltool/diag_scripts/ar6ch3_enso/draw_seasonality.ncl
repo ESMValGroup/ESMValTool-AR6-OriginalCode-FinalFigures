@@ -583,7 +583,7 @@ begin
   x2 = res@trXMaxF - 0.05
   x1 = x2 - (res@trXMaxF - res@trXMinF) * 0.32
   y1 = 1.5
-  y2 = y1 + (res@trYMaxF - res@trYMinF) * 0.09
+  y2 = y1 + (res@trYMaxF - res@trYMinF) * 0.08
   dummy(idummy) = gsn_add_polygon(wks, mme_plot, (/x1, x1, x2, x2/), \
                                   (/y1, y2, y2, y1/), polyres)
   idummy = idummy + 1
