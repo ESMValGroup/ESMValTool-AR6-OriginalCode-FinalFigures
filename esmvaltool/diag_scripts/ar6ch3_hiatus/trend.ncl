@@ -8,6 +8,7 @@
 ;    Outputs: 
 ;
 ; History
+;    20210312 kosaka_yu: implemented error fixer of temperature unit
 ;    20210227 kosaka_yu: added provenance.
 ;    20210203 kosaka_yu: updated for the new recipe structure
 ;    20201109 kosaka_yu: added Kadow and NOAAGlobalTemp-Interim
@@ -766,6 +767,11 @@ begin
       if (infoSAT2) then
         SAT2 = read_data(infoSAT2)
         SAT2&time = cd_calendar(SAT2&time, -1)
+        if (min(SAT).lt.10. .and. min(SAT2).gt.200.) then
+          SAT2 = SAT2 - 273.15
+        elseif (max(SAT).gt.200. .and. max(SAT2).lt.100.) then
+          SAT2 = SAT2 + 273.15
+        end if
         tmp  = SAT
         delete(SAT)
         SAT = concatenate_data(tmp, SAT2)
@@ -796,6 +802,11 @@ begin
       if (infoSST2) then
         SST2 = read_data(infoSST2)
         SST2&time = cd_calendar(SST2&time, -1)
+        if (min(SST).lt.10. .and. min(SST2).gt.200.) then
+          SST2 = SST2 - 273.15
+        elseif (max(SST).gt.200. .and. max(SST2).lt.100.) then
+          SST2 = SST2 + 273.15
+        end if
         tmp  = SST
         delete(SST)
         SST = concatenate_data(tmp, SST2)

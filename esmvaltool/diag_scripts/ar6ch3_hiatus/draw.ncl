@@ -8,6 +8,7 @@
 ;    Outputs:
 ;
 ; History
+;    20210312 kosaka_yu: fixed color palette setting
 ;    20210227 kosaka_yu: added netcdf output and provenance.
 ;    20210215 kosaka_yu: revised figure details
 ;    20210204 kosaka_yu: updated for the new recipe structure
@@ -1794,7 +1795,10 @@ begin
   resTs@res_cnMinLevelValF = -1.05 ;-0.95 ; -1.05
   resTs@res_cnMaxLevelValF = 1.05 ;0.95 ; 1.05
   resTs@res_cnLevelSpacingF = 0.1
-  resTs@res_cnFillPalette = "temp_div"
+  pal = read_colormap_file("$diag_scripts/shared/plot/rgb/" \
+                           + "ipcc-ar6_temperature_div.rgb")
+;  resTs@res_cnFillPalette = "temp_div"
+  resTs@res_cnFillPalette = pal
   resTs@res_lbAutoManage = False
   resTs@res_lbLabelAutoStride = True
   
