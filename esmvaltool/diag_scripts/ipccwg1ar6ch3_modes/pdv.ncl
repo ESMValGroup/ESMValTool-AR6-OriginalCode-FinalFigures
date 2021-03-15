@@ -1117,9 +1117,9 @@ begin
 ;  sx = equiv_sample_size(dim_avg_n(timeseries(:2,:),0), 0.05, 0)
 ;  sy = equiv_sample_size(timeseries(4,:), 0.05, 0)
 
-  prob = ftest(dim_variance(dim_avg_n(timeseries(:2,:),0)), dimsizes(timeseries(0,:)), dim_variance(timeseries(4,:)), dimsizes(timeseries(4,:)), 0)
+;  prob = ftest(dim_variance(dim_avg_n(timeseries(:2,:),0)), dimsizes(timeseries(0,:)), dim_variance(timeseries(4,:)), dimsizes(timeseries(4,:)), 0)
 
-  corR = regline_stats(dim_avg_n(timeseries(:2,:),0),timeseries(4,:))
+;  corR = regline_stats(dim_avg_n(timeseries(:2,:),0),timeseries(4,:))
 ;  print(corR)
 ;  if (prob.lt.0.05) then
 ;     sig = "**"
