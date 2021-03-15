@@ -196,7 +196,7 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle,
     plt.legend(fontsize=10, loc = 2)
     plt.xlim(min_year, max_year-1)
     plt.ylim(0.78)
-    plt.title(r"Amplitude of CO$_2$ atmosphere concentration and land sink")
+    plt.title(r"Amplitude of seasonal cycle of CO$_2$ concentration and land sink")
 
     # INSET
     axins = inset_axes(ax, width='30%', height='30%', loc=4, borderpad=2)
@@ -463,7 +463,7 @@ def main(cfg):
     # Plot data
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
-    plot_path = get_plot_filename('SCA_trend_xy_' + str(min_year)
+    plot_path = get_plot_filename('SCA_trend_' + str(min_year)
                                   + '_' + str(max_year), cfg)
     plot_data(timeranges, dataset_yrs, rel_trend_sca, sca_x0, data_sca,
               dataset_groups, plot_path)

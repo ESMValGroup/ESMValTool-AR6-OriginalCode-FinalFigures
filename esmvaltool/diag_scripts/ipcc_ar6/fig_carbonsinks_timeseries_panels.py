@@ -125,6 +125,7 @@ def main(cfg):
             ax1.plot(cube.coord("year").points, cube.data, color="black",
                      label = "OBS", linewidth = 1.5)
         else:
+            print(cube.data[-1])
             style = plot.get_dataset_style(name, 'cmip6_ipcc')
             legend_items[name] = {'color': style['color'],
                                   'linewidth': style['thick']}
@@ -257,6 +258,15 @@ def main(cfg):
     ax4.set_ylabel("Net Ocean C Flux [PgC yr$^{-1}$]")
     ax4.yaxis.set_ticks_position('both')
 
+    ax1.text(0.00, 1.15, 'a', transform=ax1.transAxes,
+             fontsize=14, va='top', ha='right')
+    ax2.text(0.00, 1.15, 'b', transform=ax2.transAxes,
+             fontsize=14, va='top', ha='right')
+    ax3.text(0.00, 1.15, 'c', transform=ax3.transAxes,
+             fontsize=14, va='top', ha='right')
+    ax4.text(0.00, 1.15, 'd', transform=ax4.transAxes,
+             fontsize=14, va='top', ha='right')
+
     lines = []
     labels = []
 
@@ -264,8 +274,7 @@ def main(cfg):
 
     fig.legend(lines, labels,
                loc='upper left', bbox_to_anchor=(1, 0.92))
-    plot_path = get_plot_filename('fig_3_30_carbonsinks_timeseries', cfg)
-
+    plot_path = get_plot_filename('fig_3_31_carbonsinks_timeseries', cfg)
     fig.suptitle("Carbon sinks in CMIP6 emission driven simulations")
     fig.tight_layout()
     fig.savefig(plot_path, bbox_inches='tight', dpi = 300)
