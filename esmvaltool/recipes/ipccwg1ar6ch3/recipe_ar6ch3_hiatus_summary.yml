@@ -98,8 +98,8 @@ cmip5_models: &cmip5_models
   - {dataset: CESM1-CAM5, ensemble: r(1:3)i1p1, exp: rcp45, start_year: 2006}
   #- {dataset: CESM1-FASTCHEM, ensemble: r1i1p1, exp: historical, end_year; 2005}
   #- {dataset: CESM1-FASTCHEM, ensemble: r1i1p1, exp: rcp45, start_year: 2006} #no tos, sic
-  - {dataset: CESM1-WACCM, ensemble: r(2:4)i1p1, exp: historical, end_year: 2005} #works?
-  - {dataset: CESM1-WACCM, ensemble: r(2:4)i1p1, exp: rcp45, start_year: 2006} #works?
+  - {dataset: CESM1-WACCM, ensemble: r(2:4)i1p1, exp: historical, end_year: 2005}
+  - {dataset: CESM1-WACCM, ensemble: r(2:4)i1p1, exp: rcp45, start_year: 2006}
   #- {dataset: CMCC-CESM, ensemble: r1i1p1, exp: historical, end_year: 2005}
   #- {dataset: CMCC-CESM, ensemble: r1i1p1, exp: rcp45, start_year: 2006} #no tos, sic
   - {dataset: CMCC-CM, ensemble: r1i1p1, exp: historical, end_year: 2005}
@@ -222,110 +222,120 @@ cmip5_models: &cmip5_models
   #- {dataset: inmcm4, ensemble: r1i1p1, exp: rcp45, start_year: 2006}
   
 cmip6_siconc_models_h_gngngn: &cmip6_siconc_models_h_gngngn # models w/ siconc, all on the same grid, historical
-  - {dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1}
-  - {dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1}
+  - {dataset: ACCESS-CM2, ensemble: r(2:3)i1p1f1}
+  - {dataset: ACCESS-ESM1-5, ensemble: r(2:6)i1p1f1}
+  - {dataset: ACCESS-ESM1-5, ensemble: r(8:20)i1p1f1}
   #- {dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1} #preprocess fail
   - {dataset: BCC-CSM2-MR, ensemble: r(1:3)i1p1f1}
-  #- {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1}
+  #- {dataset: BCC-ESM1, ensemble: r(1:2)i1p1f1} #YK: preprocessor failure
+  #- {dataset: BCC-ESM1, ensemble: r3i1p1f1} #YK not tested, but probably fails
   - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
-  #- {dataset: CAS-ESM2-0, ensemble: r(1:4)i1p1f1} #preprocess fail  @  siconc
+  - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f2}
+  - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
+  - {dataset: CanESM5, ensemble: r(1:25)i1p1f1}
+  - {dataset: CanESM5, ensemble: r(1:40)i1p2f1}
+  - {dataset: CESM2, ensemble: r(1:11)i1p1f1}
   #- {dataset: CESM2-FV2, ensemble: r(1:3)i1p1f1} #preprocess fail @ siconc
   #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1} #preprocess fail @ siconc
   #- {dataset: CESM2-WACCM-FV2, ensemble: r(1:3)i1p1f1}
-  - {dataset: CESM2, ensemble: r(1:10)i1p1f1} 
-  #- {dataset: CIESM, ensemble: r(1:3)i1p1f1} #preprocess fail @ siconc
   - {dataset: CMCC-CM2-HR4, ensemble: r1i1p1f1}
   - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1}
-  - {dataset: CanESM5, ensemble: r(1:25)i1p1f1}
-  - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
-  - {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, grid: gr}
-  - {dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr}
-  - {dataset: E3SM-1-1-ECA, ensemble: r1i1p1f1, grid: gr}
-  - {dataset: FGOALS-g3, ensemble: r(1:6)i1p1f1}
+  - {dataset: CMCC-ESM2, ensemble: r1i1p1f1}
   - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1}
-  - {dataset: HadGEM3-GC31-LL, ensemble: r(1:4)i1p1f3}
-  - {dataset: HadGEM3-GC31-MM, ensemble: r(1:3)i1p1f3}
-  #- {dataset: HadGEM3-GC31-MM, ensemble: r4i1p1f3} #tos 1988-1989 missing
-  - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
-  - {dataset: INM-CM5-0, ensemble: r(1:10)i1p1f1, grid: gr1}
-  #- {dataset: KIOST-ESM, ensemble: r1i1p1f1} #preprocess fail @ tas
-  #- {dataset: MCM-UA-1-0, ensemble: r1i1p1f1} #no siconc*
-  - {dataset: MIROC-ES2L, ensemble: r(1:3)i1p1f2}
-  - {dataset: MIROC6, ensemble: r(1:10)i1p1f1}
-  - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r(3:4)i1p1f3}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r(1:4)i1p1f3}
+  - {dataset: MIROC6, ensemble: r(1:50)i1p1f1}
+  - {dataset: MIROC-ES2L, ensemble: r(1:10)i1p1f2}
+  - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:3)i1p1f1}
   - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1}
   - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1000p1f1}
   - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1}
+  #- {dataset: MRI-ESM2-0, ensemble: r1i2p1f1} #YK: siconc = 0 everywhere after preprocess
   - {dataset: NESM3, ensemble: r(1:5)i1p1f1}
   - {dataset: NorCPM1, ensemble: r(1:30)i1p1f1}
   #- {dataset: NorESM2-LM, ensemble: r1i1p1f1} #preprocess fail  @ siconc
   - {dataset: NorESM2-LM, ensemble: r(2:3)i1p1f1}
-  #- {dataset: NorESM2-MM, ensemble: r1i1p1f1} #preprocess fail @ siconc
+    #- {dataset: NorESM2-MM, ensemble: r1i1p1f1} #preprocess fail  @ siconc
   - {dataset: NorESM2-MM, ensemble: r(2:3)i1p1f1}
   #- {dataset: SAM0-UNICON, ensemble: r1i1p1f1} #preprocess fail @ siconc
   - {dataset: TaiESM1, ensemble: r1i1p1f1}
   - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2}
-  - {dataset: UKESM1-0-LL, ensemble: r(5:7)i1p1f3}
-  - {dataset: UKESM1-0-LL, ensemble: r(8:12)i1p1f2}
-  - {dataset: UKESM1-0-LL, ensemble: r16i1p1f2}
-  - {dataset: UKESM1-0-LL, ensemble: r(18:19)i1p1f2}
+  - {dataset: UKESM1-0-LL, ensemble: r(8:13)i1p1f2}
+  - {dataset: UKESM1-0-LL, ensemble: r(16:19)i1p1f2}
 
 cmip6_siconc_models_s_gngngn: &cmip6_siconc_models_s_gngngn # models w/ siconc, all on the same grid, ssp245
-  - {dataset: ACCESS-CM2, ensemble: r1i1p1f1}
-  - {dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1}
+  #- {dataset: ACCESS-CM2, ensemble: r(2:3)i1p1f1}
+  #- {dataset: ACCESS-ESM1-5, ensemble: r(2:3)i1p1f1}
   - {dataset: BCC-CSM2-MR, ensemble: r1i1p1f1}
   - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
-  #- {dataset: CESM2-WACCM, ensemble: r1i1p1f1}
-  - {dataset: CESM2, ensemble: r1i1p1f1}
-  #- {dataset: CIESM, ensemble: r1i1p1f1} #preprocess fail @ siconc
-  - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1}
-  - {dataset: CanESM5, ensemble: r(1:10)i1p1f1}
+  #- {dataset: CAMS-CSM1-0, ensemble: r3i1p1f1} # missing data
   - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
-  - {dataset: FGOALS-g3, ensemble: r1i1p1f1}
+  - {dataset: CanESM5, ensemble: r(1:25)i1p1f1}
+  - {dataset: CanESM5, ensemble: r(1:25)i1p2f1}
+  #- {dataset: CESM2, ensemble: r(1:3)i1p1f1} # missing data
+  - {dataset: CESM2, ensemble: r4i1p1f1}
+  - {dataset: CESM2, ensemble: r(10:11)i1p1f1}
+  #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1}
+  - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1}
+  - {dataset: CMCC-ESM2, ensemble: r1i1p1f1}
   - {dataset: FIO-ESM-2-0, ensemble: r(1:3)i1p1f1}
   - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3}
-  #- {dataset: HadGEM3-GC31-LL, ensemble: r(2:4)i1p1f3} #until 2020
-  - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
-  - {dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  #- {dataset: HadGEM3-GC31-LL, ensemble: r(3:4)i1p1f3}
+  - {dataset: MIROC6, ensemble: r(1:50)i1p1f1}
   - {dataset: MIROC-ES2L, ensemble: r1i1p1f2}
-  - {dataset: MIROC6, ensemble: r(1:3)i1p1f1}
-  - {dataset: MPI-ESM1-2-HR, ensemble: r(1:2)i1p1f1}
+  - {dataset: MIROC-ES2L, ensemble: r(8:9)i1p1f2}
   - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1}
   - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1}
   #- {dataset: NESM3, ensemble: r(1:2)i1p1f1} #preprocess fail @ siconc
   #- {dataset: NorESM2-LM, ensemble: r1i1p1f1}
   - {dataset: NorESM2-LM, ensemble: r(2:3)i1p1f1}
-  #- {dataset: NorESM2-MM, ensemble: r1i1p1f1} #preprocess fail @ siconc
-  - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2} 
-  - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2} 
+  #- {dataset: NorESM2-MM, ensemble: r1i1p1f1}
+  - {dataset: NorESM2-MM, ensemble: r2i1p1f1}
+  - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2}
+  - {dataset: UKESM1-0-LL, ensemble: r8i1p1f2}
 
 cmip6_siconc_models_h_grgngn: &cmip6_siconc_models_h_grgngn # models w/ siconc, grid: gr for tas, gn for tos and siconc, historical
+  #- {dataset: CIESM, ensemble: r(2:3)i1p1f1} #YK: r3i1p1f1 preprocessor failure
+  - {dataset: CNRM-CM6-1, ensemble: r(1:20)i1p1f2}
+  - {dataset: CNRM-CM6-1, ensemble: r29i1p1f2}
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
-  - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r(1:5)i1p1f2}
-  - {dataset: EC-Earth3-Veg, ensemble: r(1:5)i1p1f1}
-  - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1}
-  - {dataset: EC-Earth3, ensemble: r(1:3)i1p1f1}
+  - {dataset: CNRM-ESM2-1, ensemble: r11i1p1f2}
+  - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1}
+  - {dataset: EC-Earth3-AerChem, ensemble: r4i1p1f1}
+  - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r(1:4)i1p1f1}
   #- {dataset: EC-Earth3, ensemble: r4i1p1f1}
   #- {dataset: EC-Earth3, ensemble: r6i1p1f1}
-  #- {dataset: EC-Earth3, ensemble: r9i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r7i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r10i1p1f1}
   #- {dataset: EC-Earth3, ensemble: r(11:20)i1p1f1}
-  - {dataset: EC-Earth3, ensemble: r(21:22)i1p1f1}
-  - {dataset: EC-Earth3, ensemble: r24i1p1f1}
-  #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r(21:25)i1p1f1}
+  - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1}
+  #- {dataset: EC-Earth3-Veg, ensemble: r10i1p1f1}
+  - {dataset: EC-Earth3-Veg, ensemble: r14i1p1f1}
+  - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1}
+  #- {dataset: FGOALS-f3-L, ensemble: r(1:3)i1p1f1} #YK: preprocessor failure
+  - {dataset: IPSL-CM5A2-INCA, ensemble: r1i1p1f1}
   - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1}
 
 cmip6_siconc_models_s_grgngn: &cmip6_siconc_models_s_grgngn # models w/ siconc, grid: gr for tas, gn for tos and siconc, ssp245
-  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-CM6-1, ensemble: r(1:6)i1p1f2}
+  - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2}
   - {dataset: CNRM-ESM2-1, ensemble: r1i1p1f2}
-  - {dataset: EC-Earth3-Veg, ensemble: r1i1p1f1}
-  - {dataset: EC-Earth3-Veg, ensemble: r(4:5)i1p1f1}
+  - {dataset: EC-Earth3-CC, ensemble: r1i1p1f1}
   - {dataset: EC-Earth3, ensemble: r(1:2)i1p1f1}
-  #- {dataset: EC-Earth3, ensemble: r7i1p1f1}
-  #- {dataset: EC-Earth3, ensemble: r12i1p1f1}
-  #- {dataset: EC-Earth3, ensemble: r14i1p1f1}
-  #- {dataset: EC-Earth3, ensemble: r(17:20)i1p1f1}
+  #- {dataset: EC-Earth3, ensemble: r4i1p1f1}
+  #- {dataset: EC-Earth3, ensemble: r6i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r7i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r10i1p1f1}
+  #- {dataset: EC-Earth3, ensemble: r(11:20)i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r(21:22)i1p1f1}
+  - {dataset: EC-Earth3, ensemble: r(24:25)i1p1f1}
+  - {dataset: EC-Earth3-Veg, ensemble: r(1:6)i1p1f1}
+  - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1}
   #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1}
   - {dataset: IPSL-CM6A-LR, ensemble: r(1:6)i1p1f1}
   - {dataset: IPSL-CM6A-LR, ensemble: r(10:11)i1p1f1}
@@ -335,6 +345,10 @@ cmip6_siconc_models_s_grgngn: &cmip6_siconc_models_s_grgngn # models w/ siconc, 
 
 cmip6_siconc_models_h_gngngr: &cmip6_siconc_models_h_gngngr # models w/ siconc, all grid: gn for tas, tos, gr for siconc, historical
   - {dataset: GISS-E2-1-H, ensemble: r(1:10)i1p1f1}  
+  - {dataset: GISS-E2-1-H, ensemble: r(1:5)i1p1f2}
+  #- {dataset: GISS-E2-1-H, ensemble: r(1:2)i1p3f1} # missing data
+  - {dataset: GISS-E2-1-H, ensemble: r(3:5)i1p3f1}
+  - {dataset: GISS-E2-1-H, ensemble: r(1:5)i1p5f1}
 
 #cmip6_siconc_models_s_gngngr: &cmip6_siconc_models_s_gngngr # models w/ siconc, all grid: gn for tas, tos, gr for siconc, ssp245
 
@@ -348,15 +362,61 @@ cmip6_siconc_models_s_gr1gngn: &cmip6_siconc_models_s_gr1gngn # models w/ siconc
   - {dataset: GFDL-ESM4, ensemble: r(1:3)i1p1f1}
   
 cmip6_siconca_models_h_gngngn: &cmip6_siconca_models_h_gngngn # models w/ siconca, all grid: gn, historical
+  #- {dataset: ACCESS-CM2, ensemble: r(2:3)i1p1f1}
+  #- {dataset: ACCESS-ESM1-5, ensemble: r(2:6)i1p1f1}
+  #- {dataset: ACCESS-ESM1-5, ensemble: r7i1p1f1} # missing data
+  #- {dataset: ACCESS-ESM1-5, ensemble: r(8:20)i1p1f1}
+  #- {dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1} #YK: fix_metadata failure
+  #- {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
+  #- {dataset: CAMS-CSM1-0, ensemble: r1i1p1f2}
+  #- {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
+  #- {dataset: CanESM5, ensemble: r(26:40)i1p2f1}
+  #- {dataset: CESM2, ensemble: r(1:11)i1p1f1}
+  #- {dataset: CESM2-FV2, ensemble: r(1:3)i1p1f1}
+  #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1} #YK: preprocessor failure in r3i1p1f1
+  #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1} #YK: preprocessor failure
+  #- {dataset: CESM2-WACCM-FV2, ensemble: r(1:3)i1p1f1} #YK: preprocessor failure in r2i1p1f1
   - {dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1}
-  - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f2}
-  #- {dataset: GISS-E2-1-G, ensemble: r101i1p1f1}
-  #- {dataset: GISS-E2-1-G, ensemble: r102i1p1f1}
+  #- {dataset: GISS-E2-1-G, ensemble: r(101:102)i1p1f1}
+  - {dataset: GISS-E2-1-G, ensemble: r(1:10)i1p1f1}
+  - {dataset: GISS-E2-1-G, ensemble: r(1:11)i1p1f2}
+  - {dataset: GISS-E2-1-G, ensemble: r(1:6)i1p3f1}
+  #- {dataset: GISS-E2-1-G, ensemble: r7i1p3f1} # missing data
+  - {dataset: GISS-E2-1-G, ensemble: r(8:10)i1p3f1}
+  - {dataset: GISS-E2-1-G, ensemble: r(1:4)i1p5f1}
+  #- {dataset: GISS-E2-1-G, ensemble: r5i1p5f1} # missing data
+  - {dataset: GISS-E2-1-G, ensemble: r(6:10)i1p5f1}
+  #- {dataset: GISS-E2-1-H, ensemble: r(1:10)i1p1f1}
+  #- {dataset: GISS-E2-1-H, ensemble: r(1:5)i1p1f2}
+  #- {dataset: GISS-E2-1-H, ensemble: r(1:2)i1p3f1}
+  #- {dataset: GISS-E2-1-H, ensemble: r(1:4)i1p5f1}
+  #- {dataset: GISS-E2-1-H, ensemble: r(3:5)i1p3f1}
+  #- {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:3)i1p1f1}
+  #- {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1}
+  #- {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1}
+  #- {dataset: MRI-ESM2-0, ensemble: r1i1000p1f1}
+  #- {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1}
+  #- {dataset: MRI-ESM2-0, ensemble: r1i2p1f1}
+  #- {dataset: SAM0-UNICON, ensemble: r1i1p1f1} #YK: preprocessor failure
 
 cmip6_siconca_models_s_gngngn: &cmip6_siconca_models_s_gngngn # models w/ siconca, all grid: gn, ssp245, ssp245
+  #- {dataset: ACCESS-CM2, ensemble: r(2:3)i1p1f1}
+  #- {dataset: ACCESS-ESM1-5, ensemble: r(2:3)i1p1f1}
+  - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
+  #- {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1}
+  #- {dataset: CESM2, ensemble: r(1:3)i1p1f1}
+  #- {dataset: CESM2, ensemble: r4i1p1f1}
+  #- {dataset: CESM2, ensemble: r(10:11)i1p1f1}
+  #- {dataset: CESM2-WACCM, ensemble: r1i1p1f1} #YK: preprocessor failure
+  #- {dataset: CESM2-WACCM, ensemble: r2i1p1f1}
+  #- {dataset: CESM2-WACCM, ensemble: r3i1p1f1}
   - {dataset: GISS-E2-1-G, ensemble: r(1:4)i1p1f2}
-  #- {dataset: GISS-E2-1-G, ensemble: r(5:7)i1p1f2} #siconca missing until 2049
+  - {dataset: GISS-E2-1-G, ensemble: r6i1p1f2}
   - {dataset: GISS-E2-1-G, ensemble: r(8:10)i1p1f2}
+  - {dataset: GISS-E2-1-G, ensemble: r(1:5)i1p3f1}
+  - {dataset: GISS-E2-1-G, ensemble: r(1:4)i1p5f1}
+  #- {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1}
+  #- {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1}
     
 sftlf_cmip5: &sftlf_cmip5
   #- {dataset: ACCESS1-0} #sic=0 everywhere after regridding
@@ -402,44 +462,65 @@ sftlf_cmip5: &sftlf_cmip5
   #- {dataset: bcc-csm1-1}
 
 sftlf_cmip6: &sftlf_cmip6
-  - {dataset: ACCESS-CM2, ensemble: r(1:3)i1p1f1, grid: gn}
-  - {dataset: ACCESS-ESM1-5, ensemble: r(1:3)i1p1f1, grid: gn}
-#  - {dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: ACCESS-CM2, ensemble: r(2:3)i1p1f1, grid: gn}
+  - {dataset: ACCESS-ESM1-5, ensemble: r(2:6)i1p1f1, grid: gn}
+  - {dataset: ACCESS-ESM1-5, ensemble: r(8:10)i1p1f1, grid: gn}
+  #- {dataset: AWI-CM-1-1-MR, ensemble: r(1:5)i1p1f1, grid: gn}
+  - {dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn, exp: 1pctCO2}
+  - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
+  - {dataset: CanESM5, ensemble: r(1:25)i1p1f1, grid: gn}
+  - {dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn}
+  - {dataset: CESM2, ensemble: r(1:11)i1p1f1, grid: gn}
+  - {dataset: CESM2-FV2, ensemble: r(1:3)i1p1f1, grid: gn}
   #- {dataset: CESM2-WACCM, ensemble: r(1:3)i1p1f1, grid: gn}
-  - {dataset: CESM2, ensemble: r(1:10)i1p1f1, grid: gn}
+  - {dataset: CESM2-WACCM-FV2, ensemble: r(1:3)i1p1f1, grid: gn}
   - {dataset: CMCC-CM2-HR4, ensemble: r1i1p1f1, grid: gn}
   - {dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: CNRM-CM6-1, ensemble: r(1:28)i1p1f2, grid: gr}
+  #- {dataset: CNRM-CM6-1, ensemble: r29i1p1f2, grid: gr} # missing data
+  - {dataset: CNRM-CM6-1, ensemble: r30i1p1f2, grid: gr}
   - {dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
-  - {dataset: CNRM-CM6-1, ensemble: r(1:10)i1p1f2, grid: gr}
-  - {dataset: CNRM-ESM2-1, ensemble: r(2:5)i1p1f2, grid: gr}
-  - {dataset: CanESM5, ensemble: r(1:25)i1p2f1, grid: gn}
-  - {dataset: CanESM5-CanOE, ensemble: r(1:3)i1p2f1, grid: gn}
-  - {dataset: E3SM-1-0, ensemble: r(1:5)i1p1f1, grid: gr}
-  - {dataset: E3SM-1-1, ensemble: r1i1p1f1, grid: gr}
-  - {dataset: E3SM-1-1-ECA, ensemble: r1i1p1f1, grid: gr}
+  - {dataset: CNRM-ESM2-1, ensemble: r(2:6)i1p1f2, grid: gr}
+  - {dataset: CNRM-ESM2-1, ensemble: r(8:11)i1p1f2, grid: gr}
+  - {dataset: E3SM-1-0, ensemble: r(2:5)i1p1f1, grid: gr}
+  - {dataset: EC-Earth3-AerChem, ensemble: r1i1p1f1, grid: gr, exp: 1pctCO2}
   - {dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
   - {dataset: EC-Earth3-Veg, ensemble: r(1:3)i1p1f1, grid: gr}
-  - {dataset: EC-Earth3-Veg-LR, ensemble: r(1:3)i1p1f1, grid: gr}
-  #- {dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
-  - {dataset: FGOALS-g3, ensemble: r(1:6)i1p1f1, grid: gn}
-  - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, exp: piControl}
+  - {dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr}
+  #- {dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: FGOALS-g3, ensemble: r(2:6)i1p1f1, grid: gn}
   #- {dataset: GFDL-CM4, ensemble: r1i1p1f1, grid: gr1}
-  - {dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p1f1, grid: gn, exp: piControl}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p3f1, grid: gn, exp: piControl}
+  - {dataset: GISS-E2-1-G, ensemble: r1i1p5f1, grid: gn, exp: piControl}
+  - {dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn, exp: piControl}
+  - {dataset: GISS-E2-1-H, ensemble: r1i1p3f1, grid: gn, exp: piControl}
+  - {dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f1, grid: gn, exp: piControl}
+  - {dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f1, grid: gn, exp: piControl}
   - {dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
   - {dataset: INM-CM5-0, ensemble: r(1:10)i1p1f1, grid: gr1}
   - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1, grid: gr}
-  - {dataset: MIROC-ES2L, ensemble: r(1:4)i1p1f2, grid: gn}
-  - {dataset: MIROC6, ensemble: r(1:10)i1p1f1, grid: gn}
-  - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1, grid: gn}
+  - {dataset: MIROC6, ensemble: r(1:15)i1p1f1, grid: gn}
+  #- {dataset: MIROC6, ensemble: r(16:17)i1p1f1, grid: gn}
+  - {dataset: MIROC6, ensemble: r(18:50)i1p1f1, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r(1:3)i1p1f2, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r7i1p1f2, grid: gn}
+  - {dataset: MIROC-ES2L, ensemble: r10i1p1f2, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:3)i1p1f1, grid: gn}
   - {dataset: MPI-ESM1-2-HR, ensemble: r(1:10)i1p1f1, grid: gn}
   - {dataset: MPI-ESM1-2-LR, ensemble: r(1:10)i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r1i1000p1f1, grid: gn}
   - {dataset: MRI-ESM2-0, ensemble: r(1:5)i1p1f1, grid: gn}
-  - {dataset: NorCPM1, ensemble: r(1:30)i1p1f1, grid: gn}
+  - {dataset: MRI-ESM2-0, ensemble: r1i2p1f1, grid: gn}
+  - {dataset: NorCPM1, ensemble: r10i1p1f1, grid: gn}
+  - {dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
   #- {dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
   - {dataset: NorESM2-LM, ensemble: r(2:3)i1p1f1, grid: gn}
-  - {dataset: NorESM2-MM, ensemble: r(2:3)i1p1f1, grid: gn}
+  - {dataset: NorESM2-MM, ensemble: r2i1p1f1, grid: gn}
   #- {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
   - {dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+  - {dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn, exp: piControl}
 
 sftof_cmip5: &sftof_cmip5
 #  - {dataset: CanCM4}
@@ -656,110 +737,7 @@ tasaga_datasets: &tasaga_datasets
   - {dataset: HadCRUT5, project: OBS, type: ens198, version: 5.0.1.0, tier: 2}
   - {dataset: HadCRUT5, project: OBS, type: ens199, version: 5.0.1.0, tier: 2}
   - {dataset: HadCRUT5, project: OBS, type: ens200, version: 5.0.1.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: median, version: version2.0, tier: 2}
   - {dataset: GISTEMP, project: OBS, type: ground, version: v4, tier: 2}
-  #- {dataset: NOAAGlobalTemp, project: OBS, type: ground, version: v5, tier: 2}
-  #- {dataset: BerkeleyEarth, project: OBS, type: ground, version: 1, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens001, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens002, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens003, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens004, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens005, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens006, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens007, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens008, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens009, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens010, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens011, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens012, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens013, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens014, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens015, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens016, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens017, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens018, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens019, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens020, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens021, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens022, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens023, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens024, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens025, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens026, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens027, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens028, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens029, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens030, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens031, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens032, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens033, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens034, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens035, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens036, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens037, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens038, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens039, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens040, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens041, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens042, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens043, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens044, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens045, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens046, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens047, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens048, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens049, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens050, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens051, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens052, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens053, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens054, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens055, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens056, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens057, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens058, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens059, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens060, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens061, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens062, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens063, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens064, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens065, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens066, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens067, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens068, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens069, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens070, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens071, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens072, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens073, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens074, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens075, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens076, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens077, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens078, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens079, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens080, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens081, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens082, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens083, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens084, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens085, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens086, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens087, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens088, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens089, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens090, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens091, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens092, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens093, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens094, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens095, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens096, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens097, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens098, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens099, version: version2.0, tier: 2}
-  #- {dataset: CowtanWay, project: OBS, type: ens100, version: version2.0, tier: 2}
   
 preprocessors:
 
