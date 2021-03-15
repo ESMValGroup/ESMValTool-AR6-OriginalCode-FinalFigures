@@ -659,7 +659,9 @@ diagnostics:
           #- {dataset: AWI-ESM-1-1-LR, exp: piControl, start_year: 1855, end_year: 1969} # too short
           - {dataset: BCC-CSM2-MR, ensemble: r(1:3)i1p1f1}
           - {dataset: BCC-CSM2-MR, exp: piControl, start_year: 1850, end_year: 1964}
-          - {dataset: BCC-ESM1, ensemble: r(1:3)i1p1f1} # preprocessor failure; all member?
+          - {dataset: BCC-ESM1, ensemble: r1i1p1f1}
+          #- {dataset: BCC-ESM1, ensemble: r2i1p1f1} # preprocessor failure
+          - {dataset: BCC-ESM1, ensemble: r3i1p1f1}
           - {dataset: BCC-ESM1, exp: piControl, start_year: 1850, end_year: 1964}
           - {dataset: CAMS-CSM1-0, ensemble: r(1:2)i1p1f1}
           - {dataset: CAMS-CSM1-0, ensemble: r1i1p1f2}
