@@ -463,8 +463,7 @@ def main(cfg):
     # Plot data
     min_year = min([timeranges[dataset][0] for dataset in timeranges])
     max_year = max([timeranges[dataset][1] for dataset in timeranges])
-    plot_path = get_plot_filename('SCA_trend_' + str(min_year)
-                                  + '_' + str(max_year), cfg)
+    plot_path = get_plot_filename('fig_ipccar6_3_32', cfg)
     plot_data(timeranges, dataset_yrs, rel_trend_sca, sca_x0, data_sca,
               dataset_groups, plot_path)
 

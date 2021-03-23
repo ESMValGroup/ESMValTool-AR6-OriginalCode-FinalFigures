@@ -274,7 +274,7 @@ def main(cfg):
 
     fig.legend(lines, labels,
                loc='upper left', bbox_to_anchor=(1, 0.92))
-    plot_path = get_plot_filename('fig_3_31_carbonsinks_timeseries', cfg)
+    plot_path = get_plot_filename('fig_ipcca6_3_31', cfg)
     fig.suptitle("Carbon sinks in CMIP6 emission driven simulations")
     fig.tight_layout()
     fig.savefig(plot_path, bbox_inches='tight', dpi = 300)
