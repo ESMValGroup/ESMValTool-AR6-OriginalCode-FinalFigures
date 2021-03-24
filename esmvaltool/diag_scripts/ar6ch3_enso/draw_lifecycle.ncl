@@ -483,7 +483,7 @@ begin
   panel_width = 0.4
 ;  panel_width = 0.4*54./(tofloat(count_unique_values(models_cmip6)))
 ;  print(panel_width)
-  dummy   = new(1000, "graphic")
+  dummy   = new(2000, "graphic")
   idummy = 0
   
 ; ========================= CMIP5, CMIP6 and obs ========================
@@ -860,7 +860,7 @@ begin
   x2 = res@trXMaxF - 0.5
   x1 = x2 - (res@trXMaxF - res@trXMinF) * 0.32
   y1 = 1.5
-  y2 = y1 + (res@trYMaxF - res@trYMinF) * 0.09
+  y2 = y1 + (res@trYMaxF - res@trYMinF) * 0.08
   dummy(idummy) = gsn_add_polygon(wks, mme_plots(0), (/x1, x1, x2, x2/), \
                                   (/y1, y2, y2, y1/), polyres)
   idummy = idummy + 1
