@@ -75,7 +75,7 @@ models_cmip6_historical_woa: &models_cmip6_historical_woa #historical, Omon, tos
   - {dataset: E3SM-1-0, ensemble: r1i1p1f1, grid: gr}
   - {dataset: E3SM-1-1, grid: gr, institute: E3SM-Project}
   - {dataset: E3SM-1-1-ECA, grid: gr, institute: E3SM-Project}
-  - {dataset: EC-Earth3} #tos: not all years available
+  #- {dataset: EC-Earth3} #tos: not all years available
   - {dataset: EC-Earth3-AerChem}
   - {dataset: EC-Earth3-CC}
   - {dataset: EC-Earth3-Veg} #tos: empty folder
@@ -138,7 +138,7 @@ models_cmip6_piControl: &models_cmip6_piControl #piControl, Omon, tos+so
   #- {dataset: E3SM-1-0, grid: gr, start_year: 1, end_year: 500} #no sos
   #- {dataset: E3SM-1-1, grid: gr, institute: E3SM-Project, start_year: 1850, end_year: 2014} #no sos data
   #- {dataset: E3SM-1-1-ECA, grid: gr, institute: E3SM-Project, start_year: 1850, end_year: 2014} #no sos data
-  - {dataset: EC-Earth3, ensemble: r2i1p1f1, start_year: 2103, end_year: 3357} #empty folder
+  #- {dataset: EC-Earth3, ensemble: r2i1p1f1, start_year: 2103, end_year: 3357} #empty folder
   #- {dataset: EC-Earth3-AerChem,  start_year: 1850, end_year: 2160} #no sos data
   #- {dataset: EC-Earth3-LR, start_year: 2219, end_year: 2419} #no sos data
   #- {dataset: EC-Earth3-Veg, start_year: 1850, end_year: 2349} #no sos data
