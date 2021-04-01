@@ -692,80 +692,134 @@ begin
 
 ;---------------------------------------------------------------------------
 ; Calculate whether 80% of simulations match the sign of the MME
+;
+;  mme_nam_sign_C6 = mme_nam_C6
+;  mme_nam_sign_C6 = mme_nam_sign_C6@_FillValue
+;  do cc = 0,dimsizes(mme_nam_C6&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
+;     do dd = 0,dimsizes(mme_nam_C6&lon)-1     ; otherwise assign a value of 0.
+;        if (.not.ismissing(mme_nam_C6(cc,dd))) then
+;           tnum = toint(num(.not.ismissing(nam_patterns_C6(:,cc,dd)))*.8)
+;           if (mme_nam_C6(cc,dd).ge.0) then   ; MME >= 0
+;              count = num(nam_patterns_C6(:,cc,dd).ge.0)
+;              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
+;                 mme_nam_sign_C6(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_nam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+;             end if
+;           else                            ; MME < 0
+;              count = num(nam_patterns_C6(:,cc,dd).lt.0)  
+;              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
+;                 mme_nam_sign_C6(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_nam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+;              end if
+;           end if      
+;        end if
+;     end do
+;  end do
+;
+;  mme_nao_sign_C6 = mme_nao_C6
+;  mme_nao_sign_C6 = mme_nao_sign_C6@_FillValue
+;  do cc = 0,dimsizes(mme_nao_C6&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
+;     do dd = 0,dimsizes(mme_nao_C6&lon)-1     ; otherwise assign a value of 0.
+;        if (.not.ismissing(mme_nao_C6(cc,dd))) then
+;           tnum = toint(num(.not.ismissing(nao_patterns_C6(:,cc,dd)))*.8)
+;           if (mme_nao_C6(cc,dd).ge.0) then   ; MME >= 0
+;              count = num(nao_patterns_C6(:,cc,dd).ge.0)
+;              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
+;                 mme_nao_sign_C6(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_nao_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+;             end if
+;           else                            ; MME < 0
+;              count = num(nao_patterns_C6(:,cc,dd).lt.0)  
+;              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
+;                 mme_nao_sign_C6(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_nao_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+;              end if
+;           end if      
+;        end if
+;     end do
+;  end do
+;
+;  mme_sam_sign_C6 = mme_sam_C6
+;  mme_sam_sign_C6 = mme_sam_sign_C6@_FillValue
+;  do cc = 0,dimsizes(mme_sam_C6&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
+;     do dd = 0,dimsizes(mme_sam_C6&lon)-1     ; otherwise assign a value of 0.
+;        if (.not.ismissing(mme_sam_C6(cc,dd))) then
+;           tnum = toint(num(.not.ismissing(sam_patterns_C6(:,cc,dd)))*.8)
+;           if (mme_sam_C6(cc,dd).ge.0) then   ; MME >= 0
+;              count = num(sam_patterns_C6(:,cc,dd).ge.0)
+;              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
+;                 mme_sam_sign_C6(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_sam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+;             end if
+;           else                            ; MME < 0
+;              count = num(sam_patterns_C6(:,cc,dd).lt.0)  
+;              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
+;                 mme_sam_sign_C6(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_sam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+;              end if
+;           end if      
+;        end if
+;     end do
+;  end do
+
+;---------------------------------------------------------------------------
+; Calculate whether 80% of simulations match the sign
 
   mme_nam_sign_C6 = mme_nam_C6
   mme_nam_sign_C6 = mme_nam_sign_C6@_FillValue
-  do cc = 0,dimsizes(mme_nam_C6&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
+  do cc = 0,dimsizes(mme_nam_C6&lat)-1        ; If more than 80% of the runs match the sign, assign value of 1. 
      do dd = 0,dimsizes(mme_nam_C6&lon)-1     ; otherwise assign a value of 0.
         if (.not.ismissing(mme_nam_C6(cc,dd))) then
-           tnum = toint(num(.not.ismissing(nam_patterns_C6(:,cc,dd)))*.8)
-           if (mme_nam_C6(cc,dd).ge.0) then   ; MME >= 0
-              count = num(nam_patterns_C6(:,cc,dd).ge.0)
-              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
-                 mme_nam_sign_C6(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_nam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
-             end if
-           else                            ; MME < 0
-              count = num(nam_patterns_C6(:,cc,dd).lt.0)  
-              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
-                 mme_nam_sign_C6(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_nam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
-              end if
-           end if      
+          tnum = toint(num(.not.ismissing(nam_patterns_C6(:,cc,dd)))*.8)
+          countp = num(nam_patterns_C6(:,cc,dd).gt.0)
+          countn = num(nam_patterns_C6(:,cc,dd).lt.0)
+          if (countp.gt.tnum .or. countn.gt.tnum) then ; if more than 80% of the members are >0 or <0
+            mme_nam_sign_C6(cc,dd) = 1   ; assign value of 1
+          else
+            mme_nam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
+          end if
         end if
      end do
   end do
 
   mme_nao_sign_C6 = mme_nao_C6
   mme_nao_sign_C6 = mme_nao_sign_C6@_FillValue
-  do cc = 0,dimsizes(mme_nao_C6&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
-     do dd = 0,dimsizes(mme_nao_C6&lon)-1     ; otherwise assign a value of 0.
-        if (.not.ismissing(mme_nao_C6(cc,dd))) then
-           tnum = toint(num(.not.ismissing(nao_patterns_C6(:,cc,dd)))*.8)
-           if (mme_nao_C6(cc,dd).ge.0) then   ; MME >= 0
-              count = num(nao_patterns_C6(:,cc,dd).ge.0)
-              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
-                 mme_nao_sign_C6(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_nao_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
-             end if
-           else                            ; MME < 0
-              count = num(nao_patterns_C6(:,cc,dd).lt.0)  
-              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
-                 mme_nao_sign_C6(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_nao_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
-              end if
-           end if      
+  do cc = 0,dimsizes(mme_nao_C6&lat)-1        ; If more than 80% of the runs match the sign, assign value of 1.
+    do dd = 0,dimsizes(mme_nao_C6&lon)-1     ; otherwise assign a value of 0.
+      if (.not.ismissing(mme_nao_C6(cc,dd))) then
+        tnum = toint(num(.not.ismissing(nao_patterns_C6(:,cc,dd)))*.8)
+        countp = num(nao_patterns_C6(:,cc,dd).gt.0)
+        countn = num(nao_patterns_C6(:,cc,dd).lt.0)
+        if (countp.gt.tnum .or. countn.gt.tnum) then ; if more than 80% of the members are >0 or <0
+          mme_nao_sign_C6(cc,dd) = 1   ; assign value of 1
+        else
+          mme_nao_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
         end if
-     end do
+      end if
+    end do
   end do
 
   mme_sam_sign_C6 = mme_sam_C6
   mme_sam_sign_C6 = mme_sam_sign_C6@_FillValue
-  do cc = 0,dimsizes(mme_sam_C6&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
-     do dd = 0,dimsizes(mme_sam_C6&lon)-1     ; otherwise assign a value of 0.
-        if (.not.ismissing(mme_sam_C6(cc,dd))) then
-           tnum = toint(num(.not.ismissing(sam_patterns_C6(:,cc,dd)))*.8)
-           if (mme_sam_C6(cc,dd).ge.0) then   ; MME >= 0
-              count = num(sam_patterns_C6(:,cc,dd).ge.0)
-              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
-                 mme_sam_sign_C6(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_sam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
-             end if
-           else                            ; MME < 0
-              count = num(sam_patterns_C6(:,cc,dd).lt.0)  
-              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
-                 mme_sam_sign_C6(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_sam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
-              end if
-           end if      
+  do cc = 0,dimsizes(mme_sam_C6&lat)-1       ; If more than 80% of the runs match the sign, assign value of 1. 
+    do dd = 0,dimsizes(mme_sam_C6&lon)-1     ; otherwise assign a value of 0.
+      if (.not.ismissing(mme_sam_C6(cc,dd))) then
+        tnum = toint(num(.not.ismissing(sam_patterns_C6(:,cc,dd)))*.8)
+        countp = num(sam_patterns_C6(:,cc,dd).gt.0)
+        countn = num(sam_patterns_C6(:,cc,dd).lt.0)
+        if (countp.gt.tnum .or. countn.gt.tnum) then ; if more than 80% of the members are >0 or <0
+          mme_sam_sign_C6(cc,dd) = 1   ; assign value of 1
+        else
+          mme_sam_sign_C6(cc,dd) = 0   ; otherwise assign value of 0
         end if
-     end do
+      end if
+    end do
   end do
 
 ;-------------------------------------------------------------
@@ -1439,14 +1493,16 @@ begin
   res@gsnCenterString = "(a) NAM - Obs ("+diag_script_info@reference_dataset+")"
 ;  plot(0) = gsn_csm_contour_map_polar(wks,nam_patterns_obs,res)
   plot(0) = gsn_csm_contour_map_polar(wks,nam_patterns_obs_map,res)
-  res@gsnCenterString = "(d) NAM - Hist MME"
+;  res@gsnCenterString = "(d) NAM - Hist MME"
+  res@gsnCenterString = "(d) NAM - Hist MME mean"
 ;  plot(3) = gsn_csm_contour_map_polar(wks,mme_nam_C6,res)
   plot(3) = gsn_csm_contour_map_polar(wks,mme_nam_C6_map,res)
 
   res@gsnCenterString = "(b) NAO - Obs ("+diag_script_info@reference_dataset+")"
 ;  plot(1) = gsn_csm_contour_map_polar(wks,nao_patterns_obs,res)
   plot(1) = gsn_csm_contour_map_polar(wks,nao_patterns_obs_map,res)
-  res@gsnCenterString = "(e) NAO - Hist MME"  
+;  res@gsnCenterString = "(e) NAO - Hist MME"
+  res@gsnCenterString = "(e) NAO - Hist MME mean"  
 ;  plot(4) = gsn_csm_contour_map_polar(wks,mme_nao_C6,res)
   plot(4) = gsn_csm_contour_map_polar(wks,mme_nao_C6_map,res)
 
@@ -1456,7 +1512,8 @@ begin
   res@gsnCenterString = "(c) SAM - Obs ("+diag_script_info@reference_dataset+")"
 ;  plot(2) = gsn_csm_contour_map_polar(wks,sam_patterns_obs,res)
   plot(2) = gsn_csm_contour_map_polar(wks,sam_patterns_obs_map,res)
-  res@gsnCenterString = "(f) SAM - Hist MME"    
+;  res@gsnCenterString = "(f) SAM - Hist MME"
+  res@gsnCenterString = "(f) SAM - Hist MME mean"    
 ;  plot(5) = gsn_csm_contour_map_polar(wks,mme_sam_C6,res)
   plot(5) = gsn_csm_contour_map_polar(wks,mme_sam_C6_map,res)
 
@@ -1902,7 +1959,8 @@ begin
   textres@lgLabelFontHeights = 0.008
 
   gres@YPosPercent = 0.5
-  gres@XPosPercent = 20.
+;  gres@XPosPercent = 20.
+  gres@XPosPercent = 15.
   lineres@lgLineColors = 1
   lineres@lgLineThicknesses = 1. ;1.5 
   lineres@lgDashIndexes = 1
@@ -1912,26 +1970,33 @@ begin
 
   polyres@gsLineDashSegLenF = 0.07
   polyres@gsLineDashPattern = 0
-  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.009, 0.009/), polyres)
+;  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.009, 0.009/), polyres)
+  gsn_polyline_ndc(wks, (/0.15,0.175/), (/0.009, 0.009/), polyres)
   polyres@gsLineDashPattern = 3
-  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.001, 0.001/), polyres)
+;  gsn_polyline_ndc(wks, (/0.2,0.225/), (/0.001, 0.001/), polyres)
+  gsn_polyline_ndc(wks, (/0.15,0.175/), (/0.001, 0.001/), polyres)
   
-  gres@XPosPercent = 32
+;  gres@XPosPercent = 32
+  gres@XPosPercent = 27
   lineres@lgLineColors := 5
   lineres@lgLineThicknesses := 3
   delete(lineres@lgDashIndexes)
   delete(lineres@lgLineDashSegLenF)
-  textres@lgLabels := "CMIP5 Hist MME ("+cmip5_num+")"
+;  textres@lgLabels := "CMIP5 Hist MME ("+cmip5_num+")"
+  textres@lgLabels := "CMIP5 Hist MME mean ("+cmip5_num+")"
   simple_legend_ndc(wks,gres,lineres,textres)
 
-  gres@XPosPercent = 48.5
+;  gres@XPosPercent = 48.5
+  gres@XPosPercent = 46
   lineres@lgLineColors = 9
-  textres@lgLabels = "CMIP6 Hist MME ("+cmip6_num+")"
+;  textres@lgLabels = "CMIP6 Hist MME ("+cmip6_num+")"
+  textres@lgLabels = "CMIP6 Hist MME mean ("+cmip6_num+")"
   simple_legend_ndc(wks,gres,lineres,textres)
 
   gres@XPosPercent = 65
   lineres@lgLineColors = 3
-  textres@lgLabels = "CMIP6 AMIP MME ("+cmip6A_num+")"
+;  textres@lgLabels = "CMIP6 AMIP MME ("+cmip6A_num+")"
+  textres@lgLabels = "CMIP6 AMIP MME mean ("+cmip6A_num+")"
   simple_legend_ndc(wks,gres,lineres,textres)
 
   panres2 = True
@@ -2095,7 +2160,7 @@ begin
   mares@gsMarkerIndex = 16
   mares@gsMarkerSizeF   = 0.008
   tlres = True
-  tlres@txFontHeightF = 0.009;0.007
+  tlres@txFontHeightF = 0.008; 0.009;0.007
   tlres@txJust = "CenterLeft"
 
   yval = .2275
@@ -2104,38 +2169,51 @@ begin
 ;  gsn_text_ndc(wks,"Observations",.2325,yval,tlres)
 ;  gsn_polymarker_ndc(wks,.19,yval,mares)
 ;  gsn_text_ndc(wks,"Observations",.197,yval,tlres)
-  gsn_polymarker_ndc(wks,.18,yval,mares)
-  gsn_text_ndc(wks,"Observations",.187,yval,tlres)
+;  gsn_polymarker_ndc(wks,.18,yval,mares)
+;  gsn_text_ndc(wks,"Observations",.187,yval,tlres)
+  gsn_polymarker_ndc(wks,.16,yval,mares)
+  gsn_text_ndc(wks,"Observations",.167,yval,tlres)
   mares@gsMarkerIndex = 2
   mares@gsMarkerSizeF   = 0.006
   mares@gsMarkerColor = 5
 ;  gsn_polymarker_ndc(wks,.305,yval,mares)
 ;  gsn_text_ndc(wks,"CMIP5 Run (Hist)",.3125,yval,tlres)
-  gsn_polymarker_ndc(wks,.27,yval,mares)
-  gsn_text_ndc(wks,"CMIP5 Hist each",.277,yval,tlres)
+;  gsn_polymarker_ndc(wks,.27,yval,mares)
+;  gsn_text_ndc(wks,"CMIP5 Hist each",.277,yval,tlres)
+  gsn_polymarker_ndc(wks,.24,yval,mares)
+  gsn_text_ndc(wks,"CMIP5 Hist each",.247,yval,tlres)
   mares@gsMarkerColor = 4
 ;  gsn_polymarker_ndc(wks,.405,yval,mares)
 ;  gsn_text_ndc(wks,"CMIP6 Run (Hist)",.4125,yval,tlres)
-  gsn_polymarker_ndc(wks,.38,yval,mares)
-  gsn_text_ndc(wks,"CMIP6 Hist each",.387,yval,tlres)
+;  gsn_polymarker_ndc(wks,.38,yval,mares)
+;  gsn_text_ndc(wks,"CMIP6 Hist each",.387,yval,tlres)
+  gsn_polymarker_ndc(wks,.34,yval,mares)
+  gsn_text_ndc(wks,"CMIP6 Hist each",.347,yval,tlres)
   mares@gsMarkerIndex = 16
   mares@gsMarkerColor = 2
   mares@gsMarkerThicknessF = 3.0
 ;  gsn_polymarker_ndc(wks,.505,yval,mares)
 ;  gsn_text_ndc(wks,"CMIP5 MME (Hist)",.5125,yval,tlres)
-  gsn_polymarker_ndc(wks,.49,yval,mares)
-  gsn_text_ndc(wks,"CMIP5 Hist MME",.497,yval,tlres)
+;  gsn_polymarker_ndc(wks,.49,yval,mares)
+;  gsn_text_ndc(wks,"CMIP5 Hist MME",.497,yval,tlres)
+;  gsn_text_ndc(wks,"CMIP5 Hist MME mean",.497,yval,tlres)
+  gsn_polymarker_ndc(wks,.44,yval,mares)
+  gsn_text_ndc(wks,"CMIP5 Hist MME mean",.447,yval,tlres)
   mares@gsMarkerColor = 9
 ;  gsn_polymarker_ndc(wks,.605,yval,mares)
 ;  gsn_text_ndc(wks,"CMIP6 MME (Hist)",.6125,yval,tlres)
-  gsn_polymarker_ndc(wks,.60,yval,mares)
-  gsn_text_ndc(wks,"CMIP6 Hist MME",.607,yval,tlres)
+;  gsn_polymarker_ndc(wks,.60,yval,mares)
+;  gsn_text_ndc(wks,"CMIP6 Hist MME",.607,yval,tlres)
+;  gsn_text_ndc(wks,"CMIP6 Hist MME mean",.607,yval,tlres)
+  gsn_polymarker_ndc(wks,.57,yval,mares)
+  gsn_text_ndc(wks,"CMIP6 Hist MME mean",.577,yval,tlres)
   mares@gsMarkerColor = 3
-;  gsn_polymarker_ndc(wks,.705,yval,mares)
-;  gsn_text_ndc(wks,"CMIP6 MME (AMIP)",.7125,yval,tlres)
-  gsn_polymarker_ndc(wks,.71,yval,mares)
-  gsn_text_ndc(wks,"CMIP6 AMIP MME",.717,yval,tlres)
-
+;  gsn_polymarker_ndc(wks,.71,yval,mares)
+;  gsn_text_ndc(wks,"CMIP6 AMIP MME",.717,yval,tlres)
+;  gsn_text_ndc(wks,"CMIP6 AMIP MME mean",.717,yval,tlres)
+  gsn_polymarker_ndc(wks,.70,yval,mares)
+  gsn_text_ndc(wks,"CMIP6 AMIP MME mean",.707,yval,tlres)
+  
   pmres0 = True
 ;  pmres0@gsLineThicknessF     = 1.          ; polymarker size
 ;  pmres0@gsLineColor = "gray25"
@@ -2155,7 +2233,7 @@ begin
   y2 = 0.49 ; 0.485
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres0)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
-  gsn_text_ndc(wks," < 80% of runs~C~ match MME sign",x2+0.005,0.48,tlres)
+  gsn_text_ndc(wks," < 80% of runs~C~ agree on sign",x2+0.005,0.48,tlres)
 
 ;  pmres = True
 ;  pmres@gsMarkerIndex     = 16          ; polymarker style
