@@ -1,0 +1,736 @@
+# requires ESMValCore branch working_cordex_2.2
+---
+documentation:
+
+  description:
+    Producing figure from IPCC WGI AR6, ch. 10 fig. 12
+
+  authors:
+    -  jury_martin
+
+  projects:
+    - ipcc_ar6
+
+obs_pr: &obs_pr
+  - {dataset: GPCC, project: OBS, version: v2018_25-numgauge1, type: reanaly, tier: 2}
+  - {dataset: CRU, project: OBS, version: TS4.04-stn1, type: reanaly, tier: 2, end_year: 2018}
+
+cmip6_pr: &cmip6_pr
+  - {institute: AS-RCEC, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAMS, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: CAS-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  - {institute: CAS, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {institute: CMCC, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CSIRO, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CSIRO-ARCCSS, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: FIO-QLNM, dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: HAMMOZ-Consortium, dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: INM, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: INM, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: IPSL, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MIROC, dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MRI, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G, ensemble: r1i1p1f2, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NIMS-KMA, dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr}
+  - {institute: NIMS-KMA, dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
+  - {institute: NOAA-GFDL, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: NUIST, dataset: NESM3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: SNU, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {institute: THU, dataset: CIESM, ensemble: r1i1p1f1, grid: gr}
+  - {institute: UA, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
+
+mod_mpige: &mod_mpige
+  - {dataset: MPI-ESM, ensemble: [r001i1850p3, r001i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r002i1850p3, r002i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r003i1850p3, r003i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r004i1850p3, r004i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r005i1850p3, r005i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r006i1850p3, r006i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r007i1850p3, r007i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r008i1850p3, r008i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r009i1850p3, r009i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r010i1850p3, r010i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r011i1850p3, r011i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r012i1850p3, r012i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r013i1850p3, r013i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r014i1850p3, r014i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r015i1850p3, r015i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r016i1850p3, r016i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r017i1850p3, r017i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r018i1850p3, r018i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r019i1850p3, r019i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r020i1850p3, r020i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r021i1850p3, r021i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r022i1850p3, r022i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r023i1850p3, r023i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r024i1850p3, r024i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r025i1850p3, r025i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r026i1850p3, r026i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r027i1850p3, r027i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r028i1850p3, r028i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r029i1850p3, r029i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r030i1850p3, r030i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r031i1850p3, r031i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r032i1850p3, r032i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r033i1850p3, r033i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r034i1850p3, r034i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r035i1850p3, r035i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r036i1850p3, r036i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r037i1850p3, r037i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r038i1850p3, r038i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r039i1850p3, r039i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r040i1850p3, r040i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r041i1850p3, r041i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r042i1850p3, r042i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r043i1850p3, r043i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r044i1850p3, r044i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r045i1850p3, r045i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r046i1850p3, r046i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r047i1850p3, r047i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r048i1850p3, r048i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r049i1850p3, r049i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r050i1850p3, r050i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r051i1850p3, r051i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r052i1850p3, r052i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r053i1850p3, r053i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r054i1850p3, r054i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r055i1850p3, r055i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r056i1850p3, r056i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r057i1850p3, r057i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r058i1850p3, r058i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r059i1850p3, r059i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r060i1850p3, r060i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r061i1850p3, r061i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r062i1850p3, r062i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r063i1850p3, r063i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r064i1850p3, r064i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r065i1850p3, r065i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r066i1850p3, r066i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r067i1850p3, r067i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r068i1850p3, r068i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r069i1850p3, r069i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r070i1850p3, r070i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r071i1850p3, r071i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r072i1850p3, r072i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r073i1850p3, r073i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r074i1850p3, r074i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r075i1850p3, r075i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r076i1850p3, r076i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r077i1850p3, r077i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r078i1850p3, r078i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r079i1850p3, r079i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r080i1850p3, r080i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r081i1850p3, r081i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r082i1850p3, r082i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r083i1850p3, r083i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r084i1850p3, r084i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r085i1850p3, r085i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r086i1850p3, r086i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r087i1850p3, r087i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r088i1850p3, r088i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r089i1850p3, r089i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r090i1850p3, r090i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r091i1850p3, r091i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r092i1850p3, r092i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r093i1850p3, r093i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r094i1850p3, r094i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r095i1850p3, r095i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r096i1850p3, r096i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r097i1850p3, r097i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r098i1850p3, r098i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r099i1850p3, r099i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r100i1850p3, r100i2005p3]}
+
+mod_d4pdf: &mod_d4pdf
+  - &d4PDFGE {dataset: MRI-AGCM3.2H, frequency: mon, modeling_realm: atmos, ensemble: r001i1p1f1, start_year: 1951, end_year: 2014}
+  - {<<: *d4PDFGE, ensemble: r002i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r003i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r004i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r005i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r006i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r007i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r008i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r009i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r010i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r011i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r012i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r013i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r014i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r015i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r016i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r017i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r018i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r019i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r020i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r021i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r022i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r023i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r024i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r025i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r026i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r027i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r028i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r029i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r030i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r031i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r032i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r033i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r034i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r035i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r036i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r037i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r038i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r039i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r040i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r041i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r042i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r043i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r044i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r045i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r046i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r047i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r048i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r049i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r050i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r051i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r052i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r053i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r054i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r055i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r056i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r057i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r058i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r059i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r060i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r061i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r062i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r063i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r064i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r065i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r066i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r067i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r068i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r069i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r070i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r071i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r072i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r073i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r074i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r075i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r076i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r077i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r078i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r079i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r080i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r081i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r082i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r083i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r084i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r085i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r086i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r087i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r088i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r089i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r090i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r091i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r092i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r093i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r094i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r095i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r096i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r097i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r098i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r099i1p1f1}
+  - {<<: *d4PDFGE, ensemble: r100i1p1f1}
+
+
+mod_csiromk360: &mod_csiromk360
+# r1-30
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r1i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r2i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r3i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r4i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r5i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r6i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r7i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r8i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r9i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r10i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r11i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r12i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r13i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r14i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r15i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r16i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r17i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r18i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r19i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r20i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r21i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r22i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r23i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r24i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r25i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r26i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r27i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r28i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r29i1p1}
+  - {dataset: CSIRO-Mk3-6-0, ensemble: r30i1p1}
+
+mod_miroc6: &mod_miroc6
+  - {institute: MIROC, dataset: MIROC6, ensemble: r1i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r2i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r3i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r4i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r5i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r6i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r7i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r8i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r9i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r10i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r11i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r12i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r13i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r14i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r15i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r16i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r17i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r18i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r19i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r20i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r21i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r22i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r23i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r24i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r25i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r26i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r27i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r28i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r29i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r30i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r31i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r32i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r33i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r34i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r35i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r36i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r37i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r38i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r39i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r40i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r41i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r42i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r43i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r44i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r45i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r46i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r47i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r48i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r49i1p1f1}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r50i1p1f1}
+
+
+preprocessors:
+  pr_maps:
+    custom_order: true
+    mask_landsea:
+      mask_out: sea
+    extract_region: &mask_big
+      start_longitude: -81.25
+      end_longitude: -41.25
+      start_latitude: -53.75
+      end_latitude: -11.25
+    extract_time: &per_trend
+      start_year: 1951
+      start_month: 1
+      start_day: 1
+      end_year: 2014
+      end_month: 12
+      end_day: 31
+    extract_season:
+      season: DJF
+    convert_units:
+      units: kg m-2 month-1
+    seasonal_statistics:
+      operator: mean
+
+  pr_areamean_trend:
+    mask_landsea:
+      mask_out: sea
+    extract_region: &mask_box
+      start_longitude: -66.25
+      end_longitude: -56.25
+      start_latitude: -38.75
+      end_latitude: -26.25
+    extract_time:
+      {<<: *per_trend}
+    extract_season:
+      season: DJF
+    convert_units:
+      units: kg m-2 month-1
+    seasonal_statistics:
+      operator: mean
+    area_statistics:
+      operator: mean
+
+  pr_areamean_timeseries:
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      {<<: *mask_box}
+    extract_time: &per_ts
+      start_year: 1951
+      start_month: 1
+      start_day: 1
+      end_year: 2014
+      end_month: 12
+      end_day: 31
+    extract_season:
+      season: DJF
+    convert_units:
+      units: kg m-2 month-1
+    seasonal_statistics:
+      operator: mean
+    area_statistics:
+      operator: mean
+
+  pr_common:
+    custom_order: true
+    mask_landsea:
+      mask_out: sea
+    extract_region:
+      {<<: *mask_big}
+    extract_time:
+      {<<: *per_ts}
+    extract_season:
+      season: DJF
+    convert_units:
+      units: kg m-2 month-1
+
+
+diagnostics:
+  ch_10:
+    description: IPCC WGI AR6 Ch. 10, Fig 10.12 SESA illustrative example
+    realms:
+      - atmos
+    variables:
+      pr_common_obsmasking: &pr_common_obsmasking
+        short_name: pr
+        preprocessor: pr_common
+        reference_dataset: CRU
+        mip: Amon
+        start_year: 1901
+        end_year: 2014
+        additional_datasets:
+          *obs_pr
+
+      # For the histogram
+      pr_areamean_cmip6: &pr_areamean_cmip6
+        project: CMIP6
+        activity: CMIP
+        exp: historical
+        mip: Amon
+        short_name: pr
+        preprocessor: pr_areamean_trend
+        mip: Amon
+        start_year: 1951
+        end_year: 2014
+        additional_datasets:
+          *cmip6_pr
+
+      pr_areamean_d4pdf:
+        <<: *pr_areamean_cmip6
+        project: d4PDF
+        exp: d4pdf
+        frequency: mon
+        additional_datasets:
+          *mod_d4pdf
+
+      pr_areamean_mpige:
+        <<: *pr_areamean_cmip6
+        mip: Amon
+        project: MPIGE
+        exp: [historical, rcp85]
+        frequency: mon
+        modeling_realm: atmos
+        additional_datasets:
+          *mod_mpige
+
+      pr_areamean_csiromk360:
+        <<: *pr_areamean_cmip6
+        mip: Amon
+        project: CMIP5LENS
+        exp: historical_rcp85
+        frequency: mon
+        modeling_realm: atmos
+        additional_datasets:
+          *mod_csiromk360
+
+      pr_areamean_miroc6:
+        <<: *pr_areamean_cmip6
+        mip: Amon
+        frequency: mon
+        grid: gn
+        additional_datasets:
+          *mod_miroc6
+
+      # for the extended timeseries
+      pr_areamean_timeseries_mpige:
+        <<: *pr_areamean_cmip6
+        start_year: 1901
+        end_year: 2014
+        preprocessor: pr_areamean_timeseries
+
+        mip: Amon
+        project: MPIGE
+        exp: [historical, rcp85]
+        frequency: mon
+        modeling_realm: atmos
+        additional_datasets:
+          *mod_mpige
+
+    scripts:
+      fig_12:
+        script: ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
+        obsmasking_pr_maps_CRU: &obsmasking_pr_maps
+          variable_group: pr_common_obsmasking
+          datasets: [CRU]
+          seasonal_statistics:
+            operator: mean
+          extract_time:
+            {<<: *per_trend}
+        obsmasking_pr_maps_GPCC:
+          <<: *obsmasking_pr_maps
+          datasets: [GPCC]
+
+        obsmasking_pr_timeseries_CRU: &obsmasking_pr_ts
+          variable_group: pr_common_obsmasking
+          datasets: [CRU]
+          extract_region:
+            {<<: *mask_box}
+          extract_time:
+            {<<: *per_ts}
+          seasonal_statistics:
+            operator: mean
+          area_statistics:
+            operator: mean
+          # custom_threshholds:
+          #   area_statistics: 0.0
+
+        obsmasking_pr_timeseries_GPCC:
+          <<: *obsmasking_pr_ts
+          datasets: [GPCC]
+          custom_threshholds:
+            area_statistics: 0.7
+        obsmasking_pr_timeseries:
+          <<: *obsmasking_pr_ts
+          datasets: [CRU, GPCC] # , REGEN]
+          custom_threshholds:
+            area_statistics: 0.7
+
+
+        mapplot_pr_trend_CRU: &mapplot_pr_trend_CRU
+          domain: 'SESA'
+
+          type: single
+          metric: trend
+          trend_base: decade
+          ensembles: [obsmasking_pr_maps_CRU]
+          region:  &mask_plot
+            start_longitude: -76.25
+            end_longitude: -46.25
+            start_latitude: -48.75
+            end_latitude: -16.25
+          box: {<<: *mask_box}
+          period_plot: {<<: *per_trend}
+
+          plotting_information: &plotting_information_maps_CRU
+            projection: LambertConformal
+            title: Observed precipitation trends over southern South America
+            subtitle: CRU TS
+            plot_title: True
+            coastlines: True
+            latlonlabels: False
+            plot_box: True
+            indicate_N: False
+            # color management and color bar
+            extend: 'both'
+            add_colorbar: True
+            cmap_str: prec_div_disc
+            Ncolors: 14
+            minmax: [-7, 7]
+            cbar_label_format: '{units} {trend_base}$^{{-1}}$'
+            mintozero: False
+            extend: both
+
+        mapplot_pr_trend_GPCC:
+          <<: *mapplot_pr_trend_CRU
+          ensembles: [obsmasking_pr_maps_GPCC]
+
+          plotting_information:
+            <<: *plotting_information_maps_CRU
+            plot_box: False
+            title: ''
+            subtitle: GPCC
+
+        timeseries_SESA:
+          domain: 'SESA'
+          relative: True
+          anomalies: True
+          period_norm:
+            start_year: 1995
+            end_year: 2014
+          span: full
+          window: 5weighted
+
+          timeseries_cru:
+            period:
+              <<: *per_ts
+            ensembles: [obsmasking_pr_timeseries_CRU]
+            labeling: '{dataset}'
+            metrics: [single]
+            indicate_bars: True
+          timeseries_mpige:
+            period:
+              <<: *per_trend
+            period_trend:
+              <<: *per_trend
+            ensembles: [pr_areamean_timeseries_mpige]
+            labeling: '{dataset}'
+            metrics: [minmaxtrend]
+            indicate_bars: False
+
+          plotting_information:
+            period_plot:
+              <<: *per_ts
+            add_legend: true
+            xlabel: ''
+            ylabel:
+            ncol: 3
+            loc: 2
+            zero_line: true
+            title: Southeastern South America precipitation anomalies
+            subtitle: Baseline period is 1995-2014
+
+        histogram_SESA:
+          domain: 'SESA'
+
+          trend_base: decade
+          period_trend:
+            <<: *per_trend
+          relative: False
+          add_mean_trends: True
+          histogram_histogram:
+            metric: trend
+            ensembles: [pr_areamean_d4pdf, pr_areamean_mpige, pr_areamean_csiromk360, pr_areamean_miroc6]
+            labeling: '{dataset}'
+            plot_type: boxplot
+          histogram_symbols:
+            metric: trend
+            ensembles: [pr_areamean_cmip6, obsmasking_pr_timeseries]
+            labeling: ['{project}']
+            plot_type: symbols
+
+          plotting_information:
+            add_legend: true
+            xlabel:
+            ylabel: '(% of simlations)'
+            ncol: 1
+            loc: 1
+            ylims:
+            title: Southeastern South America precipitation trend distribution
+            subtitle: Trend period (1951-2014)
+
+
+        placeholder_1:
+          plotting_information:
+            title: Mechanisms contributing to the southeastern South America summer wetting (1951-2014)
+
+        diagnostics_combination_figure_parta:
+          figure_name: Fig_12
+          title_leading:
+            '({ascii_lowercase})'
+          add_title: true
+          add_subtitle: true
+          figsize: [16, 32]
+          gridspec: [200, 60]
+          x_grid: [0, 15, 30, 45, 60]
+          y_grid:
+            [[4, 15, 0, 1],
+             [27, 20, 25, 26]]
+          diagnostics_position:
+            placeholder_1:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [0, 30]
+              x_pos_title: 0
+              y_pos_title: 0
+
+            timeseries_SESA:
+              position: 2
+              x_pos: [3, 60]
+              y_pos: [30, 50]
+              x_pos_title: 0
+              y_pos_title: 26
+              x_pos_subtitle: 1
+              y_pos_subtitle: 28
+
+            mapplot_pr_trend_CRU: &row3
+              position: 3
+              x_pos: [0, 15]
+              y_pos: [58, 84]
+              x_pos_title: 0
+              y_pos_title: 54
+              x_pos_subtitle: [0, 15]
+              y_pos_subtitle: 56
+              subtitlekwags:
+                horizontalalignment: center
+            mapplot_pr_trend_GPCC:
+              <<: *row3
+              x_pos: [15, 30]
+              x_pos_subtitle: [15, 30]
+            colorbar_1:
+              mapplot_diagnostic: mapplot_pr_trend_CRU
+              x_pos: [5, 25]
+              y_pos: 84
+
+            histogram_SESA:
+              <<: *row3
+              position: 4
+              x_pos: [32, 54]
+              x_pos_title: 30
+              x_pos_subtitle: 31
+              subtitlekwags:
+                horizontalalignment: left
+
+        savepdf: True
+        savesvg: True
+        saveeps: True

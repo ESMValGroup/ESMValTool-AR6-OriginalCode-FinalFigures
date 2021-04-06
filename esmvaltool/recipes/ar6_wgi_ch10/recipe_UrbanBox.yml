@@ -1,0 +1,356 @@
+# requires ESMValCore branch working_cordex_2.2
+---
+documentation:
+
+  description:
+    Producing figure from IPCC WGI AR6, ch. 10 fig. CB 3.1
+
+  authors:
+    - jury_martin
+
+  projects:
+    - ipcc_ar6
+
+preprocessors:
+  tas_common:
+    mask_landsea:
+      mask_out: sea
+    extract_time: &period_maps
+      start_year: 1950
+      start_month: 1
+      start_day: 1
+      end_year: 2018
+      end_month: 12
+      end_day: 31
+
+  tas_maps_world:
+    mask_landsea:
+      mask_out: sea
+    extract_time: {<<: *period_maps}
+    annual_statistics:
+      operator: mean
+
+figUB_data: &figUB_data
+      - {dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, start_year: 1950, end_year: 2018}
+      - {dataset: CRU, project: OBS, version: TS4.04-stn1, type: reanaly, tier: 2, start_year: 1950, end_year: 2018}
+      - {dataset: HadCRUT5, project: OBS, version: noninfilled, type: ground, tier: 2, start_year: 1950, end_year: 2018}
+      - {short_name: tasa, dataset: CowtanWay, project: OBS, version: had4sst4_krig_v2, type: reanaly, tier: 2, start_year: 1950, end_year: 2018}
+      - {short_name: tasa, dataset: GISTEMP, project: OBS, version: v4, type: ground, tier: 2, start_year: 1950, end_year: 2018}
+
+diagnostics:
+  ch_10:
+    description: IPCC WGI AR6 Ch. 10, Box 10.3 Fig 1 Urban Warming
+    variables:
+      tas_common_obsmasking: &tas_common_obsmasking
+        short_name: tas
+        preprocessor: tas_common
+        reference_dataset: BEST
+        mip: Amon
+        project: CMIP5
+        exp: historical
+        ensemble: r1i1p1
+        start_year: 1950
+        end_year: 2018
+        additional_datasets:
+          *figUB_data
+
+    scripts:
+      fig_CB-3.1:
+        script: ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
+
+        obsmasking_annual_mean_CRU:
+          variable_group: tas_common_obsmasking
+          datasets: [CRU]
+          annual_statistics:
+            operator: mean
+
+        obsmasking_annual_mean_BerkeleyEarth:
+          variable_group: tas_common_obsmasking
+          datasets: [BerkeleyEarth]
+          annual_statistics:
+            operator: mean
+
+        obsmasking_annual_mean_HadCRUT5:
+          variable_group: tas_common_obsmasking
+          datasets: [HadCRUT5]
+          annual_statistics:
+            operator: mean
+
+        obsmasking_annual_mean_CowtanWay:
+          variable_group: tas_common_obsmasking
+          datasets: [CowtanWay]
+          annual_statistics:
+            operator: mean
+
+        obsmasking_annual_mean_GISTEMP:
+          variable_group: tas_common_obsmasking
+          datasets: [GISTEMP]
+          annual_statistics:
+            operator: mean
+
+        mapplot_CRU_tas_trend: &mapplot_CRU_tas_trend
+          domain: 'World'
+
+          type: single
+          metric: trend
+          trend_base: all
+
+          ensembles: [obsmasking_annual_mean_CRU]
+
+          plot_markers: external_UrbanBox
+          plot_markers_style: pies
+          add_shapes: False
+
+          centerlononzero: True
+          period_plot: {<<: *period_maps}
+          region:
+            start_longitude: -180.
+            end_longitude: 180.
+            start_latitude: -60.
+            end_latitude: 90.
+
+          plotting_information: &plotting_information_maps_CRU
+            figsize: [20, 12]
+            projection: PlateCarree
+            title: Trend in global surface air temperature (CRU TS, 1950-2018)
+            plot_title: True
+            coastlines: True
+            latlonlabels: False
+            indicate_N: False
+            # color management and color bar
+            add_colorbar: True
+            cmap_str: temp_div_disc
+            Ncolors: 14
+            minmax: [-3.5, 3.5]
+            truncate_colormap: [-0.5, 3.5]
+            cbar_label_format: '{units} {trend_base}$^{{-1}}$'
+            mintozero: False
+            extend: neither
+
+        mapplot_BerkeleyEarth_tas_trend:
+          <<: *mapplot_CRU_tas_trend
+          ensembles: [obsmasking_annual_mean_BerkeleyEarth]
+          plotting_information:
+            <<: *plotting_information_maps_CRU
+            title: Trend in global surface air temperature (Berkeley Earth, 1950-2018)
+
+        mapplot_HadCRUT5_tas_trend:
+          <<: *mapplot_CRU_tas_trend
+          ensembles: [obsmasking_annual_mean_HadCRUT5]
+          plotting_information:
+            <<: *plotting_information_maps_CRU
+            title: Trend in global surface air temperature (HadCRUT5, 1950-2018)
+
+        mapplot_CowtanWay_tas_trend:
+          <<: *mapplot_CRU_tas_trend
+          ensembles: [obsmasking_annual_mean_CowtanWay]
+          plotting_information:
+            <<: *plotting_information_maps_CRU
+            title: Trend in global surface air temperature (CowtanWay, 1950-2018)
+
+        mapplot_GISTEMP_tas_trend:
+          <<: *mapplot_CRU_tas_trend
+          ensembles: [obsmasking_annual_mean_GISTEMP]
+          plotting_information:
+            <<: *plotting_information_maps_CRU
+            title: Trend in global surface air temperature (GISTEMP, 1950-2018)
+
+        external_timeseries_UrbanBox_Japan:
+          domain: 'Japan'
+          anomalies: False
+          window: 5weighted
+          plotting_information:
+            figsize: [8, 6]
+            period_plot: &period_ts
+              start_year: 1887
+              end_year: 2018
+            add_legend: true
+            xlabel: ''
+            ylabel: '(°C)'
+            ncol: 1
+            loc: 2
+            zero_line: false
+            xlims: [1887, 2018]
+            ylims: [13., 17.]
+            title: Temperature evolution Japan examples
+
+        dependent_boxplot_UrbanBox_relurban:
+          source_diagnostics: [mapplot_CRU_tas_trend, mapplot_BerkeleyEarth_tas_trend, mapplot_HadCRUT5_tas_trend, mapplot_CowtanWay_tas_trend, mapplot_GISTEMP_tas_trend]
+          x_data: 'cities'
+          y_data: ['rel_urban']
+          type: 'marker'
+          plotting_information:
+            figsize: [8, 6]
+            ylims: [-5, 105.]
+            xlabel: 'Cities'
+            ylabel: '(%)'
+            zero_line: True
+            100_line: True
+            grid_lines: False
+            title: 'Relative share urban warming of total warming' # Urban Warming - surrounding Warming
+            ncol: 2
+            loc: 2
+
+        diagnostics_combination_figure_CRU:
+          figure_name: Fig_CB-3.1_CRU
+          title_leading: '({ascii_lowercase})'
+          add_title: true
+          figsize: [18, 36]
+          gridspec: [200, 60]
+          diagnostics_position:
+            # row1
+            mapplot_CRU_tas_trend:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [1, 44]
+              x_pos_title: 0
+              y_pos_title: 0
+            colorbar_1:
+              mapplot_diagnostic: mapplot_CRU_tas_trend
+              x_pos: [10, 50]
+              y_pos: 45
+
+            timeseries_UrbanBox_Japan:
+              position: 2
+              x_pos: [3, 25]
+              y_pos: [53, 80]
+              x_pos_title: 0
+              y_pos_title: 52
+            boxplot_UrbanBox_relurban:
+              position: 3
+              x_pos: [29, 58]
+              y_pos: [53, 72]
+              y_pos_title: 52
+              x_pos_title: 25
+
+        diagnostics_combination_figure_BerkeleyEarth:
+          figure_name: Fig_CB-3.1_BerkeleyEarth
+          title_leading: '({ascii_lowercase})'
+          add_title: true
+          figsize: [18, 36]
+          gridspec: [200, 60]
+          diagnostics_position:
+            # row1
+            mapplot_BerkeleyEarth_tas_trend:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [1, 44]
+              x_pos_title: 0
+              y_pos_title: 0
+            colorbar_1:
+              mapplot_diagnostic: mapplot_BerkeleyEarth_tas_trend
+              x_pos: [10, 50]
+              y_pos: 45
+
+            timeseries_UrbanBox_Japan:
+              position: 2
+              x_pos: [3, 25]
+              y_pos: [53, 80]
+              x_pos_title: 0
+              y_pos_title: 52
+            boxplot_UrbanBox_relurban:
+              position: 3
+              x_pos: [29, 58]
+              y_pos: [53, 72]
+              y_pos_title: 52
+              x_pos_title: 25
+
+        diagnostics_combination_figure_HadCRUT5:
+          figure_name: Fig_CB-3.1_HadCRUT5
+          title_leading: '({ascii_lowercase})'
+          add_title: true
+          figsize: [18, 36]
+          gridspec: [200, 60]
+          diagnostics_position:
+            # row1
+            mapplot_HadCRUT5_tas_trend:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [1, 44]
+              x_pos_title: 0
+              y_pos_title: 0
+            colorbar_1:
+              mapplot_diagnostic: mapplot_HadCRUT5_tas_trend
+              x_pos: [10, 50]
+              y_pos: 45
+
+            timeseries_UrbanBox_Japan:
+              position: 2
+              x_pos: [3, 25]
+              y_pos: [53, 80]
+              x_pos_title: 0
+              y_pos_title: 52
+            boxplot_UrbanBox_relurban:
+              position: 3
+              x_pos: [29, 58]
+              y_pos: [53, 72]
+              y_pos_title: 52
+              x_pos_title: 25
+
+        diagnostics_combination_figure_CowtanWay:
+          figure_name: Fig_CB-3.1_CowtanWay
+          title_leading: '({ascii_lowercase})'
+          add_title: true
+          figsize: [18, 36]
+          gridspec: [200, 60]
+          diagnostics_position:
+            # row1
+            mapplot_CowtanWay_tas_trend:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [1, 44]
+              x_pos_title: 0
+              y_pos_title: 0
+            colorbar_1:
+              mapplot_diagnostic: mapplot_CowtanWay_tas_trend
+              x_pos: [10, 50]
+              y_pos: 45
+
+            timeseries_UrbanBox_Japan:
+              position: 2
+              x_pos: [3, 25]
+              y_pos: [53, 80]
+              x_pos_title: 0
+              y_pos_title: 52
+            boxplot_UrbanBox_relurban:
+              position: 3
+              x_pos: [29, 58]
+              y_pos: [53, 72]
+              y_pos_title: 52
+              x_pos_title: 25
+
+        diagnostics_combination_figure_GISTEMP:
+          figure_name: Fig_CB-3.1_GISTEMP
+          title_leading: '({ascii_lowercase})'
+          add_title: true
+          figsize: [18, 36]
+          gridspec: [200, 60]
+          diagnostics_position:
+            # row1
+            mapplot_GISTEMP_tas_trend:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [1, 44]
+              x_pos_title: 0
+              y_pos_title: 0
+            colorbar_1:
+              mapplot_diagnostic: mapplot_GISTEMP_tas_trend
+              x_pos: [10, 50]
+              y_pos: 45
+
+            timeseries_UrbanBox_Japan:
+              position: 2
+              x_pos: [3, 25]
+              y_pos: [53, 80]
+              x_pos_title: 0
+              y_pos_title: 52
+            boxplot_UrbanBox_relurban:
+              position: 3
+              x_pos: [29, 58]
+              y_pos: [53, 72]
+              y_pos_title: 52
+              x_pos_title: 25
+
+        savepdf: True
+        saveeps: True
+        savesvg: True

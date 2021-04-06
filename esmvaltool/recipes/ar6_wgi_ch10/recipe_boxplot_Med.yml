@@ -1,0 +1,1524 @@
+# requires ESMValCore branch working_cordex_2.2
+---
+documentation:
+
+  description:
+    Producing figure from IPCC WGI AR6, ch. 10 fig. 6
+
+  authors:
+    - jury_martin
+
+  projects:
+    - ipcc_ar6
+
+obs_tas_best: &obs_tas_best
+  - {dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+
+obs_tas: &obs_tas
+  - {dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+  - {dataset: CRU, project: OBS, version: TS4.04, type: reanaly, tier: 2, end_year: 2018}
+  - {dataset: HadCRUT4, project: OBS, version: 1, type: ground, tier: 2, end_year: 2018}
+  - {dataset: HadCRUT5, project: OBS, version: noninfilled, type: ground, tier: 2, end_year: 2018}
+  - {dataset: E-OBS, project: OBS, version: v21.0e-0.1, type: ground, tier: 2, end_year: 2018} #, mip: day}
+  - {dataset: E-OBS, project: OBS, version: v21.0e-0.25, type: ground, tier: 2, end_year: 2018} #, mip: day}
+  - {dataset: WFDE5, project: OBS, version: v1.0-CRU, type: ground, tier: 2, end_year: 2016} #, mip: day}
+  # # obs4mips
+  - {dataset: CERA-20C, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2010}
+  - {dataset: JRA-25, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2013}
+  - {dataset: ERA5, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2019}
+  - {dataset: ERA-Interim, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2018}
+  - {dataset: JRA-55, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1958, end_year: 2019}
+  - {dataset: MERRA, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2016}
+  - {dataset: MERRA2, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1980, end_year: 2019}
+  - {dataset: CFSR, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2019}
+
+obs_pr_gpcc: &obs_pr_gpcc
+  - {dataset: GPCC, project: OBS, version: v2018_10, type: reanaly, tier: 2}
+
+obs_pr_gpcc_masked: &obs_pr_gpcc_masked
+  - {dataset: GPCC, project: OBS, version: v2018_10-numgauge1, type: reanaly, tier: 2}
+
+obs_pr_cru: &obs_pr_cru
+  - {dataset: CRU, project: OBS, version: TS4.04, type: reanaly, tier: 2, end_year: 2018}
+
+obs_pr_cru_masked: &obs_pr_cru_masked
+  - {dataset: CRU, project: OBS, version: TS4.04-stn1, type: reanaly, tier: 2, end_year: 2018}
+
+obs_pr_regen: &obs_pr_regen
+  - {dataset: REGEN, project: OBS, version: V1-2019, type: reanaly, tier: 2, end_year: 2016}
+
+obs_pr_regen_masked: &obs_pr_regen_masked
+  - {dataset: REGEN, project: OBS, version: V1-2019-masked, type: reanaly, tier: 2, end_year: 2016}
+
+obs_pr_masked: &obs_pr_masked
+  - {dataset: GPCC, project: OBS, version: v2018_10-numgauge1, type: reanaly, tier: 2}
+  - {dataset: CRU, project: OBS, version: TS4.04-stn1, type: reanaly, tier: 2, end_year: 2018}
+  - {dataset: REGEN, project: OBS, version: V1-2019-masked, type: reanaly, tier: 2, end_year: 2016}
+
+
+obs_pr: &obs_pr
+  - {dataset: GHCN, project: OBS, version: 1, type: ground, tier: 2}
+  - {dataset: E-OBS, project: OBS, version: v21.0e-0.1, type: ground, tier: 2, end_year: 2018} #, mip: day}
+  - {dataset: E-OBS, project: OBS, version: v21.0e-0.25, type: ground, tier: 2, end_year: 2018} #, mip: day}
+  - {dataset: WFDE5, project: OBS, version: v1.0-CRU+GPCC, type: ground, tier: 2, end_year: 2016} #, mip: day}
+  # # obs4mips
+  - {dataset: ERA5, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2019}
+  - {dataset: ERA-Interim, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2018}
+  - {dataset: JRA-55, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1958, end_year: 2019}
+  - {dataset: MERRA, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2016}
+  - {dataset: MERRA2, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1980, end_year: 2019}
+  - {dataset: CFSR, project: obs4mips, type: reanalysis, tier: 2, level: surface, version: 1, start_year: 1979, end_year: 2019}
+
+cmip5_tas: &cmip5_tas
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1-m, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120709}
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: BNU, dataset: BNU-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120510}
+  - {product: output1, institute: CCCma, dataset: CanESM2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120718}
+  - {product: output1, institute: CCCma, dataset: CanCM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120612}
+  - {product: output1, institute: CMCC, dataset: CMCC-CMS, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5-2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130401}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110901}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120727}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130325}
+  - {product: output1, institute: CSIRO-QCCCE, dataset: CSIRO-Mk3-6-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120323}
+  - {product: output1, institute: FIO, dataset: FIO-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121010}
+  - {product: output1, institute: INM, dataset: inmcm4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130207}
+  - {product: output1, institute: INPE, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r5i1p1, esgf_version: v20130312}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5B-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120114}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111119}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110406}
+  - {product: output1, institute: LASG-CESS, dataset: FGOALS-g2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: LASG-IAP, dataset: FGOALS-s2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20161204}
+  - {product: output1, institute: MIROC, dataset: MIROC4h, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120628}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM-CHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120928}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110927}
+  - {product: output1, institute: MOHC, dataset: HadCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110823}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120503}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-P, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MRI, dataset: MRI-ESM1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130307}
+  - {product: output1, institute: MRI, dataset: MRI-CGCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120701}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NCAR, dataset: CCSM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160829}
+  - {product: output1, institute: NCC, dataset: NorESM1-ME, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20140327}
+  - {product: output1, institute: NCC, dataset: NorESM1-M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NIMR-KMA, dataset: HadGEM2-AO, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130815}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2G, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120227}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111228}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM2p1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110601}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-FASTCHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121029}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-WACCM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130314}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-CAM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130313}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-BGC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130213}
+  - {product: output1, institute: UNSW, dataset: CSIRO-Mk3L-1-2, cmip_table: Amon, ensemble: r1i2p1, esgf_version: v20170728}
+
+cmip5_pr: &cmip5_pr
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1-m, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120709}
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: BNU, dataset: BNU-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120510}
+  - {product: output1, institute: CCCma, dataset: CanESM2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120718}
+  - {product: output1, institute: CCCma, dataset: CanCM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120612}
+  - {product: output1, institute: CMCC, dataset: CMCC-CMS, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5-2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130401}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110901}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120727}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130325}
+  - {product: output1, institute: CSIRO-QCCCE, dataset: CSIRO-Mk3-6-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120323}
+  - {product: output1, institute: FIO, dataset: FIO-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121010}
+  - {product: output1, institute: INM, dataset: inmcm4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130207}
+  - {product: output1, institute: INPE, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r5i1p1, esgf_version: v20130312}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5B-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120114}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111119}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110406}
+  - {product: output1, institute: LASG-CESS, dataset: FGOALS-g2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: LASG-IAP, dataset: FGOALS-s2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20161204}
+  - {product: output1, institute: MIROC, dataset: MIROC4h, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120628}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM-CHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120928}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110927}
+  - {product: output1, institute: MOHC, dataset: HadCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110823}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120503}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-P, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MRI, dataset: MRI-ESM1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130307}
+  - {product: output1, institute: MRI, dataset: MRI-CGCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120701}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NCAR, dataset: CCSM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160829}
+  - {product: output1, institute: NCC, dataset: NorESM1-ME, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20140327}
+  - {product: output1, institute: NCC, dataset: NorESM1-M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NIMR-KMA, dataset: HadGEM2-AO, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130815}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2G, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120227}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111228}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM2p1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110601}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-FASTCHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121029}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-WACCM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130314}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-CAM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130313}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-BGC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130213}
+  - {product: output1, institute: UNSW, dataset: CSIRO-Mk3L-1-2, cmip_table: Amon, ensemble: r1i2p1, esgf_version: v20170728}
+
+
+cmip6_tas: &cmip6_tas
+  - {institute: AS-RCEC, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAMS, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: CAS-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  - {institute: CAS, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {institute: CMCC, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CSIRO, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CSIRO-ARCCSS, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: FIO-QLNM, dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: HAMMOZ-Consortium, dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: INM, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: INM, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: IPSL, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MIROC, dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MRI, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G, ensemble: r1i1p3f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NIMS-KMA, dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr}
+  - {institute: NIMS-KMA, dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
+  - {institute: NOAA-GFDL, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: NUIST, dataset: NESM3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: SNU, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {institute: THU, dataset: CIESM, ensemble: r1i1p1f1, grid: gr}
+  - {institute: UA, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
+
+cmip6_pr: &cmip6_pr
+  - {institute: AS-RCEC, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAMS, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: CAS-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  - {institute: CAS, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {institute: CMCC, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CSIRO, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CSIRO-ARCCSS, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: FIO-QLNM, dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: HAMMOZ-Consortium, dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: INM, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: INM, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: IPSL, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MIROC, dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MRI, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G, ensemble: r1i1p1f2, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NIMS-KMA, dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr}
+  - {institute: NIMS-KMA, dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
+  - {institute: NOAA-GFDL, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: NUIST, dataset: NESM3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: SNU, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {institute: UA, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
+
+hrmip: &hrmip
+  - {institute: CMCC, dataset: CMCC-CM2-VHR4, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3P-HR, ensemble: r1i1p2f1, grid: gr}
+  - {institute: MOHC, dataset: HadGEM3-GC31-HM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-XR, ensemble: r1i1p1f1, grid: gn}
+
+cdx44: &cdx44
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: HIRHAM5, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: HMS-ALADIN52, institute: HMS, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: ALADIN52, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: ICHEC-EC-EARTH, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CSIRO-QCCCE-CSIRO-Mk3-6-0, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NOAA-GFDL-GFDL-ESM2M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+
+cdx11: &cdx11
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v2}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v3}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v2}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MPI-M-MPI-ESM-LR, ensemble: r3i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1a}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+# cordex-reklies
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: CCLM4-8-17}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: CCLM4-8-17}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: REMO2015}
+
+tasobs_cmip5: &tasobs_cmip5
+  - {dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1-m, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120709}
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: BNU, dataset: BNU-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120510}
+  - {product: output1, institute: CCCma, dataset: CanESM2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120718}
+  - {product: output1, institute: CCCma, dataset: CanCM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120612}
+  - {product: output1, institute: CMCC, dataset: CMCC-CMS, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5-2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130401}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110901}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120727}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130325}
+  - {product: output1, institute: CSIRO-QCCCE, dataset: CSIRO-Mk3-6-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120323}
+  - {product: output1, institute: FIO, dataset: FIO-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121010}
+  - {product: output1, institute: INM, dataset: inmcm4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130207}
+  - {product: output1, institute: INPE, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r5i1p1, esgf_version: v20130312}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5B-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120114}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111119}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110406}
+  - {product: output1, institute: LASG-CESS, dataset: FGOALS-g2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: LASG-IAP, dataset: FGOALS-s2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20161204}
+  - {product: output1, institute: MIROC, dataset: MIROC4h, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120628}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM-CHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120928}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110927}
+  - {product: output1, institute: MOHC, dataset: HadCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110823}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120503}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-P, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MRI, dataset: MRI-ESM1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130307}
+  - {product: output1, institute: MRI, dataset: MRI-CGCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120701}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NCAR, dataset: CCSM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160829}
+  - {product: output1, institute: NCC, dataset: NorESM1-ME, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20140327}
+  - {product: output1, institute: NCC, dataset: NorESM1-M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NIMR-KMA, dataset: HadGEM2-AO, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130815}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2G, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120227}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111228}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM2p1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110601}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-FASTCHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121029}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-WACCM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130314}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-CAM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130313}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-BGC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130213}
+  - {product: output1, institute: UNSW, dataset: CSIRO-Mk3L-1-2, cmip_table: Amon, ensemble: r1i2p1, esgf_version: v20170728}
+
+tasobs_cmip6: &tasobs_cmip6
+  - {dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+  - {institute: AS-RCEC, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAMS, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: CAS-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  - {institute: CAS, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {institute: CMCC, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CSIRO, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CSIRO-ARCCSS, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: FIO-QLNM, dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: HAMMOZ-Consortium, dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: INM, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: INM, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: IPSL, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MIROC, dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MRI, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G, ensemble: r1i1p3f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NIMS-KMA, dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr}
+  - {institute: NIMS-KMA, dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
+  - {institute: NOAA-GFDL, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: NUIST, dataset: NESM3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: SNU, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {institute: THU, dataset: CIESM, ensemble: r1i1p1f1, grid: gr}
+  - {institute: UA, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
+
+tasobs_hrmip: &tasobs_hrmip
+  - {dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+  - {institute: CMCC, dataset: CMCC-CM2-VHR4, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3P-HR, ensemble: r1i1p2f1, grid: gr}
+  - {institute: MOHC, dataset: HadGEM3-GC31-HM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-XR, ensemble: r1i1p1f1, grid: gn}
+
+tasobs_cdx44: &tasobs_cdx44
+  - {mip: Amon, dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: HIRHAM5, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: HMS-ALADIN52, institute: HMS, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: ALADIN52, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: ICHEC-EC-EARTH, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CSIRO-QCCCE-CSIRO-Mk3-6-0, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NOAA-GFDL-GFDL-ESM2M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+
+tasobs_cdx11: &tasobs_cdx11
+  - {mip: Amon, dataset: BerkeleyEarth, project: OBS, version: 2020, type: reanaly, tier: 2, end_year: 2019}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v2}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v3}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v2}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MPI-M-MPI-ESM-LR, ensemble: r3i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1a}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+# cordex-reklies
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: CCLM4-8-17}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: CCLM4-8-17}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: REMO2015}
+
+probs_cmip5: &probs_cmip5
+  - {dataset: GPCC, project: OBS, version: v2018_10, type: reanaly, tier: 2}
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1-m, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120709}
+  - {product: output1, institute: BCC, dataset: bcc-csm1-1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: BNU, dataset: BNU-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120510}
+  - {product: output1, institute: CCCma, dataset: CanESM2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120718}
+  - {product: output1, institute: CCCma, dataset: CanCM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120612}
+  - {product: output1, institute: CMCC, dataset: CMCC-CMS, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CMCC, dataset: CMCC-CESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20170725}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5-2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130401}
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110901}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120727}
+  - {product: output1, institute: CSIRO-BOM, dataset: ACCESS1-3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130325}
+  - {product: output1, institute: CSIRO-QCCCE, dataset: CSIRO-Mk3-6-0, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120323}
+  - {product: output1, institute: FIO, dataset: FIO-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121010}
+  - {product: output1, institute: INM, dataset: inmcm4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130207}
+  - {product: output1, institute: INPE, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r5i1p1, esgf_version: v20130312}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5B-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120114}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111119}
+  - {product: output1, institute: IPSL, dataset: IPSL-CM5A-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110406}
+  - {product: output1, institute: LASG-CESS, dataset: FGOALS-g2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v1}
+  - {product: output1, institute: LASG-IAP, dataset: FGOALS-s2, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20161204}
+  - {product: output1, institute: MIROC, dataset: MIROC4h, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120628}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC-ESM-CHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MIROC, dataset: MIROC5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120710}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120928}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110927}
+  - {product: output1, institute: MOHC, dataset: HadCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110823}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-MR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120503}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-P, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-LR, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120315}
+  - {product: output1, institute: MRI, dataset: MRI-ESM1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130307}
+  - {product: output1, institute: MRI, dataset: MRI-CGCM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120701}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-H, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160426}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R-CC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NASA-GISS, dataset: GISS-E2-R, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160502}
+  - {product: output1, institute: NCAR, dataset: CCSM4, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20160829}
+  - {product: output1, institute: NCC, dataset: NorESM1-ME, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20140327}
+  - {product: output1, institute: NCC, dataset: NorESM1-M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NIMR-KMA, dataset: HadGEM2-AO, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130815}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2G, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120412}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM3, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20120227}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-ESM2M, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20111228}
+  - {product: output1, institute: NOAA-GFDL, dataset: GFDL-CM2p1, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20110601}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-FASTCHEM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20121029}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-WACCM, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130314}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-CAM5, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130313}
+  - {product: output1, institute: NSF-DOE-NCAR, dataset: CESM1-BGC, cmip_table: Amon, ensemble: r1i1p1, esgf_version: v20130213}
+  - {product: output1, institute: UNSW, dataset: CSIRO-Mk3L-1-2, cmip_table: Amon, ensemble: r1i2p1, esgf_version: v20170728}
+
+probs_cmip6: &probs_cmip6
+  - {dataset: GPCC, project: OBS, version: v2018_10, type: reanaly, tier: 2}
+  - {institute: AS-RCEC, dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: AWI, dataset: AWI-ESM-1-1-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-ESM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: BCC, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAMS, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: CAS-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
+  - {institute: CAS, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CCCma, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}
+  - {institute: CMCC, dataset: CMCC-CM2-SR5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CNRM-CERFACS, dataset: CNRM-ESM2-1, ensemble: r1i1p1f2, grid: gr}
+  - {institute: CSIRO, dataset: ACCESS-ESM1-5, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CSIRO-ARCCSS, dataset: ACCESS-CM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg, ensemble: r1i1p1f1, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3-Veg-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: FIO-QLNM, dataset: FIO-ESM-2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: HAMMOZ-Consortium, dataset: MPI-ESM-1-2-HAM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: INM, dataset: INM-CM4-8, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: INM, dataset: INM-CM5-0, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: IPSL, dataset: IPSL-CM6A-LR, ensemble: r1i1p1f1, grid: gr}
+  - {institute: MIROC, dataset: MIROC6, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MIROC, dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: UKESM1-0-LL, ensemble: r1i1p1f2, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-MM, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MOHC, dataset: HadGEM3-GC31-LL, ensemble: r1i1p1f3, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-LR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-HR, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MRI, dataset: MRI-ESM2-0, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G, ensemble: r1i1p1f2, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-G-CC, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NASA-GISS, dataset: GISS-E2-1-H, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-WACCM-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCAR, dataset: CESM2-FV2, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorCPM1, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-MM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NCC, dataset: NorESM2-LM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: NIMS-KMA, dataset: KACE-1-0-G, ensemble: r1i1p1f1, grid: gr}
+  - {institute: NIMS-KMA, dataset: UKESM1-0-LL, ensemble: r13i1p1f2, grid: gn}
+  - {institute: NOAA-GFDL, dataset: GFDL-ESM4, ensemble: r1i1p1f1, grid: gr1}
+  - {institute: NUIST, dataset: NESM3, ensemble: r1i1p1f1, grid: gn}
+  - {institute: SNU, dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn}
+  - {institute: UA, dataset: MCM-UA-1-0, ensemble: r1i1p1f1, grid: gn}
+
+probs_hrmip: &probs_hrmip
+  - {dataset: GPCC, project: OBS, version: v2018_10, type: reanaly, tier: 2}
+  - {institute: CMCC, dataset: CMCC-CM2-VHR4, ensemble: r1i1p1f1, grid: gn}
+  - {institute: CNRM-CERFACS, dataset: CNRM-CM6-1-HR, ensemble: r1i1p1f2, grid: gr}
+  - {institute: EC-Earth-Consortium, dataset: EC-Earth3P-HR, ensemble: r1i1p2f1, grid: gr}
+  - {institute: MOHC, dataset: HadGEM3-GC31-HM, ensemble: r1i1p1f1, grid: gn}
+  - {institute: MPI-M, dataset: MPI-ESM1-2-XR, ensemble: r1i1p1f1, grid: gn}
+
+probs_cdx44: &probs_cdx44
+  - {mip: Amon, dataset: GPCC, project: OBS, version: v2018_10, type: reanaly, tier: 2}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: HIRHAM5, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM5-0-6, institute: ETH, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM5-0-6, rcm_version: v1}
+  - {instdataset: HMS-ALADIN52, institute: HMS, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: ALADIN52, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: ICHEC-EC-EARTH, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CSIRO-QCCCE-CSIRO-Mk3-6-0, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NOAA-GFDL-GFDL-ESM2M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+
+probs_cdx11: &probs_cdx11
+  - {mip: Amon, dataset: GPCC, project: OBS, version: v2018_10, type: reanaly, tier: 2}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: CCLM4-8-17, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CLMcom-ETH-COSMO-crCLIM-v1-1, institute: CLMcom-ETH, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: COSMO-crCLIM-v1-1, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v2}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: CNRM-ALADIN63, institute: CNRM, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: ALADIN63, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v2}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v1}
+  - {instdataset: DMI-HIRHAM5, institute: DMI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: HIRHAM5, rcm_version: v3}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v2}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MPI-M-MPI-ESM-LR, ensemble: r3i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: REMO2015, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: ICTP-RegCM4-6, institute: ICTP, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RegCM4-6, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v2}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: KNMI-RACMO22E, institute: KNMI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RACMO22E, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: MOHC-HadREM3-GA7-05, institute: MOHC, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: HadREM3-GA7-05, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: ICHEC-EC-EARTH, ensemble: r3i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: IPSL-IPSL-CM5A-MR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: MPI-M-MPI-ESM-LR, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1a}
+  - {instdataset: SMHI-RCA4, institute: SMHI, driver: NCC-NorESM1-M, ensemble: r1i1p1, dataset: RCA4, rcm_version: v1}
+# cordex-reklies
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: CCLM4-8-17}
+  - {instdataset: CLMcom-CCLM4-8-17, institute: CLMcom, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: CCLM4-8-17}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: CCCma-CanESM2, ensemble: r1i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: ICHEC-EC-EARTH, ensemble: r12i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MIROC-MIROC5, ensemble: r1i1p1, dataset: REMO2015}
+  - {instdataset: GERICS-REMO2015, institute: GERICS, driver: MOHC-HadGEM2-ES, ensemble: r1i1p1, dataset: REMO2015}
+
+
+preprocessors:
+  tas_means:
+    mask_landsea:
+      mask_out: sea
+    extract_region: &mask
+        start_longitude: -10.
+        end_longitude: 10.
+        start_latitude: 33.
+        end_latitude: 45.
+    extract_time: &per
+      start_year: 1986
+      start_month: 1
+      start_day: 1
+      end_year: 2005
+      end_month: 12
+      end_day: 31
+    extract_season:
+      season: JJA
+    seasonal_statistics:
+      operator: mean
+    area_statistics:
+      operator: mean
+    convert_units:
+      units: degC
+
+  pr_means:
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    seasonal_statistics:
+      operator: mean
+    area_statistics:
+      operator: mean
+    convert_units:
+      units: kg m-2 d-1
+
+  pr_means_common:
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    convert_units:
+      units: kg m-2 d-1
+
+
+  tas_maps_best:
+    custom_order: true
+    mask_landsea:
+      mask_out: sea
+    extract_region: &mask_big
+      start_longitude: -20.
+      end_longitude: 20.
+      start_latitude: 23.
+      end_latitude: 55.
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    seasonal_statistics:
+      operator: mean
+    convert_units:
+      units: degC
+    regrid:
+      target_grid: reference_dataset
+      scheme:
+        method: cdo_remapcon
+        tmp_dir: /tmp/EVT_tmp
+    multi_model_statistics:
+      span: full
+      statistics: [mean]
+      exclude: [reference_dataset]
+    climate_statistics:
+      operator: mean
+      period: full
+
+  tas_maps_best_single:
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask_big}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    seasonal_statistics:
+      operator: mean
+    convert_units:
+      units: degC
+    climate_statistics:
+      operator: mean
+      period: full
+
+  pr_maps_11:
+    custom_order: true
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask_big}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    seasonal_statistics:
+      operator: mean
+    convert_units:
+      units: kg m-2 d-1
+    regrid:
+      target_grid: reference_dataset
+      scheme:
+        method: cdo_remapcon
+        tmp_dir: /tmp/EVT_tmp
+    multi_model_statistics:
+      span: full
+      statistics: [mean]
+      exclude: [reference_dataset]
+    climate_statistics:
+      operator: mean
+      period: full
+
+  pr_maps_gpcc_single:
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask_big}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    seasonal_statistics:
+      operator: mean
+    convert_units:
+      units: kg m-2 d-1
+    climate_statistics:
+      operator: mean
+      period: full
+
+  pr_maps_gpcc_single_common:
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask_big}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    convert_units:
+      units: kg m-2 d-1
+
+  pr_maps_obs_single_common_regr:
+    mask_landsea:
+      mask_out: sea
+    extract_region: {<<: *mask_big}
+    extract_time: {<<: *per}
+    extract_season:
+      season: JJA
+    regrid: &regr_11
+      target_grid: 1.0x1.0
+      scheme:
+        method: cdo_remapcon
+        tmp_dir: /tmp/EVT_tmp
+    convert_units:
+      units: kg m-2 d-1
+
+diagnostics:
+  ch_10:
+    description: IPCC WGI AR6 Ch. 10, Fig 10.6 western Mediterranean summer
+    realms:
+      - atmos
+    variables:
+      # # For boxplots
+      tas_obs_areamean: &tas_areamean
+        short_name: tas
+        preprocessor: tas_means
+        reference_dataset: BerkeleyEarth
+        mip: Amon
+        frequency: mon
+        start_year: 1986
+        end_year: 2005
+        additional_datasets:
+          *obs_tas
+
+      tas_cmip5_areamean: &tas_cmip5_areamean
+        <<: *tas_areamean
+        project: CMIP5
+        exp: historical
+        time_frequency: mon
+        realm: atmos
+        additional_datasets:
+          *cmip5_tas
+
+      tas_cmip6_areamean: &tas_cmip6_areamean
+        <<: *tas_areamean
+        project: CMIP6
+        activity: CMIP
+        exp: historical
+        realm: atmos
+        additional_datasets:
+          *cmip6_tas
+
+      tas_hrmip_areamean: &tas_hrmip_areamean
+        <<: *tas_areamean
+        project: CMIP6
+        activity: HighResMIP
+        exp: hist-1950
+        mip: Amon
+        additional_datasets:
+          *hrmip
+
+      tas_cdx44_areamean: &tas_cdx44_areamean
+        <<: *tas_areamean
+        mip: mon
+        ensemble: r1i1p1
+        project: CORDEX
+        domain: EUR-44
+        exp: historical
+        rcm_version: v1
+        additional_datasets:
+          *cdx44
+
+      tas_cdx11_areamean: &tas_cdx11_areamean
+        <<: *tas_areamean
+        mip: mon
+        ensemble: r1i1p1
+        project: CORDEX
+        domain: EUR-11
+        exp: historical
+        rcm_version: v1
+        additional_datasets:
+          *cdx11
+
+      pr_obs_areamean: &pr_areamean
+        <<: *tas_areamean
+        short_name: pr
+        preprocessor: pr_means
+        reference_dataset: GPCC
+        additional_datasets:
+          *obs_pr
+
+      pr_obs_areamean_common: &pr_obs_areamean_common
+        <<: *tas_areamean
+        short_name: pr
+        preprocessor: pr_means_common
+        reference_dataset: GPCC
+        additional_datasets:
+          *obs_pr_masked
+
+
+      pr_cmip5_areamean: &pr_cmip5_areamean
+        <<: *tas_areamean
+        project: CMIP5
+        exp: historical
+        time_frequency: mon
+        realm: atmos
+        short_name: pr
+        preprocessor: pr_means
+        reference_dataset: GPCC
+        additional_datasets:
+          *cmip5_pr
+
+      pr_cmip6_areamean: &pr_cmip6_areamean
+        <<: *tas_areamean
+        project: CMIP6
+        activity: CMIP
+        exp: historical
+        realm: atmos
+        short_name: pr
+        preprocessor: pr_means
+        reference_dataset: GPCC
+        additional_datasets:
+          *cmip6_pr
+
+      pr_hrmip_areamean: &pr_hrmip_areamean
+        <<: *tas_areamean
+        project: CMIP6
+        activity: HighResMIP
+        exp: hist-1950
+        short_name: pr
+        preprocessor: pr_means
+        reference_dataset: GPCC
+        additional_datasets:
+          *hrmip
+
+      pr_cdx44_areamean: &pr_cdx44_areamean
+        <<: *tas_areamean
+        mip: mon
+        ensemble: r1i1p1
+        project: CORDEX
+        domain: EUR-44
+        exp: historical
+        rcm_version: v1
+        short_name: pr
+        preprocessor: pr_means
+        reference_dataset: GPCC
+        additional_datasets:
+          *cdx44
+
+      pr_cdx11_areamean: &pr_cdx11_areamean
+        <<: *tas_areamean
+        mip: mon
+        ensemble: r1i1p1
+        project: CORDEX
+        domain: EUR-11
+        exp: historical
+        rcm_version: v1
+        short_name: pr
+        preprocessor: pr_means
+        reference_dataset: GPCC
+        additional_datasets:
+          *cdx11
+
+      tas_obs_map:
+        <<: *tas_areamean
+        preprocessor: tas_maps_best_single
+        additional_datasets:
+          *obs_tas_best
+      tas_cmip5_map:
+        <<: *tas_cmip5_areamean
+        preprocessor: tas_maps_best
+        additional_datasets:
+          *tasobs_cmip5
+      tas_cmip6_map:
+        <<: *tas_cmip6_areamean
+        preprocessor: tas_maps_best
+        additional_datasets:
+          *tasobs_cmip6
+      tas_hrmip_map:
+        <<: *tas_hrmip_areamean
+        preprocessor: tas_maps_best
+        additional_datasets:
+          *tasobs_hrmip
+      tas_cdx44_map:
+        <<: *tas_cdx44_areamean
+        preprocessor: tas_maps_best
+        additional_datasets:
+          *tasobs_cdx44
+      tas_cdx11_map:
+        <<: *tas_cdx11_areamean
+        preprocessor: tas_maps_best
+        additional_datasets:
+          *tasobs_cdx11
+
+      pr_obs_map_gpcc:
+        <<: *pr_areamean
+        preprocessor: pr_maps_gpcc_single
+        additional_datasets:
+          *obs_pr_gpcc
+      pr_obs_map_cru:
+        <<: *pr_areamean
+        preprocessor: pr_maps_gpcc_single
+        additional_datasets:
+          *obs_pr_cru
+      pr_obs_map_regen:
+        <<: *pr_areamean
+        preprocessor: pr_maps_gpcc_single
+        additional_datasets:
+          *obs_pr_regen
+      pr_cmip5_map:
+        <<: *pr_cmip5_areamean
+        preprocessor: pr_maps_11
+        additional_datasets:
+          *probs_cmip5
+      pr_cmip6_map:
+        <<: *pr_cmip6_areamean
+        preprocessor: pr_maps_11
+        additional_datasets:
+          *probs_cmip6
+      pr_hrmip_map:
+        <<: *pr_hrmip_areamean
+        preprocessor: pr_maps_11
+        additional_datasets:
+          *probs_hrmip
+      pr_cdx44_map:
+        <<: *pr_cdx44_areamean
+        preprocessor: pr_maps_11
+        additional_datasets:
+          *probs_cdx44
+      pr_cdx11_map:
+        <<: *pr_cdx11_areamean
+        preprocessor: pr_maps_11
+        additional_datasets:
+          *probs_cdx11
+
+      pr_obs_map_common_gpcc:
+        <<: *pr_areamean
+        preprocessor: pr_maps_gpcc_single_common # pr_maps_gpcc_single
+        additional_datasets:
+          *obs_pr_gpcc_masked
+
+      pr_obs_map_common_cru:
+        <<: *pr_areamean
+        preprocessor: pr_maps_obs_single_common_regr # pr_maps_gpcc_single
+        additional_datasets:
+          *obs_pr_cru_masked
+
+      pr_obs_map_common_regen:
+        <<: *pr_areamean
+        preprocessor: pr_maps_gpcc_single_common # pr_maps_gpcc_single
+        additional_datasets:
+          *obs_pr_regen_masked
+
+    scripts:
+      fig_6:
+        script: ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
+        obsmasking_pr_obs_map_masked_gpcc:
+          variable_group: pr_obs_map_common_gpcc
+          datasets: ['GPCC']
+          seasonal_statistics:
+            operator: mean
+          climate_statistics:
+            operator: mean
+            period: full
+
+        obsmasking_pr_obs_map_masked_cru:
+          variable_group: pr_obs_map_common_cru
+          datasets: ['CRU']
+          seasonal_statistics:
+            operator: mean
+          climate_statistics:
+            operator: mean
+            period: full
+
+        obsmasking_pr_obs_map_masked_regen:
+          variable_group: pr_obs_map_common_regen
+          datasets: ['REGEN']
+          seasonal_statistics:
+            operator: mean
+          climate_statistics:
+            operator: mean
+            period: full
+
+        obsmasking_pr_obs_areamean_masked:
+          variable_group: pr_obs_areamean_common
+          datasets: [CRU, GPCC, REGEN] # , REGEN]
+          seasonal_statistics:
+            operator: mean
+          area_statistics:
+            operator: mean
+          custom_threshholds:
+            area_statistics: 0.4
+
+
+        mapplot_tas_obs_single: &mapplot_tas_obs_single
+          domain: 'western Mediterranean'
+
+          type: single
+          metric: mean
+          ensembles: [tas_obs_map]
+          region: &mask_plot
+            start_longitude: -15.
+            end_longitude: 15.
+            start_latitude: 28.
+            end_latitude: 50.
+          box: {<<: *mask}
+          centerlononzero: True
+
+          plotting_information: &pi_obs_single
+            projection: LambertConformal
+            title_format: '{dataset}'
+            plot_title: True
+            coastlines: True
+            latlonlabels: False
+            plot_box: True
+            # color management and color bar
+            extend: 'both'
+            add_colorbar: True
+            cmap_str: temp_seq_disc
+            Ncolors: 12
+            minmax: [4, 40]
+            cbar_label_format: '{units}'
+            mintozero: False
+            extend: both
+
+        mapplot_pr_obs_single_gpcc:
+          <<: *mapplot_tas_obs_single
+          ensembles: [pr_obs_map_gpcc]
+          plotting_information:
+            <<: *pi_obs_single
+            cmap_str: prec_seq_disc
+            minmax: [0, 6]
+            extend: max
+
+        mapplot_pr_obs_single_cru:
+          <<: *mapplot_tas_obs_single
+          ensembles: [pr_obs_map_cru]
+          plotting_information:
+            <<: *pi_obs_single
+            cmap_str: prec_seq_disc
+            minmax: [0, 6]
+            extend: max
+
+        mapplot_pr_obs_single_regen:
+          <<: *mapplot_tas_obs_single
+          ensembles: [pr_obs_map_regen]
+          plotting_information:
+            <<: *pi_obs_single
+            cmap_str: prec_seq_disc
+            minmax: [0, 6]
+            extend: max
+
+        mapplot_pr_obs_single_masked_gpcc:
+          <<: *mapplot_tas_obs_single
+          ensembles: [obsmasking_pr_obs_map_masked_gpcc]
+          plotting_information:
+            <<: *pi_obs_single
+            cmap_str: prec_seq_disc
+            minmax: [0, 6]
+            extend: max
+
+        mapplot_pr_obs_single_masked_cru:
+          <<: *mapplot_tas_obs_single
+          ensembles: [obsmasking_pr_obs_map_masked_cru]
+          plotting_information:
+            <<: *pi_obs_single
+            cmap_str: prec_seq_disc
+            minmax: [0, 6]
+            extend: max
+
+        mapplot_pr_obs_single_masked_regen:
+          <<: *mapplot_tas_obs_single
+          ensembles: [obsmasking_pr_obs_map_masked_regen]
+          plotting_information:
+            <<: *pi_obs_single
+            cmap_str: prec_seq_disc
+            minmax: [0, 6]
+            extend: max
+
+        mapplot_tas_bias_cmip5: &mapplot_tas_bias
+          domain: 'western Mediterranean'
+
+          type: MultiModelMean
+          metric: bias
+          ensembles: [tas_cmip5_map]
+          masking: true
+          reference_dataset: BerkeleyEarth
+          region:
+            <<: *mask_plot
+          centerlononzero: True
+
+          plotting_information: &pi_tas_bias
+            indicate_N: true
+            projection: LambertConformal
+            title_format: '{project}'
+            plot_title: True
+            coastlines: True
+            latlonlabels: False
+            plot_box: False
+            # color management and color bar
+            extend: 'both'
+            add_colorbar: True
+            cmap_str: temp_div_disc
+            Ncolors: 12
+            minmax: [-3, 3]
+            cbar_label_format: '{units}'
+            mintozero: False
+            extend: both
+
+        mapplot_tas_bias_cmip6:
+          <<: *mapplot_tas_bias
+          ensembles: [tas_cmip6_map]
+        mapplot_tas_bias_hrmip:
+          <<: *mapplot_tas_bias
+          ensembles: [tas_hrmip_map]
+          plotting_information:
+            <<: *pi_tas_bias
+            title_format: '{activity}'
+        mapplot_tas_bias_cdx44:
+          <<: *mapplot_tas_bias
+          ensembles: [tas_cdx44_map]
+          plotting_information:
+            <<: *pi_tas_bias
+            title_format: '{domain}'
+        mapplot_tas_bias_cdx11:
+          <<: *mapplot_tas_bias
+          ensembles: [tas_cdx11_map]
+          plotting_information:
+            <<: *pi_tas_bias
+            title_format: '{domain}'
+
+
+        mapplot_pr_bias_cmip5: &mapplot_pr_bias
+          <<: *mapplot_tas_bias
+          reference_ensemble: obsmasking_pr_obs_map_masked_cru
+          reference_dataset: CRU
+          ensembles: [pr_cmip5_map]
+          plotting_information: &pi_pr_bias
+            <<: *pi_tas_bias
+            cmap_str: prec_div_disc
+            minmax: [-1.5, 1.5]
+        mapplot_pr_bias_cmip6:
+          <<: *mapplot_pr_bias
+          ensembles: [pr_cmip6_map]
+        mapplot_pr_bias_hrmip:
+          <<: *mapplot_pr_bias
+          ensembles: [pr_hrmip_map]
+          plotting_information:
+            <<: *pi_pr_bias
+            title_format: '{activity}'
+        mapplot_pr_bias_cdx44:
+          <<: *mapplot_pr_bias
+          ensembles: [pr_cdx44_map]
+          plotting_information:
+            <<: *pi_pr_bias
+            title_format: '{domain}'
+        mapplot_pr_bias_cdx11:
+          <<: *mapplot_pr_bias
+          ensembles: [pr_cdx11_map]
+          plotting_information:
+            <<: *pi_pr_bias
+            title_format: '{domain}'
+
+        boxplot_tas: &boxplot_tas
+          domain: 'western Mediterranean'
+          type: 'bp_single-values'
+          ensembles: [tas_obs_areamean, tas_cmip5_areamean, tas_cmip6_areamean, tas_hrmip_areamean, tas_cdx44_areamean, tas_cdx11_areamean]
+          ordering:
+            tas_obs_areamean: ['OBS_None_BerkeleyEarth_None', 'OBS_None_CRU_TS4.04', 'OBS_None_HadCRUT4', 'OBS_None_HadCRUT5', 'OBS_None_E-OBS_v21.0e-0.1', 'OBS_None_E-OBS_v21.0e-0.25', 'OBS_None_WFDE5_v1.0-CRU', 'obs4mips_ERA5', 'obs4mips_ERA-Interim', 'obs4mips_CERA-20C', 'obs4mips_JRA-25', 'obs4mips_JRA-55', 'obs4mips_CFSR', 'obs4mips_MERRA2', 'obs4mips_MERRA']
+          plotting_information:
+            labeling: ['{activity}', '{domain}', '{project}']
+            add_legend: true
+            grid_lines: true
+            ylabel_format: '({units})'
+            ncol: 3
+            loc: 2
+
+        boxplot_pr: &boxplot_pr
+          domain: 'western Mediterranean'
+          type: 'bp_single-values'
+          ensembles: [obsmasking_pr_obs_areamean_masked, pr_obs_areamean, pr_cmip5_areamean, pr_cmip6_areamean, pr_hrmip_areamean, pr_cdx44_areamean, pr_cdx11_areamean]
+          ordering:
+            obsmasking_pr_obs_areamean_masked: ['OBS_None_CRU_TS4.04-stn1', 'OBS_None_GPCC_None_v2018_10-numgauge1', 'OBS_None_REGEN_V1-2019-masked']
+            pr_obs_areamean: ['OBS_None_E-OBS_v21.0e-0.1', 'OBS_None_E-OBS_v21.0e-0.25', 'OBS_None_GHCN', 'OBS_None_WFDE5_v1.0-CRU+GPCC', 'obs4mips_CFSR', 'obs4mips_ERA-Interim', 'obs4mips_ERA5', 'obs4mips_JRA-55', 'obs4mips_MERRA2', 'obs4mips_MERRA']
+          plotting_information:
+            labeling: ['{activity}', '{domain}', '{project}']
+            add_legend: true
+            grid_lines: true
+            ylabel_format: '({units})'
+            ncol: 3
+            loc: 2
+
+        placeholder_1:
+          plotting_information:
+            title: western Mediterranean June to August mean surface air temperature (1986-2005)
+        placeholder_2:
+          plotting_information:
+            title: western Mediterranean June to August mean precipitation (1986-2005)
+
+        diagnostics_combination_figure:
+          figure_name: Fig_6
+          title_leading:
+            '({ascii_lowercase})'
+          add_title: true
+          add_subtitle: true
+          figsize: [20, 40]
+          gridspec: [200, 60]
+
+          diagnostics_position:
+            placeholder_1:
+              position: 1
+              x_pos: [0, 60]
+              y_pos: [0, 1]
+              x_pos_title: 0
+              y_pos_title: 0
+            mapplot_tas_obs_single:
+              position: 1
+              x_pos: [1, 10]
+              y_pos: [3, 18]
+              x_pos_title: [0, 9]
+              y_pos_title: 3
+              titlekwags:
+                horizontalalignment: center
+            colorbar_1:
+              mapplot_diagnostic: mapplot_tas_obs_single
+              x_pos: [1, 10]
+              y_pos: 18
+
+            mapplot_tas_bias_cmip5:
+              position: 1
+              x_pos: [14, 23]
+              y_pos: [3, 18]
+              x_pos_title: [14, 23]
+              y_pos_title: 3
+              titlekwags:
+                horizontalalignment: center
+            mapplot_tas_bias_cmip6:
+              position: 1
+              x_pos: [23, 32]
+              y_pos: [3, 18]
+              x_pos_title: [23, 32]
+              y_pos_title: 3
+              titlekwags:
+                horizontalalignment: center
+            mapplot_tas_bias_hrmip:
+              position: 1
+              x_pos: [32, 41]
+              y_pos: [3, 18]
+              x_pos_title: [32, 41]
+              y_pos_title: 3
+              titlekwags:
+                horizontalalignment: center
+            mapplot_tas_bias_cdx44:
+              position: 1
+              x_pos: [41, 50]
+              y_pos: [3, 18]
+              x_pos_title: [41, 50]
+              y_pos_title: 3
+              titlekwags:
+                horizontalalignment: center
+            mapplot_tas_bias_cdx11:
+              position: 1
+              x_pos: [50, 59]
+              y_pos: [3, 18]
+              x_pos_title: [50, 59]
+              y_pos_title: 3
+              titlekwags:
+                horizontalalignment: center
+            colorbar_2:
+              mapplot_diagnostic: mapplot_tas_bias_cmip5
+              x_pos: [23, 50]
+              y_pos: 18
+
+            boxplot_tas:
+              position: 1
+              x_pos: [4, 57]
+              y_pos: [23, 57]
+
+
+            placeholder_2:
+              position: 2
+              x_pos: [0, 60]
+              y_pos: [60, 61]
+              x_pos_title: 0
+              y_pos_title: 60
+
+            mapplot_pr_obs_single_masked_cru:
+              position: 2
+              x_pos: [1, 10]
+              y_pos: [63, 78]
+              x_pos_title: [0, 9]
+              y_pos_title: 63
+              titlekwags:
+                horizontalalignment: center
+            colorbar_3:
+              mapplot_diagnostic: mapplot_pr_obs_single_masked_cru
+              x_pos: [1, 10]
+              y_pos: 78
+
+            mapplot_pr_bias_cmip5:
+              position: 2
+              x_pos: [14, 23]
+              y_pos: [63, 78]
+              x_pos_title: [14, 23]
+              y_pos_title: 63
+              titlekwags:
+                horizontalalignment: center
+            mapplot_pr_bias_cmip6:
+              position: 2
+              x_pos: [23, 32]
+              y_pos: [63, 78]
+              x_pos_title: [23, 32]
+              y_pos_title: 63
+              titlekwags:
+                horizontalalignment: center
+            mapplot_pr_bias_hrmip:
+              position: 2
+              x_pos: [32, 41]
+              y_pos: [63, 78]
+              x_pos_title: [32, 41]
+              y_pos_title: 63
+              titlekwags:
+                horizontalalignment: center
+            mapplot_pr_bias_cdx44:
+              position: 2
+              x_pos: [41, 50]
+              y_pos: [63, 78]
+              x_pos_title: [41, 50]
+              y_pos_title: 63
+              titlekwags:
+                horizontalalignment: center
+            mapplot_pr_bias_cdx11:
+              position: 2
+              x_pos: [50, 59]
+              y_pos: [63, 78]
+              x_pos_title: [50, 59]
+              y_pos_title: 63
+              titlekwags:
+                horizontalalignment: center
+            colorbar_4:
+              mapplot_diagnostic: mapplot_pr_bias_cmip5
+              x_pos: [23, 50]
+              y_pos: 78
+
+            boxplot_pr:
+              position: 2
+              x_pos: [4, 57]
+              y_pos: [83, 117]
+
+        savepdf: True
+        savesvg: True
+        saveeps: True

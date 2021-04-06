@@ -1,0 +1,618 @@
+# requires ESMValCore branch working_cordex_2.2
+---
+documentation:
+
+  description:
+    Producing figure from IPCC WGI AR6, ch. 10 fig. 10
+
+  authors:
+    - jury_martin
+
+  projects:
+    - ipcc_ar6
+
+obs_pr: &obs_pr
+  - {dataset: GPCC, project: OBS, version: v2018_25-numgauge1, type: reanaly, tier: 2, end_year: 2016}
+  - {dataset: CRU, project: OBS, version: TS4.04-stn1, type: reanaly, tier: 2, end_year: 2018}
+
+mod_mpige: &mod_mpige
+  - {dataset: MPI-ESM, ensemble: [r001i1850p3, r001i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r002i1850p3, r002i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r003i1850p3, r003i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r004i1850p3, r004i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r005i1850p3, r005i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r006i1850p3, r006i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r007i1850p3, r007i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r008i1850p3, r008i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r009i1850p3, r009i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r010i1850p3, r010i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r011i1850p3, r011i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r012i1850p3, r012i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r013i1850p3, r013i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r014i1850p3, r014i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r015i1850p3, r015i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r016i1850p3, r016i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r017i1850p3, r017i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r018i1850p3, r018i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r019i1850p3, r019i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r020i1850p3, r020i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r021i1850p3, r021i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r022i1850p3, r022i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r023i1850p3, r023i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r024i1850p3, r024i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r025i1850p3, r025i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r026i1850p3, r026i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r027i1850p3, r027i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r028i1850p3, r028i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r029i1850p3, r029i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r030i1850p3, r030i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r031i1850p3, r031i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r032i1850p3, r032i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r033i1850p3, r033i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r034i1850p3, r034i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r035i1850p3, r035i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r036i1850p3, r036i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r037i1850p3, r037i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r038i1850p3, r038i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r039i1850p3, r039i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r040i1850p3, r040i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r041i1850p3, r041i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r042i1850p3, r042i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r043i1850p3, r043i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r044i1850p3, r044i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r045i1850p3, r045i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r046i1850p3, r046i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r047i1850p3, r047i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r048i1850p3, r048i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r049i1850p3, r049i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r050i1850p3, r050i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r051i1850p3, r051i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r052i1850p3, r052i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r053i1850p3, r053i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r054i1850p3, r054i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r055i1850p3, r055i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r056i1850p3, r056i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r057i1850p3, r057i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r058i1850p3, r058i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r059i1850p3, r059i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r060i1850p3, r060i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r061i1850p3, r061i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r062i1850p3, r062i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r063i1850p3, r063i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r064i1850p3, r064i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r065i1850p3, r065i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r066i1850p3, r066i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r067i1850p3, r067i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r068i1850p3, r068i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r069i1850p3, r069i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r070i1850p3, r070i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r071i1850p3, r071i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r072i1850p3, r072i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r073i1850p3, r073i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r074i1850p3, r074i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r075i1850p3, r075i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r076i1850p3, r076i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r077i1850p3, r077i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r078i1850p3, r078i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r079i1850p3, r079i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r080i1850p3, r080i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r081i1850p3, r081i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r082i1850p3, r082i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r083i1850p3, r083i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r084i1850p3, r084i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r085i1850p3, r085i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r086i1850p3, r086i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r087i1850p3, r087i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r088i1850p3, r088i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r089i1850p3, r089i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r090i1850p3, r090i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r091i1850p3, r091i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r092i1850p3, r092i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r093i1850p3, r093i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r094i1850p3, r094i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r095i1850p3, r095i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r096i1850p3, r096i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r097i1850p3, r097i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r098i1850p3, r098i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r099i1850p3, r099i2005p3]}
+  - {dataset: MPI-ESM, ensemble: [r100i1850p3, r100i2005p3]}
+
+
+preprocessors:
+  pr_DJF_map: &pr_DJF_map
+    mask_landsea:
+      mask_out: sea
+    extract_time: &per_hist
+      start_year: 1994
+      start_month: 1
+      start_day: 1
+      end_year: 2070
+      end_month: 12
+      end_day: 31
+    extract_region: # SES bounds (minx, miny, maxx, maxy) (-70.2, -40.0, -34.0, -20.0)
+      start_longitude: -78
+      end_longitude: -27
+      start_latitude: -48
+      end_latitude: -10
+    extract_season:
+      season: DJF # JJA
+    seasonal_statistics:
+      operator: mean
+    convert_units: &units
+      units: kg m-2 day-1
+
+  pr_DJF_global: &pr_DJF_global
+    mask_landsea:
+      mask_out: sea
+    extract_time: &per_ts
+      start_year: 1950
+      start_month: 1
+      start_day: 1
+      end_year: 2100
+      end_month: 12
+      end_day: 31
+    extract_season:
+      season: DJF # JJA
+    seasonal_statistics:
+      operator: mean
+    area_statistics:
+      operator: mean
+    convert_units: {<<: *units}
+
+  pr_obs_common: &pr_obs_common
+    mask_landsea:
+      mask_out: sea
+    extract_time: {<<: *per_ts}
+    extract_season:
+      season: DJF # JJA
+    convert_units: {<<: *units}
+
+  pr_DJF_SES: &pr_DJF_region
+    mask_landsea:
+      mask_out: sea
+    extract_time: {<<: *per_ts}
+    extract_shape: &SES
+      shapefile: /nas/home/maj/MyDocuments/Myprogramme/ESMValTool_related/22/ESMValTool-AR6/esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Atlas_regions/SOUTH-AMERICA_Land_S.E.South-America_SES.shp
+    area_statistics:
+      operator: mean
+    extract_season:
+      season: DJF
+    seasonal_statistics:
+      operator: mean
+    convert_units: {<<: *units}
+
+
+  pr_DJF_SaoPaulo: &pr_DJF_city
+    mask_landsea:
+      mask_out: sea
+    extract_time: {<<: *per_ts}
+    extract_region: &SaoPaulo
+    # -46.6400693,-23.5541353, Sao Paulo
+    # +- 1.875  +- 1.866
+        start_longitude: 311.485
+        end_longitude: 315.235
+        start_latitude: -25.42
+        end_latitude: -21.688
+    area_statistics:
+      operator: mean
+    extract_season:
+      season: DJF
+    seasonal_statistics:
+      operator: mean
+    convert_units: {<<: *units}
+
+  pr_DJF_BuenosAires:
+    <<: *pr_DJF_city
+    extract_region: &BuenosAires
+    # -58.5033387,-34.6156625, Buenos Aires
+    # +- 1.875  +- 1.866
+        start_longitude: 299.622
+        end_longitude: 303.372
+        start_latitude: -36.482
+        end_latitude: -32.75
+
+
+diagnostics:
+  ch_10:
+    description: IPCC WGI AR6 Ch. 10, Fig 10.10 internal variability example
+    realms:
+      - atmos
+    variables:
+      pr_DJF_map_mpi: &pr_mpi_map_DJF
+        short_name: pr
+        preprocessor: pr_DJF_map
+        mip: Amon
+        ensemble: r1i1p1
+        project: MPIGE
+        exp: [historical, rcp85]
+        frequency: mon
+        modeling_realm: atmos
+        start_year: 1990
+        end_year: 2070
+        additional_datasets:
+          *mod_mpige
+
+      pr_DJF_obs_common: &pr_DJF_obs_common
+        short_name: pr
+        preprocessor: pr_obs_common
+        reference_dataset: CRU
+        mip: Amon
+        start_year: 1950
+        end_year: 2100
+        additional_datasets:
+          *obs_pr
+
+      pr_DJF_global_mpi: &pr_DJF_global_mpi
+        short_name: pr
+        preprocessor: pr_DJF_global
+        mip: Amon
+        ensemble: r1i1p1
+        project: MPIGE
+        exp: [historical, rcp85]
+        frequency: mon
+        modeling_realm: atmos
+        start_year: 1994
+        end_year: 2099
+        additional_datasets:
+          *mod_mpige
+
+      pr_DJF_SES_mpi:
+        <<: *pr_DJF_global_mpi
+        preprocessor: pr_DJF_SES
+
+      pr_DJF_SaoPaulo_mpi:
+        <<: *pr_DJF_global_mpi
+        preprocessor: pr_DJF_SaoPaulo
+
+      pr_DJF_BuenosAires_mpi:
+        <<: *pr_DJF_global_mpi
+        preprocessor: pr_DJF_BuenosAires
+
+
+    scripts:
+      fig_10:
+        script: ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
+        obsmasking_pr_DJF_global_obs:
+          variable_group: pr_DJF_obs_common
+          datasets: [CRU, GPCC]
+          seasonal_statistics:
+            operator: mean
+          area_statistics:
+            operator: mean
+          custom_threshholds:
+            area_statistics: 0.0
+
+        obsmasking_pr_DJF_SES_obs:
+          variable_group: pr_DJF_obs_common
+          datasets: [CRU, GPCC]
+          extract_shape: {<<: *SES}
+          seasonal_statistics:
+            operator: mean
+          area_statistics:
+            operator: mean
+          custom_threshholds:
+            area_statistics: 0.0
+
+        obsmasking_pr_DJF_SaoPaulo_obs:
+          variable_group: pr_DJF_obs_common
+          datasets: [CRU, GPCC]
+          extract_region: {<<: *SaoPaulo}
+          seasonal_statistics:
+            operator: mean
+          area_statistics:
+            operator: mean
+          custom_threshholds:
+            area_statistics: 0.0
+
+        obsmasking_pr_DJF_BuenosAires_obs:
+          variable_group: pr_DJF_obs_common
+          datasets: [CRU, GPCC]
+          extract_region: {<<: *BuenosAires}
+          seasonal_statistics:
+            operator: mean
+          area_statistics:
+            operator: mean
+          custom_threshholds:
+            area_statistics: 0.0
+
+
+        mapplot_trend_SES_DJF: &mapplot_mean_trend_DJF
+          domain: SES
+          region: # SES bounds (minx, miny, maxx, maxy) (-70.2, -40.0, -34.0, -20.0)
+            start_longitude: -75
+            end_longitude: -31
+            start_latitude: -45
+            end_latitude: -15
+          add_shapes: True
+          shape_paths: [Atlas_regions/SOUTH-AMERICA_Land_S.E.South-America_SES.shp]
+
+          box_1: {<<: *SaoPaulo}
+          box_2: {<<: *BuenosAires}
+
+          type: single-MultiModelMean
+          metric: trend-min-median-max
+          trend_base: decade
+          ensembles: [pr_DJF_map_mpi]
+          centerlononzero: False
+
+          period_plot: &per_trend
+            start_year: 2015
+            end_year: 2070
+          anomalies: True
+          relative: True
+          period_norm: &per_norm
+            start_year: 1995
+            end_year: 2014
+          plotting_information: &plotting_information_trend_future
+            indicate_N: false
+            projection: PlateCarree
+            title: 'MPI-ESM trends (2015-2070)'
+            plot_title: True
+            coastlines: True
+            latlonlabels: False
+            plot_box: True
+            # color management and color bar
+            extend: 'both'
+            add_colorbar: True
+            cmap_str: prec_div
+            Ncolors: 12
+            minmax: [-15, 15]
+            cbar_label_format: '{units} {trend_base}$^{{-1}}$'
+            mintozero: False
+            extend: both
+
+        postpreprocessing_changes:
+          mapplot_trend_SES_DJF_MPI-GE_max:
+            plot_markers: False
+            add_shapes: False
+            plot_box: False
+
+        timeseries_global_DJF: &ts_global_DJF
+          domain: 'global'
+          relative: True
+          anomalies: True
+          period_norm:
+            <<: *per_norm
+          window: 5weighted
+
+          timeseries_obs: &ts_obs
+            period:
+              <<: *per_ts
+            ensembles: [obsmasking_pr_DJF_global_obs]
+            labeling: '{dataset}'
+            metrics: [single]
+          timeseries_mpi_all: &ts_mpi
+            period: &per_mpi
+              start_year: 2015
+              end_year: 2100
+            ensembles: [pr_DJF_global_mpi]
+            labeling: '{dataset}'
+            metrics: [single]
+          timeseries_mpi_minmax: &ts_mpi_mm
+            period:
+              <<: *per_trend # per_ts
+            period_trend:
+              <<: *per_trend
+            ensembles: [pr_DJF_global_mpi]
+            labeling: '{dataset}'
+            metrics: [minmaxtrend, minmaxtrend-lines]
+
+          plotting_information: &pi_ts_global
+            period_plot:
+              <<: *per_ts
+            add_legend: false
+            xlabel: ''
+            ylabel:
+            ncol: 3
+            loc: 2
+            ylims: [-7.5, 17.5]
+            zero_line: true
+            title: Precipitation anomalies - global
+
+        boxplot_global_DJF: &boxplot_global_DJF
+          domain: 'global'
+          type: 'bp_single-trends'
+          ensembles: [pr_DJF_global_mpi]
+          relative: True
+          anomalies: True
+          period_norm:
+            <<: *per_norm
+          trend_base: decade
+          periods_boxes:
+            per_1_near:
+              <<: *per_trend
+              labeling: 'Trend'
+
+          plotting_information: &pi_bp
+            labeling: ['']
+            add_legend: False
+            grid_lines: false # true
+            zero_line: True
+            ylabel_format: 'Trend ({units} {trend_base}$^{{-1}}$)' # '{units} {trend_base}$^{{-1}}$'
+            second_yaxis: False
+            second_xaxisspline: False
+            ylims: [-0.1, 2.1]
+            force_ytick_integers: True
+
+        timeseries_SES_DJF:
+          <<: *ts_global_DJF
+          domain: SES
+          timeseries_obs:
+            <<: *ts_obs
+            ensembles: [obsmasking_pr_DJF_SES_obs]
+          timeseries_mpi_all:
+            <<: *ts_mpi
+            ensembles: [pr_DJF_SES_mpi]
+          timeseries_mpi_minmax:
+            <<: *ts_mpi_mm
+            ensembles: [pr_DJF_SES_mpi]
+            metrics: [minmaxtrend, minmaxtrend-lines]
+          plotting_information:
+            <<: *pi_ts_global
+            title: SES - S.E.South-America
+            subtitle:
+            ylims: [-35, 25]
+
+        timeseries_SaoPaulo_DJF:
+          <<: *ts_global_DJF
+          domain: SaoPaulo
+          timeseries_obs:
+            <<: *ts_obs
+            ensembles: [obsmasking_pr_DJF_SaoPaulo_obs]
+          timeseries_mpi_all:
+            <<: *ts_mpi
+            ensembles: [pr_DJF_SaoPaulo_mpi]
+          timeseries_mpi_minmax:
+            <<: *ts_mpi_mm
+            ensembles: [pr_DJF_SaoPaulo_mpi]
+            metrics: [minmaxtrend, minmaxtrend-lines]
+          plotting_information:
+            <<: *pi_ts_global
+            title: Sao Paulo
+            subtitle:
+            ylims: [-35, 65]
+
+        timeseries_BuenosAires_DJF:
+          <<: *ts_global_DJF
+          domain: SaoPaulo
+          timeseries_obs:
+            <<: *ts_obs
+            ensembles: [obsmasking_pr_DJF_BuenosAires_obs]
+          timeseries_mpi_all:
+            <<: *ts_mpi
+            ensembles: [pr_DJF_BuenosAires_mpi]
+          timeseries_mpi_minmax:
+            <<: *ts_mpi_mm
+            ensembles: [pr_DJF_BuenosAires_mpi]
+            metrics: [minmaxtrend, minmaxtrend-lines]
+          plotting_information:
+            <<: *pi_ts_global
+            ylims: [-99.9, 99.9]
+            auto_indper_ylims: False
+            title: Buenos Aires
+            subtitle:
+            indicate_period_1:
+              <<: *per_norm
+              name: Base period
+              add_shading: True
+            indicate_period_2:
+              <<: *per_trend
+              name: Trend period
+              add_shading: True
+            add_legend: true
+
+        boxplot_SES_DJF:
+          <<: *boxplot_global_DJF
+          ensembles: [pr_DJF_SES_mpi]
+          plotting_information:
+            <<: *pi_bp
+            ylims: [-4.1, 3]
+        boxplot_SaoPaulo_DJF:
+          <<: *boxplot_global_DJF
+          ensembles: [pr_DJF_SaoPaulo_mpi]
+          plotting_information:
+            <<: *pi_bp
+            ylims: [-2.5,7]
+        boxplot_BuenosAires_DJF:
+          <<: *boxplot_global_DJF
+          ensembles: [pr_DJF_BuenosAires_mpi]
+          plotting_information:
+            <<: *pi_bp
+            ylims: [-11,6.5]
+
+        diagnostics_combination_figure_SES:
+          figure_name: Fig_10
+          title_leading:
+            '({ascii_lowercase})'
+          add_title: true
+          add_subtitle: true
+          figsize: [20, 60]
+          gridspec: [300, 60]
+          x_grid: [0, 15, 30, 45, 60]
+          y_grid:
+            [[4, 15, 0, 1],
+             [27, 20, 25, 26]]
+
+          diagnostics_position:
+            mapplot_trend_SES_DJF_MPI-GE_min: &row1
+              position: 1
+              x_pos: [0, 20]
+              y_pos: [2, 26]
+              x_pos_title: 0
+              y_pos_title: 0
+              add_subtitle: True
+              x_pos_subtitle: [0, 20]
+              y_pos_subtitle: 2
+              subtitle: 'Driest'
+              subtitlekwags:
+                horizontalalignment: center
+                color: [0.5490196078431373, 0.35294117647058826, 0.10196078431372549, 1.0]
+            mapplot_trend_SES_DJF_MPI-GE_max:
+              <<: *row1
+              position: 1
+              x_pos: [20, 40]
+              y_pos: [2, 26]
+              add_title: False
+              add_subtitle: True
+              x_pos_subtitle: [20, 40]
+              y_pos_subtitle: 2
+              subtitle: 'Wettest'
+              subtitlekwags:
+                horizontalalignment: center
+                color: [0.050980392156862744, 0.3254901960784314, 0.28627450980392155, 1.0]
+
+            colorbar_1:
+              mapplot_diagnostic: mapplot_trend_SES_DJF_MPI-GE_max
+              x_pos: [10, 30]
+              y_pos: 26
+
+            timeseries_global_DJF:
+              position: 2
+              x_pos: [4, 33]
+              y_pos: [33, 38]
+              x_pos_title: 0
+              y_pos_title: 32
+            boxplot_global_DJF:
+              position: 2
+              x_pos: [37, 40]
+              y_pos: [33, 38]
+
+            timeseries_SES_DJF:
+              position: 2
+              # position: 3
+              x_pos: [4, 33]
+              y_pos: [43, 55]
+              x_pos_title: 0
+              y_pos_title: 42
+            boxplot_SES_DJF:
+              position: 2
+              x_pos: [37, 40]
+              y_pos: [43, 55]
+
+            timeseries_SaoPaulo_DJF:
+              position: 2
+              # position: 4
+              x_pos: [4, 33]
+              y_pos: [60, 80]
+              x_pos_title: 0
+              y_pos_title: 59
+            boxplot_SaoPaulo_DJF:
+              position: 2
+              x_pos: [37, 40]
+              y_pos: [60, 80]
+
+            timeseries_BuenosAires_DJF:
+              position: 2
+              # position: 5
+              x_pos: [4, 33]
+              y_pos: [85, 125]
+              x_pos_title: 0
+              y_pos_title: 84
+            boxplot_BuenosAires_DJF:
+              position: 2
+              x_pos: [37, 40]
+              y_pos: [85, 125]
+
+        savepdf: True
+        saveeps: True
+        savesvg: True

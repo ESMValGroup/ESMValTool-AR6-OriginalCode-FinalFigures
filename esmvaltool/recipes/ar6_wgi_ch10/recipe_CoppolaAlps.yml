@@ -1,0 +1,203 @@
+# requires ESMValCore branch working_cordex_2.2
+---
+documentation:
+
+  description:
+    Producing figure from IPCC WGI AR6, ch. 10 fig. 9
+
+  authors:
+    - jury_martin
+
+  projects:
+    - ipcc_ar6
+
+
+# CNRM-CM5
+# EC-EARTH
+# HadGEM2-ES
+# MPI-ESM-LR
+mod_cmip5: &mod_cmip5
+  - {product: output1, institute: CNRM-CERFACS, dataset: CNRM-CM5, cmip_table: Amon, ensemble: r0i1p1}
+  - {product: output1, institute: ICHEC, dataset: EC-EARTH, cmip_table: Amon, ensemble: r0i1p1, start_year: 1960}
+  - {product: output1, institute: MOHC, dataset: HadGEM2-ES, cmip_table: Amon, ensemble: r0i1p1}
+  - {product: output1, institute: MPI-M, dataset: MPI-ESM-LR, cmip_table: Amon, ensemble: r0i1p1}
+# /cmip5/output1
+# CNRM-CERFACS/CNRM-CM5/historical/fx/atmos/fx/r0i0p0/v20130826/orog_fx_CNRM-CM5_historical_r0i0p0.nc
+# ICHEC/EC-EARTH/historical/fx/atmos/fx/r0i0p0/v20130211/orog_fx_EC-EARTH_historical_r0i0p0.nc
+# MOHC/HadGEM2-ES/historical/fx/atmos/fx/r0i0p0/v20120215/orog_fx_HadGEM2-ES_historical_r0i0p0.nc
+# MPI-M/MPI-ESM-LR/historical/fx/atmos/fx/r0i0p0/v20120315/orog_fx_MPI-ESM-LR_historical_r0i0p0.nc
+
+# ALADIN
+# CCLM
+# RCA4
+# RACMO
+# REMO
+# RegCM4
+mod_cordex: &mod_cordex
+  - {institute: CNRM, dataset: ALADIN53, instdataset: CNRM-ALADIN53, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r1i1p1}
+  - {institute: CLMcom, dataset: CCLM4-8-17, instdataset: CLMcom-CCLM4-8-17, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r0i0p0}
+  - {institute: SMHI, dataset: RCA4, instdataset: SMHI-RCA4, driver: CNRM-CERFACS-CNRM-CM5, ensemble: r0i0p0}
+  - {institute: KNMI, dataset: RACMO22E, instdataset: KNMI-RACMO22E, driver: ICHEC-EC-EARTH, ensemble: r1i1p1}
+  - {institute: MPI-CSC, driver: MPI-M-MPI-ESM-LR, instdataset: MPI-CSC-REMO2009, ensemble: r0i0p0, dataset: REMO2009}
+  - {institute: ICTP, driver: MOHC-HadGEM2-ES, instdataset: ICTP-RegCM4-6, ensemble: r1i1p1, dataset: RegCM4-6}
+# CNRM/CNRM-CERFACS-CNRM-CM5/historical/r1i1p1/ALADIN53/v1/fx/orog/v20150127/orog_EUR-11_CNRM-CERFACS-CNRM-CM5_historical_r1i1p1_CNRM-ALADIN53_v1_fx.nc
+# CLMcom/CNRM-CERFACS-CNRM-CM5/historical/r0i0p0/CCLM4-8-17/v1/fx/orog/v20140515/orog_EUR-11_CNRM-CERFACS-CNRM-CM5_historical_r0i0p0_CLMcom-CCLM4-8-17_v1_fx.nc
+# SMHI/CNRM-CERFACS-CNRM-CM5/historical/r0i0p0/RCA4/v1/fx/orog/v20131026/orog_EUR-11_CNRM-CERFACS-CNRM-CM5_historical_r0i0p0_SMHI-RCA4_v1_fx.nc
+# KNMI/ICHEC-EC-EARTH/historical/r1i1p1/RACMO22E/v1/fx/orog/v20140313/orog_EUR-11_ICHEC-EC-EARTH_historical_r1i1p1_KNMI-RACMO22E_v1_fx.nc
+# MPI-CSC/MPI-M-MPI-ESM-LR/historical/r0i0p0/REMO2009/v1/fx/orog/v20160419/orog_EUR-11_MPI-M-MPI-ESM-LR_historical_r0i0p0_MPI-CSC-REMO2009_v1_fx.nc
+# ICTP/MOHC-HadGEM2-ES/historical/r1i1p1/RegCM4-6/v1/fx/orog/v20190502/orog_EUR-11_MOHC-HadGEM2-ES_historical_r1i1p1_ICTP-RegCM4-6_v1_fx.nc
+
+preprocessors:
+  pp_orog:
+    extract_region: &mask_big
+      start_longitude: 3.
+      end_longitude: 19.
+      start_latitude: 41.
+      end_latitude: 51.
+    convert_units: &units
+      units: m
+
+diagnostics:
+  ch_10:
+    description: IPCC WGI AR6 Ch. 10, Fig 10.9 Alps precipitation changes
+    realms:
+      - atmos
+    variables:
+      orog_cmip5:
+        short_name: orog
+        preprocessor: pp_orog
+        project: CMIP5
+        exp: historical
+        mip: fx
+        time_frequency: fx
+        start_year: 1950
+        end_year: 2100
+        realm: atmos
+        additional_datasets:
+          *mod_cmip5
+
+      orog_cordex:
+        short_name: orog
+        preprocessor: pp_orog
+        mip: fx
+        project: CORDEX
+        domain: EUR-11
+        exp: historical
+        rcm_version: v1
+        additional_datasets:
+          *mod_cordex
+
+    scripts:
+      fig_10_9:
+        script: ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
+        external_mapplot_GCM_orog: &mapplot_orog
+          domain: 'Alps'
+          ensemble: 'orog_cmip5'
+          target_grid: 'ECoppola_Alps/GCM.nc'
+          metric: 'mean'
+          type: 'single'
+          region: &plot_region
+            start_longitude: 4.7425
+            end_longitude: 17.3925
+            start_latitude: 42.8775
+            end_latitude: 49.1475
+
+          plotting_information: &pi_orog
+            projection: Miller
+            title: GCMs orography
+            plot_title: True
+            coastlines: True
+            res_coastlines: 110m
+            latlonlabels: True
+            # color management and color bar
+            add_colorbar: True
+            cmap_str: misc_seq_3
+            Ncolors: 25
+            minmax: [-1000, 4000]
+            cbar_label_format: '{units}'
+            indicate_N: false
+
+        external_mapplot_RCM_orog:
+          <<: *mapplot_orog
+          ensemble: 'orog_cordex'
+          target_grid: 'ECoppola_Alps/RCM.nc'
+
+          plotting_information:
+            <<: *pi_orog
+            title: RCMs orography
+            res_coastlines: 50m
+            cmap_str: misc_seq_3
+            Ncolors: 25
+            minmax: [-1000, 4000]
+
+        external_mapplot_GCM: &mapplot
+          domain: 'Alps'
+          filename: 'ECoppola_Alps/GCM.nc'
+          metric: 'mean'
+          type: 'single'
+          region: {<<: *plot_region}
+          orog_overlay: True
+          orog_diagnostic: mapplot_GCM_orog
+
+          plotting_information: &pi
+            projection: Miller
+            title: GCMs
+            plot_title: True
+            coastlines: True
+            res_coastlines: 110m
+            latlonlabels: True
+            # color management and color bar
+            add_colorbar: True
+            cmap_str: prec_div_disc
+            Ncolors: 8
+            minmax: [-40, 40]
+            cbar_label_format: '{units}'
+            indicate_N: false
+
+        external_mapplot_RCM:
+          <<: *mapplot
+          filename: 'ECoppola_Alps/RCM.nc'
+          orog_diagnostic: mapplot_RCM_orog
+
+          plotting_information:
+            <<: *pi
+            title: RCMs
+            res_coastlines: 50m
+
+        postpreprocessing_changes:
+          mapplot_GCM:
+            orog_overlay: True
+            orog_diagnostics: [mapplot_GCM_orog]
+          mapplot_RCM:
+            orog_overlay: True
+            orog_diagnostics: [mapplot_RCM_orog]
+
+        diagnostics_combination_figure_10-9:
+          figure_name: Fig_9
+          title_leading:
+            '({ascii_lowercase})'
+          add_title: true
+          add_subtitle: true
+          figsize: [20, 40]
+          gridspec: [200, 60]
+          diagnostics_position:
+            mapplot_GCM:
+              position: 1
+              x_pos: [2, 20]
+              y_pos: [1, 19]
+              x_pos_title: 2
+              y_pos_title: 0
+            mapplot_RCM:
+              position: 2
+              x_pos: [22, 40]
+              y_pos: [1, 19]
+              x_pos_title: 22
+              y_pos_title: 0
+            colorbar_1:
+              mapplot_diagnostic: mapplot_GCM
+              x_pos: [10, 30]
+              y_pos: 22
+
+        savepdf: True
+        saveeps: True
+        savesvg: True
