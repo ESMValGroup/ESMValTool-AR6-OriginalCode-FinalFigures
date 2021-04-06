@@ -234,6 +234,10 @@ authors:
     name: Juckes, Martin
     institute: BADC, UK
     orcid:
+  jury_martin:
+    name: Jury, Martin
+    institute: BSC, Spain
+    orcid: https://orcid.org/0000-0003-0590-7843
   kadygrov_nikolay:
     name: Kadygrov, Nikolay
     institute: IPSL, France
@@ -657,6 +661,7 @@ projects:
   trr181: DFG Project TRR-181, Energy transfers in Atmosphere and Ocean
   ukesm: UKESM, UK Earth System Model project (NERC)
   usmile: ERC Synergy Grant USMILE
+  ipcc_ar6: IPCC AR6 WGI
 
 realms:
   aerosol: aerosol
