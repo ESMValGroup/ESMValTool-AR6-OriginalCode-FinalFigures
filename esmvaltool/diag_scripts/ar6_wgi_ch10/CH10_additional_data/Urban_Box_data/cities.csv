@@ -1,0 +1,22 @@
+x,y,Temperature,annual or seasonal ,Specific country or region,GHG-induced changes
+88.3858024,22.5842501,2.6,annual,Kolkata area,present day CO2 forcing
+106.6531411,10.7927451,0.41,annual,Ho Chi Minh area,present day CO2 forcing
+126.9838103,37.5419845,1.15,annual,Seoul area,future urbanization under A1B 
+4.3509208,50.8470137,0.62,annual,Brussels area,present day CO2 forcing
+51.3986705,35.7186186,2.33,annual,Tehran area,present day CO2 forcing
+32.5477019,15.517868,0.19,annual,Khartoum area,present day CO2 forcing
+23.7281051,37.9843483,0.7,annual,Athens area,present day CO2 forcing
+-8.6291828,41.1579129,1.6,annual,Porto area,RCP8.5
+37.6158914,55.7512371,1,annual,Moscow area,present day CO2 forcing
+-156.7859961,71.2883055,2,DJF,Barrow Alaska,present day CO2 forcing
+-66.5104884,18.2281552,1.11,annual,Puerto rico,present day CO2 forcing
+-74.0034035,40.7200935,0.2139,annual,New York,present day CO3 forcing
+-118.6919263,34.0207305,0.138,annual,Los Angeles,present day CO4 forcing
+-99.2837002,19.3910038,0.138,annual,Mexico City,present day CO5 forcing
+6.5255298,3.3470714,0.069,annual,Lagos,present day CO6 forcing
+27.9699841,-26.1713505,0.138,annual,Johannesburg,present day CO7 forcing
+-46.6400693,-23.5541353,0.207,annual,Sao Paulo,present day CO8 forcing
+-58.5033387,-34.6156625,0.207,annual,Buenos Aires,present day CO9 forcing
+150.6517846,-33.8473567,0.207,annual,Sydney,present day CO10 forcing
+31.1884238,30.0596185,0,annual,Cairo,present day CO11 forcing
+114.1578907,22.3213112,0.2553,annual,Hong Kong,present day CO12 forcing

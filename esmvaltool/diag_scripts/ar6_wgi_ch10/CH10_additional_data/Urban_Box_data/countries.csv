@@ -1,0 +1,11 @@
+x,y,Temperature,annual or seasonal ,Specific country or region,GHG-induced changes
+-66.5104884,18.2281552,1.11,annual,Puerto rico,present day CO2 forcing
+102.0238842,34.4471171,0.49,annual,China,present day CO2 forcing
+126.5293972,33.3617827,2.25,annual,eastern asia,present day CO2 forcing
+139.0482363,36.3914889,0.98,annual,Japan,present day CO2 forcing
+117.7169447,33.7465502,0.34,annual,Eastern china,present day CO2 forcing
+107.5850519,60.3308861,1,DJF,Russia/northen asia,present day CO2 forcing
+-104.710998,48.7860924,0.8,DJF,north america north eastern US southern canada,present day CO2 forcing
+-105.4225321,42.3146692,2,DJF,north america,present day CO2 forcing
+-85.6593344,39.7172483,0.5,JJA,Eurasia and north america,present day CO2 forcing
+98.8,15.6,0.75,annual,Thailand,present day CO2 forcing
