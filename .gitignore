@@ -88,8 +88,8 @@ doc/sphinx/source/_sidebar.rst.inc
 doc/sphinx/source/gallery.rst
 
 # Data files
-*.nc
-*.nc4
+# *.nc
+# *.nc4
 *.grb
 *.grib
 *.RData
