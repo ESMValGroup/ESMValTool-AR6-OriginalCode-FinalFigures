@@ -952,13 +952,13 @@ begin
   statistics = (/"clim", "diff"/)
   domain = ("global")
   plottype = ("geo")
-  references = (/""/)
+  references = (/"bock20jgr"/)
   prov_caption = caption + " for variable " + var0 \
     + ", reference = " + names(ref_ind) + "."
   infiles = metadata_att_as_array(info0, "filename")
 
-  log_provenance(nc_filename, plotfile, prov_caption, statistics, \
-                 domain, plottype, authors, references, infiles)
+;  log_provenance(nc_filename, plotfile, prov_caption, statistics, \
+;                 domain, plottype, authors, references, infiles)
 
   leave_msg(DIAG_SCRIPT, "")
 
