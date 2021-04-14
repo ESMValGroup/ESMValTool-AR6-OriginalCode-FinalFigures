@@ -290,11 +290,11 @@ panels_dic = {'a': {'title': 'Annual precipitation accumulation',
                     'legend_loc':2
                     },
               'c': {'title': 'Southern Annular Mode (SAM) and precipitation anomalies',
-                    'input': ['panelC_SAM_v2.csv', 'panelC_rainfall_v2.csv'],
+                    'input': ['panelC_SAM_v3.csv', 'panelC_rainfall_v3.csv'],
                     'figsize': [16, 8],
                     'ylims': (-49,62),
                     'ylabel_1': 'SAM index ()',
-                    'ylims_1': (-2.5,2.5),
+                    'ylims_1': (-2.5, 2.5),
                     'legend_loc_1': 2,
                     'legend_col_1': 3,
                     'ylabel_2': 'Precipitation (%)',
@@ -306,21 +306,21 @@ panels_dic = {'a': {'title': 'Annual precipitation accumulation',
                     'legend_loc':2,
                     },
               'd': {'title': 'SAM and precipitation trends',
-                    'input': [['panelD_SAM_1979-2017_v2.csv',
-                               'panelD_SAM_1933-2017_v2.csv',
-                               'panelD_SAM_2018-2100_v2.csv'],
-                              ['panelD_rainfall_1979-2017_v2.csv',
-                               'panelD_rainfall_1933-2017_v2.csv',
-                               'panelD_rainfall_2018-2100_v2.csv',
+                    'input': [['panelD_SAM_1979-2017_v3.csv',
+                               'panelD_SAM_1933-2017_v3.csv',
+                               'panelD_SAM_2018-2100_v3.csv'],
+                              ['panelD_rainfall_1979-2017_v3.csv',
+                               'panelD_rainfall_1933-2017_v3.csv',
+                               'panelD_rainfall_2018-2100_v3.csv',
                                ]],
                     'figsize': [16, 8],
-                    'ylims': (-6.5, 10.1),
+                    'ylims': (-6.5, 10.8),
                     'ylabel_1': 'SAM index trend (1 year$^{-1}$)',
-                    'ylims_1': (-.06,.08),
+                    'ylims_1': (-.06, .08),
                     'legend_loc_1': 9,
                     'legend_col_1': 3,
                     'ylabel_2': 'Precipitation trend (mm year$^{-1}$)',
-                    'ylims_2': (-7.,4.25),
+                    'ylims_2': (-7., 4.8),
                     'legend_loc_2': 8,
                     'legend_col_2': 2,
                     'xlabels': ['1979-2017', '1933-2017', '2018-2100'],
@@ -366,7 +366,7 @@ def Cape_Town():
 
     # load data
     for panel, diagnostic in panels_dic.items():
-        logger.info("Loading panel %s data")
+        logger.info(f"Loading panel {panel} data")
         data = []
         if isinstance(diagnostic['input'], str):
             in_file = os.path.join(exernal_path, diagnostic['input'])
@@ -661,7 +661,7 @@ def fill_ax_pr_trends(ax, plot_dic):
     dfs2 = plot_dic['data'][1]
 
     ax2 = ax.twinx()
-    ax2_ofs = 6.1
+    ax2_ofs = 6.85
     ax2_factor = 50
 
     spacing_mod = 1
@@ -703,7 +703,7 @@ def fill_ax_pr_trends(ax, plot_dic):
     # ax2.spines['right'].set_visible(True)
 
     # ax2_yticks = np.arange(-.04,.07,0.02)
-    ax2_yticks = np.arange(-2, 9, 2) / 100.
+    ax2_yticks = np.arange(-4, 9, 2) / 100.
     ax2_ytick_locs = ax2_yticks * ax2_factor + ax2_ofs
     ax2.set_yticks(ax2_ytick_locs)
     ax2.set_yticklabels(ax2_yticks)
