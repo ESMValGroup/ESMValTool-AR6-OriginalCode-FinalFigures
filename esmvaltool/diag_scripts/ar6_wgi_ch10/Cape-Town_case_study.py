@@ -314,13 +314,13 @@ panels_dic = {'a': {'title': 'Annual precipitation accumulation',
                                'panelD_rainfall_2018-2100_v3.csv',
                                ]],
                     'figsize': [16, 8],
-                    'ylims': (-6.5, 10.8),
+                    'ylims': (-7.4, 10.8),
                     'ylabel_1': 'SAM index trend (1 year$^{-1}$)',
                     'ylims_1': (-.06, .08),
                     'legend_loc_1': 9,
                     'legend_col_1': 3,
                     'ylabel_2': 'Precipitation trend (mm year$^{-1}$)',
-                    'ylims_2': (-7., 4.8),
+                    'ylims_2': (-7., 4.55),
                     'legend_loc_2': 8,
                     'legend_col_2': 2,
                     'xlabels': ['1979-2017', '1933-2017', '2018-2100'],
@@ -661,7 +661,7 @@ def fill_ax_pr_trends(ax, plot_dic):
     dfs2 = plot_dic['data'][1]
 
     ax2 = ax.twinx()
-    ax2_ofs = 6.85
+    ax2_ofs = 6.90
     ax2_factor = 50
 
     spacing_mod = 1
@@ -675,6 +675,14 @@ def fill_ax_pr_trends(ax, plot_dic):
         modcolumns = [col
                       for col in columns
                       if 'CMIP' in col or 'MIROC' in col]
+        # sort after cmip5,6,miroc,rest
+        sorted_columns = [col for col in modcolumns if 'CMIP5' in col]
+        sorted_columns.extend([col for col in modcolumns if 'CMIP6' in col])
+        sorted_columns.extend([col for col in modcolumns if 'MIROC6' in col])
+        rest_columns = [col
+                        for col in columns
+                        if 'CMIP' not in col and 'MIROC' not in col]
+        sorted_columns.extend(rest_columns)
         try:
             xs = np.arange(0, len(modcolumns), spacing_mod) + x_ranges[-1][-1] + spacing
         except IndexError:
@@ -683,7 +691,7 @@ def fill_ax_pr_trends(ax, plot_dic):
         xs = np.concatenate((xs, xs_obs), axis=0)
         x_ranges.append(xs)
 
-        for k,x in zip(columns, xs):
+        for k,x in zip(sorted_columns, xs):
             if 'CMIP6' in k: lab = 'CMIP6'
             elif 'CMIP5' in k: lab = 'CMIP5'
             elif 'MIROC6' in k: lab = 'MIROC6'
@@ -703,7 +711,7 @@ def fill_ax_pr_trends(ax, plot_dic):
     # ax2.spines['right'].set_visible(True)
 
     # ax2_yticks = np.arange(-.04,.07,0.02)
-    ax2_yticks = np.arange(-4, 9, 2) / 100.
+    ax2_yticks = np.arange(-4, 10, 2) / 100.
     ax2_ytick_locs = ax2_yticks * ax2_factor + ax2_ofs
     ax2.set_yticks(ax2_ytick_locs)
     ax2.set_yticklabels(ax2_yticks)
@@ -720,8 +728,19 @@ def fill_ax_pr_trends(ax, plot_dic):
     for df, xs in zip(dfs2, x_ranges):
         columns = list(df.keys())
         columns.remove('Unnamed: 0')
+        # sort after cmip5,6,miroc,rest
+        modcolumns = [col
+                      for col in columns
+                      if 'CMIP' in col or 'MIROC' in col]
+        sorted_columns = [col for col in modcolumns if 'CMIP5' in col]
+        sorted_columns.extend([col for col in modcolumns if 'CMIP6' in col])
+        sorted_columns.extend([col for col in modcolumns if 'MIROC6' in col])
+        rest_columns = [col
+                        for col in columns
+                        if 'CMIP' not in col and 'MIROC' not in col]
+        sorted_columns.extend(rest_columns)
 
-        for k,x in zip(columns, xs):
+        for k,x in zip(sorted_columns, xs):
             if 'CMIP6' in k: lab = 'CMIP6'
             elif 'CMIP5' in k: lab = 'CMIP5'
             elif 'MIROC6' in k: lab = 'MIROC6'
@@ -739,7 +758,7 @@ def fill_ax_pr_trends(ax, plot_dic):
     by_label = OrderedDict(zip(labels, handles))
     ax.legend(by_label.values(), by_label.keys(), ncol=plot_dic['legend_col_2'], loc=plot_dic['legend_loc_2'])
 
-    ax_yticks = np.arange(-6, 5, 1)
+    ax_yticks = np.arange(-7, 5, 1)
     ax.set_yticks(ax_yticks)
     ax.set_yticklabels(ax_yticks)
     ax.tick_params(axis='y', which=u'minor', length=0, pad=35)
