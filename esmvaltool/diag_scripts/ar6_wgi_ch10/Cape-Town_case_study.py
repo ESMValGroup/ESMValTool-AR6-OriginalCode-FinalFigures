@@ -289,7 +289,8 @@ panels_dic = {'a': {'title': 'Annual precipitation accumulation',
                     'xlims': (-0.5, 11.5),
                     'legend_loc':2
                     },
-              'c': {'title': 'Southern Annular Mode (SAM) and precipitation anomalies',
+              'c': {'title': 'Southern Annular Mode (SAM) index and precipitation anomalies',
+                    'subtitle': 'Baseline period is 1980-2010',
                     'input': ['panelC_SAM_v3.csv', 'panelC_rainfall_v3.csv'],
                     'figsize': [16, 8],
                     'ylims': (-49,62),
@@ -305,7 +306,7 @@ panels_dic = {'a': {'title': 'Annual precipitation accumulation',
                     'xlims': (1925, 2090),
                     'legend_loc':2,
                     },
-              'd': {'title': 'SAM and precipitation trends',
+              'd': {'title': 'SAM index and precipitation trends',
                     'input': [['panelD_SAM_1979-2017_v3.csv',
                                'panelD_SAM_1933-2017_v3.csv',
                                'panelD_SAM_2018-2100_v3.csv'],
@@ -348,14 +349,16 @@ combi_fig =  {'figure_name': 'Fig_18',
                         },
                   'c': {'position': 3,
                         'x_pos': [4, 60],
-                        'y_pos': [26, 54],
+                        'y_pos': [27, 54],
                         'y_pos_title': 24,
                         'x_pos_title': 0,
+                        'y_pos_subtitle': 26,
+                        'x_pos_subtitle': 2,
                         },
                   'd': {'position': 4,
                         'x_pos': [4, 60],
-                        'y_pos': [61, 90],
-                        'y_pos_title': 58,
+                        'y_pos': [62, 91],
+                        'y_pos_title': 59,
                         'x_pos_title': 0,
                         },
               }
@@ -471,6 +474,12 @@ def Cape_Town():
         ax = fig.add_subplot(ax_grid)
         ax.axis('off')
         ax.text(0.5, 0.5, title, **title_kwag_default)
+        if diag_name == 'c':
+            ax_grid = get_ax_grid(ax_grid_root, pos['x_pos_subtitle'],
+                                  pos['y_pos_subtitle'])
+            ax = fig.add_subplot(ax_grid)
+            ax.axis('off')
+            ax.text(0.5, 0.5, diagnostic['subtitle'], **title_kwag_default)
 
         ax_grid = get_ax_grid(ax_grid_root, pos['x_pos'], pos['y_pos'])
         ax = fig.add_subplot(ax_grid)
