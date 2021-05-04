@@ -49,7 +49,6 @@ models: &models
  - {dataset: HadCM3, exp: [historical, rcp45], project: CMIP5, ensemble: "r(1:10)i1p1", start_year: 1923, end_year: 2017}
  - {dataset: HadGEM2-ES, exp: [historical, rcp45], project: CMIP5, ensemble: "r(2:3)i1p1", start_year: 1923, end_year: 2017}
  - {dataset: inmcm4, exp: [historical, rcp45], project: CMIP5, ensemble: r1i1p1, start_year: 1923, end_year: 2017}
-# - {dataset: MIROC5, exp: [historical, rcp45], project: CMIP5, ensemble: "r(1:5)i1p1", start_year: 1923, end_year: 2017} not concatinated cubes
  - {dataset: MIROC-ESM, exp: [historical, rcp45], project: CMIP5, ensemble: r1i1p1, start_year: 1923, end_year: 2017}
  - {dataset: MIROC-ESM-CHEM, exp: [historical, rcp45], project: CMIP5, ensemble: r1i1p1, start_year: 1923, end_year: 2017}
  - {dataset: MPI-ESM-LR, exp: [historical, rcp45], project: CMIP5, ensemble: "r(1:3)i1p1", start_year: 1923, end_year: 2017}
@@ -90,7 +89,7 @@ models: &models
  - {dataset: GFDL-CM3, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
  - {dataset: GFDL-ESM2G, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
  - {dataset: GFDL-ESM2M, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1, end_year: 475}
- - {dataset: GISS-E2-H, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1180, end_year: 1369} # exists only until 1419, originally asked to 1844
+ - {dataset: GISS-E2-H, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1180, end_year: 1369}
  - {dataset: GISS-E2-H, exp: piControl, project: CMIP5, ensemble: "r1i1p(2:3)", start_year: 2490, end_year: 2964}
  - {dataset: GISS-E2-H-CC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2081, end_year: 2270}
  - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 3331, end_year: 3615}
@@ -100,10 +99,8 @@ models: &models
  - {dataset: GISS-E2-R, exp: piControl, project: CMIP5, ensemble: r1i1p142, start_year: 2790, end_year: 2884}
  - {dataset: GISS-E2-R-CC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2050, end_year: 2239}
  - {dataset: HadGEM2-CC, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1860, end_year: 2049}
-# - {dataset: HadGEM2-ES, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1860, end_year: 2429} # cmor check fail: frequency mon doesn't match input data
  - {dataset: inmcm4, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1851, end_year: 2325}
  - {dataset: MIROC4h, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 51, end_year: 145}
-# - {dataset: MIROC5, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 2000, end_year: 2664} # cmor check fail: frequency mon doesn't match input data
  - {dataset: MIROC-ESM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1800, end_year: 2369}
  - {dataset: MIROC-ESM-CHEM, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1846, end_year: 2035}
  - {dataset: MPI-ESM-LR, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 1850, end_year: 2799}
@@ -113,53 +110,64 @@ models: &models
  - {dataset: NorESM1-M, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 700, end_year: 1174}
  - {dataset: NorESM1-ME, exp: piControl, project: CMIP5, ensemble: r1i1p1, start_year: 901, end_year: 1090}
 # models_cmip6_all: &models_cmip6_all
- - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
+ - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: ACCESS-ESM1-5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: BCC-CSM2-MR, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
- - {dataset: CanESM5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f1", start_year: 1923, end_year: 2017} # should be until r25
-# - {dataset: CanESM5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:10)i1p2f1", start_year: 1923, end_year: 2017} # should be until r25; ssp 1:10, historical 16, 20
- - {dataset: CanESM5-CanOE, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:3)i1p2f1", start_year: 1923, end_year: 2017}
+ - {dataset: CanESM5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:7)i1p1f1", start_year: 1923, end_year: 2017}
+ - {dataset: CanESM5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(9:25)i1p1f1", start_year: 1923, end_year: 2017}
+ - {dataset: CanESM5, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:25)i1p2f1", start_year: 1923, end_year: 2017}
  - {dataset: CESM2-WACCM, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
+ - {dataset: CESM2, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r4i1p1f1, start_year: 1923, end_year: 2017}
+ - {dataset: CESM2, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(10:11)i1p1f1", start_year: 1923, end_year: 2017}
+ - {dataset: CIESM, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: CNRM-CM6-1, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(1:10)i1p1f2", start_year: 1923, end_year: 2017}
  - {dataset: CNRM-CM6-1-HR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: r1i1p1f2, start_year: 1923, end_year: 2017}
- - {dataset: CNRM-ESM2-1, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(1:5)i1p1f2", start_year: 1923, end_year: 2017}
+ - {dataset: CNRM-ESM2-1, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(1:6)i1p1f2", start_year: 1923, end_year: 2017}
+ - {dataset: CNRM-ESM2-1, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(8:10)i1p1f2", start_year: 1923, end_year: 2017}
+ - { dataset: EC-Earth3, exp: [ historical, ssp245 ], grid: gr, project: CMIP6, ensemble: "r(1:2)i1p1f1", start_year: 1923, end_year: 2017 }
+ - { dataset: EC-Earth3, exp: [ historical, ssp245 ], grid: gr, project: CMIP6, ensemble: r4i1p1f1, start_year: 1923, end_year: 2017 }
+ - { dataset: EC-Earth3, exp: [ historical, ssp245 ], grid: gr, project: CMIP6, ensemble: "r(6:7)i1p1f1", start_year: 1923, end_year: 2017 }
+ - { dataset: EC-Earth3, exp: [ historical, ssp245 ], grid: gr, project: CMIP6, ensemble: "r(9:20)i1p1f1", start_year: 1923, end_year: 2017 }
+ - {dataset: EC-Earth3-CC, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
+ - {dataset: EC-Earth3-Veg, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(1:5)i1p1f1", start_year: 1923, end_year: 2017}
+ - {dataset: EC-Earth3-Veg-LR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: GFDL-CM4, exp: [historical, ssp245], grid: gr1, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: GFDL-ESM4, exp: [historical, ssp245], grid: gr1, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: GISS-E2-1-G, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f2", start_year: 1923, end_year: 2017}
-# - {dataset: GISS-E2-1-G, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:5)i1p3f1", start_year: 1923, end_year: 2017} no historical files
+ - {dataset: GISS-E2-1-G, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:5)i1p3f1", start_year: 1923, end_year: 2017}
+ - {dataset: GISS-E2-1-G, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:4)i1p5f1", start_year: 1923, end_year: 2017}
  - {dataset: HadGEM3-GC31-LL, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f3", start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(1:6)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: "r(10:11)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: r14i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: r22i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: [historical, ssp245], grid: gr, project: CMIP6, ensemble: r25i1p1f1, start_year: 1923, end_year: 2017}
+ - {dataset: KIOST-ESM, exp: [historical, ssp245], grid: gr1, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: MIROC-ES2L, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r1i1p1f2, start_year: 1923, end_year: 2017}
  - {dataset: MIROC6, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: MPI-ESM1-2-HR, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:2)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: MPI-ESM1-2-LR, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: MRI-ESM2-0, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:5)i1p1f1", start_year: 1923, end_year: 2017}
-# - {dataset: NorESM2-LM, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(2:3)i1p1f1", start_year: 1923, end_year: 2017} cmor check fail: frequency mon doesn't match input data
-# - {dataset: NorESM2-MM, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017} cmor check fail: frequency mon doesn't match input data
+ - {dataset: TaiESM1, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: UKESM1-0-LL, exp: [historical, ssp245], grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f2", start_year: 1923, end_year: 2017}
 # models_cmip6_nat: &models_cmip6_nat
+ - {dataset: ACCESS-ESM1-5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017} # (1:3)
  - {dataset: BCC-CSM2-MR, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
  - {dataset: CanESM5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
- - {dataset: CanESM5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(3:11)i1p1f1", start_year: 1923, end_year: 2017} # should be 1:15
+ - {dataset: CanESM5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(3:11)i1p1f1", start_year: 1923, end_year: 2017} # should be 1:25
  - { dataset: CanESM5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: r15i1p1f1, start_year: 1923, end_year: 2017 }
- - {dataset: CanESM5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:12)i1p2f1", start_year: 1923, end_year: 2017} # should be 1:15
+ - {dataset: CanESM5, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:12)i1p2f1", start_year: 1923, end_year: 2017} # should be 1:25
  - {dataset: CNRM-CM6-1, exp: hist-nat, grid: gr, project: CMIP6, ensemble: "r(1:10)i1p1f2", start_year: 1923, end_year: 2017}
  - {dataset: GFDL-ESM4, exp: hist-nat, grid: gr1, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: HadGEM3-GC31-LL, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f3", start_year: 1923, end_year: 2017}
  - {dataset: IPSL-CM6A-LR, exp: hist-nat, grid: gr, project: CMIP6, ensemble: "r(1:10)i1p1f1", start_year: 1923, end_year: 2017}
- - {dataset: MIROC6, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017}
+ - {dataset: MIROC6, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017} #(1:50)
  - {dataset: MRI-ESM2-0, exp: hist-nat, grid: gn, project: CMIP6, ensemble: r1i1p1f1, start_year: 1923, end_year: 2017} # should be 1:5
  - {dataset: MRI-ESM2-0, exp: hist-nat, grid: gn, project: CMIP6, ensemble: r3i1p1f1, start_year: 1923, end_year: 2017}
  - {dataset: MRI-ESM2-0, exp: hist-nat, grid: gn, project: CMIP6, ensemble: r5i1p1f1, start_year: 1923, end_year: 2017}
-# - {dataset: NorESM2-LM, exp: hist-nat, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1", start_year: 1923, end_year: 2017} cmor check fail: frequency mon doesn't match input data
 # models_cmip6_ctl: &models_cmip6_ctl
  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 950, end_year: 1424}
  - {dataset: ACCESS-ESM1-5, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 101, end_year: 955}
-# - {dataset: AWI-ESM-1-1-LR, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1855, end_year: 1949}  ValueError: zero not allowed as a reference year, does not exist in Julian or Gregorian calendars
  - {dataset: BCC-CSM2-MR, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2419}
  - {dataset: CanESM5, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 5201, end_year: 6150}
  - {dataset: CanESM5, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p2f1, start_year: 5550, end_year: 6594}
@@ -176,8 +184,7 @@ models: &models
  - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 4150, end_year: 4909}
  - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f2, start_year: 7550, end_year: 7834}
  - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f3, start_year: 2900, end_year: 2994}
-# - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p3f1, start_year: 2000, end_year: 2284} non existent
-# - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p5f1, start_year: 2000, end_year: 2189} non existent
+ - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p5f1, start_year: 2000, end_year: 2189}
  - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: r2i1p1f1, start_year: 2900, end_year: 2994}
  - {dataset: GISS-E2-1-G, exp: piControl, project: CMIP6, grid: gn, ensemble: "r(101:102)i1p1f1", start_year: 1850, end_year: 1944}
  - {dataset: GISS-E2-1-G-CC, institute: NASA-GISS, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 1944}
@@ -193,13 +200,12 @@ models: &models
  - {dataset: MPI-ESM1-2-LR, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2799}
  - {dataset: MPI-ESM1-2-HR, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2324}
  - {dataset: MRI-ESM2-0, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1850, end_year: 2514}
-# - {dataset: MRI-ESM2-0, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i2p1f1, start_year: 1850, end_year: 2039} no snw
+ - {dataset: MRI-ESM2-0, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i2p1f1, start_year: 1850, end_year: 2039} # no snw
  - {dataset: NorESM2-LM, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1600, end_year: 2074}
  - {dataset: NorESM2-MM, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1201, end_year: 1675}
  - {dataset: SAM0-UNICON, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f1, start_year: 1, end_year: 665}
- - {dataset: UKESM1-0-LL, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f2, start_year: 1960, end_year: 2624}
+ - {dataset: UKESM1-0-LL, exp: piControl, project: CMIP6, grid: gn, ensemble: r1i1p1f2, start_year: 1960, end_year: 2624} # not there 12.01.2020
  - { dataset: GLDAS_NOAH, project: OBS, tier: 3, type: reanaly, version: V2, start_year: 1948, end_year: 2012 }
- - { dataset: 20CR, project: OBS, tier: 2, type: reanaly, version: v2, start_year: 1923, end_year: 2012 }
 
 diagnostics:
   ipcc_ar6_wg1_fgd_3_20:
@@ -219,6 +225,7 @@ diagnostics:
     scripts:
       ipcc_ar6_wg1_fgd_3_20:
         script: seaice/sie_ipcc_ar6_wg1_fgd_3_20.py
+        mpl_style: ipcc_ar6_fgd
         months: [3,4]
         years_for_average: 5
         ref_period: [1971, 2000]

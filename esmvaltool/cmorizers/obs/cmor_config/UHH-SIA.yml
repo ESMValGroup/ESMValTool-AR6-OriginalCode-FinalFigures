@@ -1,0 +1,38 @@
+---
+
+# Common global attributes for Cmorizer output
+attributes:
+  dataset_id: UHH
+  tier: 2
+  modeling_realm: clim
+  project_id: OBS
+  institution: 'University of Hamburg'
+  source: 'https://www.fdr.uni-hamburg.de/record/8559#.YDBe7nVKjmF'
+  source_url: 'https://www.fdr.uni-hamburg.de/record/8559#.YDBe7nVKjmF'
+  version: 'v2021'
+  reference: 'uhh_sia'
+  comment: 'The datasets are created by the University of Hamburg (UHH) from sea ice concentrations files'
+  dataset_base_id: UHH
+
+# Variables to cmorize
+variables:
+  siarean:
+    mip: OImon
+    raw_units: 1e6 km2
+    filename: 'SeaIceArea__NorthernHemisphere__monthly__UHH__v2019_fv0.01.nc'
+  siareas:
+    mip: OImon
+    raw_units: 1e6 km2
+    filename: 'SeaIceArea__SouthernHemisphere__monthly__UHH__v2019_fv0.01.nc'
+
+custom:
+  osisaf:
+    var_name: osisaf
+    title_did: OSISAF
+  bootstrap:
+    var_name: nsidc_bt
+    title_did: Bootstrap
+  nasa_team:
+    var_name: nsidc_nt
+    title_did: NASATeam
+

@@ -1,0 +1,171 @@
+# ESMValTool
+# recipe_ocean_basin_profile_bias.yml
+---
+documentation:
+  description: |
+    Recipe to demonstrate several simple plots based on the monthly ocean
+    temperature. Please use this file as a template for adding additional
+    fields into the ocean. This work based on the BGC-val toolkit GMD-2018-103.
+
+  authors:
+    - demora_lee
+    - malinina_elizaveta
+
+  maintainer:
+    - malinina_elizaveta
+
+preprocessors:
+  # --------------------------------------------------
+  # Transects preprocessors
+  # --------------------------------------------------
+  # Global
+  prep_global:
+    custom_order: true
+    climate_statistics:
+      operator: mean
+      period: full
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    zonal_statistics:
+      operator: mean
+    extract_levels:
+      levels: &levels_anchor [0.1, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1250, 1500, 1750, 2000,  2400,  2800,  3200,  3600,  4000,  4400,  4800,  5200]
+      scheme: linear_horizontal_extrapolate_vertical
+
+  ##########################
+  # indian
+  prep_indian:
+    custom_order: true
+    climate_statistics:
+      operator: mean
+      period: full
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    extract_shape:
+      shapefile: 'indian_ocean.shp'
+      method: 'contains'
+      crop: False
+    zonal_statistics:
+      operator: mean
+    extract_levels:
+      levels: *levels_anchor
+      scheme: linear_horizontal_extrapolate_vertical
+
+  ##########################
+  # pacicfic
+  prep_pacific:
+    custom_order: true
+    climate_statistics:
+      operator: mean
+      period: full
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    extract_shape:
+      shapefile: 'pacific.shp'
+      method: 'contains'
+      crop: False
+    zonal_statistics:
+      operator: mean
+    extract_levels:
+      levels: *levels_anchor
+      scheme: linear_horizontal_extrapolate_vertical
+
+  ############################
+  prep_atlantic:
+    custom_order: true
+    climate_statistics:
+      operator: mean
+      period: full
+    regrid:
+      target_grid: 1x1
+      scheme: linear
+    extract_shape:
+      shapefile: 'atlantic.shp'
+      method: 'contains'
+      crop: False
+    zonal_statistics:
+      operator: mean
+    extract_levels:
+      levels: *levels_anchor
+      scheme: linear_horizontal_extrapolate_vertical
+
+datasets:
+  - {dataset: WOA,  project: OBS, mip: Omon, type: clim,  version: 2019v2, start_year: 1995, end_year: 1995, tier: 2}
+  - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: ACCESS-ESM1-5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: CAMS-CSM1-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: CAS-ESM2-0, institute: CAS,project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: CanESM5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: CIESM, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: CMCC-CM2-SR5, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: CNRM-CM6-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: E3SM-1-1, institute: E3SM-Project, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: E3SM-1-1-ECA, institute: E3SM-Project, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: EC-Earth3-Veg-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: EC-Earth3, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: FIO-ESM-2-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: GFDL-ESM4, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - { dataset: GISS-E2-1-G-CC, institute: NASA-GISS, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - { dataset: GISS-E2-1-G, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - { dataset: GISS-E2-1-H, project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: HadGEM3-GC31-LL, project: CMIP6, ensemble: r1i1p1f3, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: IPSL-CM6A-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: MPI-ESM-1-2-HAM, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: MPI-ESM1-2-HR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: MPI-ESM1-2-LR, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: MRI-ESM2-0, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: NESM3, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - { dataset: NorCPM1, institute: NCC , project: CMIP6, ensemble: r1i1p1f1, grid: gr, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: SAM0-UNICON, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: TaiESM1, project: CMIP6, ensemble: r1i1p1f1, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: UKESM1-0-LL, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+
+dataset_thetao: &dataset_thetao
+  - {dataset: CNRM-ESM2-1, project: CMIP6, ensemble: r1i1p1f2, grid: gn, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+  - {dataset: INM-CM5-0, project: CMIP6, ensemble: r1i1p1f1, grid: gr1, mip: Omon, exp: historical, start_year: 1981, end_year: 2010}
+
+diagnostics:
+   # --------------------------------------------------
+  # Transects diagnostics
+  # --------------------------------------------------
+  diag_transect_thetao:
+    description: Extracting along a trajectory
+    variables:
+      thetao_global: # Temperature ocean 3D
+        short_name: thetao
+        preprocessor: prep_global
+        additional_datasets: *dataset_thetao
+      thetao_atlantic:
+        short_name: thetao
+        preprocessor: prep_atlantic
+        additional_datasets: *dataset_thetao
+      thetao_indian:
+        short_name: thetao
+        preprocessor: prep_indian
+        additional_datasets: *dataset_thetao
+      thetao_pacific:
+        short_name: thetao
+        preprocessor: prep_pacific
+        additional_datasets: *dataset_thetao
+
+      so_global: # Salinty ocean 3D
+        short_name: so
+        preprocessor: prep_global
+      so_atlantic:
+        short_name: so
+        preprocessor: prep_atlantic
+      so_indian:
+        short_name: so
+        preprocessor: prep_indian
+      so_pacific:
+        short_name: so
+        preprocessor: prep_pacific
+
+    scripts:
+      Ocean_basin_profile_bias:
+        script: ocean/diagnostic_basin_profile_bias.py
+        observational_dataset: {dataset: WOA, project: OBS,}
+        mpl_style: ipcc_ar6_fgd

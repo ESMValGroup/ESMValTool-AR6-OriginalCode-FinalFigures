@@ -21,8 +21,6 @@ models_cmip5_list: &models_cmip5_list
 # CMIP5_ALL
  - {dataset: ACCESS1-0, project: CMIP5, ensemble: r1i1p1}
  - {dataset: ACCESS1-3, project: CMIP5, ensemble: r1i1p1}
-# - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1} looks like problems by regridding  seam = (lon.bounds[1:-1, -1, (1, 2)] TypeError: 'NoneType' object is not subscriptable
-# - {dataset: bcc-csm1-1-m, project: CMIP5, ensemble: r1i1p1}  same as above
  - {dataset: CanESM2, project: CMIP5, ensemble: "r(1:5)i1p1"}
  - {dataset: CCSM4, project: CMIP5, ensemble: "r(1:6)i1p1"}
  - {dataset: CESM1-BGC, project: CMIP5, ensemble: r1i1p1}
@@ -50,11 +48,9 @@ models_cmip5_list: &models_cmip5_list
  - {dataset: HadGEM2-AO, project: CMIP5, ensemble: r1i1p1}
  - {dataset: HadGEM2-CC, project: CMIP5, ensemble: r1i1p1}
  - {dataset: HadGEM2-ES, project: CMIP5, ensemble: "r(1:4)i1p1"}
-# - {dataset: inmcm4, project: CMIP5, ensemble: r1i1p1} NoneType for sia calculations
  - {dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: "r(1:4)i1p1"}
  - {dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: r1i1p1}
  - {dataset: IPSL-CM5B-LR, project: CMIP5, ensemble: r1i1p1}
-# - {dataset: MIROC5, project: CMIP5, ensemble: "r(1:3)i1p1" } can't concatenate cubes: time???
  - {dataset: MIROC-ESM, project: CMIP5, ensemble: r1i1p1}
  - {dataset: MIROC-ESM-CHEM, project: CMIP5, ensemble: r1i1p1}
  - {dataset: MPI-ESM-LR, project: CMIP5, ensemble: "r(1:3)i1p1"}
@@ -65,24 +61,27 @@ models_cmip5_list: &models_cmip5_list
 
 models_cmip6_list: &models_cmip6_list
 # CMIP6_ALL
-# - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, grid: gn, project: CMIP6, ensemble: r1i1p1f1} can't concatenate cubes
- - {dataset: ACCESS-ESM1-5, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
-# - {dataset: BCC-CSM2-MR, grid: gn, project: CMIP6, ensemble: r1i1p1f1} double lat /lons
+ - {dataset: ACCESS-CM2, institute: CSIRO-ARCCSS, grid: gn, project: CMIP6, ensemble: r1i1p1f1}
+ - {dataset: ACCESS-ESM1-5, grid: gn, project: CMIP6, ensemble: r1i1p1f1}
+ - {dataset: ACCESS-ESM1-5, grid: gn, project: CMIP6, ensemble: r10i1p1f1}
+ - {dataset: BCC-CSM2-MR, grid: gn, project: CMIP6, ensemble: r1i1p1f1}
  - {dataset: CAMS-CSM1-0, grid: gn, project: CMIP6, ensemble: "r(1:2)i1p1f1"}
- - {dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f1"} # should be until 25
- - {dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:10)i1p2f1"} # should be until 25
- - {dataset: CanESM5-CanOE, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p2f1"}
-# - {dataset: CESM2, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"} esmvalcore.cmor.check.CMORCheckError: There were errors in variable siconc: typesi: does not exist
-# - {dataset: CESM2-WACCM, grid: gn, project: CMIP6, ensemble: r1i1p1f1} esmvalcore.cmor.check.CMORCheckError: There were errors in variable siconc: typesi: does not exist
-# - {dataset: CESM2-WACCM, grid: gn, project: CMIP6, ensemble: r3i1p1f1} esmvalcore.cmor.check.CMORCheckError: There were errors in variable siconc: typesi: does not exist
+ - {dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:25)i1p1f1"}
+ - {dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:25)i1p2f1"}
+ - {dataset: CESM2, grid: gn, project: CMIP6, ensemble: r4i1p1f1}
+ - {dataset: CESM2, grid: gn, project: CMIP6, ensemble: "r(10:11)i1p1f1"}
  - {dataset: CNRM-CM6-1, grid: gn, project: CMIP6, ensemble: "r(1:6)i1p1f2"}
  - {dataset: CNRM-CM6-1-HR, grid: gn, project: CMIP6, ensemble: r1i1p1f2}
  - {dataset: CNRM-ESM2-1, grid: gn, project: CMIP6, ensemble: r1i1p1f2}
-# - {dataset: FGOALS-g3, grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f1"} hanging long time, can't concatenate things
+ - {dataset: EC-Earth3-Veg, grid: gn, project: CMIP6, ensemble: "r(4:6)i1p1f1"}
+ - {dataset: EC-Earth3, grid: gn, project: CMIP6, ensemble: "r(1:2)i1p1f1"}
+ - {dataset: EC-Earth3, grid: gn, project: CMIP6, ensemble: r4i1p1f1}
+ - {dataset: EC-Earth3, grid: gn, project: CMIP6, ensemble: "r(6:7)i1p1f1"}
+ - {dataset: EC-Earth3, grid: gn, project: CMIP6, ensemble: "r(10:25)i1p1f1"}
  - {dataset: FIO-ESM-2-0, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
-# - {dataset: GFDL-CM4, grid: gn, project: CMIP6, ensemble: r1i1p1f1} the same cmor typsi problem
-# - {dataset: GFDL-ESM4, grid: gn, project: CMIP6, ensemble: r1i1p1f1} cmor problems typsi
- - {dataset: HadGEM3-GC31-LL, grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f3"}
+ - {dataset: GFDL-ESM4, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
+ - {dataset: HadGEM3-GC31-LL, grid: gn, project: CMIP6, ensemble: r1i1p1f3}
+ - {dataset: HadGEM3-GC31-LL, grid: gn, project: CMIP6, ensemble: "r(3:4)i1p1f3"}
  - {dataset: INM-CM4-8, grid: gr1, project: CMIP6, ensemble: r1i1p1f1}
  - { dataset: INM-CM5-0, grid: gr1, project: CMIP6, ensemble: r1i1p1f1 }
  - {dataset: IPSL-CM6A-LR, grid: gn, project: CMIP6, ensemble: "r(1:6)i1p1f1"}
@@ -90,19 +89,22 @@ models_cmip6_list: &models_cmip6_list
  - {dataset: IPSL-CM6A-LR, grid: gn, project: CMIP6, ensemble: r14i1p1f1}
  - {dataset: IPSL-CM6A-LR, grid: gn, project: CMIP6, ensemble: r22i1p1f1}
  - {dataset: IPSL-CM6A-LR, grid: gn, project: CMIP6, ensemble: r25i1p1f1}
- - {dataset: MIROC6, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"} # should be until 50, hist is, ssp245 only until 3
- - {dataset: MIROC-ES2L, grid: gn, project: CMIP6, ensemble: r1i1p1f2}
+ - {dataset: MIROC6, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
+ - {dataset: MIROC6, grid: gn, project: CMIP6, ensemble: "r(11:50)i1p1f1"}
+ - { dataset: MIROC-ES2L, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f2" }
+ - { dataset: MIROC-ES2L, grid: gn, project: CMIP6, ensemble: r5i1p1f2 }
+ - { dataset: MIROC-ES2L, grid: gn, project: CMIP6, ensemble: "r(8:9)i1p1f2" }
  - { dataset: MPI-ESM1-2-HR,grid: gn, project: CMIP6, ensemble: "r(1:2)i1p1f1" }
  - { dataset: MPI-ESM1-2-LR, grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f1" }
  - { dataset: MRI-ESM2-0, grid: gn, project: CMIP6, ensemble: "r(1:5)i1p1f1" }
-# - { dataset: NESM3, grid: gn, project: CMIP6, ensemble: "r(1:2)i1p1f1" } can't concatenate cubes. Time stamps
-# - {dataset: NorESM2-LM, grid: gn,  project: CMIP6, ensemble: "r(1:3)i1p1f1"} can't concatenate cubes. Apparently there are problems with the time stamps
+ - {dataset: NorESM2-LM, grid: gn,  project: CMIP6, ensemble: r2i1p1f1}
+ - {dataset: NorESM2-MM, grid: gn,  project: CMIP6, ensemble: r2i1p1f1}
+ - { dataset: TaiESM1, grid: gn, project: CMIP6, ensemble: r1i1p1f1 }
  - {dataset: UKESM1-0-LL, grid: gn,  project: CMIP6, ensemble: "r(1:4)i1p1f2"}
- - {dataset: UKESM1-0-LL, grid: gn,  project: CMIP6, ensemble: r8i1p1f2}
+ - {dataset: UKESM1-0-LL, grid: gn,  project: CMIP6, ensemble: "r8i1p1f2"}
 
 models_cmip5_nat: &models_cmip5_nat
  # CMIP5_NAT
-# - {dataset: bcc-csm1-1, project: CMIP5, ensemble: r1i1p1}
  - { dataset: CanESM2, project: CMIP5, ensemble: "r(1:5)i1p1" }
  - { dataset: CNRM-CM5, project: CMIP5, ensemble: "r(1:5)i1p1" }
  - { dataset: CNRM-CM5, project: CMIP5, ensemble: r8i1p1 }
@@ -113,28 +115,29 @@ models_cmip5_nat: &models_cmip5_nat
  - { dataset: GISS-E2-R, project: CMIP5, ensemble: "r(1:5)i1p3" }
  - { dataset: HadGEM2-ES, project: CMIP5, ensemble: "r(1:4)i1p1" }
  - { dataset: IPSL-CM5A-LR, project: CMIP5, ensemble: "r(1:3)i1p1" }
-# - { dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: "r(1:3)i1p1" } not subsciptabale NoneType
+ - { dataset: IPSL-CM5A-MR, project: CMIP5, ensemble: "r(1:3)i1p1" } 
  - { dataset: NorESM1-M, project: CMIP5, ensemble: r1i1p1 }
 
 models_cmip6_nat: &models_cmip6_nat
  # CMIP6_NAT
-# - {dataset: BCC-CSM2-MR, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"} double lats / lons
- - { dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:15)i1p1f1" }
+ - {dataset: ACCESS-ESM1-5, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
+ - {dataset: BCC-CSM2-MR, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
+ - { dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:15)i1p1f1" } # should have been be to 25
+ - { dataset: CanESM5, grid: gn, project: CMIP6, ensemble: "r(1:15)i1p2f1" } # should have been be to 25
  - { dataset: CNRM-CM6-1, grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f2" }
-# - { dataset: FGOALS-g3, grid: gn, project: CMIP6, ensemble: r1i1p1f1} # should be r(1:3) process just hangs
-# - {dataset: GFDL-ESM4, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"} cmor_check problems
+ - {dataset: GFDL-ESM4, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
  - { dataset: HadGEM3-GC31-LL, grid: gn, project: CMIP6, ensemble: "r(1:4)i1p1f3" }
  - { dataset: IPSL-CM6A-LR, grid: gn, project: CMIP6, ensemble: "r(1:10)i1p1f1" }
- - { dataset: MIROC6, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1" }
- - {dataset: MRI-ESM2-0, grid: gn, project: CMIP6, ensemble: r1i1p1f1}
- - {dataset: MRI-ESM2-0, grid: gn, project: CMIP6, ensemble: r3i1p1f1}
- - {dataset: MRI-ESM2-0, grid: gn, project: CMIP6, ensemble: r5i1p1f1}
+ - { dataset: MIROC6, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1" } # should have been 1:50
+ - { dataset: MIROC6, grid: gn, project: CMIP6, ensemble: r34i1p1f1 }
+ - { dataset: MIROC6, grid: gn, project: CMIP6, ensemble: "r(47:48)i1p1f1" }
+ - {dataset: MRI-ESM2-0, grid: gn, project: CMIP6, ensemble: "r(1:5)i1p1f1"}
  - {dataset: NorESM2-LM, grid: gn, project: CMIP6, ensemble: "r(1:3)i1p1f1"}
 
 observations: &observations
-  - {dataset: Bootstrap, project: OBS, mip: OImon, tier: 3, type: clim, version: v1}
-  - {dataset: OSISAF, project: OBS, mip: OImon, tier: 3, type: clim, version: v1}
-  - {dataset: NASATeam, project: OBS, mip: OImon, tier: 3, type: clim, version: v1}
+  - {dataset: UHH-OSISAF, project: OBS, mip: OImon, tier: 2, type: clim, version: v2021}
+  - {dataset: UHH-Bootstrap, project: OBS, mip: OImon, tier: 2, type: clim, version: v2021}
+  - {dataset: UHH-NASATeam, project: OBS, mip: OImon, tier: 2, type: clim, version: v2021}
 
 diagnostics:
   ipcc_ar6_wg1_fgd_3_18:
@@ -167,7 +170,8 @@ diagnostics:
 
     scripts:
       ipcc_ar6_wg1_fgd_3_18:
-        script: /pf/b/b381183/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_18.py
+        script: seaice/sie_ipcc_ar6_wg1_fgd_3_18.py
+        mpl_style: ipcc_ar6_fgd
         seaiceextent: false # if sea ice extent is false, sea ice area is used instead
         month_latitude_NH: [9, 50.] # month and latitude for NH panel
         month_latitude_SH: [2, -50.] # month and latitude for SH panel
@@ -218,7 +222,8 @@ diagnostics:
 
     scripts:
       ipcc_ar6_wg1_fgd_3_19:
-        script: /pf/b/b381183/ESMValTool-AR6/esmvaltool/diag_scripts/seaice/sie_ipcc_ar6_wg1_fgd_3_19.py
+        script: seaice/sie_ipcc_ar6_wg1_fgd_3_19.py
+        mpl_style: ipcc_ar6_fgd
         seaiceextent: false # if sea ice extent is false, sea ice area is used instead
         month_latitude_NH: [[3,6,9,12], 50.] # month and latitude for NH panel
         month_latitude_SH: [[2,6,9,12], -50.] # month and latitude for SH panel
