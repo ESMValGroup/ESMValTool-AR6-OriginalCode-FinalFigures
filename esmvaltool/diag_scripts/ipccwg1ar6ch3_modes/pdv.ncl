@@ -853,22 +853,29 @@ begin
      do dd = 0,dimsizes(mme_ipo&lon)-1     ; otherwise assign a value of 0.
         if (.not.ismissing(mme_ipo(cc,dd))) then
            tnum = toint(num(.not.ismissing(ipo_hist(:,cc,dd)))*.8)
-           if (mme_ipo(cc,dd).ge.0) then   ; MME >= 0
-              count = num(ipo_hist(:,cc,dd).ge.0)
-              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
-                 mme_ipo_sign(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
-             end if
-           else                            ; MME < 0
-              count = num(ipo_hist(:,cc,dd).lt.0)  
-              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
-                 mme_ipo_sign(cc,dd) = 1   ; assign value of 1
-              else
-                 mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
-              end if
-           end if      
-        end if
+;           if (mme_ipo(cc,dd).ge.0) then   ; MME >= 0
+;              count = num(ipo_hist(:,cc,dd).ge.0)
+;              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
+;                 mme_ipo_sign(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
+;             end if
+;           else                            ; MME < 0
+;              count = num(ipo_hist(:,cc,dd).lt.0)  
+;              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
+;                 mme_ipo_sign(cc,dd) = 1   ; assign value of 1
+;              else
+;                 mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
+;              end if
+;           end if      
+           countp = num(ipo_hist(:,cc,dd).gt.0)
+           countn = num(ipo_hist(:,cc,dd).lt.0)
+           if (countp.gt.tnum.or.countn.gt.tnum) then      ; if more than 80% of the members are >0 or <0
+             mme_ipo_sign(cc,dd) = 1   ; assign value of 1
+           else
+             mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
+           end if
+         end if
      end do
   end do
    
@@ -1198,7 +1205,8 @@ begin
   plot = new(2,graphic)
   res@gsnCenterString = "(a) Observations"
   plot(0) = gsn_csm_contour_map(wks,ipo_obs,res)
-  res@gsnCenterString = "(b) CMIP6 Hist MME"
+;  res@gsnCenterString = "(b) CMIP6 Hist MME"
+  res@gsnCenterString = "(b) CMIP6 Hist MME mean"
   plot(1) = gsn_csm_contour_map(wks,mme_ipo,res)
 
 ;  res2@cnFillScaleF        = 1. ; 0.4
@@ -1608,7 +1616,8 @@ begin
   lres@gsLineColor = 5
   lres@gsLineThicknessF = 2.5
   gsn_polyline_ndc(wks, (/x1,x1+0.03/),(/y1,y1/), lres)
-  gsn_text_ndc(wks, "CMIP5 Hist MME", x1+0.035, y1, txres)
+;  gsn_text_ndc(wks, "CMIP5 Hist MME", x1+0.035, y1, txres)
+  gsn_text_ndc(wks, "CMIP5 Hist MME mean", x1+0.035, y1, txres)
 
   
   lres = True   ; draw box showing observational range
@@ -1621,7 +1630,8 @@ begin
   x1 = 0.78
   lres@gsLineColor = 3
   gsn_polyline_ndc(wks, (/x1,x1+0.03/),(/y1,y1/), lres)
-  gsn_text_ndc(wks, "CMIP6 Hist MME", x1+0.035, y1, txres)
+;  gsn_text_ndc(wks, "CMIP6 Hist MME", x1+0.035, y1, txres)
+  gsn_text_ndc(wks, "CMIP6 Hist MME mean", x1+0.035, y1, txres)
   lres@gsLineDashPattern = 5
   lres@gsLineThicknessF = 1.
   gsn_polyline_ndc(wks, (/x1,x1+0.03/),(/y1-0.0125,y1-0.0125/), lres)
@@ -1642,7 +1652,7 @@ begin
   mares@gsMarkerIndex = 1
   mares@gsMarkerSizeF   = 0.018
   tlres = True
-  tlres@txFontHeightF = 0.007;0.006
+  tlres@txFontHeightF = 0.0065 ;0.007;0.006
   tlres@txJust = "CenterLeft"
 
   mares@gsMarkerColor = "Black"
@@ -1663,10 +1673,12 @@ begin
   mares@gsMarkerColor = 8
   mares@gsMarkerSizeF = 0.018
   gsn_polymarker_ndc(wks,.858,.788,mares)
-  gsn_text_ndc(wks,"CMIP5 Hist MME",.863,.788,tlres)
+;  gsn_text_ndc(wks,"CMIP5 Hist MME",.863,.788,tlres)
+  gsn_text_ndc(wks,"CMIP5 Hist MME mean",.863,.788,tlres)
   mares@gsMarkerColor = 9
   gsn_polymarker_ndc(wks,.858,.778,mares)
-  gsn_text_ndc(wks,"CMIP6 Hist MME",.863,.778,tlres)
+;  gsn_text_ndc(wks,"CMIP6 Hist MME",.863,.778,tlres)
+  gsn_text_ndc(wks,"CMIP6 Hist MME mean",.863,.778,tlres)
 
 ;- - - - - - - - - - - - - - - - - - - - - - - 
 ; Boxplot legend, additional text
@@ -1715,7 +1727,7 @@ begin
   y2 = 0.627
   gsn_polygon_ndc(wks, (/x1, x2, x2, x1/), (/y1, y1, y2, y2/), pmres0)
   gsn_polyline_ndc(wks, (/x1, x2, x2, x1, x1/), (/y1, y1, y2, y2, y1/), lres)
-  gsn_text_ndc(wks," < 80% of runs~C~ match MME sign",x2+0.004,0.62,tlres)
+  gsn_text_ndc(wks," < 80% of runs~C~ agree on sign",x2+0.004,0.62,tlres)
 
 ;  pmres = pmres0
 ;  pmres@gsFillScaleF = 0.8  ; 0.55
