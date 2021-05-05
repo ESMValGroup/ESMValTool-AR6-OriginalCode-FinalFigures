@@ -1711,6 +1711,6 @@ diagnostics:
                      'Sea Ice Concentration - NH', 'Sea Surface Temperature', 
                      'Soil Moisture', 'Surface Net Downward Mass Flux of Carbon', 
                      'Leaf Area Index', 'Gross Primary Productivity', 
-                     'Surface Downward Mass Flux of Carbon', 'Evatransporation', 
+                     'Surface Downward Mass Flux of Carbon', 'Evapotransporation', 
                      'Surface Downwelling Shortwave Radiation', 'Surface Upwelling Shortwave Radiation', 
                      'Surface Downwelling Longwave Radiation', 'Surface Upwelling Longwave Radiation']
