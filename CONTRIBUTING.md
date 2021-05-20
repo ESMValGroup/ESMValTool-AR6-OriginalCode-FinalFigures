@@ -1,22 +1,22 @@
 # IPCC AR6 diagnostics in the ESMValTool
 
-The ESMValTool code for IPCC AR6 will be released in two steps: 
-  - 1. The original code that was used to produce the final IPCC figures will be collected and stored; 
-  - 2. The recipes and diagnostics will be updated and merged into the public ESMValTool version 
+The ESMValTool code for IPCC AR6 will be released in two steps:
+ 
+  - **Step 1:** The original code that was used to produce the final IPCC figures will be collected and stored; 
+  - **Step 2:** The recipes and diagnostics will be updated and merged into the public ESMValTool version 
 This needs to be done by the author of the diagnostics and supported by at least one person from the technical ESMValTool development team who is also a Contributing Author on one of the chapters. 
 
 **Coordinators and Contact for questions:**
 
-General inquiries:
+*General inquiries:*
 - Lisa Bock (<lisa.bock@dlr.de>)
 - Rémi Kazeroni (<Remi.Kazeroni@dlr.de>)
 
-Technical support (`git`, `conda`, `pip`-related questions)
+*Technical support (`git`, `conda`, `pip`-related questions):*
 - Valeriu Predoi (<valeriu.predoi@ncas.ac.uk>)
 - Klaus Zimmermann (<klaus.zimmermann@smhi.se>)
 
-## Step 1: Documentation of original code 
-## Basis for Zenodo citations (TSU will do this step)
+## Step 1: Documentation of original code (basis for Zenodo citations (TSU will do this step))
 
 - **Upload ESMValTool code that you used to create the final IPCC figures**
   In order to ensure that the figures can be reproduced, the original code used to produce the final IPCC AR6 figures will be collected. If you have used multiple branches to create your figures, do the following steps for each branch. Do not merge any branches at this point.
