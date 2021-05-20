@@ -66,7 +66,7 @@ This needs to be done by the author of the diagnostics and supported by at least
   git status  # make sure you are on your newly created branch and is up to date
   conda env export > IPCC_environments/$NAME_environment.yml  # export full environment specs; replace $NAME with relevant run name
   echo "# conda version:" >> IPCC_environments/$NAME_conda_environment.yml 2>&1  # add a field that records conda version
-  conda -V >> IPCC_environments/$NAME_environment.yml && sed -i '$ s/^/# "conda -V" /' IPCC_environments/$NAME_conda_environment.yml # record conda version
+  conda -V >> IPCC_environments/$NAME_conda_environment.yml && sed -i '$ s/^/# "conda -V" /' IPCC_environments/$NAME_conda_environment.yml # record conda version
   git add IPCC_environments/$NAME_conda_environment.yml  # add your new file to git control
   git commit IPCC_environments/$NAME_conda_environment.yml -m "added environment record for $NAME"
   ```
