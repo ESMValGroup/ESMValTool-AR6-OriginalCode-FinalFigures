@@ -109,85 +109,84 @@ Technical support (`git`, `conda`, `pip`-related questions)
   TSU could create with the informations in the README the Zenodo citation
 
 
-Step 2: Merge the code into the public version of the ESMValTool
+## Step 2: Merge the code into the public version of the ESMValTool
 
-1. Merge ESMValCore developments
-All ESMValCore developments could be merged from now on in the public ESMValCore repository. Ideally all IPCC AR6 developments are part of the next release in June 2021 (code freeze on June 7). This only needs to be done if changes have been made to the ESMValCore.
-    • Create your own branch(es) in the public ESMValCore repository
-> git clone https://github.com/ESMValGroup/ESMValCore.git  # get the gitball
-> cd ESMValCore
-> git checkout -b my_branch  # create your branch; rename my_branch with a valid name
-    • Upload your final code to this branch (or to multiple branches)
-# copy over all the code you need to commit
-# be aware of paths e.g. recipes, diagnostics etc
-> git status  # here you'll see all your changes that have not been commited
-> git add new_file  # add all the new files that you created and need to add to git version control
-> git commit new_file -m "commit message"  # commit new files; write a relevant commit message
-# please don't use git commit * -m "commit message", we want to keep track of individual commits
-    • Open a new issue using the following link (https://github.com/ESMValGroup/ESMValCore/issues). In your new issue, please describe your code, the figure it produces, and also include the contents of your README, above. 
-        ◦ Once created, please assign your issue to the valeriupredoi, remi-kazeroni  github user accounts.
-        ◦ Take a note of your issue number, you will need it later. 
-    • With the help of your partner from the ESMValTool technical development team, ensure that you code complies with the coding standards required by ESMValTool:
-    • Open a new draft pull request: (https://github.com/ESMValGroup/ESMValCore/pulls)
-        ◦ When creating a pull request, the base branch should be “master” and the compare branch should be your branch name.
-        ◦ Please make sure that you link to your issue number in the pull request description. 
-        ◦ Once created, please assign your pull request to the valeriupredoi, remi-kazeroni  github user accounts.
-        ◦ Please use the menu on the right hand side to assign the label ipcc to your pull request.
-    • Once you have created the pull request, GitHub will automatically test your code for compliance with ESMValTool standards and you are expected to fix any non-compliances before your pull request can be completed. 
-    • Find here the checklist for pull requests in the documentation
-    • Once your code passes automated testing, the ESMValTool team with review the pull request. You may receive some instructions on what needs to be changed before your code can be merged. Please work with your ESMValTool reviewer and address any further comments that they raise.
-    • Note that this process may take a while to run through. It is possible that the underlying ESVMalTool code will change and that you may need to bring in recent changes from the master. Please ask for help with this if needed. 
-    • When your code passes both the automated and human review, your code is ready to be merged – congratulations!
+- **Merge ESMValCore developments**
 
-2. Prepare ESMValTool code
-The code will not be merged in the master of the ESMValTool-AR6 repository but will be prepared for a merge in the master of the public ESMValTool repository. It could then be merged after the report is published (beginning of August).
-    • Open separate branches for each recipe in the repository ESMValTool-AR6
-> cd ESMValTool-AR6
-> git checkout -b <your_branch>
-    • Update your code to the recent ESMValTool version by merging the master in your branch
-> git checkout master
-> git pull
-> git checkout <your_branch>
-> git merge master
-#maybe there are some conflicts to solve before merging is possible
-    • Collect all recipes in the folder recipes/ipccar6wg1ch3/
-Naming convention for recipes:
-recipe_eyring21ipcc_3-3-atmosphere.yml
-recipe_eyring21ipcc_3-3-atmosphere_Fig3-8.yml
-recipe_eyring21ipcc_3-3-atmosphere_CCB3-2.yml
-recipe_eyring21ipcc_3-4-cryosphere.yml
-recipe_eyring21ipcc_3-5-ocean.yml
-recipe_eyring21ipcc_3-6-biosphere.yml
-recipe_eyring21ipcc_3-7-modes.yml
-recipe_eyring21ipcc_3-8-synthesis_FigX.yml
-    • With the help of your partner from the ESMValTool technical development team, ensure that you code complies with the coding standards required by ESMValTool:
-    • Open a new draft pull request: (https://github.com/ESMValGroup/ESMValTool-AR6/pulls)
-        ◦ When creating a pull request, the base branch should be “master” and the compare branch should be your branch name.
-        ◦ Once created, please assign your pull request to the valeriupredoi, remi-kazeroni  github user accounts.
-        ◦ Please use the menu on the right hand side to assign the label ipcc to your pull request.
-    • Once you have created the pull request, GitHub will automatically test your code for compliance with ESMValTool standards and you are expected to fix any non-compliances before your pull request can be completed. 
-    • Find here the checklist for pull requests in the documentation
-    • Once your code passes automated testing, the ESMValTool team with review the pull request. You may receive some instructions on what needs to be changed before your code can be merged. Please work with your ESMValTool reviewer and address any further comments that they raise.
-    • Note that this process may take a while to run through. It is possible that the underlying ESVMalTool code will change and that you may need to bring in recent changes from the master. Please ask for help with this if needed. 
-    • When your code passes both the automated and human review, your code is ready to be merged – congratulations!
-    • 
-    • 
+  All ESMValCore developments could be merged from now on in the public [ESMValCore](https://github.com/ESMValGroup/ESMValCore) repository. Ideally all IPCC AR6 developments are part of the next release in June 2021 (code freeze on June 7, 2021). This only needs to be done if changes have been made to the ESMValCore code by you:
+  - Create your own branch(es) in the public ESMValCore repository
+  ```
+  git clone https://github.com/ESMValGroup/ESMValCore.git  # get the gitball
+  cd ESMValCore
+  git checkout -b my_branch  # create your branch; rename my_branch with a valid name
+  ```
+  - Upload your final code to this branch (or to multiple branches, if needed):
+  ```
+  # first copy over all the code you need to commit
+  # be aware of paths e.g. recipes, diagnostics etc
+  git status  # here you'll see all your changes that have not been commited
+  # add new files, one by one, if any 
+  git add <new_file>  # add all the new files that you created and need to add to git version control
+  git commit <new_file> -m "commit message"  # commit new files; write a relevant commit message
+  # please don't use git commit * -m "commit message", we want to keep track of individual commits
+  ```
+  - Open a new issue in ESMValCore's [GitHub issues](https://github.com/ESMValGroup/ESMValCore/issues). In your new issue, please describe your code, the figure it produces, and also include the contents of your `README` from above. Once created, please assign your issue to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Take a note of your issue number, you will need it later. 
+  - With the help of your partner from the ESMValTool technical development team, ensure that your code complies with the coding standards required by ESMValTool:
+  - Open a new draft pull request in ESMValCore's [Pull Requests](https://github.com/ESMValGroup/ESMValCore/pulls). When creating a pull request, the base branch should be `master` and the compare branch should be your branch name. Please make sure that you link to your issue number in the pull request description. Once created, please assign your pull request to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Please use the **Labels** tab on the right hand side to assign the label **ipcc** to your pull request. Once you have created the pull request, GitHub will automatically test your code for compliance with ESMValTool standards and you are expected to fix any non-compliances before your pull request can be completed. Find here the checklist for pull requests in the documentation. Once your code passes automated testing, the ESMValTool team with review the pull request. You may receive some instructions on what needs to be changed before your code can be merged. Please work with your ESMValTool reviewer and discuss and address any further comments that they raise. Note that this process may take a while to run through. It is possible that the underlying ESVMalTool code will change and that you may need to bring in recent changes from the `master`. Please ask for help with this if needed. When your code passes both the automated and human review, your code is ready to be merged – congratulations!
 
-3. Merging of ESMValTool code after report is published
-    • Transfer of pull requests from the private ESMValTool-AR6 repository in the public ESMValTool repository
-    • Final review of pull requests and merging
----------------------------------------------------------------------------------------------------------------
+- **Prepare ESMValTool code**
+  The code will not be merged in the master of the ESMValTool-AR6 repository but will be prepared for a merge in the master of the public ESMValTool repository. It could then be merged after the report is published (beginning of August).
+  - Open separate branches for each recipe in the repository ESMValTool-AR6
+  ```
+  cd ESMValTool-AR6
+  git checkout -b <your_branch>
+  ```
+  - Update your code to the recent ESMValTool version by merging the master in your branch
+  ```
+  git checkout master
+  git pull
+  git checkout <your_branch>
+  git merge master
+  # maybe there are some conflicts to solve before merging is possible
+  # please fix those if any, ask for help if you get stuck
+  ```
+  - Collect all recipes in the folder `recipes/ipccar6wg1ch3/`. Naming convention for recipes:
+  ```
+  recipe_eyring21ipcc_3-3-atmosphere.yml
+  recipe_eyring21ipcc_3-3-atmosphere_Fig3-8.yml
+  recipe_eyring21ipcc_3-3-atmosphere_CCB3-2.yml
+  recipe_eyring21ipcc_3-4-cryosphere.yml
+  recipe_eyring21ipcc_3-5-ocean.yml
+  recipe_eyring21ipcc_3-6-biosphere.yml
+  recipe_eyring21ipcc_3-7-modes.yml
+  recipe_eyring21ipcc_3-8-synthesis_FigX.yml
+  ```
+  - With the help of your partner from the ESMValTool technical development team, ensure that your code complies with the coding standards required by ESMValTool:
+  - Follow the same instructions to open an issue, then a pull request as for the ESMValCore case
+
+## Merging of ESMValTool code after report is published
+
+- **Transfer of pull requests from the private ESMValTool-AR6 repository in the public ESMValTool repository**
+  XXX
+- **Final review of pull requests and merging**
+  XXX
+
+## Support team
+
 There will be support by ESMValTool core developers which are Contributing Authors:
-Chapter 3: 
-Atmosphere 🡪 Lisa, Katja, Yu with support by Rémi
-Ocean 🡪 Lee, Liza with support by Valeriu
-Modes 🡪 Yu, Lisa with support by Rémi
-SeaIce + Extremes 🡪 Liza with support by ?
-Biosphere 🡪 Tina
-Synthesis 🡪 Lisa
-Chapter 4:
-Erich Fisher with support by Ruth and ?
-Chapter 6:
-Chaincy Kuo with support by Lisa, Rémi
+
+**Chapter 3:** 
+- Atmosphere: Lisa, Katja, Yu with support by Rémi
+- Ocean: Lee, Liza with support by Valeriu
+- Modes: Yu, Lisa with support by Rémi
+- SeaIce + Extremes: Liza with support by ?
+- Biosphere: Tina
+- Synthesis: Lisa
+
+**Chapter 4:**
+- Erich Fisher with support by Ruth and ?
+
+**Chapter 6:**
+- Chaincy Kuo with support by Lisa, Rémi
 …
 
