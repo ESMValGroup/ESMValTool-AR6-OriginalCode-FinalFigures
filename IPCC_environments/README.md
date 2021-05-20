@@ -1,4 +1,7 @@
-# This is where the environments information is stored; please use this convention to add your files:
+**This is where the environments information is stored**
+
+Please use this convention to add your files:
+
 For `conda` environments:
 
 ```
