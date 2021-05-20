@@ -19,6 +19,7 @@ This needs to be done by the author of the diagnostics and supported by at least
 ## Step 1: Documentation of original code (basis for Zenodo citations (TSU will do this step))
 
 - **Upload ESMValTool code that you used to create the final IPCC figures**
+
   In order to ensure that the figures can be reproduced, the original code used to produce the final IPCC AR6 figures will be collected. If you have used multiple branches to create your figures, do the following steps for each branch. Do not merge any branches at this point.
 
   - Please check that you are satisfied with your code’s comments and documentation. Do not change any active code at this stage, but you can add comments and documentation. The code and recipe header should fully describe the figures it produces and include their IPCC figure number. Please contact Lisa (email: lisa.bock@dlr.de) if the figure numbers are not known.
@@ -44,6 +45,7 @@ This needs to be done by the author of the diagnostics and supported by at least
   Please note that this should really document the original code used to create the final figures without ANY changes
 
 - **Upload ESMValCore developments**
+
   Additionally, to the ESMValTool code the ESMValCore version and further changes have to be saved. This only needs to be done if  changes have been made to the ESMValCore.
   - Use `git status` in your local copy of ESMValCore to check whether you have made any changes to it
   - Make sure all relevant code is committed to your local git repository. If any files added by you are missing from git's version control, please add and commit them with:
@@ -65,7 +67,8 @@ This needs to be done by the author of the diagnostics and supported by at least
   - Please note that this should really document the original code used to create the final figures without ANY changes!
 
 - **Save conda environment**
-  - Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `conda`; here `esmvaltool` is the name of the conda environment you used for the analysis, please change it with whatever you named your main environment.
+
+  Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `conda`; here `esmvaltool` is the name of the conda environment you used for the analysis, please change it with whatever you named your main environment.
   ```
   conda activate esmvaltool  # activate the environment you used to run the IPCC stuff
   cd ESMValTool-AR6-OriginalCode-FinalFigures
@@ -78,7 +81,8 @@ This needs to be done by the author of the diagnostics and supported by at least
   ```
 
 - **Save pip environment**
-  - Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `pip`:
+
+  Save your pip dependencies environment: follow these steps to take a snapshot of your full dependencies environment managed by `pip`:
   ```
   pip freeze > IPCC_environments/$NAME_pip_environment.txt
   git add IPCC_environments/$NAME_pip_environment.txt
@@ -86,12 +90,13 @@ This needs to be done by the author of the diagnostics and supported by at least
   ```
 
 - **Write `README`**
-  - Create a `README` file in your branch
+
+  Create a `README` file in your branch
   ```
   cd ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_README_files
   # create here text a file with your favorite text editor: vim, gedit, etc
   ```
-    Add to text file:
+  Add to text file:
     - Figure number(s)
     - Branch(es) in the repositories ESMValTool-AR6-OriginalCode-FinalFigures and ESMValCore-AR6-OriginalCode-FinalFigures
     - Recipe(s) and diagnostic(s) used 
@@ -135,6 +140,7 @@ This needs to be done by the author of the diagnostics and supported by at least
   - Open a new draft pull request in ESMValCore's [Pull Requests](https://github.com/ESMValGroup/ESMValCore/pulls). When creating a pull request, the base branch should be `master` and the compare branch should be your branch name. Please make sure that you link to your issue number in the pull request description. Once created, please assign your pull request to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Please use the **Labels** tab on the right hand side to assign the label **ipcc** to your pull request. Once you have created the pull request, GitHub will automatically test your code for compliance with ESMValTool standards and you are expected to fix any non-compliances before your pull request can be completed. Find here the checklist for pull requests in the documentation. Once your code passes automated testing, the ESMValTool team with review the pull request. You may receive some instructions on what needs to be changed before your code can be merged. Please work with your ESMValTool reviewer and discuss and address any further comments that they raise. Note that this process may take a while to run through. It is possible that the underlying ESVMalTool code will change and that you may need to bring in recent changes from the `master`. Please ask for help with this if needed. When your code passes both the automated and human review, your code is ready to be merged – congratulations!
 
 - **Prepare ESMValTool code**
+
   The code will not be merged in the master of the ESMValTool-AR6 repository but will be prepared for a merge in the master of the public ESMValTool repository. It could then be merged after the report is published (beginning of August).
   - Open separate branches for each recipe in the repository ESMValTool-AR6
   ```
@@ -167,8 +173,11 @@ This needs to be done by the author of the diagnostics and supported by at least
 ## Merging of ESMValTool code after report is published
 
 - **Transfer of pull requests from the private ESMValTool-AR6 repository in the public ESMValTool repository**
+
   XXX
+
 - **Final review of pull requests and merging**
+
   XXX
 
 ## Support team
