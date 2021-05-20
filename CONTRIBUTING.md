@@ -5,26 +5,36 @@ The ESMValTool code for IPCC AR6 will be released in two steps:
   - 2. The recipes and diagnostics will be updated and merged into the public ESMValTool version 
 This needs to be done by the author of the diagnostics and supported by at least one person from the technical ESMValTool development team who is also a Contributing Author on one of the chapters. 
 
-Coordinators and Contact for questions: 
-Lisa Bock (email: <lisa.bock@dlr.de>) and Rémi Kazeroni (email: <Remi.Kazeroni@dlr.de>) 
+**Coordinators and Contact for questions:**
+- Lisa Bock (email: <lisa.bock@dlr.de>)
+- Rémi Kazeroni (email: <Remi.Kazeroni@dlr.de>) 
 
-Step 1: Documentation of original code 
-🡪 Basis for Zenodo citations (TSU will do)
+## Step 1: Documentation of original code 
+### Basis for Zenodo citations (TSU will do this step)
 
-1. Upload ESMValTool code that you used to create the final IPCC figures
-In order to ensure that the figures can be reproduced, the original code used to produce the final IPCC AR6 figures will be collected. If you have used multiple branches to create your figures, do the following steps for each branch. Do not merge any branches at this point.
-    • Please check that you are satisfied with your code’s comments and documentation. Do not change any active code at this stage, but you can add comments and documentation. The code and recipe header should fully describe the figures it produces and include their IPCC figure number. Please contact Lisa (email: lisa.bock@dlr.de) if the figure numbers are not known.
-    • Make sure all relevant code is committed to your local git repository. You can check the status of the local repository with:
-> git status
-    • If any necessary files are missing, please add and commit them with:
-> git add <pathtofilename>
-> git commit -m “some message”
-    • Make a full record of your current branch and commit details. Use the command:
-> git log –n 1 
-Take a note of the output, specifically the commit id, which will be a long number and look something like: 215095e2e338525be0baeeebdf66bfbb304e7270. This commit ID will allow you to fully restore your code in the case of an unforeseen error.This is not necessary because git log can be used at any time as long as the branch is still active, if the branch has been merged then we’ll have to track the issue via the merge commit
-    • Upload your final code in your branch(es) on the ESMValTool-AR6-OriginalCode-FinalFigures repository
->git remote add origin2 https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures.git
-> git push origin2 <your branch>
+- Upload ESMValTool code that you used to create the final IPCC figures
+  In order to ensure that the figures can be reproduced, the original code used to produce the final IPCC AR6 figures will be collected. If you have used multiple branches to create your figures, do the following steps for each branch. Do not merge any branches at this point.
+
+  - Please check that you are satisfied with your code’s comments and documentation. Do not change any active code at this stage, but you can add comments and documentation. The code and recipe header should fully describe the figures it produces and include their IPCC figure number. Please contact Lisa (email: lisa.bock@dlr.de) if the figure numbers are not known.
+  - Make sure all relevant code is committed to your local git repository. You can check the status of the local repository with:
+    ```
+    git status
+    ```
+  - If any necessary files are missing, please add and commit them with:
+    ```
+    git add <pathtofilename>
+    git commit -m "some message"
+    ```
+  - Make a full record of your current branch and commit details. Use the command:
+    ```
+    git log –n 1
+    ```
+    Take a note of the output, specifically the commit hash ID, which will be a long number and look something like: `215095e2e338525be0baeeebdf66bfbb304e7270`. This commit hash ID will allow you to fully restore your code in the case of an unforeseen error (but this can only be done before the branch gets merged and deleted!). If the branch has been merged, then we’ll have to track the issue from the merge commit hash ID (see below)
+  - Upload your final code in your branch(es) on the [ESMValTool-AR6-OriginalCode-FinalFigures](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures) repository:
+  ```
+  git remote add origin2 https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures.git
+  git push origin2 <your branch>
+  ```
 Please note that this should really document the original code used to create the final figures without ANY changes
 
 2. Upload ESMValCore developments
