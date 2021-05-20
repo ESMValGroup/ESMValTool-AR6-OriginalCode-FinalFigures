@@ -12,7 +12,7 @@ This needs to be done by the author of the diagnostics and supported by at least
 ## Step 1: Documentation of original code 
 ### Basis for Zenodo citations (TSU will do this step)
 
-- Upload ESMValTool code that you used to create the final IPCC figures
+- **Upload ESMValTool code that you used to create the final IPCC figures**
   In order to ensure that the figures can be reproduced, the original code used to produce the final IPCC AR6 figures will be collected. If you have used multiple branches to create your figures, do the following steps for each branch. Do not merge any branches at this point.
 
   - Please check that you are satisfied with your code’s comments and documentation. Do not change any active code at this stage, but you can add comments and documentation. The code and recipe header should fully describe the figures it produces and include their IPCC figure number. Please contact Lisa (email: lisa.bock@dlr.de) if the figure numbers are not known.
@@ -35,62 +35,72 @@ This needs to be done by the author of the diagnostics and supported by at least
   git remote add origin2 https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures.git
   git push origin2 <your branch>
   ```
-Please note that this should really document the original code used to create the final figures without ANY changes
+  Please note that this should really document the original code used to create the final figures without ANY changes
 
-2. Upload ESMValCore developments
-Additionally, to the ESMValTool code the ESMValCore version and further changes have to be saved. This only needs to be done if changes have been made to the ESMValCore.
-    • You can check whether you have made any changes to ESMValCore by using the following command:
-> ?
-    • Make sure all relevant code is committed to your local git repository. You can check the status of the local repository with:
-> git status
-    • If any files are missing, please add and commit them with:
-> git add <pathtofilename>
-> git commit -m “some message”
-    • Make a full record of your current branch and commit details. Use the command:
-> git log –n 1 
-Take a note of the output, specifically the commit id, which will be a long number and look something like: 215095e2e338525be0baeeebdf66bfbb304e7270. This commit ID will allow you to fully restore your code in the case of some kind of unforeseen error.
-    • Upload your final code in your branch(es) on the ESMValCore-AR6-OriginalCode-FinalFigures repository
-> git remote add origin2 https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures.git
-> git push origin2 <your branch> 
-    • Please note that this should really document the original code used to create the final figures without ANY changes
+- **Upload ESMValCore developments**
+  Additionally, to the ESMValTool code the ESMValCore version and further changes have to be saved. This only needs to be done if  changes have been made to the ESMValCore.
+  - Use `git status` in your local copy of ESMValCore to check whether you have made any changes to it
+  - Make sure all relevant code is committed to your local git repository. If any files added by you are missing from git's version control, please add and commit them with:
+  ```
+  git add <pathtofilename>
+  git commit -m "some message"
+  ```
+  **NOTE:** it is best you committed each file separateley and not using a `*` wildcard since it's useful to have each commit's hash ID and message logged.
+  - Make a full record of your current branch and commit details. Use the command:
+  ```
+  git log –n 1
+  ```
+    Take a note of the output, specifically the commit hash ID, which will be a long number and look something like `215095e2e338525be0baeeebdf66bfbb304e7270`. This commit ID will allow you to fully restore your code in the case of some kind of unforeseen error.
+  - Upload your final code in your branch(es) on the [ESMValCore-AR6-OriginalCode-FinalFigures](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures) repository:
+  ```
+  git remote add origin2 https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures.git
+  git push origin2 <your branch> 
+  ```
+  - Please note that this should really document the original code used to create the final figures without ANY changes!
 
-3. Save environment version
-    • Save your environment
-> conda activate esmvaltool  # activate the environment you used to run the IPCC stuff
-> cd ESMValTool-AR6-OriginalCode-FinalFigures
-> git status  # make sure you are on your newly created branch and is up to date
-> mkdir IPCC_environments # needed right??
-> conda env export > IPCC_environments/$NAME_environment.yml  # export full environment specs; replace $NAME with relevant run name
-> echo "# conda version:" >> IPCC_environments/$NAME_environment.yml 2>&1  # add a field that records conda version
-> conda -V >> IPCC_environments/$NAME_environment.yml && sed -i '$ s/^/# "conda -V" /' IPCC_environments/$NAME_environment.yml # record conda version
-> git add IPCC_environments/$NAME_environment.yml  # add your new file to git control
-> git commit IPCC_environments/$NAME_environment.yml -m "added environment record for $NAME"  # push to remote
-    • Save your pip environment
-> pip freeze > IPCC_environments/$NAME_pip.txt
-> git add IPCC_environments/$NAME_pip.txt
-> git commit IPCC_environments/$NAME_pip.txt -m “added pip environment for $NAME”
+- **Save conda environment**
+  - Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `conda`; here `esmvaltool` is the name of the conda environment you used for the analysis, please change it with whatever you named your main environment.
+  ```
+  conda activate esmvaltool  # activate the environment you used to run the IPCC stuff
+  cd ESMValTool-AR6-OriginalCode-FinalFigures
+  git status  # make sure you are on your newly created branch and is up to date
+  conda env export > IPCC_environments/$NAME_environment.yml  # export full environment specs; replace $NAME with relevant run name
+  echo "# conda version:" >> IPCC_environments/$NAME_conda_environment.yml 2>&1  # add a field that records conda version
+  conda -V >> IPCC_environments/$NAME_environment.yml && sed -i '$ s/^/# "conda -V" /' IPCC_environments/$NAME_conda_environment.yml # record conda version
+  git add IPCC_environments/$NAME_conda_environment.yml  # add your new file to git control
+  git commit IPCC_environments/$NAME_conda_environment.yml -m "added environment record for $NAME"
+  ```
 
-4. Write README
-    • Create README file in your branch
-> cd ESMValTool-AR6-OriginalCode-FinalFigures
-> mkdir IPCC_readme ??
-> cd IPCC_readme
-# create here text file with your favorite text editor
-    • Add to text file:
-        ◦ Figure number(s)
-        ◦ Branch(es) in the repositories ESMValTool-AR6-OriginalCode-FinalFigures and ESMValCore-AR6-OriginalCode-FinalFigures
-        ◦ Recipe(s) and diagnostic(s) used 
-        ◦ Were any automated recipe generations tools used?
-        ◦ Software versions, name of environment file (see 3.), other software packages,…
-        ◦ Further instructions
-        ◦ Author list
-        ◦ List/Description of auxiliary data used to produce the IPCC AR6 figures
-        ◦ Publication sources
-        ◦ Machine used (e.g. Mistral, Jasmin, ...)
-        ◦ something missing??? Would it be useful to include the esmvaltool instructions to reproduce the same figure or would it be too much: (git checkout branch; conda env create …; esmvaltool run recipe_xxx.yml)
+- **Save pip environment**
+  - Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `pip`:
+  ```
+  pip freeze > IPCC_environments/$NAME_pip_environment.txt
+  git add IPCC_environments/$NAME_pip_environment.txt
+  git commit IPCC_environments/$NAME_pip_environment.txt -m "added pip environment for $NAME"
+  ```
 
-5. Create Zenodo citation
-TSU could create with the informations in the README the Zenodo citation
+- **Write `README`**
+  - Create a `README` file in your branch
+  ```
+  cd ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_README_files
+  # create here text a file with your favorite text editor: vim, gedit, etc
+  ```
+    Add to text file:
+    - Figure number(s)
+    - Branch(es) in the repositories ESMValTool-AR6-OriginalCode-FinalFigures and ESMValCore-AR6-OriginalCode-FinalFigures
+    - Recipe(s) and diagnostic(s) used 
+    - Were any automated recipe generations tools used?
+    - Software versions, name of environment file (see 3.), other software packages,…
+    - Further instructions
+    - Author list
+    - List/Description of auxiliary data used to produce the IPCC AR6 figures
+    - Publication sources
+    - Machine used (e.g. Mistral, Jasmin, ...)
+    - something missing??? 
+    - Question: Would it be useful to include the esmvaltool instructions to reproduce the same figure or would it be too much: (`git checkout branch; conda env create ...; esmvaltool run recipe_xxx.yml`)
+
+- **Create Zenodo citation**
+  TSU could create with the informations in the README the Zenodo citation
 
 
 Step 2: Merge the code into the public version of the ESMValTool
