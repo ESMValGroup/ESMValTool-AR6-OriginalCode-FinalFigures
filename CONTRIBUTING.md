@@ -15,7 +15,6 @@ This needs to be done by the author of the diagnostics and supported by at least
 
 *Technical support (`git`, `conda`, `pip`-related questions):*
 - Valeriu Predoi (<valeriu.predoi@ncas.ac.uk>)
-- Klaus Zimmermann (<klaus.zimmermann@smhi.se>)
 
 ## Step 1: Documentation of original code (basis for Zenodo citations (TSU will do this step))
 
@@ -92,12 +91,13 @@ This needs to be done by the author of the diagnostics and supported by at least
 
 - **Write `README`**
 
-  Create a `README` file in your branch
+  Create a `README` file in your branch. Please use this [README](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md) as a template.
   ```
   cd ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_README_files
   # create here text a file with your favorite text editor: vim, gedit, etc
   ```
-  Add to text file:
+  Add to text file [see template](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures\
+/blob/main/IPCC_README_files/README.md):
     - Figure number(s)
     - Author list
     - Branch(es) in the repositories ESMValTool-AR6-OriginalCode-FinalFigures and ESMValCore-AR6-OriginalCode-FinalFigures
@@ -108,7 +108,7 @@ This needs to be done by the author of the diagnostics and supported by at least
     - Further instructions
     - List/Description of auxiliary data used to produce the IPCC AR6 figures
     - Publication sources
-    - ESMVValTool instructions to reproduce the same figure
+    - ESMValTool instructions to reproduce the same figure
 
 - **Create Zenodo citation**
 
@@ -174,16 +174,6 @@ This needs to be done by the author of the diagnostics and supported by at least
   - With the help of your partner from the ESMValTool technical development team, ensure that your code complies with the coding standards required by ESMValTool.
   - Follow the same instructions to open an issue, then a pull request as for the ESMValCore case
 
-## Merging of ESMValTool code after report is published
-
-- **Transfer of pull requests from the private [ESMValTool-AR6](https://github.com/ESMValGroup/ESMValTool-AR6) repository in the public [ESMValTool](https://github.com/ESMValGroup/ESMValTool) repository**
-
-  XXX
-
-- **Final review of pull requests and merging**
-
-  XXX
-
 ## Support team
 
 There will be support by ESMValTool core developers which are Contributing Authors:
@@ -192,12 +182,12 @@ There will be support by ESMValTool core developers which are Contributing Autho
 - Atmosphere: Lisa, Katja, Yu with support by Rémi
 - Ocean: Lee, Liza with support by Valeriu
 - Modes: Yu, Lisa with support by Rémi
-- SeaIce + Extremes: Liza with support by ?
+- SeaIce + Extremes: Liza with support by TBD
 - Biosphere: Tina
 - Synthesis: Lisa
 
 **Chapter 4:**
-- Erich Fisher with support by Ruth and ?
+- Erich Fisher with support by Ruth and TBD
 
 **Chapter 6:**
 - Chaincy Kuo with support by Lisa, Rémi
