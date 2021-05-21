@@ -22,9 +22,9 @@ Software versions, name of environment file (see 3.), other software packages,â€
 
 Machine used: _e.g. Mistral or Jasmin_
 
-Any further instructions: _X_
+Any further instructions: <i>X</i>
 
-List/Description of auxiliary data used to produce the IPCC AR6 figures: _X_
+List/Description of auxiliary data used to produce the IPCC AR6 figures: <i>X</i>
 
-Publication sources: e.g. _X_
+Publication sources: e.g. <i>X</i>
 ```
