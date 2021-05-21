@@ -23,7 +23,7 @@ This needs to be done by the author of the diagnostics and supported by at least
 
   In order to ensure that the figures can be reproduced, the original code used to produce the final IPCC AR6 figures will be collected. If you have used multiple branches to create your figures, do the following steps for each branch. Do not merge any branches at this point.
 
-  - Please check that you are satisfied with your code’s comments and documentation. Do not change any active code at this stage, but you can add comments and documentation. The code and recipe header should fully describe the figures it produces and include their IPCC figure number. Please contact Lisa (email: lisa.bock@dlr.de) if the figure numbers are not known.
+  - Please check that you are satisfied with your code’s comments and documentation. Do not change any active code at this stage, but you can add comments and documentation. The code and recipe header should fully describe the figures it produces and include their IPCC figure number. Please contact Lisa (email: <lisa.bock@dlr.de>) if the figure numbers are not known.
   - Make sure all relevant code is committed to your local git repository. You can check the status of the local repository with:
     ```
     git status
@@ -54,7 +54,7 @@ This needs to be done by the author of the diagnostics and supported by at least
   git add <pathtofilename>
   git commit -m "some message"
   ```
-  **NOTE:** it is best you committed each file separateley and not using a `*` wildcard since it's useful to have each commit's hash ID and message logged.
+  **NOTE:** it is best you committed each file separateley and not using a `*` wildcard since it's useful to have each commit's hash ID and message logged; also when adding to the git repository using `git add` make sure you are not adding unnecessary files like temporary or log files (try not to use `git add *` as much as possible).
   - Make a full record of your current branch and commit details. Use the command:
   ```
   git log –n 1
@@ -69,9 +69,9 @@ This needs to be done by the author of the diagnostics and supported by at least
 
 - **Save conda environment**
 
-  Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `conda`; here `esmvaltool` is the name of the conda environment you used for the analysis, please change it with whatever you named your main environment.
+  Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `conda`; here `<environment>` is the name of the conda environment you used for the analysis (most probably `esmvaltool`), please change it with whatever you named your main environment.
   ```
-  conda activate esmvaltool  # activate the environment you used to run the IPCC stuff
+  conda activate <environment>  # activate the environment you used to run the IPCC stuff
   cd ESMValTool-AR6-OriginalCode-FinalFigures
   git status  # make sure you are on your newly created branch and is up to date
   conda env export > IPCC_environments/$NAME_environment.yml  # export full environment specs; replace $NAME with relevant run name
