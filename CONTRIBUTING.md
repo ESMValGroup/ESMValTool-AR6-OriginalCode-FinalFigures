@@ -91,7 +91,7 @@ This needs to be done by the author of the diagnostics and supported by at least
 
 - **Write `README`**
 
-  Create a `README` file in your branch. Please use this [README](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md) as a template.
+  Create one `README` file for each figure produced with your ESMValTool branch. Please use this [README](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md) as a template and do not include several figures in a given README.
   ```
   cd ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_README_files
   # create here text a file with your favorite text editor: vim, gedit, etc

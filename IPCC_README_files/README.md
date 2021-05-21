@@ -1,6 +1,6 @@
 **This is where the README files live**
 
-Please use a template like this:
+Please use a template like this and create one README file per figure (_e.g. `IPCC_README_files/README_Fig3_3.md`_):
 ```
 Figure number(s): _e.g. Figure 3.3_
 
