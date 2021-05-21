@@ -2,28 +2,29 @@
 
 Please use a template like this:
 ```
-Figure number(s): e.g. Figure 3.3
+Figure number(s): _e.g. Figure 3.3_
 
-Author list: e.g. Bock Lisa and Kazeroni Rémi
+Author list: _e.g. Bock Lisa and Kazeroni Rémi_
 
 Branch(es):
-- in the repository ESMValTool-AR6-OriginalCode-FinalFigures: X
-- in the repository ESMValCore-AR6-OriginalCode-FinalFigures: X
+- in the repository ESMValTool-AR6-OriginalCode-FinalFigures: _`ar6_chap_3_Fig_10`_
+- in the repository ESMValCore-AR6-OriginalCode-FinalFigures: _`ar6_Core_changes`_
 
-Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-5-ocean.yml
-Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
+Recipe(s) used: _e.g. `recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-5-ocean.yml`_
+Diagnostic(s) used: _e.g. `diag_scripts/ipcc_ar6/tsline.ncl`_
+
 (Were any automated recipe generations tools used?)
 
 Software versions, name of environment file (see 3.), other software packages,…
-- ESMValTool environment file: e.g. X
-- pip file: e.g. X
-- Other software: e.g. X
+- ESMValTool environment file: _e.g. `IPCC_environments/$NAME_conda_environment.yml`_
+- pip file: _e.g. `IPCC_environments/$NAME_pip_environment.txt`_
+- Other software: _e.g. X_
 
-Machine used: e.g. Mistral or Jasmin
+Machine used: _e.g. Mistral or Jasmin_
 
-Any further instructions: X
+Any further instructions: _X_
 
-List/Description of auxiliary data used to produce the IPCC AR6 figures:
+List/Description of auxiliary data used to produce the IPCC AR6 figures: _X_
 
-Publication sources: e.g. X
+Publication sources: e.g. _X_
 ```
