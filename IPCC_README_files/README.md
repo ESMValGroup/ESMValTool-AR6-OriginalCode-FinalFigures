@@ -15,7 +15,7 @@ Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
 
 (Were any automated recipe generations tools used?)
 
-Software versions, name of environment file (see 3.), other software packages,…
+Software versions, name of environment file (see **save conda environment** in the [release instructions](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/CONTRIBUTING.md)), other software packages,…
 - ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
 - pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
 - Other software:
