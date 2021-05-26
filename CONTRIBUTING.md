@@ -32,6 +32,7 @@ This needs to be done by the author of the diagnostics and supported by at least
     git add <pathtofilename>
     git commit -m "some message"
     ```
+    **NOTE:** it is best you committed each file separateley and not using a `*` wildcard since it's useful to have each commit's hash ID and message logged; also when adding to the git repository using `git add` make sure you are not adding unnecessary files like temporary or log files (try not to use `git add *` as much as possible).
   - Make a full record of your current branch and commit details. Use the command:
     ```
     git log –n 1
