@@ -113,7 +113,7 @@ This needs to be done by the author of the diagnostics and supported by at least
 
 - **Create Zenodo citation**
 
-  TSU could create with the informations in the README the Zenodo citation
+  TSU will create the Zenodo citation using the information in the README file
 
 
 ## Step 2: Merge the code into the public version of the ESMValTool
