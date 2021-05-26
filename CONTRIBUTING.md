@@ -72,6 +72,7 @@ This needs to be done by the author of the diagnostics and supported by at least
   Save your conda environment: follow these steps to take a snapshot of your full dependencies environment managed by `conda`; here `<environment>` is the name of the conda environment you used for the analysis (most probably `esmvaltool`), please change it with whatever you named your main environment.
   ```
   conda activate <environment>  # activate the environment you used to run the IPCC stuff
+  git clone https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures.git
   cd ESMValTool-AR6-OriginalCode-FinalFigures
   git status  # make sure you are on your newly created branch and it is up to date
   conda env export > IPCC_environments/$NAME_environment.yml  # export full environment specs; replace $NAME with relevant run name
