@@ -162,7 +162,7 @@ This needs to be done by the author of the diagnostics and supported by at least
     cd ESMValTool-AR6
     git checkout -b <your_branch>
     ```
-  - Update your code to the recent ESMValTool version by switching the default remote branch from `master` to `main` (if not done befor) 
+  - Update your code to the recent ESMValTool version by switching the default remote branch from `master` to `main` (if not done before) 
     ```
     git branch -m master main
     git fetch origin
