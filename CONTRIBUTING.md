@@ -149,25 +149,32 @@ This needs to be done by the author of the diagnostics and supported by at least
     ```
   - Open a new issue in ESMValCore's [GitHub issues](https://github.com/ESMValGroup/ESMValCore/issues). In your new issue, please describe your code, the figure it produces, and also include the contents of your `README` from above. Once created, please assign your issue to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Take a note of your issue number, you will need it later. 
   - With the help of your partner from the ESMValTool technical development team, ensure that your code complies with the coding standards required by ESMValTool.
-  - Open a new draft pull request in ESMValCore's [Pull Requests](https://github.com/ESMValGroup/ESMValCore/pulls). When creating a pull request, the base branch should be `master` and the compare branch should be your branch name. Please make sure that you link to your issue number in the pull request description. Once created, please assign your pull request to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Please use the **Labels** tab on the right hand side to assign the label **ipcc** to your pull request. Once you have created the pull request, GitHub will automatically test your code for compliance with ESMValTool standards and you are expected to fix any non-compliances before your pull request can be completed. 
+  - Open a new draft pull request in ESMValCore's [Pull Requests](https://github.com/ESMValGroup/ESMValCore/pulls). When creating a pull request, the base branch should be `main` and the compare branch should be your branch name. Please make sure that you link to your issue number in the pull request description. Once created, please assign your pull request to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Please use the **Labels** tab on the right hand side to assign the label **ipcc** to your pull request. Once you have created the pull request, GitHub will automatically test your code for compliance with ESMValTool standards and you are expected to fix any non-compliances before your pull request can be completed. 
   - Find [here](https://docs.esmvaltool.org/projects/esmvalcore/en/latest/contributing.html#checklist-for-pull-requests) the checklist for pull requests in the documentation. 
-  - Once your code passes automated testing, the ESMValTool team will review the pull request. You may receive some instructions on what needs to be changed before your code can be merged. Please work with your ESMValTool reviewer and discuss and address any further comments that they raise. Note that this process may take a while to run through. It is possible that the underlying ESVMalTool code will change and that you may need to bring in recent changes from the `master`. Please ask for help with this if needed. 
+  - Once your code passes automated testing, the ESMValTool team will review the pull request. You may receive some instructions on what needs to be changed before your code can be merged. Please work with your ESMValTool reviewer and discuss and address any further comments that they raise. Note that this process may take a while to run through. It is possible that the underlying ESVMalTool code will change and that you may need to bring in recent changes from the `main`. Please ask for help with this if needed. 
   - When your code passes both the automated and human review, your code is ready to be merged – congratulations!
 
 - **Prepare ESMValTool code**
 
-  The code will not be merged in the master of the ESMValTool-AR6 repository but will be prepared for a merge in the master of the public ESMValTool repository. It could then be merged after the report is published (beginning of August).
+  The code will not be merged in the `main` branch of the ESMValTool-AR6 repository but will be prepared for a merge in the `main` branch of the public ESMValTool repository. It could then be merged after the report is published (beginning of August).
   - Open separate branches for each recipe in the repository ESMValTool-AR6
     ```
     cd ESMValTool-AR6
     git checkout -b <your_branch>
     ```
-  - Update your code to the recent ESMValTool version by merging the master in your branch
+  - Update your code to the recent ESMValTool version by switching the default remote branch from `master` to `main` (if not done before and if you are working with a local copy of the ESMValTool repository): 
     ```
-    git checkout master
+    git branch -m master main
+    git fetch origin
+    git branch -u origin/main main
+    git remote set-head origin -a
+    ```
+    and merging the `main` in your branch:
+    ```
+    git checkout main
     git pull
     git checkout <your_branch>
-    git merge master
+    git merge main
     # maybe there are some conflicts to solve before merging is possible
     # please fix those if any, ask for help if you get stuck
     ```
