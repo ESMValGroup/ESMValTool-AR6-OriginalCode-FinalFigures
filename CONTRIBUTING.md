@@ -94,31 +94,31 @@ This needs to be done by the author of the diagnostics and supported by at least
 
 - **Write `README`**
 
-    - Create one `README` file for each figure produced with your ESMValTool branch. Please use this [README](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md) as a template and do not include several figures in a given README. The README file should be named as: `IPCC_README_files/README_Chap_X_Fig_Y.md` where X refers to the chapter number and Y to the figure number.
-  ```
-  cd ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_README_files
-  # create here text a file with your favorite text editor: vim, gedit, etc
-  ```
-  Add to text file [see template](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md):
-    - Figure number(s)
-    - Author list
-    - Branch(es) in the repositories ESMValTool-AR6-OriginalCode-FinalFigures and ESMValCore-AR6-OriginalCode-FinalFigures
-    - Recipe(s) and diagnostic(s) used 
-    - Were any automated recipe generations tools used?
-    - Software versions, name of environment file (see 3.), other software packages,…
-    - Machine used (e.g. Mistral, Jasmin, ...)
-    - Further instructions
-    - List/Description of auxiliary data used to produce the IPCC AR6 figures
-    - Publication sources
-    - ESMValTool instructions to reproduce the same figure
+  - Create one `README` file for each figure produced with your ESMValTool branch. Please use this [README](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md) as a template and do not include several figures in a given README. The README file should be named as: `IPCC_README_files/README_Chap_X_Fig_Y.md` where X refers to the chapter number and Y to the figure number.
+    ```
+    cd ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_README_files
+    # create here text a file with your favorite text editor: vim, gedit, etc
+    ```
+    Add to text file [see template](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README.md):
+      - Figure number(s)
+      - Author list
+      - Branch(es) in the repositories ESMValTool-AR6-OriginalCode-FinalFigures and ESMValCore-AR6-OriginalCode-FinalFigures
+      - Recipe(s) and diagnostic(s) used 
+      - Were any automated recipe generations tools used?
+      - Software versions, name of environment file (see 3.), other software packages,…
+      - Machine used (e.g. Mistral, Jasmin, ...)
+      - Further instructions
+      - List/Description of auxiliary data used to produce the IPCC AR6 figures
+      - Publication sources
+      - ESMValTool instructions to reproduce the same figure
 
-```
-    - Push the environment and README files to the ESMValTool-AR6-OriginalCode-FinalFigures repository
-  git add IPCC_README_files/README_Chap_X_Fig_Y.md # add a readme file for every figure of your ESMValTool-AR6 branch
-  git commit -m "added README for Fig Y of Chap X"
-  git push --set-upstream origin <info_on_your_ipcc_branch> # replace `<info_on_your_ipcc_branch>` by the branch named used to create these files.
-```
-    - Open a new issue in ESMValTool-AR6-OriginalCode-FinalFigures's [GitHub issues](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/issues). In your new issue, please include the figure numbers for the `README` files created with the instructions above. Once created, please assign your issue to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Take a note of your issue number, you will need it later. 
+  - Push the environment and README files to the ESMValTool-AR6-OriginalCode-FinalFigures repository
+    ```
+      git add IPCC_README_files/README_Chap_X_Fig_Y.md # add a readme file for every figure of your ESMValTool-AR6 branch
+      git commit -m "added README for Fig Y of Chap X"
+      git push --set-upstream origin <info_on_your_ipcc_branch> # replace `<info_on_your_ipcc_branch>` by the branch named used to create these files.
+    ```
+  - Open a new issue in ESMValTool-AR6-OriginalCode-FinalFigures's [GitHub issues](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/issues). In your new issue, please include the figure numbers for the `README` files created with the instructions above. Once created, please assign your issue to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right. Take a note of your issue number, you will need it later. 
   - Open a new draft pull request in ESMValCore's [Pull Requests](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/pulls). When creating a pull request, the base branch should be `main` and the compare branch should be your branch name (e.g. `<info_on_your_ipcc_branch>`). Please make sure that you link to your issue number in the pull request description. Once created, please assign your pull request to `valeriupredoi` and `remi-kazeroni` using the **Assignees** tab on the right.
 
 - **Create Zenodo citation**
