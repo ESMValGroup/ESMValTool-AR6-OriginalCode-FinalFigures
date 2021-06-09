@@ -1061,7 +1061,7 @@ misc_seq = matplotlib.colors.ListedColormap(misc_seq_colors_list, name='misc_seq
 
 
 def weighted_quantile(values, quantiles, sample_weight=None,
-                      values_sorted=False, old_style=False):
+                      values_sorted=False, old_style=False, method='standard'):
     """
     Very close to numpy.percentile, but supports weights.
     NOTE: quantiles should be in [0, 1]!
@@ -1089,7 +1089,10 @@ def weighted_quantile(values, quantiles, sample_weight=None,
         values = values[sorter]
         sample_weight = sample_weight[sorter]
 
-    weighted_quantiles = np.cumsum(sample_weight) - 0.5 * sample_weight
+    if method == 'standard':
+        weighted_quantiles = np.cumsum(sample_weight) - 0.5 * sample_weight
+    elif method == 'cdf':
+        weighted_quantiles = np.cumsum(sample_weight)
     if old_style:
         # To be convenient with numpy.percentile
         weighted_quantiles -= weighted_quantiles[0]

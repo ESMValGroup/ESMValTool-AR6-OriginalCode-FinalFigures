@@ -437,6 +437,8 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
 
     if plot_style in ['mono', '5-95', '10-90']:
         color_dict={}
+    if plot_style in ['all_plus_5-95', ]:
+        color_dict = {dataset: CMIP6_red for dataset in datasets}
     color_dict['Observations'] = 'black'
 
     # ocean_heat_content_timeseries keys:
@@ -498,9 +500,9 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                413: True,
                414: False,}
         axes_texts ={411: 'Full-depth',
-               412: '0-700m',
-               413: '700m - 2000m',
-               414:  '> 2000m',}
+               412: '0 - 700m',
+               413: '700 - 2000 m',
+               414:  '> 2000 m',}
         fig.set_size_inches(6 , 5)
 
     if  plot_type=='large_full':
@@ -518,9 +520,9 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                '7-20': True,
                '2plus': False,}
         axes_texts ={'full': 'Full depth',
-               '0-700': '0m - 700m',
-               '7-20': '700m - 2000m',
-               '2plus':  '> 2000m',}
+               '0-700': '0 - 700 m',
+               '7-20': '700 - 2000 m',
+               '2plus':  '> 2000 m',}
         axes_text_y['full'] = 0.95
 
         fig.set_size_inches(8 , 5)
@@ -576,7 +578,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             maxs = [np.max(fill_betweens[subplot][t]) for t in times]
             axes[subplot].fill_between(times, mins, maxs, color='grey', alpha=0.5)
 
-    elif plot_style in[ '10-90', '5-95']: # plot between 5-95 percentiles, weighted such that each model gets an even vote.
+    elif plot_style in[ '10-90', '5-95', 'all_plus_5-95']: # plot between 5-95 percentiles, weighted such that each model gets an even vote.
         fill_betweens = {subplot:{} for subplot in axes.keys()}
         weights = {subplot:{} for subplot in axes.keys()}
 
@@ -620,11 +622,14 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                 t_weights = [] # list of datasets.
                 for dset in weights[subplot][t]:
                     t_weights.append(1./float(counts[dset]))
-                if plot_style in[ '5-95']:
-                    [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights)
+                if plot_style in[ 'all_plus_5-95',]:
+                    [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights, method='cdf')
+                elif plot_style in[ '5-95', ]:
+                    [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.05, 0.5, 0.95], sample_weight=t_weights, method='cdf')
                 elif plot_style in[ '10-90']:
                     [pc5, pc50, pc95] = diagtools.weighted_quantile(fill_betweens[subplot][t], [0.10, 0.5, 0.90], sample_weight=t_weights)
                 pc5s.append(pc5)
+
                 if median:
                     pc50s.append(pc50)
                 else: # mean:
@@ -663,6 +668,20 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
                     ax.set_xlim(xlims_dict[subplot])
                 if no_ticks[subplot]:
                     ax.set_xticklabels([])
+    if plot_style in[ 'all_plus_5-95', ]:
+         for project, dataset, ensemble in itertools.product(projects, datasets, ensembles):
+            total_key = (project, dataset, 'historical', ensemble, 'ohc', 'detrended', 'total')
+            fn = ocean_heat_content_timeseries.get(total_key, False)
+            if not fn:
+                continue
+            for subplot, ax in axes.items():
+                key =  (project, dataset, 'historical', ensemble, 'ohc', 'detrended', depth_dict[subplot])
+                fn = ocean_heat_content_timeseries[key]
+                times, data = load_convert(fn, relative_to=relative_to)
+                if show_UKESM and dataset.lower().find('ukesm')>-1:
+                    ax.plot(times, data, c=color_dict[dataset], alpha=1.0, lw=1.5, zorder=2)
+                else:
+                    ax.plot(times, data, c=color_dict[dataset], alpha=0.5)
 
     for subplot, ax in axes.items():
         ax.axhline(0., c='k', ls=':')
@@ -781,7 +800,7 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
             axes[subplot].fill_between(np.array(times), np.array(lower_sigma), np.array(upper_sigma), color='black', alpha=0.35, edgecolor=None)
 
     legend_fs = 9
-    if plot_style in ['all_one', 'mono', '5-95', '10-90',]:leg_size=2
+    if plot_style in ['all_one', 'mono', '5-95', '10-90','all_plus_5-95',]:leg_size=2
     else:
         leg_size = len(datasets)
 
@@ -802,16 +821,17 @@ def multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries,
         axleg.plot([], [], c='black', lw=1, ls='-', label='Observations')
         if show_UKESM:
             axleg.plot([], [], c='purple', lw=1, ls='-', label='UKESM')
-    if plot_style in ['5-95', '10-90',]:
+    if plot_style in ['5-95', '10-90','all_plus_5-95', ]:
         axleg.plot([], [],
                    c=CMIP6_red, lw=1.5, ls='-',
                    marker='s', markerfacecolor=(0.80, 0.137, 0.137, 0.35), markeredgewidth=0., markersize = 11,
-                   label='CMIP6 mean and '+plot_style+' percentile range')
-
+                   #abel='CMIP6 mean and '+plot_style+' percentile range')
+                   label = "CMIP6 multi-model mean (5-95% uncertainty)")
         if all_obs_sigma:
             #sigma_label = 'Observations '+r'$\pm 1.6 \sigma$'
-            sigma_label = 'Observations mean and 10-90 percentile range'
-
+            #sigma_label = 'Observations mean and 10-90 percentile range'
+            #sigma_label = 'Observations mean and 5-95 Confidence Interval'
+            sigma_label = 'Observed central estimate (5-95% uncertainty)'
             axleg.plot([], [], c='black', lw=1.5,ls='-',
                        marker='s', markerfacecolor=(0.,0.,0.,0.35), markeredgewidth=0., markersize = 11,
                        label=sigma_label)
@@ -4310,6 +4330,30 @@ def fix_depth(cube):
     print(cube, z)
     return cube
 
+def list_models_used(cfg, metadatas, detrended_ncs,
+        master_exp='historical',
+        master_project = 'CMIP6',
+        master_short_name = 'so',
+        trend = 'detrended',
+    ):
+    """Tool to pprint out all the datasets included. """
+    datasets = {index[1]:True for index in detrended_ncs.keys()}
+    included_datasets = {}
+    for master_dataset in datasets:
+        included_datasets[master_dataset] = []
+        if master_dataset in ['FGOALS-f3-L','FGOALS-g3', ]:
+            continue
+    
+        for (project, dataset, exp, ensemble, short_name), fn in detrended_ncs.items():
+            if master_dataset != dataset: continue
+            if master_project != project: continue
+            if master_exp != exp: continue
+            if master_short_name != short_name: continue
+      
+            included_datasets[dataset].append(ensemble)
+
+    for datset in sorted(included_datasets.keys()):
+        print(datset,':', ', '.join(sorted(included_datasets[datset])))
 
 def calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
     master_project = '',
@@ -4690,6 +4734,7 @@ def sea_surface_salinity_multipane(
     """
     Plot the multipane sea surface salinity plot.
     do_ss if True
+    final versions options are: trends_only, DW1950, 1950-2014, 2_pane, decadal..
     """
     time_range_str = '-'.join([str(t) for t in [start_year, end_year]])
 
@@ -5241,9 +5286,9 @@ def main(cfg):
     specvol_anomalies = {}
     ocean_heat_content_timeseries = {}
 
-    do_SS = 0 # True  #True
+    do_SS =  True
     do_SLR = True#  #False
-    do_OHC = 0 # True #False #True  #True
+    do_OHC = True #False #True  #True
     bad_models = ['NorESM2-LM', 'NorESM2-MM',
                   'FGOALS-f3-L', 'FGOALS-g3',
                   #'CESM2-FV2', 'CESM2-WACCM-FV2', 'CESM2-WACCM', 'CESM2'
@@ -5293,6 +5338,8 @@ def main(cfg):
         time_ranges =  [1950, 1970, 2014, [1950, 2014], [1970, 2014]]
         ss_files = {}
         for master_short_name, time_range in itertools.product(short_names, time_ranges):
+            list_models_used(cfg, metadatas, detrended_ncs,master_exp='historical',)
+
             fn = calculate_multi_model_mean(cfg, metadatas, detrended_ncs,
                 master_project = 'CMIP6',
                 master_short_name = master_short_name,
@@ -5747,12 +5794,11 @@ def main(cfg):
         except: continue
         fig_like_2_25(cfg, metadatas, ocean_heat_content_timeseries, dataset, ensemble, project, exp)
 
+    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='all_plus_5-95', show_UKESM=False, relative_to=[1995.,2014.])
+
     multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=[1995.,2014.])
-
-    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=1971.)
-
-    multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='10-90', show_UKESM=False, relative_to=[1995.,2014.])
-
+    #multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='5-95', show_UKESM=False, relative_to=1971.)
+    #multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='large_full', plot_style='10-90', show_UKESM=False, relative_to=[1995.,2014.])
     #multimodel_2_25(cfg, metadatas, ocean_heat_content_timeseries, plot_type='4_panes', plot_style='5-95', show_UKESM=False)
 
     for plot_style, plot_type ,ukesm in itertools.product(['viridis', 'mono','all_one', '5-95'],['7_panes', '4_panes', 'large_full'], [True, False]):
