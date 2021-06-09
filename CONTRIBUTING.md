@@ -35,7 +35,7 @@ This needs to be done by the author of the diagnostics and supported by at least
     **NOTE:** it is best you committed each file separateley and not using a `*` wildcard since it's useful to have each commit's hash ID and message logged; also when adding to the git repository using `git add` make sure you are not adding unnecessary files like temporary or log files (try not to use `git add *` as much as possible).
   - Make a full record of your current branch and commit details. Use the command:
     ```
-    git log –n 1
+    git log -n 1
     ```
     Take a note of the output, specifically the commit hash ID, which will be a long number and look something like: `215095e2e338525be0baeeebdf66bfbb304e7270`. This commit hash ID will allow you to fully restore your code in the case of an unforeseen error (but this can only be done before the branch gets merged and deleted!). If the branch has been merged, then we’ll have to track the issue from the merge commit hash ID (see below)
   - Upload your final code in your branch(es) on the [ESMValTool-AR6-OriginalCode-FinalFigures](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures) repository:
