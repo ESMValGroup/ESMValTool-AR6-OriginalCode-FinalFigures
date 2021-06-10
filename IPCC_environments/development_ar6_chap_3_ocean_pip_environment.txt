@@ -1,0 +1,161 @@
+alabaster==0.7.12
+antlr4-python3-runtime==4.7.2
+astroid==2.4.1
+attrs==19.3.0
+autodocsumm==0.1.13
+Babel==2.8.0
+bokeh @ file:///home/conda/feedstock_root/build_artifacts/bokeh_1592869569111/work
+brotlipy==0.7.0
+Cartopy==0.17.0
+cdo==1.5.3
+cdsapi==0.3.0
+certifi==2020.6.20
+cf-units==2.1.4
+cffi==1.14.0
+cftime @ file:///home/conda/feedstock_root/build_artifacts/cftime_1594010275415/work
+chardet==3.0.4
+click==7.1.2
+click-plugins==1.1.1
+cligj==0.5.0
+cloudpickle @ file:///home/conda/feedstock_root/build_artifacts/cloudpickle_1593623337153/work
+cmocean==2.0
+codespell==1.17.1
+colorama==0.4.3
+coverage==5.2
+cryptography==2.9.2
+cycler==0.10.0
+Cython @ file:///home/conda/feedstock_root/build_artifacts/cython_1591799506125/work
+cytoolz==0.10.1
+dask @ file:///home/conda/feedstock_root/build_artifacts/dask-core_1593753420471/work
+decorator==4.4.2
+distributed @ file:///home/conda/feedstock_root/build_artifacts/distributed_1593754196377/work
+docutils==0.16
+dodgy==0.2.1
+easytest==0.1.5
+ecmwf-api-client==1.5.4
+eofs==1.4.0
+ESMPy==8.0.0
+# Editable install with no version control (ESMValCore==2.0.0b9)
+-e /home/users/ldemora/anaconda3_20190821/envs/ar6/lib/python3.8/site-packages
+-e git+git@github.com:ESMValGroup/ESMValTool-AR6.git@ebac46f122a477959ac57e34ae9e17d49a6385e9#egg=ESMValTool
+Fiona==1.8.13.post1
+fire==0.3.1
+flake8==3.8.3
+flake8-polyfill==1.0.2
+fsspec @ file:///home/conda/feedstock_root/build_artifacts/fsspec_1589989738418/work
+GDAL==3.0.4
+gsw==3.4.0
+HeapDict==1.0.1
+html5lib @ file:///home/conda/feedstock_root/build_artifacts/html5lib_1592930327044/work
+idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1593328102638/work
+imagesize==1.2.0
+isodate==0.6.0
+isort==5.0.4
+Jinja2==2.11.2
+joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1593624380152/work
+keepalive==0.5
+kiwisolver==1.2.0
+lazy-object-proxy==1.4.3
+llvmlite==0.33.0
+locket==0.2.0
+lxml @ file:///home/conda/feedstock_root/build_artifacts/lxml_1589927508659/work
+MarkupSafe==1.1.1
+matplotlib @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-base_1592576119134/work
+mccabe==0.6.1
+mock==4.0.2
+more-itertools==8.4.0
+mpi4py==3.0.3
+msgpack==1.0.0
+munch==2.5.0
+nc-time-axis==1.2.0
+netCDF4==1.5.3
+networkx==2.4
+nose==1.3.7
+numba==0.50.1
+numpy @ file:///home/conda/feedstock_root/build_artifacts/numpy_1591485221441/work
+olefile==0.46
+OWSLib @ file:///home/conda/feedstock_root/build_artifacts/owslib_1591376955812/work
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1589925210001/work
+pandas @ file:///home/conda/feedstock_root/build_artifacts/pandas_1592421989564/work
+partd==1.1.0
+pathspec==0.8.0
+pep8-naming==0.10.0
+Pillow @ file:///home/conda/feedstock_root/build_artifacts/pillow_1593694143080/work
+pluggy==0.13.1
+prospector==1.3.0
+prov==1.5.3
+psutil==5.7.0
+py==1.9.0
+pycodestyle==2.6.0
+pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1593275161868/work
+pydocstyle==5.0.2
+pydot==1.4.1
+pyepsg==0.4.0
+pyflakes==2.2.0
+Pygments==2.6.1
+pykdtree==1.3.1
+pyke==1.1.1
+pylint==2.5.2
+pylint-celery==0.3
+pylint-django==2.0.15
+pylint-flask==0.6
+pylint-plugin-utils==0.6
+pyOpenSSL==19.1.0
+pyparsing==2.4.7
+pyproj @ file:///home/conda/feedstock_root/build_artifacts/pyproj_1588596072923/work
+pyroma==2.6
+pyshp==2.1.0
+PySocks==1.7.1
+pytest==5.4.3
+pytest-cov==2.10.0
+pytest-env==0.6.2
+pytest-flake8==1.0.6
+pytest-html==2.1.1
+pytest-metadata==1.10.0
+pytest-mock==3.1.1
+python-dateutil==2.8.1
+pytz==2020.1
+PyYAML==5.3.1
+rdflib @ file:///home/conda/feedstock_root/build_artifacts/rdflib_1588779863735/work
+requests @ file:///home/conda/feedstock_root/build_artifacts/requests_1592425495151/work
+requirements-detector==0.7
+scikit-learn @ file:///home/conda/feedstock_root/build_artifacts/scikit-learn_1589920858304/work
+scipy @ file:///home/conda/feedstock_root/build_artifacts/scipy_1593253471027/work
+scitools-iris==2.4.0
+seaborn==0.10.1
+seawater==3.3.4
+setoptconf==0.2.0
+Shapely==1.7.0
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work
+snowballstemmer==2.0.0
+sortedcontainers @ file:///home/conda/feedstock_root/build_artifacts/sortedcontainers_1591999956871/work
+SPARQLWrapper @ file:///home/conda/feedstock_root/build_artifacts/sparqlwrapper_1588887987673/work
+Sphinx==3.1.2
+sphinx-rtd-theme==0.5.0
+sphinxcontrib-applehelp==1.0.2
+sphinxcontrib-devhelp==1.0.2
+sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-qthelp==1.0.3
+sphinxcontrib-serializinghtml==1.1.4
+stratify==0.1.1
+tblib==1.6.0
+termcolor==1.1.0
+threadpoolctl @ file:///tmp/tmp79xdzxkt/threadpoolctl-2.1.0-py3-none-any.whl
+toml==0.10.1
+toolz==0.10.0
+tornado==6.0.4
+tqdm==4.47.0
+typing-extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1588470653596/work
+urllib3==1.25.9
+vmprof==0.4.15
+wcwidth==0.2.5
+webencodings==0.5.1
+wrapt==1.12.1
+xarray==0.16.0
+xesmf==0.3.0
+XlsxWriter==1.2.9
+yamale @ file:///home/conda/feedstock_root/build_artifacts/yamale_1593325229497/work
+yamllint==1.23.0
+yapf==0.30.0
+zict==2.0.0
