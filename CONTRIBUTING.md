@@ -78,13 +78,11 @@ This needs to be done by the author of the diagnostics and supported by at least
   ```
   git clone https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures.git
   cd ESMValTool-AR6-OriginalCode-FinalFigures
-  
   ```
   
   Create a new branch where you will put information about <your branch> that was just pushed to this repository:
   ```
   git checkout -b <info_on_your_branch>
- 
   ```
   
   Make sure you are on your newly created branch and it is up to date
@@ -97,10 +95,10 @@ This needs to be done by the author of the diagnostics and supported by at least
   ```
   Export your full environment:
   ```
-  conda env export > IPCC_environments/$NAME_conda_environment.yml  # export full environment specs
-  echo "# conda version:" >> IPCC_environments/$NAME_conda_environment.yml 2>&1  # add a field that records conda version
-  conda -V >> IPCC_environments/$NAME_conda_environment.yml && sed -i '$ s/^/# "conda -V" /' IPCC_environments/$NAME_conda_environment.yml # record conda version
-  git add IPCC_environments/$NAME_conda_environment.yml  # add your new file to git control
+  conda env export > IPCC_environments/${NAME}_conda_environment.yml  # export full environment specs
+  echo "# conda version:" >> IPCC_environments/${NAME}_conda_environment.yml 2>&1  # add a field that records conda version
+  conda -V >> IPCC_environments/${NAME}_conda_environment.yml && sed -i '$ s/^/# "conda -V" /' IPCC_environments/${NAME}_conda_environment.yml # record conda version
+  git add IPCC_environments/${NAME}_conda_environment.yml  # add your new file to git control
   git commit -m "added environment record for $NAME"
   ```
 
@@ -108,9 +106,9 @@ This needs to be done by the author of the diagnostics and supported by at least
 
   Save your pip dependencies environment: follow these steps to take a snapshot of your full dependencies environment managed by `pip`:
   ```
-  pip freeze > IPCC_environments/$NAME_pip_environment.txt
-  git add IPCC_environments/$NAME_pip_environment.txt
-  git commit IPCC_environments/$NAME_pip_environment.txt -m "added pip environment for $NAME"
+  pip freeze > IPCC_environments/${NAME}_pip_environment.txt
+  git add IPCC_environments/${NAME}_pip_environment.txt
+  git commit IPCC_environments/${NAME}_pip_environment.txt -m "added pip environment for $NAME"
   ```
 
 - **Write `README`**
