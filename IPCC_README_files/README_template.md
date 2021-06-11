@@ -4,6 +4,7 @@ FIGURE TITLE
 
 Figure number: Figure X.xx
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
+![Figure x.xx](../images/figure_x_xx.png?raw=true)
 
 Description:
 ------------
@@ -74,5 +75,4 @@ When was this machine used?
 
 Any further instructions: 
 -------------------------
-
 
