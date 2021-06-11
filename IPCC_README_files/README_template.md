@@ -2,11 +2,12 @@
 FIGURE TITLE
 ============
 
-Figure number(s): e.g. Figure 3.3
+Figure number: Figure X.xx
+From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
 
 Description:
 ------------
-Please describe the figure . 
+Please describe the figure. 
 
 Author list:
 ------------
@@ -18,6 +19,7 @@ Author list:
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure. 
+- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021. 
 
 ESMValTool Branch:
 ------------------
