@@ -4,16 +4,19 @@ FIGURE TITLE
 
 Figure number: Figure X.xx
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
+
 ![Figure x.xx](../images/figure_x_xx.png?raw=true)
+
 
 Description:
 ------------
 Please describe the figure. 
 
+
 Author list:
 ------------
--  Author, A: Institute, contact email (lead only) github ID 
--   Author, B: Institute,
+- Author, A: Institute, contact email (lead only) github ID 
+- Author, B: Institute,
 -
 
 
@@ -22,14 +25,15 @@ Publication sources:
 Please list any publications that describe, explain or use this figure. 
 - A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021. 
 
+
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_Fig_03
+- ESMValTool-AR6-OriginalCode-FinalFigures: branch_name
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: ar6_Core_changes
+- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
 
 
 Recipe & diagnostics:
@@ -38,7 +42,13 @@ Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-3-ocean.yml
 Please describe this recipe:
 
 Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
-Please describe this diagnostic. 
+Please describe this diagnostic:
+
+
+Expected image path:
+--------------------
+This is the path of the image relative to the automatically generated ESMValTool output location:
+- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
 
 
 Recipe generations tools: 
