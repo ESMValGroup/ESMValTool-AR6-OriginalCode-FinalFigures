@@ -1,1 +1,2 @@
-This is the directory in which the final IPCC figures produced with the ESMValTool are stored.
+# IPCC AR6 figures produced with the ESMValTool
+This directory contains a copy of the orignal IPCC AR6 figures produced with the ESMValTool.
