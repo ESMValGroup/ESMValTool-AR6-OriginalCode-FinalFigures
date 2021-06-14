@@ -1,0 +1,1 @@
+This is the directory in which the final IPCC figures produced with the ESMValTool are stored.
