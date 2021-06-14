@@ -137,6 +137,13 @@ This needs to be done by the author of the diagnostics and supported by at least
       git commit -m "added README for Fig Y of Chap X"
       git push --set-upstream origin <info_on_your_ipcc_branch> # replace `<info_on_your_ipcc_branch>` by the branch named used to create these files.
     ```
+  - Upload a copy of your IPCC AR6 figures produced with the ESMValTool
+    ```
+      cd ESMValTool-AR6-OriginalCode-FinalFigures/images
+      git add figure_x.yy.png
+      git commit -m "Fig Y of Chap X added"
+      git push origin <info_on_your_ipcc_branch> # replace `<info_on_your_ipcc_branch>` by the branch named used to create these files.
+    ```
   - Open a new issue in ESMValTool-AR6-OriginalCode-FinalFigures's [GitHub issues](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/issues). In your new issue, please include the figure numbers for the `README` files created with the instructions above. Once created, please assign your issue to `valeriupredoi` or `remi-kazeroni` using the **Assignee** tab on the right. Take a note of your issue number, you will need it later. 
   - Open a new draft pull request in ESMValCore's [Pull Requests](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/pulls). When creating a pull request, the base branch should be `main` and the compare branch should be your branch name (e.g. `<info_on_your_ipcc_branch>`). Please make sure that you link to your issue number in the pull request description. Once created, please assign your pull request to `valeriupredoi` or `remi-kazeroni` using the **Assignee** tab on the right.
 
