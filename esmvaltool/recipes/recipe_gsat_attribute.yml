@@ -6,6 +6,7 @@ documentation:
   description: |
     Produces AR6 Chapter 3 GSAT attribution figures.
     Adapted from recipe_gillett20.yml
+    Uses model data available as of Jan 31st 2021.
 
   authors:
     - kirchmeier-young_megan

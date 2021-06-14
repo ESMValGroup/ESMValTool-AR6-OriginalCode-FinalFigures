@@ -1,4 +1,4 @@
-"""Plots timeseries of masked and blended GMST from CMIP6 models, for comparison with obs."""
+"""Plots Figure 3.8 and writes out data for Fig SPM.1 and FAQ 3.1, Fig 1."""
 import logging
 import os
 from pprint import pformat
@@ -53,11 +53,12 @@ def main(cfg):
     """Compute the time average for each input dataset."""
     # Get a description of the preprocessed data that we will use as input.
     input_data = cfg['input_data'].values()
-#    had4_file='/mnt/lustre02/work/bd0854/DATA/ESMValTool2/RAWOBS/Tier2/HadCRUT4/HadCRUT.4.6.0.0.median.nc'
-#    had4_file='/home/rng/data/esmvaltool/HadCRUT.4.6.0.0.median.nc'
-    had4_file='/home/rng/data/esmvaltool/HadCRUT.4.6.0.0.median.nc'
-    sftlf_file='/home/rng/data/esmvaltool/CNRM-CM6-1-5x5-sftlf.nc'
-#sftlf_file='/pf/b/b380746/CNRM-CM6-1-5x5-sftlf.nc' #Hard-coded path to sftlf file for CNRM-CM6 on a 5x5 grid. 
+    auxiliary_data_dir=cfg['auxiliary_data_dir']
+    plot_dir=cfg['plot_dir']
+    output_file_type=cfg['output_file_type']
+    had4_file=auxiliary_data_dir+'/HadCRUT.4.6.0.0.median.nc'
+    sftlf_file=auxiliary_data_dir+'/CNRM-CM6-1-5x5-sftlf.nc'
+
     
     grouped_input_data = group_metadata(
         input_data, 'dataset', sort='ensemble')
@@ -114,7 +115,7 @@ def main(cfg):
     lbl=['Ribes','Haustein','Gillett','Chapter 7','CMIP6']
 
 # Get obs GSAT timeseries from Chapter 2.
-    obs_gsat=pandas.read_csv('/home/rng/data/esmvaltool/AR6_GSAT.csv',header=None)
+    obs_gsat=pandas.read_csv(auxiliary_data_dir+'/AR6_GSAT.csv',header=None)
     print ('obs_gsat',obs_gsat)
 
     
@@ -184,8 +185,9 @@ def main(cfg):
 
 
                 
-
-    with open('/home/rng/plots/esmvaltool/faq3-3.csv', mode='w') as file:
+#Write out to a CSV file timeseries needed for Fig SPM.1 and FAQ 3.1, Fig 1.
+                
+    with open(plot_dir+'/faq3-1_spm-1.csv', mode='w') as file:
         data_writer=csv.writer(file,delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for experiment in range(0,4):
             data_writer.writerow([long_labels[experiment]])
@@ -208,14 +210,12 @@ def main(cfg):
         plt.plot([1850,2025],[0,0],color='black',linewidth=1)
         plt.plot(years,mm_ann_warming[:,experiment],color=cols[experiment+1,:],linewidth=1,zorder=zzs[experiment]+4,label=long_labels[experiment])
 
-#    plt.plot(years,had4_diag*1.1719758280521986,color='black',linewidth=1,label='Observations',zorder=8)
     plt.plot(obs_gsat[0],obs_gsat[1],color='black',linewidth=1,label='Observations',zorder=8)
     plt.axis([1850,2020,-1.5,2.5])
     plt.xlabel('Year')
     plt.ylabel('Global temperature change ($^\circ$C)')
     plt.legend(loc="upper left")
-    plt.savefig('/home/rng/plots/esmvaltool/faq3_3.pdf')
-
+    plt.savefig(plot_dir+'/faq3_1.'+output_file_type)
     plt.close()
    
     out_dec_warming=numpy.zeros((5,nmodel))
@@ -240,8 +240,6 @@ def main(cfg):
         plt.plot([xpos[bar]-0.17],[mean_haustein[bar]],color=cols[bar,:],marker='+',linewidth=2)
         plt.plot([xpos[bar],xpos[bar]],[min_gillett[bar],max_gillett[bar]],color=cols[bar,:],linewidth=2,label=lbl[2],solid_capstyle='butt')
         plt.plot([xpos[bar]],[mean_gillett[bar]],color=cols[bar,:],marker='+',linewidth=2)
-#        plt.plot([xpos[bar]+0.075,xpos[bar]+0.075],[min_jenkins[bar],max_jenkins[bar]],color=cols[bar,:],linewidth=2)
-#        plt.plot([xpos[bar]+0.075],[mean_jenkins[bar]],color=cols[bar,:],marker='+',linewidth=2)
         plt.plot([xpos[bar]+0.17,xpos[bar]+0.17],[min_ch7[bar],max_ch7[bar]],color=cols[bar,:],label=lbl[3],linewidth=1,solid_capstyle='butt')
         plt.plot([xpos[bar]+0.17],[mean_ch7[bar]],color=cols[bar,:],marker='+',linewidth=1)
         lbl=['','','','','','']
@@ -252,7 +250,6 @@ def main(cfg):
 
     plt.xticks(list(range(0,nbar)),labels, size='small',rotation=30.,ha="right")
     plt.ylabel('Attributable change in GSAT, 2010-2019 vs 1850-1900 ($^\circ$C)')
-#    plt.xlabel('Forcing')
     plt.title('Drivers of observed warming')
 
     markers=['.','o','v','^','<','>','1','2','P','*','x','X','D']
@@ -270,13 +267,9 @@ def main(cfg):
     plt.tight_layout()
 
 
-    plt.savefig('/home/rng/plots/esmvaltool/fig3_8.png')
+    plt.savefig(plot_dir+'/fig3_8.'+output_file_type)
 
     plt.close()
-
-
-
-
 
 
 if __name__ == '__main__':

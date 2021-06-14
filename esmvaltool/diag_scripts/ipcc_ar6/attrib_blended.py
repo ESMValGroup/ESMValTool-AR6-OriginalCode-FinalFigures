@@ -1,5 +1,5 @@
 """Perform attribution using blended and masked temperatures."""
-"""Plots Figure 2, and Extended Data Figures 2-6 and 8 in Gillett et al.."""
+"""Plots Figure 3-7."""
 import logging
 import os
 import xarray as xr
