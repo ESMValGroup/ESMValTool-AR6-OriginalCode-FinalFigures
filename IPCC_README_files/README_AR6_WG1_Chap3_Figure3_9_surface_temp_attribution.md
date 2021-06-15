@@ -5,7 +5,7 @@ ANOMALY OF NERA-SURFACE AIR TEMPERATURE - ATTRIBUTION
 Figure number: Figure 3.9
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.9](../images/figure_3_9.png?raw=true)
+![Figure 3.9](../images/ar6_wg1_chap3_figure3_9_surface_temp_attribution.png?raw=true)
 
 
 Description:
@@ -23,7 +23,7 @@ ensemble members were used (see Section 3.2). Regions are defined by
 Iturbide et al. (2020).
 
 
-Author list:
+Author list: TO BE COMPLETED!
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Gillett, N.:

@@ -5,7 +5,7 @@ PRECIPITATION - MODEL BIAS
 Figure number: 3.13
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.13](../images/figure_3_13.png?raw=true)
+![Figure 3.13](../images/ar6_wg1_chap3_figure3_13_precip_model_bias.png?raw=true)
 
 
 Description:
@@ -35,7 +35,7 @@ is lower in at least 3 out of 4 models than in the corresponding low resolution
 versions.
 
 
-Author list:
+Author list: TO BE COMPLETED!
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Barreiro, M.: 

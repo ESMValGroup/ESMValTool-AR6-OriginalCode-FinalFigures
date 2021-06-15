@@ -5,7 +5,7 @@ TEMPORAL VARIABILITY OF NEAR-SURFACE AIR TEMPERATURE
 Figure number: Figure 3.5
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.5](../images/figure_3_5.png?raw=true)
+![Figure 3.5](../images/ar6_wg1_chap3_figure3_5_surface_temp_variablility.png?raw=true)
 
 
 Description:
@@ -20,7 +20,7 @@ and standard deviation (grey shading) are shown. Observational and model
 datasets were detrended by removing the least-squares quadratic trend.
 
 
-Author list:
+Author list: TO BE COMPLETED!
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Bellouin, N.:

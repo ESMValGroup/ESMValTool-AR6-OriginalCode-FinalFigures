@@ -5,7 +5,7 @@ PRECIPITATION ANOMALY
 Figure number: 3.15
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.15](../images/figure_3_15.png?raw=true)
+![Figure 3.15](../images/ar6_wg1_chap3_figure3_15_precip_anomaly.png?raw=true)
 
 
 Description:
@@ -31,7 +31,7 @@ rate (mm day-1) of GHCN V2 for the years 1950-2014 over land areas used to
 compute the plots.
 
 
-Author list:
+Author list: TO BE COMPLETED!
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Barreiro, M.: 

@@ -5,7 +5,7 @@ ANOMALY OF NERA-SURFACE AIR TEMPERATURE
 Figure number: Figure 3.4
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.4](../images/figure_3_4.png?raw=true)
+![Figure 3.4](../images/ar6_wg1_chap3_figure3_4_surface_temp_anomaly.png?raw=true)
 
 
 Description:
@@ -32,7 +32,7 @@ used (see Section 3.2). The multi-model means and percentiles were calculated
 solely from simulations available for the whole time span (1850-2020).
 
 
-Author list:
+Author list: TO BE COMPLETED!
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Bellouin, N.:

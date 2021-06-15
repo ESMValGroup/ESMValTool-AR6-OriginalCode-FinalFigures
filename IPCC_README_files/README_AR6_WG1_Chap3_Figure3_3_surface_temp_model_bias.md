@@ -5,7 +5,7 @@ SURFACE AIR TEMPERATURE - MODEL BIAS
 Figure number: 3.3
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.3](../images/figure_3_3.png?raw=true)
+![Figure 3.3](../images/ar6_wg1_chap3_figure3_3_surface_temp_model_bias.png?raw=true)
 
 
 Description:
@@ -34,7 +34,7 @@ versions of the HighResMIP models is lower in at least 3 out of 4 models than in
 the corresponding low resolution versions.
 
 
-Author list:
+Author list: TO BE COMPLETED!
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Bellouin, N.: 
