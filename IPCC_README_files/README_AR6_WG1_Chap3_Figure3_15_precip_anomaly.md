@@ -31,10 +31,10 @@ rate (mm day-1) of GHCN V2 for the years 1950-2014 over land areas used to
 compute the plots.
 
 
-Author list: TO BE COMPLETED!
+Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
-- Barreiro, M.: 
+- Barreiro, M.: Universidad de la República, Uruguay 
 - Eyring, V.: DLR., Germany
 
 

@@ -35,10 +35,10 @@ is lower in at least 3 out of 4 models than in the corresponding low resolution
 versions.
 
 
-Author list: TO BE COMPLETED!
+Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
-- Barreiro, M.: 
+- Barreiro, M.: Universidad de la República, Uruguay
 - Eyring, V.: DLR., Germany
 
 

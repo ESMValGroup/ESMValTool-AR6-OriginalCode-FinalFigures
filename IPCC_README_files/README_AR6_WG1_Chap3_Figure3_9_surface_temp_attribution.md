@@ -23,10 +23,10 @@ ensemble members were used (see Section 3.2). Regions are defined by
 Iturbide et al. (2020).
 
 
-Author list: TO BE COMPLETED!
+Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
-- Gillett, N.:
+- Gillett, N.: Environment and Climate Change Canada
 
 
 ESMValTool Branch:

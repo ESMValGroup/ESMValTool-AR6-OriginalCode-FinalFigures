@@ -20,11 +20,11 @@ and standard deviation (grey shading) are shown. Observational and model
 datasets were detrended by removing the least-squares quadratic trend.
 
 
-Author list: TO BE COMPLETED!
+Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
-- Bellouin, N.:
-- Gillett, N.:
+- Bellouin, N.: University of Reading, UK
+- Gillett, N.: Environment and Climate Change Canada
 
 
 ESMValTool Branch:

@@ -34,10 +34,10 @@ versions of the HighResMIP models is lower in at least 3 out of 4 models than in
 the corresponding low resolution versions.
 
 
-Author list: TO BE COMPLETED!
+Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
-- Bellouin, N.: 
+- Bellouin, N.: University of Reading, UK 
 - Eyring, V.: DLR., Germany
 
 

@@ -32,12 +32,12 @@ used (see Section 3.2). The multi-model means and percentiles were calculated
 solely from simulations available for the whole time span (1850-2020).
 
 
-Author list: TO BE COMPLETED!
+Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
-- Bellouin, N.:
+- Bellouin, N.: University of Reading, UK
 - Eyring, V.: DLR., Germany
-- Gillett, N.:
+- Gillett, N.: Environment and Climate Change Canada
 
 
 Publication sources:
