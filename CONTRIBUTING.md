@@ -137,7 +137,7 @@ This needs to be done by the author of the diagnostics and supported by at least
       git commit -m "added README for FigX_ xx of Chap X"
       git push --set-upstream origin <info_on_your_ipcc_branch> # replace `<info_on_your_ipcc_branch>` by the branch named used to create these files.
     ```
-  - Upload a copy of your IPCC AR6 figures produced with the ESMValTool. Figures should be named as ar6_wg1_chapX_figureX_xx_SHORT_NAME.png 
+  - Upload a copy of your IPCC AR6 figures produced with the ESMValTool. Figures should be named as: ar6_wg1_chapX_figureX_xx_SHORT_NAME.png 
     ```
       cd ESMValTool-AR6-OriginalCode-FinalFigures/images
       cp path_to_the_original_figure ar6_wg1_chapX_figureX_xx_SHORT_NAME.png
