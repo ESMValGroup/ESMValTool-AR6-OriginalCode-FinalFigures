@@ -4,10 +4,10 @@ IPCC AR6 Chapter 3 Ocean plots: AMOC, OHC, Halo SLR and SSS trends
 
 ESMValTool decription for Intergovernmentalk Panel on Cliamte change, Sixth
 Assessmenent Report, Chapter 3 figures:
-- Atlantic Meridional Overturning Current  (figure 3.XX )
-- Ocean Heat Content (figure 3.XX )
-- Halosteric Sea Level Rise (figure 3.XX )
-- Global Sea Surface Saliinty trends  (figure 3.XX )
+- Atlantic Meridional Overturning Current (figure 3.30 )
+- Ocean Heat Content (figure 3.26 )
+- Halosteric Sea Level Rise (figure 3.28 )
+- Global Sea Surface Salinity trends (figure 3.27 )
 
 Figures authorship team:
 =======================
