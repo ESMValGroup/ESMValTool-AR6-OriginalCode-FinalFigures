@@ -51,6 +51,7 @@ ESMValCore Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
+
 Diagnostic used: diag_scripts/ipcc_ar6/precip_anom.ncl
 
 

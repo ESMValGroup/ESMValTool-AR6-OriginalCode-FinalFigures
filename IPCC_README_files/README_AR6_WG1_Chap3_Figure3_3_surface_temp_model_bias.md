@@ -59,7 +59,10 @@ ESMValCore Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
-Diagnostics used: diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl; diag_scripts/ipcc_ar6/model_bias.ncl
+
+Diagnostics used: 
+- diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
+- diag_scripts/ipcc_ar6/model_bias.ncl
 
 
 Expected image path:

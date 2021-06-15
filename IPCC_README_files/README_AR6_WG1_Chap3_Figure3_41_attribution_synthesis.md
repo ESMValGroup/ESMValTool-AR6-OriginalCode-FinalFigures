@@ -43,6 +43,7 @@ Recipes used:
 - recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere_fig_9.yml
 - recipe_ipccwg1ar6ch3_fig_3_41_pr.yml
 - recipe_ipccwg1ar6ch3_fig_3_41_siconc.yml
+
 Diagnostic used: diag_scripts/ipcc_ar6/tas_anom_damip.ncl
 
 

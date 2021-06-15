@@ -37,6 +37,7 @@ ESMValCore Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_3_19.yml
+
 Diagnostic used: diag_scripts/ipcc_ar6/zonal_westerly_winds.ncl
 
 

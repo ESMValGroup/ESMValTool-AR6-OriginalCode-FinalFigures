@@ -61,7 +61,10 @@ ESMValCore Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
-Diagnostics used: diag_scripts/ipcc_ar6/tas_anom.ncl, diag_scripts/ipcc_ar6/tsline_blend_collect.ncl
+
+Diagnostics used: 
+- diag_scripts/ipcc_ar6/tas_anom.ncl
+- diag_scripts/ipcc_ar6/tsline_blend_collect.ncl
 
 
 Expected image path:

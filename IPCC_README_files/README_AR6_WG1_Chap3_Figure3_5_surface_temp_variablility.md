@@ -40,7 +40,8 @@ ESMValCore Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
-Diagnostics used: diag_scripts/ipcc_ar6/zonal_st_dev.ncl
+
+Diagnostic used: diag_scripts/ipcc_ar6/zonal_st_dev.ncl
 
 
 Expected image path:
