@@ -1,20 +1,80 @@
-Figure number(s): 3.4
 
-Author list: Bock, L.; Bellouin, N; Eyring, V.; Gillet, N.
+ANOMALY OF NERA-SURFACE AIR TEMPERATURE
+=======================================
 
-Branches:
-- in the repository ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3
-- in the repository ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+Figure number: Figure 3.4
+From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
+![Figure 3.4](../images/figure_3_4.png?raw=true)
+
+
+Description:
+------------
+Observed and simulated time series of the anomalies in annual and global mean
+near-surface air temperature (GSAT). All anomalies are differences from the 
+1850–1900 time-mean of each individual time series. The reference period 1850–
+1900 is indicated by grey shading. (a) Single simulations from CMIP6 models 
+(thin lines) and the multi-model mean (thick red line). Observational data
+(thick black lines) are HadCRUT5, and are blended surface temperature (2 m air
+temperature over land and sea surface temperature over the ocean). All models 
+have been subsampled using the HadCRUT5 observational data mask. Vertical lines
+indicate large historical volcanic eruptions. CMIP6 models which are marked 
+with an asterisk are either tuned to reproduce observed warming directly, or 
+indirectly by tuning equilibrium climate sensitivity. Inset: GSAT for each 
+model over the reference period, not masked to any observations. (b). Multi-
+model means of CMIP5 (blue line) and CMIP6 (red line) ensembles and associated 
+5 to 95 percentile ranges (shaded regions). Observational data are HadCRUT5, 
+Berkeley Earth, NOAAGlobalTemp-Interim and Kadow et al. (2020). Masking was 
+done as in (a). CMIP6 historical simulations are extended with SSP2-4.5 
+simulations for the period 2015-2020 and CMIP5 simulations are extended with 
+RCP4.5 simulations for the period 2006-2020. All available ensemble members were
+used (see Section 3.2). The multi-model means and percentiles were calculated 
+solely from simulations available for the whole time span (1850-2020).
+
+
+Author list:
+------------
+- Bock, L.: DLR, Germany; lisa.bock@dlr.de
+- Bellouin, N.:
+- Eyring, V.: DLR., Germany
+- Gillett, N.:
+
+
+Publication sources:
+--------------------
+Bock, L., Lauer, A., Schlund, M., Barreiro, M., Bellouin, N., Jones, C., 
+Predoi, V., Meehl, G., Roberts, M., and Eyring, V.: Quantifying progress 
+across different CMIP phases with the ESMValTool, Journal of Geophysical 
+Research: Atmospheres, 125, e2019JD032321. https://doi.org/10.1029/2019JD032321
+
+
+ESMValTool Branch:
+------------------
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3
+
+
+ESMValCore Branch:
+------------------
+- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+
+
+Recipe & diagnostics:
+---------------------
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
 Diagnostics used: diag_scripts/ipcc_ar6/tas_anom.ncl, diag_scripts/ipcc_ar6/tsline_blend_collect.ncl
 
-Software versions, name of environment file:
+
+Expected image path:
+--------------------
+- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+
+
+Software description:
+---------------------
 - ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
 - pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
 
-Machine used: Mistral
 
-Publication sources:
-Bock, L., Lauer, A., Schlund, M., Barreiro, M., Bellouin, N., Jones, C., Predoi, V., Meehl, G., Roberts, M., and Eyring, V.: Quantifying progress across different CMIP phases with the ESMValTool, Journal of Geophysical Research: Atmospheres, 125, e2019JD032321. https://doi.org/10.1029/2019JD032321
-```
+Hardware description:
+---------------------
+What machine was used:  Mistral
