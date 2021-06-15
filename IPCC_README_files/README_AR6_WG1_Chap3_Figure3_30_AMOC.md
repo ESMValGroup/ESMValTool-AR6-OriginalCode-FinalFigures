@@ -44,17 +44,19 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-3-ocean.yml
+Recipe(s) used: e.g. recipes/recipe_ocean_amoc_streamfunction_profiles.yml
 Please describe this recipe:
 
-Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
+Diagnostic(s) used: e.g. diagocean/diagnostic_amoc_profiles.py
 Please describe this diagnostic:
 
 
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+- plots/diagnostic_name/diag_timeseries_amoc_hist/AMOC_timeseries/fig_3.24.png
+
+Please note that this filename uses the older incorrect figure number (3.24).
 
 
 Recipe generations tools:
@@ -68,6 +70,9 @@ based on the available data on jasmin/badc in January 2021.
 Ancillary figures and datasets:
 -------------------------------
 In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
+
+
+In addition to the final figure, the AMOC diagnostic can produce a single figure plot for each pane.
 
 
 Additional datasets:
