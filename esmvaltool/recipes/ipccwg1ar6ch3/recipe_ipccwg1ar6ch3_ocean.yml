@@ -1,14 +1,13 @@
 # ESMValTool
-# recipe_ipccwg1ar6ch3_fig_3_2.yml
+# recipe_ipccwg1ar6ch3_ocean.yml
 ---
 documentation:
 
   description: |
-    Producing Fig. 3.2
+    Producing Fig. 3.23
 
   authors:
     - bock_lisa
-    - eyring_veronika
 
 
 preprocessors:
@@ -55,8 +54,8 @@ models_cmip6_historical_woa: &models_cmip6_historical_woa #historical, Omon, tos
   - {dataset: ACCESS-ESM1-5, grid: gn, institute: CSIRO}
   #- {dataset: AWI-CM-1-1-MR, grid: gn} #tos: preprocessor fails
   #- {dataset: AWI-ESM-1-1-LR, grid: gn} #tos: preprocessor fails
-  - {dataset: BCC-CSM2-MR, grid: gn} #sos: time is not monotonic
-  - {dataset: BCC-ESM1, grid: gn} #sos: time is not monotonic
+  - {dataset: BCC-CSM2-MR, grid: gn}
+  - {dataset: BCC-ESM1, grid: gn}
   #- {dataset: CAMS-CSM1-0, grid: gn} #no sos data
   - {dataset: CanESM5, grid: gn}
   - {dataset: CanESM5-CanOE, ensemble: r3i1p2f1, grid: gn}
@@ -78,7 +77,7 @@ models_cmip6_historical_woa: &models_cmip6_historical_woa #historical, Omon, tos
   #- {dataset: EC-Earth3} #tos: not all years available
   - {dataset: EC-Earth3-AerChem}
   - {dataset: EC-Earth3-CC}
-  - {dataset: EC-Earth3-Veg} #tos: empty folder
+  - {dataset: EC-Earth3-Veg}
   #- {dataset: FGOALS-f3-L} #sos: preprocessor fails
   #- {dataset: FGOALS-g3, grid: gn} #sos: Failed to run regrid
   #- {dataset: FIO-ESM-2-0, grid: gn} #no sos data
@@ -97,7 +96,7 @@ models_cmip6_historical_woa: &models_cmip6_historical_woa #historical, Omon, tos
   #- {dataset: KACE-1-0-G} #no sos
   - {dataset: KIOST-ESM, grid: gr1}
   #- {dataset: MCM-UA-1-0, grid: gn} #tos: lon: has values < valid_min = 0.0
-  - {dataset: MIROC6, grid: gn} #so: concatinate error
+  - {dataset: MIROC6, grid: gn}
   - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
   - {dataset: MPI-ESM-1-2-HAM, grid: gn}
   - {dataset: MPI-ESM1-2-HR, grid: gn}
@@ -150,7 +149,7 @@ models_cmip6_piControl: &models_cmip6_piControl #piControl, Omon, tos+so
   - {dataset: GFDL-ESM4, start_year: 151, end_year: 500}
   - {dataset: GISS-E2-1-G, grid: gn, start_year: 4150, end_year: 5000}
   - {dataset: GISS-E2-1-H, grid: gn, start_year: 3180, end_year: 3980}
-  - {dataset: GISS-E2-2-G, institute: NASA-GISS, grid: gn, start_year: 2000, end_year: 2150} #IAV nan
+  - {dataset: GISS-E2-2-G, institute: NASA-GISS, grid: gn, start_year: 2000, end_year: 2150}
   - {dataset: HadGEM3-GC31-LL, grid: gn, start_year: 1850, end_year: 2349}
   - {dataset: HadGEM3-GC31-MM, grid: gn, start_year: 1850, end_year: 2349}
   #- {dataset: IITM-ESM,  grid: gn, start_year: 1926,  end_year: 2125} #tos: preprocessor fails
@@ -180,7 +179,7 @@ diagnostics:
   # **********************************************************************
   # IPCC WGI AR6, chap. 3
   # Sect. 3.3
-  # Fig. 3.22
+  # Fig. 3.23
   # **********************************************************************
   # Lisa
   # **********************************************************************

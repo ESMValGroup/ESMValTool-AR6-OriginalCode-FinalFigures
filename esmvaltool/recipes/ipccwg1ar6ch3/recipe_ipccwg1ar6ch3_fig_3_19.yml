@@ -69,11 +69,11 @@ datasets:
   - {dataset: MIROC6, grid: gn}
   - {dataset: MIROC-ES2L, ensemble: r1i1p1f2, grid: gn}
   - {dataset: MPI-ESM-1-2-HAM, grid: gn}
-  - {dataset: MPI-ESM1-2-HR, grid: gn} #Failed to run extract_levels
+  - {dataset: MPI-ESM1-2-HR, grid: gn}
   - {dataset: MPI-ESM1-2-LR, grid: gn}
   - {dataset: MRI-ESM2-0, grid: gn}
   - {dataset: NESM3, grid: gn}
-  - {dataset: NorCPM1, grid: gn, institute: NCC} # empty directory
+  - {dataset: NorCPM1, grid: gn, institute: NCC}
   - {dataset: NorESM2-LM, grid: gn, institute: NCC}
   - {dataset: NorESM2-MM, grid: gn, institute: NCC}
   - {dataset: SAM0-UNICON, grid: gn}

@@ -1,5 +1,5 @@
 # ESMValTool
-# recipe_ipccwg1ar6ch3.yml
+# recipe_ipccwg1ar6ch3_fig_3_41_pr.yml
 ---
 documentation:
 
@@ -10,7 +10,6 @@ documentation:
     - bock_lisa
     - eyring_veronika
 
-#  maintainer:
     
   references:
     - flato13ipcc

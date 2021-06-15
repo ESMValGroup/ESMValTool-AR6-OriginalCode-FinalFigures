@@ -1,6 +1,6 @@
-; EYRING13JGR_FIG12
-; Author: Irene Cionni (ENEA, Italy), Veronika Eyring (DLR, Germany)
-; PROJECT-NAME CCMI
+; Based on EYRING13JGR_FIG12
+; Author: Irene Cionni (ENEA, Italy), Veronika Eyring (DLR, Germany), 
+;         Lisa Bock (DLR, Germany), Birgit Hassler (DLR, Germany)
 ; #############################################################################
 ; Description
 ;  Calculation of the long-term mean and trend of the zonal wind
