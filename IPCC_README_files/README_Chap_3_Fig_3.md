@@ -33,15 +33,18 @@ Atlas.1. Stippling in panel e) marks areas where the bias in high resolution
 versions of the HighResMIP models is lower in at least 3 out of 4 models than in
 the corresponding low resolution versions.
 
+
 Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Bellouin, N.: 
 - Eyring, V.: DLR., Germany
 
+
 Publication sources:
 --------------------
 Bock, L., Lauer, A., Schlund, M., Barreiro, M., Bellouin, N., Jones, C., Predoi, V., Meehl, G., Roberts, M., and Eyring, V.: Quantifying progress across different CMIP phases with the ESMValTool, Journal of Geophysical Research: Atmospheres, 125, e2019JD032321. https://doi.org/10.1029/2019JD032321
+
 
 ESMValTool Branch:
 ------------------
@@ -58,14 +61,18 @@ Recipe & diagnostics:
 Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
 Diagnostics used: diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl; diag_scripts/ipcc_ar6/model_bias.ncl
 
+
 Expected image path:
 --------------------
-xxx
+- recipe_ipccwg1ar6ch3_atmosphere_YYYYMMDD_HHMMSS/plots/fig_3_3_cmip5/fig_3_3/model_bias_tas_annualclim_CMIP5.eps
+- recipe_ipccwg1ar6ch3_atmosphere_YYYYMMDD_HHMMSS/plots/fig_3_3_cmip6/fig_3_3/model_bias_tas_annualclim_CMIP6.eps
+
 
 Software description:
 ---------------------
 - ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
 - pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
+
 
 Hardware description:
 ---------------------

@@ -56,7 +56,7 @@ Diagnostic used: diag_scripts/ipcc_ar6/precip_anom.ncl
 
 Expected image path:
 --------------------
-xxx
+- recipe_ipccwg1ar6ch3_atmosphere_YYYYMMDD_HHMMSS/plots/fig_3_15_precip_anom/tsline/precip_anom_1950-2014.eps
 
 
 Software description:

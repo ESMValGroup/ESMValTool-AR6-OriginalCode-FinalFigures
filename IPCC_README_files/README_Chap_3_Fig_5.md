@@ -45,7 +45,7 @@ Diagnostics used: diag_scripts/ipcc_ar6/zonal_st_dev.ncl
 
 Expected image path:
 --------------------
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+- recipe_ipccwg1ar6ch3_atmosphere_YYYYMMDD_HHMMSS/plots/fig_3_5/fig_3_5/tas_std_dev_zonmean.eps
 
 
 Software description:

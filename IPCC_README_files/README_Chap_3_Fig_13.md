@@ -65,7 +65,8 @@ Diagnostics used: diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl; dia
 
 Expected image path:
 --------------------
-xxx
+- recipe_ipccwg1ar6ch3_atmosphere_YYYYMMDD_HHMMSS/plots/fig_3_13_cmip5/fig_3_13/model_bias_pr_annualclim_CMIP5.eps  
+- recipe_ipccwg1ar6ch3_atmosphere_YYYYMMDD_HHMMSS/plots/fig_3_13_cmip6/fig_3_13/model_bias_pr_annualclim_CMIP6.eps
 
 
 Software description:

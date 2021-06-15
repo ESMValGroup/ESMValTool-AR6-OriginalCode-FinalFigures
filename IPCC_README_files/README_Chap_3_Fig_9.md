@@ -47,7 +47,10 @@ Diagnostic used: diag_scripts/ipcc_ar6/tas_anom_damip.ncl
 
 Expected image path:
 --------------------
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+- recipe_ipccwg1ar6ch3_atmosphere_fig_3_9_YYYYMMDD_HHMMSS/plots/fig_3_9_tas_anom_damip_1/tsline/tas_anom_damip_global_1850-2020.eps
+- recipe_ipccwg1ar6ch3_atmosphere_fig_3_9_YYYYMMDD_HHMMSS/plots/fig_3_9_tas_anom_damip_2/tsline/tas_anom_damip_america_europe_1850-2020.eps
+- recipe_ipccwg1ar6ch3_atmosphere_fig_3_9_YYYYMMDD_HHMMSS/plots/fig_3_9_tas_anom_damip_3/tsline/tas_anom_damip_africa_asia_1850-2020.eps
+- recipe_ipccwg1ar6ch3_atmosphere_fig_3_9_YYYYMMDD_HHMMSS/plots/fig_3_9_tas_anom_damip_4/tsline/tas_anom_damip_antarctica_1850-2020.eps
 
 
 Software description:
