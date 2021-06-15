@@ -1,3 +1,14 @@
+; ****************************************************************************
+; Fig_3_41_collect.ncl
+;
+; Description:
+; Generates the final figure Fig. 3.41 with all input files of tas, pr, sic
+; and ohc data
+;
+; Creator: Lisa Bock (lisa.bock@dlr.de)
+; Creation Date: 10 March 2021
+; ****************************************************************************
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 

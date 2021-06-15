@@ -1,3 +1,14 @@
+; ****************************************************************************
+; Fig_3_41_ohc.ncl
+;
+; Description:
+; Generates for Fig. 3.41 the input OHC file by collecting all CMIP6 historical
+; and hist-nat results alongside with the observations
+;
+; Creator: Lisa Bock (lisa.bock@dlr.de)
+; Creation Date: 02 March 2021 
+; ****************************************************************************
+
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
 
