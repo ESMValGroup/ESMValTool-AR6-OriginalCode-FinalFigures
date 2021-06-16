@@ -5,7 +5,7 @@ FIGURE TITLE
 Figure number: Figure X.xx
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
 
-![Figure x.xx](../images/figure_x_xx.png?raw=true)
+![Figure x.xx](../images/ar6_wg1_chapX_figX_xx_SHORT_NAME.png?raw=true)
 
 
 Description:
