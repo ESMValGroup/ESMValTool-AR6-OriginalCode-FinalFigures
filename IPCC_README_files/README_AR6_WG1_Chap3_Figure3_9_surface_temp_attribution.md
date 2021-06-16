@@ -63,3 +63,9 @@ Software description:
 Hardware description:
 ---------------------
 What machine was used:  Mistral
+
+
+Further instructions:
+---------------------
+Create map with shapefiles by using IPCC_additional_scripts/map.ncl
+(-> shapefiles.png).
