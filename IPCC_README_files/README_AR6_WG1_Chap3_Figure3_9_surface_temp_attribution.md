@@ -31,7 +31,7 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapteterr_3
 
 
 ESMValCore Branch:
