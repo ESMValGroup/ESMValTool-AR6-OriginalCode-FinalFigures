@@ -1,10 +1,10 @@
 # ESMValTool
-# recipe_ipccwg1ar6ch3.yml
+# recipe_ipccwg1ar6ch3_fig3_43.yml
 ---
 documentation:
 
   description: |
-    Producing selected figures from IPCC WGI AR6, chap. 3
+    Producing figure 3.43 from IPCC WGI AR6, chap. 3
 
   authors:
     - bock_lisa

@@ -4,14 +4,12 @@
 documentation:
 
   description: |
-    Producing selected figures from IPCC WGI AR6, chap. 3
+    Producing figure FAQ 3.3 from IPCC WGI AR6, chap. 3
 
   authors:
     - bock_lisa
     - eyring_veronika
 
-#  maintainer:
-    
   references:
     - flato13ipcc
 
@@ -28,8 +26,7 @@ preprocessors:
 
 datasets:
   #CMIP3
-  - &cmip3 {dataset: bccr_bcm2_0,  institute: BCCR, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1} #no rlutcs
-  #- &cmip3 {dataset: cccma_cgcm3_1, institute: CCCMA, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
+  - &cmip3 {dataset: bccr_bcm2_0,  institute: BCCR, project: CMIP3,  mip: A1,  modeling_realm: atm,  exp: 20c3m,  frequency: mo, ensemble: run1}
   - {<<: *cmip3, dataset: cccma_cgcm3_1, institute: CCCMA}
   - {<<: *cmip3, dataset: cccma_cgcm3_1_t63, institute: CCCMA}
   - {<<: *cmip3, dataset: csiro_mk3_0, institute: CSIRO}
@@ -48,7 +45,7 @@ datasets:
   - {<<: *cmip3, dataset: ncar_ccsm3_0, institute: NCAR}
   - {<<: *cmip3, dataset: ncar_pcm1, institute: NCAR}
   - {<<: *cmip3, dataset: ukmo_hadcm3, institute: UKMO}
-  - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO} #zg, ua, hus: missing years
+  - {<<: *cmip3, dataset: ukmo_hadgem1, institute: UKMO}
 
   #CMIP5
   - {dataset: ACCESS1-0, ensemble: r1i1p1}
@@ -157,7 +154,7 @@ datasets:
   - {dataset: INM-CM5-0, grid: gr1, ensemble: r(1:10)i1p1f1, project: CMIP6}
   - {dataset: IPSL-CM6A-LR, ensemble: r(1:32)i1p1f1, grid: gr, project: CMIP6}
   - {dataset: KACE-1-0-G, ensemble: r(1:2)i1p1f1, grid: gr, project: CMIP6}
-  - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f(1:2), project: CMIP6} #no clt, rlutcs
+  - {dataset: MCM-UA-1-0, grid: gn, ensemble: r1i1p1f(1:2), project: CMIP6}
   - {dataset: MIROC6, ensemble: r(1:50)i1p1f1, grid: gn, project: CMIP6}
   - {dataset: MIROC-ES2L, ensemble: r(1:10)i1p1f2, grid: gn, project: CMIP6}
   - {dataset: MPI-ESM-1-2-HAM, ensemble: r(1:2)i1p1f1, grid: gn, project: CMIP6}
@@ -170,7 +167,7 @@ datasets:
   - {dataset: NorESM2-LM, grid: gn, institute: NCC, ensemble: r(1:3)i1p1f1, project: CMIP6}
   - {dataset: NorESM2-MM, grid: gn, institute: NCC, ensemble: r(1:2)i1p1f1, project: CMIP6}
   - {dataset: SAM0-UNICON, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
-  - {dataset: TaiESM1, grid: gn, ensemble: r1i1p1f1, project: CMIP6} #permission denied
+  - {dataset: TaiESM1, grid: gn, ensemble: r1i1p1f1, project: CMIP6}
   - {dataset: UKESM1-0-LL, ensemble: r(1:4)i1p1f2, grid: gn, project: CMIP6}
   - {dataset: UKESM1-0-LL, ensemble: r(5:7)i1p1f3, grid: gn, project: CMIP6}
   - {dataset: UKESM1-0-LL, ensemble: r(8:19)i1p1f2, grid: gn, project: CMIP6}
@@ -231,7 +228,3 @@ diagnostics:
         script: ipcc_ar6/corr_pattern_collect.ncl
         ancestors: ['*/pattern_cor']
         diag_order: ['tas','pr', 'psl']
-        #diag_order: ['tas','pr', 'psl']
-
-
-

@@ -21,8 +21,6 @@ preprocessors:
     regrid:
       target_grid: 1x1
       scheme: linear
-    #mask_fillvalues:
-    #  threshold_fraction: 0.95
 
   ppNOLEV1:
     regrid:
@@ -255,8 +253,6 @@ diagnostics:
       - {dataset: TaiESM1, ensemble: r1i1p1f1, grid: gn, project: CMIP6}
       - {dataset: UKESM1-0-LL, grid: gn, ensemble: r1i1p1f2, project: CMIP6}
 
-      #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly,
-      #   version: 2018, tier: 3, start_year: 1985}
       - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly,
           version: 1, tier: 2, start_year: 1986}
     scripts:
@@ -554,8 +550,6 @@ diagnostics:
          version: v2016, tier: 2}
       - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1,
          tier: 2, start_year: 1986}
-#      - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly,
-#         version: 2018, tier: 3, start_year: 1985}
     scripts:
       grading:
         <<: *grading_settings
@@ -1350,27 +1344,6 @@ diagnostics:
     scripts:
       grading:
         <<: *grading_settings
-      #grading: &grading_settings
-      #  script: perfmetrics/main.ncl
-      #  # Plot type ('cycle', 'zonal', 'latlon', 'cycle_latlon', 'cycle_zonal')
-      #  plot_type: cycle_latlon
-      #  # Time average ('opt' argument of time_operations.ncl)
-      #  time_avg: monthlyclim
-      #  # Region ('global', 'trop', 'nhext', 'shext')
-      #  region: global
-      #  # Plot standard deviation ('all', 'none', 'ref_model' or dataset name)
-      #  plot_stddev: ref_model
-      #  # Plot legend in a separate file
-      #  legend_outside: true
-      #  # Plot style
-      #  styleset: CMIP5
-      #  # Calculate grading
-      #  calc_grading: true
-      #  # Metric ('RMSD', 'BIAS', taylor')
-      #  metric: [RMSD]
-      #  # Normalization ('mean', 'median', 'centered_median', 'none')
-      #  normalization: [centered_median]
-
 
 
   siconc:
@@ -1696,17 +1669,10 @@ diagnostics:
         # Sort dataset in alphabetic order (excluding MMM)
         #sort: true
         project_order: ['CMIP5', 'CMIP6']
-        #diag_order: ['siconc-shpolar', 'siconc-nhpolar']
-        #diag_order: ['hfds-global', 'tos-global'] 
-        #diag_order: ['hfds-global', 'siconc-shpolar', 'siconc-nhpolar', 'tos-global'] 
         diag_order: ['hfds-global', 'siconc-shpolar', 'siconc-nhpolar', 'tos-global', 
                      'sm-global', 'nbp-global', 'lai-global', 'gpp-global',
                      'fgco2-global', 'et-global',
                      'rsds-global', 'rsus-global', 'rlds-global', 'rlus-global']
-        #diag_label: ['sea ice concentration - SH', 'sea ice concentration - NH']
-        #diag_label: ['downward heat flux at sea water surface', 'sea surface temperature']
-        #diag_label: ['Downward Heat Flux at Sea Water Surface', 'Sea Ice Concentration - SH', 
-        #             'Sea Ice Concentration - NH', 'Sea Surface Temperature'] 
         diag_label: ['Downward Heat Flux at Sea Water Surface', 'Sea Ice Concentration - SH', 
                      'Sea Ice Concentration - NH', 'Sea Surface Temperature', 
                      'Soil Moisture', 'Surface Net Downward Mass Flux of Carbon', 
