@@ -50,7 +50,7 @@ Research: Atmospheres, 125, e2019JD032321. https://doi.org/10.1029/2019JD032321
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
 
 
 ESMValCore Branch:
