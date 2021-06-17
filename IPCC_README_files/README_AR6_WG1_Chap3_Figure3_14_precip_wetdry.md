@@ -5,7 +5,7 @@ DETECTION AND ATTRIBUTION ANALYIS OF TROPICAL PRECIPITATION
 Figure number: Figure 3.14
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
 
-![Figure 3.14](../images/ar6_wg1_chap3_fig3_14_precip_wetdry.png?raw=true)
+![Figure 3.14](../images/ar6_wg1_chap3_figure3_14_precip_wetdry.png?raw=true)
 
 
 Description:
