@@ -5,7 +5,7 @@ TROPICAL OVERTUNING CIRCULATION CHANGES
 Figure number: Figure 3.16
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.16](../images/ar6_wg1_chap3_figure3_16_Hadley-Walker.pdf?raw=true)
+![Figure 3.16](../images/ar6_wg1_chap3_figure3_16_hadley-walker.png?raw=true)
 
 
 Description:

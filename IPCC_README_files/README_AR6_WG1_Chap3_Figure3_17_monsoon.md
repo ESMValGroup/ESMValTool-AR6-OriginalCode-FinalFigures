@@ -5,7 +5,7 @@ GLOBAL MONSSON DOMAIN AND INTENSITY
 Figure number: Figure 3.17
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.17](../images/ar6_wg1_chap3_figure3_17_monsoon.pdf?raw=true)
+![Figure 3.17](../images/ar6_wg1_chap3_figure3_17_monsoon.png?raw=true)
 
 
 Description:
