@@ -5,7 +5,7 @@ ATTRIBUTION OF NAM AND SAM TRENDS
 Figure number: Figure 3.34
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.34](../images/ar6_wg1_chap3_fig3_34_nam_sam_trends_damip.png?raw=true)
+![Figure 3.34](../images/ar6_wg1_chap3_figure3_34_nam_sam_trends_damip.png?raw=true)
 
 
 Description:

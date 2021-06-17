@@ -5,7 +5,7 @@ NAM, NAO and SAM
 Figure number: Figure 3.33
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.33](../images/ar6_wg1_chap3_fig3_33_nam_nao_sam.png?raw=true)
+![Figure 3.33](../images/ar6_wg1_chap3_figure3_33_nam_nao_sam.png?raw=true)
 
 
 Description:

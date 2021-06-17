@@ -5,7 +5,7 @@ AMV
 Figure number: Figure 3.40
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.40](../images/ar6_wg1_chap3_fig3_40_amv.png?raw=true)
+![Figure 3.40](../images/ar6_wg1_chap3_figure3_40_amv.png?raw=true)
 
 
 Description:

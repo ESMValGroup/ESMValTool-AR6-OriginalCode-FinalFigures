@@ -5,7 +5,7 @@ ENSO LIFECYCLE
 Figure number: Figure 3.36
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.36](../images/ar6_wg1_chap3_fig3_36_enso_lifecycle.png?raw=true)
+![Figure 3.36](../images/ar6_wg1_chap3_figure3_36_enso_lifecycle.png?raw=true)
 
 
 Description:

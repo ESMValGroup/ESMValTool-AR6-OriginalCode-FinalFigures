@@ -5,7 +5,7 @@ SAM INDICES IN THE LAST MILLENIUM
 Figure number: Figure 3.35
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.35](../images/ar6_wg1_chap3_fig3_35_sam_millenium.png?raw=true)
+![Figure 3.35](../images/ar6_wg1_chap3_figure3_35_sam_millenium.png?raw=true)
 
 
 Description:

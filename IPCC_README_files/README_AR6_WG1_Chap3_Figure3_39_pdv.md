@@ -5,7 +5,7 @@ PDV
 Figure number: Figure 3.39
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.39](../images/ar6_wg1_chap3_fig3_39_pdv.png?raw=true)
+![Figure 3.39](../images/ar6_wg1_chap3_figure3_39_pdv.png?raw=true)
 
 
 Description:
