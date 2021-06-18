@@ -44,9 +44,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_santer20jclim.yml
+Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_santer20jclim.yml
 
-Diagnostic(s) used: e.g. diag_scripts/santer20jclim/santer20jclimfig.py
+Diagnostic used: diag_scripts/santer20jclim/santer20jclimfig.py
 
 
 Expected image path:
