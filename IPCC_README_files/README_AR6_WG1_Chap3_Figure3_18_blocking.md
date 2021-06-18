@@ -55,13 +55,13 @@ Diagnostic used: diag_scripts/miles/miles_block_groupby_projects.R
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_miles_block_groupby_extended_DJFM_20210301_151120/plots/miles_diagnostics/miles_block/Multimodel/historical/1979-2000/DJFM/Block/DA98_Multimodel_historical_1979-2000_DJFM.png
+- recipe_miles_block_groupby_extended_DJFM_YYYYMMDD_HHMMSS/plots/miles_diagnostics/miles_block/Multimodel/historical/1979-2000/DJFM/Block/DA98_Multimodel_historical_1979-2000_DJFM.png
 
 
 Software description:
 ---------------------
 - ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: e.g. IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
 
 
 Hardware description:
