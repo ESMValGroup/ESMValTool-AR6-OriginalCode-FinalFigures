@@ -52,7 +52,7 @@ Diagnostic used: diag_scripts/santer20jclim/santer20jclimfig.py
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_ipccwg1ar6ch3_santer20jclim_newextendedv3_20210304_161330/plots/wvtrend/santer20jclim/fig1.png
+- recipe_ipccwg1ar6ch3_santer20jclim_newextendedv3_YYYYMMDD_HHMMSS/plots/wvtrend/santer20jclim/fig1.png
 
 
 Recipe generations tools: 
@@ -75,8 +75,8 @@ What are their access permissions/Licenses?
 
 Software description:
 ---------------------
-- ESMValTool environment file: e.g. IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: e.g. IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
+- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
 
 
 Hardware description:
@@ -86,4 +86,3 @@ What machine was used: Mistral
 
 Any further instructions: 
 -------------------------
-
