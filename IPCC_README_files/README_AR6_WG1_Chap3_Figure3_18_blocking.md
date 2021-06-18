@@ -47,9 +47,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_blocking.yml
+Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_blocking.yml
 
-Diagnostic(s) used: e.g. diag_scripts/miles/miles_block_groupby_projects.R
+Diagnostic used: diag_scripts/miles/miles_block_groupby_projects.R
 
 
 Expected image path:
