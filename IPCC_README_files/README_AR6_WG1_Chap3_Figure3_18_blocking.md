@@ -3,7 +3,7 @@ BLOCKING
 ========
 
 Figure number: Figure 3.18
-From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
+From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
 ![Figure 3.18](../images/ar6_wg1_chap3_figure3_18_blocking.png?raw=true)
 
@@ -37,61 +37,33 @@ atmospheric blocking simulation in present and future climate. J. Clim. 33,
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-3-ocean.yml
-Please describe this recipe:
+Recipe(s) used: e.g. recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_blocking.yml
 
-Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
-Please describe this diagnostic:
+Diagnostic(s) used: e.g. diag_scripts/miles/miles_block_groupby_projects.R
 
 
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
-
-
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
-
-
-Ancillary figures and datasets:
--------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
-
-
-Additional datasets:
---------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
-Can they be re-created?
-What are their access permissions/Licenses?
+- recipe_miles_block_groupby_extended_DJFM_20210301_151120/plots/miles_diagnostics/miles_block/Multimodel/historical/1979-2000/DJFM/Block/DA98_Multimodel_historical_1979-2000_DJFM.png
 
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
-- Other software used:
+- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
+- pip file: e.g. IPCC_environments/ar6_newcore_remi_pip_environment.txt
 
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
-
-
-Any further instructions: 
--------------------------
-
+What machine was used: Mistral
