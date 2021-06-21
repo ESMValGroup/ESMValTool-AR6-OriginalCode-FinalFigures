@@ -66,7 +66,7 @@ Diagnostics used:
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_ar6ch3_enso_cmip5+6/YYYYMMDD_HHMMSS/plots/enso_index/draw_enso_lifecycle/enso_lifecycle.pdf
+- recipe_ar6ch3_enso_cmip5+6_YYYYMMDD_HHMMSS/plots/enso_index/draw_enso_lifecycle/enso_lifecycle.pdf
 
 
 Recipe generations tools: 
