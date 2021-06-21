@@ -20,8 +20,8 @@ estimation. Figure is updated from Santer et al. (2007).
 
 Author list:
 ------------
-- Weigel, K.: University of Bremen, Germany; weigel@iup.physik.uni-bremen.de
-- Santer, S.D.: LLNL, U.S.
+- Santer, S.D.: LLNL, U.S.; santer1@llnl.gov
+- Weigel, K.: University of Bremen, Germany
 - Kazeroni, R.: DLR, Germany
 
 
