@@ -5,12 +5,28 @@ AR6 WG1 Chapter 3, figure .30: Atlantic Meridional Overturning Circulation (AMOC
 Figure number: Figure 3.30
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![AR6 WG1 Chap3 Figure 3.30](../images/ar6_wg1_chap3_fig3_30_amoc.png?raw=true)
+![AR6 WG1 Chap3 Figure 3.30 Atlantic Meridional Overturning Circulation (AMOC)](../images/ar6_wg1_chap3_fig3_30_amoc.png?raw=true)
 
 
 Description:
 ------------
-This
+Please describe the figure.
+
+This is a six pane figure the summarises the behaviour of the
+Atlantic Meridional Overturning Circulation in CMIP5, CMIP6 and in the
+observational record.
+
+In panes a), b) and c). CMIP5 and CMIP6 are shown in blue and red, respectively,
+and the observations are shown in grey bands.
+
+Pane a) shows the depth profile of the AMOC in model and observations.
+Pane b) shows the distribution of 8 year trends in the AMOC for the CMIP5 & CMIP6
+ensemble means, and for all CMIP6  models that contrinuted toi the mean.
+Similarly, pane c) shows the distribution of interannual AMOC changes for the CMIP5 & CMIP6
+ensemble means, and for all CMIP6  models that contrinuted toi the mean.
+
+Panes d), e), and f) show the AMOC behaviour of various DAMIP for three different
+time periods. 
 
 
 Author list:
@@ -39,7 +55,7 @@ ESMValTool Branch:
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValCore-AR6-OriginalCode-FinalFigures: optimize_mem_annual_statistic_plus_amoc
 
 
 Recipe & diagnostics:

@@ -5,12 +5,37 @@ AR6 WG1 Chapter 3 Figure 3.28 Halosteric Sea Level Change
 Figure number: Figure 3.28
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure x.xx](../images/ar6_wg1_chap3_fig3_28_halostericsealevel.png?raw=true)
+![Figure 3.28 Halosteric Sea Level Change](../images/ar6_wg1_chap3_fig3_28_halostericsealevel.png?raw=true)
 
 
 Description:
 ------------
 Please describe the figure.
+
+
+This is a six pane figure. The left two panes are scatter plots and the
+right four panes are maps.
+
+The two left panes show the behaviour of the halosteric sea level change
+in the top pane and the thermosteric sea level change in the lower pane.
+The x axis of these figures shows the mean behaviour of the Pacific
+region and the y shows the mean of the Atlantic.
+The scatter points include CMIP6 historical data, CMIP6 hist-nat data,
+and three observational datasets.
+
+The right hand side shows the halosteric sea level trend over the whole time period.
+The top three maps are observational data and the lowest pane is the CMIP6 multi model mean.
+
+
+The halosteric content was calculated using the TEOS-10 gsw python toolkit: https://teos-10.github.io/GSW-Python/
+
+In all cases, the model temperature and salininty were de-drifted against the
+pi-control. From there, we ensured that the pressure was calculated correctly,
+the cell volume was available, we use absolute salinity & conservative temperature.
+
+The multi model mean is caluated such that each modelled ensemble has the
+same weight. ie One-model, one vote.
+
 
 
 Author list:
@@ -29,7 +54,7 @@ Author list:
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure.
-- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021.
+- Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
 
 
 ESMValTool Branch:
@@ -39,7 +64,7 @@ ESMValTool Branch:
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValCore-AR6-OriginalCode-FinalFigures: optimize_mem_annual_statistic_plus_amoc
 
 
 Recipe & diagnostics:
@@ -163,15 +188,15 @@ These regions should be standarised throught AR6, and were emailed to me by chap
 Software description:
 ---------------------
 Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
+- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
 - Other software used:
 
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
+What machine was used: Jasmin
+When was this machine used? December 2020 to March 2021
 
 
 Any further instructions:

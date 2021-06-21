@@ -5,12 +5,23 @@ AR6 WG1 Chapter 3 Figure 3.27 Global Sea Surface Salinity Trends
 Figure number: Figure 3.27
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure x.xx](../images/ar6_wg1_chap3_fig3_27_GlobalSeaSurfaceSalinityTrends.png?raw=true)
+![Figure 3.27:  Global Sea Surface Salinity Trends](../images/ar6_wg1_chap3_fig3_27_GlobalSeaSurfaceSalinityTrends.png?raw=true)
 
 
 Description:
 ------------
 Please describe the figure.
+
+This is a two pane figure where both  panes shows:
+ - the trend in the near surface salinity (colourscale)
+ - the mean near surface salinity saliniy over the time period (black contours).
+
+The top pane shows the observational data and the bottom pane shows the multi-model
+CMIP6 mean.
+
+The model sea surface salininty was de-drifted against the pi-control.
+The multi model mean is caluated such that each modelled ensemble has the
+same weight. ie One-model, one vote.
 
 
 Author list:
@@ -29,8 +40,8 @@ Author list:
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure.
-- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021.
-
+- Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean
+  Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
 
 ESMValTool Branch:
 ------------------
@@ -39,7 +50,7 @@ ESMValTool Branch:
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValCore-AR6-OriginalCode-FinalFigures: optimize_mem_annual_statistic_plus_amoc
 
 
 Recipe & diagnostics:
@@ -144,15 +155,15 @@ via the invite-only google drive page: https://drive.google.com/drive/folders/1V
 Software description:
 ---------------------
 Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
+- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
 - Other software used:
 
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
+What machine was used: Jasmin
+When was this machine used? December 2020 to March 2021
 
 
 Any further instructions:

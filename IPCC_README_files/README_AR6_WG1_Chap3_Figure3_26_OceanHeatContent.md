@@ -12,6 +12,40 @@ Description:
 ------------
 Please describe the figure.
 
+THis is a time series of ocean heat content, with four panes.
+On the left, the figure shows the change (relative t o 1971)
+in heat content of the total global Ocean.
+The red area is th 5-95 percentile range and the grey area is the observational
+record.
+
+On the right hand side, the three panes show the depth ranges 0-700m, 700m-2000m,
+and below 2000m.
+
+The heat content was calculated using the TEOS-10 gsw python toolkit: https://teos-10.github.io/GSW-Python/
+
+In all cases, the model temperature and salininty were de-drifted against the
+pi-control. From there, we ensured that the pressure was calculated correctly,
+the cell volume was available, we use absolute salinity & conservative temperature.
+
+The multi model mean is caluated such that each modelled ensemble has the
+same weight. ie One-model, one vote.
+
+From there the calculation of te "heat content" was:
+
+a) The global ocean heat content is interpreted to be calculated as the volume integral
+   of the product of in situ density, ρ , and potential enthalpy, h0 (with reference sea pressure of 0 dbar).
+b) The in situ density is calculated using gsw_rho(SA,CT,p).  
+    Here the actual pressure at the target depth is used (i.e., the mass of the water).
+c) The *surface referenced* enthalpy should be calculated using gsw_enthalpy(SA,CT,0).
+   Note that here the 0 dbar pressure is critical to arrive at the surface value,
+   which is the value of enthalpy and absolute salinity that is available for exchange with the atmosphere.
+d) The product of the in situ density times the surface-referenced enthalpy is
+   the relevant energy quantity: gsw_rho(SA,CT,p)*gsw_enthalpy(SA,CT,0)
+e) For the anomalous energy, we calculate:
+   gsw_rho(SA,CT,p)*gsw_enthalpy(SA,CT,0)-gsw_rho(<SA>,<CT>,p)*gsw_enthalpy(<SA>,<CT>,0).
+f) integrate the surface-referenced enthalpy times rho,
+   i.e., the previous line gives the 3D integrand, and then we want to integrate it from the bottom up.  
+
 
 Author list:
 ------------
@@ -29,7 +63,7 @@ Author list:
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure.
-- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021.
+- Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
 
 
 ESMValTool Branch:
@@ -39,7 +73,7 @@ ESMValTool Branch:
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValCore-AR6-OriginalCode-FinalFigures: optimize_mem_annual_statistic_plus_amoc
 
 
 Recipe & diagnostics:
@@ -93,8 +127,8 @@ that a version of it was added to the ESMValTool master by Valeriu.
 
 Ancillary figures and datasets:
 -------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
-
+In addition to the main figure, diagnostics may produce several figures and datasets
+along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
 
 The OHC diagnostic produces the OHC, SSS trends and Halosteric SLR figures.
 This code is particularly complex and several ancillairy figures are produced along the way
@@ -155,24 +189,22 @@ These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
 
 
-
 Software description:
 ---------------------
 Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
+- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
 - Other software used:
 
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
+What machine was used: Jasmin
+When was this machine used? December 2020 to March 2021
 
 
 Any further instructions:
 -------------------------
-
 
 While this code was written for the IPCC report, there are several limitations
 and potential sources of error. In this section, we document some potential problems.
