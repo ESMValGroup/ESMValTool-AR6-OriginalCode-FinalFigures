@@ -98,7 +98,6 @@ Software description:
 ---------------------
 - ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
 - pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
-- Other software used:
 
 
 Hardware description:
