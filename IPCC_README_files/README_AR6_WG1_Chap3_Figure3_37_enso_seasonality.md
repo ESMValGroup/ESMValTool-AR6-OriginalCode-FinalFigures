@@ -63,7 +63,7 @@ Diagnostics used:
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_name_YYYYMMDD_HHMMSS/plots/enso_index/draw_enso_seasonality/enso_seasonality.pdf
+- recipe_ar6ch3_enso_cmip5+6_YYYYMMDD_HHMMSS/plots/enso_index/draw_enso_seasonality/enso_seasonality.pdf
 
 
 Recipe generations tools: 
