@@ -58,7 +58,7 @@ Recipe & diagnostics:
 ---------------------
 Recipe used: recipes/ipccar6wg1ch3/recipe_ar6ch3_enso_cmip5+6.yml
 
-Diagnostic used: 
+Diagnostics used: 
 - diag_scripts/ar6ch3_enso/define_ensoindex.ncl
 - diag_scripts/ar6ch3_enso/draw_lifecycle.ncl
 
