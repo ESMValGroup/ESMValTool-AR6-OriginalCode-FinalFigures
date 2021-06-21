@@ -43,27 +43,27 @@ Please list any publications that describe, explain or use this figure.
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-3-ocean.yml
-Please describe this recipe:
+Recipe used: recipes/ipccar6wg1ch3/recipe_ar6ch3_enso_cmip5+6.yml
 
-Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
-Please describe this diagnostic:
+Diagnostics used: 
+- diag_scripts/ar6ch3_enso/define_ensoindex.ncl
+- diag_scripts/ar6ch3_enso/draw_seasonality.ncl
 
 
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+- recipe_name_YYYYMMDD_HHMMSS/plots/enso_index/draw_enso_seasonality/enso_seasonality.pdf
 
 
 Recipe generations tools: 
@@ -86,16 +86,13 @@ What are their access permissions/Licenses?
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
-- Other software used:
+- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
+- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
 
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
+What machine was used: Mistral
 
 
 Any further instructions: 
