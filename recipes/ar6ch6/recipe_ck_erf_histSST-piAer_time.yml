@@ -1,0 +1,95 @@
+# ESMValTool
+# recipe_python.yml
+---
+documentation:
+  description: |
+    Example recipe that plots the mean rsut 
+
+  authors:
+    - kuo_chaincy
+
+  maintainer:
+    - kuo_chaincy
+
+  references:
+    - acknow_project
+
+  projects:
+    - esmval
+
+datasets:
+#histSST-piAer: &histSST-piAer _models
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gr1}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p3f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f2, start_year: 1850,  end_year: 2014, grid: gn}
+#histSST_models: &histSST_models
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gr1}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p3f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f2, start_year: 1850,  end_year: 2014, grid: gn}
+
+preprocessors:
+  preprocessor2:
+    regrid:
+      target_grid: 1x1 
+      scheme: linear
+#      threshold: 1000.
+
+diagnostics:
+
+  diffexpts:
+    description: AerChemMIP  histSST 
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      rlut:
+        preprocessor: preprocessor2
+#        mask_above_threshold: 1000.
+      rsut:
+        preprocessor: preprocessor2
+#        mask_above_threshold: 1000.
+#    additional_datasets: *aerchemmip_histSST # *aerchemmip_histSST_piCH4]
+    scripts:
+      ar6fig6_erf_time: 
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_erf_aer_time.py
+      ar6ia_erf: 
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ia_erf_aer_time.py
+#        exper_expt: *aerchemmip_histSST
+#        cntrl_expt: *aerchemmip_histSST_piCH4
+#  histSST:
+#    description: AerChemMIP  histSST 
+#    themes:
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      rsut:
+#        preprocessor: preprocessor2
+#    additional_datasets: *aerchemmip_histSST
+#    scripts:
+#      ar6fig6_7: &ar6fig6_7_settings
+#        script: ar6ch6/fig6_7_rsut.py
+#        cmip6expt: histSST
+#  histSST-piCH4:
+#    description: AerChemMIP  histSST-piCH4
+#    themes:
+#      - phys
+#    realms:
+#      - atmos
+#    variables:
+#      rsut:
+#        preprocessor: preprocessor2 
+#    additional_datasets: *aerchemmip_histSST_piCH4 
+#    scripts:
+#      ar6fig6_7:
+#        <<: *ar6fig6_7_settings
+#        cmip6expt: histSST-piCH4

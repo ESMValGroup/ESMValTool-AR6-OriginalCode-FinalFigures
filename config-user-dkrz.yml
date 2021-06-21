@@ -1,0 +1,50 @@
+###############################################################################
+# User's configuration file for the ESMValTool
+###############################################################################
+---
+
+# Diagnostics create plots? [true]/false
+write_plots: true
+# Diagnositcs write NetCDF files? [true]/false
+write_netcdf: true
+# Set the console log level debug, [info], warning, error
+log_level: info
+# verbosity is deprecated and will be removed in the future
+# verbosity: 1
+# Exit on warning? true/[false]
+exit_on_warning: false
+# Plot file format? [ps]/pdf/png/eps/epsi
+output_file_type: png
+# Destination directory
+output_dir: /scratch/b/b381044/esmvaltool_output
+# Save intermediary cubes in the preprocessor true/[false]
+save_intermediary_cubes: false
+# Run at most this many tasks in parallel null/[1]/2/3/4/..
+# Set to null to use the number of available CPUs.
+# Make sure your system has enough memory for the specified number of tasks.
+#max_parallel_tasks: 16
+max_parallel_tasks: 1
+# set remove preproc containing preprocessed data
+remove_preproc_dir: false 
+
+rootpath:
+  # Rootpath to CMIP5 data
+  CMIP5: /work/kd0956/CMIP5/data/cmip5/output1/
+  # Rootpath to CMIP6 data
+  #CMIP6: [/work/ik1017/CMIP6/data/CMIP6/CMIP/,/work/ik1017/CMIP6/data/CMIP6/AerChemMIP/]
+  CMIP6: [/work/ik1017/CMIP6/data/CMIP6/,/work/ik1017/CMIP6/data/CMIP6/AerChemMIP/,/work/ik1017/CMIP6/data/CMIP6/ScenarioMIP/,/scratch/b/b381044/CMIP6]
+  # Rootpath to OBS data
+  OBS: /work/bd0854/DATA/ESMValTool2/OBS/
+  # Rootpath to obs4mpis data
+  obs4mips: /work/bd0854/DATA/ESMValTool1/OBS/
+  # Rootpath to ana4mpis data
+  ana4mips: /work/bd0854/DATA/ESMValTool1/OBS/
+  # Default
+  default: [~/esmvaltool_input,/scratch/b/b381044/AerChemMIP/]
+
+# Directory structure for input data: [default]/BADC/DKRZ/ETHZ/etc
+# See config-developer.yml for definitions.
+drs:
+  CMIP5: DKRZ
+  CMIP6: DKRZ
+  default: DKRZ

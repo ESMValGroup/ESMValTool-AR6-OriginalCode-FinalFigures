@@ -1,0 +1,83 @@
+# ESMValTool
+# recipe_python.yml
+---
+documentation:
+  description: |
+    recipe that plots the change in surface air temperature due to Aerosols 
+
+  authors:
+    - kuo_chaincy
+
+  references:
+    - acknow_project
+
+  projects:
+    - esmval
+
+datasets:
+# historical
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: historical, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: historical, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: historical, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: historical, ensemble: r1i1p1f1,  start_year: 1995,  end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: historical, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: historical, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
+# hist-piAer
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: hist-piAer,ensemble: r1i1p1f1,  start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: hist-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: hist-piAer, ensemble: r1i1p1f1,   start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: hist-piAer,  ensemble: r1i1p1f1,  start_year: 1995,  end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: hist-piAer, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: hist-piAer, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
+#histSST_models: &histSST_models
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1,  start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
+
+#histSST-piAer: &histSST-piAer_models
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gr1}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
+
+preprocessors:
+  preprocessor1:
+    extract_levels:
+      levels: 85000
+      scheme: nearest
+    regrid:
+      target_grid: 1x1 
+      scheme: linear
+  preprocessor_pr:
+    regrid:
+      target_grid: 1x1 
+      scheme: linear
+    mask_above_threshold: 
+      threshold: 1000. 
+  preprocessor_tas:
+    regrid:
+      target_grid: 1x1 
+      scheme: linear
+    mask_above_threshold: 
+      threshold: 1000. 
+
+diagnostics:
+  diffexpts:
+    description: AerChemMIP  
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      tas:
+        preprocessor: preprocessor_tas
+    scripts:
+      ar6fig6_piAer: 
+#        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_tas_piAer.py
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_tas_piAer_coupledOnly.py
+        piexpt: piAer
