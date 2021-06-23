@@ -59,7 +59,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: 
+Recipes used: 
 - recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
 - recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_highres.yml
 

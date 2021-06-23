@@ -49,7 +49,7 @@ ESMValCore Branch:
 Recipe & diagnostics:
 ---------------------
 Recipes used: 
-- recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_faq3_2_ens.yml
+- recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_faq3_3_ens.yml
 
 Diagnostics used: 
 - diag_scripts/ipcc_ar6/corr_pattern.ncl
@@ -58,7 +58,7 @@ Diagnostics used:
 
 Expected image path:
 --------------------
-- recipe_ipccwg1ar6ch3_fig_faq3_2_ens_YYYYMMDD_HHMMSS/plots/fig_6/cor_collect/patterncor.pdf
+- recipe_ipccwg1ar6ch3_fig_faq3_3_ens_YYYYMMDD_HHMMSS/plots/fig_6/cor_collect/patterncor.pdf
 
 
 Software description:

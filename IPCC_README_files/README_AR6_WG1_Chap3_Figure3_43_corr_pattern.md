@@ -49,7 +49,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipes used: 
+Recipe used: 
 - recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_3_43.yml
 
 Diagnostics used: 
