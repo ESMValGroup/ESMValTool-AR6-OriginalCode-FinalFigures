@@ -30,7 +30,7 @@ Author list:
 ------------
 - Bock, L.: DLR, Germany; lisa.bock@dlr.de
 - Barimalala, R.: University of Cape Town, South Africa
-- Durack, P.: Lawrence Livermore National Laboratory, U.S.
+- Durack, P.: Lawrence Livermore National Laboratory, USA
 
 
 ESMValTool Branch:

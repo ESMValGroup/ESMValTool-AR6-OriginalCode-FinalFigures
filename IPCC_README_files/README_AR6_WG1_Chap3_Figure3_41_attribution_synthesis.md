@@ -49,14 +49,15 @@ Diagnostic used: diag_scripts/ipcc_ar6/tas_anom_damip.ncl
 
 Expected image path:
 --------------------
-- Fig_3_41.pdf
+- Fig_3_41.pdf (See the section Additional instructions below.)
 
 
 Additional datasets:
 --------------------
-received from Lee De Mora:
+received from Lee De Mora (CA in Chapter 3):
 - CMIP6_*_historical_*_detrended_total.nc
 - CMIP6_*_hist-nat_*_detrended_total.nc
+
 received from Chapter 2:
 - AR6_FGD_assessment_timeseries_OHC.csv
 
@@ -72,11 +73,12 @@ Hardware description:
 What machine was used:  Mistral
 
 
-Any further instructions:
--------------------------
+Additional instructions:
+------------------------
 
-1. Create with ESMValTool recipes output nc-files: tas_anom_damip_*.nc; 
-   precip_anom_*.nc; tsline_collect_siconc_*.nc
-2. Create with IPCC_additional_scripts/Fig_3_41_ohc.ncl output nc-file: 
-   ohc_damip.nc (input are ohc-files listed under addtional datasets) 
-3. Create with Fig_3_41_collect.ncl the final figure: Fig_3_41.pdf
+1. Run the three ESMValTool recipes listed above to generate the nc-files: 
+   tas_anom_damip_.nc; precip_anom_.nc; tsline_collect_siconc_*.nc
+2. Run IPCC_additional_scripts/Fig_3_41_ohc.ncl to generate the nc-file: 
+   ohc_damip.nc (input are ohc-files listed under addtional datasets)
+3. Run IPCC_additional_scripts/Fig_3_41_collect.ncl to create the final figure: 
+   Fig_3_41.pdf
