@@ -77,7 +77,7 @@ Additional instructions:
 ------------------------
 
 1. Run the three ESMValTool recipes listed above to generate the nc-files: 
-   tas_anom_damip_.nc; precip_anom_.nc; tsline_collect_siconc_*.nc
+   tas_anom_damip_*.nc; precip_anom_*.nc; tsline_collect_siconc_*.nc
 2. Run IPCC_additional_scripts/Fig_3_41_ohc.ncl to generate the nc-file: 
    ohc_damip.nc (input are ohc-files listed under addtional datasets)
 3. Run IPCC_additional_scripts/Fig_3_41_collect.ncl to create the final figure: 
