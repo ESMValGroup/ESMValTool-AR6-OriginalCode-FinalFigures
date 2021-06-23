@@ -81,7 +81,7 @@ Software description:
 
 Hardware description:
 ---------------------
-What machine was used: Mistral
+Machine used: Mistral
 
 
 Any further instructions: 
