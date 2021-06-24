@@ -1,9 +1,13 @@
+# This is a script to create a figure 3.21 in Chapter 3 IPCC WGI AR6
+# Authors: Elizaveta Malinina (elizaveta.malinina-rieger@canada.ca)
+#          Seung-Ki Min, Yeon-Hee Kim, Nathan Gillett
+
+
 import iris
 from iris.experimental.equalise_cubes import equalise_attributes
 import iris.plot as iplt
 import logging
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.colors as mcolors
@@ -11,8 +15,7 @@ import os
 import sys
 
 # import internal esmvaltool modules here
-from esmvaltool.diag_scripts.shared import group_metadata, run_diagnostic, Datasets
-from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
+from esmvaltool.diag_scripts.shared import run_diagnostic, Datasets
 from esmvaltool.diag_scripts.seaice import ipcc_sea_ice_diag_tools as ipcc_sea_ice_diag
 import esmvaltool.diag_scripts.shared.plot as eplot
 
@@ -23,6 +26,10 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 
 def detect_exp(datasets, panel_id, project):
+
+    # here the name of the experiment is detected
+    # CMIP5 and CMIP6 have different experiment names, dependent on NAT or ALL
+    # the experiment name is coming out
 
     experiments = list(set(datasets.get_info_list('exp', project = project)))
 
@@ -62,10 +69,12 @@ def ensemble_average(cubelist):
 
 def mme_stats(data_cubelist):
 
+    # the function calculates multi-model statistics
+
     # we can't do iris.analysis.MEAN because adding an aux coord realizes the data
     # and then np.nans screw things over, also the averaging is easier because of time stamps
 
-    n_models= len(data_cubelist)
+    n_models = len(data_cubelist)
 
     mod_cube_arr = np.ma.masked_all((n_models,len(data_cubelist[0].coord('time').points)))
 
@@ -91,16 +100,17 @@ def mme_stats(data_cubelist):
     yearly_stamp_point = np.asarray(yearly_stamp_point)
     yearly_stamp_bounds = np.asarray(yearly_stamp_bounds)
 
-    # maybe clean it later as np.datimedelta [D]
     points_days_since = yearly_stamp_point - np.datetime64('1850-01-01')
     bounds_days_since = yearly_stamp_bounds - np.datetime64('1850-01-01')
 
     time_coord = iris.coords.DimCoord(np.asarray(points_days_since,  dtype = np.int32), bounds=np.asarray(bounds_days_since, dtype = np.int32), standard_name='time',
                                       long_name='time', var_name='time', units=cube.coord('time').units)
 
+    # creating a multi-model mean cube
     mme = iris.cube.Cube(mme_arr, long_name= 'multi-model mean of '+var+' anomaly', var_name='mme_sie_ano',
                          units=data_cubelist[0].units, dim_coords_and_dims=[(time_coord,0)])
 
+    # creating a standard deviation cube
     std = iris.cube.Cube(std_arr, long_name= 'multi-model std of '+var+' anomaly', var_name='std_sie_ano',
                          units=data_cubelist[0].units, dim_coords_and_dims=[(time_coord,0)])
 
@@ -108,7 +118,9 @@ def mme_stats(data_cubelist):
     pl_sct_arr[:] = np.nan
     pl_sct_arr[np.abs(mme_arr)>std_arr] = 1
 
-    pl_sct = iris.cube.Cube(pl_sct_arr, long_name= 'significance of '+var+' anomaly', var_name='mme_signif',
+    # here we save the "significance" cube, in case the mean is larger than
+    # standard deviation the value is considered significant
+    pl_sct = iris.cube.Cube(pl_sct_arr, long_name='significance of '+var+' anomaly', var_name='mme_signif',
                          units=data_cubelist[0].units, dim_coords_and_dims=[(time_coord,0)])
 
     stat_dic = {'mme_mean': mme, 'mme_std': std, 'mme_significance': pl_sct, 'n_models': n_models}
@@ -117,6 +129,8 @@ def mme_stats(data_cubelist):
 
 
 def reform_data_dic(data_dic):
+
+    # the structure of the dictionary is reformed to make it easier to plot
 
     verb_month_dict={1:'JAN', 2:'FEB', 3:'MAR', 4:'APR', 5: 'MAY', 6:'JUN',
                      7:'JUL', 8:'AUG', 9: 'SEP', 10:'OCT', 11:'NOV', 12:'DEC'}
@@ -270,14 +284,16 @@ def main(cfg):
 
     dtsts = Datasets(cfg)
 
+    # here we prepare the dictionary structure for the plotting dictionary
     data_dict = {'NH': {}, 'SH': {}}
     panel_ids = ['ALL', 'NAT']
     mod_projects = ['CMIP5', 'CMIP6']
 
+    # obtaining observational dataset names
     obs_names = set(dtsts.get_info_list('dataset', project='OBS'))
 
     for hemisph in data_dict.keys():
-        # here the model structure of data_dic is created. Not graceful, but works
+        # here the model structure of data_dic is created
         for panel_id in panel_ids:
             data_dict[hemisph][panel_id] = {}
             for mod_project in mod_projects:
@@ -292,36 +308,46 @@ def main(cfg):
             for panel_id in panel_ids:
                 for mod_project in mod_projects:
                     data_dict[hemisph][panel_id][mod_project][month] = {}
+                    # since CMIP5 and CMIP6 have different experiment names
+                    # it's needed to be distinguished which experiment it is
                     exp = detect_exp(dtsts, panel_id, mod_project)
                     models = set(dtsts.get_info_list('dataset', exp= exp,project=mod_project))
                     models_cubelist = iris.cube.CubeList()
                     for model in models:
                         ens_fnames = dtsts.get_info_list('filename', dataset=model, exp=exp, project=mod_project)
                         ens_cubelist = iris.load(ens_fnames)
+                        # selecting the months
                         ens_cubelist = ipcc_sea_ice_diag.select_months(ens_cubelist, month)
                         if hemisph == 'NH':
                             ens_cubelist = ipcc_sea_ice_diag.select_latitudes(ens_cubelist, border_lat, 90)
                         else:
                             ens_cubelist = ipcc_sea_ice_diag.select_latitudes(ens_cubelist, -90, border_lat)
                         sea_ice_cubelist = ipcc_sea_ice_diag.calculate_siparam(ens_cubelist, cfg['seaiceextent'])
-                        ano_cubelist = ipcc_sea_ice_diag.substract_ref_period(sea_ice_cubelist, cfg['ref_period'])
+                        # subtracting anomalies for the reference period
+                        ano_cubelist = ipcc_sea_ice_diag.subtract_ref_period(sea_ice_cubelist, cfg['ref_period'])
+                        # calculating 3-year means
                         mean_ano_cubelist = ipcc_sea_ice_diag.n_year_mean(ano_cubelist, 3)
+                        # calculating ensemble average for a model
                         mod_ano_cube = ensemble_average(mean_ano_cubelist)
                         models_cubelist.append(mod_ano_cube)
+                    # calculating multi-model statistics
                     mme_dict = mme_stats(models_cubelist)
                     data_dict[hemisph][panel_id][mod_project][month] = mme_dict
-            #   here observations added, they are already in sia, so they don't need the same preprocessing as models.
+            #  here observations added, they are already in sia,
+            #  so they don't need the same preprocessing as models.
             sia_var = 'siarea' + hemisph[0].lower()
             obses = dtsts.get_info_list('dataset', project='OBS', short_name=sia_var)
             for obs in obses:
                 obs_fname = dtsts.get_info('filename', dataset=obs, project='OBS', short_name=sia_var)
                 obs_cubelist = iris.load(obs_fname)
                 obs_cubelist = ipcc_sea_ice_diag.select_months(obs_cubelist, month)
-                obs_cubelist = ipcc_sea_ice_diag.substract_ref_period(obs_cubelist, cfg['ref_period'])
+                obs_cubelist = ipcc_sea_ice_diag.subtract_ref_period(obs_cubelist, cfg['ref_period'])
                 obs_cubelist = ipcc_sea_ice_diag.n_year_mean(obs_cubelist, 3)
                 obs_cb = ensemble_average(obs_cubelist)
                 data_dict[hemisph]['OBS'][obs][month] = mme_stats([obs_cb])
 
+        #  the data dictionary has awkward structure, so it needs to be
+        #  restructured for an ease of plotting
         data_dict[hemisph] = reform_data_dic(data_dict[hemisph])
 
     make_plot(data_dict, cfg)

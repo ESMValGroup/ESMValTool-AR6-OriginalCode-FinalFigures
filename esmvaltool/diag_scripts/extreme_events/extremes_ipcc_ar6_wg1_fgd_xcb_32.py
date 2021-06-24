@@ -1,3 +1,9 @@
+# This is a script to create a cross-chapter box 3.2 Fig 1 in Ch 3 IPCC WGI AR6
+# Authors: Elizaveta Malinina (elizaveta.malinina-rieger@canada.ca)
+#          Seung-Ki Min, Ying Sun, Nathan Gillett & Chapter 11 team
+# The Fig. is updated from Fig. 3 Seong et al. (2021) 10.1175/JCLI-D-19-1023.1
+# and Fig. 3 from Paik et al. (2020) 10.1175/JCLI-D-20-0002.1
+
 import cf_units
 import cftime
 import datetime
@@ -15,15 +21,15 @@ from esmvaltool.diag_scripts.shared import run_diagnostic, Datasets, Variables
 from esmvaltool.diag_scripts.seaice import ipcc_sea_ice_diag_tools as ipcc_sea_ice_diag
 from esmvalcore.preprocessor import regrid
 import esmvaltool.diag_scripts.shared.plot as eplot
-from esmvaltool.diag_scripts.ocean import diagnostic_tools as diagtools
 
 # # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 # logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+
 def rename_variables(vars, datasets):
 
-    # this function renames the variables in the model to run the script more effectively
+    # function renames variables in the model to run script more effectively
     # tasmax is txx and pr is rx1day
 
     for var in vars.short_names():
@@ -43,6 +49,7 @@ def rename_variables(vars, datasets):
 
     return
 
+
 def sort_experiment_info(datasets, variable,project, exp_key):
     # as variable we mean short_name
 
@@ -58,7 +65,10 @@ def sort_experiment_info(datasets, variable,project, exp_key):
 
     return (exp_name)
 
+
 def obtain_datasets(all_datasets, project, short_name, exp_key):
+
+    # here the datasets are obtained, depending if the data are models or obs
 
     if exp_key == 'OBS':
         exp = exp_key
@@ -71,31 +81,38 @@ def obtain_datasets(all_datasets, project, short_name, exp_key):
 
     return (dataset_names, exp)
 
-def create_obs_mask(obs_filename, var):
+
+def create_obs_mask(obs_filename):
+
+    # the observational mask is created from the observational data file
 
     obs_data = iris.load_cube(obs_filename)
 
     n_lats = len(obs_data.coord('latitude').points)
     n_lons = len(obs_data.coord('longitude').points)
 
-    obs_mask = np.ones((n_lats, n_lons), dtype = bool)
+    obs_mask = np.ones((n_lats, n_lons), dtype=bool)
 
     n_years = len(obs_data.coord('time').points)
+    # grid cells with more than 70% data availability during all years
+    # plus data for at least year_param years during last last_years_n are used
     t_param = round((n_years*0.7)+0.5)
 
-    last_years_n= n_years - 5
-    year_param=3
+    last_years_n = n_years - 5
+    year_param = 3
 
     for lat in range(n_lats):
         for lon in range(n_lons):
+            # the mask as boolean array is created
             if ((np.ma.count(obs_data.data[:, lat, lon])>=t_param)&(np.ma.count(obs_data.data[last_years_n:, lat, lon])
                                                                     >= year_param)):
                 obs_mask[lat, lon] = False
 
     return (obs_mask)
 
+
 def reform_exp_keys(project, exp_keys):
-    #      this function is made in order to pass the correct keys into the next loop
+    # function is made in order to pass the correct keys into the next loop
     if project =='OBS':
         exp_keys = ['OBS']
     else:
@@ -104,21 +121,33 @@ def reform_exp_keys(project, exp_keys):
 
     return(exp_keys)
 
+
 def obtain_filepaths(all_datasets, dataset, project, short_name, exp):
 
+    # here the filepaths depending if it's observations or models are obtained
     if exp == 'OBS':
-        filepaths = all_datasets.get_dataset_info_list(dataset=dataset, project=project, short_name=short_name)
+        filepaths = all_datasets.get_dataset_info_list(dataset=dataset,
+                                                       project=project,
+                                                       short_name=short_name)
     else:
-        filepaths = all_datasets.get_dataset_info_list(dataset=dataset, project=project, short_name=short_name, exp=exp)
+        filepaths = all_datasets.get_dataset_info_list(dataset=dataset,
+                                                       project=project,
+                                                       short_name=short_name,
+                                                       exp=exp)
 
     return(filepaths)
 
+
 def covert_to_flx(cubelist):
+
+    # the data in observations is in mm, but in model it's flux (kg m-2 s-1),
+    # so it needs conversion to mm
 
     converted_cblst = iris.cube.CubeList()
 
     for cube in cubelist:
-        cube = cube * 86400  # convert precipitation_flux / (kg m-2 s-1) to mm 60 s*60 m*24 h
+        cube = cube * 86400  # convert (kg m-2 s-1) to mm 60 s*60 m*24 h
+        # renaming the cube attributes
         cube.standard_name = 'precipitation_amount'
         cube.var_name = 'precip'
         cube.units = 'mm'
@@ -127,19 +156,29 @@ def covert_to_flx(cubelist):
 
     return (converted_cblst)
 
+
 def fit_cdf(cubelist, end_year, mod_name, exp, r_dir, proj):
 
+    # here the extreme distribution function is fitted for the rx1day data
+    # since the process is very slow, the data is saved to the run directory
+
+    # defining the directory where the extreme data is stored
     cdf_dir = os.path.join(r_dir, 'rx1day_cdfs')
+    # if the directory doesn't exist, create it
     if not os.path.isdir(cdf_dir):
         os.mkdir(cdf_dir)
 
-    cont=np.asarray(os.listdir(cdf_dir))
+    # here the content of the directory is called
+    cont = np.asarray(os.listdir(cdf_dir))
 
+    # checking if a data for the model, experiment, and project already exists
+    # if yes, just load the dataset, if not calculate and save
     if np.any([(mod_name in fname) & (proj in fname) & (exp in fname) for fname in cont]):
         fname = cont[[(mod_name in fname) & (proj in fname) & (exp in fname) for fname in cont]][0]
         cdf_cubelist = iris.load(os.path.join(cdf_dir, fname))
     else:
         cdf_cubelist = iris.cube.CubeList()
+        # taking only the data until the end_year which is provided in recipe
         constr = iris.Constraint(time=lambda cell: cell.point.year <= end_year)
 
         for nc, cube in enumerate(cubelist):
@@ -148,24 +187,44 @@ def fit_cdf(cubelist, end_year, mod_name, exp, r_dir, proj):
             ntim = len(cube.coord('time').points)
             nlat = len(cube.coord('latitude').points)
             nlon = len(cube.coord('longitude').points)
+            # creating an array for cdf
             cdf = np.ma.masked_all((ntim, nlat, nlon))
             for lat in range(0, nlat):
                 for lon in range(0, nlon):
+                    # getting data for all years for a specific point on the
+                    # grid in the cube with all data
                     cube_point = cube.data[:, lat, lon]
+                    # getting data for all years for a specific point on the
+                    # grid in the short cube (which end in the end year)
                     short_cube_point = short_cube.data[:, lat, lon]
+                    # checking the masks
                     if not (short_cube_point.mask.all()|(np.sum(short_cube_point.data[~short_cube_point.mask]<=1e-04)>0.35*ntim_sh)):
+                        # getting the extreme distribution function parameters
                         gev_par = gev.fit(short_cube_point[~short_cube_point.mask])
-                        cdf[:,lat,lon] = gev.cdf(cube_point, gev_par[0], loc=gev_par[1], scale=gev_par[2]) * 100 # *100 to translate it to %
+                        # cdf is calculated from params and multiplied by 100
+                        # to translate it to %
+                        cdf[:,lat,lon] = gev.cdf(cube_point, gev_par[0],
+                                        loc=gev_par[1], scale=gev_par[2]) * 100
+            #  if cdf value is 100% it's masked out
             cdf.mask[cdf==100]=True
-            cdf_cube=iris.cube.Cube(cdf, long_name='Probability index', var_name='cdf', units='%', attributes=cube.attributes, dim_coords_and_dims=cube._dim_coords_and_dims)
+            # saving the cdfs to a cube
+            cdf_cube=iris.cube.Cube(cdf, long_name='Probability index',
+                                    var_name='cdf', units='%',
+                                    attributes=cube.attributes,
+                                    dim_coords_and_dims=cube._dim_coords_and_dims)
             cdf_cubelist.append(cdf_cube)
+        # saving the cdfs for all ensembles in a model to a netcdf file
         iris.save(cdf_cubelist, os.path.join(cdf_dir,
                                          'cdf_' + proj + '_' + exp +
                                          '_' + mod_name + '.nc'))
 
     return (cdf_cubelist)
 
+
 def dataset_regriding(cubelist, exp, obs_filename):
+
+    # re-gridding the model dataset to the observational grid
+    # if the project is observations, not need to re-grid, only models
 
     if exp =='OBS':
         regridded_cubelist = cubelist
@@ -178,18 +237,22 @@ def dataset_regriding(cubelist, exp, obs_filename):
 
     return (regridded_cubelist)
 
+
 def apply_obs_mask(cubelist, mask):
+    # applying observational mask which was creating earlier depending on the
+    # data availability in the obs file
 
     for cube in cubelist:
         if cube.shape[1:] == mask.shape:
             cube.data.mask = cube.data.mask | mask
         else:
-            print('The regridding did not work correctly')
+            logger.info('The regridding did not work correctly')
 
     return(cubelist)
 
+
 def create_coords(cubelist, year_n):
-    # dirty trick, we try to unify time to merge  the cubelist in the end
+    # dirty trick, we try to unify time to merge the cubelist in the end
 
     cb = cubelist [0]
 
@@ -214,28 +277,31 @@ def create_coords(cubelist, year_n):
             range(0, int(n_t / year_n))]
     if n_t%year_n != 0:
         # raise warning
-        print('The n of years is not divisible by '+str(year_n))
-        # coord.append(np.average(cb.coord('time').points[int(n_t / year_n):-1]))
-        # bnds.append([cb.coord('time').bounds[int(n_t / year_n) * year_n][0], cb.coord('time').bounds[-1][1]])
+        logger.info('The n of years is not divisible by '+str(year_n))
 
+    # creating an iris coordinate
     dcoord = iris.coords.DimCoord(np.asarray(coord), bounds=np.asarray(bnds), standard_name='time',
                                   units=cf_units.Unit(dest_orig, dest_calendar), long_name='time', var_name='time')
 
     return (dcoord)
 
+
 def n_year_mean(cubelist, n):
 
+    # this function calculates n_year average for the provided cubelist
     # the idea behind it is that we pass the cubelist with the same time coords
 
     n_aver_cubelist = iris.cube.CubeList()
 
+    # cubelist might have different calendars, this function just chooses one
     dcoord = create_coords(cubelist, n)
 
     for cube in cubelist:
         n_t = len(cube.coord('time').points)
         if n_t%n!=0:
-            # add here a warning that the last is an average of n_t%n==0 years
-            print('The n of years is not divisible by '+str(n)+' last '+str(n_t%n)+' years were not taken into account')
+            # a warning that the last is an average of n_t%n==0 years
+            logger.info('The n of years is not divisible by '+str(n)+' last '+str(n_t%n)+' years were not taken into account')
+        # averaging the data for n years and saving it to a cube
         data = np.asarray([np.average(cube.data[n * i:n * i + n], axis=0) for i in range(0, int(n_t / n))])
         n_aver_cube = iris.cube.Cube(data, long_name=cube.long_name + ', ' + str(n) + 'y mean',
                                      var_name=cube.var_name, units=cube.units, attributes=cube.attributes,
@@ -245,7 +311,10 @@ def n_year_mean(cubelist, n):
 
     return (n_aver_cubelist)
 
+
 def area_wght_averaging(cubelist):
+
+    # calculating an area averaged mean for each cube in a cubelist
 
     area_wght_cblst = iris.cube.CubeList()
 
@@ -256,11 +325,15 @@ def area_wght_averaging(cubelist):
 
     return (area_wght_cblst)
 
+
 def ens_averaging(cubelist):
 
-    if len(cubelist) >1:
+    # averaging the data for the whole ensemble for a model
+
+    if len(cubelist) > 1:
         for n, cube in enumerate(cubelist):
             cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='n_order', var_name='n_order'))
+            # some precip cubes have names like 'precip_ano1' and are renamed
             if 'precip' in cube.var_name:
                 cube.var_name = 'precip_ano'
         equalise_attributes(cubelist)
@@ -271,6 +344,7 @@ def ens_averaging(cubelist):
         aver_ens_cube = cubelist[0]
 
     return (aver_ens_cube)
+
 
 def calculate_stats(cubelist):
 
@@ -316,6 +390,7 @@ def calculate_stats(cubelist):
     stats_dic['n_models'] = n_models
 
     return(stats_dic)
+
 
 def make_panel(data_dic, variable, exp_key, nrows, ncols, idx, ref_period, obs_cube):
 
@@ -391,6 +466,7 @@ def make_panel(data_dic, variable, exp_key, nrows, ncols, idx, ref_period, obs_c
 
     return
 
+
 def make_figure(data_dic, cfg):
 
     ncols = len(data_dic.keys())
@@ -408,18 +484,20 @@ def make_figure(data_dic, cfg):
         obs = data_dic[vrbl].pop('OBS')
         for k, exp_key in enumerate(sorted(data_dic[vrbl].keys())):
             make_panel(data_dic[vrbl][exp_key], vrbl, exp_key, ncols, nrows,
-                       (n+1)+(k+1)*k, cfg['ref_period'], obs_cube = obs['OBS'])
+                       (n+1)+(k+1)*k, cfg['ref_period'], obs_cube=obs['OBS'])
 
-    fig.suptitle('Climate Extremes Indices', fontsize = 'x-large')
+    fig.suptitle('Climate Extremes Indices', fontsize='x-large')
     fig.set_dpi(250)
 
     return
+
 
 def main(cfg):
 
     vrbls = Variables(cfg)
     all_dtsts = Datasets(cfg)
 
+    # model datasets are already rx1day and txx, but need renaming
     rename_variables(vrbls, all_dtsts)
     vrbls_list = list(set(all_dtsts.get_info_list('short_name')))
 
@@ -433,32 +511,47 @@ def main(cfg):
         projects = set(all_dtsts.get_info_list('project', short_name=vrbl))
         obs_filename = all_dtsts.get_dataset_info(project='OBS',
                                                   short_name=vrbl)['filename']
-        obs_mask = create_obs_mask(obs_filename, vrbl)
+        # creating observational mask from obs_filename
+        obs_mask = create_obs_mask(obs_filename)
         for project in sorted(projects):
+            # this function reforms raw_exp_keys
             exp_keys = reform_exp_keys(project, raw_exp_keys)
             for exp_key in sorted(exp_keys):
+                # the datasets are obtained depending on the project
                 dtsts, exp = obtain_datasets(all_dtsts, project=project,
                                              short_name=vrbl, exp_key=exp_key)
                 ens_cubelist = iris.cube.CubeList()
                 for dtst in dtsts:
+                    # the filepaths depending on the projects are obtained
                     flpths = obtain_filepaths(all_dtsts, dataset=dtst,
                                               project=project, short_name=vrbl,
                                               exp=exp)
-                    mod_cblst = ipcc_sea_ice_diag.load_cubelist([dtst['filename'] for dtst in flpths])
+                    mod_cblst = iris.load([dtst['filename'] for dtst in flpths])
                     if vrbl == 'rx1day':
                         if exp != 'OBS':
+                            # pr data in models is flux, to be converted to mm
                             mod_cblst = covert_to_flx(mod_cblst)
                         r_dir = cfg['run_dir']
+                        # here the extreme distribution function is fitted
+                        # it is very-very slow slow process
                         mod_cblst = fit_cdf(mod_cblst, cfg['year_gev_end'],
                                             mod_name=dtst, exp=exp,
-                                            r_dir=r_dir, proj=project)  # very slow process in order to plot quicker commented
+                                            r_dir=r_dir, proj=project)
+                    # the dataset is re-gridded onto the observational grid
                     mod_cblst = dataset_regriding(mod_cblst, exp, obs_filename)
+                    # here the observational dataset is applied
                     mod_cblst = apply_obs_mask(mod_cblst, obs_mask)
-                    ano_mod_cblst = ipcc_sea_ice_diag.substract_ref_period(mod_cblst, cfg['ref_period'])
+                    # here the anomalies are subtracted
+                    ano_mod_cblst = ipcc_sea_ice_diag.subtract_ref_period(mod_cblst, cfg['ref_period'])
+                    # here the area weighted average is calculated
                     wght_mod_cblst = area_wght_averaging(ano_mod_cblst)
+                    # an 5-year mean is calculated
                     aver_mod_cblst = n_year_mean(wght_mod_cblst,5)
                     # mod_cube = ens_averaging(aver_mod_cblst)
                     ens_cubelist.append(aver_mod_cblst)
+                # here depending if it's observations or models either just the
+                # data is submitted to the dictionary, or statistics for models
+                # are calculated
                 if exp == 'OBS':
                     plotting_dic[vrbl][exp_key][project] = ens_cubelist[0][0]
                 else:

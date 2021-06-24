@@ -1,19 +1,19 @@
 """
-Diagnostics for fig 3.21
+Diagnostics for fig 3.24 in Chapter 3 of IPCC AR6 WGI
 ========================
 
 
 Author: Lee de Mora (PML)
         ledm@pml.ac.uk
+Revised and corrected (15.01.2021): Elizaveta Malinina (CCCma)
+                        elizaveta.malinina-rieger@canada.ca
 
 """
 import logging
 import os
 import sys
-from itertools import product
 
 import iris
-import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -24,8 +24,6 @@ import esmvaltool.diag_scripts.shared.plot as eplot
 # This part sends debug statements to stdout
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-
-dpi = 100
 
 
 def titlify(title):
@@ -116,9 +114,6 @@ def make_single_zonal_mean_plots(
     else:
         title = ' '.join([key_word, metadata['dataset'], ])
     plt.title(title)
-
-   # Add Legend outside right.
-    # diagtools.add_legend_outside_right(plot_details, plt.gca())
 
     # Load image format extention
     image_extention = diagtools.get_image_format(cfg)
@@ -274,7 +269,6 @@ def make_std_of_cube_list(cube_list, axis):
         print(model, cube.data[0])
         for l, coord in np.ndenumerate(coords):
             dat = cube.data.squeeze()[l]
-        #     print(model, l, coord, dat, cube.data.shape)
             if np.isnan(dat) or np.ma.is_masked(dat):
                 dat = 1.e20
             out_dict[coord].append(dat)
@@ -291,7 +285,7 @@ def make_std_of_cube_list(cube_list, axis):
 
 def make_perc_cube_list(cube_list, perc, axis):
     """
-    Makes the standard deviation of a list of cubes (not an iris.cube.CubeList).
+    Makes the percentiles of a list of cubes (not an iris.cube.CubeList).
 
     Assumes all the cubes are the same shape and 1D.
     """
@@ -498,19 +492,15 @@ def make_multimodle_zonal_mean_plots(
                 ylabel = 'SST bias ('+r'$^\circ$'+'C)'
 
         if pane in 'a':
-                # cube_std = make_std_of_cube_list(errorcubeslist, 'lat')
                 cube_perc_5 = make_perc_cube_list(errorcubeslist, 5, 'lat')
                 cube_perc_95 = make_perc_cube_list(errorcubeslist, 95, 'lat')
                 plt.text(-75, -2.0 - list(projects.keys()).index(project)*0.45, project, c= mip_color)
                 plt.ylim(-3.1, 2.75)
-                # fill_between_two_cubes(project_mean_error - cube_std, project_mean_error + cube_std, mip_color)
                 fill_between_two_cubes(cube_perc_5, cube_perc_95, mip_color)
 
         if pane in 'ab':
-                # cube_std = make_std_of_cube_list(errorcubeslist, 'lon')
                 cube_perc_5 = make_perc_cube_list(errorcubeslist, 5, 'lon')
                 cube_perc_95 = make_perc_cube_list(errorcubeslist, 95, 'lon')
-                # fill_between_two_cubes(project_mean_error - cube_std, project_mean_error + cube_std, mip_color)
                 fill_between_two_cubes(cube_perc_5, cube_perc_95, mip_color)
 
         if pane in 'c':
@@ -518,13 +508,9 @@ def make_multimodle_zonal_mean_plots(
                 project_mean = make_mean_of_cube_list(cubeslist)
                 key_word, xlabel = plot_zonal_cube(project_mean, plot_details[project])
 
-                # cube_std = make_std_of_cube_list(cubeslist, 'lon')
                 cube_perc_5 = make_perc_cube_list(cubeslist, 5, 'lon')
                 cube_perc_95 = make_perc_cube_list(cubeslist, 95, 'lon')
                 print('project_mean', project_mean.data.min(), project_mean.data.max())
-                # print('cube_std', cube_std.data.min(), cube_std.data.max())
-                #assert 0
-                # fill_between_two_cubes(project_mean - cube_std, project_mean + cube_std, mip_color)
                 fill_between_two_cubes(cube_perc_5, cube_perc_95, mip_color)
 
                 plot_details[obs_key] = {'c': 'black', 'ls': '-', 'label': obs_key}
@@ -589,7 +575,6 @@ def main(cfg):
         the opened global config dictionairy, passed by ESMValTool.
 
     """
-    dpi = 100
     #####
     # individual panes
     for pane in ['a', 'b', 'c', ]:

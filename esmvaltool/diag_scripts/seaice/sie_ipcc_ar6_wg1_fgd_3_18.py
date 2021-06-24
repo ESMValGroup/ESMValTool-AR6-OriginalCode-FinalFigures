@@ -1,3 +1,7 @@
+# This is a script to create a figure 3.20 in Chapter 3 IPCC WGI AR6
+# Authors: Elizaveta Malinina (elizaveta.malinina-rieger@canada.ca)
+#          Seung-Ki Min, Yeon-Hee Kim, Nathan Gillett
+
 import iris
 import logging
 import numpy as np
@@ -17,6 +21,7 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 
 def calculate_entry_stat(cubelist):
+
     list_dic = []
 
     for cube in cubelist:
@@ -28,13 +33,15 @@ def calculate_entry_stat(cubelist):
             reg = stats.linregress(x, cube.data)
             mean = np.average(cube.data)
             slope = reg.slope
-        # list of dictionaries. Not beautiful, but works. It is not needed which realisation the data belongs to.
+        # list of dictionaries. Not beautiful, but works.
+        # It is not needed to know which realisation the data belongs to.
         list_dic.append({'mean': mean, 'lin_reg_slope': slope})
 
     return (list_dic)
 
 
 def ens_average(ens_list_dic):
+
     if len(ens_list_dic) == 1:
         mod_mean = ens_list_dic[0]['mean']
         mod_dec_slope = ens_list_dic[0]['lin_reg_slope'] * 10
@@ -48,10 +55,11 @@ def ens_average(ens_list_dic):
 
 
 def model_stats(inp_dict):
+
     means = np.asarray([inp_dict[key]['mean'] for key in inp_dict.keys()])
     slopes = np.asarray([inp_dict[key]['dec_slope'] for key in inp_dict.keys()])
 
-    # may be remove it in the future. Basically, checks if we're not comparing numbers with nans
+    # checks if we're not comparing numbers with nans
     mask = np.isfinite(means) & np.isfinite(slopes)
 
     reg = stats.linregress(means[mask], slopes[mask])
@@ -173,11 +181,14 @@ def make_plot(data_dict, cfg):
 
 
 def main(cfg):
+
     dtsts = Datasets(cfg)
 
+    # here we create the dictionary which afterwards will be plotted
     data_dict = {'NH': {'CMIP5': {}, 'CMIP6': {}}, 'SH': {'CMIP5': {}, 'CMIP6': {}}}
 
     for hemisph in data_dict.keys():
+        # here we choose the month and the part of hemisphere
         month = cfg['month_latitude_' + hemisph][0]
         border_lat = cfg['month_latitude_' + hemisph][1]
         for project in data_dict[hemisph].keys():
@@ -190,11 +201,16 @@ def main(cfg):
                     ens_cubelist = ipcc_sea_ice_diag.select_latitudes(ens_cubelist, border_lat, 90)
                 else:
                     ens_cubelist = ipcc_sea_ice_diag.select_latitudes(ens_cubelist, -90, border_lat)
+                # calculating sea ice area or extent, depending on seaiceextent
                 sea_ice_cubelist = ipcc_sea_ice_diag.calculate_siparam(ens_cubelist, cfg['seaiceextent'])
+                #  calculating climatology and regression slope
                 ens_stats = calculate_entry_stat(sea_ice_cubelist)
+                # calculating average over ensembles in the model
                 mod_mean, mod_dec_slope = ens_average(ens_stats)
+                # creating a dictionary for a model with mean and decadal slope
                 data_dict[hemisph][project][model] = {'mean': mod_mean}
                 data_dict[hemisph][project][model]['dec_slope'] = mod_dec_slope
+            #  calculating the statistics for a multi-model ensemble
             data_dict[hemisph][project] = model_stats(data_dict[hemisph][project])
         # here observations are added, they are already provided as sia. no need to process them the same way as models
         sia_var = 'siarea' + hemisph[0].lower()

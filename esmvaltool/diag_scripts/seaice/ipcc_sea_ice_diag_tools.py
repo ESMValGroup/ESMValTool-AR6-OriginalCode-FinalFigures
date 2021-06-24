@@ -1,10 +1,12 @@
+# This is a set of additional functions which were used to create cryopsheric
+# figures and CCB 3.2 Figure 1 of IPCC WGI AR6 Chapter 3
+# Author: Elizaveta Malinina (elizaveta.malinina-rieger@canada.ca)
+
 import iris
-from iris.experimental.equalise_cubes import equalise_attributes
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from scipy import stats, special
 import sys
 
 # import internal esmvaltool modules here
@@ -17,6 +19,8 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 def select_months(cubelist,month):
 
+    # selecting a month in each cube in a cubelist
+
     month_constr = iris.Constraint(time=lambda cell: cell.point.month == month)
 
     cropped_cubelist = iris.cube.CubeList()
@@ -27,9 +31,10 @@ def select_months(cubelist,month):
 
     return (cropped_cubelist)
 
+
 def select_latitudes(cubelist, start_lat=-90, end_lat=90):
 
-    # possibly add here a warning about start_ and end_lat
+    # selecting latitudes depending on the start and end latitude
 
     lat_constr=iris.Constraint(latitude=lambda cell: start_lat < cell <= end_lat)
 
@@ -40,17 +45,6 @@ def select_latitudes(cubelist, start_lat=-90, end_lat=90):
         cropped_cubelist.append(cropped_cube)
 
     return (cropped_cubelist)
-
-
-def load_cubelist(filenames):
-
-    cubelist = iris.cube.CubeList()
-
-    for n, filename in enumerate(filenames):
-        cube=iris.load_cube(filename)
-        cubelist.append(cube)
-
-    return (cubelist)
 
 
 def calculate_siextent(cubelist, threshold=15):
@@ -84,7 +78,11 @@ def calculate_siextent(cubelist, threshold=15):
 
     return (conv_cubelist)
 
+
 def calculate_siarea(cubelist):
+
+    # calculates siarea for the hemisphere
+    # creates a cubelist with only one dimension: 'time'
 
     sia_cubelist = iris.cube.CubeList()
     for cube in cubelist:
@@ -104,8 +102,9 @@ def calculate_siarea(cubelist):
 
     return (sia_cubelist)
 
+
 def calculate_siparam(cubelist, siext=True):
-    # function which determines if sea ice extent or sea ice are should be calculated
+    # function determines if sea ice extent or sea ice are should be calculated
 
     if siext:
         cubelist=calculate_siextent(cubelist)
@@ -114,32 +113,43 @@ def calculate_siparam(cubelist, siext=True):
 
     return (cubelist)
 
+
 def n_year_mean(cubelist, n):
 
+    # this function calculates n_year average for the provided cubelist
     # the idea behind it is that we pass the cubelist with the same time coords
 
     n_aver_cubelist = iris.cube.CubeList()
 
+    # cubelist might have different calendars, this function just chooses one
     dcoord = create_coords(cubelist, n)
 
     for cube in cubelist:
         n_t = len(cube.coord('time').points)
         if n_t%n!=0:
-            # add here a warning that the last is an average of n_t%n==0 years
+            # a warning that the last is an average of n_t%n==0 years
             logger.info('The n of years is not divisible by %s last %s years were not taken into account',
                         str(n), str(n_t%n))
+        # stupid but works, checks a shape of a cube and assuming the first one
+        # is time, averages over it
         if len(cube.data.shape) == 1:
+            # averaging
             data = [np.average(cube.data[n*i:n*i + n]) for i in range(0, int(n_t / n))]
+            # renaming cube
             n_aver_cube = iris.cube.Cube(np.asarray(data), long_name=cube.long_name + ', ' + str(n) + 'y mean',
                                          var_name=cube.var_name, units=cube.units,
                                          attributes=cube.attributes, dim_coords_and_dims=[(dcoord, 0)])
         elif len(cube.data.shape) == 2:
+            # averaging
             data = np.asarray([np.average(cube.data[n * i:n * i + n, :], axis=0) for i in range(0, int(n_t / n))])
+            # renaming cube
             n_aver_cube =iris.cube.Cube(data, long_name=cube.long_name + ', ' + str(n) + 'y mean',
                                                  var_name=cube.var_name, units=cube.units, attributes=cube.attributes,
                                                  dim_coords_and_dims=[(dcoord,0), (cube.coords()[1],1)])
         elif len(cube.data.shape) == 3:
+            # averaging
             data = np.asarray([np.average(cube.data[n * i:n * i + n, :, :], axis=0) for i in range(0, int(n_t / n))])
+            # renaming cube
             n_aver_cube = iris.cube.Cube(data, long_name=cube.long_name + ', ' + str(n) + 'y mean',
                                          var_name=cube.var_name, units=cube.units, attributes=cube.attributes,
                                          dim_coords_and_dims=[(dcoord, 0), (cube.coords()[1], 1), (cube.coords()[2],2)])
@@ -147,6 +157,7 @@ def n_year_mean(cubelist, n):
         n_aver_cubelist.append(n_aver_cube)
 
     return (n_aver_cubelist)
+
 
 def create_coords(cubelist, year_n):
     # dirty trick, we try to unify time to merge  the cubelist in the end
@@ -160,8 +171,6 @@ def create_coords(cubelist, year_n):
     if n_t%year_n != 0:
         # raise warning
         logger.info('The n of years is not divisible by %s', str(year_n))
-        # coord.append(np.average(cb.coord('time').points[int(n_t / year_n):-1]))
-        # bnds.append([cb.coord('time').bounds[int(n_t / year_n) * year_n][0], cb.coord('time').bounds[-1][1]])
 
     dcoord = iris.coords.DimCoord(np.asarray(coord), bounds=np.asarray(bnds),
                                   standard_name=cb.coord('time').standard_name,
@@ -171,7 +180,10 @@ def create_coords(cubelist, year_n):
     return (dcoord)
 
 
-def substract_ref_period(cubelist, ref_period):
+def subtract_ref_period(cubelist, ref_period):
+
+    # here we subtract the reference period which is provided as a list
+    # as a second input parameter. Basically, subtracting anomalies
 
     constr = iris.Constraint(time=lambda cell: ref_period[0] <= cell.point.year <= ref_period[1])
 
@@ -181,16 +193,20 @@ def substract_ref_period(cubelist, ref_period):
         mean = cube.extract(constr).collapsed('time', iris.analysis.MEAN)
         upd_cube = cube - mean
         upd_cube.attributes = cube.attributes
+        # here the cube is renamed
         upd_cube.long_name = cube.long_name + ' anomaly'
         upd_cube.var_name = cube.var_name + '_ano'
         upd_cubelist.append(upd_cube)
 
     return(upd_cubelist)
 
-def figure_handling(cfg, name = 'plot', img_ext=None):
+
+def figure_handling(cfg, name='plot', img_ext=None):
+
+    #  this is a function which saves the figure into a provided figure type,
+    # or defines if from cfg dictionary or shows the figure
 
     if cfg['write_plots']:
-
         if img_ext == None:
             img_ext = diagtools.get_image_format(cfg)
 
@@ -198,9 +214,7 @@ def figure_handling(cfg, name = 'plot', img_ext=None):
 
         logger.info('Saving plots to %s', path)
         plt.savefig(path)
-
     else:
-
         plt.show()
 
     return

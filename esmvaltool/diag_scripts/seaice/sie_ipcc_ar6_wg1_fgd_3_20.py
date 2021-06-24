@@ -1,3 +1,8 @@
+# This is a script to create a figure 3.20 in Chapter 3 IPCC WGI AR6
+# Authors: Elizaveta Malinina (elizaveta.malinina-rieger@canada.ca)
+#          Seung-Ki Min, Olaf Morgenstern, Seungmok Paik, Nathan Gillett
+# The figure is modified from Fig. 1 from Paik et al. (2020), 10.1175/JCLI-D-20-0002.1
+
 import cf_units
 import datetime
 import esmvalcore
@@ -24,7 +29,8 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 def concatenate_observations(cfg, datasets):
 
-    # clean before merging
+    # Here the datasets defined in the recipe are concatenated together
+    # the new datacube is saved into the work directory
 
     if cfg['merge_scen_observations']:
         datasets_to_conc= cfg['obs_dataset_merging']
@@ -46,7 +52,7 @@ def concatenate_observations(cfg, datasets):
         dtsts_info['end_year'] = datasets.get_info('end_year',f_names[-1])
         dtsts_info['alias'] = 'OBS'+merging_fs[:-1]
         dtsts_info['dataset'] = merging_fs[:-1]
-        datasets.add_dataset(result_f_name, dataset_info= dtsts_info)
+        datasets.add_dataset(result_f_name, dataset_info=dtsts_info)
         datasets.set_data(data = {}, path=result_f_name, dataset_info=dtsts_info)
 
     return
@@ -57,7 +63,7 @@ def update_dataset_info(datasets):
     projects = set(datasets.get_info_list('project'))
 
     if 'OBS' in projects:
-        obs_datasets = datasets.get_info_list('filename',project = 'OBS')
+        obs_datasets = datasets.get_info_list('filename', project='OBS')
         for obs_dataset in obs_datasets:
             obs_dataset_info = datasets.get_dataset_info(obs_dataset)
             updated_info = obs_dataset_info
@@ -69,18 +75,23 @@ def update_dataset_info(datasets):
 
 def mask_greenland(cubelist, var_name, shape_file):
 
+    # this is a function to mask out greenland from the model data
+
+    # some of the observations are already as snow cover extent
+    # that's why we need to mask only the datasets that are grid-resolved
     if 'snw' in var_name:
 
         masked_cubelist = iris.cube.CubeList()
 
         for cube in cubelist:
-            masked_cube = esmvalcore.preprocessor.extract_shape(cube, shape_file, crop = False)
+            # here greenland shape is extracted from a cube
+            masked_cube = esmvalcore.preprocessor.extract_shape(cube, shape_file, crop=False)
+            # here a the mask is reversed to mask greenland out
             mask = ~ masked_cube.data.mask
-            if cube.data.mask.all() == False:
-                cb_mask = np.zeros(cube.shape, dtype=bool)
-            else:
-                cb_mask = cube.data.mask
-            cube.mask = cb_mask | masked_cube.data.mask
+            cb_mask = cube.data.mask
+            # here the mask is applied, the end mask is combination of original
+            # mask and greenland mask
+            cube.data.mask = cb_mask | mask
             masked_cubelist.append(cube)
     else:
         masked_cubelist = cubelist
@@ -89,6 +100,8 @@ def mask_greenland(cubelist, var_name, shape_file):
 
 
 def select_months(cubelist, months_list):
+    # selecting months, since there are several months needed for calculation
+    # usual approach doesn't work and a separate function is needed
 
     res_cubelist = iris.cube.CubeList()
 
@@ -101,7 +114,9 @@ def select_months(cubelist, months_list):
 
     return(res_cubelist)
 
-def calculate_sce(cubelist, var_name, threshold = 5):
+
+def calculate_sce(cubelist, var_name, threshold=5):
+    # function to calculate snow cover extent
 
     sce_cubelist = iris.cube.CubeList()
 
@@ -139,7 +154,7 @@ def calculate_sce(cubelist, var_name, threshold = 5):
                 area = np.ma.array(area, mask=mask)
                 area = area.sum(axis=(1, 2))/ 1e12
                 month = cf_units.num2date(cube.coord('time').points[0], orig, calendar).month
-                # for now passing paren cube attributes, clean before merging!!!
+                # passing parent cube attributes, to save the info on a model
                 sce_cube = iris.cube.Cube(area, long_name='snow cover extent', var_name='sce',
                                     units="10^6km2", attributes=cube.attributes, dim_coords_and_dims=[(tim_coor, 0)])
                 sce_cube.add_aux_coord(iris.coords.AuxCoord(month, long_name='month', var_name='month'))
@@ -150,7 +165,9 @@ def calculate_sce(cubelist, var_name, threshold = 5):
 
     return (sce_cubelist)
 
+
 def monthly_av(cubelist):
+    # averaging over the months
 
     aver_cubelist = iris.cube.CubeList()
 
@@ -162,9 +179,12 @@ def monthly_av(cubelist):
 
 
 def shuffle_period(cubelist, period):
+    # this is a function to re-shuffle piControl data, piControl can have more
+    # than period time points, so it need shuffled to the n period sized array
 
     shuffled_cubelist = iris.cube.CubeList()
 
+    # creating data for time coordinates, calculated for period
     pnts = [datetime.datetime(yr, 7,1) for yr in np.arange(period[0], period[1]+1)]
     bnds = [[datetime.datetime(yr, 1,1),datetime.datetime(yr, 12, 31)] for yr in np.arange(period[0], period[1]+1)]
 
@@ -187,15 +207,22 @@ def shuffle_period(cubelist, period):
         n_coord = iris.coords.DimCoord(np.arange(n_rows), long_name='n', var_name='n')
         for row in range(n_rows):
             sub_shuf_data[:, row] = data[row*nyears:(row*nyears + nyears)]
+        # this is a shuffled cube for a model
         shuffled_cube =iris.cube.Cube(sub_shuf_data, long_name='shuffled snow cover extent', var_name='sce',
                             units="10^6km2", attributes=cube.attributes, dim_coords_and_dims=[(time_coord, 0), (n_coord, 1)])
         shuffled_cubelist.append(shuffled_cube)
 
     return (shuffled_cubelist)
 
+
 def cubelist_averaging(cubelist, exp, model_name):
 
+    # averaging cubelist, this function is a bit of a rest from the previous
+    # logic of a program. It saves the data in order to calculate stats later
+
+    # here we look at the number of experiments in a cubelist
     if len(cubelist)>1:
+        # if there 2+ members weights are calculated usually
         if exp == 'piControl':
             len_arr = []
             for cube in cubelist:
@@ -208,6 +235,7 @@ def cubelist_averaging(cubelist, exp, model_name):
                     cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis', bounds = [n-1, n+1]))
                 equalise_attributes(cubelist)
                 merged_cube = cubelist.merge_cube()
+                # calculating weights to calculate stats
                 wght_aux_coord = iris.coords.AuxCoord(np.ones(len(cubelist))/len(cubelist),
                     long_name='ensamble_weights',
                     var_name='ens_wght')
@@ -221,6 +249,7 @@ def cubelist_averaging(cubelist, exp, model_name):
                     int_wghts.append(np.ones(cube.shape[1]) * 1/cube.shape[1])
                 arr = np.hstack(arr_list)
                 int_w_arr = np.concatenate(int_wghts)
+                # calculating weights to calculate stats
                 wght_aux_coord = iris.coords.AuxCoord(int_w_arr/len(cubelist),
                                                       long_name='ensamble_weights',
                                                       var_name='ens_wght')
@@ -236,6 +265,7 @@ def cubelist_averaging(cubelist, exp, model_name):
                 cube.add_aux_coord(iris.coords.AuxCoord(n, long_name='ave_axis', var_name='ave_axis'))
             equalise_attributes(cubelist)
             merged_cube = cubelist.merge_cube()
+            # calculating weights to calculate stats
             wght_aux_coord = iris.coords.AuxCoord(
                 np.ones(len(cubelist)) / len(cubelist),
                 long_name='ensamble_weights',
@@ -244,6 +274,8 @@ def cubelist_averaging(cubelist, exp, model_name):
             merged_cube.transpose()
             averaged_cube = merged_cube.collapsed('ave_axis', iris.analysis.MEAN)
     else:
+        # otherwise save just the only element of a cubelist
+        # and give it a weight of 1
         averaged_cube = cubelist[0]
         if exp == 'piControl':
             averaged_cube.coord('n').var_name = 'ave_axis'
@@ -276,16 +308,23 @@ def cubelist_averaging(cubelist, exp, model_name):
 
     return(averaged_cube, merged_cube)
 
+
 def calc_weighted_percentiles(mod_dict):
+    # here we calculate weighted percentiles; the idea is that we look at
+    # the multi-model ensemble in total, a model independent on the number of
+    # ensembles has to have a weight of 1. If more than 1 realization is in a
+    # model, weight is calculated 1/number of realization for a model
 
     ave_ax_lens = [mod_dict[mod].coord('ave_axis').points.__len__()
                    for mod in mod_dict.keys()]
+    # determining max of realization numbers over all models
     ens_dim_len = np.asarray(ave_ax_lens).max()
     t_dim_lens = [mod_dict[mod].coord('time').points.__len__()
                    for mod in mod_dict.keys()]
     t_dim_len = t_dim_lens[0]
     mod_dim_len = len(mod_dict.keys())
 
+    # we create a arrays for end weights and values to create an end cube
     all_mod_wghts = np.zeros((t_dim_len, ens_dim_len, mod_dim_len))
     all_mod_values = np.ma.masked_all((t_dim_len, ens_dim_len, mod_dim_len))
 
@@ -293,8 +332,13 @@ def calc_weighted_percentiles(mod_dict):
         mod_cube = mod_dict[mod]
         ind_ens_n = mod_cube.coord('ave_axis').points.__len__()
         wghts = mod_cube.aux_coords[0].points
+        # if the number of realizations in a model is less than max,
+        # other weights and values are set to 0; iris will deal with it
         all_mod_wghts[:, 0:ind_ens_n, n] = wghts[np.newaxis, :] / mod_dim_len
         all_mod_values[:, 0:ind_ens_n, n] = mod_cube.data
+
+    # iris doesn't like nans, so nans need to be masked
+    mod_cube.data = np.ma.masked_where(np.isnan(mod_cube.data), mod_cube.data)
 
     max_ens_coord = iris.coords.DimCoord(np.arange(0, ens_dim_len),
                                          long_name='ave_axis',
@@ -309,6 +353,7 @@ def calc_weighted_percentiles(mod_dict):
                                        (mod_cube.coord('time'), 0),
                                        (max_ens_coord, 1), (mod_coord, 2)])
 
+    # calculating weighted percentiles over the whole ensemble
     percentiles_cube = all_mods_cube.collapsed(['ave_axis', 'mod_axis'],
                                           iris.analysis.WPERCENTILE,
                                           percent=[5, 95],
@@ -316,22 +361,30 @@ def calc_weighted_percentiles(mod_dict):
 
     return (percentiles_cube)
 
+
 def calc_stats(cubelist, mod_dict, exp):
+
+    #  function calculates statistics for an experiment
 
     output_dic = {}
 
     if exp == 'piControl':
+        # piConrol only needs these values
         output_dic['5_95_percentiles'] = calc_weighted_percentiles(mod_dict)
         output_dic['number_models'] = len(cubelist)
     elif exp == 'OBS':
+        # observations do not need the statistics at all
         for cube in cubelist:
             dataset = cube.attributes['dataset']
+            # removing aux coord and cell method to make it easier to plot
             cube.remove_coord('ave_axis')
             cube.cell_methods = None
             output_dic [dataset] = cube
     else:
+        # calculating weighted percentiles for the whole experiment
         output_dic['5_95_percentiles'] = calc_weighted_percentiles(mod_dict)
         for n, cube in enumerate(cubelist):
+            # removing aux coords, needs for easier calculations and plotting
             cube.remove_coord('ave_axis')
             try:
                 cube.remove_coord('ensamble_weights')
@@ -341,10 +394,12 @@ def calc_stats(cubelist, mod_dict, exp):
             cube.cell_methods = None
         equalise_attributes(cubelist)
         exp_cube = cubelist.merge_cube()
+        # need to mask out nans, iris doesn't calculate stats with them
+        exp_cube.data = np.ma.masked_where(np.isnan(exp_cube.data),
+                                           exp_cube.data)
         output_dic['mean'] = exp_cube.collapsed('coll_axis', iris.analysis.MEAN)
         output_dic['min'] = exp_cube.collapsed('coll_axis', iris.analysis.MIN)
         output_dic['max'] = exp_cube.collapsed('coll_axis', iris.analysis.MAX)
-        # output_dic['5_95_percentiles'] = calc_weighted_percentiles(mod_dict)
         output_dic['number_models'] = len(cubelist)
 
     return(output_dic)
@@ -454,13 +509,15 @@ def main(cfg):
 
     dtsts = Datasets(cfg)
 
+    # updating the Dataset class to get experiment to observations
     update_dataset_info(dtsts)
 
     projects = set(dtsts.get_info_list('project'))
 
-    # try to improve it!!!!
+    # observations(BR2011&NOAA_CDR) need to be concatenated to create a row
     concatenate_observations(cfg, dtsts)
 
+    # this is the dictionary which will be used for plotting
     plotting_dic = {}
 
     for project in projects:
@@ -472,25 +529,40 @@ def main(cfg):
             ens_cubelist = iris.cube.CubeList()
             ens_all_dict = {}
             for model in models:
+                # since the Datasets class doesn't allow to remove datasets
+                # and the merged dataset is in the models list, we skip the
+                # single datasets which were used for the merged one
                 if model in cfg['obs_dataset_merging']:
                     continue
                 mod_fnames = dtsts.get_info_list('filename', dataset=model, exp=exp, project=project)
                 var_name = set(dtsts.get_info_list('short_name', dataset=model, exp=exp, project=project))
                 mod_cubelist = iris.load(mod_fnames)
+                # to mask out greenland, that's why we load the shapefile
                 if cfg['maskout_greenland']:
+                    # shape file should be located in auxiliary directory
                     greenland_shp = os.path.join(cfg['auxiliary_data_dir'], cfg['greenland_shape_file'])
                     mod_cubelist = mask_greenland(mod_cubelist, var_name, greenland_shp)
+                # here the months are selected, there are several months so
+                # usual month extraction doesn't work
                 mod_cubelist = select_months(mod_cubelist, cfg['months'])
+                # calculating snow cover extent
                 mod_sce_cubelist = calculate_sce(mod_cubelist, var_name=var_name)
+                # averaging over months
                 mod_sce_cubelist = monthly_av(mod_sce_cubelist)
                 if exp == 'piControl':
+                    # piControl has different periods, so the period need to be
+                    # shuffled to the main period, which comes from the recipe
                     mod_sce_cubelist = shuffle_period(mod_sce_cubelist, cfg['main_period'])
+                # averaging over 5-years
                 mod_sce_cubelist = ipcc_sea_ice_diag.n_year_mean(mod_sce_cubelist, n=cfg['years_for_average'])
-                mod_sce_cubelist = ipcc_sea_ice_diag.substract_ref_period(mod_sce_cubelist, cfg['ref_period'])
+                # subtracting the reference period, or calculating anomalies
+                mod_sce_cubelist = ipcc_sea_ice_diag.subtract_ref_period(mod_sce_cubelist, cfg['ref_period'])
                 logger.info("proj %s, exp %s, model %s", project, exp, model)
-                ens_cube, merged_cube= cubelist_averaging(mod_sce_cubelist, exp, model)
+                # averaging the data for models, needed to calculate the stats
+                ens_cube, merged_cube = cubelist_averaging(mod_sce_cubelist, exp, model)
                 ens_all_dict[model] = merged_cube
                 ens_cubelist.append(ens_cube)
+            # calculating statistics for an experiment
             plotting_dic[project][exp] = calc_stats(ens_cubelist, ens_all_dict, exp)
 
     make_plot(plotting_dic, cfg)

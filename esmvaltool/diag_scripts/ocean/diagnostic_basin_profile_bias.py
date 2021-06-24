@@ -1,8 +1,8 @@
 """
-Transects diagnostics figure 3.17
+Transects diagnostics figure 3.25 in Chapter 3 of IPCC AR6 WGI
 =================================
 
-Diagnostic to produce images of a transect. These plost show either latitude or
+Diagnostic to produce images of a transect. These plots show either latitude or
 longitude against depth, and the cube value is used as the colour scale.
 
 Note that this diagnostic assumes that the preprocessors do the bulk of the
@@ -24,13 +24,12 @@ This tool is part of the ocean diagnostic tools package in the ESMValTool.
 Author: Lee de Mora (PML)
         ledm@pml.ac.uk
 
-Corrected (15.01.2021): Elizaveta Malinina (CCCma)
+Revised and corrected (15.01.2021): Elizaveta Malinina (CCCma)
                         elizaveta.malinina-rieger@canada.ca
 """
 import logging
 import os
 import sys
-from itertools import product
 
 import iris
 import iris.quickplot as qplt
@@ -47,12 +46,6 @@ import esmvaltool.diag_scripts.shared.plot as eplot
 logger = logging.getLogger(os.path.basename(__file__))
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-
-# TODO: Fix colour scale. Why can't it do the total range?
-# TODO: Add further models and colour ranges
-# TODO: Write figure description
-# TODO: Add x and y axis labels.
-# TODO: Add documentation and PEP8 compliance.
 
 def titlify(title):
     """
@@ -368,13 +361,16 @@ def make_multimodelmean_transects(
     ----------
     cfg: dict
         the opened global config dictionairy, passed by ESMValTool.
+    fig: pyplot.figure
+        the figure to plot on
+    grid: matplotlib.gridspec instance
+        a gridspec to plot on
+
 
     """
     metadatas = diagtools.get_input_files(cfg,)
     obs_key = 'observational_dataset'
-    obs_filename = ''
     obs_dataset = ''
-    obs_metadata = {}
     print('=======\nStarting', short_name, variable_group, key)
     obs_filename = match_model_to_key(obs_key,
                                       cfg[obs_key],
@@ -395,7 +391,7 @@ def make_multimodelmean_transects(
         if filename == obs_filename:
             obs_dataset = metadata['dataset']
             continue
-        if  metadata['project'] == 'OBS':
+        if metadata['project'] == 'OBS':
             continue
         if metadata['short_name'] != short_name:
             continue
@@ -407,7 +403,7 @@ def make_multimodelmean_transects(
         ensemble = metadata['ensemble']
         experiment = metadata['exp']
 
-        long_name =  metadata['long_name']
+        long_name = metadata['long_name']
 
         cube = iris.load_cube(filename)
         cube = diagtools.bgc_units(cube, short_name)
@@ -419,13 +415,12 @@ def make_multimodelmean_transects(
 
     print('all cubes found:', len(cubes), 'cubes')
 
-    if obs_filename.find(variable_group)==-1:
+    if obs_filename.find(variable_group) == -1:
         assert 0
 
     obs_cube = iris.load_cube(obs_filename)
     obs_cube = diagtools.bgc_units(obs_cube, short_name)
     obs_cube = standardize_depth_coord(obs_cube)
-    #rint('pre: obs cube mean:' ,  obs_cube.data.mean(), obs_cube.units)
     print(key, cubes.keys())
 
     if key == obs_dataset:
@@ -530,14 +525,8 @@ def make_multimodelmean_transects(
     plt.clim(colour_range)
     ax1.set_title(title)
 
-    # plt.setp(ax1.get_xticklabels(), visible=False)
-    # plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
-
     CS = iris.plot.contour(obs_cube, contours, linewidths=0.7,  colors='k', axes= ax1)
     ax1.clabel(CS, CS.levels, inline=True, fontsize=10, fmt = fmt)
-
-    # CS_diff = iris.plot.contour(cube, diff_contours, linewidths=0.3, linestyles = 'solid', colors='white' , axes= ax1)
-    # ax1.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
 
     ax1.spines['bottom'].set_visible(False)
     ax1.tick_params(axis='x', which='both', bottom=False)
@@ -550,9 +539,7 @@ def make_multimodelmean_transects(
     ax2.set_xlabel(r'Latitude ($^o$N)')
     plt.clim(colour_range)
 
-    # locs, labels = ax2.get_yticks()
     ax2.set_yticks([2000, 3000, 4000, 5000,])
-    # fig.colorbar(cont,cax=cax, orientation='horizontal')
     plt.clim(colour_range)
 
     CS = iris.plot.contour(obs_cube, contours, linewidths=0.7,  colors='black', axes= ax2)
@@ -566,9 +553,6 @@ def make_multimodelmean_transects(
         ax2.arrow(-20, 1800, -4, -600, length_includes_head=True,
                   head_width=2, head_length=50)
         ax2.text(-18, 2300, 'WOA18\nclimatology', fontsize=10)
-
-    # CS_diff = iris.plot.contour(cube, diff_contours, linewidths=0.3, linestyles = 'solid' , colors='white', axes= ax2)
-    # ax2.clabel(CS_diff, CS_diff.levels, inline=True, fontsize=10, fmt = diff_fmt)
 
     plt.text(0.9, 0.1, ocean,fontsize=11, horizontalalignment='center',
         verticalalignment='center', transform = ax2.transAxes)
@@ -607,12 +591,10 @@ def main(cfg):
     """
     #####
     metadatas = diagtools.get_input_files(cfg,)
-    # model_names = {'CMIP5':True, 'CMIP6':True, 'all': True, 'all_ensembles':True}
     model_names = {'CMIP6':True}
     short_names = {}
     for filename in sorted(metadatas):
         metadata = metadatas[filename]
-        # model_names[metadata['dataset']] = True
         short_names[metadata['short_name']] = True
 
     st_file = eplot.get_path_to_mpl_style(cfg.get('mpl_style'))
@@ -630,8 +612,6 @@ def main(cfg):
         outer = gridspec.GridSpec(n_rows, n_cols, figure=fig, left=0.1,
                                   right=0.98, top=0.94, bottom=0.11,
                                   wspace=0.1, hspace=0.1)
-
-        # cax = [fig.add_axes([left, 0.05, 0.37, 0.01]) for left in [0.14, 0.61]]
 
         lits = np.asarray([['(a)','(c)', '(e)','(g)'], ['(b)','(d)','(f)','(h)']])
 
