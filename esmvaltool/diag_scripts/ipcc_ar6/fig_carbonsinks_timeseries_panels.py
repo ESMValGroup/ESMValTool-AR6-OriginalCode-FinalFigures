@@ -1,23 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Diagnostic script to plot figure 9.42a of IPCC AR5 chapter 9.
+"""Diagnostic script to plot figure 3.31 of IPCC AR6 chapter 3.
 
 Description
 -----------
-Calculate and plot trends in CO2 Seasonal cycle amplitude
+Evaluation of atmospheric CO2, ocean carbon uptake, land carbon uptake
 
 Author
 ------
 Bettina Gier (Univ. of Bremen, Germany)
-
-Project
--------
-Eval4CMIP
-
-Configuration options in recipe
--------------------------------
-save : dict, optional
-    Keyword arguments for the `fig.saveplot()` function.
 
 """
 
@@ -29,7 +20,6 @@ from iris import Constraint
 import iris.quickplot
 import matplotlib.pyplot as plt
 import matplotlib.dates as mda
-# import iris.plot as iplt
 from scipy.ndimage import gaussian_filter
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from esmvaltool.diag_scripts.shared import (
@@ -238,13 +228,10 @@ def main(cfg):
                      linestyle = "-", label = name,
                      linewidth = legend_items[name]['linewidth'])
 
-    #tick_params(labelright=True)
     ax1.set_xlim(1850, 2014)
-    #ax1.set_ylim(320, 420)
     ax2.set_xlim(1850, 2014)
     ax3.set_xlim(1850, 2014)
     ax4.set_xlim(1850, 2014)
-    #ax4.set_ylim(0.5, 3.2)
     ax1.set_xlabel("Year")
     ax1.set_ylabel(r"Atmospheric CO$_2$ [ppmv]")
     ax1.yaxis.set_ticks_position('both')

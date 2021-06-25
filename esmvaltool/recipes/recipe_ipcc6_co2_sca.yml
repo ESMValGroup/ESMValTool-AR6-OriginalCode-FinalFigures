@@ -1,10 +1,10 @@
 # ESMValTool
-# recipe_ipcc6_co2.yml
+# recipe_ipcc6_co2_sca.yml
 ---
 documentation:
 
   description: |
-    Producing selected figures from IPCC WGI AR6, chap. 3
+    Producing selected figures from IPCC WGI AR6, chap. 3 - figure 3.32
   authors:
     - gier_bettina
 
@@ -17,7 +17,6 @@ documentation:
   projects:
     - ipcc_ar6
 
-
 preprocessors:
   nbp_mean:
     mask_landsea:
@@ -27,8 +26,7 @@ preprocessors:
 
 diagnostics:
   # **********************************************************************
-  # IPCC WGI AR6, chap. 3
-  # Sect. 3.6.1 (FOD fig. 3.31)
+  # IPCC WGI AR6, chap. 3, figure 3.32
   # **********************************************************************
   # Changes to the amplitude of the net land carbon flux (nbp)
   # **********************************************************************
@@ -42,7 +40,7 @@ diagnostics:
     realms:
       - land
     variables:
-      nbp: #might need to go nbp_grid! -> Currently didn't find fx files?
+      nbp:
         preprocessor: nbp_mean
         project: CMIP6
         ensemble: r1i1p1f1
@@ -53,7 +51,6 @@ diagnostics:
         end_year: 2014
         additional_datasets:
           - {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 1, tier: 2, start_year: 1986, end_year: 2008}
-          #- {dataset: JMA-TRANSCOM, project: OBS, type: reanaly, version: 2018, tier: 3, start_year: 1986, end_year: 2014}
           - {dataset: ACCESS-ESM1-5, grid: gn}
           - {dataset: CanESM5, grid: gn}
           - {dataset: CanESM5-CanOE, grid: gn, ensemble: r1i1p2f1}

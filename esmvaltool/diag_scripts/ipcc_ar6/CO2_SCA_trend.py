@@ -1,23 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Diagnostic script to plot figure 9.42a of IPCC AR5 chapter 9.
+"""Diagnostic script to plot figure 3.32 of IPCC AR6 chapter 3.
 
 Description
 -----------
-Calculate and plot trends in CO2 Seasonal cycle amplitude
+Changes to the amplitude of the net land carbon flux (nbp)
 
 Author
 ------
 Bettina Gier (Univ. of Bremen, Germany)
-
-Project
--------
-Eval4CMIP
-
-Configuration options in recipe
--------------------------------
-save : dict, optional
-    Keyword arguments for the `fig.saveplot()` function.
 
 """
 
@@ -132,18 +123,6 @@ def plot_data(timeranges, yrs, amps, t_cycle, avg_cycle,
               "CO2-GLOBAL": (0, 0, 0), "JMA-TRANSCOM": (0, 0, 0),
               "first10": (237/255., 128/255., 55/255.),
               "last10": (36/255., 147/255., 126/255.)}
-    # CMIP6_colors = [(0, 0, 0),
-    #                 (112/255., 160/255., 205/255.),
-    #                 (178/255., 178/255., 178/255.),
-    #                 (196/255., 121/255., 0),
-    #                 (0/255., 52/255., 102/255.),
-    #                 (0, 79/255., 0)]
-    # CMIP6_shading = [(128/255., 128/255., 128/255.),
-    #                  (91/255., 174/255., 178/255.),
-    #                  (191/255., 191/255., 191/255.),
-    #                  (204/255., 174/255., 113/255.),
-    #                  (67/255., 147/255., 195/255.),
-    #                  (223/255., 237/255., 195/255.)]
     fig, ax = plt.subplots()
 
     # Compute MMM Shading
