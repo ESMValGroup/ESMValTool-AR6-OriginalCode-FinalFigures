@@ -60,9 +60,9 @@ diagnostics:
 #    additional_datasets: *aerchemmip_histSST # *aerchemmip_histSST_piCH4]
     scripts:
       ar6fig6_erf_time: 
-        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_erf_aer_time.py
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6.11_erf_aer_time.py
       ar6ia_erf: 
-        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ia_erf_aer_time.py
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/interactiveatlas_erf_aer_time.py
 #        exper_expt: *aerchemmip_histSST
 #        cntrl_expt: *aerchemmip_histSST_piCH4
 #  histSST:

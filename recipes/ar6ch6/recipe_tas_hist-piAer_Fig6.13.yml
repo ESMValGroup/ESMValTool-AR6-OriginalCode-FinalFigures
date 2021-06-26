@@ -79,5 +79,5 @@ diagnostics:
     scripts:
       ar6fig6_piAer: 
 #        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_tas_piAer.py
-        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_tas_piAer_coupledOnly.py
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6.13_tas_piAer_coupledOnly.py
         piexpt: piAer
