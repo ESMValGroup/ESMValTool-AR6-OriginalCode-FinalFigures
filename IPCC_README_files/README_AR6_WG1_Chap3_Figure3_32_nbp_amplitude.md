@@ -16,6 +16,8 @@ Relative change in the amplitude of the seasonal cycle of global land carbon upt
 Author list:
 ------------
 - Gier, B.K.: Univ. of Bremen, Germany; gier@uni-bremen.de
+- Bellouin, N.: University of Reading, UK
+- Bock, L.: DLR, Germany
 
 Publication sources:
 --------------------

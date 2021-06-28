@@ -16,6 +16,8 @@ Evaluation of historical emission-driven CMIP6 simulations for 1850-2014. Observ
 Author list:
 ------------
 - Gier, B.K.: Univ. of Bremen, Germany; gier@uni-bremen.de
+- Bellouin, N.: University of Reading, UK
+- Bock, L.: DLR, Germany
 
 Publication sources:
 --------------------
@@ -48,7 +50,6 @@ Expected image path:
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
 - ESMValTool environment file: IPCC_environments/env_ipcc_conda_environment.yml
 - pip file: IPCC_environments/env_ipcc_pip_environment.txt
 
