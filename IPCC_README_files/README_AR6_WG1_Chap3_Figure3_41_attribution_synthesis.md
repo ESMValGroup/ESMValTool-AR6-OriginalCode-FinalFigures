@@ -54,7 +54,7 @@ Expected image path:
 
 Additional datasets:
 --------------------
-received from Lee De Mora (CA in Chapter 3):
+received from Lee De Mora (CA in Chapter 3, ledm@pml.ac.uk):
 - CMIP6_*_historical_*_detrended_total.nc
 - CMIP6_*_hist-nat_*_detrended_total.nc
 
