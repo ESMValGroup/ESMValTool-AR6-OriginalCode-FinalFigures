@@ -49,15 +49,15 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_santer20jclim.yml
+Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_santer21jclim.yml
 
-Diagnostic used: diag_scripts/santer20jclim/santer20jclimfig.py
+Diagnostic used: diag_scripts/santer20jclim/santer21jclimfig.py
 
 
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_ipccwg1ar6ch3_santer20jclim_newextendedv3_YYYYMMDD_HHMMSS/plots/wvtrend/santer20jclim/fig1.png
+- recipe_ipccwg1ar6ch3_santer21jclim_newextendedv3_YYYYMMDD_HHMMSS/plots/wvtrend/santer20jclim/fig1.png
 
 
 Ancillary figures and datasets:
