@@ -1,5 +1,5 @@
 
-GLOBAL MONSSON DOMAIN AND INTENSITY
+GLOBAL MONSOON DOMAIN AND INTENSITY
 ===================================
 
 Figure number: Figure 3.17
@@ -65,11 +65,6 @@ Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
 - recipe_ipccwg1ar6ch3_globalmonsoon_YYYYMMDD_HHMMSS/plots/draw_global_monsoon_cmip5+6/plot_global_monsoon_runmean5yr/global_monsoon_GPCP-SG+ERA5_movingave5yrs.pdf
-
-
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
 
 
 Ancillary figures and datasets:

@@ -1,6 +1,6 @@
 
-TRENDS OF SURFACE GLOBAL WARMING
-================================
+15-YEAR TRENDS OF SURFACE GLOBAL WARMING
+========================================
 
 Figure number: Figure CC-Box 3.1
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
@@ -75,7 +75,10 @@ Were any tools used to populate the recipe? if so what were they? N/A if not app
 
 Ancillary figures and datasets:
 -------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
+If the recipe is based on recipe_ar6ch3_hiatus_summary.yml, it will creates 
+summary tables of percentiles values of 1998-2012 GMST trends in CMIP5 and CMIP6 
+calculated based on resolution, anomaly definition, and masking of individual 
+observational datasets.
 
 
 Additional datasets:

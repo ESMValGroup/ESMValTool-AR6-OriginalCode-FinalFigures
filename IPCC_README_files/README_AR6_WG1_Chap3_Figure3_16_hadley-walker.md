@@ -30,7 +30,7 @@ means of individual models. The edge latitude of the Hadley cell is defined
 where the surface zonal wind velocity changes sign from negative to positive, as 
 described in the Appendix of Grise et al. (2018). The Pacific Walker circulation 
 strength is evaluated as the annual mean difference of sea level pressure 
-between [5ªS-5ºN, 160ºW-80ºW] and [5ºS-5ºN, 80ºE-160ºE].
+between [5°S-5ºN, 160ºW-80ºW] and [5ºS-5ºN, 80ºE-160ºE].
 
 
 Author list:
@@ -68,11 +68,6 @@ Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
 - recipe_ar6ch3_hadley+walker_cmip5+6+damip_YYYYMMDD_HHMMSS/plots/draw/draw_pdf/hadley_walker_trends.pdf
-
-
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
 
 
 Ancillary figures and datasets:

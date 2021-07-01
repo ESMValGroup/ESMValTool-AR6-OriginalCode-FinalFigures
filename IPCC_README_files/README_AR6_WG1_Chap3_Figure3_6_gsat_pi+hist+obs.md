@@ -28,8 +28,9 @@ annual time series.
 Author list:
 ------------
 - Kosaka, Y.: University of Tokyo, Japan; ykosaka@atmos.rcast.u-tokyo.ac.jp
+- Phillips, A.: NCAR, USA
 - Bellouin, N.: University of Reading, UK
-- Cassous, C.: CNRS-Cerfacs, France
+- Cassou, C.: CNRS-Cerfacs, France
 - Gillett, N.: Environment and Climate Change Canada
 - Bock, L.: DLR, Germany
 
