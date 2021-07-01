@@ -41,9 +41,9 @@ represent the 5th-95th percentile range obtained from all ensemble members. The
 
 Author list:
 ------------
-- Phillips, A.: NCAR, U.S.; asphilli@ucar.edu
+- Phillips, A.: NCAR, USA; asphilli@ucar.edu
 - Kosaka, Y.: University of Tokyo, Japan
-- Cassous, C.: CNRS-Cerfacs, France
+- Cassou, C.: CNRS-Cerfacs, France
 - Karmouche, S.: University of Bremen, Germany
 - Bock, L.: DLR, Germany
 - Kazeroni, R.: DLR, Germany
