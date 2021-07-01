@@ -29,7 +29,12 @@ Publication sources:
 --------------------
 Santer, B. D., Mears, C., Wentz, F. J., Taylor, K. E., Glecker, P. J., Wigley, 
 T. M. L., et al. (2007). Identification of human-induced changes in atmospheric 
-moisture content. Proc. Natl. Acad. Sci. 25. Available at: https://doi.org/10.1073/pnas.0702872104.
+moisture content. Proc. Natl. Acad. Sci. 25, https://doi.org/10.1073/pnas.0702872104
+
+Santer, B. D., Po-Chedley, S., Mears, C., Fyfe, J. C., Gillett, N., Fu, Q., 
+Painter, J. F., Solomon, S., Steiner, A. K., Wentz, F. J., Zelinka, M. D., & 
+Zou, C. (2021). Using Climate Model Simulations to Constrain Observations, 
+Journal of Climate, 34(15), 6281-6301, https://doi.org/10.1175/JCLI-D-20-0768.1
 
 
 ESMValTool Branch:
@@ -55,22 +60,30 @@ This is the path of the image relative to the automatically generated ESMValTool
 - recipe_ipccwg1ar6ch3_santer20jclim_newextendedv3_YYYYMMDD_HHMMSS/plots/wvtrend/santer20jclim/fig1.png
 
 
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
-
-
 Ancillary figures and datasets:
 -------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
+There is one optional, additional figure which can be turned on in the recipe 
+displays the pdf for ensemble members of chosen models (instead of all CMIP5 and 
+CMIP6 models) by listing model names under the key word "add_model_dist".
 
 
 Additional datasets:
 --------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
-Can they be re-created?
-What are their access permissions/Licenses?
+RSS data:
+SOURCE = "ftp://ftp.remss.com/vapor/monthly_1deg/"
+Remote Sensing Systems.
+Monthly Mean Total Precipitable Water Data Set
+on a 1 degree grid made from Remote Sensing
+Systems Version-7 Microwave Radiometer Data,
+Date created: 20201110T185551Z
+accessed on 2020-11-19]. Santa Rosa, CA, USA.
+Available at www.remss.com
+
+cmorized with esmvaltool/cmorizers/obs/cmorize_obs_rss.ncl (in the ar6_chapter_3
+branch, not in the main ESMValTool branch, yet) using the "precipitable_water" 
+variable. The "fixed coverage" mask was produced from the same file, using 
+"precipitable_water_climatology" and "precipitable_water_anomaly" with a tool 
+based on the cmorizer: esmvaltool/cmorizers/obs/cmorize_obs_rssanom.ncl.
 
 
 Software description:
@@ -82,7 +95,3 @@ Software description:
 Hardware description:
 ---------------------
 Machine used: Mistral
-
-
-Any further instructions: 
--------------------------
