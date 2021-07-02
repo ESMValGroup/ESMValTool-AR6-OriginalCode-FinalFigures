@@ -112,7 +112,7 @@ where the following six datasets exist for a given model & ensemnle member:
 - historical salinity (so)
 - piControl temperature (thetao)
 - piControl salinity (so)
-- volcello: both historical anbd piControl for models where volume varies with time.
+- volcello: both historical and piControl for models where volume varies with time.
 - volcello: piControl only for models where volume is fixed in time.
 
 The tool checks that the data for all these 5 or 6 datasets must be available
