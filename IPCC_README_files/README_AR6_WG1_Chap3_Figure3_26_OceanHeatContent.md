@@ -15,7 +15,7 @@ Please describe the figure.
 THis is a time series of ocean heat content, with four panes.
 On the left, the figure shows the change (relative t o 1971)
 in heat content of the total global Ocean.
-The red area is th 5-95 percentile range and the grey area is the observational
+The red area is the 5-95 percentile range and the grey area is the observational
 record.
 
 On the right hand side, the three panes show the depth ranges 0-700m, 700m-2000m,
