@@ -95,7 +95,7 @@ This is the path of the image relative to the automatically generated ESMValTool
 
 
 
-Recipe generations tools:
+Recipe generation tools:
 -------------------------
 Were any tools used to populate the recipe? if so what were they? N/A if not applicable.
 
