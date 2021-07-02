@@ -139,7 +139,7 @@ These figures include the following directories related to the de-derifting proc
   - piControl:
     - maps showing the raw temperature and salinity data at the surface at the final time step of the PI control run.
   - piTrend:
-    - histograms showing the distributiuon of the de-drifting linear regression (slope & intersect)
+    - histograms showing the distribution of the de-drifting linear regression (slope & intersect)
   - slope:
     - maps showing the slope over the surface for the  entire PI control
   - intersect:
