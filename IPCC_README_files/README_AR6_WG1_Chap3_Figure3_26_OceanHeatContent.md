@@ -184,7 +184,7 @@ What are their access permissions/Licenses?
 
 The observational data for this figure is take from the file:
 - 210204_0908_DM-AR6FGDAssessmentTimeseriesOHC-v1.csv
-All columns are used in the final fiugre.
+All columns are used in the final figure.
 
 These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
