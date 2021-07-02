@@ -23,7 +23,7 @@ and below 2000m.
 
 The heat content was calculated using the TEOS-10 gsw (v3.4.0) python toolkit: https://teos-10.github.io/GSW-Python/
 
-In all cases, the model temperature and salininty were de-drifted against the
+In all cases, the model temperature and salinity were de-drifted against the
 pi-control. From there, we ensured that the pressure was calculated correctly,
 the cell volume was available, we use absolute salinity & conservative temperature.
 
