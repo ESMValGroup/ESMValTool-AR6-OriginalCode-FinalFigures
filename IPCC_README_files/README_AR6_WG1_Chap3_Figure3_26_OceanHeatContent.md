@@ -21,7 +21,7 @@ record.
 On the right hand side, the three panes show the depth ranges 0-700m, 700m-2000m,
 and below 2000m.
 
-The heat content was calculated using the TEOS-10 gsw python toolkit: https://teos-10.github.io/GSW-Python/
+The heat content was calculated using the TEOS-10 gsw (v3.4.0) python toolkit: https://teos-10.github.io/GSW-Python/
 
 In all cases, the model temperature and salininty were de-drifted against the
 pi-control. From there, we ensured that the pressure was calculated correctly,
