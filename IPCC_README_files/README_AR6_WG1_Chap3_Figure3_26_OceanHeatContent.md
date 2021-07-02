@@ -117,7 +117,7 @@ where the following six datasets exist for a given model & ensemnle member:
 
 The tool checks that the data for all these 5 or 6 datasets must be available
 for the entire time range.
-In addition, the tool checks where tyhe historical was branched from the piControl
+In addition, the tool checks where the historical was branched from the piControl
 and adds the relevant picontrol years.
 
 The recipe filler is an earlier and more general version of the check_TSV.py tool.
