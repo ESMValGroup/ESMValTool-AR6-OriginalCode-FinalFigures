@@ -63,7 +63,8 @@ Author list:
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure.
-- Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
+- Durack, P., Gleckler, P., Landerer, F. et al. Quantifying underestimates of long-term upper-ocean warming. Nature Clim Change 4, 999–1005 (2014). https://doi.org/10.1038/nclimate2389
+
 
 
 ESMValTool Branch:
