@@ -132,7 +132,7 @@ In addition to the main figure, diagnostics may produce several figures and data
 along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
 
 The OHC diagnostic produces the OHC, SSS trends and Halosteric SLR figures.
-This code is particularly complex and several ancillairy figures are produced along the way
+This code is particularly complex and several ancillary figures are produced along the way
 for each model and each ensemble member.
 
 These figures include the following directories related to the de-derifting process:
