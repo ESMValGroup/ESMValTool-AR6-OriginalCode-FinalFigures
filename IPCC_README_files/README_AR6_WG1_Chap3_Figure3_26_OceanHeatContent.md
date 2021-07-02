@@ -86,7 +86,7 @@ Diagnostic(s) used: e.g. ocean/diagnostic_chap3_ocean_heat_content.py
 Please describe this diagnostic:
 
 The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
-diagnostic. This is because they all require the same process to de-dedrift.
+diagnostic. This is because they all require the same process to de-drift.
 
 Expected image path:
 --------------------
