@@ -45,7 +45,7 @@ Please list any publications that describe, explain or use this figure.
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: branch_name
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_hiatus
 
 
 ESMValCore Branch:
@@ -55,8 +55,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/ipccar6wg1ch3/recipe_eyring21ipcc_3-3-ocean.yml
-Please describe this recipe:
+Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_hiatus_summary.yml
 
 Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
 Please describe this diagnostic:
@@ -64,8 +63,7 @@ Please describe this diagnostic:
 
 Expected image path:
 --------------------
-This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+- recipe_ipccwg1ar6ch3_hiatus_summary_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
 
 
 Recipe generations tools: 
