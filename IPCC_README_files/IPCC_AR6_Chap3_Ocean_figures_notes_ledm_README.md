@@ -98,7 +98,7 @@ In addition, shapefiles are required to calculate the regional boundaries:
 These regions should be standarised throught AR6, and were emailed to me by chapter author Liza Bock.
 
 
-Sea surface salininty auxiliary data:
+Sea surface salinity auxiliary data:
 ------------------------------------
 
 The observational data from here is taken from: the files:
@@ -157,9 +157,9 @@ The OHC diagnostic produces the OHC, SSS trends and Halosteric SLR figures.
 This code is particularly complex and several ancillairy figures are produced along the way
 for each model and each ensemble member.
 
-These figures include the following directories related to the de-derifting process and the sea surface salininity trends figure:
+These figures include the following directories related to the de-derifting process and the sea surface salinity trends figure:
   - piControl:
-    - maps showing the raw temperature and salininty data at the surface at the final time step of the PI control run.
+    - maps showing the raw temperature and salinity data at the surface at the final time step of the PI control run.
   - piTrend:
     - histograms showing the distributiuon of the de-drifting linear regression (slope & intersect)
   - slope:
@@ -167,19 +167,19 @@ These figures include the following directories related to the de-derifting proc
   - intersect:
     - maps showing the intersect overthe surface for the entire PI control
   - trend_intact:
-    - maps showing the raw temperature and salininty data at the surface at the final time step of historical and hist-nat run
+    - maps showing the raw temperature and salinity data at the surface at the final time step of historical and hist-nat run
   - detrended:
-    - maps showing the dedrifted temperature and salininty data at the surface at the final time step of historical and hist-nat run.
+    - maps showing the dedrifted temperature and salinity data at the surface at the final time step of historical and hist-nat run.
   - detrended_quad:
     - 4 pane figure showing the surface map for the historical detrended, trend-intact, the difference and the quoitent.
   - vw_timeseries:
     - time series figure showing the volume Weighted mean for the detrended and trend intact.
   - detrending_ts:
-    - time series figure showing the global volume weighted mean (or total) temperature, salininity or OHC for the historical and piControl.
+    - time series figure showing the global volume weighted mean (or total) temperature, salinity or OHC for the historical and piControl.
   - multi_model_mean:
     - shows maps of the multi-model mean surface temperature and salinity at various points in time and specific time ranges.
   - sea_surface_salinity_plot directory:
-    - The full sea surface salininty trends figure.
+    - The full sea surface salinity trends figure.
 
 The following figure directories contain figures for the Dynamic Height calculation:
   - dyn_height_timeseries:
@@ -197,7 +197,7 @@ The following figure directories contain figures for the Dynamic Height calculat
 
 THe following directories contain figures related to the Ocean Heat Content calculation:
   - detrending_ts:
-      - time series figure showing the global volume weighted mean (or total) temperature, salininity or OHC for the historical and piControl.
+      - time series figure showing the global volume weighted mean (or total) temperature, salinity or OHC for the historical and piControl.
   - ohc_summary:
     - Single model ensemble version of the final figure, showing each volume range.
   - OHC_full_instact and OHC_full_detrended:

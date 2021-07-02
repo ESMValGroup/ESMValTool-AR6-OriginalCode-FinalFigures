@@ -29,7 +29,7 @@ The top three maps are observational data and the lowest pane is the CMIP6 multi
 
 The halosteric content was calculated using the TEOS-10 gsw python toolkit: https://teos-10.github.io/GSW-Python/
 
-In all cases, the model temperature and salininty were de-drifted against the
+In all cases, the model temperature and salinity were de-drifted against the
 pi-control. From there, we ensured that the pressure was calculated correctly,
 the cell volume was available, we use absolute salinity & conservative temperature.
 
@@ -125,7 +125,7 @@ for each model and each ensemble member.
 
 These figures include the following directories related to the de-derifting process:
   - piControl:
-    - maps showing the raw temperature and salininty data at the surface at the final time step of the PI control run.
+    - maps showing the raw temperature and salinity data at the surface at the final time step of the PI control run.
   - piTrend:
     - histograms showing the distributiuon of the de-drifting linear regression (slope & intersect)
   - slope:
@@ -133,15 +133,15 @@ These figures include the following directories related to the de-derifting proc
   - intersect:
     - maps showing the intersect overthe surface for the entire PI control
   - trend_intact:
-    - maps showing the raw temperature and salininty data at the surface at the final time step of historical and hist-nat run
+    - maps showing the raw temperature and salinity data at the surface at the final time step of historical and hist-nat run
   - detrended:
-    - maps showing the dedrifted temperature and salininty data at the surface at the final time step of historical and hist-nat run.
+    - maps showing the dedrifted temperature and salinity data at the surface at the final time step of historical and hist-nat run.
   - detrended_quad:
     - 4 pane figure showing the surface map for the historical detrended, trend-intact, the difference and the quoitent.
   - vw_timeseries:
     - time series figure showing the volume Weighted mean for the detrended and trend intact.
   - detrending_ts:
-    - time series figure showing the global volume weighted mean (or total) temperature, salininity or OHC for the historical and piControl.
+    - time series figure showing the global volume weighted mean (or total) temperature, salinity or OHC for the historical and piControl.
   - multi_model_mean:
     - shows maps of the multi-model mean surface temperature and salinity at various points in time and specific time ranges.
 
