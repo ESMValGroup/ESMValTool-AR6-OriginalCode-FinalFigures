@@ -1,5 +1,5 @@
 
-FIGURE TITLE
+SNOW ANOMALIES
 ============
 
 Figure number: Figure 3.22
