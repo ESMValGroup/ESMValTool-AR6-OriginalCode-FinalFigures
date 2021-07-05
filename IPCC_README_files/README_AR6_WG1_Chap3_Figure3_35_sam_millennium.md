@@ -10,12 +10,12 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-SAM indices in the last millennium. (a) Annual SAM reconstructions by Abram et 
-al. (2014) and Dätwyler et al. (2018). (b) The annual-mean SAM index defined by 
-Gong and Wang (1999) in CMIP5 and CMIP6 Last Millennium simulations extended by 
-historical simulations. All indices are normalized with respect to 1961-1990 
-means and standard deviations. Thin lines and thick lines show 7-year and 70-
-year moving averages, respectively. 
+Southern Annular Mode (SAM) indices in the last millennium. (a) Annual SAM 
+reconstructions by Abram et al. (2014) and Dätwyler et al. (2018). (b) The 
+annual-mean SAM index defined by Gong and Wang (1999) in CMIP5 and CMIP6 
+Last Millennium simulations extended by historical simulations. All indices 
+are normalized with respect to 1961-1990 means and standard deviations. Thin 
+lines and thick lines show 7-year and 70-year moving averages, respectively. 
 
 
 Author list:
