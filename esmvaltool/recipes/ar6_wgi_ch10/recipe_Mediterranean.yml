@@ -23,7 +23,7 @@ mod_cmip6_ssps: &mod_cmip6_ssps
   - {institute: AWI, dataset: AWI-CM-1-1-MR, ensemble: r1i1p1f1, grid: gn}
   - {institute: BCC, dataset: BCC-CSM2-MR, ensemble: r1i1p1f1, grid: gn}
   - {institute: CAMS, dataset: CAMS-CSM1-0, ensemble: r1i1p1f1, grid: gn, end_year: 2099}
-  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}  # bad time bounds
+  - {institute: CAS, dataset: FGOALS-f3-L, ensemble: r1i1p1f1, grid: gr}
   - {institute: CAS, dataset: FGOALS-g3, ensemble: r1i1p1f1, grid: gn}
   - {institute: CCCma, dataset: CanESM5, ensemble: r1i1p1f1, grid: gn}
   - {institute: CCCma, dataset: CanESM5-CanOE, ensemble: r1i1p2f1, grid: gn}

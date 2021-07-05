@@ -654,6 +654,7 @@ def ar6_wg1_ch10_figures(cfg):
 
     new_diagnostics = {}
     remove_diagnostics_keys = []
+
     # Prepare diagnostics data
     for diag_name, diagnostic in diagnostics.items():
         if diag_name.split('_')[0] == 'mapplot':
@@ -5291,6 +5292,7 @@ def write_data(cfg, diag_name, diagnostic):
 
     if 'timeseries' in diag_name:
         bname_format = '{}_{}_{}_{}' # diag_name, tsk, ens, metric
+        bname_format_raw = '{}_{}_{}_{}-raw' # diag_name, tsk, ens, metric
         metric_save_names = {'envelop': ['min', 'max'],
                         'mean_pm_std': ['mean+std', 'mean-std'],
                         'minmaxtrend': ['min-trend', 'max-trend']}
@@ -5299,17 +5301,37 @@ def write_data(cfg, diag_name, diagnostic):
             logger.info("Writing data for timeseries: {}".format(tsk))
 
             for ens, ens_data in zip(ts['ensembles'], ts['data']):
-                if ens == 'external': continue
+                if ens == 'external': # continue
+                    if len(ts['ensembles']) == 1:
+                        cube = ens_data[0][0]
+                        ds = ts['labels'][ts['ensembles'].index('external')][0]
+                        basename = bname_format.format(diag_name, tsk, ens,
+                                                    metric) + '_' + ds
+                        path = get_diagnostic_filename(basename, cfg)
+                        io.iris_save(cube, path)
+                        nc_paths.append(path)
                 else:
                     for metric, metric_data in zip(ts['metrics'], ens_data):
                         if metric == 'single':
                             if f'datasets_{ens}' in ts.keys():
-                                for ds, cube in zip(ts[f'datasets_{ens}'], metric_data):
-                                    basename = bname_format.format(diag_name, tsk, ens,
-                                                                metric) + '_' + ds
-                                    path = get_diagnostic_filename(basename, cfg)
-                                    io.iris_save(cube, path)
-                                    nc_paths.append(path)
+                                if len(set(ts[f'datasets_{ens}'])) != \
+                                    len(ts[f'datasets_{ens}']):
+                                    for ds, cube in zip(ts[f'datasets_{ens}'], metric_data):
+                                        if 'realization' in cube.attributes.keys():
+                                            basename = bname_format.format(diag_name, tsk, ens,
+                                                                        metric) + '_' + ds + '_' + str(cube.attributes['realization'])#
+                                            path = get_diagnostic_filename(basename, cfg)
+                                            io.iris_save(cube, path)
+                                            nc_paths.append(path)
+                                        else:
+                                            raise KeyError
+                                else:
+                                    for ds, cube in zip(ts[f'datasets_{ens}'], metric_data):
+                                        basename = bname_format.format(diag_name, tsk, ens,
+                                                                    metric) + '_' + ds
+                                        path = get_diagnostic_filename(basename, cfg)
+                                        io.iris_save(cube, path)
+                                        nc_paths.append(path)
                             else:
                                 for ds, cube in zip(ts['datasets'], metric_data):
                                     basename = bname_format.format(diag_name, tsk, ens,
@@ -5317,6 +5339,15 @@ def write_data(cfg, diag_name, diagnostic):
                                     path = get_diagnostic_filename(basename, cfg)
                                     io.iris_save(cube, path)
                                     nc_paths.append(path)
+                            if ts['indicate_bars']:
+                                if np.array(ts['data_raw']).shape == (1,1,1):
+                                    cube = ts['data_raw'][0][0][0]
+                                    basename = bname_format_raw.format(diag_name, tsk, ens,
+                                                                metric) + '_' + ts[f'datasets_{ens}'][0]
+                                    path = get_diagnostic_filename(basename, cfg)
+                                    io.iris_save(cube, path)
+                                    nc_paths.append(path)
+
                         elif len(metric_data) == 1:
                             cube = metric_data[0]
                             basename = bname_format.format(diag_name, tsk, ens,
@@ -5324,8 +5355,8 @@ def write_data(cfg, diag_name, diagnostic):
                             path = get_diagnostic_filename(basename, cfg)
                             io.iris_save(cube, path)
                             nc_paths.append(path)
-                        elif metric in metric_save_names:
-                            for (metr, cube) in zip(metric_save_names,
+                        elif metric in metric_save_names.keys():
+                            for (metr, cube) in zip(metric_save_names[metric],
                                                     metric_data):
                                 basename = bname_format.format(diag_name, tsk, ens,
                                                             metr)
@@ -5334,17 +5365,31 @@ def write_data(cfg, diag_name, diagnostic):
                                 nc_paths.append(path)
                         else:
                             logger.error(f"Metric {metric} not implemented")
+        bx_dicts = {k: v for k, v in diagnostic.items() if 'boxes' in k}
+        if bx_dicts:
+            bname_format = '{}_{}.csv'
+            for bxk, bx in bx_dicts.items():
+                logger.info("Writing data for boxplot in timeseries: {}".format(bxk))
+                basename = bname_format.format(diag_name, bxk)
+                path = get_diagnostic_filename(basename, cfg)[:-3]
+                df = bx['data']
+                df.to_csv(path, index=False)
     elif 'histogram' in diag_name:
         bname_format = '{}_{}_{}' # diag_name, ens, ds_name
         model_format_cmip6 = '{institution_id}_{source_id}_'\
                              '{parent_variant_label}'
+        model_format_miroc6 = '{institution_id}_{source_id}_'\
+                              '{variant_label}'
         model_format_cmip5 = '{institute_id}_{model_id}_'\
                              '{parent_experiment_rip}'
+        model_format_mpige = '{institute_id}_{model_id}_'\
+                             'r{realization}'
+        model_format_csiro = '{institute_id}_{model_id}_'\
+                             'r{realization}'
         model_format_cordex = '{institute_id}_{model_id}_{driving_model_id}_'\
                               '{experiment_id}'
         obs_format = '{}_{}' #title,version
         mean_format = '{}_{}_mean' # diag_name, ens, ds_name
-        # parent_source_id mip_era parent_variant_label
         hist_dicts = {k: v for k, v in diagnostic.items() if 'histogram' in k}
         for histk, hist in hist_dicts.items():
             for eind, ens in enumerate(hist['ensembles']):
@@ -5366,13 +5411,21 @@ def write_data(cfg, diag_name, diagnostic):
                                 if len(inst) > 20:
                                     cube.attributes['institution_id'] = \
                                         ';'.join(list(set(inst.split(';'))))
-                                ds_name = model_format_cmip6.format(
-                                            **cube.attributes)
+                                if 'miroc6' in ens.lower():
+                                    ds_name = model_format_miroc6.format(
+                                                **cube.attributes)
+                                else:
+                                    ds_name = model_format_cmip6.format(
+                                                **cube.attributes)
                         elif 'project_id' in cube.attributes:
                             if 'obs' in cube.attributes['project_id'].lower():
                                 ds_name = obs_format.format(
                                     cube.attributes['title'].split(' ')[0],
                                     cube.attributes['version'])
+                            elif 'create-ip' in cube.attributes['project_id'].lower():
+                                ds_name = obs_format.format(
+                                    cube.attributes['title'].split(' ')[0],
+                                    cube.attributes['model_id'])
                             elif 'cmip' in cube.attributes['project_id'].lower():
                                 try:
                                     runs = cube.attributes['parent_experiment_rip']
@@ -5383,11 +5436,33 @@ def write_data(cfg, diag_name, diagnostic):
                                         cube.attributes['parent_experiment_rip']:
                                         cube.attributes['parent_experiment_rip'] = \
                                             cube.attributes['parent_experiment_rip'].replace('/', '-')
-                                    ds_name = model_format_cmip5.format(
-                                        **cube.attributes)
+                                    # mpige
+                                    if cube.attributes.get('references') == \
+                                        'Maher et.al. 2018':
+                                        ds_name = model_format_mpige.format(
+                                            **cube.attributes)
+                                    elif cube.attributes.get('model_id') == \
+                                        'CSIRO-Mk3-6-0' and \
+                                        'realization' in cube.attributes.keys():
+                                        ds_name = model_format_csiro.format(
+                                            **cube.attributes)
+                                    else:
+                                        ds_name = model_format_cmip5.format(
+                                            **cube.attributes)
                                 except KeyError:
-                                    logger.warning(f"Unable to save cube {cube.attributes}")
-                                    continue
+                                    if cube.attributes['institute_id'] == 'NIMR-KMA' and  \
+                                        cube.attributes['model_id'] == 'HadGEM2-AO':
+                                        cube.attributes.update({'parent_experiment_rip': 'r1i1p1'})
+                                        ds_name = model_format_cmip5.format(
+                                            **cube.attributes)
+                                    elif cube.attributes['institute_id'] == 'INM' and  \
+                                        cube.attributes['model_id'] == 'inmcm4':
+                                        cube.attributes.update({'parent_experiment_rip': 'r1i1p1'})
+                                        ds_name = model_format_cmip5.format(
+                                            **cube.attributes)
+                                    else:
+                                        logger.error(f"Unable to save cube {cube.attributes}")
+                                        raise KeyError
                             elif 'cordex' in cube.attributes['project_id'].lower():
                                 exp = cube.attributes['experiment_id']
                                 if len(exp) > 20:
@@ -5403,8 +5478,6 @@ def write_data(cfg, diag_name, diagnostic):
                         ds_name = ds_name.replace(';', '-')
                         basename = bname_format.format(diag_name, ens, ds_name)
                         path = get_diagnostic_filename(basename, cfg)
-                        # if len(path) > 400:
-                        #     IPython.embed(config=c)
                         io.iris_save(cube, path)
                         nc_paths.append(path)
     elif 'mapplot' in diag_name:
@@ -5422,7 +5495,50 @@ def write_data(cfg, diag_name, diagnostic):
             path = get_diagnostic_filename(basename, cfg)
             io.iris_save(cube, path)
             nc_paths.append(path)
+    elif 'boxplot' in diag_name:
+        basename = f'{diag_name}.csv'
+        path = get_diagnostic_filename(basename, cfg)[:-3]
+        df = diagnostic['data']
+        df.to_csv(path, index=False)
+        nc_paths.append(path)
+    elif 'gwlrwl' in diag_name:
+        bname_format = '{}.csv'
+        basename = bname_format.format(diag_name)
+        path = get_diagnostic_filename(basename, cfg)[:-3]
 
+        columns = ['diag_name', 'label', 'metric', 'coord_name', 'coord', 'data']
+        dfs = []
+
+        for labels, metrics, ens_cubes in zip(diagnostic['labels'],
+                diagnostic['metrics'], diagnostic['data']):
+            for stat_cubes, label in zip(ens_cubes, labels):
+                for metric, cubes in zip(metrics, stat_cubes):
+                    if metric in ['mean', 'median', 'std', 'min', 'max']:
+                        # IPython.embed(config=c)
+                        coord_name = cubes.dim_coords[0].standard_name
+                        coord = cubes.coord(coord_name).points
+                        data = copy.deepcopy(cubes.data.data)
+                        data[cubes.data.mask == True] = np.nan
+                        df_tmp = pd.DataFrame([[diag_name, label.replace(' ', '_'),
+                                               metric, coord_name, coord, data]],
+                                              columns=columns)
+                        dfs.append(df_tmp)
+                    elif metric == 'mean_pm_std':
+                        for metric_add, cube in zip(['mean_p_std', 'mean_m_std'],
+                                                    cubes):
+                            coord_name = cube.dim_coords[0].standard_name
+                            coord = cube.coord(coord_name).points
+                            data = copy.deepcopy(cube.data.data)
+                            data[cube.data.mask == True] = np.nan
+                            df_tmp = pd.DataFrame([[diag_name, label.replace(' ', '_'),
+                                                metric_add, coord_name, coord, data]],
+                                                columns=columns)
+                            dfs.append(df_tmp)
+                    else:
+                        raise NotImplementedError
+        df = pd.concat(dfs)
+        df.to_csv(path, index=False)
+        nc_paths.append(path)
     return nc_paths
 
 
@@ -5826,20 +5942,12 @@ def plot_timeseries_ax(ax, pi, ts):
                                 color=label_colors(label+' '+add),
                                 label=label+' '+add, ls=ls, zorder=15)
             elif metric in ['mean_pm_std', 'envelop']:
-                if 'mean' in ts['metrics'] or 'median' in ts['metrics']:
-                    ax.fill_between(cubes[0].coord('year').points,
-                                    cubes[0].data, cubes[1].data,
-                                    color=label_colors(label),
-                                    alpha=pi[metric+'_alpha'],
-                                    label=label,
-                                    zorder=5)
-                else:
-                    ax.fill_between(cubes[0].coord('year').points,
-                                    cubes[0].data, cubes[1].data,
-                                    color=label_colors(label),
-                                    alpha=pi[metric+'_alpha'],
-                                    label=label,
-                                    zorder=5)
+                ax.fill_between(cubes[0].coord('year').points,
+                                cubes[0].data, cubes[1].data,
+                                color=label_colors(label),
+                                alpha=pi[metric+'_alpha'],
+                                label=label,
+                                zorder=5)
             else:
                 logger.error("Plotting of metric {} not implemented "\
                                 "just yet ..".format(metric))
@@ -6843,18 +6951,18 @@ def format_label(label):
 
 def format_units(unit):
     """Formats units."""
-    if 'degC' in unit:
-        unit = unit.replace('degC', '°C')
-    if 'K ' in unit:
-        unit = unit.replace('K ', '°C ')
-    if 'kg m-2' in unit:
-        unit = unit.replace('kg m-2', 'mm')
-    if 'month-1' in unit:
-        unit = unit.replace('month-1', 'month$^{{-1}}$')
-    if 'day-1' in unit:
-        unit = unit.replace('day-1', 'day$^{{-1}}$')
-    if 'd-1' in unit:
-        unit = unit.replace('d-1', 'day$^{{-1}}$')
+
+    repl_map = {'degC': '°C',
+                'K ': '°C ',
+                'kg m-2': 'mm',
+                'month-1': 'month$^{{-1}}$',
+                'day-1': 'day$^{{-1}}$',
+                'd-1': 'day$^{{-1}}$'}
+
+    for k, v in repl_map.items():
+        if k in unit:
+            unit = unit.replace(k, v)
+
     return unit
 
 
