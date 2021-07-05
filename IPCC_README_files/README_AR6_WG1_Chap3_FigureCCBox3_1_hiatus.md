@@ -100,7 +100,7 @@ Software versions, name of environment file (see **save conda environment** in C
 
 Hardware description:
 ---------------------
-What machine was used:  avocado.rcast.u-tokyo.ac.jp
+What machine was used:  avocado.atmos.rcast.u-tokyo.ac.jp
 
 
 Any further instructions: 
