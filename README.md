@@ -10,3 +10,10 @@ diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py which provides data outp
 
 Figure 6.13 is created by running ESMValTool recipe recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml, which calls 
 diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py.
+
+The conda environment for running ESMValTool recipes has been exported to environment.yml via the command:
+% conda env export > environment.yml
+
+The conda environment for running Jupyter notebooks ipynb/ipcc*.ipynb has been exported to ipynb/ipcc_ipynb_environment.yml via the command:
+% conda env export > ipcc_ipynb_environment.yml
+
