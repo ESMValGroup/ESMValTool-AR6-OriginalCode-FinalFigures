@@ -23,7 +23,7 @@ industrial control simulations and historical simulations. The number of
 ensemble members and models used for computing the distribution is given in the 
 upper-left legend. Grey lines show observed trends from the ERA5 and JRA-55 
 reanalyses. Multi-model multi-member ensemble means of the forced component of 
-the trends as well as their 5- 95% confidence intervals assessed from 
+the trends as well as their 5-95% confidence intervals assessed from 
 t-statistics, are represented by filled boxes, based on CMIP6 individual forcing 
 simulations from DAMIP ensembles; greenhouse gases in brown, aerosols in light 
 blue, stratospheric ozone in purple and natural forcing in green. Models with at 
