@@ -188,32 +188,10 @@ begin
     copy_VarMeta(arr_lp(0,:,:),ipo)
 
     if (ii.eq.0) then
-; Method 1
-;           BootStrap   := bootstrap_regcoef(dim_standardize(tpi_lp,0),arr_lp, 1000, 0, opt)
-;           rcBoot      := BootStrap[0]
-;           rcBootLow   := (/ bootstrap_estimate(rcBoot, 0.05, False) /)
-;           rcBootHi    := (/ bootstrap_estimate(rcBoot, 0.95, False) /)
-;           sig:=ipo
-;           sig=(/ where(ipo.le.rcBootLow.or.ipo.ge.rcBootHi,1,0) /)
-;           delete([/BootStrap,rcBoot,rcBootLow,rcBootHi/])
-;
-; Method 2
-;           tval = arr_lp(0,:,:)
-;           df = new((/dimsizes(arr_lp&lat),dimsizes(arr_lp&lon)/),"integer")
-;           rc = regcoef(dim_standardize(tpi_lp,0),arr_lp(lat|:,lon|:,time|:),tval,df) 
-;;   df = equiv_sample_size(arr_lp(lat|:,lon|:,time|:),0.05,0)   ; Optional! over rule df returned from regcoef. Up to you whether you want to use equiv_sample_size or not
-;           df = df-2		;regcoef/equiv_sample_size return N, need N-2
-;           beta_b = tval
-;           beta_b = 0.5
-;           sig = (/ (1.-betainc(df/(df+tval^2), df/2.0, beta_b))*100. /)  ; probability in %
-;           copy_VarMeta(ipo,sig)
-
       reg_fld=arr_lp(0,:,:)
       reg_fld=(/regCoef_n(dim_standardize(tpi_lp,0),arr_lp,0,0)/)
       cor_fld=reg_fld
       cor_fld=(/escorc(dim_standardize(tpi_lp,0),arr_lp(lat|:,lon|:,time|:))/)
-
-;           print("Significance by rtest plus false rate detection")
 
       prob_rtest=cor_fld
       prob_rtest=(/ rtest(cor_fld,dimsizes(tpi_lp)/10,0) /)
@@ -222,28 +200,6 @@ begin
       siglev = 0.10
 
       sig = where(prob_rtest.gt.siglev, 0., 1.)
-
-;           npts=num(.not.ismissing(ndtooned(arr_lp(0,:,:))))
-;           
-;           frac = fspan(1, npts, npts)
-;           scale=1
-;           frac = (/ (frac/npts)* scale * siglev /)
-;           prob_rtest_fdr=prob_rtest
-;
-;           prob_rtest_1d=ndtooned(prob_rtest)
-;           prob_rtest_1d_nomiss=prob_rtest_1d(ind(.not.ismissing(prob_rtest_1d)))
-; 
-;           sig_fdr = prob_rtest_1d_nomiss
-;           ip = dim_pqsort(sig_fdr, 2)
-;           sig_fdr = where(sig_fdr .gt. frac, sig_fdr@_FillValue, sig_fdr)
-;           if (all(ismissing(sig_fdr))) then
-;             pval_fdr = 0.
-;           else
-;             pval_fdr = (/ max(sig_fdr) /)
-;           end if
-;           prob_rtest_fdr=  (/ where(prob_rtest.gt. pval_fdr, 0, 1.) /) 
-;           sig = prob_rtest_fdr
-;           delete(prob_rtest_fdr)
            
       fn = out_path + "pdv.obs."+syearA+"-"+eyearA+".nc"
       print("fn = " + fn)
@@ -849,25 +805,10 @@ begin
   mme_ipo_sign = mme_ipo
   mme_ipo_sign = mme_ipo_sign@_FillValue
 
-  do cc = 0,dimsizes(mme_ipo&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
+  do cc = 0,dimsizes(mme_ipo&lat)-1        ; If more than 80% of the runs agree on sign, assign value of 1. 
      do dd = 0,dimsizes(mme_ipo&lon)-1     ; otherwise assign a value of 0.
         if (.not.ismissing(mme_ipo(cc,dd))) then
            tnum = toint(num(.not.ismissing(ipo_hist(:,cc,dd)))*.8)
-;           if (mme_ipo(cc,dd).ge.0) then   ; MME >= 0
-;              count = num(ipo_hist(:,cc,dd).ge.0)
-;              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
-;                 mme_ipo_sign(cc,dd) = 1   ; assign value of 1
-;              else
-;                 mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
-;             end if
-;           else                            ; MME < 0
-;              count = num(ipo_hist(:,cc,dd).lt.0)  
-;              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
-;                 mme_ipo_sign(cc,dd) = 1   ; assign value of 1
-;              else
-;                 mme_ipo_sign(cc,dd) = 0   ; otherwise assign value of 0
-;              end if
-;           end if      
            countp = num(ipo_hist(:,cc,dd).gt.0)
            countn = num(ipo_hist(:,cc,dd).lt.0)
            if (countp.gt.tnum.or.countn.gt.tnum) then      ; if more than 80% of the members are >0 or <0
