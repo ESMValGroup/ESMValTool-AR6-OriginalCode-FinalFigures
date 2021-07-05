@@ -215,28 +215,6 @@ begin
 
       sig = where(prob_rtest.gt.siglev, 0., 1.)
 
-;      npts=num(.not.ismissing(ndtooned(arr_lp(0,:,:))))
- 
-;      frac = fspan(1, npts, npts)
-;      scale=1
-;      frac = (/ (frac/npts)* scale * siglev /)
-;      prob_rtest_fdr=prob_rtest
-;
-;      prob_rtest_1d=ndtooned(prob_rtest)
-;      prob_rtest_1d_nomiss=prob_rtest_1d(ind(.not.ismissing(prob_rtest_1d)))
-; 
-;      sig_fdr = prob_rtest_1d_nomiss
-;      ip = dim_pqsort(sig_fdr, 2)
-;      sig_fdr = where(sig_fdr .gt. frac, sig_fdr@_FillValue, sig_fdr)
-;      if (all(ismissing(sig_fdr))) then
-;        pval_fdr = 0.
-;      else
-;        pval_fdr = (/ max(sig_fdr) /)
-;      end if
-;      prob_rtest_fdr=  (/ where(prob_rtest.gt. pval_fdr, 0, 1.) /) 
-;      sig = prob_rtest_fdr
-;      delete(prob_rtest_fdr)
-
       fn = out_path + "amv.obs."+syearA+"-"+eyearA+".nc"
       print("fn = " + fn)
       system("rm -f " + fn)
@@ -859,25 +837,10 @@ begin
   mme_amv_sign = mme_amv
   mme_amv_sign = mme_amv_sign@_FillValue
  
-  do cc = 0,dimsizes(mme_amv&lat)-1        ; If more than 80% of the runs match the sign of the MME, assign value of 1. 
+  do cc = 0,dimsizes(mme_amv&lat)-1        ; If more than 80% of the runs agree on sign, assign value of 1. 
      do dd = 0,dimsizes(mme_amv&lon)-1     ; otherwise assign a value of 0.
         if (.not.ismissing(mme_amv(cc,dd))) then
            tnum = toint(num(.not.ismissing(amv_hist(:,cc,dd)))*.8)
-;           if (mme_amv(cc,dd).ge.0) then   ; MME >= 0
-;              count = num(amv_hist(:,cc,dd).ge.0)
-;              if (count.ge.tnum) then      ; if more than 80% of the EM are >=0
-;                 mme_amv_sign(cc,dd) = 1   ; assign value of 1
-;              else
-;                 mme_amv_sign(cc,dd) = 0   ; otherwise assign value of 0
-;             end if
-;           else                            ; MME < 0
-;              count = num(amv_hist(:,cc,dd).lt.0)  
-;              if (count.ge.tnum) then      ; if more than 80% of EM are < 0
-;                 mme_amv_sign(cc,dd) = 1   ; assign value of 1
-;              else
-;                 mme_amv_sign(cc,dd) = 0   ; otherwise assign value of 0
-;              end if
-;           end if      
            countp = num(amv_hist(:,cc,dd).gt.0)
            countn = num(amv_hist(:,cc,dd).lt.0)
            if (countp.gt.tnum.or.countn.gt.tnum) then      ; if more than 80% of the members are >0 or <0
