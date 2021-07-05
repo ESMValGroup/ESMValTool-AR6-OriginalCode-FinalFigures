@@ -1,3 +1,14 @@
+# ipcc__ar6wg1_fig6.10_erf_piAer.py
+
+# Description
+# Generates figures and proprocessed data for IPCC Working Group I Contribution to the Sixth Assessment Report
+#  IPCC AR6 WG1 Figure 6.10a 
+#  IPCC AR6 WG1 Figure 6.10b preprosessed data 
+
+# Creator: Chaincy Kuo (CKuo@lbl.gov, chaincy.ipccwg1@gmail.com )
+# Creation Date:  11 March 2021
+
+
 import logging
 import os
 from pprint import pformat

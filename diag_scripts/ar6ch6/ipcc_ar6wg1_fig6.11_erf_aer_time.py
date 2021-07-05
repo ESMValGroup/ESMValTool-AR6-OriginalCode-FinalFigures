@@ -1,3 +1,16 @@
+
+# ipcc_ar6wg1_fig6.11_erf_aer_time.py 
+
+# Description
+# Generates ESMValTool preprocessed data for IPCC Working Group I Contribution to the Sixth Assessment Report
+# IPCC AR6 WG1 Figure 6.11 preprosessed data 
+# Final Figure 6.11 generatied by ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb
+
+# Creator: Chaincy Kuo (CKuo@lbl.gov, chaincy.ipccwg1@gmail.com )
+# Creation Date:  11 March 2021
+
+
+
 import logging
 import os
 from pprint import pformat

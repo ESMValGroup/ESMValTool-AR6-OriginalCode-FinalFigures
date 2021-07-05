@@ -1,3 +1,14 @@
+
+# ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py 
+
+# Description
+# Generates figures for IPCC Working Group I Contribution to the Sixth Assessment Report
+#  IPCC AR6 WG1 Figure 6.13 
+
+# Creator: Chaincy Kuo (CKuo@lbl.gov, chaincy.ipccwg1@gmail.com )
+# Creation Date:  11 March 2021
+
+
 import logging
 import os
 from pprint import pformat

@@ -1,3 +1,15 @@
+
+# ipcc_ar6wg1_interactiveatlas_erf_aer_time.py  
+
+# Description
+# Generates figures for IPCC Working Group I Contribution to the Sixth Assessment Report
+# IPCC AR6 WG1 Interactive Atlas preprosessed data for Effective Radiative Forcing due to aerosols 
+
+# Creator: Chaincy Kuo (CKuo@lbl.gov, chaincy.ipccwg1@gmail.com )
+# Creation Date:  11 March 2021
+
+
+
 import logging
 import os
 from pprint import pformat
