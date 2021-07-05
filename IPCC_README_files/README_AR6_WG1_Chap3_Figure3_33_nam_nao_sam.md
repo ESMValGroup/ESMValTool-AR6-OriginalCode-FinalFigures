@@ -97,13 +97,13 @@ What are their access permissions/Licenses?
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
+- ESMValTool environment file: IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml
+- pip file: IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt
 
 
 Hardware description:
 ---------------------
-Machine used: Mistral
+Machine used: avocado.atmos.rcast.u-tokyo.ac.jp
 
 
 Any further instructions: 
