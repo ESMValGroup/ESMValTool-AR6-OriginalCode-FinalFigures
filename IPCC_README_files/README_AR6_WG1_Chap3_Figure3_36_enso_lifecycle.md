@@ -35,6 +35,8 @@ mean SST anomalies with triangular-weights after linear detrending.
 Author list:
 ------------
 - Kosaka, Y.: University of Tokyo, Japan; ykosaka@atmos.rcast.u-tokyo.ac.jp
+- McGregor, S.: Monash University, Australia
+- Cassou, C.: CNRS-Cerfacs, France
 - Kazeroni, R.: DLR, Germany
 
 
