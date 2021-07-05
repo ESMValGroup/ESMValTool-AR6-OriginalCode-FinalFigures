@@ -64,9 +64,9 @@ File: woa18_decav81B0_t00_01.nc. As well as (https://www.ncei.noaa.gov/access/wo
 File: woa18_decav81B0_s00_01.nc. It was cmorized with cmorizers/obs/cmorize_obs_woa.py 
 from the above mentioned repository.
 
-To run the recipe three shape files are needed: indian_ocean.shp, indian_ocean.shp, and indian_ocean.shp. 
+To run the recipe three shape files are needed: indian_ocean.shp, atlantic.shp, and pacific.shp. 
 Those were created from https://github.com/SantanderMetGroup/ATLAS/blob/devel/reference-regions/IPCC-WGI-reference-regions-v4_shapefile.zip 
-with [this script](../auxiliary_scripts/shape_file_creation.py), which selects the ocean basins shapes,
+with [this script](../IPCC_additional_scripts/shape_file_creation.py), which selects the ocean basins shapes,
 adds the south part and plots the basins. 
 
 Software description:
