@@ -55,27 +55,31 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_hiatus_summary.yml
+Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_fig_ccb3_1.yml
 
-Diagnostic(s) used: e.g. diag_scripts/ipcc_ar6/tsline.ncl
-Please describe this diagnostic:
+Diagnostics used: 
+- diag_scripts/ar6ch3_hiatus/trend.ncl
+- diag_scripts/ar6ch3_hiatus/composite.ncl
+- diag_scripts/ar6ch3_hiatus/draw.ncl
+- diag_scripts/ar6ch3_hiatus/summary_percentiles.ncl
 
 
 Expected image path:
 --------------------
-- recipe_ipccwg1ar6ch3_hiatus_summary_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
+- recipe_ipccwg1ar6ch3_fig_ccb3_1_YYYYMMDD_HHMMSS/plots/trend_hiatus_posthiatus_5x5/plot_refHadCRUT5_HadCRUT5mean/hiatus_and_posthiatus_pdfs.pdf
 
 
 Recipe generations tools: 
 -------------------------
 Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
+N/A
 
 
 Ancillary figures and datasets:
 -------------------------------
-If the recipe is based on recipe_ar6ch3_hiatus_summary.yml, it will creates 
-summary tables of percentiles values of 1998-2012 GMST trends in CMIP5 and CMIP6 
-calculated based on resolution, anomaly definition, and masking of individual 
+In addition to Cross-Chapter Box 3.1 Figure 1, This recipe will create 
+tables summarizing percentiles values of 1998-2012 GMST trends in CMIP5 and CMIP6 
+calculated based on the resolution, anomaly definition, and masking of individual 
 observational datasets.
 
 
@@ -90,15 +94,13 @@ What are their access permissions/Licenses?
 Software description:
 ---------------------
 Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
-- Other software used:
+- ESMValTool environment file: IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml
+- pip file: IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt
 
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
+What machine was used:  avocado.rcast.u-tokyo.ac.jp
 
 
 Any further instructions: 
