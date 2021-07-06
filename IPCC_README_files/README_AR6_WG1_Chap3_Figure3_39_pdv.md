@@ -49,13 +49,7 @@ Author list:
 - Kazeroni, R.: DLR, Germany
 
 
-Publication sources:
---------------------
-Please list any publications that describe, explain or use this figure. 
-- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021. 
-
-
-ESMValTool Branch:
+SMValTool Branch:
 ------------------
 - ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
 
@@ -74,26 +68,7 @@ Diagnostic used: diag_scripts/ipccwg1ar6ch3_modes/pdv.ncl
 
 Expected image path:
 --------------------
-This is the path of the image relative to the automatically generated ESMValTool output location:
 - recipe_ipccwg1ar6ch3_modes_YYYYMMDD_HHMMSS/plots/pdv-amv/pdv/pdv.pdf
-
-
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
-
-
-Ancillary figures and datasets:
--------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
-
-
-Additional datasets:
---------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
-Can they be re-created?
-What are their access permissions/Licenses?
 
 
 Software description:
@@ -105,8 +80,3 @@ Software description:
 Hardware description:
 ---------------------
 Machine used: avocado.atmos.rcast.u-tokyo.ac.jp
-
-
-Any further instructions: 
--------------------------
-
