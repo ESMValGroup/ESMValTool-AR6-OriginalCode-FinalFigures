@@ -37,20 +37,9 @@ Author list:
 - Kazeroni, R.: DLR, Germany
 
 
-Publication sources:
---------------------
-Please list any publications that describe, explain or use this figure. 
-- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021. 
-
-
 ESMValTool Branch:
 ------------------
 - ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_hiatus
-
-
-ESMValCore Branch:
-------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: branch_name
 
 
 Recipe & diagnostics:
@@ -69,12 +58,6 @@ Expected image path:
 - recipe_ipccwg1ar6ch3_fig_ccb3_1_YYYYMMDD_HHMMSS/plots/trend_hiatus_posthiatus_5x5/plot_refHadCRUT5_HadCRUT5mean/hiatus_and_posthiatus_pdfs.pdf
 
 
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
-N/A
-
-
 Ancillary figures and datasets:
 -------------------------------
 In addition to Cross-Chapter Box 3.1 Figure 1, This recipe will create 
@@ -83,17 +66,8 @@ calculated based on the resolution, anomaly definition, and masking of individua
 observational datasets.
 
 
-Additional datasets:
---------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
-Can they be re-created?
-What are their access permissions/Licenses?
-
-
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
 - ESMValTool environment file: IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml
 - pip file: IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt
 
@@ -101,8 +75,3 @@ Software versions, name of environment file (see **save conda environment** in C
 Hardware description:
 ---------------------
 What machine was used:  avocado.atmos.rcast.u-tokyo.ac.jp
-
-
-Any further instructions: 
--------------------------
-
