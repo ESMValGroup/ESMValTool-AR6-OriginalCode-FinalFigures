@@ -2,7 +2,7 @@
 # recipe_python.yml
 ---
 documentation:
-  description: For plotting temperature trends in the vertical temperature profile. IPCC AR6 Chapter 3 Fig. 3.9.
+  description: For plotting temperature trends in the vertical temperature profile. IPCC AR6 Chapter 3 Fig. 3.10.
 
   authors:
     - lo_eunice
