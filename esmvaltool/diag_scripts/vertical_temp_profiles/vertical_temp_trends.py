@@ -21,6 +21,7 @@ from esmvaltool.diag_scripts.shared import (
 
 ''' Atmospheric temperature trends at pressure levels '''
 ''' from CMIP6 coupled and atmos-only models, and radiosonde and reanalysis data '''
+''' Disgnostic code for IPCC AR6 Chapter 3 Figure 3.10 '''
 ''' Eunice Lo '''
 
 
