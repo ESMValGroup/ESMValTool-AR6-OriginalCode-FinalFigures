@@ -4,7 +4,7 @@ FIGURE TITLE
 Figure number: Figure 3.10
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
-![Figure 3.10](../images/ar6_wg1_chap3_fig3_10_SHORT_NAME.png?raw=true)
+![Figure 3.10](../images/ar6_wg1_chap3_fig3_10_vertical_temp.png?raw=true)
 
 
 Description:
