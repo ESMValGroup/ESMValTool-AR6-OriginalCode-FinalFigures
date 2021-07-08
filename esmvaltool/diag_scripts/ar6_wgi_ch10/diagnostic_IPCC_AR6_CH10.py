@@ -1,10 +1,10 @@
-#!/pf/b/b380860/miniconda3/envs/evt21/bin/python
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Diagnostic script to plot:
 - multi-ensembles timeseries figures
-- trend histograms
+- trend histograms and boxplots
+- mapplots
+- boxplots
+- gwlrwl
 of IPCC AR6 chapter 10.
 
 Author
@@ -16,8 +16,81 @@ Project
 ipcc_ar6
 
 
+General description:
+Chapter 10 figures show a lot of overlap in terms of the type of plots. Hence,
+it made sense to provide a diagnostic python script that can handle the
+specific figure specifications in a generic way.
+
+Workflow of diagnostic python script:
+- apply possible obsmasking on ensembles
+- process data for diagnostic type mapplot, histogram, timeseries, gwlrwl,
+    boxplot and possible external data
+- process data for diagnostic type mapplotcombination
+- process data for diagnostic type dependent
+- apply postprocessing changes (sometimes it was necessary to change e.g. the
+    labeling)
+- plot the 'standalone' figures, write the plotted data, write provenance
+- plot the combination figures
+
+-------------------------------------------------------------------------------
+General settings
+-------------------------------------------------------------------------------
+# figures are always save as png files, additionally:
+savepdf: bool
+    # if output plot also as pdf
+saveeps: bool
+    # if output plot also as eps
+savesvg: bool
+    # if output plot also as svg
+
+Globals
+root_path = os.path.dirname(os.path.realpath(__file__))
+exernal_path = os.path.join(root_path, "CH10_additional_data")
+    # path to 'external' plotting data
+path_to_ctabels = os.path.join(root_path, "colormaps")
+    # path to IPCC color tabels
+matplotlibrc_path = os.path.join(root_path, "ar6_wgi_ch10.mplstyle")
+    # path to mplstyle file
+
+-------------------------------------------------------------------------------
+Description of diagnostics
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+Observational masking (obsmasking_*)
+-------------------------------------------------------------------------------
+Description
+-----------
+Runs a preprocessor with additional masking criteria, which check for missing
+data points, and mask the processed data if certain thresholds are reached.
+(see function header obs_masking for more information).
+
+Inputs from recipe
+------------------
+Preprocessor output
+
+Configuration options in recipe
+-------------------------------
+obsmasking_*:
+    variable_group: str
+        a preprocessor output (variables, ensemble)
+    datasets: list of strings
+        datasets to consider
+
+    # preprocessor function included:
+    # ['extract_time', 'extract_region', 'extract_shape',
+       'seasonal_statistics', 'climate_statistics', 'annual_statistics',
+       'area_statistics', 'area_statistics_mask']
+    # to be used like ESMValTool preprocessors
+    custom_threshholds:
+        ppfunction: float
+        # there are some predifined threshholds, though they can be addapted
+        # via this arguments
 
 
+-------------------------------------------------------------------------------
+Timeseries (timeseries_*)
+-------------------------------------------------------------------------------
 Description
 -----------
 Derive multimodel multi-ensembles timeseries.
@@ -28,8 +101,7 @@ Annual (subseasonal, submonthly) data from preprocessor
 
 Configuration options in recipe
 -------------------------------
-timeseries:
-    # anomalies
+timeseries_*:
     anomalies: bool
         if data is to be treated as anomalies
     relative: bool
@@ -39,8 +111,8 @@ timeseries:
         end_year: 2014
             the period used for the anomalies
 
-    # provenance information to maintain
     domain: str
+        provenance information to maintain
 
     # multimodel arguments
     span: str
@@ -52,13 +124,15 @@ timeseries:
             if low pass filtering is to be performed on the plotted timeseries
             implemented string options are 5weighted and 13weighted (see
             https://archive.ipcc.ch/publications_and_data/ar4/wg1/en/ch3sappendix-3-a.html)
-            or simple unweighted int
+            or simple unweighted running mean (int, 1 if no filetering)
 
     order: list
             holding information on the plotting order of the single timeseries
 
     # input data
     timeseries_xyz:
+        # input can have arbitrary names, but must start with the word
+        # 'timeseries_*'
         ensembles: list
             # list of diagnostic variable group, i.e. preprocessed ensembles,
             # e.g. [tas_cmip6]
@@ -95,6 +169,8 @@ timeseries:
             end_year: 2100
                 # period of the timeseries to plot
         indicate_bars: bool (False)
+            Additionally bars can be added to the timeseries showing the raw
+            unfiltered data (see window).
         # Example (Multiple timeseries can be provided):
         #     timeseries_obs:
         #         period:
@@ -110,10 +186,56 @@ timeseries:
         #         period:
         #         start_year: 1960
         #         end_year: 2100
+    boxes_xyz:
+        # input can have arbitrary names, but must start with the word
+        # 'boxes_*'
+
+        box_type: str
+            change - the change between period_norm and period_box
+            trend - the trend over the period_box
+        ensembles: list
+            # list of diagnostic variable group, i.e. preprocessed ensembles,
+            # e.g. [tas_cmip6]
+        labeling: python formatted string, list of python formatted string
+            # e.g. '{project} {exp} {N}'
+            #     ['{activity} {exp}', '{project} {exp}']
+        metrics: [single]
+            period:
+              start_year: 1960
+              end_year: 2100
+            period_box: &per_long
+              start_year: 2081
+              end_year: 2100
+        period:
+            start_year: 1960
+            end_year: 2100
+                period of the timeseries to plot
+        period_box:
+            start_year: 2081
+            end_year: 2100
+                the target period for the change
+        trend_base: str
+            possible options are [decade, year, all]
+        # Example (Multiple boxes can be provided):
+        #   boxes_1: &ts_boxes
+        #     box_type: change
+        #     ensembles: [tas_cmip6_areamean_ssp126, tas_cmip6_areamean_ssp245, tas_cmip6_areamean_ssp370, tas_cmip6_areamean]
+        #     labeling: '{project} {exp} (N={N})'
+        #     metrics: [single]
+        #     period:
+        #       start_year: 1960
+        #       end_year: 2100
+        #     period_box:
+        #       start_year: 2081
+        #       end_year: 2100
+
+
     # plotting options
     plotting_information: (each optional)
+        figsize: tuple (default: (16, 10))
+
         # legend options [todo: treat as keyword arguments]
-        add_legend: (bool) true
+        add_legend: (bool)
         ncol: int
         loc: int
 
@@ -127,9 +249,16 @@ timeseries:
         ylims: tuple
         xlabel: str
         ylabel: str
-        zero_line: bool
+        zero_line: bool (default: True)
         title: str
-        grid_lines: bool
+        subtitle: str
+        grid_lines: bool (default: False)
+        force_ytick_integers: bool (default: False)
+        mean_pm_std_alpha: float (default: 0.2)
+        envelop_alpha: float, (default: 0.2)
+        minmax_ls: list of strings (default: ['-','-'])
+        add_shading: bool (to the indicate_period) (default: True)
+        auto_indper_ylims: bool (default: True)
 
         # splitting the x-axis
         # This works only correctly if the ylims and xlims/period plot are set.
@@ -145,29 +274,35 @@ timeseries:
 
         # Special plotting objects
         indicate_period:
-                # plots a lying I |-| over the given period and maybe names it and
-                # maybe adds a shading. Possible to add multiple (non overlapping)
-                # indication periods
+                # plots a lying I |-| over the given period and maybe names it
+                # and maybe adds a shading. Possible to add multiple (non
+                # overlapping) indication periods
             start_year: int
             end_year: int
             name: str
-            add_shading: bool
+            # e.g.
+            # indicate_period_2:
+            #       start_year: 2015
+            #       end_year: 2050
+            #       name: Future period
 
 
+-------------------------------------------------------------------------------
+Histograms (histogram_*)
+-------------------------------------------------------------------------------
 Description
 -----------
-Derive trend histogram and trend symbols.
+Derive trend histogram/boxplots and trend symbols.
 
 Inputs from recipe
 ------------------
-Annual data from preprocessor
+Annual (subseasonal, submonthly) data from preprocessor
 
 Configuration options in recipe
 -------------------------------
-histogram:
-    # provenance information to maintain
+histogram_*:
     domain: str
-        # e.g. 'Mediterranean'
+        provenance information to maintain e.g. 'Mediterranean'
 
     # trend calculation
     trend_base: str
@@ -178,20 +313,24 @@ histogram:
         # the period used for the trend calculation
 
     # anomalies
-    relative: bool
+    relative: bool (default: False)
         # if trends should be calculated on relative values
     period_norm:
         start_year: 1995
         end_year: 2014
         # the period used as basis for the relative values
 
-    # input data
-    add_mean_trends: bool
+    add_mean_trends: bool (default: True)
         # if mean trends should be added as extra line of symbols
-    # input data can have arbitrary names, but must include the word
-    # 'histogram'
+    add_mean_trends_before_obs: bool (default: True)
+
+    # input data
+    # input can have arbitrary names, but must start with the word
+    # 'histogram_*'
     histogram_histogram:
-        metric: trend
+        # input can have arbitrary names, but must start with the word
+        # 'histogram_histogram_*'
+        metric: str (default: trend, currently the only implemented metric)
             # str so far only option
         ensembles: list
             # list of diagnostic variable group, i.e. preprocessed ensembles,
@@ -208,10 +347,12 @@ histogram:
         plot_type: str
             # must be either histogram, symbols, violin, or boxplot
     histogram_symbols: same as histogram_histogram
+        # input can have arbitrary names, but must start with the word
+        # 'histogram_symbols_*'
         metric: trend
         ensembles: [tas_cmip5, tas_obs]
-        labeling: '{project}'
-        plot_type: symbols
+        labeling: see above
+        plot_type: str (default: symbols)
     # Example
     #     add_mean_trends: True
     #     histogram_histogram:
@@ -225,8 +366,9 @@ histogram:
 
     # plotting options
     plotting_information: (each optional)
+        figsize: tuple (default: (12, 12))
         # legend options [todo: treat as keyword arguments]
-        add_legend: true
+        add_legend: bool (default: True)
         ncol: int
         loc: int
 
@@ -234,18 +376,25 @@ histogram:
         xlims: tuple
         ylims: tuple
         title: str
+        subtitle: str
+        mean_text_label: str (default: 'Ensemble means'),
         xlabel: str
             # default set to 'Trend ({units} {trend_base}$^{{-1}}$)'
         ylabel: str
             # default set to '(% of simulations)'
+            This only applies to histogram_histogram plot_type: histogram
 
         # histogram information, major tick marks will be set to the bins
-        bins_spacing: 0.05
+        bins_spacing: float (default: None)
+            None leads to a default bin space of 10x the data range
 
 
+-------------------------------------------------------------------------------
+Boxplots (boxplot_*)
+-------------------------------------------------------------------------------
 Description
 -----------
-Derive RWL as a function of GWL.
+Derive boxplot.
 
 Inputs from recipe
 ------------------
@@ -253,17 +402,95 @@ Annual (subseasonal, submonthly) data from preprocessor
 
 Configuration options in recipe
 -------------------------------
-gwlrwl:
+boxplot_*:
+    domain: str
+        provenance information to maintain e.g. 'Mediterranean'
+    type: str
+        'bp_single-values': build boxplots based on data values
+        'bp_single-trends': build boxplots based on trends over data values
+    ensembles: list
+        # list of diagnostic variable group, i.e. preprocessed ensembles,
+        # e.g. [tas_obs_areamean, tas_cmip5_areamean, tas_cmip6_areamean]
+    ordering: (optional for type: bp_single-values)
+        ensemble name (e.g. tas_obs_areamean) list
+        # can set the order of included datasets
+        # e.g. tas_obs_areamean: ['OBS_None_BerkeleyEarth_None', 'OBS_None_CRU_TS4.04', 'OBS_None_HadCRUT4', 'OBS_None_HadCRUT5', 'OBS_None_E-OBS_v21.0e-0.1', 'OBS_None_E-OBS_v21.0e-0.25', 'OBS_None_WFDE5_v1.0-CRU', 'obs4mips_ERA5', 'obs4mips_ERA-Interim', 'obs4mips_CERA-20C', 'obs4mips_JRA-25', 'obs4mips_JRA-55', 'obs4mips_CFSR', 'obs4mips_MERRA2', 'obs4mips_MERRA']
+
+    applicable to bp_single-trends:
+        relative: bool
+        anomalies: bool
+        period_norm:
+            start_year: 1995
+            end_year: 2014
+            # the base period used for the relative anomalies
+        trend_base: str
+            # possible options are [decade, year, all]
+        periods_boxes:
+             per_1_near:
+                start_year: 1995
+                end_year: 2014
+                labeling: 'Trend'
+            # the periods used for the boxes trends
+
+    # plotting options
+    plotting_information: (each optional)
+        figsize: tuple (default: (10, 8))
+
+        add_legend: bool
+        ncol: int
+        loc: int
+
+        xlabel: str
+        ylabel: str
+        ylabel_format: str (default: ({units}))
+        xlims: tuple
+        ylims: tuple
+
+        remove_xticks: bool (default: True),
+        second_yaxis: bool (default: True),
+        second_xaxisspline: bool (default: True),
+
+        zero_line: bool (default: False)
+        100_line: bool (default: False)
+        grid_lines: bool (default: False)
+
+        title: str
+        subtitle: str
+        force_ytick_integers: bool (default: False)
+
+        labeling: python formatted string, list of python formatted string
+            # e.g. '{project} {exp} {N}'
+            #     ['{activity} {exp}', '{project} {exp}']
+            # if the initial labeling faild due to a KeyError or TypeError
+            # subsequentl list entries are tried
+            # formatting strings can be metadata describing preprocessed data
+            # but have to be unifrom throughout the ensemble (except for
+            # dataset) or can me {metric}. Also the number of ensemble members
+            # can be added ({N}).
+
+
+-------------------------------------------------------------------------------
+Global warming level - regional warming level (gwlrwl_*)
+-------------------------------------------------------------------------------
+Description
+-----------
+Derive RWL as a function of GWL, i.e. interpolate RWL (x-axis) on GWL (y-axis)
+
+Inputs from recipe
+------------------
+Annual (subseasonal, submonthly) data from preprocessor
+
+Configuration options in recipe
+-------------------------------
+gwlrwl_*:
+    domain: str
+        provenance information to maintain e.g. 'Mediterranean'
+
     interp_grid:
-        start: flt
-        stop: flt
-        intervall: flt
-        used to intep RWL(GWL) to RWL(interp_grid)
-        e.g.:
-        interp_grid:
-            start: -1.
-            stop: 10.
-            intervall: 0.05
+        start: flt, (default: -1)
+        stop: flt, (default: 10)
+        intervall: flt, (default: 0.5)
+        used to intep RWL(GWL) to GWL(interp_grid)
 
     # anomalies
     anomalies: bool
@@ -275,13 +502,15 @@ gwlrwl:
         end_year: 1900
             the period used for the anomalies
 
-    # provenance information to maintain
-    domain: str
-
     # multimodel arguments
     multimodel_threshhold: flt
-        threshhold used for the mulitmodel statistics (default: 0.8)
+        threshhold used for the mulitmodel statistics (default: 0.8, i.e.
+        there has to be data for at least 80% of models)
 
+    ensembles: list of list
+        [[[GWL-ensemble, RWL-ensemble]]], 1st dimension loops with metrics
+        # list of diagnostic variable group, i.e. preprocessed ensembles,
+        # e.g. [tas_cmip6_GWL_ssp585, tas_cmip6_RWL_ssp585]
     metrics: list of metrics to be calculated
         # e.g. [mean, mean_pm_std],
         # possible metrics are:
@@ -306,25 +535,32 @@ gwlrwl:
 
     # plotting options
     plotting_information: (each optional)
+        figsize: tuple (default: (10, 10))
+
         # legend options [todo: treat as keyword arguments]
-        add_legend: (bool) true
-        ncol: int
-        loc: int
+        add_legend: bool (default: true)
+        ncol: int (default: 1)
+        loc: int (default: 2)
 
         # ax keywords [todo: treat as keyword arguments]
         xlims: tuple
         ylims: tuple
         xlabel: str, if none cube coord will be used
         ylabel: str, if none cube units
-        45degree_line: bool
-        zero_line_x: bool
-        zero_line_y: bool
+        45degree_line: bool, (default: True)
+        zero_line_x: bool, (default: False)
+        zero_line_y: bool, (default: False)
         title: str
-        grid_lines: bool
+        subtitle: str
+        grid_lines: bool, (default: False)
+        mean_pm_std_alpha: float, (default: 0.2)
+        envelop_alpha: float, (default: 0.2)
+        minmax_ls: list of strings (default: [':','--'])
 
 
-
-
+-------------------------------------------------------------------------------
+Mapplot (mapplot_*)
+-------------------------------------------------------------------------------
 Description
 -----------
 Derive several kinds of mapplots
@@ -337,13 +573,11 @@ Inputs from recipe
                                  but also for mean if relative treatment is
                                  wanted)
 
-
 Configuration options in recipe
 -------------------------------
-mapplot:
-    # provenance information to maintain
+mapplot_*:
     domain: str
-        # e.g. 'Mediterranean'
+        provenance information to maintain e.g. 'Mediterranean'
 
     # Basic information
     type: str
@@ -358,8 +592,10 @@ mapplot:
         #                         trend-difference-minN-maxN]
         # for trend-min-median-max, trend-min-mean-max,
         # trend-difference-minN-maxN the regional definition
-        # of region_metric is used to calculate the trends (if no
-        # region_metric is the definition of region is used).
+        # of region_metric is used to calculate the trends (if no region_metric
+        # is the definition of shapefile, box, region is used).
+        # for trend-difference-minN-maxN, N indicates the number of models to
+        # use, e.g. trend-difference-min3-max3
 
     trend_base: str
         # possible options are [decade, year, all]
@@ -370,6 +606,14 @@ mapplot:
         # i.e. newmask = oldmask | refmask
     reference_dataset: str (optional)
         # dataset name to be used as reference e.g. BerkeleyEarth
+    reference_ensemble: str
+        # diagnostic variable group that is used as reference (usefull if
+        # obs are treatet with obsmasking)
+        # reference can also be included in ensembles.
+    ensembles: list
+        # list of diagnostic variable group, i.e. preprocessed ensembles,
+        # e.g. [tas_cmip6]
+
     exclude_obs: bool
         # Only applies if type != MultiModelMean.
         # If the obs is to be excluded from the metric calculations.
@@ -392,9 +636,6 @@ mapplot:
         #   start_year: 1960
         #   end_year: 1990
 
-    ensembles: list
-        # list of diagnostic variable group, i.e. preprocessed ensembles,
-        # e.g. [tas_cmip6], currently only lists of N=1 are implemented
     region: yaml dic (optional)
         # the region to appear on the plot (this may be different from the
         # preprocessor region, in order not to have space wo data in the plot)
@@ -406,7 +647,10 @@ mapplot:
         #   end_latitude: 55.
     region_metric: yaml dic (optional)
         # same form as region, but used for the trend calculation of
-        # trend-min-median-max and trend-min-mean-max
+        # trend-min-median-max, trend-min-mean-max, trend-difference-minN-maxN
+    shapefile: str (optional)
+        # may be used for the trend calculation of
+        # trend-min-median-max, trend-min-mean-max, trend-difference-minN-maxN
 
     centerlononzero: bool (optional)
         # transform data/plot to be centered on 0° longitude
@@ -419,6 +663,8 @@ mapplot:
         #   start_latitude: 46.
         #   end_latitude: 50.
         # can be provided mutiple times, e.g. box_A, box_north, ...
+    shape_paths: list (optional)
+        # plot the shape outline on the plot
 
     wind_overlay: bool (optional)
         # overlays mapplot with wind arrows
@@ -428,10 +674,23 @@ mapplot:
     normalise_wind: bool
         # Normalise the data for uniform arrow size
 
+    orog_overlay: bool (optional)
+        # overlays mapplot with contour lines
+    orog_diagnostic:list of str
+        # holding the orographic information
+
+    pattern_overlay: bool (optional)
+        # if a pattern overlay should be plotted
+    pattern_metric: str (optional)
+        # currently only 'obs_trend_within_model_spread' is implemented,
+
     # plotting options (each option)
     plotting_information:
+        figsize: tuple (default: (16, 12))
         projection: str (default LambertConformal)
             # can be PlateCarree, Mercator, Miller, LambertConformal
+        title: str
+        subtitle: str
         plot_title: bool (default True)
         title_format: python formatted string
             # e.g. '{project}'
@@ -441,8 +700,25 @@ mapplot:
             # a respective string is added to the title
         coastlines: bool (default True)
             # if coastlines should be drawn
-        plot_box: bool (default True)
+        res_coastlines: str (default: '50m'),
+            # resolution of coastlines
+        lakes: bool (default: False),
+            # if lakes should be drawn
+        res_lakes: str (default: '50m'),
+            # resolution of lakes
+        latlonlabels: bool (default: False)
+            # add lat lon ticks
+
+        add_legend: bool (default: False)
+            # add legend if symbols are added to the map
+
+        plot_box: bool (default: True)
             # if the regions indicated by 'box' in the name should be drawn
+        indicate_N: bool (default: False)
+            # indicate the number of underlying models
+        overlay_pattern: str (default: stippling)
+            # overlay pattern in the case of pattern_overlay: True
+            # currently only 'stippling' is implemented,
 
         # color management and color bar
         extend: str (default 'both')
@@ -471,74 +747,12 @@ mapplot:
             # can hold cube units (=units) or trend_base
             # for trends a sensefull user setting would be:
             # '{units} {trend_base}$^{{-1}}$'
+        cbar_label: str (default: None)
+            # to manually set cbar label
         mintozero: bool (default True)
             # if no minmax is given sets the min to 0
         maxtozero: bool (default False)
             # if no minmax is given sets the max to 0
-
-
-    # # trend calculation
-    # trend_base: str
-    #     # possible options are [decade, year, all]
-    # period_trend:
-    #     start_year: 1960
-    #     end_year: 2014
-    #     # the period used for the trend calculation
-
-    # # normalisation
-    # relative: bool
-    #     # if trends should be calculated on relative values
-    # period_norm:
-    #     start_year: 1995
-    #     end_year: 2014
-    #     # the period used as basis for the relative values
-
-    # # input data
-    # add_mean_trends: bool
-    #     # if mean trends should be added as extra line of symbols
-    # histogram_histogram:
-    #     metric: trend
-    #         # str so far only option
-    #     ensembles: list
-    #         # list of diagnostic variable group, i.e. preprocessed ensembles,
-    #         # e.g. [tas_cmip6]
-    #     labeling:  python formatted string
-    #         # e.g. '{project}'
-    #         # formatting strings can be metadata describing preprocessed data
-    #         # but should have to be unifrom throughout the ensemble.
-    # histogram_symbols: same as histogram_histogram
-    #     metric: trend
-    #     ensembles: [tas_cmip5, tas_obs]
-    #     labeling: '{project}'
-    # # Example
-    # #     add_mean_trends: True
-    # #     histogram_histogram:
-    # #         metric: trend
-    # #         ensembles: [tas_cmip6]
-    # #         labeling: '{project}'
-    # #     histogram_symbols:
-    # #         metric: trend
-    # #         ensembles: [tas_cmip5, tas_obs]
-    # #         labeling: '{project}'
-
-    # # plotting options
-    # plotting_information: (each optional)
-    #     # legend options [todo: treat as keyword arguments]
-    #     add_legend: true
-    #     ncol: int
-    #     loc: int
-
-    #     # ax keywords [todo: treat as keyword arguments]
-    #     xlims: tuple
-    #     ylims: tuple
-    #     title: str
-    #     xlabel: str
-    #         # default set to 'Trend ({units} {trend_base}$^{{-1}}$)'
-    #     ylabel: str
-    #         # default set to '(% of simulations)'
-
-    #     # histogram information, major tick marks will be set to the bins
-    #     bins_spacing: 0.05
 
 
 Description
@@ -561,20 +775,69 @@ mapplotcombination:
         calculations are mapplotA operator mapplotB
 
 
+-------------------------------------------------------------------------------
+Placeholder (placeholder_*)
+-------------------------------------------------------------------------------
+Description
+-----------
+Serves as a placeholder panel to add titles to the combination figure for
+panels which are introduced by means of graphics software.
+
+placeholder_*:
+    plotting_information:
+        title: str
 
 
-matplotlibrc: str
-    # path to mplstyle file
-savepdf: bool
-    # if output plot also as pdf
+-------------------------------------------------------------------------------
+Dependent (dependent_*)
+-------------------------------------------------------------------------------
+Description
+-----------
+Figure CB 3.1 needs mapplot output processed beforehand.
 
 
+-------------------------------------------------------------------------------
+Combination figures (diagnostics_combination_figure_*)
+-------------------------------------------------------------------------------
+Description
+-----------
+Combines single figures into the final chapter figure
 
+Inputs from diagnostics
+------------------------
+- processed diagnostics figures
 
+Configuration options in recipe
+-------------------------------
+diagnostics_combination_figure_*:
+    figure_name: str
+    title_leading: str (default: ({ascii_lowercase}))
+        adds a string to the single panel titles. ascii_lowercase takes the
+        position argument of the single diagnostics_positions.
+    figsize: tuple (default: (20, 40))
+    add_title: bool (default: True)
+    add_subtitle: bool (default: True)
+    gridspec: tuple
+        the underlying figure gridspec
 
-Todo:
-    - add subtitles and subtitles formating
-
+    diagnostics_position:
+        diagnostic name: (e.g. mapplots_*)
+            position: int
+                relevant for title_leading (see above)
+            x_pos: tuple
+                x-grid extent
+            y_pos: tuple
+                y-grid extent
+            x_pos_title: int
+                x-grid position
+            y_pos_title: int
+                y-grid position
+            x_pos_subtitle: int
+                x-grid position
+            y_pos_subtitle: int
+                y-grid position
+            titlekwags: **text_kwargs
+            subtitlekwags: **text_kwargs
 
 
 """
@@ -626,12 +889,6 @@ zero_line = {'color': 'k', 'linewidth': 1., 'ls': '--'}
 
 logger = logging.getLogger(os.path.basename(__file__))
 
-import IPython
-from traitlets.config import get_config
-c = get_config()
-c.InteractiveShellEmbed.colors = "Linux"
-# IPython.embed(config=c)
-
 def ar6_wg1_ch10_figures(cfg):
     """Create Multi-ensemble histogram trend plots"""
     # get matplotlib style sheet
@@ -667,10 +924,7 @@ def ar6_wg1_ch10_figures(cfg):
                 for k, v in subdiags.items():
                     new_diagnostics.update({k: v})
                 remove_diagnostics_keys.append(diag_name)
-            ##################
-            ## some strange behavior where CMIP5 gets overwritten with CMIP6
             diagnostics[diag_name] = copy.deepcopy(diagnostic)
-            ###################
         elif diag_name.split('_')[0] == 'histogram':
             logger.info(f"Processing {diag_name}")
             diagnostics[diag_name] = prepare_histogram_data(diag_name,
@@ -1644,14 +1898,6 @@ def get_ax_grid(ax_grid_root, x_pos, y_pos):
     return ax_grid
 
 
-def add_subplot_letter(ax, text, x=-0.1, y=1.05, size='xx-large',
-                       weight='bold', horizontalalignment='left',
-                       verticalalignment='bottom', **kwargs):
-    ax.text(x, y, text, transform=ax.transAxes,
-            size=size, weight=weight, horizontalalignment=horizontalalignment,
-            verticalalignment=verticalalignment, **kwargs)
-
-
 ###############################################################################
 # All connected to diagnostics_combination_figure preperation
 ###############################################################################
@@ -1757,9 +2003,9 @@ def get_combination_figure_grid(combo_name, diagnostic):
 def obs_masking(cfg, diag_name, diagnostic, ensembles):
     """ Preprocessor depending masking of obs input data.
 
-    In order to ensure a correct usage of CRU data in updated versions of
-    our figures and based on the approaches sighted in D & A literature,
-    we plan to deal with this the following:
+    In order to ensure a correct usage of CRU (and other) data in updated
+    versions of our figures and based on the approaches sighted in D & A
+    literature, we plan to deal with this the following:
     1) For annual values, not missing if stn is not 0 for at least 10
     months. For 3-month season, not missing if stn is not 0 for at least 2
     months
@@ -2227,6 +2473,7 @@ def prepare_gwlrwl_plot(diagnostic):
                 'xlims': None,
                 'ylims': None,
                 'mean_pm_std_alpha': 0.2,
+                'envelop_alpha': 0.2,
                 'minmax_ls': [':','--'],
                 'dgrey': [0.4,0.4,0.4],
                 'mgrey': [0.65,0.65,0.65],
@@ -2662,7 +2909,7 @@ def verify_boxplot_diagnostic_settings(diagnostic):
     - check valid types
     """
 
-    defaults = {'type': 'single-values',
+    defaults = {'type': 'bp_single-values',
                 'ordering': []}
     valids = {}
     valid_types = {}
@@ -2829,6 +3076,37 @@ def compute_rwl_statistic(cubes, statistic_name, threshhold=0.8):
     return_cube.data = statistic
 
     return return_cube
+
+
+def _quantile(data, axis, quantile):
+    """Calculate quantile.
+
+    Workaround for calling scipy's mquantiles with arrays of >2
+    dimensions Similar to iris' _percentiles function, see their
+    discussion: https://github.com/SciTools/iris/pull/625
+    """
+    from scipy import stats as sstats
+
+    # Ensure that the target axis is the last dimension.
+    data = np.rollaxis(data, axis, start=data.ndim)
+    shape = data.shape[:-1]
+    # Flatten any leading dimensions.
+    if shape:
+        data = data.reshape([np.prod(shape), data.shape[-1]])
+    # Perform the quantile calculation.
+    result = sstats.mstats.mquantiles(data,
+                                      quantile,
+                                      axis=-1,
+                                      alphap=1,
+                                      betap=1)
+    # Ensure to unflatten any leading dimensions.
+    if shape:
+        result = result.reshape(shape)
+    # Check whether to reduce to a scalar result
+    if result.shape == (1, ):
+        result = result[0]
+
+    return result
 
 
 def interpolate_gwlrwl_cube(gcube, rcube, diagnostic):
@@ -4678,7 +4956,6 @@ def plot_histogram_ax(ax, diagnostic):
         xpossx, sym_labels, ind = [], [], 0
         ymax = pi['ylims'][1]
 
-        # for histk in pi['diag_order']:
         for histk, label in pi['hist_order_det']:
             if histk != 'histogram_means':
                 data_index = diagnostic[histk]['labels'].index(label)
@@ -4886,7 +5163,6 @@ def prepare_histogram_plot(diagnostic):
                 'dgrey': [0.4, 0.4, 0.4],
                 'mgrey': [0.65, 0.65, 0.65],
                 'lgrey': [0.9, 0.9, 0.9],
-                'add_shading': True,
                 'title': '',
                 'mean_text_label': 'Ensemble means',
                 'histogram': False,
@@ -5305,8 +5581,12 @@ def write_data(cfg, diag_name, diagnostic):
                     if len(ts['ensembles']) == 1:
                         cube = ens_data[0][0]
                         ds = ts['labels'][ts['ensembles'].index('external')][0]
-                        basename = bname_format.format(diag_name, tsk, ens,
-                                                    metric) + '_' + ds
+                        try:
+                            basename = bname_format.format(diag_name, tsk, ens,
+                                                        metric) + '_' + ds
+                        except NameError:
+                            basename = bname_format.format(diag_name, tsk, ens,
+                                                        '') + '_' + ds
                         path = get_diagnostic_filename(basename, cfg)
                         io.iris_save(cube, path)
                         nc_paths.append(path)
@@ -5514,7 +5794,6 @@ def write_data(cfg, diag_name, diagnostic):
             for stat_cubes, label in zip(ens_cubes, labels):
                 for metric, cubes in zip(metrics, stat_cubes):
                     if metric in ['mean', 'median', 'std', 'min', 'max']:
-                        # IPython.embed(config=c)
                         coord_name = cubes.dim_coords[0].standard_name
                         coord = cubes.coord(coord_name).points
                         data = copy.deepcopy(cubes.data.data)
@@ -5858,6 +6137,7 @@ def prepare_timeseries_plot(diagnostic):
                 'zero_line': True,
                 'ylims': None,
                 'mean_pm_std_alpha': 0.2,
+                'envelop_alpha': 0.2,
                 'minmax_ls': ['-','-'],
                 'split_x_axis': False,
                 'dgrey': [0.4,0.4,0.4],
@@ -7248,11 +7528,10 @@ def derive_timeseries_box_data(cube, box, diagnostic):
         change_cube.var_name = cube.var_name
         change_cube.long_name = cube.long_name
         change_cube.attributes = cube.attributes
-
     elif btype == 'trend':
         # future_cube =  extract_time(cube, **box['period_box'])
-        change_cube, trend_over_n = calculate_trend(cube, False, box['trend_base'],
-                          period_trend=box['period_box'])
+        change_cube, trend_over_n = calculate_trend(cube, False,
+                            box['trend_base'], period_trend=box['period_box'])
     else:
         logger.error(f"boxes type: {btype} not implemented")
         raise NotImplementedError
