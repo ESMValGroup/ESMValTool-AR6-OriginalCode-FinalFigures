@@ -14,11 +14,11 @@ Observed and simulated tropical mean temperature trends through the atmosphere. 
 
 Author list:
 ------------
-- Lo, Eunice: University of Bristol, eunice.lo@bristol.ac.uk, yteunicelo 
-- Mitchell, Dann: University of Bristol
-- Seviour, William: University of Exeter
-- Haimberger, Leopold: University ofVienna
-- Polvani, Lorenzo: Columbia University 
+- Lo, Eunice: University of Bristol, UK, eunice.lo@bristol.ac.uk, githubid: yteunicelo 
+- Mitchell, Dann: University of Bristol, UK
+- Seviour, William: University of Exeter, UK
+- Haimberger, Leopold: University of Vienna, Austria
+- Polvani, Lorenzo: Columbia University, USA
 
 
 Publication sources:
@@ -29,7 +29,7 @@ Please list any publications that describe, explain or use this figure.
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_fig_3_9
+- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_fig_10
 
 
 ESMValCore Branch:
@@ -73,8 +73,8 @@ What are their access permissions/Licenses?
 Software description:
 ---------------------
 Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: IPCC_environments/ar6_chap_3_fig_3_9_conda_environment.yml
-- pip file: IPCC_environments/ar6_chap_3_fig_3_9_pip_environment.txt
+- ESMValTool environment file: IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml
+- pip file: IPCC_environments/ar6_chap_3_fig_3_10_pip_environment.txt
 - Other software used: N/A
 
 
