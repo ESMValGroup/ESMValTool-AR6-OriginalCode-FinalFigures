@@ -1,4 +1,4 @@
-FIGURE TITLE
+Observed and simulated tropical mean temperature trends through the atmosphere
 ============
 
 Figure number: Figure 3.10
@@ -9,7 +9,7 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-Observed and simulated tropical mean temperature trends through the atmosphere. Vertical profiles of temperature trends in the tropics (20°S-20°N) for three periods: (a) 1979-2014 (b) 1979-1997 (ozone depletion era) (c) 1998-2014 (ozone recovery era). The black lines show trends in the RICH 1.7 (long dashed) and RAOBCORE 1.7 (dashed) radiosonde datasets (Haimberger et al. 2012), and in the ERA5/5.1 reanalysis (solid). Grey envelopes show the relative uncertainty in the RICH dataset based on 32 RICH-obs members of a previous version, 1.5.1, which used version 1.7.3 of the RICH software but with the parameters of version 1.5.1. ERA5 was used as reference for calculating the adjustments between 2010 and 2019, and ERA-Interim was used for the year before that. The grey envelopes have been scaled around the RICH 1.7 best estimates, based on the assumption that the relative uncertainty remains the same between the two versions. Red lines show trends in CMIP6 historical simulations by 52 couple climate models. Blue lines show trends in 39 CMIP6 models that used prescribed, rather than simulated, sea surface temperatures (SSTs). (Adapted from Figure 1 of Mitchell et al. (2020).)
+Vertical profiles of temperature trends in the tropics (20°S-20°N) for three periods: (a) 1979-2014 (b) 1979-1997 (ozone depletion era) (c) 1998-2014 (ozone recovery era). The black lines show trends in the RICH 1.7 (long dashed) and RAOBCORE 1.7 (dashed) radiosonde datasets (Haimberger et al. 2012), and in the ERA5/5.1 reanalysis (solid). Grey envelopes show the relative uncertainty in the RICH dataset based on 32 RICH-obs members of a previous version, 1.5.1, which used version 1.7.3 of the RICH software but with the parameters of version 1.5.1. ERA5 was used as reference for calculating the adjustments between 2010 and 2019, and ERA-Interim was used for the year before that. The grey envelopes have been scaled around the RICH 1.7 best estimates, based on the assumption that the relative uncertainty remains the same between the two versions. Red lines show trends in CMIP6 historical simulations by 52 couple climate models. Blue lines show trends in 39 CMIP6 models that used prescribed, rather than simulated, sea surface temperatures (SSTs). (Adapted from Figure 1 of Mitchell et al. (2020).)
 
 
 Author list:
@@ -49,7 +49,7 @@ Please describe this diagnostic: Diagnostic that calculates trends of atmospheri
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_verticaltemp_20210225_100312/plots/atmos_trends/fig_3_9/png/vertical_temp_profiles_20S-20N_1979_2014_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_20210225.png
+- recipe_verticaltemp_20210225_100312/plots/atmos_trends/fig_3_10/png/vertical_temp_profiles_20S-20N_1979_2014_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_20210225.png
 
 
 Recipe generations tools: 
