@@ -210,5 +210,5 @@ diagnostics:
         start_year: 1979
         end_year: 2014
     scripts:
-      fig_3_9:
+      fig_3_10:
         script: vertical_temp_profiles/vertical_temp_trends.py
