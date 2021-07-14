@@ -23,7 +23,6 @@ Author list:
 
 Publication sources:
 --------------------
-Please list any publications that describe, explain or use this figure. 
 - The vertical profile of recent tropical temperature trends: Persistent model biases in the context of internal variability, D. Mitchell et al, Environmental Research Letters 15, DOI:10.1088/1748-9326/ab9af7, 2020. 
 
 
@@ -39,11 +38,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: recipes/recipe_verticaltemp.yml
-Please describe this recipe: Recipe to extract and process data for plotting vertical profiles of atmospheric temperatures
+Recipe used: recipes/recipe_verticaltemp.yml - Recipe to extract and process data for plotting vertical profiles of atmospheric temperatures
 
-Diagnostic(s) used: diag_scripts/vertical_temp_profiles/vertical_temp_trends.py
-Please describe this diagnostic: Diagnostic that calculates trends of atmospheric temperatures at different pressure levels
+Diagnostic used: diag_scripts/vertical_temp_profiles/vertical_temp_trends.py - Diagnostic that calculates trends of atmospheric temperatures at different pressure levels
 
 
 Expected image path:
@@ -52,38 +49,12 @@ This is the path of the image relative to the automatically generated ESMValTool
 - recipe_verticaltemp_20210225_100312/plots/atmos_trends/fig_3_10/png/vertical_temp_profiles_20S-20N_1979_2014_rich_raobcore_1.7_rio_range_1.5.1_recentred_all_5-95_20210225.png
 
 
-Recipe generations tools: 
--------------------------
-Were any tools used to populate the recipe? N/A 
-
-
-Ancillary figures and datasets:
--------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
-
-
-Additional datasets:
---------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository? All datasets used are listed in the recipe and are stored on Jasmin
-Can they be re-created?
-What are their access permissions/Licenses?
-
-
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
 - ESMValTool environment file: IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml
 - pip file: IPCC_environments/ar6_chap_3_fig_3_10_pip_environment.txt
-- Other software used: N/A
 
 
 Hardware description:
 ---------------------
-What machine was used: Jasmin
-When was this machine used? 2021-02-25
-
-
-Any further instructions: 
--------------------------
-
+Machine used: Jasmin on 2021-02-25
