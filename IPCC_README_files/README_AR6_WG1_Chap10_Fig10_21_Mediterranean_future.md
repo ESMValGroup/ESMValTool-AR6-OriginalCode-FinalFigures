@@ -18,6 +18,7 @@ Author list:
 - Haarsma, R.: KNMI, Netherlands
 - Dosio, A.: JRC, Italy
 - Doblas-Reyes, F.J.: BSC, Spain
+- Terray, L.: CERFACS/CNRS, France
 
 
 Publication sources:
