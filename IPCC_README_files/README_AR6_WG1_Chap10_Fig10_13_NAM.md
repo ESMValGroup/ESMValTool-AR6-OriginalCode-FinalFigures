@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+ATTRIBUTION OF THE SOUTHWESTERN NORTH AMERICA PRECIPITATION DECLINE
+===================================================================
 
 Figure number: Figure 10.13
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Attribution of the southwestern North America precipitation decline during the 1
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Terray, L.: CERFACS/CNRS, France
 
 
@@ -35,7 +35,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_NAM.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 

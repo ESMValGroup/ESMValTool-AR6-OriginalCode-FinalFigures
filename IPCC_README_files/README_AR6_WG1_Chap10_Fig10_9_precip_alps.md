@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+PROJECTED CHANGES IN PRECIPITATION OVER THE ALPS
+================================================
 
 Figure number: Figure 10.9
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Projected changes in summer (June to August) precipitation (in percent with resp
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Dosio, A.: JRC, Italy
 - Coppola, E.: ICTP, Italy
 
@@ -36,7 +36,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_CoppolaAlps.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 
@@ -60,8 +60,8 @@ N/A
 Additional datasets:
 --------------------
 'external' data has been included in ESMValTool totalling 40KB:
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ECoppola_Alps/GCM.nc
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ECoppola_Alps/RCM.nc
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ECoppola_Alps/GCM.nc
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ECoppola_Alps/RCM.nc
 
 
 Software description:

@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+ILLUSTRATION OF MODEL BIASES WESTERN MEDITERRANEAN
+==================================================
 
 Figure number: Figure 10.6
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Illustration of some model biases in simulations performed with dynamical models
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Doblas-Reyes, F.J.: BSC, Spain
 
 

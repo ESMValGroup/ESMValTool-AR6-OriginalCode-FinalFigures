@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+OBSERVED AND PROJECTED CHANGES IN AUSTRAL SUMMER PRECIPITATION
+==============================================================
 
 Figure number: Figure 10.10
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Observed and projected changes in austral summer (December to February) mean pre
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Maraun, D.: UniGraz, Austria
 
 
@@ -35,7 +35,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_Douglas_SES_DJF.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 
@@ -59,7 +59,7 @@ N/A
 Additional datasets:
 --------------------
 'external' data (IPCC Atlas region SES shape) has been included in ESMValTool totalling ~10KB
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/SOUTH-AMERICA_Land_S.E.South-America_SES.*
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/SOUTH-AMERICA_Land_S.E.South-America_SES.*
 
 
 Software description:

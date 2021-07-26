@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+PROJECTED MEDITERRANEAN SUMMER WARMING
+======================================
 
 Figure number: Figure 10.21
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Projected Mediterranean summer warming. (a) Time series of area averaged Mediter
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Haarsma, R.: KNMI, Netherlands
 - Dosio, A.: JRC, Italy
 - Doblas-Reyes, F.J.: BSC, Spain
@@ -38,7 +38,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_Mediterranean.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 

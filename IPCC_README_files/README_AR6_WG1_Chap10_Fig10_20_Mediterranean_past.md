@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+ASPECTS OF THE MEDITERRANEAN SUMMER WARMING
+===========================================
 
 Figure number: Figure 10.20
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Aspects of Mediterranean summer warming. (a) Mechanisms and feedbacks involved i
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Haarsma, R.: KNMI, Netherlands
 - Dosio, A.: JRC, Italy
 - Doblas-Reyes, F.J.: BSC, Spain
@@ -38,7 +38,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_Mediterranean.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 
@@ -63,9 +63,9 @@ Additional datasets:
 --------------------
 'external' data has been included in ESMValTool totalling ~288kB
 observational gridpoint differences (12KB):
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/GvdSchrier_pdfs/diff_trend_eobs-*.csv
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/GvdSchrier_pdfs/diff_trend_eobs-*.csv
 obs station locations (276K):
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Mediterranean_station_info/
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Mediterranean_station_info/
 
 
 Software description:

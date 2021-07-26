@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+CHANGES IN THE INDIAN SUMMER MONSOON IN THE HISTORICAL AND FUTURE PERIODS
+=========================================================================
 
 Figure number: Figure 10.19
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -15,7 +15,7 @@ historical/RCP8.5 (41 models) experiments for future projections to 2100. The fi
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Turner, A.: University of Reading, UK
 
 
@@ -36,7 +36,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_IndianMonsoon.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 
@@ -60,8 +60,7 @@ N/A
 Additional datasets:
 --------------------
 'external' data has been included in ESMValTool totalling ~11KB
-IITM obs timeseries (11KB):
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ATurner_SouthAsia/iitm-regionrf_all_india.csv
+- IITM obs timeseries (11KB): esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ATurner_SouthAsia/iitm-regionrf_all_india.csv
 
 
 Software description:

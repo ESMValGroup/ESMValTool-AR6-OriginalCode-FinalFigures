@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+URBAN WARMING
+=============
 
 Figure number: Chapter Box 10.3 Figure 1
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Urban warming compared to global GHG-induced warming. (a) Change in the annual m
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Hamdi, R.: Royal Meteorological Institute of Belgium, Belgium
 
 
@@ -35,7 +35,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_UrbanBox.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 
@@ -59,7 +59,7 @@ N/A
 Additional datasets:
 --------------------
 'external' data has been included in ESMValTool totalling ~362KB
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Urban_Box_data
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Urban_Box_data
 
 
 Software description:

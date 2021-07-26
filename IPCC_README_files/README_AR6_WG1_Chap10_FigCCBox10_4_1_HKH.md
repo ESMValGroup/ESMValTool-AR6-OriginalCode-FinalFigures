@@ -1,5 +1,5 @@
-DRIVERS OF OBSERVED WARMING
-============
+HISTORICAL SURFACE AIR TEMPERATURE TREND OVER THE HINDU KUSH HIMALAYA REGION
+============================================================================
 
 Figure number: Cross-Chapter Box 10.4 Figure 1
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 10
@@ -14,7 +14,7 @@ Historical annual-mean surface air temperature linear trend (°C per decade) and
 
 Author list:
 ------------
-- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; mwjury
+- Jury, M.W.: BSC, Spain; martin.w.jury@gmail.com; githubid: mwjury
 - Turner, A.: University of Reading, UK
 - Zuo, Z.: Chinese Academy of Meteorological Sciences, China
 
@@ -36,7 +36,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_boxplot_Med.yml
+Recipe used: recipes/ar6_wgi_ch10/recipe_HKH.yml
 
 Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
 
@@ -61,9 +61,9 @@ Additional datasets:
 --------------------
 'external' data has been included in ESMValTool totalling ~400KB
 IPCC Atlas region TIB shape (10KB):
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/ASIA_Land_Tibetan-Plateau_TIB.*
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Atlas_regions/ASIA_Land_Tibetan-Plateau_TIB.*
 HKH shapefile (389kB):
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/HKH_shape
+- esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/HKH_shape/data/outline.*
 
 
 Software description:
