@@ -1,4 +1,3 @@
-
 AR6 WG1 Chapter 3 Figure 3.28 Halosteric Sea Level Change
 =========================================================
 
@@ -10,9 +9,6 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-Please describe the figure.
-
-
 This is a six pane figure. The left two panes are scatter plots and the
 right four panes are maps.
 
@@ -26,7 +22,6 @@ and three observational datasets.
 The right hand side shows the halosteric sea level trend over the whole time period.
 The top three maps are observational data and the lowest pane is the CMIP6 multi model mean.
 
-
 The halosteric content was calculated using the TEOS-10 gsw python toolkit: https://teos-10.github.io/GSW-Python/
 
 In all cases, the model temperature and salinity were de-drifted against the
@@ -37,18 +32,17 @@ The multi model mean is caluated such that each modelled ensemble has the
 same weight. ie One-model, one vote.
 
 
-
 Author list:
 ------------
-- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk, github: ledm
-- Paul J. Durack, durack1@llnl.gov
-- Nathan Gillett, nathan.gillett@canada.ca
-- Krishna Achutarao, krishna.achutarao@gmail.com
-- Shayne McGregor, shayne.mcgregor@monash.edu
-- Rondrotiana Barimalala, rondrotiana.barimalala@uct.ac.za
-- Elizaveta Malinina-Rieger, elizaveta.malinina-rieger@canada.ca
-- Valeriu Predoi, valeriu.predoi@ncas.ac.uk
-- Veronika Eyring, Veronika.Eyring@dlr.de
+- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
+- Nathan Gillett, University of Victoria
+- Krishna Achutarao, Indian Institute of Technology, Delhi
+- Shayne McGregor, Monash University, Melbourne
+- Rondrotiana Barimalala, University of Cape Town
+- Elizaveta Malinina-Rieger, Environment and Climate Change Canada
+- Valeriu Predoi, University of Reading
+- Veronika Eyring, German Aerospace Center (DLR)
 
 
 Publication sources:
@@ -69,11 +63,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/recipe_ocean_heat_content_TSV_all.yml
-Please describe this recipe:
+Recipe(s) used: recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used: e.g. ocean/diagnostic_chap3_ocean_heat_content.py
-Please describe this diagnostic:
+Diagnostic(s) used: ocean/diagnostic_chap3_ocean_heat_content.py
 
 
 Expected image path:
@@ -94,7 +86,7 @@ Two scripts are included to populate this recipe:
 Check_TSV is a tool to generate the dataset list in the recipe_ocean_heat_content_TSV_all.yml recipe.
 
 This tool is relatively complex, as it needs to find all possible cases
-where the following six datasets exist for a given model & ensemnle member:
+where the following six datasets exist for a given model & ensemble member:
 - historical temperature (thetao)
 - historical salinity (so)
 - piControl temperature (thetao)
@@ -112,11 +104,11 @@ It can be used to add whatever data is available into a recipe. I believe
 that a version of it was added to the ESMValTool master by Valeriu.
 
 
-
-
 Ancillary figures and datasets:
 -------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
+In addition to the main figure, diagnostics may produce several figures and datasets
+along the way or several versions of the main figure. Please use this space
+to highlight anything that may be useful for future iterations:
 
 
 The OHC diagnostic produces the OHC, SSS trends and Halosteric SLR figures.
@@ -160,8 +152,6 @@ The following figure directories contain figures for the Dynamic Height calculat
     - The full Halosteric sea level figure.
 
 
-
-
 Additional datasets:
 --------------------
 What additional datasets were used to produce this figure?
@@ -170,27 +160,35 @@ Can they be re-created?
 What are their access permissions/Licenses?
 
 The file names are:
+
  - 210201_EN4.2.1.g10_annual_steric_1950-2019_5-5350m.nc
+
  - 210201_Ishii17_v7.3_annual_steric_1955-2019_0-3000m.nc
+
  - 210127_DurackandWijffels_V1.0_70yr_steric_1950-2019_0-2000db_210122-205355_beta.nc
+
 These are the observational datasets that were added to panes a, b, and to panes
 c,d and e. The variables steric_height_halo_anom_depthInterp and steric_height_thermo_anom_depthInterp are used.
 These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
 
 In addition, shapefiles are required to calculate the regional boundaries:
-- Pacific.shp
-- Atlantic.shp
-These regions should be standarised throught AR6, and were emailed to me by chapter author Liza Bock.
 
+- Pacific.shp
+
+- Atlantic.shp
+
+These regions should be standarised throught AR6, and were emailed to me by
+chapter author Lisa Bock, (mailto):lisa.bock@dlr.de)
 
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
+Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages:
+
 - ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+
 - pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
-- Other software used:
 
 
 Hardware description:

@@ -1,4 +1,3 @@
-salini
 AR6 WG1 Chapter 3 Figure 3.27 Global Sea Surface Salinity Trends
 ================================================================
 
@@ -10,10 +9,9 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-Please describe the figure.
 
-This is a two pane figure where both  panes shows:
- - the trend in the near surface salinity (colourscale)
+This is a two pane figure where both panes show:
+ - the trend in the near surface salinity (colour scale)
  - the mean near surface salinity over the time period (black contours).
 
 The top pane shows the observational data and the bottom pane shows the multi-model
@@ -26,15 +24,15 @@ same weight. ie One-model, one vote.
 
 Author list:
 ------------
-- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk, github: ledm
-- Paul J. Durack, durack1@llnl.gov
-- Nathan Gillett, nathan.gillett@canada.ca
-- Krishna Achutarao, krishna.achutarao@gmail.com
-- Shayne McGregor, shayne.mcgregor@monash.edu
-- Rondrotiana Barimalala, rondrotiana.barimalala@uct.ac.za
-- Elizaveta Malinina-Rieger, elizaveta.malinina-rieger@canada.ca
-- Valeriu Predoi, valeriu.predoi@ncas.ac.uk
-- Veronika Eyring, Veronika.Eyring@dlr.de
+- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
+- Nathan Gillett, University of Victoria
+- Krishna Achutarao, Indian Institute of Technology, Delhi
+- Shayne McGregor, Monash University, Melbourne
+- Rondrotiana Barimalala, University of Cape Town
+- Elizaveta Malinina-Rieger, Environment and Climate Change Canada
+- Valeriu Predoi, University of Reading
+- Veronika Eyring, German Aerospace Center (DLR)
 
 
 Publication sources:
@@ -42,6 +40,7 @@ Publication sources:
 Please list any publications that describe, explain or use this figure.
 - Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean
   Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
+
 
 ESMValTool Branch:
 ------------------
@@ -55,11 +54,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/recipe_ocean_heat_content_TSV_all.yml
-Please describe this recipe:
+Recipe(s) used: recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used: e.g. ocean/diagnostic_chap3_ocean_heat_content.py
-Please describe this diagnostic:
+Diagnostic(s) used: ocean/diagnostic_chap3_ocean_heat_content.py
 
 
 Expected image path:
@@ -98,7 +95,6 @@ It can be used to add whatever data is available into a recipe. I believe
 that a version of it was added to the ESMValTool master by Valeriu.
 
 
-
 Ancillary figures and datasets:
 -------------------------------
 In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
@@ -133,7 +129,6 @@ These figures include the following directories related to the de-derifting proc
     - The full sea surface salinity trends figure.
 
 
-
 Additional datasets:
 --------------------
 What additional datasets were used to produce this figure?
@@ -148,8 +143,6 @@ depending on which time range you are looking at.
 The field of interest are salinity_mean (shown as black contours) and salinity_change (shown in colourscale).
 These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
-
-
 
 
 Software description:
@@ -168,7 +161,6 @@ When was this machine used? December 2020 to March 2021
 
 Any further instructions:
 -------------------------
-
 While this code was written for the IPCC report, there are several limitations
 and potential sources of error. In this section, we document some potential problems.
 

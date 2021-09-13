@@ -1,4 +1,3 @@
-
 AR6 WG1 Chapter 3, figure 3.30: Atlantic Meridional Overturning Circulation (AMOC)
 =================================================================================
 
@@ -10,8 +9,6 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-Please describe the figure.
-
 This is a six pane figure the summarises the behaviour of the
 Atlantic Meridional Overturning Circulation in CMIP5, CMIP6 and in the
 observational record.
@@ -26,26 +23,25 @@ Similarly, pane c) shows the distribution of interannual AMOC changes for the CM
 ensemble means, and for all CMIP6  models that contrinuted toi the mean.
 
 Panes d), e), and f) show the AMOC behaviour of various DAMIP for three different
-time periods. 
+time periods.
 
 
 Author list:
 ------------
-- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk, github: ledm
-- Paul J. Durack, durack1@llnl.gov
-- Nathan Gillett, nathan.gillett@canada.ca
-- Krishna Achutarao, krishna.achutarao@gmail.com
-- Shayne McGregor, shayne.mcgregor@monash.edu
-- Rondrotiana Barimalala, rondrotiana.barimalala@uct.ac.za
-- Elizaveta Malinina-Rieger, elizaveta.malinina-rieger@canada.ca
-- Valeriu Predoi, valeriu.predoi@ncas.ac.uk
-- Veronika Eyring, Veronika.Eyring@dlr.de
+- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
+- Nathan Gillett, University of Victoria
+- Krishna Achutarao, Indian Institute of Technology, Delhi
+- Shayne McGregor, Monash University, Melbourne
+- Rondrotiana Barimalala, University of Cape Town
+- Elizaveta Malinina-Rieger, Environment and Climate Change Canada
+- Valeriu Predoi, University of Reading
+- Veronika Eyring, German Aerospace Center (DLR)
 
 
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure.
-- A paper title, A. Author et al, journal of science stuff 9, p51, DOI:564, 2021.
 
 
 ESMValTool Branch:
@@ -60,11 +56,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: e.g. recipes/recipe_ocean_amoc_streamfunction_profiles.yml
-Please describe this recipe:
+Recipe(s) used: recipes/recipe_ocean_amoc_streamfunction_profiles.yml
 
-Diagnostic(s) used: e.g. diagocean/diagnostic_amoc_profiles.py
-Please describe this diagnostic:
+Diagnostic(s) used: diagocean/diagnostic_amoc_profiles.py
 
 
 Expected image path:
@@ -85,10 +79,13 @@ based on the available data on jasmin/badc in January 2021.
 
 Ancillary figures and datasets:
 -------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
+In addition to the main figure, diagnostics may produce several figures and datasets
+along the way or several versions of the main figure.
+Please use this space to highlight anything that may be useful for future iterations:
 
 
-In addition to the final figure, the AMOC diagnostic can produce a single figure plot for each pane.
+In addition to the final figure, the AMOC diagnostic can produce a single
+figure plot for each pane.
 
 
 Additional datasets:

@@ -12,15 +12,16 @@ Assessmenent Report, Chapter 3 figures:
 Figures authorship team:
 =======================
 
-- Lee de Mora, ledm@pml.ac.uk
-- Paul J. Durack, durack1@llnl.gov
-- Nathan Gillett, nathan.gillett@canada.ca
-- Krishna Achutarao, krishna.achutarao@gmail.com
-- Shayne McGregor, shayne.mcgregor@monash.edu
-- Rondrotiana Barimalala, rondrotiana.barimalala@uct.ac.za
-- Elizaveta Malinina-Rieger, elizaveta.malinina-rieger@canada.ca
-- Valeriu Predoi, valeriu.predoi@ncas.ac.uk
-- Veronika Eyring, Veronika.Eyring@dlr.de
+- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
+- Nathan Gillett, University of Victoria
+- Krishna Achutarao, Indian Institute of Technology, Delhi
+- Shayne McGregor, Monash University, Melbourne
+- Rondrotiana Barimalala, University of Cape Town
+- Elizaveta Malinina-Rieger, Environment and Climate Change Canada
+- Valeriu Predoi, University of Reading
+- Veronika Eyring, German Aerospace Center (DLR)
+
 
 
 Table 1:
