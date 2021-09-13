@@ -1,5 +1,5 @@
 
-AR6 WG1 Chapter 3, figure .30: Atlantic Meridional Overturning Circulation (AMOC)
+AR6 WG1 Chapter 3, figure 3.30: Atlantic Meridional Overturning Circulation (AMOC)
 =================================================================================
 
 Figure number: Figure 3.30
