@@ -64,7 +64,7 @@ Diagnostic(s) used: diagocean/diagnostic_amoc_profiles.py
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
-- plots/diagnostic_name/diag_timeseries_amoc_hist/AMOC_timeseries/fig_3.24.png
+- plots/diag_timeseries_amoc_hist/AMOC_timeseries/fig_3.24.png
 
 Please note that this filename uses the older incorrect figure number (3.24).
 
