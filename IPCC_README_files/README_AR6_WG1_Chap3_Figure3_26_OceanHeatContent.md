@@ -85,9 +85,11 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: recipes/recipe_ocean_heat_content_TSV_all.yml
+Recipe(s) used:
+- recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used: ocean/diagnostic_chap3_ocean_heat_content.py
+Diagnostic(s) used:
+-ocean/diagnostic_chap3_ocean_heat_content.py
 
 The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
 diagnostic. This is because they all require the same process to de-drift.
@@ -159,7 +161,7 @@ These figures include the following directories related to the de-derifting proc
     - shows maps of the multi-model mean surface temperature and salinity at various points in time and specific time ranges.
 
 
-THe following directories contain figures related to the Ocean Heat Content calculation:
+The following directories contain figures related to the Ocean Heat Content calculation:
   - detrending_ts:
       - time series figure showing the global volume weighted mean (or total) temperature, salinity or OHC for the historical and piControl.
   - ohc_summary:

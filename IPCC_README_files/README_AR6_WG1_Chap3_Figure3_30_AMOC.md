@@ -56,9 +56,11 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: recipes/recipe_ocean_amoc_streamfunction_profiles.yml
+Recipe(s) used:
+- recipes/recipe_ocean_amoc_streamfunction_profiles.yml
 
-Diagnostic(s) used: diagocean/diagnostic_amoc_profiles.py
+Diagnostic(s) used:
+- diagocean/diagnostic_amoc_profiles.py
 
 
 Expected image path:

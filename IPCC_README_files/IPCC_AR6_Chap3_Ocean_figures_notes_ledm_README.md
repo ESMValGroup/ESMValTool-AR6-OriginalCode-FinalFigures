@@ -52,7 +52,7 @@ diagnostic. This is because they all require the same process to de-dedrift.
 The recipes are in the location:
 - ESMValTool_AR6/esmvaltool/recipes
 
-THe diagnostics are in the location:
+The diagnostics are in the location:
 - ESMValTool_AR6/esmvaltool/diagnostics/ocean
 
 The final plots directory will live in the output directory, generated at run time by ESMValTool.
@@ -106,7 +106,7 @@ The observational data from here is taken from: the files:
 - DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc'
 - DurackandWijffels_GlobalOceanChanges_19700101-20191231__210122-205448_beta.nc
 depending on which time range you are looking at.
-THe field of interest are salinity_mean (shown as black contours) and salinity_change (shown in colourscale).
+The field of interest are salinity_mean (shown as black contours) and salinity_change (shown in colourscale).
 These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
 
@@ -196,7 +196,7 @@ The following figure directories contain figures for the Dynamic Height calculat
   - halosteric_multipane:
     - The full Halosteric sea level figure.
 
-THe following directories contain figures related to the Ocean Heat Content calculation:
+The following directories contain figures related to the Ocean Heat Content calculation:
   - detrending_ts:
       - time series figure showing the global volume weighted mean (or total) temperature, salinity or OHC for the historical and piControl.
   - ohc_summary:

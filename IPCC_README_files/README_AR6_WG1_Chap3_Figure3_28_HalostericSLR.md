@@ -63,9 +63,11 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used: recipes/recipe_ocean_heat_content_TSV_all.yml
+Recipe(s) used:
+- recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used: ocean/diagnostic_chap3_ocean_heat_content.py
+Diagnostic(s) used:
+- ocean/diagnostic_chap3_ocean_heat_content.py
 
 
 Expected image path:
