@@ -145,7 +145,7 @@ The observational data from here is taken from: the files:
 - DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc'
 - DurackandWijffels_GlobalOceanChanges_19700101-20191231__210122-205448_beta.nc
 depending on which time range you are looking at.
-THe field of interest are salinity_mean (shown as black contours) and salinity_change (shown in colourscale).
+The field of interest are salinity_mean (shown as black contours) and salinity_change (shown in colourscale).
 These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
 
