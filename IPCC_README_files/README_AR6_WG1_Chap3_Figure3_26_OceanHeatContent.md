@@ -3,7 +3,7 @@ AR6 WG1 Chap3 Figure 3.26 Ocean Heat Content
 ============================================
 
 Figure number: Figure 3.26
-From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter X
+From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 3
 
 ![AR6 WG1 Chap3 Figure 3.26 Ocean Heat Content](../images/ar6_wg1_chap3_figure3_26_oceanheatcontent.png?raw=true)
  
