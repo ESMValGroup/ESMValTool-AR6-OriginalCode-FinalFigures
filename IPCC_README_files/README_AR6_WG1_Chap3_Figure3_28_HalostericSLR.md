@@ -48,7 +48,7 @@ Author list:
 Publication sources:
 --------------------
 Please list any publications that describe, explain or use this figure.
-- Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
+-  Durack, Paul J.; Wijffels, Susan E.; Gleckler, Peter J.; Long-term sea-level change revisited: the role of salinity, 2014 Environ. Res. Lett. 9 114017, http://dx.doi.org/10.1088/1748-9326/9/11/114017
 
 
 ESMValTool Branch:
