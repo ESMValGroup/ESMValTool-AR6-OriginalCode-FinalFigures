@@ -84,8 +84,7 @@ along the way or several versions of the main figure.
 Please use this space to highlight anything that may be useful for future iterations:
 
 
-In addition to the final figure, the AMOC diagnostic can produce a single
-figure plot for each pane.
+In addition to the final figure, the AMOC diagnostic can produce a single figure plot for each pane.
 
 
 Additional datasets:
