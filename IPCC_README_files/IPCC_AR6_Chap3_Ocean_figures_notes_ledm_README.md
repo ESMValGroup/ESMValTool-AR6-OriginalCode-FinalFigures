@@ -2,8 +2,8 @@
 IPCC AR6 Chapter 3 Ocean plots: AMOC, OHC, Halo SLR and SSS trends
 ==================================================================
 
-ESMValTool decription for Intergovernmentalk Panel on Cliamte change, Sixth
-Assessmenent Report, Chapter 3 figures:
+ESMValTool description for Intergovernmental Panel on Climate change, Sixth
+Assessment Report, Chapter 3 figures:
 - Atlantic Meridional Overturning Current (figure 3.30 )
 - Ocean Heat Content (figure 3.26 )
 - Halosteric Sea Level Rise (figure 3.28 )
@@ -46,7 +46,7 @@ Table 1:  all recipes, diagnostics, and paths described in this document.
 
 Notes on paths:
 
-The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
+The OHC, Halo and SSS trends plots are all produced using the same recipe and
 diagnostic. This is because they all require the same process to de-dedrift.
 
 The recipes are in the location:
@@ -96,7 +96,7 @@ via the invite-only google drive page: https://drive.google.com/drive/folders/1V
 In addition, shapefiles are required to calculate the regional boundaries:
 - Pacific.shp
 - Atlantic.shp
-These regions should be standarised throught AR6, and were emailed to me by chapter author Liza Bock.
+These regions should be standarised throught AR6, and were emailed to me by chapter author Lisa Bock.
 
 
 Sea surface salinity auxiliary data:
@@ -116,7 +116,7 @@ Ocean Heat Content auxiliary data:
 
 The observational data for this figure is take from the file:
 - 210204_0908_DM-AR6FGDAssessmentTimeseriesOHC-v1.csv
-All columns are used in the final fiugre.
+All columns are used in the final figure.
 
 These files were downloaded directly from Paul Durack
 via the invite-only google drive page: https://drive.google.com/drive/folders/1VO2FehHCz1zJu8tLvp1dNPF2IURJudJN
@@ -131,7 +131,7 @@ These tools are not part of ESMValTool, but are available upon request.
 Check_TSV is a tool to generate the dataset list in the recipe_ocean_heat_content_TSV_all.yml recipe.
 
 This tool is relatively complex, as it needs to find all possible cases
-where the following six datasets exist for a given model & ensemnle member:
+where the following six datasets exist for a given model & ensemble member:
 - historical temperature (thetao)
 - historical salinity (so)
 - piControl temperature (thetao)
@@ -141,7 +141,7 @@ where the following six datasets exist for a given model & ensemnle member:
 
 The tool checks that the data for all these 5 or 6 datasets must be available
 for the entire time range.
-In addition, the tool checks where tyhe historical was branched from the piControl
+In addition, the tool checks where the historical was branched from the piControl
 and adds the relevant picontrol years.
 
 The recipe filler is an earlier and more general version of the check_TSV.py tool.
@@ -162,17 +162,17 @@ These figures include the following directories related to the de-derifting proc
   - piControl:
     - maps showing the raw temperature and salinity data at the surface at the final time step of the PI control run.
   - piTrend:
-    - histograms showing the distributiuon of the de-drifting linear regression (slope & intersect)
+    - histograms showing the distribution of the de-drifting linear regression (slope & intersect)
   - slope:
     - maps showing the slope over the surface for the  entire PI control
   - intersect:
-    - maps showing the intersect overthe surface for the entire PI control
+    - maps showing the intersect over the surface for the entire PI control
   - trend_intact:
     - maps showing the raw temperature and salinity data at the surface at the final time step of historical and hist-nat run
   - detrended:
     - maps showing the dedrifted temperature and salinity data at the surface at the final time step of historical and hist-nat run.
   - detrended_quad:
-    - 4 pane figure showing the surface map for the historical detrended, trend-intact, the difference and the quoitent.
+    - 4 pane figure showing the surface map for the historical detrended, trend-intact, the difference and the quotient.
   - vw_timeseries:
     - time series figure showing the volume Weighted mean for the detrended and trend intact.
   - detrending_ts:
@@ -190,7 +190,7 @@ The following figure directories contain figures for the Dynamic Height calculat
   - SLR_Regional_trend_scatter:
     - scatter plots for the regional thermostericd and halosteric data. Like panes a and b of the halosteric SLR figure.
   - SLR_timeseries_all:
-    - time series plots shows the time development of each of the total, thermo and halo SLR mean for the global, atlantic and pacific regions.
+    - time series plots show the time development of each of the total, thermo and halo SLR mean for the global, atlantic and pacific regions.
   - multi_model_agrement_with_*:
     - map showing where the CMIP data agrees with the observations.   
   - halosteric_multipane:
@@ -222,7 +222,7 @@ and potential sources of error. In this section, we document some potential prob
 This code uses shelve files, which are sometimes not portable between different
 versions of python.
 
-We can not guarentee that the auxiliary data will remain available indefinately.
+We cannot guarantee that the auxiliary data will remain available indefinitely.
 
 If the hatching is turned on in the Halosateric SLR figure, and the multi_model_agrement_with_* figures
 do not exist, then the code will try to create a new figure while another is unfinished.
@@ -237,12 +237,12 @@ picontrol trend from the hisotircal run, where as we used a much linear regressi
 straight line fit.
 
 The DAMIP experiment has the flaw that the Omon wasn't required to
-contribue the cell volume. This means that the hist-nat datasets do not include
-any time-variying cell volume data. To maximise the data available, we assume that
+contribute the cell volume. This means that the hist-nat datasets do not include
+any time-varying cell volume data. To maximize the data available, we assume that
 the hist-nat data can use the mean along of the time axis of the pre-industrial control
 data.
 
-We have interchangably used the terms de-drifting and de-trending, but the
+We have interchangeably used the terms de-drifting and de-trending, but the
 correct term for the process that we've applied is de-drifting. When something
 is marked as de-trended, it is actually dedrifted.
 
