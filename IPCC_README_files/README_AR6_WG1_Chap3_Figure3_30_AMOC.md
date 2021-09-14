@@ -18,9 +18,9 @@ and the observations are shown in grey bands.
 
 Pane a) shows the depth profile of the AMOC in model and observations.
 Pane b) shows the distribution of 8 year trends in the AMOC for the CMIP5 & CMIP6
-ensemble means, and for all CMIP6  models that contrinuted toi the mean.
+ensemble means, and for all CMIP6 models that contributed to the mean.
 Similarly, pane c) shows the distribution of interannual AMOC changes for the CMIP5 & CMIP6
-ensemble means, and for all CMIP6  models that contrinuted toi the mean.
+ensemble means, and for all CMIP6 models that contributed to the mean.
 
 Panes d), e), and f) show the AMOC behaviour of various DAMIP for three different
 time periods.
@@ -28,16 +28,15 @@ time periods.
 
 Author list:
 ------------
-- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
-- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
-- Nathan Gillett, University of Victoria
-- Krishna Achutarao, Indian Institute of Technology, Delhi
-- Shayne McGregor, Monash University, Melbourne
-- Rondrotiana Barimalala, University of Cape Town
+- Lee de Mora, Plymouth Marine Laboratory, UK; ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory, USA; durack1@llnl.gov
+- Nathan Gillett, University of Victoria, Canada
+- Krishna Achutarao, Indian Institute of Technology, Delhi, India
+- Shayne McGregor, Monash University, Melbourne, Australia
+- Rondrotiana Barimalala, University of Cape Town, South Africa
 - Elizaveta Malinina-Rieger, Environment and Climate Change Canada
-- Valeriu Predoi, University of Reading
-- Veronika Eyring, German Aerospace Center (DLR)
-
+- Valeriu Predoi, University of Reading, UK
+- Veronika Eyring, DLR, Germany
 
 Publication sources:
 --------------------
@@ -92,7 +91,7 @@ In addition to the final figure, the AMOC diagnostic can produce a single figure
 Additional datasets:
 --------------------
 What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
+Where are they on the computational machine or in the repository?
 Can they be re-created?
 What are their access permissions/Licenses?
 
