@@ -37,7 +37,7 @@ Author list:
 
 Publication sources:
 --------------------
-Please list any publications that describe, explain or use this figure.
+
 - Durack, Paul J., Susan E. Wijffels, 2010: Fifty-Year Trends in Global Ocean
   Salinities and Their Relationship to Broad-Scale Warming. J. Climate, 23, 4342–4362.
 
@@ -54,10 +54,10 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used:
+Recipe used:
 - recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used:
+Diagnostic used:
 - ocean/diagnostic_chap3_ocean_heat_content.py
 
 
@@ -94,7 +94,7 @@ and adds the relevant picontrol years.
 
 The recipe filler is an earlier and more general version of the check_TSV.py tool.
 It can be used to add whatever data is available into a recipe. I believe
-that a version of it was added to the ESMValTool master by Valeriu.
+that a version of it was added to the ESMValTool master by Valeriu Predoi.
 
 
 Ancillary figures and datasets:
@@ -139,7 +139,7 @@ Can they be re-created?
 What are their access permissions/Licenses?
 
 The observational data from here is taken from: the files:
-- DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc'
+- DurackandWijffels_GlobalOceanChanges_19500101-20191231__210122-205355_beta.nc
 - DurackandWijffels_GlobalOceanChanges_19700101-20191231__210122-205448_beta.nc
 depending on which time range you are looking at.
 The field of interest are salinity_mean (shown as black contours) and salinity_change (shown in colourscale).
@@ -158,6 +158,7 @@ Software versions, name of environment file (see **save conda environment** in C
 Hardware description:
 ---------------------
 What machine was used: Jasmin
+
 When was this machine used? December 2020 to March 2021
 
 
