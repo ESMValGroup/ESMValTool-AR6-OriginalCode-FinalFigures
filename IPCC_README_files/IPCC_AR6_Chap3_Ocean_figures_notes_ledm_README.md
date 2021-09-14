@@ -30,16 +30,16 @@ Table 1:
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
 | Name                                    | Fig. | Recipe and Diagnostic                         | Final plot path and  Final Plot name                 |
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
-| Atlantic Meridional Overturning Current | 3.XX | recipe_ocean_amoc_streamfunction_profiles.yml | diag_timeseries_amoc_hist/AMOC_timeseries            |
+| Atlantic Meridional Overturning Current | 3.30 | recipe_ocean_amoc_streamfunction_profiles.yml | diag_timeseries_amoc_hist/AMOC_timeseries            |
 |                                         |      | ocean/diagnostic_amoc_profiles.py             | fig_3.24                                             |      
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
-| Ocean Heat Content                      | 3.XX | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/multimodel_ohc             |   
+| Ocean Heat Content                      | 3.26 | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/multimodel_ohc             |   
 |                                         |      | ocean/diagnostic_chap3_ocean_heat_content.py  | multimodel_ohc_range_10-90_large_full_1995.0-2014.0  |
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
-| Halosteric Sea Level Rise               | 3.XX | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/halosteric_multipane/      |
+| Halosteric Sea Level Rise               | 3.28 | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/halosteric_multipane/      |
 |                                         |      | ocean/diagnostic_chap3_ocean_heat_content.py  | halosteric_multipane_historical_1950-2015            |
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
-| Global Sea Surface Saliinty trends      | 3.XX | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/sea_surface_salinity_plot/ |
+| Global Sea Surface Saliinty trends      | 3.27 | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/sea_surface_salinity_plot/ |
 |                                         |      | ocean/diagnostic_chap3_ocean_heat_content.py  | salinity_trends_only_1950-2014_DW1950_decadal        |
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
 Table 1:  all recipes, diagnostics, and paths described in this document.
