@@ -47,7 +47,7 @@ From there the calculation of the "heat content" was:
 5. For the anomalous energy, we calculate:
    gsw_rho(SA,CT,p)*gsw_enthalpy(SA,CT,0)-gsw_rho(<SA>,<CT>,p)*gsw_enthalpy(<SA>,<CT>,0).
 
-6. integrate the surface-referenced enthalpy times rho,
+6. Integrate the surface-referenced enthalpy times rho,
    i.e., the previous line gives the 3D integrand, and then we want to integrate it from the bottom up.  
 
 
@@ -138,7 +138,7 @@ The OHC diagnostic produces the OHC, SSS trends and Halosteric SLR figures.
 This code is particularly complex and several ancillary figures are produced along the way
 for each model and each ensemble member.
 
-These figures include the following directories related to the de-derifting process:
+These figures include the following directories related to the de-drifting process:
   - piControl:
     - maps showing the raw temperature and salinity data at the surface at the final time step of the PI control run.
   - piTrend:
@@ -146,15 +146,15 @@ These figures include the following directories related to the de-derifting proc
   - slope:
     - maps showing the slope over the surface for the  entire PI control
   - intersect:
-    - maps showing the intersect overthe surface for the entire PI control
+    - maps showing the intersect over the surface for the entire PI control
   - trend_intact:
     - maps showing the raw temperature and salinity data at the surface at the final time step of historical and hist-nat run
   - detrended:
     - maps showing the dedrifted temperature and salinity data at the surface at the final time step of historical and hist-nat run.
   - detrended_quad:
-    - 4 pane figure showing the surface map for the historical detrended, trend-intact, the difference and the quoitent.
+    - 4 pane figure showing the surface map for the historical detrended, trend-intact, the difference and the quotient.
   - vw_timeseries:
-    - time series figure showing the volume Weighted mean for the detrended and trend intact.
+    - time series figure showing the volume weighted mean for the detrended and trend intact.
   - detrending_ts:
     - time series figure showing the global volume weighted mean (or total) temperature, salinity or OHC for the historical and piControl.
   - multi_model_mean:
@@ -210,7 +210,7 @@ and potential sources of error. In this section, we document some potential prob
 This code uses shelve files, which are sometimes not portable between different
 versions of python.
 
-We can not guarentee that the auxiliary data will remain available indefinately.
+We cannot guarantee that the auxiliary data will remain available indefinitely.
 
 If the hatching is turned on in the Halosateric SLR figure, and the multi_model_agrement_with_* figures
 do not exist, then the code will try to create a new figure while another is unfinished.
@@ -225,11 +225,11 @@ picontrol trend from the hisotircal run, where as we used a much linear regressi
 straight line fit.
 
 The DAMIP experiment has the flaw that the Omon wasn't required to
-contribue the cell volume. This means that the hist-nat datasets do not include
-any time-variying cell volume data. To maximise the data available, we assume that
+contribute the cell volume. This means that the hist-nat datasets do not include
+any time-variying cell volume data. To maximize the data available, we assume that
 the hist-nat data can use the mean along of the time axis of the pre-industrial control
 data.
 
-We have interchangably used the terms de-drifting and de-trending, but the
+We have interchangeably used the terms de-drifting and de-trending, but the
 correct term for the process that we've applied is de-drifting. When something
 is marked as de-trended, it is actually dedrifted.
