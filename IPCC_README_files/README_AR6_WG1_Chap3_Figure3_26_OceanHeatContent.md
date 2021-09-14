@@ -66,7 +66,7 @@ Author list:
 
 Publication sources:
 --------------------
-Please list any publications that describe, explain or use this figure.
+
 - Durack, P., Gleckler, P., Landerer, F. et al. Quantifying underestimates of
   long-term upper-ocean warming. Nature Clim Change 4, 999–1005 (2014).
   https://doi.org/10.1038/nclimate2389
@@ -85,10 +85,10 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used:
+Recipe used:
 - recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used:
+Diagnostic used:
 -ocean/diagnostic_chap3_ocean_heat_content.py
 
 The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
@@ -98,8 +98,6 @@ Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
 - plots/diag_ohc/diagnostic/multimodel_ohc/ multimodel_ohc_range_10-90_large_full_1995.0-2014.0.png
-
-
 
 Recipe generation tools:
 -------------------------
@@ -189,10 +187,9 @@ via the invite-only google drive page: https://drive.google.com/drive/folders/1V
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
-- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
-- Other software used:
+
+- ESMValTool environment file: IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- pip file: IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
 
 
 Hardware description:
