@@ -15,11 +15,11 @@ right four panes are maps.
 The two left panes show the behaviour of the halosteric sea level change
 in the top pane and the thermosteric sea level change in the lower pane.
 The x axis of these figures shows the mean behaviour of the Pacific
-region and the y shows the mean of the Atlantic.
+region and the y axis shows the mean of the Atlantic.
 The scatter points include CMIP6 historical data, CMIP6 hist-nat data,
 and three observational datasets.
 
-The right hand side shows the halosteric sea level trend over the whole time period.
+The right-hand side shows the halosteric sea level trend over the whole time period.
 The top three maps are observational data and the lowest pane is the CMIP6 multi model mean.
 
 The halosteric content was calculated using the TEOS-10 gsw python toolkit: https://teos-10.github.io/GSW-Python/
@@ -28,26 +28,26 @@ In all cases, the model temperature and salinity were de-drifted against the
 pi-control. From there, we ensured that the pressure was calculated correctly,
 the cell volume was available, we use absolute salinity & conservative temperature.
 
-The multi model mean is caluated such that each modelled ensemble has the
-same weight. ie One-model, one vote.
+The multi model mean is calculated such that each modelled ensemble has the
+same weight, i.e. one-model, one vote.
 
 
 Author list:
 ------------
-- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
-- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
-- Nathan Gillett, University of Victoria
-- Krishna Achutarao, Indian Institute of Technology, Delhi
-- Shayne McGregor, Monash University, Melbourne
-- Rondrotiana Barimalala, University of Cape Town
+- Lee de Mora, Plymouth Marine Laboratory, UK; ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory, USA; durack1@llnl.gov
+- Nathan Gillett, University of Victoria, Canada
+- Krishna Achutarao, Indian Institute of Technology, Delhi, India
+- Shayne McGregor, Monash University, Melbourne, Australia
+- Rondrotiana Barimalala, University of Cape Town, South Africa
 - Elizaveta Malinina-Rieger, Environment and Climate Change Canada
-- Valeriu Predoi, University of Reading
-- Veronika Eyring, German Aerospace Center (DLR)
+- Valeriu Predoi, University of Reading, UK
+- Veronika Eyring, DLR, Germany
 
 
 Publication sources:
 --------------------
-Please list any publications that describe, explain or use this figure.
+
 -  Durack, Paul J.; Wijffels, Susan E.; Gleckler, Peter J.; Long-term sea-level change revisited: the role of salinity, 2014 Environ. Res. Lett. 9 114017, http://dx.doi.org/10.1088/1748-9326/9/11/114017
 
 
@@ -63,10 +63,10 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used:
+Recipe used:
 - recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used:
+Diagnostic used:
 - ocean/diagnostic_chap3_ocean_heat_content.py
 
 
@@ -98,12 +98,12 @@ where the following six datasets exist for a given model & ensemble member:
 
 The tool checks that the data for all these 5 or 6 datasets must be available
 for the entire time range.
-In addition, the tool checks where tyhe historical was branched from the piControl
+In addition, the tool checks where the historical was branched from the piControl
 and adds the relevant picontrol years.
 
 The recipe filler is an earlier and more general version of the check_TSV.py tool.
 It can be used to add whatever data is available into a recipe. I believe
-that a version of it was added to the ESMValTool master by Valeriu.
+that a version of it was added to the ESMValTool master by Valeriu Predoi.
 
 
 Ancillary figures and datasets:
@@ -114,18 +114,18 @@ to highlight anything that may be useful for future iterations:
 
 
 The OHC diagnostic produces the OHC, SSS trends and Halosteric SLR figures.
-This code is particularly complex and several ancillairy figures are produced along the way
+This code is particularly complex and several ancillary figures are produced along the way
 for each model and each ensemble member.
 
-These figures include the following directories related to the de-derifting process:
+These figures include the following directories related to the de-drifting process:
   - piControl:
     - maps showing the raw temperature and salinity data at the surface at the final time step of the PI control run.
   - piTrend:
-    - histograms showing the distributiuon of the de-drifting linear regression (slope & intersect)
+    - histograms showing the distribution of the de-drifting linear regression (slope & intersect)
   - slope:
-    - maps showing the slope over the surface for the  entire PI control
+    - maps showing the slope over the surface for the entire PI control
   - intersect:
-    - maps showing the intersect overthe surface for the entire PI control
+    - maps showing the intersect over the surface for the entire PI control
   - trend_intact:
     - maps showing the raw temperature and salinity data at the surface at the final time step of historical and hist-nat run
   - detrended:
@@ -147,7 +147,7 @@ The following figure directories contain figures for the Dynamic Height calculat
   - SLR_Regional_trend_scatter:
     - scatter plots for the regional thermostericd and halosteric data. Like panes a and b of the halosteric SLR figure.
   - SLR_timeseries_all:
-    - time series plots shows the time development of each of the total, thermo and halo SLR mean for the global, atlantic and pacific regions.
+    - time series plots show the time development of each of the total, thermo and halo SLR mean for the global, atlantic and pacific regions.
   - multi_model_agrement_with_*:
     - map showing where the CMIP data agrees with the observations.   
   - halosteric_multipane:
@@ -157,7 +157,7 @@ The following figure directories contain figures for the Dynamic Height calculat
 Additional datasets:
 --------------------
 What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
+Where are they on the computational machine or in the repository?
 Can they be re-created?
 What are their access permissions/Licenses?
 
@@ -180,22 +180,22 @@ In addition, shapefiles are required to calculate the regional boundaries:
 
 - Atlantic.shp
 
-These regions should be standarised throught AR6, and were emailed to me by
+These regions should be standardized through AR6, and were emailed to me by
 chapter author Lisa Bock, (mailto):lisa.bock@dlr.de)
 
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages:
 
-- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- ESMValTool environment file: IPCC_environments/development_ar6_chap_3_ocean_environment.yml
 
-- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
+- pip file: IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
 
 
 Hardware description:
 ---------------------
 What machine was used: Jasmin
+
 When was this machine used? December 2020 to March 2021
 
 
@@ -208,7 +208,7 @@ and potential sources of error. In this section, we document some potential prob
 This code uses shelve files, which are sometimes not portable between different
 versions of python.
 
-We can not guarentee that the auxiliary data will remain available indefinately.
+We cannot guarantee that the auxiliary data will remain available indefinitely.
 
 If the hatching is turned on in the Halosateric SLR figure, and the multi_model_agrement_with_* figures
 do not exist, then the code will try to create a new figure while another is unfinished.
@@ -219,12 +219,12 @@ to the period specific in the historical run. Other analyses have used shorter
 periods for their dedrifting range. This method was chosen due to the time constraints.
 
 Other analyses have used polymetric dedrifting, to remove even more of the
-picontrol trend from the hisotircal run, where as we used a much linear regression
+picontrol trend from the historical run, where as we used a much linear regression
 straight line fit.
 
 The DAMIP experiment has the flaw that the Omon wasn't required to
-contribue the cell volume. This means that the hist-nat datasets do not include
-any time-variying cell volume data. To maximise the data available, we assume that
+contribute the cell volume. This means that the hist-nat datasets do not include
+any time-varying cell volume data. To maximize the data available, we assume that
 the hist-nat data can use the mean along of the time axis of the pre-industrial control
 data.
 
