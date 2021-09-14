@@ -53,15 +53,15 @@ From there the calculation of the "heat content" was:
 
 Author list:
 ------------
-- Lee de Mora, Plymouth Marine Laboratory, ledm@pml.ac.uk
-- Paul J. Durack, Lawrence Livermore National Laboratory,  durack1@llnl.gov
-- Nathan Gillett, University of Victoria
-- Krishna Achutarao, Indian Institute of Technology, Delhi
-- Shayne McGregor, Monash University, Melbourne
-- Rondrotiana Barimalala, University of Cape Town
+- Lee de Mora, Plymouth Marine Laboratory, UK; ledm@pml.ac.uk
+- Paul J. Durack, Lawrence Livermore National Laboratory, USA; durack1@llnl.gov
+- Nathan Gillett, University of Victoria, Canada
+- Krishna Achutarao, Indian Institute of Technology, Delhi, India
+- Shayne McGregor, Monash University, Melbourne, Australia
+- Rondrotiana Barimalala, University of Cape Town, South Africa
 - Elizaveta Malinina-Rieger, Environment and Climate Change Canada
-- Valeriu Predoi, University of Reading
-- Veronika Eyring, German Aerospace Center (DLR)
+- Valeriu Predoi, University of Reading, UK
+- Veronika Eyring, DLR, Germany
 
 
 Publication sources:
