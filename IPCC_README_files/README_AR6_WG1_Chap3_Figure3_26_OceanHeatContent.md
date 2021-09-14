@@ -94,11 +94,11 @@ Diagnostic(s) used:
 The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
 diagnostic. This is because they all require the same process to de-drift.
 
+
 Expected image path:
 --------------------
 This is the path of the image relative to the automatically generated ESMValTool output location:
 - plots/diag_ohc/diagnostic/multimodel_ohc/ multimodel_ohc_range_10-90_large_full_1995.0-2014.0.png
-
 
 
 Recipe generation tools:
