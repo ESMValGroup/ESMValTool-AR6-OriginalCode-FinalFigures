@@ -38,10 +38,6 @@ Author list:
 - Valeriu Predoi, University of Reading, UK
 - Veronika Eyring, DLR, Germany
 
-Publication sources:
---------------------
-Please list any publications that describe, explain or use this figure.
-
 
 ESMValTool Branch:
 ------------------
@@ -55,10 +51,10 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used:
+Recipe used:
 - recipes/recipe_ocean_amoc_streamfunction_profiles.yml
 
-Diagnostic(s) used:
+Diagnostic used:
 - diagocean/diagnostic_amoc_profiles.py
 
 
@@ -107,18 +103,11 @@ and was downloaded from: https://github.com/mattofficeuk/AR6/tree/master/JSON_da
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
+
 - ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
 - pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
-- Other software used:
 
 
 Hardware description:
 ---------------------
 What machine was used: Jasmin
-
-When was this machine used:
-
-
-Any further instructions:
--------------------------
