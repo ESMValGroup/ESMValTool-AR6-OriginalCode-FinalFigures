@@ -47,7 +47,7 @@ Author list:
 
 Publication sources:
 --------------------
-Please list any publications that describe, explain or use this figure.
+
 -  Durack, Paul J.; Wijffels, Susan E.; Gleckler, Peter J.; Long-term sea-level change revisited: the role of salinity, 2014 Environ. Res. Lett. 9 114017, http://dx.doi.org/10.1088/1748-9326/9/11/114017
 
 
@@ -63,10 +63,10 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe(s) used:
+Recipe used:
 - recipes/recipe_ocean_heat_content_TSV_all.yml
 
-Diagnostic(s) used:
+Diagnostic used:
 - ocean/diagnostic_chap3_ocean_heat_content.py
 
 
@@ -186,16 +186,16 @@ chapter author Lisa Bock, (mailto):lisa.bock@dlr.de)
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages:
 
-- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- ESMValTool environment file: IPCC_environments/development_ar6_chap_3_ocean_environment.yml
 
-- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
+- pip file: IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
 
 
 Hardware description:
 ---------------------
 What machine was used: Jasmin
+
 When was this machine used? December 2020 to March 2021
 
 
