@@ -149,10 +149,10 @@ via the invite-only google drive page: https://drive.google.com/drive/folders/1V
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/development_ar6_chap_3_ocean_environment.yml
-- pip file: e.g. IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
-- Other software used:
+
+- ESMValTool environment file: IPCC_environments/development_ar6_chap_3_ocean_environment.yml
+- pip file: IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
+
 
 
 Hardware description:
