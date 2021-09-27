@@ -10,7 +10,7 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-Column water vapor path trends (%/decade) for the period 1998-2019 averaged over 
+Column water vapor path trends (%/decade) for the period 1988-2019 averaged over 
 the near-global oceans (50°S-50°N). The figure shows satellite data (RSS) and 
 ERA5.1 reanalysis, as well as CMIP5 (sky blue) and CMIP6 (brown) historical 
 simulations. All available ensemble members were used (see Section 3.2. Fits to 
