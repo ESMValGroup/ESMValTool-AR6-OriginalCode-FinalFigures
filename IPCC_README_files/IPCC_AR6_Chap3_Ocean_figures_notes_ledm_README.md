@@ -4,10 +4,10 @@ IPCC AR6 Chapter 3 Ocean plots: AMOC, OHC, Halo SLR and SSS trends
 
 ESMValTool description for Intergovernmental Panel on Climate change, Sixth
 Assessment Report, Chapter 3 figures:
-- Atlantic Meridional Overturning Current ([Figure 3.30](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_fig3_30_amoc.png))
-- Ocean Heat Content ([Figure 3.26](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_figure3_26_oceanheatcontent.png))
-- Halosteric Sea Level Rise ([Figure 3.28](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_fig3_28_halostericsealevel.png))
-- Global Sea Surface Salinity trends ([Figure 3.27](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_fig3_27_GlobalSeaSurfaceSalinityTrends.png))
+- Atlantic Meridional Overturning Current ([Figure 3.30](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README_AR6_WG1_Chap3_Figure3_30_AMOC.md))
+- Ocean Heat Content ([Figure 3.26](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README_AR6_WG1_Chap3_Figure3_26_OceanHeatContent.md))
+- Halosteric Sea Level Rise ([Figure 3.28](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README_AR6_WG1_Chap3_Figure3_28_HalostericSLR.md))
+- Global Sea Surface Salinity trends ([Figure 3.27](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/README_AR6_WG1_Chap3_Figure3_27_GlobalSeaSurfaceSalinitytrends.md))
 
 Figures authorship team:
 =======================
