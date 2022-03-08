@@ -28,7 +28,7 @@ Publication sources:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_fig_10
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chap_3_fig_10](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_fig_3_10)
 
 
 ESMValCore Branch:
@@ -38,9 +38,9 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/recipe_verticaltemp.yml - Recipe to extract and process data for plotting vertical profiles of atmospheric temperatures
+Recipe used: [recipes/recipe_verticaltemp.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_fig_3_10/esmvaltool/recipes/recipe_verticaltemp.yml) - Recipe to extract and process data for plotting vertical profiles of atmospheric temperatures
 
-Diagnostic used: diag_scripts/vertical_temp_profiles/vertical_temp_trends.py - Diagnostic that calculates trends of atmospheric temperatures at different pressure levels
+Diagnostic used: [diag_scripts/vertical_temp_profiles/vertical_temp_trends.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_fig_3_10/esmvaltool/diag_scripts/vertical_temp_profiles/vertical_temp_trends.py) - Diagnostic that calculates trends of atmospheric temperatures at different pressure levels
 
 
 Expected image path:
@@ -51,8 +51,8 @@ This is the path of the image relative to the automatically generated ESMValTool
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml
-- pip file: IPCC_environments/ar6_chap_3_fig_3_10_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_chap_3_fig_3_10_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_chap_3_fig_3_10_pip_environment.txt)
 
 
 Hardware description:
