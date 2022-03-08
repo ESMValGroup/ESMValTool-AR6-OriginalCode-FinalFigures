@@ -75,21 +75,21 @@ Publication sources:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: development_ar6_chap_3_ocean
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chap_3_ocean_figures](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_ocean_figures)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: optimize_mem_annual_statistic_plus_amoc
+- ESMValCore-AR6-OriginalCode-FinalFigures: [optimize_mem_annual_statistic_plus_amoc](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/optimize_mem_annual_statistic_plus_amoc)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipe used:
-- recipes/recipe_ocean_heat_content_TSV_all.yml
+- [recipes/recipe_ocean_heat_content_TSV_all.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_heat_content_TSV_all.yml)
 
 Diagnostic used:
--ocean/diagnostic_chap3_ocean_heat_content.py
+-[ocean/diagnostic_chap3_ocean_heat_content.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_chap3_ocean_heat_content.py)
 
 The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
 diagnostic. This is because they all require the same process to de-drift.
@@ -190,9 +190,9 @@ via the invite-only google drive page: https://drive.google.com/drive/folders/1V
 Software description:
 ---------------------
 
-- ESMValTool environment file: IPCC_environments/development_ar6_chap_3_ocean_environment.yml
-- pip file: IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
-
+- ESMValTool environment file: [IPCC_environments/development_ar6_chap_3_ocean_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
+- pip file: [IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt
+](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
 
 Hardware description:
 ---------------------
