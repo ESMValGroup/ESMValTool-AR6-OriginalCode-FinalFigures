@@ -4,10 +4,10 @@ IPCC AR6 Chapter 3 Ocean plots: AMOC, OHC, Halo SLR and SSS trends
 
 ESMValTool description for Intergovernmental Panel on Climate change, Sixth
 Assessment Report, Chapter 3 figures:
-- Atlantic Meridional Overturning Current (Figure 3.30)
-- Ocean Heat Content (Figure 3.26)
-- Halosteric Sea Level Rise (Figure 3.28)
-- Global Sea Surface Salinity trends (Figure 3.27)
+- Atlantic Meridional Overturning Current ([Figure 3.30](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_fig3_30_amoc.png))
+- Ocean Heat Content ([Figure 3.26](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_figure3_26_oceanheatcontent.png))
+- Halosteric Sea Level Rise ([Figure 3.28](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_fig3_28_halostericsealevel.png))
+- Global Sea Surface Salinity trends ([Figure 3.27](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_fig3_27_GlobalSeaSurfaceSalinityTrends.png))
 
 Figures authorship team:
 =======================
@@ -30,14 +30,14 @@ Table 1:
 
 | Name                                    | Fig. | Recipe and Diagnostic                         | Final plot path and  Final Plot name                 |
 | --------------------------------------- | ---- | --------------------------------------------- | ---------------------------------------------------- |
-| Atlantic Meridional Overturning Current | 3.30 | recipe_ocean_amoc_streamfunction_profiles.yml | diag_timeseries_amoc_hist/AMOC_timeseries            |
-|                                         |      | ocean/diagnostic_amoc_profiles.py             | fig_3.24                                             |   
-| Ocean Heat Content                      | 3.26 | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/multimodel_ohc             |   
-|                                         |      | ocean/diagnostic_chap3_ocean_heat_content.py  | multimodel_ohc_range_10-90_large_full_1995.0-2014.0  |
-| Halosteric Sea Level Rise               | 3.28 | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/halosteric_multipane/      |
-|                                         |      | ocean/diagnostic_chap3_ocean_heat_content.py  | halosteric_multipane_historical_1950-2015            |
-| Global Sea Surface Saliinty trends      | 3.27 | recipe_ocean_heat_content_TSV_all.yml         | plots/diag_ohc/diagnostic/sea_surface_salinity_plot/ |
-|                                         |      | ocean/diagnostic_chap3_ocean_heat_content.py  | salinity_trends_only_1950-2014_DW1950_decadal        |
+| Atlantic Meridional Overturning Current | 3.30 | [recipe_ocean_amoc_streamfunction_profiles.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_amoc_streamfunction_profiles.yml) | diag_timeseries_amoc_hist/AMOC_timeseries            |
+|                                         |      | [ocean/diagnostic_amoc_profiles.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_amoc_profiles.py)             | fig_3.24                                             |   
+| Ocean Heat Content                      | 3.26 | [recipe_ocean_heat_content_TSV_all.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_heat_content_TSV_all.yml)         | plots/diag_ohc/diagnostic/multimodel_ohc             |   
+|                                         |      | [ocean/diagnostic_chap3_ocean_heat_content.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_chap3_ocean_heat_content.py)  | multimodel_ohc_range_10-90_large_full_1995.0-2014.0  |
+| Halosteric Sea Level Rise               | 3.28 | [recipe_ocean_heat_content_TSV_all.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_heat_content_TSV_all.yml)         | plots/diag_ohc/diagnostic/halosteric_multipane/      |
+|                                         |      | [ocean/diagnostic_chap3_ocean_heat_content.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_chap3_ocean_heat_content.py)  | halosteric_multipane_historical_1950-2015            |
+| Global Sea Surface Saliinty trends      | 3.27 | [recipe_ocean_heat_content_TSV_all.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_heat_content_TSV_all.yml)         | plots/diag_ohc/diagnostic/sea_surface_salinity_plot/ |
+|                                         |      | [ocean/diagnostic_chap3_ocean_heat_content.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_chap3_ocean_heat_content.py)  | salinity_trends_only_1950-2014_DW1950_decadal        |
 
 Table 1:  all recipes, diagnostics, and paths described in this document.
 
@@ -47,10 +47,10 @@ The OHC, Halo and SSS trends plots are all produced using the same recipe and
 diagnostic. This is because they all require the same process to de-drift.
 
 The recipes are in the location:
-- ESMValTool_AR6/esmvaltool/recipes
+- [ESMValTool_AR6/esmvaltool/recipes](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_ocean_figures/esmvaltool/recipes)
 
 The diagnostics are in the location:
-- ESMValTool_AR6/esmvaltool/diagnostics/ocean
+- [ESMValTool_AR6/esmvaltool/diagnostics/ocean](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean)
 
 The final plots directory will live in the output directory, generated at run time by ESMValTool.
 
@@ -256,8 +256,8 @@ The following branches of ESMValTool-AR6 and ESMValCore were used to produce the
 
 | Code           | Branch                                  | Commit date                   | Commit hash                              |
 | -------------- | --------------------------------------- | ----------------------------- | ---------------------------------------- |
-| ESMValTool-AR6 | ar6_chap_3_ocean_figures                | Mon Mar 8 10:22:43 2021 +0000 | 561349aceb46aedb8b555ab7bab25e029fcddfad |
-| ESMValCore     | optimize_mem_annual_statistic_plus_amoc | Mon Mar 8 11:46:54 2021 +0000 | 5b744f78a72c2dbbc03141eb39a2b5555dd06220 |
+| ESMValTool-AR6 | [ar6_chap_3_ocean_figures](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_ocean_figures)                | Mon Mar 8 10:22:43 2021 +0000 | 561349aceb46aedb8b555ab7bab25e029fcddfad |
+| ESMValCore     | [optimize_mem_annual_statistic_plus_amoc](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/optimize_mem_annual_statistic_plus_amoc) | Mon Mar 8 11:46:54 2021 +0000 | 5b744f78a72c2dbbc03141eb39a2b5555dd06220 |
 
 
 
