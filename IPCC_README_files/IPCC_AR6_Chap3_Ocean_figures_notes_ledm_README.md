@@ -257,7 +257,7 @@ The following branches of ESMValTool-AR6 and ESMValCore were used to produce the
 
 Software description:
 ---------------------
-- ESMValTool environment file: 
+- ESMValTool environment file: [IPCC_environments/ar6_chap_3_ocean_figures_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_chap_3_ocean_figures_conda_environment.yml)
 
 
 Hardware description:
