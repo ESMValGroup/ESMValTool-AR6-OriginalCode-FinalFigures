@@ -29,22 +29,22 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipes used: 
-- recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere_fig_9.yml
-- recipe_ipccwg1ar6ch3_fig_3_41_pr.yml
-- recipe_ipccwg1ar6ch3_fig_3_41_siconc.yml
+- [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere_fig_3_9.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere_fig_3_9.yml)
+- [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_3_41_pr.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_3_41_pr.yml)
+- [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_3_41_siconc.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_3_41_siconc.yml)
 
-Diagnostic used: diag_scripts/ipcc_ar6/tas_anom_damip.ncl
+Diagnostic used: [diag_scripts/ipcc_ar6/tas_anom_damip.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/tas_anom_damip.ncl)
 
 
 Expected image path:
@@ -64,8 +64,8 @@ received from Chapter 2:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_lisa_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_lisa_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_lisa_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_lisa_pip_environment.txt)
 
 
 Hardware description:
@@ -78,7 +78,7 @@ Additional instructions:
 
 1. Run the three ESMValTool recipes listed above to generate the nc-files: 
    tas_anom_damip_*.nc; precip_anom_*.nc; tsline_collect_siconc_*.nc
-2. Run IPCC_additional_scripts/Fig_3_41_ohc.ncl to generate the nc-file: 
+2. Run [IPCC_additional_scripts/Fig_3_41_ohc.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_additional_scripts/Fig_3_41_ohc.ncl) to generate the nc-file: 
    ohc_damip.nc (input are ohc-files listed under addtional datasets)
-3. Run IPCC_additional_scripts/Fig_3_41_collect.ncl to create the final figure: 
+3. Run [IPCC_additional_scripts/Fig_3_41_collect.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_additional_scripts/Fig_3_41_collect.ncl) to create the final figure: 
    Fig_3_41.pdf

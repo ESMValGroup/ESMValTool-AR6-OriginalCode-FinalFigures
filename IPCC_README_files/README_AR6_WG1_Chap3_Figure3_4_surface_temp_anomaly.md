@@ -50,21 +50,21 @@ Research: Atmospheres, 125, e2019JD032321. https://doi.org/10.1029/2019JD032321
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml)
 
 Diagnostics used: 
-- diag_scripts/ipcc_ar6/tas_anom.ncl
-- diag_scripts/ipcc_ar6/tsline_blend_collect.ncl
+- [diag_scripts/ipcc_ar6/tas_anom.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/tas_anom.ncl)
+- [diag_scripts/ipcc_ar6/tsline_blend_collect.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/tsline_blend_collect.ncl)
 
 
 Expected image path:
@@ -76,8 +76,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_lisa_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_lisa_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_lisa_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_lisa_pip_environment.txt)
 
 
 Hardware description:

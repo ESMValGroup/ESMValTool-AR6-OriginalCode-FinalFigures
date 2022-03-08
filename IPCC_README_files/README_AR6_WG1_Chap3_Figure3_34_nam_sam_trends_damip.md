@@ -43,24 +43,24 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_modes.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_modes.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_modes.yml)
 
 Diagnostics used: 
-- diag_scripts/ipccwg1ar6ch3_modes/nam_sam.trends.summary.bar.ncl
-- diag_scripts/ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl
-- diag_scripts/ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl
-- diag_scripts/ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl
-- diag_scripts/ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl
+- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.trends.summary.bar.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes)
+- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl)
+- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl)
+- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl)
+- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/commit/283f22f5d4bae7a595703fa2764fb885fe10f94a)
 
 
 Expected image path:
@@ -70,8 +70,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_lisa_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_lisa_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_lisa_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_lisa_pip_environment.txt)
 
 
 Hardware description:
