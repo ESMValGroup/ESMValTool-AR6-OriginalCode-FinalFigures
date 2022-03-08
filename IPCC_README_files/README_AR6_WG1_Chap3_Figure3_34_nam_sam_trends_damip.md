@@ -53,7 +53,7 @@ ESMValCore Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_modes.yml
+Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_modes.yml
 
 Diagnostics used: 
 - diag_scripts/ipccwg1ar6ch3_modes/nam_sam.trends.summary.bar.ncl
