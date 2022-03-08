@@ -37,19 +37,19 @@ atmospheric blocking simulation in present and future climate. J. Clim. 33,
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_blocking.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_blocking.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_blocking.yml)
 
-Diagnostic used: diag_scripts/miles/miles_block_groupby_projects.R
+Diagnostic used: [diag_scripts/miles/miles_block_groupby_projects.R](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/miles/miles_block_groupby_projects.R)
 
 
 Expected image path:
@@ -60,8 +60,8 @@ This is the path of the image relative to the automatically generated ESMValTool
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_remi_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_remi_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_remi_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_remi_pip_environment.txt)
 
 
 Hardware description:

@@ -26,19 +26,19 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ar6ch3_sam_millennium.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ar6ch3_sam_millennium.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ar6ch3_sam_millennium.yml)
 
-Diagnostic used: diag_scripts/ar6ch3_sam_millennium/draw_samindex_millennium.ncl
+Diagnostic used: [diag_scripts/ar6ch3_sam_millennium/draw_samindex_millennium.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_sam_millennium/draw_samindex_millennium.ncl)
 
 
 Expected image path:
@@ -48,8 +48,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_remi_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_remi_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_remi_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/ar6_newcore_remi_pip_environment.txt)
 
 
 Hardware description:
