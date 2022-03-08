@@ -39,18 +39,18 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chap_3_hiatus
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chap_3_hiatus](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_hiatus)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_fig_ccb3_1.yml
+Recipe used: [recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_fig_ccb3_1.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_hiatus/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_fig_ccb3_1.yml)
 
 Diagnostics used: 
-- diag_scripts/ar6ch3_hiatus/trend.ncl
-- diag_scripts/ar6ch3_hiatus/composite.ncl
-- diag_scripts/ar6ch3_hiatus/draw.ncl
-- diag_scripts/ar6ch3_hiatus/summary_percentiles.ncl
+- [diag_scripts/ar6ch3_hiatus/trend.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_hiatus/esmvaltool/diag_scripts/ar6ch3_hiatus/trend.ncl)
+- [diag_scripts/ar6ch3_hiatus/composite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_hiatus/esmvaltool/diag_scripts/ar6ch3_hiatus/composite.ncl)
+- [diag_scripts/ar6ch3_hiatus/draw.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_hiatus/esmvaltool/diag_scripts/ar6ch3_hiatus/draw.ncl)
+- [diag_scripts/ar6ch3_hiatus/summary_percentiles.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_hiatus/esmvaltool/diag_scripts/ar6ch3_hiatus/summary_percentiles.ncl)
 
 
 Expected image path:
@@ -68,8 +68,8 @@ observational datasets.
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml
-- pip file: IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt
+- ESMValTool environment file: I[PCC_environments/esmvaltool_ar6_yu_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml)
+- pip file: [IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt)
 
 
 Hardware description:
