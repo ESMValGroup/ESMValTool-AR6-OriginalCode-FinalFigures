@@ -58,8 +58,8 @@ Another non-esmvaltool preprocessed dataset in esmvaltool auxiliary directory is
 
 Software description:
 ---------------------
-- ESMValTool environment file: [IPCC_environments/esmvaltool_ar6_attribution_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/esmvaltool_ar6_attribution_conda_environment.yml)
-- pip file: [IPCC_environments/esmvaltool_ar6_attribution_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/esmvaltool_ar6_attribution_pip_environment.txt)
+- ESMValTool environment file: [IPCC_environments/esmvaltool_ar6_attribution_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/esmvaltool_ar6_attribution_conda_environment.yml)
+- pip file: [IPCC_environments/esmvaltool_ar6_attribution_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/esmvaltool_ar6_attribution_pip_environment.txt)
 - Other software used: cdo==1.5.3
 
 

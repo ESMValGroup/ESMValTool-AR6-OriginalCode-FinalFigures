@@ -4,10 +4,10 @@ IPCC AR6 Chapter 3 Ocean plots: AMOC, OHC, Halo SLR and SSS trends
 
 ESMValTool description for Intergovernmental Panel on Climate change, Sixth
 Assessment Report, Chapter 3 figures:
-- Atlantic Meridional Overturning Current ([Figure 3.30](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_fig3_30_amoc.png))
-- Ocean Heat Content ([Figure 3.26](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_figure3_26_oceanheatcontent.png))
-- Halosteric Sea Level Rise ([Figure 3.28](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_fig3_28_halostericsealevel.png))
-- Global Sea Surface Salinity trends ([Figure 3.27](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/images/ar6_wg1_chap3_fig3_27_GlobalSeaSurfaceSalinityTrends.png))
+- Atlantic Meridional Overturning Current ([Figure 3.30](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_fig3_30_amoc.png))
+- Ocean Heat Content ([Figure 3.26](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_figure3_26_oceanheatcontent.png))
+- Halosteric Sea Level Rise ([Figure 3.28](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_fig3_28_halostericsealevel.png))
+- Global Sea Surface Salinity trends ([Figure 3.27](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/images/ar6_wg1_chap3_fig3_27_GlobalSeaSurfaceSalinityTrends.png))
 
 Figures authorship team:
 =======================
@@ -257,8 +257,8 @@ The following branches of ESMValTool-AR6 and ESMValCore were used to produce the
 
 Software description:
 ---------------------
-- ESMValTool environment file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
-- pip file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
+- ESMValTool environment file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
+- pip file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
 
 
 Hardware description:

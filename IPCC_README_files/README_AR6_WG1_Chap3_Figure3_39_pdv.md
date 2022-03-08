@@ -73,8 +73,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: [IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml)
-- pip file: [IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt)
+- ESMValTool environment file: [IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/esmvaltool_ar6_yu_conda_environment.yml)
+- pip file: [IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/esmvaltool_ar6_yu_pip_environment.txt)
 
 
 Hardware description:

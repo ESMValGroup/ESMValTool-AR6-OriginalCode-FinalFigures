@@ -104,8 +104,8 @@ and was downloaded from: https://github.com/mattofficeuk/AR6/tree/master/JSON_da
 Software description:
 ---------------------
 
-- ESMValTool environment file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
-- pip file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/fix_links/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
+- ESMValTool environment file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
+- pip file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
 
 
 Hardware description:
