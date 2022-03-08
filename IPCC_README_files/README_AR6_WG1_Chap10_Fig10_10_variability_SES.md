@@ -25,7 +25,7 @@ N/A
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_10
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_10](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_10)
 
 
 ESMValCore Branch:
