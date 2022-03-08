@@ -34,13 +34,13 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter3_cryo_xcb32
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter3_cryo_xcb32](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter3_cryo_xcb32/
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/recipe_ocean_fig_3_19_zonal_sst.yml
+Recipe used: [recipes/recipe_ocean_fig_3_19_zonal_sst.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter3_cryo_xcb32/esmvaltool/recipes/recipe_ocean_fig_3_19_zonal_sst.yml)
 
-Diagnostic used: ocean/diagnostic_fig_3_19_zonal_sst.py
+Diagnostic used: [ocean/diagnostic_fig_3_19_zonal_sst.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter3_cryo_xcb32/esmvaltool/diag_scripts/ocean/diagnostic_fig_3_19_zonal_sst.py)
 
 Expected image path:
 --------------------
@@ -62,12 +62,12 @@ It was cmorized with cmorizers/obs/cmorize_obs_woa.py from the above mentioned r
 Software description:
 ---------------------
 The software from Jasmin:
-- ESMValTool environment file: IPCC_environments/jasmin_ocean_figs_conda_environment.yml
-- pip file: IPCC_environments/jasmin_ocean_figs_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/jasmin_ocean_figs_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
+- pip file: [IPCC_environments/jasmin_ocean_figs_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
 
 The software from Liza's computer:
-- ESMValTool environment file: IPCC_environments/liza_dell_computer_conda_environment.yml
-- pip file: IPCC_environments/liza_dell_computer_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/liza_dell_computer_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/liza_dell_computer_conda_environment.yml)
+- pip file: [IPCC_environments/liza_dell_computer_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/liza_dell_computer_pip_environment.txt)
 
 
 Hardware description:
