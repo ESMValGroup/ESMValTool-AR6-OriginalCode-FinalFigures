@@ -229,3 +229,5 @@ data.
 We have interchangably used the terms de-drifting and de-trending, but the
 correct term for the process that we've applied is de-drifting. When something
 is marked as de-trended, it is actually dedrifted.
+
+Additional information can be found in [IPCC_README_files/IPCC_AR6_Chap3_Ocean_figures_notes_ledm_README.md](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/IPCC_AR6_Chap3_Ocean_figures_notes_ledm_README.md)
