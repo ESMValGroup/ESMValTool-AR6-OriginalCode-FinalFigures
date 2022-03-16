@@ -34,7 +34,7 @@ Recipe & diagnostics:
 ---------------------
 Recipe used: [recipes/recipe_gsat_attribute.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3_nathan/esmvaltool/recipes/recipe_gsat_attribute.yml)
 
-Diagnostic used: [ipcc_ar6/attrib_blended.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3_nathan/esmvaltool/ipcc_ar6/attrib_blended.py)
+Diagnostic used: [diag_scripts/ipcc_ar6/attrib_blended.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3_nathan/esmvaltool/diag_scripts/ipcc_ar6/attrib_blended.py)
 
 
 Expected image path:
