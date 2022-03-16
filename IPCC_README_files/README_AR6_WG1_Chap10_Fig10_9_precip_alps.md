@@ -66,7 +66,7 @@ Additional datasets:
 
 Software description:
 ---------------------
-- ESMValTool environment file: [IPCC_environments/ar6_chapter_10_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml)
+- ESMValTool environment file: [IPCC_environments/ar6_chapter_10_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chapter_10_conda_environment.yml)
 - pip file: [IPCC_environments/ar6_chapter_10_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chapter_10_pip_environment.txt)
 
 
