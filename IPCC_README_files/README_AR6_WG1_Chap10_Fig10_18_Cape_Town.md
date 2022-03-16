@@ -59,7 +59,7 @@ N/A
 Additional datasets:
 --------------------
 Preprocessing has been done externaly by Wolski, P.. The python script mereley plots the data. Data (totalling 48KB) is stored under
-[esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town/](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_10/esmvaltool/diag_scripts/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town/)
+[esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town/](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_10/esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town)
 
 
 Software description:
