@@ -60,7 +60,7 @@ Diagnostics used:
 - [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.damip.alt_def.ncwrite.ncl)
 - [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.hist.alt_def.ncwrite.ncl)
 - [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.obs.alt_def.ncwrite.ncl)
-- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/commit/283f22f5d4bae7a595703fa2764fb885fe10f94a)
+- [diag_scripts/ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipccwg1ar6ch3_modes/nam_sam.piControl.alt_def.ncwrite.ncl)
 
 
 Expected image path:
