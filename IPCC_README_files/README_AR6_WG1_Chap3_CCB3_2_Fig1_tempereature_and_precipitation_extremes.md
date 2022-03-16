@@ -49,7 +49,7 @@ Publication sources:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter3_cryo_xcb32
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter3_cryo_xcb32](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter3_cryo_xcb32/)
 
 ESMValCore Branch:
 ------------------
@@ -63,9 +63,9 @@ tables are in this repository.
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/recipe_ipcc_ar6_wg1_fgd_xcb_3_2.yml
+Recipe used: [recipes/recipe_ipcc_ar6_wg1_fgd_xcb_3_2.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter3_cryo_xcb32/esmvaltool/recipes/recipe_ipcc_ar6_wg1_fgd_xcb_3_2.yml)
 
-Diagnostic used: diag_scripts/extreme_events/extremes_ipcc_ar6_wg1_fgd_xcb_32.py
+Diagnostic used: [diag_scripts/extreme_events/extremes_ipcc_ar6_wg1_fgd_xcb_32.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter3_cryo_xcb32/esmvaltool/diag_scripts/extreme_events/extremes_ipcc_ar6_wg1_fgd_xcb_32.py)
 
 Expected image path:
 --------------------
@@ -92,12 +92,12 @@ is provided under Open Goevrnment Licence http://www.nationalarchives.gov.uk/doc
 Software description:
 ---------------------
 The software from Mistral:
-- ESMValTool environment file: IPCC_environments/mistral_cryo_and_xcb32_conda_environment.yml
-- pip file: IPCC_environments/mistral_cryo_and_xcb32_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/mistral_cryo_and_xcb32_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/mistral_cryo_and_xcb32_conda_environment.yml)
+- pip file: [IPCC_environments/mistral_cryo_and_xcb32_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/mistral_cryo_and_xcb32_pip_environment.txt)
 
 The software from Liza's computer:
-- ESMValTool environment file: IPCC_environments/liza_dell_computer_conda_environment.yml
-- pip file: IPCC_environments/liza_dell_computer_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/liza_dell_computer_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/liza_dell_computer_conda_environment.yml)
+- pip file: [IPCC_environments/liza_dell_computer_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/liza_dell_computer_pip_environment.txt)
 
 
 Hardware description:

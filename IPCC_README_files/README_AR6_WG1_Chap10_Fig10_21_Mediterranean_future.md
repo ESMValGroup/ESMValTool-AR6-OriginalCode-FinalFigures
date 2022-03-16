@@ -28,19 +28,19 @@ N/A
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_10
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_10](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_10)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: working_cordex_2.2
+- ESMValCore-AR6-OriginalCode-FinalFigures: [working_cordex_2.2](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/working_cordex_2.2)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ar6_wgi_ch10/recipe_Mediterranean.yml
+Recipe used: [recipes/ar6_wgi_ch10/recipe_Mediterranean.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_10/esmvaltool/recipes/ar6_wgi_ch10/recipe_Mediterranean.yml)
 
-Diagnostic used: diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py
+Diagnostic used: [diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_10/esmvaltool/diag_scripts/ar6_wgi_ch10/diagnostic_IPCC_AR6_CH10.py)
 
 
 Expected image path:
@@ -66,8 +66,8 @@ N/A
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_chapter_10_conda_environment.yml
-- pip file: IPCC_environments/ar6_chapter_10_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_chapter_10_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_chapter_10_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chapter_10_pip_environment.txt)
 
 
 Hardware description:

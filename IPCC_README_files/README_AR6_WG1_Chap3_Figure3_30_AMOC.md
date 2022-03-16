@@ -41,21 +41,21 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: development_ar6_chap_3_ocean
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chap_3_ocean_figures](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chap_3_ocean_figures)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: optimize_mem_annual_statistic_plus_amoc
+- ESMValCore-AR6-OriginalCode-FinalFigures: [optimize_mem_annual_statistic_plus_amoc](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/optimize_mem_annual_statistic_plus_amoc)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipe used:
-- recipes/recipe_ocean_amoc_streamfunction_profiles.yml
+- [recipes/recipe_ocean_amoc_streamfunction_profiles.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_amoc_streamfunction_profiles.yml)
 
 Diagnostic used:
-- diagocean/diagnostic_amoc_profiles.py
+- [diag_scripts/ocean/diagnostic_amoc_profiles.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_amoc_profiles.py)
 
 
 Expected image path:
@@ -104,10 +104,15 @@ and was downloaded from: https://github.com/mattofficeuk/AR6/tree/master/JSON_da
 Software description:
 ---------------------
 
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
+- ESMValTool environment file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_environment.yml)
+- pip file: e.g. [IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/development_ar6_chap_3_ocean_pip_environment.txt)
 
 
 Hardware description:
 ---------------------
 What machine was used: Jasmin
+
+
+Any further instructions: 
+-------------------------
+Additional information can be found in [IPCC_README_files/IPCC_AR6_Chap3_Ocean_figures_notes_ledm_README.md](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_README_files/IPCC_AR6_Chap3_Ocean_figures_notes_ledm_README.md)

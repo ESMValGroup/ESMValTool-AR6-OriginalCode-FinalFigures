@@ -35,21 +35,21 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_ocean.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_ocean.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_ocean.yml)
 
 Diagnostics used: 
-- diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl
-- diag_scripts/ipcc_ar6/model_bias.ncl
+- [diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl)
+- [diag_scripts/ipcc_ar6/model_bias.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/model_bias.ncl)
 
 
 Expected image path:
@@ -60,8 +60,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_lisa_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_lisa_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_lisa_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_lisa_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_lisa_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_lisa_pip_environment.txt)
 
 
 Hardware description:

@@ -47,21 +47,21 @@ Please list any publications that describe, explain or use this figure.
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ar6ch3_hadley+walker_cmip5+6+damip.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ar6ch3_hadley+walker_cmip5+6+damip.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ar6ch3_hadley%2Bwalker_cmip5%2B6%2Bdamip.yml)
 
 Diagnostics used:
-- diag_scripts/ar6ch3_hadley_walker/trend_walker_strength.ncl
-- diag_scripts/ar6ch3_hadley_walker/draw_pdf.ncl
+- [diag_scripts/ar6ch3_hadley_walker/trend_walker_strength.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_hadley_walker/trend_walker_strength.ncl)
+- [diag_scripts/ar6ch3_hadley_walker/draw_pdf.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_hadley_walker/trend_walker_strength.ncl)
 
 
 Expected image path:
@@ -70,29 +70,12 @@ This is the path of the image relative to the automatically generated ESMValTool
 - recipe_ar6ch3_hadley+walker_cmip5+6+damip_YYYYMMDD_HHMMSS/plots/draw/draw_pdf/hadley_walker_trends.pdf
 
 
-Ancillary figures and datasets:
--------------------------------
-In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
-
-
-Additional datasets:
---------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
-Can they be re-created?
-What are their access permissions/Licenses?
-
-
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_remi_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_remi_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_pip_environment.txt)
 
 
 Hardware description:
 ---------------------
 Machine used: Mistral
-
-
-Any further instructions: 
--------------------------

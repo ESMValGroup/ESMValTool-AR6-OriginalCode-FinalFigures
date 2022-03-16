@@ -42,21 +42,21 @@ Author list:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ar6ch3_enso_cmip5+6.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ar6ch3_enso_cmip5+6.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ar6ch3_enso_cmip5%2B6.yml)
 
 Diagnostics used: 
-- diag_scripts/ar6ch3_enso/define_ensoindex.ncl
-- diag_scripts/ar6ch3_enso/draw_lifecycle.ncl
+- [diag_scripts/ar6ch3_enso/define_ensoindex.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_enso/define_ensoindex.ncl)
+- [diag_scripts/ar6ch3_enso/draw_lifecycle.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_enso/draw_lifecycle.ncl)
 
 
 Expected image path:
@@ -66,8 +66,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_remi_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_remi_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_pip_environment.txt)
 
 
 Hardware description:

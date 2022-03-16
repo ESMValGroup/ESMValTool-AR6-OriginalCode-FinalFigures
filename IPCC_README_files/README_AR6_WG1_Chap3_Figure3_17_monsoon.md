@@ -44,21 +44,21 @@ Please list any publications that describe, explain or use this figure.
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_globalmonsoon.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_globalmonsoon.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_globalmonsoon.yml)
 
-Diagnostics used: 
-- diag_scripts/ar6ch3_monsoon/monsoon_domain_intensity.ncl
-- diag_scripts/ar6ch3_monsoon/draw_global_monsoon.ncl
+Diagnostics used:
+- [diag_scripts/ar6ch3_monsoon/monsoon_domain_intensity.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_monsoon/monsoon_domain_intensity.ncl)
+- [diag_scripts/ar6ch3_monsoon/draw_global_monsoon.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ar6ch3_monsoon/draw_global_monsoon.ncl)
 
 
 Expected image path:
@@ -82,15 +82,10 @@ What are their access permissions/Licenses?
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_remi_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_remi_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_pip_environment.txt)
 
 
 Hardware description:
 ---------------------
 Machine used: Mistral
-
-
-Any further instructions: 
--------------------------
-

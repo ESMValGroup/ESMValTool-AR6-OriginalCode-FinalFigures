@@ -39,19 +39,19 @@ Journal of Climate, 34(15), 6281-6301, https://doi.org/10.1175/JCLI-D-20-0768.1
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: fix_cmip6_models_newcore
+- ESMValCore-AR6-OriginalCode-FinalFigures: [fix_cmip6_models_newcore](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/fix_cmip6_models_newcore)
 
 
 Recipe & diagnostics:
 ---------------------
-Recipe used: recipes/ipccar6wg1ch3/recipe_ipccwg1ar6ch3_santer21jclim.yml
+Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_santer21jclim.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_santer21jclim.yml)
 
-Diagnostic used: diag_scripts/santer20jclim/santer21jclimfig.py
+Diagnostic used: [diag_scripts/santer21jclim/santer21jclimfig.py](diag_scripts/santer21jclim/santer21jclimfig.py)
 
 
 Expected image path:
@@ -79,17 +79,17 @@ Date created: 20201110T185551Z
 accessed on 2020-11-19]. Santa Rosa, CA, USA.
 Available at www.remss.com
 
-cmorized with esmvaltool/cmorizers/obs/cmorize_obs_rss.ncl (in the ar6_chapter_3
+cmorized with [esmvaltool/cmorizers/obs/cmorize_obs_rss.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/cmorizers/obs/cmorize_obs_rss.ncl) (in the ar6_chapter_3
 branch, not in the main ESMValTool branch, yet) using the "precipitable_water" 
 variable. The "fixed coverage" mask was produced from the same file, using 
 "precipitable_water_climatology" and "precipitable_water_anomaly" with a tool 
-based on the cmorizer: esmvaltool/cmorizers/obs/cmorize_obs_rssanom.ncl.
+based on the cmorizer: [esmvaltool/cmorizers/obs/cmorize_obs_rssanom.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/cmorizers/obs/cmorize_obs_rssanom.ncl).
 
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_newcore_remi_conda_environment.yml
-- pip file: IPCC_environments/ar6_newcore_remi_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_newcore_remi_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_newcore_remi_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_newcore_remi_pip_environment.txt)
 
 
 Hardware description:

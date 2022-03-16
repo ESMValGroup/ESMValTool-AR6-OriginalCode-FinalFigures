@@ -26,21 +26,21 @@ Publication sources:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3_tina
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3_tina](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3_tina/)
 
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: gier_fixes
+- ESMValCore-AR6-OriginalCode-FinalFigures: [gier_fixes](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/gier_fixes)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipe(s) used: 
-- recipes/recipe_ipcc6_co2_sca.yml
+- [recipes/recipe_ipcc6_co2_sca.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3_tina/esmvaltool/recipes/recipe_ipcc6_co2_sca.yml)
 
 Diagnostic(s) used:
-- diagnostics/ipcc_ar6/CO2_SCA_trend.py
+- [diagnostics/ipcc_ar6/CO2_SCA_trend.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3_tina/esmvaltool/diag_scripts/ipcc_ar6/CO2_SCA_trend.py)
 
 
 Expected image path:
@@ -50,8 +50,8 @@ Expected image path:
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/env_ipcc_conda_environment.yml
-- pip file: IPCC_environments/env_ipcc_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/env_ipcc_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/env_ipcc_conda_environment.yml)
+- pip file: [IPCC_environments/env_ipcc_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/env_ipcc_pip_environment.txt)
 
 
 Hardware description:

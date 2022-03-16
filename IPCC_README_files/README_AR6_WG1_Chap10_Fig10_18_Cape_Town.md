@@ -27,7 +27,7 @@ N/A
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_10
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_10](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_10)
 
 
 ESMValCore Branch:
@@ -37,7 +37,7 @@ N/A
 
 Recipe & diagnostics:
 ---------------------
-Diagnostic used: diag_scripts/ar6_wgi_ch10/Cape-Town_case_study.py
+Diagnostic used: [diag_scripts/ar6_wgi_ch10/Cape-Town_case_study.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_10/esmvaltool/diag_scripts/ar6_wgi_ch10/Cape-Town_case_study.py)
 
 
 Expected image path:
@@ -59,13 +59,13 @@ N/A
 Additional datasets:
 --------------------
 Preprocessing has been done externaly by Wolski, P.. The python script mereley plots the data. Data (totalling 48KB) is stored under
-esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town/
+[esmvaltool/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town/](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_10/esmvaltool/diag_scripts/diag_scripts/ar6_wgi_ch10/CH10_additional_data/Cape_Town/)
 
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/ar6_chapter_10_conda_environment.yml
-- pip file: IPCC_environments/ar6_chapter_10_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/ar6_chapter_10_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chap_3_fig_3_10_conda_environment.yml)
+- pip file: [IPCC_environments/ar6_chapter_10_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/ar6_chapter_10_pip_environment.txt)
 
 
 Hardware description:

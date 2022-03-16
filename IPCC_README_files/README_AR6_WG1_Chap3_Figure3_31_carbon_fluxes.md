@@ -26,32 +26,32 @@ Publication sources:
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: ar6_chapter_3_tina
-
+- ESMValTool-AR6-OriginalCode-FinalFigures: [ar6_chapter_3_tina
+](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/ar6_chapter_3_tina)
 
 ESMValCore Branch:
 ------------------
-- ESMValCore-AR6-OriginalCode-FinalFigures: gier_fixes
+- ESMValCore-AR6-OriginalCode-FinalFigures: [gier_fixes](https://github.com/ESMValGroup/ESMValCore-AR6-OriginalCode-FinalFigures/tree/gier_fixes)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipe(s) used: 
-- recipes/recipe_ipcc6_esmhist_timeseries.yml
+- [recipes/recipe_ipccar6_esmhist_timeseries.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3_tina/esmvaltool/recipes/recipe_ipccar6_esmhist_timeseries.yml)
 
 Diagnostic(s) used:
-- diagnostics/ipcc_ar6/fig_carbonsinks_timeseries_panels.py
+- [diagnostics/ipcc_ar6/fig_carbonsinks_timeseries_panels.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3_tina/esmvaltool/diag_scripts/ipcc_ar6/fig_carbonsinks_timeseries_panels.py)
 
 
 Expected image path:
 --------------------
-- recipe_ipcc6_esmhist_timeseries_YYYYMMDD_HHMMSS/plots/fig_3_30_co2/fig_3_30_co2/fig_ipcca6_3_31.png
+- recipe_ipccar6_esmhist_timeseries_YYYYMMDD_HHMMSS/plots/fig_3_30_co2/fig_3_30_co2/fig_ipcca6_3_31.png
 
 
 Software description:
 ---------------------
-- ESMValTool environment file: IPCC_environments/env_ipcc_conda_environment.yml
-- pip file: IPCC_environments/env_ipcc_pip_environment.txt
+- ESMValTool environment file: [IPCC_environments/env_ipcc_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/env_ipcc_conda_environment.yml)
+- pip file: [IPCC_environments/env_ipcc_pip_environment.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/main/IPCC_environments/env_ipcc_pip_environment.txt)
 
 
 Hardware description:
