@@ -53,7 +53,7 @@ Recipe used:
 
 Diagnostics used: 
 - [diag_scripts/ipcc_ar6/corr_pattern.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/corr_pattern.ncl)
-- diag_scripts/ipcc_ar6/corr_pattern_collect.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/corr_pattern_collect.ncl)
+- [diag_scripts/ipcc_ar6/corr_pattern_collect.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar6/corr_pattern_collect.ncl)
 
 
 Expected image path:
