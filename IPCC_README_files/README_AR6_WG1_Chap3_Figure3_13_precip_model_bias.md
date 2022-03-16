@@ -62,7 +62,7 @@ Recipe & diagnostics:
 Recipes used: 
 - [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_atmosphere.yml)
 - [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_highres.yml
-](url)https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_highres.yml
+](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_highres.yml)
 
 Diagnostics used: 
 - [diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/ipcc_ar5/ch12_calc_IAV_for_stippandhatch.ncl) 
