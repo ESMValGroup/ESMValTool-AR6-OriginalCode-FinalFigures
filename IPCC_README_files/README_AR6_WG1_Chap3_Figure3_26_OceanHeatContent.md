@@ -89,7 +89,7 @@ Recipe used:
 - [recipes/recipe_ocean_heat_content_TSV_all.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/recipes/recipe_ocean_heat_content_TSV_all.yml)
 
 Diagnostic used:
--[ocean/diagnostic_chap3_ocean_heat_content.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_chap3_ocean_heat_content.py)
+- [ocean/diagnostic_chap3_ocean_heat_content.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chap_3_ocean_figures/esmvaltool/diag_scripts/ocean/diagnostic_chap3_ocean_heat_content.py)
 
 The OHC, Halo and SSS trends plots are all produced using tyhe same recipe and
 diagnostic. This is because they all require the same process to de-drift.
