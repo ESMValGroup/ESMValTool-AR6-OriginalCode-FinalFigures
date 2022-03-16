@@ -58,7 +58,7 @@ Recipe & diagnostics:
 ---------------------
 Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_wetdry_schurer2020.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_wetdry_schurer2020.yml)
 
-Diagnostic used: [diag_scripts/aschurer/WetDry_timeseries_smooth_scaling1.py](ttps://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/aschurer/WetDry_timeseries_smooth_scaling1.py)
+Diagnostic used: [diag_scripts/aschurer/WetDry_timeseries_smooth_scaling1.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/aschurer/WetDry_timeseries_smooth_scaling1.py)
 
 
 Expected image path:
