@@ -51,7 +51,7 @@ Recipe & diagnostics:
 ---------------------
 Recipe used: [recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_santer21jclim.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/recipes/ipccwg1ar6ch3/recipe_ipccwg1ar6ch3_santer21jclim.yml)
 
-Diagnostic used: [diag_scripts/santer21jclim/santer21jclimfig.py](diag_scripts/santer21jclim/santer21jclimfig.py)
+Diagnostic used: [diag_scripts/santer21jclim/santer21jclimfig.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/ar6_chapter_3/esmvaltool/diag_scripts/santer21jclim/santer21jclimfig.py)
 
 
 Expected image path:
