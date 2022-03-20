@@ -84,7 +84,8 @@ The license details can be found at https://github.com/IPCC-WG1/Atlas/blob/main/
 
 Software description:
 ---------------------
-- ESMValTool environment file:  IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml  
+- ESMValTool environment file:   
+/ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml  
 - Other software used:  
 A Jupyter notebook (ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb) is used to create Figure 6.10 panel b. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
 
