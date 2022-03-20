@@ -5,7 +5,7 @@ NET EFFECTIVE RADIATIVE FORCING: AEROSOLS
 Figure number: Figure 6.10  
 From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapter 6  
 
-![Figure 6.10a](../images/ar6_wg1_chap6_fig6_10_netERFmap_SWLW_aer.pdf?raw=true)
+![Figure 6.10](../images/ar6_wg1_chap6_fig6_10_netERFmap_SWLW_aer.png?raw=true)
 
 
 Description:
