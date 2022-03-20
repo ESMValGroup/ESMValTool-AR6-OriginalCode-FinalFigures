@@ -1,5 +1,6 @@
-# ESMValTool-AR6-OriginalCode-FinalFigures
-Original ESMValTool code used to produce IPCC figures. This repository will be made public shortly after the publication of the IPCC report
+# IPCC AR6 WG1 Chapter 6 figures, created using ESMValTool 
+
+Detailed README files for Figures 6.10, 6.11, and 6.13 can be found in [IPCC_README_files] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/IPCC_README_files)  
 
 Figure 6.10 is created by running the ESMValTool recipe recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml
 panel a) will be run through recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml via diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py
