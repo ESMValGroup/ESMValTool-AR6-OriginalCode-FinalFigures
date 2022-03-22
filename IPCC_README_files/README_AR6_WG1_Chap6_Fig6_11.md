@@ -1,7 +1,3 @@
-Figure 6.11 is created starting from the ESMValTool recipe recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml.  It calls 
-diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py which provides data output used by ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb.
-
-
 
 TEMPORAL REGIONAL MEAN NET EFFECTIVE RADIATIVE FORCING DUE TO AEROSOLS
 ============
