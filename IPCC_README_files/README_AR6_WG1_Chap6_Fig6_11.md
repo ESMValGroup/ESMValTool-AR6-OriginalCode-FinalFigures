@@ -41,44 +41,54 @@ ipcc_ar6wg1_fig6.11_erf_aer_time.py imports:
 Please describe this diagnostic:
 
 
-Expected image path:
+Expected data output path:
 --------------------
-This is the path of the image relative to the automatically generated ESMValTool output location:
-- recipe_name_YYYYMMDD_HHMMSS/plots/diagnostic_name/subdirectory/filename.extension
-
+This is the path of the time series data relative to the automatically generated ESMValTool output location:
+- recipe_erf_histSST-piAer_Fig6.11_YYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf_time/LW_diff_timemap.nc   
+- recipe_erf_histSST-piAer_Fig6.11_YYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf_time/SW_diff_timemap.nc   
 
 Recipe generations tools: 
 -------------------------
-Were any tools used to populate the recipe? if so what were they? N/A if not applicable. 
-
+Were any tools used to populate the recipe? if so what were they? N/A if not applicable.   
+N/A
 
 Ancillary figures and datasets:
 -------------------------------
 In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
 
+The final Figure 6.11 is created by the following Jupyter notebook:  
+[ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb)  
+The Jupyter notebook reads in netcdf output from diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py, which are output into the recipe path:  
+- recipe_erf_histSST-piAer_Fig6.11_YYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf_time/LW_diff_timemap.nc   
+- recipe_erf_histSST-piAer_Fig6.11_YYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf_time/SW_diff_timemap.nc   
 
 Additional datasets:
 --------------------
-What additional datasets were used to produce this figure?
-Where are they on the computational machine or in the respository?
-Can they be re-created?
-What are their access permissions/Licenses?
+What additional datasets were used to produce this figure?   
+The AR6 WG1 Atlas reference regions are used to produce Figure 6.11.    
+Where are they on the computational machine or in the respository?   
+On the IPCC_AR6_WG1_Ch6 branch of ESMValTool-AR6-OriginalCode-FinalFigures:   
+/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shp  
+/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.dbf  
+/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.prj  
+/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.rda  
+/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shx  
 
+What are their access permissions/Licenses?  
+The license details can be found at https://github.com/IPCC-WG1/Atlas/blob/main/LICENSE.md    
 
 Software description:
 ---------------------
-Software versions, name of environment file (see **save conda environment** in CONTRIBUTING.md), other software packages,…
-- ESMValTool environment file: e.g. IPCC_environments/$NAME_conda_environment.yml
-- pip file: e.g. IPCC_environments/$NAME_pip_environment.txt
-- Other software used:
-
+- ESMValTool environment file:   
+/ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml  
+- Other software used:  
+A Jupyter notebook (ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb) is used to create Figure 6.10 panel b. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
 
 Hardware description:
 ---------------------
-What machine was used:  e.g. Mistral or Jasmin
-When was this machine used?
-
-
-Any further instructions: 
--------------------------
+What machine was used: 
+Mistral  
+ 
+When was this machine used?  
+Last used July 2021 to produce figures from ESMValTool  
 
