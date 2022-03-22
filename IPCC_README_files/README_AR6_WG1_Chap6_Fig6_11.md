@@ -78,7 +78,7 @@ Software description:
 - ESMValTool environment file:   
 /ESMValTool-AR6-OriginalCode-FinalFigures/IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml  
 - Other software used:  
-A Jupyter notebook (ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb) is used to create Figure 6.10 panel b. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
+A Jupyter notebook (ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb) is used to create Figure 6.11. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
 
 Hardware description:
 ---------------------
