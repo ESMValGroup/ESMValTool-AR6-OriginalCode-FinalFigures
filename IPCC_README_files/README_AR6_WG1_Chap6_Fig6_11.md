@@ -10,8 +10,7 @@ From the IPCC Working Group I Contribution to the Sixth Assessment Report: Chapt
 
 Description:
 ------------
-Time evolution of 20-year multi-model mean averages of the annual area-weighted mean regional net Effective Radiative Forcings (ERFs) due to aerosols for each of the 14 major regions in the Atlas, and global mean, using the models and model experiments as in Figure 6.10. 
-
+Time evolution of 20-year multi-model mean averages of the annual area-weighted mean regional net Effective Radiative Forcings (ERFs) due to aerosols for each of the 14 major regions in the Atlas, and global mean, using the models and model experiments as in Figure 6.10.
 
 Author list:
 ------------
@@ -27,7 +26,10 @@ Recipe & diagnostics:
 ---------------------
 Recipe(s) used:  
 [recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml)  
-Please describe this recipe:
+Please describe this recipe:  
+Time series of the upward top-of-the-atmosphere shortwave flux (rsut) and upward top-of-the-atmosphere flux (rlut) at each grid. The diagnostic scripts will calculate the annual mean effective radiative forcing (ERF) due to aerosols differencing shortwave and longwave fluxes between histSST-piAer and histSST AerChemMIP experiments.  
+
+
 
 Diagnostic(s) used:  
 [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py)  
@@ -35,6 +37,7 @@ ipcc_ar6wg1_fig6.11_erf_aer_time.py imports:
 * [diag_scripts/ar6ch6/cmapipcc.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py) 
  
 Please describe this diagnostic:
+Script [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py]  calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.11,  The final Figure 6.11 is created from [ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb).
 
 
 Expected data output path:
