@@ -14,7 +14,7 @@ Time evolution of 20-year multi-model mean averages of the annual area-weighted 
 
 Author list:
 ------------
-- Kuo, C: Lawrence Berkeley National Laboratory, chaincy@berkeley.edu (lead only) chaincy-ipcc, chaincy-cal 
+- Kuo, C: Lawrence Berkeley National Laboratory, chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only) chaincy-ipcc, chaincy-cal 
 
 
 ESMValTool Branch:
