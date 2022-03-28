@@ -1,9 +1,9 @@
 # ESMValTool
-# recipe_python.yml
+# recipe_erf_histSST-piAer_Fig6.10.yml  
 ---
 documentation:
   description: |
-    Example recipe that plots the mean rsut 
+    Output upward top-of-the-atmosphere shortwave flux (rsut) and upward top-of-the-atmosphere flux (rlut) at each grid. The diagnostic scripts will calculate the mean effective radiative forcing (ERF) due to aerosols differencing shortwave and longwave fluxes between histSST-piAer and histSST AerChemMIP experiments, over the time period 1995-2014.  Diagnostic script ipcc_ar6wg1_fig6.10_erf_aer.py calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.10a. 
 
   authors:
     - kuo_chaincy
@@ -40,7 +40,6 @@ preprocessors:
     regrid:
       target_grid: 1x1 
       scheme: linear
-#      threshold: 1000.
 
 diagnostics:
 
@@ -53,41 +52,8 @@ diagnostics:
     variables:
       rlut:
         preprocessor: preprocessor2
-#        mask_above_threshold: 1000.
       rsut:
         preprocessor: preprocessor2
-#        mask_above_threshold: 1000.
-#    additional_datasets: *aerchemmip_histSST # *aerchemmip_histSST_piCH4]
     scripts:
       ar6fig6_erf: 
         script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py
-#        exper_expt: *aerchemmip_histSST
-#        cntrl_expt: *aerchemmip_histSST_piCH4
-#  histSST:
-#    description: AerChemMIP  histSST 
-#    themes:
-#      - phys
-#    realms:
-#      - atmos
-#    variables:
-#      rsut:
-#        preprocessor: preprocessor2
-#    additional_datasets: *aerchemmip_histSST
-#    scripts:
-#      ar6fig6_7: &ar6fig6_7_settings
-#        script: ar6ch6/fig6_7_rsut.py
-#        cmip6expt: histSST
-#  histSST-piCH4:
-#    description: AerChemMIP  histSST-piCH4
-#    themes:
-#      - phys
-#    realms:
-#      - atmos
-#    variables:
-#      rsut:
-#        preprocessor: preprocessor2 
-#    additional_datasets: *aerchemmip_histSST_piCH4 
-#    scripts:
-#      ar6fig6_7:
-#        <<: *ar6fig6_7_settings
-#        cmip6expt: histSST-piCH4
