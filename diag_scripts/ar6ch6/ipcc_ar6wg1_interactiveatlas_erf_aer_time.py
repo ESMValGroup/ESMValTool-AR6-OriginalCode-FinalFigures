@@ -468,7 +468,7 @@ def writenetcdf_modeltimemap(cfg,dataset,styr,endyr,field,lat4wrt,lon4wrt,expmdl
     nlat = cdims[1] 
     nlon = cdims[2]
    
-    outfname = '%s_%s_SLCF_ERF_%s-%s.nc'  % (dataset,field,styr,endyr)
+    outfname = '%s_%s_Aer_ERF_%s-%s.nc'  % (dataset,field,styr,endyr)
     ncfile = netCDF4.Dataset(os.path.join(local_path,outfname), mode='w',format='NETCDF4_CLASSIC') 
     lat_dim = ncfile.createDimension('lat', nlat) # latitude axis
     lon_dim = ncfile.createDimension('lon', nlon) # longitude axis
@@ -486,7 +486,7 @@ def writenetcdf_modeltimemap(cfg,dataset,styr,endyr,field,lat4wrt,lon4wrt,expmdl
 
     erf = ncfile.createVariable('ERF',np.float64,('time','lat','lon'), fill_value = -9999) # note: unlimited dimension is leftmost
     erf.units = 'W/m^2' # 
-    erf.standard_name = 'effective_rad_forcing due to SLCF across model' # this is a CF standard name
+    erf.standard_name = 'effective_rad_forcing due to Aerosols across model' # this is a CF standard name
    
     #
     erf_mdl2mdl = expmdls-cntlmdls
