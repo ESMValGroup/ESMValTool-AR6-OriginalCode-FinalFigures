@@ -473,48 +473,6 @@ def writenetcdf_timemap(cfg,field,lat4wrt,lon4wrt,expmdls,cntlmdls):
     
     ncfile.close()
 
-#def writenetcdf_timemap(cfg,field,lat4wrt,lon4wrt,mdlname,expmdl,cntlmdl):
-#    local_path = cfg['plot_dir']
-#    cdims=expmdls.shape
-#    nmodels = cdims[0]
-#    ntime = cdims[1]
-#    nlat = cdims[2] 
-#    nlon = cdims[3]
-#    nyears = int(ntime/12)
-#   
-#    outfname = '%s_%s_diff_timemap.nc'  % (field,mdlname)
-#    ncfile = netCDF4.Dataset(os.path.join(local_path,outfname), mode='w',format='NETCDF4_CLASSIC') 
-#    lat_dim = ncfile.createDimension('lat', nlat) # latitude axis
-#    lon_dim = ncfile.createDimension('lon', nlon) # longitude axis
-#    time_dim = ncfile.createDimension('time', nyears) # unlimited axis (can be appended to).
-#    lat = ncfile.createVariable('lat', np.float32, ('lat',))
-#    lat.units = 'degrees_north'
-#    lat.long_name = 'latitude'
-#    lon = ncfile.createVariable('lon', np.float32, ('lon',))
-#    lon.units = 'degrees_east'
-#    lon.long_name = 'longitude'
-#    time = ncfile.createVariable('time', np.float64, ('time',))
-#    time.units = 'years since 1850-01-01'
-#    time.long_name = 'time'
-#    erf = ncfile.createVariable('ERF',np.float64,('time','lat','lon')) # note: unlimited dimension is leftmost
-#    erf.units = 'W/m^2' # 
-#    erf.standard_name = 'effective_rad_forcing means across models' # this is a CF standard name
-#   
-#    #
-#    erf_mdl2mdl = expmdls-cntlmdls
-#    erfalltime =  erf_mdl2mdl.mean(axis=0)
-#    # plotting ERF.  rsut=outgoing shortwave flux (positive outwards).  therefore sign convention for ERF is positive downwards.
-#    erfalltime = - erfalltime # sign convention
-#
-#    lat[:]= lat4wrt
-#    lon[:] = lon4wrt
-#
-#    # on monthly data
-#    for iyear in range(0,nyears):
-#        erf[iyear,:,:] = erfalltime[iyear*12:(iyear+1)*12,:,:].mean(axis=0) 
-#    
-#    ncfile.close()
-
 def run_some_diagnostic( experexpts):
 	"""Diagnostic to be run."""
 
