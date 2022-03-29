@@ -98,50 +98,6 @@ def checkstartend(selection):
 		endyear = attributes['end_year']
 		logger.info("start %s ", styear)
 
-##def compute_multiModelStats(cfg,selection):
-#	# output:
-#	# 	timeavgcube,  time-averaged iris cube
-#	#	alltimedata,  all time data as iris cube
-#	#	alltimemodels, all time data as numpy array
-#	#	provenance_record 
-#	nmodels=0
-#	for attributes in selection:
-#		input_file = attributes['filename']
-#		logger.info("opening %s",input_file)
-#		cube=iris.load_cube(input_file)
-#		cshape=cube.shape
-#		logger.info('cube %d  %d %d ' % (cshape[0],cshape[1],cshape[2]))	
-#		if(nmodels==0):
-#			alltimedata=cube.data
-#		else:
-#			alltimedata = np.append(alltimedata,cube.data,axis=0)
-#		nmodels=nmodels+1
-#
-#		provenance_record = get_provenance_record(
-#                        attributes, ancestor_files=[input_file])
-#
-#		output_basename = os.path.splitext(os.path.basename(input_file))[0]  
-#		diagnostic_file = get_diagnostic_filename(output_basename, cfg)
-#                #diagnostic_file = os.path.join(cfg['preproc_dir'],basename + '.' + extension,
-#		with ProvenanceLogger(cfg) as provenance_logger:
-#			provenance_logger.log(input_file,provenance_record)
-#			provenance_logger.log(diagnostic_file,provenance_record)
-#
-#	alltimeavgcube = alltimedata.mean(axis=0)
-#	alltimestdcube = alltimedata.std(axis=0)	
-#
-#	timeavgcube = cube.collapsed('time', iris.analysis.MEAN)
-#	timeavgcube.data = alltimeavgcube
-#	timestdcube = cube.collapsed('time', iris.analysis.VARIANCE)
-#	timestdcube.data = alltimestdcube
-#
-#	alltimemodels= np.zeros((nmodels,cshape[0],cshape[1],cshape[2]))
-#	for imdl in range(0,nmodels):
-#		alltimemodels[imdl,:,:,:] = alltimedata[imdl*cshape[0]:(imdl+1)*cshape[0],:,:]
-#
-#	return timeavgcube, alltimedata, alltimemodels, provenance_record 
-
-
 def plot_meanmap(cfg,cubeavg,exper,field):
     """
     Arguments:
@@ -157,24 +113,18 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     Yplot1 = cubeavg.coord('latitude').points
     Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
 
-    # colomaps
+    # colormaps
     clevels=11
     cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     cmapip=ListedColormap(cmapnow)
 
-    # do the plotting dance
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
     plotnow=cubeavg.data
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,clevels,cmap=cmapip, transform=ccrs.PlateCarree())
-#   im=ax.contourf(plotnow,cmap=cmapip)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
@@ -194,10 +144,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
 
 def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
     """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
 
     """
     local_path = cfg['plot_dir']
@@ -213,9 +159,6 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
     cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     cmapip=ListedColormap(np.flipud(cmapnow))
 
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-     
     plotnow=(histavg.data-histcntlavg.data)
 
     # cumulative sum
@@ -227,8 +170,6 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
         plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
 
 
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
@@ -240,9 +181,7 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
     imh=ax.contourf(Xplot,Yplot,hatchplot,3,colors='none', hatches=['','xx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
@@ -268,12 +207,6 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
 
 def get_erfmap(exptavg,exptall,cntlavg,cntlall):
     """
-    Arguments:
-        cube - the cubes to plot
-
-    Returns:
-	
-
     """
 
     plotnow=(exptavg.data-cntlavg.data)
@@ -334,9 +267,6 @@ def writenetcdf_erfhatch(cfg,field,lat4wrt,lon4wrt,erf4wrt,hatch4wrt):
     
     ncfile.close()
 
-def run_some_diagnostic( experexpts):
-	"""Diagnostic to be run."""
-
 def main(cfg):
 	"""Main diagnostic run function."""
 	input_data = cfg['input_data'].values()
@@ -344,14 +274,12 @@ def main(cfg):
 	allvars = variables.short_names()
 
 	# prepare figure matrix
-	#nrows=3
 	nrows=1
 	ncols=1
 	fig = plt.figure(figsize=(ncols*7, nrows*5))
 	fig.subplots_adjust(hspace=0.3)
 	plt.rcParams.update({'hatch.color': 'grey'})	
 	
-#	for ifield in range(0,len(allvars)):
 
 	histSSTexp='histSST'
 	select_histSSTSW= select_metadata(input_data, exp=histSSTexp, short_name='rsut')
@@ -392,9 +320,6 @@ def main(cfg):
 			histSSTaer_mdlmnLW,histSSTaer_mdlmnSW,histSSTaer_mdlallLW,histSSTaer_mdlallSW)
 	[aererfhatchTOT, signagreethreshTOT]  = get_signagreemap(histSSTaer_mdlsSW+histSSTaer_mdlsLW,histSST_mdlsSW+histSST_mdlsLW)
 
-	#aererfhatchSW=get_signagreemap(histSST_mdlsSW,histSSTaer_mdlsSW)
-	#aererfhatchLW=get_signagreemap(histSST_mdlsLW,histSSTaer_mdlsLW)
-	
 
 	# prep for plotting
 	repcube = histSST_mdlmnSW		 # respresentative cube
@@ -426,7 +351,6 @@ def main(cfg):
 	cincr=2.0*cmax/float(clevels)
 	crange=np.arange(cmin,cmax+cincr,cincr)
 	ax = fig.add_subplot(nrows, ncols, 1 , projection=ccrs.Robinson(central_longitude=0))
-	#im=ax.contourf(Xplot,Yplot,aererfSW+aererfLW,crange,cmap=cmapip, transform=ccrs.PlateCarree())
 	im=ax.contourf(Xplot,Yplot,aererfTOT,crange,cmap=cmapip, transform=ccrs.PlateCarree(),extend='both')
 	imh=ax.contourf(Xplot,Yplot,aererfhatchTOT,2,colors='none', hatches=[None,'xx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
 	ax.coastlines()
@@ -443,13 +367,6 @@ def main(cfg):
 	lgd.get_texts()[0].set_text('Robust change')
 	lgd.get_texts()[1].set_text('Conflicting signals')
 	lgd.get_texts()[2].set_text('No change or no robust change')
-	#bbox = dict(boxstyle="square", fc="1.0")
-	#plt.annotate('xx', xy=(-0.01,0.03), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-	#plt.annotate(r' Lack of %.2i' % (signagreethreshTOT*100) + r'$\%$', xy=(0.02,0.03), xycoords='axes fraction',color='black',fontsize=10)
-	#plt.annotate(r' model sign agreement', xy=(0.02,-0.02), xycoords='axes fraction',color='black',fontsize=10)
-	#plt.annotate('\\\\\\\\', xy=(-0.01,0.03), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-	#plt.annotate(r' Lack of 2-$\sigma$ ', xy=(0.02,0.03), xycoords='axes fraction',color='black',fontsize=10)
-	#plt.annotate(r' model significance ', xy=(0.02,-0.02), xycoords='axes fraction',color='black',fontsize=10)
 	# area-weighted mean 
 	areawtmn = np.sum(awt*aererfTOT)
 	xann=0.85
@@ -457,63 +374,6 @@ def main(cfg):
 	plt.annotate(r'Mean ERF ', xy=(xann,yann), xycoords='axes fraction',color='black',fontsize=10)
 	plt.annotate(r'= %5.2f [W-m$^{-2}$]'% areawtmn, xy=(xann,yann-0.05), xycoords='axes fraction',color='black',fontsize=10)
 	
-#        # SW
-#	cmax = np.max([np.abs(aererfSW.max()),np.abs(aererfSW.min())])
-#	cmin = -cmax
-#	cincr=2.0*cmax/float(clevels-1)
-#	crange=np.arange(cmin,cmax+cincr,cincr)
-#	ax = fig.add_subplot(nrows, ncols, 2 , projection=ccrs.Robinson(central_longitude=0))
-#	im=ax.contourf(Xplot,Yplot,aererfSW,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-#	imh=ax.contourf(Xplot,Yplot,aererfhatchSW,3,colors='none', hatches=['','xx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
-#	ax.coastlines()
-#	ax.set_global()
-#	cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
-#	cblabel=r'(W-m$^{-2}$)'
-#	maptitle='Shortwave Effective Radiative Forcing'+'\n'+'%s' % plttype
-#	plt.annotate('b)', xy=(0., 0.9), xycoords='axes fraction',fontsize=14)
-#	cb.set_label(r'%s' % cblabel,fontsize=12)
-#	plt.title(maptitle,fontsize=16)
-#	bbox = dict(boxstyle="square", fc="1.0")
-#	plt.annotate('xx', xy=(-0.01,0.03), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-#	plt.annotate(r' Lack of %.2i' % (signagreethreshSW*100) + r'$\%$', xy=(0.02,0.03), xycoords='axes fraction',color='black',fontsize=10)
-#	plt.annotate(r' model sign agreement', xy=(0.02,-0.02), xycoords='axes fraction',color='black',fontsize=10)
-#	#plt.annotate('\\\\\\\\', xy=(-0.01,0.03), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-#	#plt.annotate(r' Lack of 2-$\sigma$ ', xy=(0.02,0.03), xycoords='axes fraction',color='black',fontsize=10)
-#	#plt.annotate(r' model significance ', xy=(0.02,-0.02), xycoords='axes fraction',color='black',fontsize=10)
-#	# area-weighted mean 
-#	areawtmn = np.sum(awt*aererfSW)
-#	plt.annotate(r'Mean ERF ', xy=(xann,yann), xycoords='axes fraction',color='black',fontsize=10)
-#	plt.annotate(r'= %5.2f [W-m$^{-2}$]'% areawtmn, xy=(xann,yann-0.05), xycoords='axes fraction',color='black',fontsize=10)
-#
-#	# LW	
-#	#cmax = np.max([np.abs(aererfLW.max()),np.abs(aererfLW.min())])
-#	cmax = 4
-#	cmin = -cmax
-#	cincr=2.0*cmax/float(clevels-1)
-#	crange=np.arange(cmin,cmax+cincr,cincr)
-#	ax = fig.add_subplot(nrows, ncols, 3 , projection=ccrs.Robinson(central_longitude=0))
-#	im=ax.contourf(Xplot,Yplot,aererfLW,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-#	imh=ax.contourf(Xplot,Yplot,aererfhatchLW,3,colors='none', hatches=['','xx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
-#	ax.coastlines()
-#	ax.set_global()
-#	cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
-#	cblabel=r'(W-m$^{-2}$)'
-#	maptitle='Longwave Effective Radiative Forcing'+'\n'+'%s' % plttype
-#	plt.annotate('c)', xy=(0., 0.9), xycoords='axes fraction',fontsize=14)
-#	cb.set_label(r'%s' % cblabel,fontsize=12)
-#	plt.title(maptitle,fontsize=16)
-#	bbox = dict(boxstyle="square", fc="1.0")
-#	plt.annotate('xx', xy=(-0.01,0.03), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-#	plt.annotate(r' Lack of %.2i' % (signagreethreshLW*100) + r'$\%$', xy=(0.02,0.03), xycoords='axes fraction',color='black',fontsize=10)
-#	plt.annotate(r' model sign agreement', xy=(0.02,-0.02), xycoords='axes fraction',color='black',fontsize=10)
-#	#plt.annotate('\\\\\\\\', xy=(-0.01,0.03), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-#	#plt.annotate(r' Lack of 2-$\sigma$ ', xy=(0.02,0.03), xycoords='axes fraction',color='black',fontsize=10)
-#	#plt.annotate(r' model significance ', xy=(0.02,-0.02), xycoords='axes fraction',color='black',fontsize=10)
-#	# area-weighted mean 
-#	areawtmn = np.sum(awt*aererfLW)
-#	plt.annotate(r'Mean ERF ', xy=(xann,yann), xycoords='axes fraction',color='black',fontsize=10)
-#	plt.annotate(r'= %5.2f [W-m$^{-2}$]'% areawtmn, xy=(xann,yann-0.05), xycoords='axes fraction',color='black',fontsize=10)
-
 	plt.tight_layout()
 	local_path = cfg['plot_dir']
 	png_name = 'fig6_erf_piAer.png'  

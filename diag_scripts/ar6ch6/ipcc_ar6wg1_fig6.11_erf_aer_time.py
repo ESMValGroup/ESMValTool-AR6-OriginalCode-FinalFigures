@@ -117,14 +117,12 @@ def compute_multiModelStats(cfg,selection):
 
 		output_basename = os.path.splitext(os.path.basename(input_file))[0]  
 		diagnostic_file = get_diagnostic_filename(output_basename, cfg)
-                #diagnostic_file = os.path.join(cfg['preproc_dir'],basename + '.' + extension,
 		with ProvenanceLogger(cfg) as provenance_logger:
 			provenance_logger.log(input_file,provenance_record)
 			provenance_logger.log(diagnostic_file,provenance_record)
 
 		lon4wrt = cube.coord('longitude').points
 		lat4wrt = cube.coord('latitude').points
-		#writenetcdf_timemap(cfg,field,lat4wrt,lon4wrt,mdlname,expmdl,cntlmdl)
 
 
 	alltimeavgcube = alltimedata.mean(axis=0)
@@ -144,10 +142,6 @@ def compute_multiModelStats(cfg,selection):
 
 def plot_meanmap(cfg,cubeavg,exper,field):
     """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
 
     """
     local_path = cfg['plot_dir']
@@ -162,19 +156,13 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     cmapip=ListedColormap(cmapnow)
 
-    # do the plotting dance
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
     plotnow=cubeavg.data
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,clevels,cmap=cmapip, transform=ccrs.PlateCarree())
-#   im=ax.contourf(plotnow,cmap=cmapip)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
@@ -184,7 +172,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     elif(field=='rlut'):
 	    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
 	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
-    #plt.title(dataset)
     plt.tight_layout()
     
     png_name = 'multimodelMean_%s_%s.png' % (field,exper)
@@ -194,10 +181,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
 
 def plot_diffmaperf(cfg,histavg,histall,histcntlavg,histcntall,field):
     """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
 
     """
     local_path = cfg['plot_dir']
@@ -210,8 +193,6 @@ def plot_diffmaperf(cfg,histavg,histall,histcntlavg,histcntall,field):
         for ilon in range(0,cdims[2]):
             a = histall.data[:,ilat,ilon]
             b = histcntall.data[:,ilat,ilon]
-		#ars=np.ma.masked_greater(np.resize(a,(cdims[0],)),10)
-		#brs=np.ma.masked_greater(np.resize(b,(cdims[0],)),10)
             ars=np.resize(a,(cdims[0],))
             brs=np.resize(b,(cdims[0],))
             ttest = stats.ttest_ind(ars, brs, equal_var = False)
@@ -228,14 +209,11 @@ def plot_diffmaperf(cfg,histavg,histall,histcntlavg,histcntall,field):
     Yplot1 = histavg.coord('latitude').points
     Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
 
-    # colomaps
+    # colormaps
     clevels=11
     cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     cmapip=ListedColormap(np.flipud(cmapnow))
 
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-     
     plotnow=(histavg.data-histcntlavg.data)
     # erf sign convention
     plotnow = -plotnow
@@ -246,11 +224,9 @@ def plot_diffmaperf(cfg,histavg,histall,histcntlavg,histcntall,field):
     plotcum = np.cumsum(plothist[0][:])
     plotcumx = np.zeros((len(plotcum),))
     for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
+        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a list, not a tuple, so use this method of indexing
 
 
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
@@ -262,9 +238,7 @@ def plot_diffmaperf(cfg,histavg,histall,histcntlavg,histcntall,field):
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
     imh=ax.contourf(Xplot,Yplot,hatchplot,3,colors='none', hatches=['','++'], alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
@@ -304,14 +278,11 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
     Yplot1 = histavg.coord('latitude').points
     Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
 
-    # colomaps
+    # colormaps
     clevels=11
     cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     cmapip=ListedColormap(np.flipud(cmapnow))
 
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-     
     plotnow=(histavg.data-histcntlavg.data)
 
     # cumulative sum
@@ -322,9 +293,6 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
     for i in range(0,len(plotcum)):
         plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
 
-
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
@@ -336,9 +304,7 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
     imh=ax.contourf(Xplot,Yplot,hatchplot,3,colors='none', hatches=['','++'], alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
@@ -364,11 +330,6 @@ def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
 
 def get_erfmap(exptavg,exptall,cntlavg,cntlall):
     """
-    Arguments:
-        cube - the cubes to plot
-
-    Returns:
-	
 
     """
 
@@ -473,17 +434,12 @@ def writenetcdf_timemap(cfg,field,lat4wrt,lon4wrt,expmdls,cntlmdls):
     
     ncfile.close()
 
-def run_some_diagnostic( experexpts):
-	"""Diagnostic to be run."""
-
 def main(cfg):
 
 	"""Main diagnostic run function."""
 	input_data = cfg['input_data'].values()
 	variables = Variables(cfg)
 
-def run_some_diagnostic( experexpts):
-	"""Diagnostic to be run."""
 
 def main(cfg):
 	"""Main diagnostic run function."""
@@ -491,7 +447,6 @@ def main(cfg):
 	variables = Variables(cfg)
 	allvars = variables.short_names()
 
-#	for ifield in range(0,len(allvars)):
 
 	histSSTexp='histSST'
 	select_histSSTSW= select_metadata(input_data, exp=histSSTexp, short_name='rsut')
