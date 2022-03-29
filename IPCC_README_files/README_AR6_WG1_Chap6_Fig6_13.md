@@ -29,6 +29,8 @@ This recipe creates the plots of the mean change in surface air temperature due 
 
 Diagnostic(s) used:   
 [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py)   
+[diag_scripts/ar6ch6/cmapipcc.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py)  
+[diag_scripts/ar6ch6/ch6_fns.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ch6_fns.py)    
 Please describe this diagnostic:      
 The mean change in surface air temperature ('tas') due to aerosols, between the coupled atmospheric-ocean models from CMIP6 'historical' experiments and AerChemMIP 'hist-piAer' experiments are calculated in grids over the years 1995-2014.   
 
