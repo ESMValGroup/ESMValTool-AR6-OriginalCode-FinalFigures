@@ -100,59 +100,6 @@ def checkstartend(selection):
 		logger.info("start %s ", styear)
 		logger.info("end %s ", endyear)
 
-#def compute_multiModelDiffStats(experiment, control):  
-## historical is the experiment, and the pi-* exeriments control for specific species to pre-industrial levels
-#
-#    # compute differences between experiment and control for individual models
-#    # input are cubes [time, nlat, nlon]
-#	nmodels=0
-#	for attributes in control:
-#		logger.info("compute MM Processing dataset cntl %s", attributes['dataset'])
-#		input_model = attributes['dataset']
-#		input_filecntl = attributes['filename']
-#		logger.info("opening %s",input_filecntl)
-#		cubecntl=iris.load_cube(input_filecntl)
-#		cshape=cubecntl.shape
-#                # dims [ntime, nlat, nlon]
-#		logger.info('cubecntl %d  %d %d ' % (cshape[0],cshape[1],cshape[2]))	
-#		if(nmodels==0):
-#			alltimedata = np.zeros((cshape[0],cshape[1],cshape[2]))
-#		iflagexp = 0
-#		for attributesexp in experiment:
-#			if(attributesexp['dataset'] == input_model):
-#				iflagexp = 1 # match found
-#				logger.info("computeMM Processing dataset exp %s", attributesexp['dataset'])
-#				input_fileexp = attributesexp['filename']
-#				logger.info("opening %s",input_fileexp)
-#				cubeexp=iris.load_cube(input_fileexp)
-#				cshape=cubeexp.shape
-#				logger.info('cubeexp %d  %d %d ' % (cshape[0],cshape[1],cshape[2]))	
-#
-#		#logger.info("computeMM iflagexp %d", iflagexp)
-#		if(iflagexp == 1):
-#			climateresponse= cubeexp.data - cubecntl.data 
-#			if(nmodels==0):
-#				alltimedata = climateresponse
-#			else:
-#                		# dims [nmodels x ntime, nlat, nlon]
-#				alltimedata = np.append(alltimedata,climateresponse,axis=0)
-#			nmodels=nmodels+1
-#
-#	alltimeavgcube = alltimedata.mean(axis=0)
-#	alltimestdcube = alltimedata.std(axis=0)	
-#
-#	# set a cube for the metadata
-#	timeavgcube = cubecntl.collapsed('time', iris.analysis.MEAN)
-#	# replace with the data of interest
-#	timeavgcube.data = alltimeavgcube
-#	# set a cube for the metadata
-#	timestdcube = cubecntl.collapsed('time', iris.analysis.VARIANCE)
-#	# replace with the data of interest
-#	timestdcube.data = alltimestdcube
-#
-#        # dims [nmodels x ntime, lat, lon]
-#	return timeavgcube, alltimedata  
-
 
 def plot_meanmap(cfg,cubeavg,exper,field):
     """
@@ -175,18 +122,13 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     cmapip=ListedColormap(cmapnow)
 
     # do the plotting dance
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
     plotnow=cubeavg.data
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,clevels,cmap=cmapip, transform=ccrs.PlateCarree())
-#   im=ax.contourf(plotnow,cmap=cmapip)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal',format='%4.2f')
@@ -196,7 +138,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     elif(field=='tas'):
 	    cb.set_label(r'$^{\circ}$C ',fontsize=12)
 	    plt.suptitle(r'Mean near Surface Air Temperature',fontsize=16)
-    #plt.title(dataset)
     plt.tight_layout()
     
     png_name = 'multimodelMean_%s_%s.png' % (field,exper)
@@ -206,11 +147,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
 
 def plot_diffmap(cfg,histavg,histall,histcntlavg,histcntall,field):
     """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
-
     """
     local_path = cfg['plot_dir']
     # get hatch pattern
@@ -249,8 +185,6 @@ def plot_diffmap(cfg,histavg,histall,histcntlavg,histcntall,field):
     	cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     	cmapip=ListedColormap(np.flipud(cmapnow))
 
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
      
     if(field=='pr'):
     	convert2mmperday = 1.e3*1e-4*10*3600*24   # kg/m^2/s to mm/day.   1.e3[g/kg]*1[cm^3/g]*1e-4*[m^2/cm^2]*10[mm/cm]*3600*24[s/day] 
@@ -264,11 +198,9 @@ def plot_diffmap(cfg,histavg,histall,histcntlavg,histcntall,field):
     plotcum = np.cumsum(plothist[0][:])
     plotcumx = np.zeros((len(plotcum),))
     for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
+        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a list, not a tuple, so use this method of indexing
 
 
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
@@ -281,9 +213,7 @@ def plot_diffmap(cfg,histavg,histall,histcntlavg,histcntall,field):
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
     imh=ax.contourf(Xplot,Yplot,hatchplot,2,colors='none', hatches=[None,'xxxx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal',format='%4.2f')
@@ -336,9 +266,6 @@ def plot_fastslowresponses(cfg,fastslow,fastslowhatch,fast,fasthatch,field):
     	cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
     	cmapip=ListedColormap(np.flipud(cmapnow))
 
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-     
     if(field=='pr'):
     	convert2mmperday = 1.e3*1e-4*10*3600*24   # kg/m^2/s to mm/day.   1.e3[g/kg]*1[cm^3/g]*1e-4*[m^2/cm^2]*10[mm/cm]*3600*24[s/day] 
     	plotnow=(histavg.data-histcntlavg.data)*convert2mmperday
@@ -354,8 +281,6 @@ def plot_fastslowresponses(cfg,fastslow,fastslowhatch,fast,fasthatch,field):
         plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
 
 
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
     nrows=1
     ncols=1
 
@@ -368,9 +293,7 @@ def plot_fastslowresponses(cfg,fastslow,fastslowhatch,fast,fasthatch,field):
     fig = plt.figure(figsize=(ncols*7, nrows*5))
     ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
     im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
     imh=ax.contourf(Xplot,Yplot,hatchplot,2,colors='none', hatches=[None,'xxxx','\\\\'],alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
     ax.coastlines()
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal',format='%4.2f')
@@ -416,7 +339,6 @@ def get_diffmap(exptavg,exptall,cntlavg,cntlall):
     pthresh=0.050
     for ilat in range(0,cdims[1]):
         for ilon in range(0,cdims[2]):
-            #a = exptall.data[:,ilat,ilon]
             #b = cntlall.data[:,ilat,ilon]
             a = exptall[:,ilat,ilon]
             b = cntlall[:,ilat,ilon]
@@ -432,45 +354,6 @@ def get_diffmap(exptavg,exptall,cntlavg,cntlall):
 
     return plotnow,hatchplot
     
-def get_slowmap(histexp,histcntl,histSSTexp,histSSTcntl,histexpall,histcntlall,histSSTexpall,histSSTcntlall):
-
-    """
-    Arguments:
-    Arguments:
-	*avg are iris cubes
-	*all are numpy array dims[nmodels x ntime,nlat,nlon] 
-
-    Returns:
-	
-
-    """
-    plotnow1=(histexp.data-histcntl.data) 
-    plotnow2=(histSSTexp.data-histSSTcntl.data)
-    plotnow = plotnow1-plotnow2
-    # get hatch pattern
-    cdims=histexpall.shape
-    hatchnow = np.zeros((cdims[1],cdims[2]))
-    hatchplot = np.zeros((cdims[1],cdims[2]))
-    pthresh=0.050
-    for ilat in range(0,cdims[1]):
-        for ilon in range(0,cdims[2]):
-            a = histexpall[:,ilat,ilon] - histcntlall[:,ilat,ilon]
-            b = histSSTexpall[:,ilat,ilon] - histSSTcntlall[:,ilat,ilon]
-            ars=np.resize(a,(cdims[0],))
-            brs=np.resize(b,(cdims[0],))
-            ttest = stats.ttest_ind(ars, brs, equal_var = False)
-            hatchnow[ilat,ilon]=ttest[1]
-	    #  ttest>pthresh means mark areas without significance
-	    #  ttest<pthresh means mark significant areas 
-            if(ttest[1]>pthresh):
-                hatchplot[ilat,ilon] = 1
-
-    return plotnow,hatchplot
-
-
-def run_some_diagnostic( experexpts):
-	"""Diagnostic to be run."""
-
 def main(cfg):
 	"""Main diagnostic run function."""
 	input_data = cfg['input_data'].values()
@@ -478,13 +361,10 @@ def main(cfg):
 	allvars = variables.short_names()
 
 	# prepare figure matrix
-#	fig = plt.figure(constrained_layout=True)
-#	spec = gridspec.GridSpec(ncols=16, nrows=20, figure=fig)
 	nrows=1
 	ncols=2
 	fig = plt.figure(figsize=(ncols*6.5, nrows*5))
 	fig.subplots_adjust(top=0.6,hspace=0.3)
-	#plt.suptitle('Climate Impacts of Ozone Forcing',fontsize=28)
 	plt.rcParams.update({'hatch.color': 'grey'})	
 	
  	# make scientific notation as powers of 10
@@ -492,7 +372,6 @@ def main(cfg):
 	gp10 = lambda x,pos : "${}$".format(fp10._formatSciNotation('%1.1e' % x))
 	fmt = mticker.FuncFormatter(gp10)         
 
-	#for ifield in range(0,len(allvars)):
 	ifield=0
 	if(allvars[ifield] == 'tas'):
 
@@ -501,7 +380,6 @@ def main(cfg):
 		logger.info("Example of how to select only historical data:\n%s",
 			pformat(select_historical))
 		checkstartend(select_historical)
-		#[hist_mdlmn,hist_mdlsd,hist_mdlall]=compute_multiModelStats(select_historical)
 		[hist_mdlmn,hist_mdlall,hist_mdls,prov_rec]=compute_multiModelStats(cfg,select_historical)
 		plot_meanmap(cfg,hist_mdlmn,histexp,allvars[ifield])
 
@@ -510,42 +388,11 @@ def main(cfg):
 		logger.info("Example of how to select only hist-piAer data:\n%s",
 			pformat(select_histpiAer))
 		checkstartend(select_histpiAer)
-		#[histcntl_mdlmn,histcntl_mdlsd,histcntl_mdlall]=compute_multiModelStats(select_histpiAer)
 		[histcntl_mdlmn,histcntl_mdlall,histcntl_mdls,prov_rec]=compute_multiModelStats(cfg,select_histpiAer)
 		plot_meanmap(cfg,histcntl_mdlmn,histcntl,allvars[ifield])
-		#run_some_diagnostic(experexpts)
 		[fastslow,fastslowhatch]=get_diffmap(hist_mdlmn,hist_mdlall,histcntl_mdlmn,histcntl_mdlall)
 
 		[fastslowhatch, sigthresh] = get_signagreemap(hist_mdls,histcntl_mdls)
-
-		histSSTexp='histSST'
-		select_histSST= select_metadata(input_data, exp=histSSTexp, short_name=allvars[ifield])
-		logger.info("Example of how to select only histSST data:\n%s",
-			pformat(select_histSST))
-		checkstartend(select_histSST)
-		#[histSST_mdlmn,histSST_mdlsd,histSST_mdlall]=compute_multiModelStats(select_histSST)
-		[histSST_mdlmn,histSST_mdlall,histSST_mdls,prov_rec]=compute_multiModelStats(cfg,select_histSST)
-		plot_meanmap(cfg,histSST_mdlmn,histSSTexp,allvars[ifield])
-
-		histSSTcntl='histSST-piAer'
-		select_histSSTpiAer= select_metadata(input_data,exp=histSSTcntl, short_name=allvars[ifield])
-		logger.info("Example of how to select only histSST-piAer data:\n%s",
-			pformat(select_histSSTpiAer))
-		checkstartend(select_histSSTpiAer)
-		#[histSSTcntl_mdlmn,histSSTcntl_mdlsd,histSSTcntl_mdlall]=compute_multiModelStats(select_histSSTpiAer)
-		[histSSTcntl_mdlmn,histSSTcntl_mdlall,histSSTcntl_mdls,prov_rec]=compute_multiModelStats(cfg,select_histSSTpiAer)
-		plot_meanmap(cfg,histSSTcntl_mdlmn,histSSTcntl,allvars[ifield])
-
-#		[fast,fasthatch]=get_diffmap(histSST_mdlmn,histSST_mdlall,histSSTcntl_mdlmn,histSSTcntl_mdlall)
-#		[fasthatch, sigthresh]  = get_signagreemap(histSST_mdls,histSSTcntl_mdls)
-
-#		[slow,slowhatch]=get_slowmap(hist_mdlmn,histcntl_mdlmn,histSST_mdlmn,histSSTcntl_mdlmn,
-#			hist_mdlall,histcntl_mdlall,histSST_mdlall,histSSTcntl_mdlall)	
-
-		#plot_meanmap(cfg,fastslowAeravg,histcntlAer,allvars[ifield])
-		#plot_meanmap(cfg,fastslowNTCFavg,histcntlNTCF,allvars[ifield])
-		#plot_meanmap(cfg,fastAeravg,histSSTcntlAer,allvars[ifield])
-		#plot_meanmap(cfg,fastNTCFavg,histSSTcntlNTCF,allvars[ifield])
 
 		# prep for plotting
 		repcube = hist_mdlmn# respresentative cube
@@ -563,8 +410,6 @@ def main(cfg):
 			cmapip=ListedColormap((cmapnow))
 			convert2mmperday = 1.e3*1e-4*10*3600*24   # kg/m^2/s to mm/day.   1.e3[g/kg]*1[cm^3/g]*1e-4*[m^2/cm^2]*10[mm/cm]*3600*24[s/day] 
 			fastslow = fastslow*convert2mmperday
-			fast     = fast*convert2mmperday
-			slow     = slow*convert2mmperday
 		elif(allvars[ifield]=='tas'):
 			cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
 			if(clevels<=11):
@@ -575,12 +420,6 @@ def main(cfg):
 		
 		cmpcnt=1
 		cmax = cmpcnt*np.max([np.abs(fastslow.max()),np.abs(fastslow.min())])
-		#if(allvars[ifield]=='pr'):
-		#	# put on the same scale as for piNTCF plots
-		#	cmax = 1.125 
-		#elif(allvars[ifield]=='tas'):
-			# put on the same scale as for piNTCF plots
-		#	cmax = 2.4675
 		cmin = -cmax
 		cincr=2.0*cmax/float(clevels-1)
 		cincr = 0.7
@@ -590,11 +429,7 @@ def main(cfg):
 
 		# latitudinal profiles
 		fastslowprof = np.zeros((len(Yplot1),))
-		fastprof = np.zeros((len(Yplot1),))
-		slowprof = np.zeros((len(Yplot1),))
 		fastslowstd = np.zeros((len(Yplot1),))
-		faststd = np.zeros((len(Yplot1),))
-		slowstd = np.zeros((len(Yplot1),))
 		for ilat in range(0,len(Yplot1)):
 			fastslowprof[ilat] = np.sum(fastslow[ilat,:]*awt[ilat,:])/np.sum(awt[ilat,:])
 			fastslowstd[ilat] = np.sqrt((float(len(Yplot1)/(len(Yplot1)-1)))*np.sum(np.power(fastslow[ilat,:]-fastslowprof[ilat],2)*awt[ilat,:])/np.sum(awt[ilat,:]))
@@ -602,7 +437,6 @@ def main(cfg):
 		lateq = int(len(Yplot1)/2)
 		#fastslow		
 		plttype =''# 'fast + slow'# = [%s-%s]-[%s-%s]' % (histexp,histcntlNTCF,histexp,histcntlAer)	
-		#ax = fig.add_subplot(spec[0:8,8:], projection=ccrs.Robinson(central_longitude=0))
 		ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=0))
 		im=ax.contourf(Xplot,Yplot,fastslow,crange,cmap=cmapip, transform=ccrs.PlateCarree(),extend='both')
 		imh=ax.contourf(Xplot,Yplot,fastslowhatch,2,colors='none', edgecolor=None, hatches=[None,'xxxx','\\\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
@@ -612,11 +446,6 @@ def main(cfg):
 		lgd.get_texts()[0].set_text('Robust change')
 		lgd.get_texts()[1].set_text('Conflicting signals')
 		lgd.get_texts()[2].set_text('No change or no robust change')
-		#bbox = dict(boxstyle="square", fc="1.0")
-		#bbox = dict(boxstyle="square", fc="1.0")
-		#plt.annotate('\\\\\\\\', xy=(0.225,-0.4), xycoords='axes fraction',color='black',fontsize=10,bbox=bbox)
-		#plt.annotate(r' Lack of 2-$\sigma$ model significance and', xy=(0.275,-0.4), xycoords='axes fraction',color='black',fontsize=10)
-		#plt.annotate(r' Lack of model agreement (threshold: 80% )', xy=(0.275,-0.45), xycoords='axes fraction',color='black',fontsize=10)
 
 		fastslowglobal = np.sum(awt*fastslow)/np.sum(awt)
 		fastslowSH = np.sum(awt[0:lateq,:]*fastslow[0:lateq,:])/np.sum(awt[0:lateq,:])
@@ -646,7 +475,6 @@ def main(cfg):
 		fastslowNHfmt = r'NH {}'.format(fmt(fastslowNH)) + '$\pm${}'.format(fmt(fastslowNH_std))
 		fastslowSHfmt = r'SH {}'.format(fmt(fastslowSH)) + '$\pm${}'.format(fmt(fastslowSH_std))
 		fastslowmeanlabel = '%s\n%s\n%s\n' % (fastslowgblfmt,fastslowNHfmt,fastslowSHfmt)
-		#plt.title(r'%s'% (plttype),fontsize=10)
 		plt.title(r'Surface Air Temperature Response''\n''due to Aerosols',fontsize=8*2)
 
 
@@ -661,8 +489,7 @@ def main(cfg):
 	
 
 		ax = fig.add_subplot(nrows, ncols, 2)
-		#lines, caps, bars = ax.errorbar(fastslowprof,Yplot1,fmt='k',linewidth=3,xerr=fastslowstd,ecolor='lightgrey',errorevery=3,label=r'fast+slow' )
-		lines, caps, bars = ax.errorbar(fastslowprof,Yplot1,fmt='k',linewidth=3,xerr=fastslowstd,ecolor='lightgrey',errorevery=1) #label=r'fast+slow' )
+		lines, caps, bars = ax.errorbar(fastslowprof,Yplot1,fmt='k',linewidth=3,xerr=fastslowstd,ecolor='lightgrey',errorevery=1) 
 		# loop through bars and caps and set the alpha value
 		[bar.set_alpha(0.2) for bar in bars	]
 		ax.plot(fastslowprof+fastslowstd,Yplot1,'k',linewidth=0.2, alpha=0.3 )
@@ -685,9 +512,7 @@ def main(cfg):
 		ax.tick_params(axis='both', which='major', labelsize=6*2)
 
 		mnlblsz=10
-		#ax.text(0.10*prfmax,10,r'$\mathbf{fast+slow}$ [%s]''\n''%s '% (lblunits,fastslowmeanlabel),fontsize=mnlblsz)
 		ax.text(0.10*prfmax,10,r'$\mathbf{Means:}$ [%s]''\n\n''%s '% (lblunits,fastslowmeanlabel),fontsize=mnlblsz)
-		#ax.legend(loc=3,fontsize=6)
 
 
 	plt.tight_layout()

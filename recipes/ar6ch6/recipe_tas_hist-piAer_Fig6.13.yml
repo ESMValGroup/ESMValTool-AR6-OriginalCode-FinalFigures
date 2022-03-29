@@ -1,9 +1,9 @@
 # ESMValTool
-# recipe_python.yml
+# recipe_tas_hist-piAer_Fig6.13.yml 
 ---
 documentation:
   description: |
-    recipe that plots the change in surface air temperature due to Aerosols 
+    This recipe plots the mean change in surface air temperature due to aerosols, as a geomap plot and a zonal mean change plot, over the time period 1995-2014.  IPCC AR6 WG1  Figure 6.13 shows the surface air temperature change due to aerosols as the difference in the CMIP6 model variable 'tas' for coupled atmosphere-ocean models from the CMIP6 'historical' experiment and AerChemMIP experiments 'hist-piAer'.  
 
   authors:
     - kuo_chaincy
@@ -29,21 +29,6 @@ datasets:
   - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: hist-piAer,  ensemble: r1i1p1f1,  start_year: 1995,  end_year: 2014, grid: gr1}
   - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: hist-piAer, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
   - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: hist-piAer, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
-#histSST_models: &histSST_models
-  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1,  start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gr1}
-  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
-
-#histSST-piAer: &histSST-piAer_models
-  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f1, start_year: 1995,  end_year: 2014, grid: gr1}
-  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p3f1,  start_year: 1995,  end_year: 2014, grid: gn}
-  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f2, start_year: 1995,  end_year: 2014, grid: gn}
 
 preprocessors:
   preprocessor1:
@@ -78,6 +63,5 @@ diagnostics:
         preprocessor: preprocessor_tas
     scripts:
       ar6fig6_piAer: 
-#        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/fig6_tas_piAer.py
         script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py
         piexpt: piAer
