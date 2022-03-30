@@ -37,7 +37,16 @@ from ch6_fns import compute_multiModelStats, compute_multiModelDiffStats, get_si
 logger = logging.getLogger(os.path.basename(__file__))
 
 def get_areaweight(nlat,nlon,lat,lon):
-	# determine the quandrangle area weight 
+	''' 
+		determine the quandrangle area weight 
+    Arguments:
+				nlat - integer size of lat latitudes
+				nlon - integer size of lon longitudes
+				lat - 1D array of latitude values
+				lon - 1D array of longitude values
+	Returns::
+				areaweight - 2D array of weights by lat/lon grid area 	
+  	'''
 
 	areaweight = np.zeros((nlat,nlon),dtype=float);
 	lat4wt = np.zeros((nlat,2),dtype=float);
@@ -88,6 +97,7 @@ def get_provenance_record(attributes, ancestor_files):
     return record
 
 def checkstartend(selection):
+	''' output to verify the starting and ending years '''
 	for attributes in selection:
 		logger.info("Processing dataset %s", attributes['dataset'])
 		input_file = attributes['filename']
@@ -103,11 +113,14 @@ def checkstartend(selection):
 
 def plot_meanmap(cfg,cubeavg,exper,field):
     """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
-
+	Plots the gridded mean map of 'field'.
+	Arguments:
+		cfg - ESMValTool Python dictionary of information on input data
+		cubeavg = iris cube of gridded mean 
+		exper - string of model name
+		field - model field name ('rsut' or 'rlut')
+	Results:	
+		outputs a PNG file of the model mean of 'field'
     """
     local_path = cfg['plot_dir']
 
@@ -144,183 +157,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     plt.savefig(os.path.join(local_path, png_name))
     plt.close()
 
-
-def plot_diffmap(cfg,histavg,histall,histcntlavg,histcntall,field):
-    """
-    """
-    local_path = cfg['plot_dir']
-    # get hatch pattern
-    cdims=histall.shape
-    hatchnow = np.zeros((cdims[1],cdims[2]))
-    hatchplot = np.zeros((cdims[1],cdims[2]))
-    pthresh=0.050
-    for ilat in range(0,cdims[1]):
-        for ilon in range(0,cdims[2]):
-            a = histall.data[:,ilat,ilon]
-            b = histcntall.data[:,ilat,ilon]
-		#ars=np.ma.masked_greater(np.resize(a,(cdims[0],)),10)
-		#brs=np.ma.masked_greater(np.resize(b,(cdims[0],)),10)
-            ars=np.resize(a,(cdims[0],))
-            brs=np.resize(b,(cdims[0],))
-            ttest = stats.ttest_ind(ars, brs, equal_var = False)
-            hatchnow[ilat,ilon]=ttest[1]
-	    #  ttest>pthresh means mark areas without significance
-	    #  ttest<pthresh means mark significant areas 
-            if(ttest[1]>pthresh):
-                hatchplot[ilat,ilon] = 1
-
-    
-
-    # coordinates
-    Xplot1 = histavg.coord('longitude').points
-    Yplot1 = histavg.coord('latitude').points
-    Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
-
-    # colomaps
-    clevels=11
-    if(field=='pr'):
-    	cmapnow=cmapipcc.get_ipcc_cmap('precipitation',clevels)
-    	cmapip=ListedColormap((cmapnow))
-    elif(field=='tas'):
-    	cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
-    	cmapip=ListedColormap(np.flipud(cmapnow))
-
-     
-    if(field=='pr'):
-    	convert2mmperday = 1.e3*1e-4*10*3600*24   # kg/m^2/s to mm/day.   1.e3[g/kg]*1[cm^3/g]*1e-4*[m^2/cm^2]*10[mm/cm]*3600*24[s/day] 
-    	plotnow=(histavg.data-histcntlavg.data)*convert2mmperday
-    elif(field=='tas'):
-    	plotnow=(histavg.data-histcntlavg.data)
-
-    # cumulative sum
-    plotflat=np.resize(plotnow,((cdims[1]*cdims[2]),))
-    plothist= np.histogram(plotflat,bins=20)
-    plotcum = np.cumsum(plothist[0][:])
-    plotcumx = np.zeros((len(plotcum),))
-    for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a list, not a tuple, so use this method of indexing
-
-
-    nrows=1
-    ncols=1
-
-    cmpcnt=0.95
-    cmax = cmpcnt*np.max([np.abs(plotnow.max()),np.abs(plotnow.min())])
-    cmin = -cmax
-    cincr=2.0*cmax/float(clevels-1)
-    crange=np.arange(cmin,cmax+cincr,cincr)
-
-    fig = plt.figure(figsize=(ncols*7, nrows*5))
-    ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
-    im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    imh=ax.contourf(Xplot,Yplot,hatchplot,2,colors='none', hatches=[None,'xxxx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
-    ax.coastlines()
-    ax.set_global()
-    cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal',format='%4.2f')
-    if(field=='pr'):
-	    cb.set_label(r'(mm per day)',fontsize=12)
-	    plt.suptitle(r'Surface precipitation',fontsize=16)
-	    plt.title(r'Change in surface precip',fontsize=14)
-    elif(field=='tas'):
-	    cb.set_label(r'($^{\circ}$C) ',fontsize=12)
-	    plt.suptitle(r'Change in Near Surface Air Temperature',fontsize=16)
-	    plt.title(r'Change in near surface air temperature',fontsize=14)
-
-    if(nrows==2):
-            ax2 = fig.add_subplot(nrows, ncols, 2)
-            ax2.plot(plotcumx,plotcum)
-            if(field=='pr'):
-                ax2.set_xlabel(r'(mm per day)',fontsize=12)
-            elif(field=='tas'):
-                ax2.set_xlabel(r'($^{\circ}$C)',fontsize=12)
-                ax2.set_ylabel(r'Cumulative')
-
-    plt.tight_layout()
-    
-    png_name = 'diff_%s.png' % field
-    plt.savefig(os.path.join(local_path, png_name))
-    plt.close()
-
-def plot_fastslowresponses(cfg,fastslow,fastslowhatch,fast,fasthatch,field):
-    """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
-
-    """
-    local_path = cfg['plot_dir']
-    # get hatch pattern
-
-    # coordinates
-    Xplot1 = histavg.coord('longitude').points
-    Yplot1 = histavg.coord('latitude').points
-    Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
-
-    # colomaps
-    clevels=11
-    if(field=='pr'):
-    	cmapnow=cmapipcc.get_ipcc_cmap('precipitation',clevels)
-    	cmapip=ListedColormap((cmapnow))
-    elif(field=='tas'):
-    	cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
-    	cmapip=ListedColormap(np.flipud(cmapnow))
-
-    if(field=='pr'):
-    	convert2mmperday = 1.e3*1e-4*10*3600*24   # kg/m^2/s to mm/day.   1.e3[g/kg]*1[cm^3/g]*1e-4*[m^2/cm^2]*10[mm/cm]*3600*24[s/day] 
-    	plotnow=(histavg.data-histcntlavg.data)*convert2mmperday
-    elif(field=='tas'):
-    	plotnow=(histavg.data-histcntlavg.data)
-
-    # cumulative sum
-    plotflat=np.resize(plotnow,((cdims[1]*cdims[2]),))
-    plothist= np.histogram(plotflat,bins=20)
-    plotcum = np.cumsum(plothist[0][:])
-    plotcumx = np.zeros((len(plotcum),))
-    for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
-
-
-    nrows=1
-    ncols=1
-
-    cmpcnt=0.95
-    cmax = cmpcnt*np.max([np.abs(plotnow.max()),np.abs(plotnow.min())])
-    cmin = -cmax
-    cincr=2.0*cmax/float(clevels-1)
-    crange=np.arange(cmin,cmax+cincr,cincr)
-
-    fig = plt.figure(figsize=(ncols*7, nrows*5))
-    ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
-    im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    imh=ax.contourf(Xplot,Yplot,hatchplot,2,colors='none', hatches=[None,'xxxx','\\\\'],alpha=0.0, transform=ccrs.PlateCarree())
-    ax.coastlines()
-    ax.set_global()
-    cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal',format='%4.2f')
-    if(field=='pr'):
-	    cb.set_label(r'(mm per day)',fontsize=12)
-	    plt.suptitle(r'Surface precipitation',fontsize=16)
-	    plt.title(r'Change in surface precip',fontsize=14)
-    elif(field=='tas'):
-	    cb.set_label(r'($^{\circ}$C) ',fontsize=12)
-	    plt.suptitle(r'Change in Near Surface Air Temperature',fontsize=16)
-	    plt.title(r'Change in near surface air temperature',fontsize=14)
-
-    if(nrows==2):
-            ax2 = fig.add_subplot(nrows, ncols, 2)
-            ax2.plot(plotcumx,plotcum)
-            if(field=='pr'):
-                ax2.set_xlabel(r'(mm per day)',fontsize=12)
-            elif(field=='tas'):
-                ax2.set_xlabel(r'($^{\circ}$C) ',fontsize=12)
-                ax2.set_ylabel(r'Cumulative')
-
-    plt.tight_layout()
-    
-    png_name = 'fastslowresp_%s.png' % field
-    plt.savefig(os.path.join(local_path, png_name))
-    plt.close()
-
 def get_diffmap(exptavg,exptall,cntlavg,cntlall):
     """
     Arguments:
@@ -328,10 +164,10 @@ def get_diffmap(exptavg,exptall,cntlavg,cntlall):
 	*all are numpy array dims[nmodels x ntime,nlat,nlon] 
 
     Returns:
-	
-
+	diffmap - difference gridded map between the average of experiment models and average of control models	
+	hatchplot - binary values of the hatched grid areas, based on the IPCC AR6 WG1 Final Government Draft guidelines for model grid statistical significance
     """
-    plotnow=(exptavg.data-cntlavg.data)
+    diffmap=(exptavg.data-cntlavg.data)
     # get hatch pattern
     cdims=exptall.shape
     hatchnow = np.zeros((cdims[1],cdims[2]))
@@ -352,10 +188,15 @@ def get_diffmap(exptavg,exptall,cntlavg,cntlall):
                 hatchplot[ilat,ilon] = 1
 
 
-    return plotnow,hatchplot
+    return diffmap,hatchplot
     
 def main(cfg):
-	"""Main diagnostic run function."""
+	"""Main diagnostic run function.
+	Arguments:
+		cfg - ESMValTool Python dictionary of information on input data
+	Results:
+		Plots for IPCC AR6 WG1 Figure 6.13
+	"""
 	input_data = cfg['input_data'].values()
 	variables = Variables(cfg)
 	allvars = variables.short_names()
