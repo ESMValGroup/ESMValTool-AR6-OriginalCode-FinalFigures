@@ -36,7 +36,16 @@ import cartopy.crs as ccrs
 logger = logging.getLogger(os.path.basename(__file__))
 
 def get_areaweight(nlat,nlon,lat,lon):
-	# determine the quandrangle area weight 
+	''' 
+		determine the quandrangle area weight 
+    Arguments:
+				nlat - integer size of lat latitudes
+				nlon - integer size of lon longitudes
+				lat - 1D array of latitude values
+				lon - 1D array of longitude values
+	Returns::
+				areaweight - 2D array of weights by lat/lon grid area 	
+  	'''
 
 	areaweight = np.zeros((nlat,nlon),dtype=float);
 	lat4wt = np.zeros((nlat,2),dtype=float);
@@ -87,6 +96,7 @@ def get_provenance_record(attributes, ancestor_files):
     return record
 
 def checkstartend(selection):
+	''' output to verify the starting and ending years '''
 	nmodels=0
 	for attributes in selection:
 		logger.info("Processing dataset %s", attributes['dataset'])
@@ -107,6 +117,11 @@ def checkstartend(selection):
 	return styear, endyear
 
 def compute_ModelStats(cfg,selection):
+	'''
+	Arguments:
+		cfg - ESMValTool Python dictionary of information on input data
+		selection - selected metadata 			
+	'''
 	for attributes in selection:
 		input_file = attributes['filename']
 	logger.info("opening %s",input_file)
@@ -134,6 +149,17 @@ def compute_ModelStats(cfg,selection):
 	return timeavgcube, alltimedata, provenance_record 
 
 def compute_multiModelStats(cfg,selection):
+	'''
+	Compute the multi-model statistics
+	Arguments:
+		cfg - ESMValTool Python dictionary of information on input data
+		selection - selected metadata 			
+	Returns:
+		timeavgcube - iris cube of models, time-averaged 
+		alltimedata - numpy array of all models. dims are (nmodels*time,lat,lon)
+		alltimemodels - numpy array of all models. dims are (nmodels, time, lat, lon)
+		provenance_record 
+	'''
 	nmodels=0
 	for attributes in selection:
 		input_file = attributes['filename']
@@ -160,9 +186,13 @@ def compute_multiModelStats(cfg,selection):
 	alltimeavgcube = alltimedata.mean(axis=0)
 	alltimestdcube = alltimedata.std(axis=0)	
 
+    # set to an iris cube to use iris cube format of time-averaged data
 	timeavgcube = cube.collapsed('time', iris.analysis.MEAN)
+	# fill the data part of cube with time-averaged data
 	timeavgcube.data = alltimeavgcube
+    # set to an iris cube to use iris cube format of variance of time data 
 	timestdcube = cube.collapsed('time', iris.analysis.VARIANCE)
+	# fill the data part of cube with temporal standard-deviation of data
 	timestdcube.data = alltimestdcube
 
 	alltimemodels= np.zeros((nmodels,cshape[0],cshape[1],cshape[2]))
@@ -172,296 +202,22 @@ def compute_multiModelStats(cfg,selection):
 	return timeavgcube, alltimedata, alltimemodels, provenance_record 
 
 
-def plot_meanmap(cfg,cubeavg,exper,field):
-    """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
-
-    """
-    local_path = cfg['plot_dir']
-
-    # coordinates
-    Xplot1 = cubeavg.coord('longitude').points
-    Yplot1 = cubeavg.coord('latitude').points
-    Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
-
-    # colomaps
-    clevels=11
-    cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
-    cmapip=ListedColormap(cmapnow)
-
-    # do the plotting dance
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-    plotnow=cubeavg.data
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
-    nrows=1
-    ncols=1
-
-    fig = plt.figure(figsize=(ncols*7, nrows*5))
-    ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
-    im=ax.contourf(Xplot,Yplot,plotnow,clevels,cmap=cmapip, transform=ccrs.PlateCarree())
-#   im=ax.contourf(plotnow,cmap=cmapip)
-    ax.coastlines()
-    ax.set_global()
-    cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
-    if(field=='rsut'):
-	    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
-	    plt.suptitle(r'Shortwave Effective Radiative Forcing',fontsize=16)
-    elif(field=='rlut'):
-	    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
-	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
-    #plt.title(dataset)
-    plt.tight_layout()
-    
-    png_name = 'multimodelMean_%s_%s.png' % (field,exper)
-    plt.savefig(os.path.join(local_path, png_name))
-    plt.close()
-
-
-def plot_diffmaperf(cfg,histavg,histall,histcntlavg,histcntall,field):
-    """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
-
-    """
-    local_path = cfg['plot_dir']
-    # get hatch pattern
-    cdims=histall.shape
-    hatchnow = np.zeros((cdims[1],cdims[2]))
-    hatchplot = np.zeros((cdims[1],cdims[2]))
-    pthresh=0.05
-    for ilat in range(0,cdims[1]):
-        for ilon in range(0,cdims[2]):
-            a = histall.data[:,ilat,ilon]
-            b = histcntall.data[:,ilat,ilon]
-		#ars=np.ma.masked_greater(np.resize(a,(cdims[0],)),10)
-		#brs=np.ma.masked_greater(np.resize(b,(cdims[0],)),10)
-            ars=np.resize(a,(cdims[0],))
-            brs=np.resize(b,(cdims[0],))
-            ttest = stats.ttest_ind(ars, brs, equal_var = False)
-            hatchnow[ilat,ilon]=ttest[1]
-	    #  ttest>pthresh means mark areas without significance
-	    #  ttest<pthresh means mark significant areas 
-            if(ttest[1]>pthresh):
-                hatchplot[ilat,ilon] = 1
-
-    
-
-    # coordinates
-    Xplot1 = histavg.coord('longitude').points
-    Yplot1 = histavg.coord('latitude').points
-    Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
-
-    # colomaps
-    clevels=11
-    cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
-    cmapip=ListedColormap(np.flipud(cmapnow))
-
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-     
-    plotnow=(histavg.data-histcntlavg.data)
-    # erf sign convention
-    plotnow = -plotnow
-
-    # cumulative sum
-    plotflat=np.resize(plotnow,((cdims[1]*cdims[2]),))
-    plothist= np.histogram(plotflat,bins=20)
-    plotcum = np.cumsum(plothist[0][:])
-    plotcumx = np.zeros((len(plotcum),))
-    for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
-
-
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
-    nrows=1
-    ncols=1
-
-    cmax = np.max([np.abs(plotnow.max()),np.abs(plotnow.min())])
-    cmin = -cmax
-    cincr=2.0*cmax/float(clevels-1)
-    crange=np.arange(cmin,cmax+cincr,cincr)
-
-    fig = plt.figure(figsize=(ncols*7, nrows*5))
-    ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
-    im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
-    imh=ax.contourf(Xplot,Yplot,hatchplot,3,colors='none', hatches=['','++'], alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
-    ax.coastlines()
-    ax.set_global()
-    cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
-    cb.set_label(r'(W-m$^{-1}$)',fontsize=12)
-    if(field=='rsut'):
-	    plt.suptitle(r'Shortwave Effective Radiative Forcing',fontsize=16)
-	    plt.title(r'',fontsize=14)
-    elif(field=='rlut'):
-	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
-	    plt.title(r'',fontsize=14)
-
-    if(nrows==2):
-            ax2 = fig.add_subplot(nrows, ncols, 2)
-            ax2.plot(plotcumx,plotcum)
-            ax2.set_xlabel(r'(W-m$^{-1}$)',fontsize=12)
-            ax2.set_ylabel(r'Cumulative')
-
-    plt.tight_layout()
-    
-    png_name = 'diff_%s.png' % field
-    plt.savefig(os.path.join(local_path, png_name))
-    plt.close()
-
-def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
-    """
-    Arguments:
-        cube - the cube to plot
-
-    Returns:
-
-    """
-    local_path = cfg['plot_dir']
-    # get hatch pattern
-
-    # coordinates
-    Xplot1 = histavg.coord('longitude').points
-    Yplot1 = histavg.coord('latitude').points
-    Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
-
-    # colomaps
-    clevels=11
-    cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
-    cmapip=ListedColormap(np.flipud(cmapnow))
-
-#    plt.contourf(cube.data.mean(axis=0))
-    #plt.imshow(cube.data.mean(axis=0))
-     
-    plotnow=(histavg.data-histcntlavg.data)
-
-    # cumulative sum
-    plotflat=np.resize(plotnow,((cdims[1]*cdims[2]),))
-    plothist= np.histogram(plotflat,bins=20)
-    plotcum = np.cumsum(plothist[0][:])
-    plotcumx = np.zeros((len(plotcum),))
-    for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
-
-
-#    dims = np.shape(plotnow)
-#    print('size %f dim cube %f %f' % (plotnow.size,dims[0],dims[1]))
-    nrows=1
-    ncols=1
-
-    cmax = np.max([np.abs(plotnow.max()),np.abs(plotnow.min())])
-    cmin = -cmax
-    cincr=2.0*cmax/float(clevels-1)
-    crange=np.arange(cmin,cmax+cincr,cincr)
-
-    fig = plt.figure(figsize=(ncols*7, nrows*5))
-    ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
-    im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    #imh=ax.contourf(Xplot,Yplot,hatchnow,hlevels,colors='none', hatch=['/','//','///','////','.','*',None,None,None,'/'], alpha=0.0)
-    imh=ax.contourf(Xplot,Yplot,hatchplot,3,colors='none', hatches=['','++'], alpha=0.0, transform=ccrs.PlateCarree())
-#    ax.pcolor(Xplot,Yplot,hatchnow, color='none',hatch='/', alpha=0.7)
-    ax.coastlines()
-    ax.set_global()
-    cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
-    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
-    if(field=='rsut'):
-	    plt.suptitle(r'Shortwave Effective Radiative Forcing',fontsize=16)
-	    plt.title(r'',fontsize=14)
-    elif(field=='rlut'):
-	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
-	    plt.title(r'',fontsize=14)
-
-    if(nrows==2):
-            ax2 = fig.add_subplot(nrows, ncols, 2)
-            ax2.plot(plotcumx,plotcum)
-            ax2.set_xlabel(r'W-m$^{-1}$ ',fontsize=12)
-            ax2.set_ylabel(r'Cumulative')
-
-    plt.tight_layout()
-    
-    png_name = 'diff_%s.png' % field
-    plt.savefig(os.path.join(local_path, png_name))
-    plt.close()
-
-def get_erfmap(exptavg,exptall,cntlavg,cntlall):
-    """
-    Arguments:
-        cube - the cubes to plot
-
-    Returns:
-	
-
-    """
-
-    plotnow=(exptavg.data-cntlavg.data)
-    # ERF sign convention
-    plotnow = -plotnow   
-
-    # get hatch pattern
-    cdims=exptall.shape
-    hatchnow = np.zeros((cdims[1],cdims[2]))
-    hatchplot = np.zeros((cdims[1],cdims[2]))
-    pthresh=0.05
-    for ilat in range(0,cdims[1]):
-        for ilon in range(0,cdims[2]):
-            a = exptall.data[:,ilat,ilon]
-            b = cntlall.data[:,ilat,ilon]
-            ars=np.resize(a,(cdims[0],))
-            brs=np.resize(b,(cdims[0],))
-            ttest = stats.ttest_ind(ars, brs, equal_var = False)
-            hatchnow[ilat,ilon]=ttest[1]
-	    #  ttest>pthresh means mark areas without significance
-	    #  ttest<pthresh means mark significant areas 
-            if(ttest[1]>pthresh):
-                hatchplot[ilat,ilon] = 1
-
-    return plotnow,hatchplot
-    
-def writenetcdf_erfhatch(cfg,field,lat4wrt,lon4wrt,erf4wrt,hatch4wrt):
-    local_path = cfg['plot_dir']
-    nlat = lat4wrt.size	
-    nlon = lon4wrt.size
-   
-    outfname = 'erf_hatch_%s.nc'  % field
-    ncfile = netCDF4.Dataset(os.path.join(local_path,outfname), mode='w',format='NETCDF4_CLASSIC') 
-    lat_dim = ncfile.createDimension('lat', nlat) # latitude axis
-    lon_dim = ncfile.createDimension('lon', nlon) # longitude axis
-    time_dim = ncfile.createDimension('time', None) # unlimited axis (can be appended to).
-    lat = ncfile.createVariable('lat', np.float32, ('lat',))
-    lat.units = 'degrees_north'
-    lat.long_name = 'latitude'
-    lon = ncfile.createVariable('lon', np.float32, ('lon',))
-    lon.units = 'degrees_east'
-    lon.long_name = 'longitude'
-    time = ncfile.createVariable('time', np.float32, ('time',))
-    time.units = 'one time point. Mean over models and time period'
-    time.long_name = 'time'
-    erf = ncfile.createVariable('erf_mn',np.float32,('time','lat','lon')) # note: unlimited dimension is leftmost
-    erf.units = 'W/m^2' # 
-    erf.standard_name = 'ERF models mean' # this is a CF standard name
-    sig = ncfile.createVariable('significant',np.float32,('time','lat','lon')) # note: unlimited dimension is leftmost
-    sig.units = 'truefalse' # 
-    sig.standard_name = 'T-test significance p-val<0.05' # this is a CF standard name
-    
-    lat[:]= lat4wrt
-    lon[:] = lon4wrt
-    for ilat in range(0,nlat):
-       	for ilon in range(0,nlon):	
-            erf[0,ilat,ilon] = erf4wrt[ilat,ilon] 	
-            sig[0,ilat,ilon] = hatch4wrt[ilat,ilon] 
-    
-    ncfile.close()
-
 def writenetcdf_modeltimemap(cfg,dataset,styr,endyr,field,lat4wrt,lon4wrt,expmdls,cntlmdls):
+	'''
+	
+	Arguments:
+		cfg - ESMValTool Python dictionary of information on input data
+		dataset - string of model name
+		styr - start year of model data
+		endyr - end year of model data
+		field - model field string
+		lat4wrt - 1D array of latitudes for writing 
+		lon4wrt - 1D array of longitudes for writing 
+		expmdls - numpy array of experiment models (histSST). dimension (time,lat,lon)
+		cntlmdls - numpy array of control models (histSST-piAer). dimension (time,lat,lon)
+	Results:
+		writes out model data of Effective Radiative Forcing due to Aerosols gridded time series for use in IPCC AR6 WG1 Interactive Atlas	
+	'''
     local_path = cfg['plot_dir']
     cdims=expmdls.shape
     ntime = cdims[0]
@@ -503,9 +259,6 @@ def writenetcdf_modeltimemap(cfg,dataset,styr,endyr,field,lat4wrt,lon4wrt,expmdl
     
     ncfile.close()
 
-
-def run_some_diagnostic( experexpts):
-	"""Diagnostic to be run."""
 
 def main(cfg):
 	"""Main diagnostic run function."""
