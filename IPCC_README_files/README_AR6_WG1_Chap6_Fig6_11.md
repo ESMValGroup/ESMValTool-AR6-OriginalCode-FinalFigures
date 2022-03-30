@@ -32,12 +32,12 @@ Time series of the upward top-of-the-atmosphere shortwave flux (rsut) and upward
 
 
 Diagnostic(s) used:  
-[diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py)  
+[diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py)  
 ipcc_ar6wg1_fig6.11_erf_aer_time.py imports:   
-* [diag_scripts/ar6ch6/cmapipcc.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py) 
+* [diag_scripts/ar6ch6/cmapipcc.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py) 
  
 Please describe this diagnostic:
-Script [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py]  calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.11,  The final Figure 6.11 is created from [ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb).
+Script [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py]  calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.11,  The final Figure 6.11 is created from [ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb).
 
 
 Expected data output path:
@@ -56,7 +56,7 @@ Ancillary figures and datasets:
 In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:
 
 The final Figure 6.11 is created by the following Jupyter notebook:  
-[ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb)  
+[ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb)  
 The Jupyter notebook reads in netcdf output from diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py, which are output into the recipe path:  
 - recipe_erf_histSST-piAer_Fig6.11_YYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf_time/LW_diff_timemap.nc   
 - recipe_erf_histSST-piAer_Fig6.11_YYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf_time/SW_diff_timemap.nc   
@@ -90,4 +90,3 @@ Mistral
  
 When was this machine used?  
 Last used July 2021 to produce figures from ESMValTool  
-
