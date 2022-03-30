@@ -8,7 +8,6 @@
 # Creator: Chaincy Kuo (CKuo@lbl.gov, chaincy.ipccwg1@gmail.com )
 # Creation Date:  11 March 2021
 
-
 import logging
 import os
 from pprint import pformat
@@ -36,7 +35,16 @@ from ch6_fns import compute_multiModelStats, compute_multiModelDiffStats, get_si
 logger = logging.getLogger(os.path.basename(__file__))
 
 def get_areaweight(nlat,nlon,lat,lon):
-	# determine the quandrangle area weight 
+	''' 
+		determine the quandrangle area weight 
+    Arguments:
+				nlat - integer size of lat latitudes
+				nlon - integer size of lon longitudes
+				lat - 1D array of latitude values
+				lon - 1D array of longitude values
+	Returns::
+				areaweight - 2D array of weights by lat/lon grid area 	
+  	'''
 
 	areaweight = np.zeros((nlat,nlon),dtype=float);
 	lat4wt = np.zeros((nlat,2),dtype=float);
@@ -87,6 +95,7 @@ def get_provenance_record(attributes, ancestor_files):
     return record
 
 def checkstartend(selection):
+	''' output to verify the starting and ending years '''
 	for attributes in selection:
 		logger.info("Processing dataset %s", attributes['dataset'])
 		input_file = attributes['filename']
@@ -101,10 +110,7 @@ def checkstartend(selection):
 def plot_meanmap(cfg,cubeavg,exper,field):
     """
     Arguments:
-        cube - the cube to plot
-
-    Returns:
-
+        cubeavg - the iris cube to plot, for gridded means
     """
     local_path = cfg['plot_dir']
 
@@ -134,7 +140,6 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     elif(field=='rlut'):
 	    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
 	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
-    #plt.title(dataset)
     plt.tight_layout()
     
     png_name = 'multimodelMean_%s_%s.png' % (field,exper)
@@ -142,80 +147,26 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     plt.close()
 
 
-def plot_ch4erfresponses(cfg,ch4erf,ch4erfhatch,aererf,aererfhatch,field):
-    """
-
-    """
-    local_path = cfg['plot_dir']
-    # get hatch pattern
-
-    # coordinates
-    Xplot1 = histavg.coord('longitude').points
-    Yplot1 = histavg.coord('latitude').points
-    Xplot, Yplot = np.meshgrid(Xplot1, Yplot1)
-
-    # colomaps
-    clevels=11
-    cmapnow=cmapipcc.get_ipcc_cmap('temperature',clevels)
-    cmapip=ListedColormap(np.flipud(cmapnow))
-
-    plotnow=(histavg.data-histcntlavg.data)
-
-    # cumulative sum
-    plotflat=np.resize(plotnow,((cdims[1]*cdims[2]),))
-    plothist= np.histogram(plotflat,bins=20)
-    plotcum = np.cumsum(plothist[0][:])
-    plotcumx = np.zeros((len(plotcum),))
-    for i in range(0,len(plotcum)):
-        plotcumx[i] = (plothist[1][i+1]+plothist[1][i])/2.0  # plothist is a lsit, not a tuple, so use this method of indexing
-
-
-    nrows=1
-    ncols=1
-
-    cmax = np.max([np.abs(plotnow.max()),np.abs(plotnow.min())])
-    cmin = -cmax
-    cincr=2.0*cmax/float(clevels-1)
-    crange=np.arange(cmin,cmax+cincr,cincr)
-
-    fig = plt.figure(figsize=(ncols*7, nrows*5))
-    ax = fig.add_subplot(nrows, ncols, 1, projection=ccrs.Robinson(central_longitude=180))
-    im=ax.contourf(Xplot,Yplot,plotnow,crange,cmap=cmapip, transform=ccrs.PlateCarree())
-    imh=ax.contourf(Xplot,Yplot,hatchplot,3,colors='none', hatches=['','xx','\\\\'], alpha=0.0, transform=ccrs.PlateCarree())
-    ax.coastlines()
-    ax.set_global()
-    cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
-    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
-    if(field=='rsut'):
-	    plt.suptitle(r'Shortwave Effective Radiative Forcing',fontsize=16)
-	    plt.title(r'',fontsize=14)
-    elif(field=='rlut'):
-	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
-	    plt.title(r'',fontsize=14)
-
-    if(nrows==2):
-            ax2 = fig.add_subplot(nrows, ncols, 2)
-            ax2.plot(plotcumx,plotcum)
-            ax2.set_xlabel(r'W-m$^{-1}$ ',fontsize=12)
-            ax2.set_ylabel(r'Cumulative')
-
-    plt.tight_layout()
-    
-    png_name = 'diff_%s.png' % field
-    plt.savefig(os.path.join(local_path, png_name))
-    plt.close()
-
 def get_erfmap(exptavg,exptall,cntlavg,cntlall):
     """
+	Calculate the gridded effective radiative forcing map, and determine hatched areas.
+
+	Arguments:
+		exptavg - gridded mean of the model experiments (CMIP6 'historical')
+		exptall - all the model experiment (CMIP6 'historical'), to determine hatching statistics
+		cntlavg - gridded mean of the model control (AerChemMIP 'hist-piAer')
+		cntlall - all the model experiment (AerChemMIP 'hist-piAer'), to determine hatching statistics
+	Returns:
+		erfmap - the effective radiative forcing map. [W/m^2]
+		hatchplot - map of binary values. 1 - grid is hatched, 0 - grid is not hatched.	
     """
 
-    plotnow=(exptavg.data-cntlavg.data)
+    erfmap =(exptavg.data-cntlavg.data)
     # ERF sign convention
-    plotnow = -plotnow   
+    erfmap = -erfmap
 
     # get hatch pattern
     cdims=exptall.shape
-    hatchnow = np.zeros((cdims[1],cdims[2]))
     hatchplot = np.zeros((cdims[1],cdims[2]))
     for ilat in range(0,cdims[1]):
         for ilon in range(0,cdims[2]):
@@ -225,14 +176,18 @@ def get_erfmap(exptavg,exptall,cntlavg,cntlall):
             brs=np.resize(b,(cdims[0],))
 
             varthresh = np.sqrt(2)*1.645*b.std() 
-	    # FGD guidelines on hatching threshold. hatch were not significant 
+	    # FGD guidelines on hatching threshold. hatch where not significant 
             if( np.abs(a.mean()) < (np.abs(b.mean())+varthresh)):		
                 hatchplot[ilat,ilon] = 1   
 
-    return plotnow,hatchplot
+    return erfmap,hatchplot
 
     
 def writenetcdf_erfhatch(cfg,field,lat4wrt,lon4wrt,erf4wrt,hatch4wrt):
+	'''
+	Write out the erf and hatch patterns into a netCDF file, 
+	netCDF file to be read into ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb to create IPCC AR6 WG1 Figure 6.10b
+	'''
     local_path = cfg['plot_dir']
     nlat = lat4wrt.size	
     nlon = lon4wrt.size
