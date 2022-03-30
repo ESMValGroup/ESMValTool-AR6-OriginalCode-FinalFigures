@@ -25,7 +25,7 @@ ESMValTool Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe(s) used:  
-[recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml)  
+[recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml)  
 Please describe this recipe:  
 Time series of the upward top-of-the-atmosphere shortwave flux (rsut) and upward top-of-the-atmosphere flux (rlut) at each grid. The diagnostic scripts will calculate the annual mean effective radiative forcing (ERF) due to aerosols differencing shortwave and longwave fluxes between histSST-piAer and histSST AerChemMIP experiments.  
 
