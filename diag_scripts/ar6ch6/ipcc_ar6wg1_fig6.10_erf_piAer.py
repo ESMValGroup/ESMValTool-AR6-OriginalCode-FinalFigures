@@ -135,10 +135,10 @@ def plot_meanmap(cfg,cubeavg,exper,field):
     ax.set_global()
     cb=fig.colorbar(im,fraction=0.05,pad=0.05,orientation='horizontal')
     if(field=='rsut'):
-	    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
+	    cb.set_label(r'W-m$^{-2}$ ',fontsize=12)
 	    plt.suptitle(r'Shortwave Effective Radiative Forcing',fontsize=16)
     elif(field=='rlut'):
-	    cb.set_label(r'W-m$^{-1}$ ',fontsize=12)
+	    cb.set_label(r'W-m$^{-2}$ ',fontsize=12)
 	    plt.suptitle(r'Longwave Effective Radiative Forcing',fontsize=16)
     plt.tight_layout()
     
