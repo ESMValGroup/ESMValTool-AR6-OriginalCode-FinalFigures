@@ -1,0 +1,21 @@
+SOURCE: CMIP5
+!============
+variable_entry:    scen
+!============
+modeling_realm:    land
+!----------------------------------
+! Variable attributes:
+!----------------------------------
+standard_name:
+units:             1e6 km2
+cell_methods:      area: time: mean
+cell_measures:
+long_name:         Snow Cover Extent in all Northern-Hemisphere grid cells
+comment:           sce is the area of land with snow on the ground
+!----------------------------------
+! Additional variable information:
+!----------------------------------
+dimensions:        time
+type:              real
+!----------------------------------
+!
