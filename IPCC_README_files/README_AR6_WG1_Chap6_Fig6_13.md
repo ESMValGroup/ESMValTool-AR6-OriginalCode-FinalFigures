@@ -13,7 +13,7 @@ Multi-model mean surface air temperature response due to aerosol changes between
 
 Author list:
 ------------
-- Kuo, C: Lawrence Berkeley National Laboratory, chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only) chaincy-ipcc, chaincy-cal 
+- Kuo, C: Lawrence Berkeley National Laboratory, USA; chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only); githubid:chaincy-ipcc, githubid:chaincy-cal 
 
 ESMValTool Branch:
 ------------------
