@@ -13,24 +13,24 @@ Multi-model mean surface air temperature response due to aerosol changes between
 
 Author list:
 ------------
-- Kuo, C: Lawrence Berkeley National Laboratory, chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only) chaincy-ipcc, chaincy-cal 
+- Kuo, C: Lawrence Berkeley National Laboratory, USA; chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only); githubid:chaincy-ipcc, githubid:chaincy-cal 
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: [IPCC_AR6_WG1_Ch6] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6)
+- ESMValTool-AR6-OriginalCode-FinalFigures: [IPCC_AR6_WG1_Ch6](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipe(s) used:   
-[recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml)   
+[recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml)   
 Please describe this recipe:  
 This recipe creates the plots of the mean change in surface air temperature due to aerosols, as a geomap plot and a zonal mean change plot, over the time period 1995-2014.  IPCC AR6 WG1  Figure 6.13 shows the surface air temperature change due to aerosols as the difference in the CMIP6 model variable 'tas' for coupled atmosphere-ocean models from the CMIP6 'historical' experiment and AerChemMIP experiments 'hist-piAer'.   
 
 Diagnostic(s) used:   
-[diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py)   
-[diag_scripts/ar6ch6/cmapipcc.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py)  
-[diag_scripts/ar6ch6/ch6_fns.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ch6_fns.py)    
+[diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py)   
+[diag_scripts/ar6ch6/cmapipcc.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py)  
+[diag_scripts/ar6ch6/ch6_fns.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ch6_fns.py)    
 Please describe this diagnostic:      
 The mean change in surface air temperature ('tas') due to aerosols, between the coupled atmospheric-ocean models from CMIP6 'historical' experiments and AerChemMIP 'hist-piAer' experiments are calculated in grids over the years 1995-2014.   
 
@@ -53,7 +53,7 @@ Software versions, name of environment file (see **save conda environment** in C
 Hardware description:
 ---------------------
 What machine was used:  
-Mistral    
+Mistral
+
 When was this machine used?
 Last used July 2021 to produce figures from ESMValTool   
-

@@ -16,27 +16,27 @@ Panel (a) shows the spatial distribution of the net ERF with area-weighted globa
 
 Author list:
 ------------
-- Kuo, C: Lawrence Berkeley National Laboratory, chaincy@berkeley.edu, chaincy@ipccwg1@gmail.com (lead only) chaincy-ipcc, chaincy-cal 
+- Kuo, C: Lawrence Berkeley National Laboratory, USA; chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only); githubid:chaincy-ipcc, githubid:chaincy-cal 
 
 ESMValTool Branch:
 ------------------
-- ESMValTool-AR6-OriginalCode-FinalFigures: [IPCC_AR6_WG1_Ch6] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6)
+- ESMValTool-AR6-OriginalCode-FinalFigures: [IPCC_AR6_WG1_Ch6](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6)
 
 
 Recipe & diagnostics:
 ---------------------
 Recipe(s) used:   
-[recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml)   
+[recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml)   
 Please describe this recipe:  
 Collect the upward shortwave and longwave fluxes at the top of the atmosphere, for AerChemMIP (Collins et al,2017,GMD,10(2),585-607, https://doi.org/10.5194/gmd-10-585-2017) experiments histSST and histSST-piAer, over the period 1995-2014.
 
 
 Diagnostic(s) used:   
-[diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py)   
+[diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py)   
 The above diagnostic imports:  
-[diag_scripts/ar6ch6/cmapipcc.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py)  
-[diag_scripts/ar6ch6/ch6_fns.py] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ch6_fns.py)    
-[diag_scripts/ar6ch6/chem_div_disc.txt] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/chem_div_disc.txt)  
+[diag_scripts/ar6ch6/cmapipcc.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/cmapipcc.py)  
+[diag_scripts/ar6ch6/ch6_fns.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/ch6_fns.py)    
+[diag_scripts/ar6ch6/chem_div_disc.txt](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/diag_scripts/ar6ch6/chem_div_disc.txt)  
 
 Please describe this diagnostic:  
 Calculates the spatial distribution of the net ERF with area-weighted global mean ERF, calculated from the difference in upward shortwave and longwave fluxes at the top of the atmosphere, between AerChemMIP experiments histSST and histSST-piAer, averaged over 1995-2014.
@@ -61,7 +61,7 @@ Ancillary figures and datasets:
 -------------------------------
 In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:  
 Panel b) of Figure 6.10 is created by the file  
-[ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb] (https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb)  
+[ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb)  
 It reads in netcdf output from diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py, which are output into the recipe path:  
 - recipe_erf_histSST-piAer_Fig6.10_YYYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf/erf_hatch_LW.nc
 - recipe_erf_histSST-piAer_Fig6.10_YYYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf/erf_hatch_SW.nc
@@ -96,4 +96,3 @@ Mistral
  
 When was this machine used?  
 Last used July 2021 to produce figures from ESMValTool  
-
