@@ -16,7 +16,7 @@ Panel (a) shows the spatial distribution of the net ERF with area-weighted globa
 
 Author list:
 ------------
-- Kuo, C: Lawrence Berkeley National Laboratory, chaincy@berkeley.edu, chaincy@ipccwg1@gmail.com (lead only) chaincy-ipcc, chaincy-cal 
+- Kuo, C: Lawrence Berkeley National Laboratory, USA; chaincy@berkeley.edu, chaincy.ipccwg1@gmail.com (lead only); githubid:chaincy-ipcc, githubid:chaincy-cal 
 
 ESMValTool Branch:
 ------------------
