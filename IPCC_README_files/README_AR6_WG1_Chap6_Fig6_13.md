@@ -23,7 +23,7 @@ ESMValTool Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used:   
-[recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/recipes/ar6ch6/recipe_tas_hist-piAer_Fig6.13.yml)   
+[recipes/ar6ch6/recipe_ckuo_ipcc_6_13_tas_hist-piAer.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/recipes/ar6ch6/recipe_ckuo_ipcc_6_13_tas_hist-piAer.yml)   
 
 Recipe description:  
 This recipe creates the plots of the mean change in surface air temperature due to aerosols, as a geomap plot and a zonal mean change plot, over the time period 1995-2014.  IPCC AR6 WG1  Figure 6.13 shows the surface air temperature change due to aerosols as the difference in the CMIP6 model variable 'tas' for coupled atmosphere-ocean models from the CMIP6 'historical' experiment and AerChemMIP experiments 'hist-piAer'.   
