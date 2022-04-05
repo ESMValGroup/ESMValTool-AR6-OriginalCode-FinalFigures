@@ -61,7 +61,7 @@ Ancillary figures and datasets:
 -------------------------------
 In addition to the main figure, diagnostics may produce several figures and datasets along the way or several versions of the main figure. Please use this space to highlight anything that may be useful for future iterations:  
 Panel b) of Figure 6.10 is created by the file  
-[ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/IPCC_AR6_WG1_Ch6/ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb)  
+[IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/main/IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb)  
 It reads in netcdf output from [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py), which are output into the recipe path:  
 - recipe_erf_histSST-piAer_Fig6.10_YYYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf/erf_hatch_LW.nc
 - recipe_erf_histSST-piAer_Fig6.10_YYYYMMDD_HHMMSS/plots/diffexpts/ar6fig6_erf/erf_hatch_SW.nc
@@ -72,11 +72,11 @@ Additional datasets:
 The AR6 WG1 Atlas reference regions are used to produce Figure 6.10b.    
 Where are they on the computational machine or in the respository?   
 On the IPCC_AR6_WG1_Ch6 branch of ESMValTool-AR6-OriginalCode-FinalFigures:   
-/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shp  
-/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.dbf  
-/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.prj  
-/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.rda  
-/ESMValTool-AR6-OriginalCode-FinalFigures/ipynb/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shx  
+diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shp  
+[diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.dbf](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.dbf)  
+[diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.prj](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.prj)  
+[diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.rda](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.rda)  
+[diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shx](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shx)  
 
 What are their access permissions/Licenses?  
 The license details can be found at https://github.com/IPCC-WG1/Atlas/blob/main/LICENSE.md    
@@ -85,7 +85,7 @@ Software description:
 ---------------------
 - ESMValTool environment file: [IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6/IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml)  
 - Other software used:  
-A Jupyter notebook (ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb) is used to create Figure 6.10 panel b. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
+A Jupyter notebook ([ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/main/IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.10b_FGD_submit.ipynb)) is used to create Figure 6.10 panel b. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
 
 Hardware description:
 ---------------------
