@@ -24,7 +24,7 @@ ESMValTool Branch:
 Recipe & diagnostics:
 ---------------------
 Recipe used:  
-[recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.11.yml)
+[recipes/ar6ch6/recipe_ckuo_ipcc_6_11_erf_histSST-piAer.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/recipes/ar6ch6/recipe_ckuo_ipcc_6_11_erf_histSST-piAer.yml)
 
 Recipe description:  
 Time series of the upward top-of-the-atmosphere shortwave flux (rsut) and upward top-of-the-atmosphere flux (rlut) at each grid. The diagnostic scripts will calculate the annual mean effective radiative forcing (ERF) due to aerosols differencing shortwave and longwave fluxes between histSST-piAer and histSST AerChemMIP experiments.  
@@ -34,8 +34,8 @@ Diagnostics used:
 ipcc_ar6wg1_fig6.11_erf_aer_time.py imports:   
 * [diag_scripts/ar6ch6/cmapipcc.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/cmapipcc.py) 
  
-Please describe this diagnostic:
-Script [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py] calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.11, the final Figure 6.11 is created from [IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/main/IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb).
+Diagnostics description:
+Script [diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py) calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.11, the final Figure 6.11 is created from [IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/main/IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb).
 
 
 Expected data output path:
@@ -58,9 +58,7 @@ The Jupyter notebook reads in netcdf output from [diag_scripts/ar6ch6/ipcc_ar6wg
 
 Additional datasets:
 --------------------
-What additional datasets were used to produce this figure?   
 The AR6 WG1 Atlas reference regions are used to produce Figure 6.11.    
-Where are they on the computational machine or in the respository?   
 On the IPCC_AR6_WG1_Ch6_ESMValTool branch of ESMValTool-AR6-OriginalCode-FinalFigures:   
 [diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shp](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.shp)  
 [diag_scripts/ar6ch6//data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.dbf](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/diag_scripts/ar6ch6/data/regionmask/AR6_WGI_referenceRegions/AR6_WGI_referenceRegions.dbf)  
@@ -73,7 +71,7 @@ The license details can be found at https://github.com/IPCC-WG1/Atlas/blob/main/
 
 Software description:
 ---------------------
-- ESMValTool environment file: [IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6/IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml)
+- ESMValTool environment file: [IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/main/IPCC_environments/ar6wg1_chap6_figs_conda_environment.yml)
 - Other software used:  
 A Jupyter notebook ([ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/tree/main/IPCC_additional_scripts/ipynb/ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb)) is used to create Figure 6.11. See section "Ancillary figures and datasets" and "Additional datasets", above, for information.  
 
