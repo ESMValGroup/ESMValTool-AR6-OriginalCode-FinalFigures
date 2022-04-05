@@ -56,4 +56,4 @@ diagnostics:
         preprocessor: preprocessor2
     scripts:
       ar6fig6_erf: 
-        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py
+        script: ar6ch6/ipcc_ar6wg1_fig6.10_erf_piAer.py

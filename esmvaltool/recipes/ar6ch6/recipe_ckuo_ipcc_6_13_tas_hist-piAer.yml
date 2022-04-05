@@ -63,5 +63,5 @@ diagnostics:
         preprocessor: preprocessor_tas
     scripts:
       ar6fig6_piAer: 
-        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py
+        script: ar6ch6/ipcc_ar6wg1_fig6.13_tas_piAer_coupledOnly.py
         piexpt: piAer
