@@ -1,0 +1,61 @@
+# ESMValTool
+# recipe_erf_histSST-piAer_Fig6.11.yml  
+---
+documentation:
+  description: 
+    Time series of the upward top-of-the-atmosphere shortwave flux (rsut) and upward top-of-the-atmosphere flux (rlut) at each grid. The diagnostic scripts will calculate the annual mean effective radiative forcing (ERF) due to aerosols differencing shortwave and longwave fluxes between histSST-piAer and histSST AerChemMIP experiments.  Script ipcc_ar6wg1_fig6.11_erf_aer_time.py calculates the gridded annual mean ERF of all models for IPCC AR6 WG1 Figure 6.11, while ipcc_ar6wg1_interactiveatlas_erf_aer_time.py calculates gridded the annual mean ERF for individual models, for use in the IPCC AR6 WG1 Interactive Atlas.   The final Figure 6.11  is created from ipcc_ar6wg1_Fig6.11_FGD_submit.ipynb.
+
+  authors:
+    - kuo_chaincy
+
+  maintainer:
+    - kuo_chaincy
+
+  references:
+    - acknow_project
+
+  projects:
+    - esmval
+
+datasets:
+#histSST-piAer: &histSST-piAer _models
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gr1}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST-piAer,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p3f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST-piAer, ensemble: r1i1p1f2, start_year: 1850,  end_year: 2014, grid: gn}
+#histSST_models: &histSST_models
+  - {dataset: MIROC6,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MPI-ESM-1-2-HAM,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: MRI-ESM2-0,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GFDL-ESM4,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gr1}
+  - {dataset: NorESM2-LM,  project: CMIP6,  mip: Amon,  exp: histSST,  ensemble: r1i1p1f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: GISS-E2-1-G,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p3f1,  start_year: 1850,  end_year: 2014, grid: gn}
+  - {dataset: UKESM1-0-LL,  project: CMIP6,  mip: Amon,  exp: histSST, ensemble: r1i1p1f2, start_year: 1850,  end_year: 2014, grid: gn}
+
+preprocessors:
+  preprocessor2:
+    regrid:
+      target_grid: 1x1 
+      scheme: linear
+
+diagnostics:
+
+  diffexpts:
+    description: AerChemMIP  histSST 
+    themes:
+      - phys
+    realms:
+      - atmos
+    variables:
+      rlut:
+        preprocessor: preprocessor2
+      rsut:
+        preprocessor: preprocessor2
+    scripts:
+      ar6fig6_erf_time: 
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ipcc_ar6wg1_fig6.11_erf_aer_time.py
+      ar6ia_erf: 
+        script: /pf/b/b381044/my_esmvt/diag_scripts/ar6ch6/ipcc_ar6wg1_interactiveatlas_erf_aer_time.py
