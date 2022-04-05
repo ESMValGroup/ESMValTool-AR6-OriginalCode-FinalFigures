@@ -25,8 +25,7 @@ ESMValTool Branch:
 
 Recipe & diagnostics:
 ---------------------
-Recipe used:   
-[recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/recipes/ar6ch6/recipe_ckuo_ipcc_6_10_erf_histSST-piAer.yml)   
+Recipe used: [recipes/ar6ch6/recipe_erf_histSST-piAer_Fig6.10.yml](https://github.com/ESMValGroup/ESMValTool-AR6-OriginalCode-FinalFigures/blob/IPCC_AR6_WG1_Ch6_ESMValTool/esmvaltool/recipes/ar6ch6/recipe_ckuo_ipcc_6_10_erf_histSST-piAer.yml)   
 
 Recipe description:  
 Collect the upward shortwave and longwave fluxes at the top of the atmosphere, for AerChemMIP (Collins et al,2017,GMD,10(2),585-607, https://doi.org/10.5194/gmd-10-585-2017) experiments histSST and histSST-piAer, over the period 1995-2014.
